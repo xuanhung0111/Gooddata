@@ -1,0 +1,177 @@
+package com.gooddata.qa.graphene.hds;
+
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.fragments.greypages.hds.StorageFragment;
+import com.gooddata.qa.utils.graphene.Screenshots;
+
+@Test(groups = { "hds" }, description = "Basic verification of hds restapi in GD platform")
+public class BasicHDSRestTest extends AbstractHDSTest {
+	
+	private String storageUrl;
+	
+	private static final String STORAGE_TITLE = "HDS storage";
+	private static final String STORAGE_DESCRIPTION = "HDS description";
+	private static final String STORAGE_AUTH_TOKEN = "abcd";
+	private static final String STORAGE_COPY_OF = "/gdc/storages/${storageId}";
+	
+	@BeforeClass
+	public void initStartPage() {
+		startPage = PAGE_GDC_STORAGES;
+	}
+	
+	@Test(groups = {"hdsInit"})
+	public void resourceStoragesNotAvailableForAnonymous() throws JSONException {
+		waitForElementPresent(BY_GP_PRE_JSON);
+		Assert.assertTrue(browser.getCurrentUrl().contains("gdc/account/token"), "Redirect to /gdc/account/token wasn't done for anonymous user");
+	}
+
+	@Test(groups = {"hdsInit"}, dependsOnMethods = { "resourceStoragesNotAvailableForAnonymous" })
+	public void resourceStoragesAvailable() throws JSONException {
+		validSignInWithDemoUser(true);
+		
+		loadPlatformPageBeforeTestMethod();
+		JSONObject json = loadJSON();
+		Assert.assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
+		Screenshots.takeScreenshot(browser, "hds-base-resource", this.getClass());
+	}
+	
+	@Test(dependsOnGroups = {"hdsInit"})
+	public void gpFormsAvailable() {
+		waitForElementPresent(BY_GP_FORM);
+	}
+	
+	/** ===================== Section with valid cases ================= */
+	
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void createStorage() throws JSONException {
+		waitForElementVisible(BY_GP_FORM);
+		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
+		Assert.assertTrue(storage.verifyValidCreateStorageForm(), "Create form is invalid");
+		storageUrl = storage.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, null);
+	}
+	
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void verifyStorageCreateFormPresentWithTrailingSlash() throws JSONException {
+		browser.get(getRootUrl() + PAGE_GDC_STORAGES + "/");
+		waitForElementVisible(BY_GP_FORM);
+	}
+	
+	@Test(dependsOnMethods = { "createStorage" })
+	public void verifyStorage() throws JSONException {
+		openStorageUrl();
+		Screenshots.takeScreenshot(browser, "hds-simple-storage", this.getClass());
+		JSONObject json = loadJSON();
+		Assert.assertTrue(json.has("storage"), "Storage element isn't present");
+		Assert.assertTrue(json.getJSONObject("storage").getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
+		Assert.assertTrue(json.getJSONObject("storage").getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
+		Assert.assertTrue(json.getJSONObject("storage").getString("authorizationToken").equals(STORAGE_AUTH_TOKEN), "Storage authorizationToken doesn't match");
+		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
+		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
+		Assert.assertTrue(json.getJSONObject("storage").getString("status").equals("ENABLED"), "Storage isn't enabled");
+		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
+		String creatorUrl = json.getJSONObject("storage").getString("creator");
+		browser.get(getBasicRootUrl() + storageUrl + "/users");
+		JSONObject jsonUsers = loadJSON();
+		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("parent").equals(storageUrl), "Storage users parent link doesn't match");
+		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("self").equals(storageUrl + "/users"), "Storage users self link doesn't match");
+		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").length() == 1, "Number of users doesn't match");
+		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").getJSONObject(0).getJSONObject("user").getString("profile").equals(creatorUrl), "Creator in users doesn't match with creator in storage");
+		browser.get(getBasicRootUrl() + creatorUrl);
+		JSONObject jsonUser = loadJSON();
+		Assert.assertTrue(jsonUser.getJSONObject("accountSetting").getString("login").equals(user), "Login of user in profile doesn't match");
+	}
+	
+	@Test(dependsOnMethods = { "verifyStorage" })
+	public void updateStorage() throws JSONException {
+		openStorageUrl();
+		waitForElementVisible(BY_GP_FORM);
+		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
+		Assert.assertTrue(storage.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
+		storage.updateStorage(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated");
+		storage.verifyValidEditStorageForm(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated");
+		Screenshots.takeScreenshot(browser, "hds-updated-storage", this.getClass());
+	}
+	
+	@Test(dependsOnMethods = { "createStorage" })
+	public void verifyStorageUpdateFormPresentWithTrailingSlash() throws JSONException {
+		browser.get(getBasicRootUrl() + storageUrl + "/");
+		waitForElementVisible(BY_GP_FORM);
+	}
+	
+	@Test(dependsOnMethods = { "updateStorage" })
+	public void deleteStorage() throws JSONException {
+		openStorageUrl();
+		waitForElementVisible(BY_GP_FORM_SECOND);
+		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM_SECOND));
+		Assert.assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
+		storage.deleteStorage();
+	}
+	
+	private void openStorageUrl() {
+		browser.get(getBasicRootUrl() + storageUrl);
+		waitForElementVisible(BY_GP_FORM);
+		waitForElementPresent(BY_GP_PRE_JSON);
+	}
+	
+	/** ===================== Section with invalid cases ================= */
+	
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void createStorageWithoutTitle() throws JSONException {
+		createInvalidStorage(null, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, null, "Validation failed");
+	}
+	
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void createStorageWithoutDescription() throws JSONException {
+		createInvalidStorage(STORAGE_TITLE, null, STORAGE_AUTH_TOKEN, null, "Validation failed");
+	}
+	
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void createStorageWithoutAuthToken() throws JSONException {
+		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, null, "Validation failed");
+	}
+	
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void createStorageWithInvalidCopyOfURI() throws JSONException {
+		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, STORAGE_COPY_OF, "Malformed request");
+	}
+	
+	@Test(dependsOnMethods = { "createStorage" })
+	public void updateStorageWithEmptyTitle() throws JSONException {
+		invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "Validation failed");
+	}
+	
+	@Test(dependsOnMethods = { "createStorage" })
+	public void updateStorageWithEmptyDescription() throws JSONException {
+		invalidUpdateOfStorage(STORAGE_TITLE, null, "Validation failed");
+	}
+	
+	private void createInvalidStorage(String title, String description, String authorizationToken, String copyOf, String expectedErrorMessage) throws JSONException {
+		waitForElementVisible(BY_GP_FORM);
+		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
+		Assert.assertTrue(storage.verifyValidCreateStorageForm(), "Create form is invalid");
+		storage.fillCreateStorageForm(title, description, authorizationToken, copyOf);
+		verifyErrorMessage(expectedErrorMessage, PAGE_GDC_STORAGES);
+	}
+	
+	private void invalidUpdateOfStorage(String title, String description, String expectedErrorMessage) throws JSONException {
+		openStorageUrl();
+		waitForElementVisible(BY_GP_FORM);
+		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
+		Assert.assertTrue(storage.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
+		storage.updateStorage(title, description);
+		verifyErrorMessage(expectedErrorMessage, storageUrl);
+	}
+	
+	private void verifyErrorMessage(String messageSubstring, String expectedPage) throws JSONException {
+		Assert.assertTrue(browser.getCurrentUrl().endsWith(expectedPage), "Browser was redirected at another page");
+		JSONObject json = loadJSON();
+		String errorMessage = json.getJSONObject("error").getString("message");
+		Assert.assertTrue(errorMessage.contains(messageSubstring), "Another error message present: " + errorMessage);
+	}
+}

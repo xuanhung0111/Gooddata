@@ -1,0 +1,52 @@
+package com.gooddata.qa.graphene.common;
+
+import org.jboss.arquillian.graphene.enricher.findby.FindBy;
+import org.openqa.selenium.By;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.AbstractTest;
+import com.gooddata.qa.graphene.fragments.common.LoginFragment;
+
+
+@Test(groups = { "login" }, description = "Tests for basic login functionality in GD platform")
+public class LoginPageTest extends AbstractTest {
+
+	public static final By BY_LOGOUT_LINK = By.xpath("//a[@class='s-logout']/../../li[2]");
+	
+	@FindBy(id="loginPanel")
+	LoginFragment loginFragment;
+	
+	@BeforeClass
+	public void initStartPage() {
+		startPage = "login.html";
+	}
+	
+	@Test(groups = {"loginInit"})
+	public void gd_Login_001_LoginPanel() {
+		waitForElementVisible(BY_LOGIN_PANEL);
+		Assert.assertTrue(loginFragment.allLoginElementsAvailable(), "Login panel with valid elements is available");
+	}
+	
+	@Test(dependsOnGroups = {"loginInit"})
+	public void gd_Login_002_SignInAndSignOut() throws InterruptedException {
+		loginFragment.login(user, password);
+		waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		browser.findElement(BY_LOGGED_USER_BUTTON).click();
+		browser.findElement(BY_LOGOUT_LINK).click();
+		waitForElementVisible(BY_LOGIN_PANEL);
+	}
+	
+	@Test(dependsOnGroups = {"loginInit"})
+	public void gd_Login_003_SignInWithEmptyPassword() {
+		loginFragment.login(user, "");
+		loginFragment.waitForErrorMessageDisplayed();
+	}
+	
+	@Test(dependsOnGroups = {"loginInit"})
+	public void gd_Login_004_SignInWithInvalidPassword() {
+		loginFragment.login(user, "abcdefgh");
+		loginFragment.waitForErrorMessageDisplayed();
+	}
+}

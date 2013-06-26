@@ -1,0 +1,181 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.gooddata.qa</groupId>
+	<artifactId>ui-tests-graphene</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>GoodData UI tests with Graphene (using TestNG)</name>
+	<url>https://confluence.intgdc.com/display/Quality/Graphene+UI+Tests</url>
+
+	<modules>
+		<module>ui-tests-core</module>
+		<module>ui-tests-hds</module>
+		<module>ui-tests-connectors</module>
+		<module>ui-tests-dashboards</module>
+		<module>ui-tests-reports</module>
+		<module>ui-tests-tools</module>
+		<module>ui-fragments</module>
+		<module>ui-tests-ccc</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<browser>firefox</browser>
+		<testng.suite.xml>testng-basic.xml</testng.suite.xml>
+
+		<propertiesPath>${basedir}/ui-tests-core/src/test/resources/variables-env-test.properties</propertiesPath>
+
+		<skipTests>false</skipTests>
+		
+		<version.org.jboss.arquillian>1.0.3.Final</version.org.jboss.arquillian>
+		<version.org.jboss.arquillian.drone>1.2.0.Alpha2</version.org.jboss.arquillian.drone>
+		<version.org.jboss.arquillian.graphene2>2.0.0.Alpha4</version.org.jboss.arquillian.graphene2>
+		<version.org.seleniumhq.selenium>2.32.0</version.org.seleniumhq.selenium>
+		<version.org.testng>6.8.5</version.org.testng>
+		<version.org.apache.maven.surefire-plugin>2.14.1</version.org.apache.maven.surefire-plugin>
+		<json-path.version>0.8.1</json-path.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.arquillian.extension</groupId>
+				<artifactId>arquillian-drone-bom</artifactId>
+				<type>pom</type>
+				<version>${version.org.jboss.arquillian.drone}</version>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian</groupId>
+				<artifactId>arquillian-bom</artifactId>
+				<type>pom</type>
+				<version>${version.org.jboss.arquillian}</version>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian.selenium</groupId>
+				<artifactId>selenium-bom</artifactId>
+				<version>${version.org.seleniumhq.selenium}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${version.org.testng}</version>
+		</dependency>
+
+		<!-- Arquillian TestNG Standalone -->
+		<dependency>
+			<groupId>org.jboss.arquillian.testng</groupId>
+			<artifactId>arquillian-testng-standalone</artifactId>
+		</dependency>
+
+		<!-- Arquillian TestNG missing dependencies -->
+		<dependency>
+			<groupId>org.jboss.arquillian.core</groupId>
+			<artifactId>arquillian-core-impl-base</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.test</groupId>
+			<artifactId>arquillian-test-impl-base</artifactId>
+		</dependency>
+
+		<!-- Graphene dependency chain - imports all other dependencies required -->
+		<dependency>
+			<groupId>org.jboss.arquillian.graphene</groupId>
+			<artifactId>arquillian-graphene</artifactId>
+			<version>${version.org.jboss.arquillian.graphene2}</version>
+			<type>pom</type>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<version>${json-path.version}</version>
+		</dependency>
+
+		<!-- Arquillian extension for video recording -->
+		<!-- 
+		<dependency> 
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-screen-recorder</artifactId> 
+			<version>1.0.0.Alpha2-SNAPSHOT</version>
+		</dependency> 
+		-->
+	</dependencies>
+	
+	<!-- no tests by default -->
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${version.org.apache.maven.surefire-plugin}</version>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	
+	<profiles>
+		<profile>
+			<id>selenium</id>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-compiler-plugin</artifactId>
+							<configuration>
+								<source>1.6</source>
+								<target>1.6</target>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-surefire-plugin</artifactId>
+							<executions>
+								<execution>
+									<id>surefire-tests</id>
+									<phase>integration-test</phase>
+									<goals>
+										<goal>test</goal>
+									</goals>
+									<configuration>
+										<skip>${skipTests}</skip>
+										<testFailureIgnore>true</testFailureIgnore>
+										<suiteXmlFiles>
+											<suiteXmlFile>src/test/resources/${testng.suite.xml}</suiteXmlFile>
+										</suiteXmlFiles>
+										<systemProperties>
+											<property>
+												<name>browser</name>
+												<value>${browser}</value>
+											</property>
+											<property>
+												<name>propertiesPath</name>
+												<value>${propertiesPath}</value>
+											</property>
+										</systemProperties>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
+</project>
