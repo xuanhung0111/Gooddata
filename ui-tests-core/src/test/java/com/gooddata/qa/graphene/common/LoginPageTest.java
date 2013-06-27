@@ -36,6 +36,7 @@ public class LoginPageTest extends AbstractTest {
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
 		browser.findElement(BY_LOGGED_USER_BUTTON).click();
+		waitForElementVisible(BY_LOGOUT_LINK);
 		browser.findElement(BY_LOGOUT_LINK).click();
 		waitForElementVisible(BY_LOGIN_PANEL);
 	}
