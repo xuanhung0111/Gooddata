@@ -46,8 +46,8 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	public void initProject(String projectTitle, Connectors connectorType, int checkIterations) throws JSONException, InterruptedException {
 		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
 		waitForElementVisible(BY_GP_FORM);
-		ProjectFragment projects = Graphene.createPageFragment(ProjectFragment.class, browser.findElement(BY_GP_FORM));
-		projectId = projects.createProject(projectTitle, "", connectorType.getTemplate(), authorizationToken, projectCheckLimit);
+		ProjectFragment project = Graphene.createPageFragment(ProjectFragment.class, browser.findElement(BY_GP_FORM));
+		projectId = project.createProject(projectTitle, "", connectorType.getTemplate(), authorizationToken, projectCheckLimit);
 		System.out.println("Project with ID enabled: " + projectId);
 	}
 	

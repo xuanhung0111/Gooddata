@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
 
 @Test(groups = { "login" }, description = "Tests for basic login functionality in GD platform")
@@ -33,6 +34,7 @@ public class LoginPageTest extends AbstractTest {
 	public void gd_Login_002_SignInAndSignOut() throws InterruptedException {
 		loginFragment.login(user, password);
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
 		browser.findElement(BY_LOGGED_USER_BUTTON).click();
 		browser.findElement(BY_LOGOUT_LINK).click();
 		waitForElementVisible(BY_LOGIN_PANEL);
