@@ -6,6 +6,7 @@ import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.fragments.ccc.LoginFragment;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class AbstractCCCTest extends AbstractTest {
 	
@@ -24,6 +25,7 @@ public class AbstractCCCTest extends AbstractTest {
 		loginFragment.login(username, password);
 		waitForElementVisible(BY_DIV_LOGGED_USER);
 		waitForElementVisible(BY_DIV_PAGE_PROCESSES);
+		Screenshots.takeScreenshot(browser, "CCC-login", this.getClass());
 	}
 	
 }
