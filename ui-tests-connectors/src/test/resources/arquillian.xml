@@ -6,7 +6,7 @@
 
 	<!-- possible options are listed at https://docs.jboss.org/author/display/ARQ/Drone -->
 	<extension qualifier="webdriver">
-		<property name="browserCapabilities">${browser}</property> <!-- user firefox directly if you want to run tests from IDE -->
+		<property name="browserCapabilities">firefox</property> <!-- ${browser} use firefox directly if you want to run tests from IDE -->
 		<property name="remoteReusable">false</property>
 		<property name="remoteAddress">http://localhost:4444/wd/hub</property>
 		<property name="chromeDriverBinary">/Applications/Google Chrome.app/Contents/MacOS/Google Chrome</property>

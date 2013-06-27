@@ -26,8 +26,8 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	protected static final By BY_GP_CONFIG_LINK = By.partialLinkText("config");
 	protected static final By BY_GP_SETTINGS_LINK = By.partialLinkText("settings");
 	
-	private static final int DEFAULT_PROJECT_CHECK_LIMIT = 48; // 4 minutes
-	private static final int DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT = 150; // 15 minutes
+	private static final int DEFAULT_PROJECT_CHECK_LIMIT = 60; // 5 minutes
+	private static final int DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT = 180; // 15 minutes
 	
 	protected int projectCheckLimit = DEFAULT_PROJECT_CHECK_LIMIT;
 	protected int integrationProcessCheckLimit = DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT;

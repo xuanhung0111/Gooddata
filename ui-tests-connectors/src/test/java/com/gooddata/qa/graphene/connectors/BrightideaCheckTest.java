@@ -34,6 +34,12 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 	};
 	
 	@BeforeClass
+	public void setCheckLimits() {
+		projectCheckLimit = 120;
+		integrationProcessCheckLimit = 720;
+	}
+	
+	@BeforeClass
 	public void loadRequiredProperties() {
 		brightideaApiKey = loadProperty("connectors.brightidea.apiKey");
 		brightideaAffiliateId = loadProperty("connectors.brightidea.affiliateId");
