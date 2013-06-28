@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.hds;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
@@ -46,6 +47,11 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		waitForElementPresent(BY_GP_FORM);
 	}
 	
+	@Test(dependsOnGroups = {"hdsInit"})
+	public void verifyDefaultResource() throws JSONException {
+		verifyDefaultResourceJSON();
+	}
+	
 	/** ===================== Section with valid cases ================= */
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
@@ -62,6 +68,11 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		waitForElementVisible(BY_GP_FORM);
 	}
 	
+	@Test(dependsOnMethods = {"createStorage"})
+	public void verifyDefaultResourceAfterStorageCreated() throws JSONException {
+		verifyDefaultResourceJSON();
+	}
+	
 	@Test(dependsOnMethods = { "createStorage" })
 	public void verifyStorage() throws JSONException {
 		openStorageUrl();
@@ -73,8 +84,9 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		Assert.assertTrue(json.getJSONObject("storage").getString("authorizationToken").equals(STORAGE_AUTH_TOKEN), "Storage authorizationToken doesn't match");
 		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
 		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getString("status").equals("ENABLED"), "Storage isn't enabled");
+		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("tables").equals(storageUrl + "/tables"), "Storage tables link doesn't match");
 		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
+		Assert.assertTrue(json.getJSONObject("storage").getString("status").equals("ENABLED"), "Storage isn't enabled");
 		String creatorUrl = json.getJSONObject("storage").getString("creator");
 		browser.get(getBasicRootUrl() + storageUrl + "/users");
 		JSONObject jsonUsers = loadJSON();
@@ -173,5 +185,24 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		JSONObject json = loadJSON();
 		String errorMessage = json.getJSONObject("error").getString("message");
 		Assert.assertTrue(errorMessage.contains(messageSubstring), "Another error message present: " + errorMessage);
+	}
+	
+	private void verifyDefaultResourceJSON() throws JSONException {
+		JSONObject json = loadJSON();
+		Assert.assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
+		JSONArray storagesItems = json.getJSONObject("storages").getJSONArray("items");
+		if (storagesItems.length() > 0) {
+			JSONObject firstStorage = storagesItems.getJSONObject(0).getJSONObject("storage");
+			Assert.assertTrue(firstStorage.has("title"), "Storage title isn't present");
+			Assert.assertTrue(firstStorage.has("description"), "Storage description isn't present");
+			Assert.assertTrue(firstStorage.has("authorizationToken"), "Storage authorizationToken isn't present");
+			Assert.assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
+			Assert.assertTrue(firstStorage.getJSONObject("links").has("self"), "Storage self link isn't present");
+			Assert.assertTrue(firstStorage.getJSONObject("links").has("tables"), "Storage tables link isn't present");
+			Assert.assertTrue(firstStorage.getJSONObject("links").has("users"), "Storage users link isn't present");
+			Assert.assertTrue(firstStorage.has("status"), "Storage status isn't present");
+		}
+		Assert.assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("parent").endsWith("gdc"), "Parent link doesn't match");
+		Assert.assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("self").substring(1).equals(PAGE_GDC_STORAGES), "Storages self link doesn't match");
 	}
 }
