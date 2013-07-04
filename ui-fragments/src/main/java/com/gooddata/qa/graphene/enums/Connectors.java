@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.connectors;
+package com.gooddata.qa.graphene.enums;
 
 public enum Connectors {
 	

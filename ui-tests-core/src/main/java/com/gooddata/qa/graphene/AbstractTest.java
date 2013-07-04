@@ -2,21 +2,27 @@ package com.gooddata.qa.graphene;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
+import org.jboss.arquillian.graphene.proxy.GrapheneProxyInstance;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
+import com.gooddata.qa.utils.graphene.RedBarInterceptor;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
@@ -35,6 +41,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected String projectName;
 	protected String user;
 	protected String password;
+	protected String authorizationToken;
 	
 	protected String startPage;
 	
@@ -49,6 +56,15 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final By BY_GP_BUTTON_SUBMIT = By.xpath("//div[@class='submit']/input");
 	
 	protected static final By BY_IFRAME = By.tagName("iframe");
+	
+	protected static final By BY_PROJECTS_PANEL = By.id("projectsCentral");
+	protected static final By BY_PROJECT_PANEL = By.id("p-projectPage");
+	protected static final By BY_PROJECTS_LIST = By.id("myProjects");
+	
+	protected static final By BY_REPORTS_PANEL = By.id("p-domainPage");
+	protected static final By BY_REPORT_PAGE = By.id("p-analysisPage");
+	
+	protected static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
 	
 	protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
 	protected static final String PAGE_GDC_PROJECTS = "gdc/projects";
@@ -70,6 +86,7 @@ public abstract class AbstractTest extends Arquillian {
 		host = loadProperty("host");
 		user = loadProperty("user");
 		password = loadProperty("password");
+		authorizationToken = loadProperty("project.authorizationToken");
 		System.out.println("Basic properties initialized, host: " + host + ", user: " + user);
 	}
 	
@@ -91,6 +108,10 @@ public abstract class AbstractTest extends Arquillian {
 	
 	@BeforeMethod
 	public void loadPlatformPageBeforeTestMethod() {
+		// register RedBasInterceptor - to check errors in UI
+		//GrapheneProxyInstance proxy = (GrapheneProxyInstance) browser;
+		//proxy.registerInterceptor(new RedBarInterceptor());
+		
 		String pageURL = getRootUrl() + (startPage != null ? startPage : "");
 		System.out.println("Loading page ... " + pageURL);
 		browser.get(pageURL);
@@ -119,13 +140,12 @@ public abstract class AbstractTest extends Arquillian {
 	}
 	
 	public void signInAtUI(String username, String password) {
-		if (browser.findElements(BY_LOGIN_PANEL).size() != 0) {
-			LoginFragment loginFragment = Graphene.createPageFragment(LoginFragment.class, browser.findElement(BY_LOGIN_PANEL));
-			loginFragment.login(username, password);
-			waitForElementVisible(BY_LOGGED_USER_BUTTON);
-			Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
-			System.out.println("Successful login with user: " + username);
-		}
+		waitForElementVisible(BY_LOGIN_PANEL);
+		LoginFragment loginFragment = Graphene.createPageFragment(LoginFragment.class, browser.findElement(BY_LOGIN_PANEL));
+		loginFragment.login(username, password);
+		waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
+		System.out.println("Successful login with user: " + username);
 	}
 	
 	public void signInAtGreyPages(String username, String password) throws JSONException {
@@ -134,6 +154,31 @@ public abstract class AbstractTest extends Arquillian {
 		AccountLoginFragment accountLoginFragment = Graphene.createPageFragment(AccountLoginFragment.class, browser.findElement(BY_GP_FORM));
 		accountLoginFragment.login(username, password);
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
+	}
+	
+	protected void verifyProjectDashboardTabs(int expectedNumberOfTabs, String[] expectedTabLabels) throws InterruptedException {
+		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+		waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		waitForDashboardPageLoaded();
+		Thread.sleep(5000);
+		DashboardsPage dashboards = Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
+		DashboardTabs tabs = dashboards.getTabs();
+		int numberOfTabs = tabs.getNumberOfTabs();
+		System.out.println("Number of tabs fo project: " + numberOfTabs);
+		Assert.assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
+		List<String> tabLabels = tabs.getAllTabNames();
+		System.out.println("These tabs are available for selected project: " + tabLabels.toString());
+		for (int i = 0; i < tabLabels.size(); i++) {
+			Assert.assertEquals(tabLabels.get(i), expectedTabLabels[i], "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
+			tabs.openTab(i);
+			System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
+			waitForDashboardPageLoaded();
+			Screenshots.takeScreenshot(browser, "dashboards-tab-" + i + "-" + tabLabels.get(i), this.getClass());
+			Assert.assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
+			if (browser.findElements(BY_RED_BAR).size() != 0) {
+				Assert.fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
+			}
+		}
 	}
 	
 	public JSONObject loadJSON() throws JSONException {
@@ -163,6 +208,14 @@ public abstract class AbstractTest extends Arquillian {
 	
 	public void waitForEmailSchedulePageLoaded() {
 		waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
+	}
+	
+	public void waitForProjectsPageLoaded() {
+		waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"));
+	}
+	
+	public void waitForAnalysisPageLoaded() {
+		waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"));
 	}
 	
 	public void waitForElementVisible(By byElement) {

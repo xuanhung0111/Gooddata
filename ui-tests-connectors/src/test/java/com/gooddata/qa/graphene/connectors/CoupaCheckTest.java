@@ -8,6 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
 
 @Test(groups = { "connectors", "coupa" }, description = "Checklist tests for Coupa connector in GD platform")
@@ -86,7 +87,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		scheduleIntegrationProcess(Connectors.COUPA, integrationProcessCheckLimit);
 
 		// verify created project and count dashboard tabs
-		verifyConnectorProjectDashboardTabs(expectedCoupaTabs.length, expectedCoupaTabs);
+		verifyProjectDashboardTabs(expectedCoupaTabs.length, expectedCoupaTabs);
 	}
 	
 	@Test(dependsOnGroups = { "coupaBasicWalkthrough" }, alwaysRun = true)

@@ -8,6 +8,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.Connectors;
+
 @Test(groups = { "connectors", "zendesk3" }, description = "Checklist tests for Zendesk3 connector in GD platform")
 public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 	
@@ -19,7 +21,7 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 	
 	private static final String[] expectedZendeskTabs = {
 		"Overview", "Ticket Creation", "Ticket Distribution", "Performance", "Backlog", "Open Issues", "Customer Satisfaction"
-	};
+	};	
 	
 	@BeforeClass
 	public void loadRequiredProperties() {
@@ -58,7 +60,7 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		scheduleIntegrationProcess(Connectors.ZENDESK3, integrationProcessCheckLimit);
 		
 		// verify created project and count dashboard tabs
-		verifyConnectorProjectDashboardTabs(expectedZendeskTabs.length, expectedZendeskTabs);
+		verifyProjectDashboardTabs(expectedZendeskTabs.length, expectedZendeskTabs);
 	}
 	
 	@Test(dependsOnGroups = { "zendesk3BasicWalkthrough" }, alwaysRun = true)

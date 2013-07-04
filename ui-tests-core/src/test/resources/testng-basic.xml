@@ -12,4 +12,26 @@
 		</packages>
 	</test>
 
+	<test name="SimpleProjectTest">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.project.SimpleProjectTest" />
+		</classes>
+	</test>
+	
+	<test name="GoodSalesProjectTest">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.project.GoodSalesProjectTest" />
+		</classes>
+	</test>
+
 </suite>

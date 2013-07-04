@@ -7,6 +7,8 @@ import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 
+import com.gooddata.qa.graphene.enums.Connectors;
+
 public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTest {
 
 	protected static final By BY_INPUT_PARDOT_ACCOUNT_ID = By.name("accountId");
@@ -62,7 +64,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		scheduleIntegrationProcess(connectorType, integrationProcessCheckLimit);
 
 		// verify created project and count dashboard tabs
-		verifyConnectorProjectDashboardTabs(expectedPardotTabs.length, expectedPardotTabs);
+		verifyProjectDashboardTabs(expectedPardotTabs.length, expectedPardotTabs);
 	}
 
 }

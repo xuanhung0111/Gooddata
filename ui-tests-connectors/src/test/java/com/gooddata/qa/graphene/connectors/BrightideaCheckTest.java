@@ -9,6 +9,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.Connectors;
+
 
 @Test(groups = { "connectors", "brightidea" }, description = "Checklist tests for Brightidea connector in GD platform")
 public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
@@ -81,7 +83,7 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		waitForIntegrationProcessSynchronized(browser, Connectors.BRIGHTIDEA, integrationProcessCheckLimit);
 		
 		// verify created project and count dashboard tabs
-		verifyConnectorProjectDashboardTabs(expectedBrightideaTabs.length, expectedBrightideaTabs);		
+		verifyProjectDashboardTabs(expectedBrightideaTabs.length, expectedBrightideaTabs);		
 	}
 	
 	@Test(dependsOnGroups = { "brightideaWalkthrough" }, alwaysRun = true)

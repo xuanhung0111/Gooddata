@@ -4,21 +4,18 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.graphene.fragments.reports.ReportFolders;
+import com.gooddata.qa.graphene.fragments.reports.ReportsFolders;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 
 @Test(groups = { "report" }, description = "Tests for basic reports functionality in GD platform")
 public class ReportsPageTest extends AbstractTest {
-	
-	public static final By BY_REPORTS_PANEL = By.xpath("//div[@id='p-domainPage']");
 	
 	private String[] expectedDefaultFolderNames = {"All", "Favorites", "My Reports", "Unsorted"};
 	private String[] expectedDefaultFoldersLinksSuffix = {"all-reports", "favorites", "myreports", "unsorted"};
@@ -81,7 +78,7 @@ public class ReportsPageTest extends AbstractTest {
 	@Test(dependsOnGroups = {"reportsInit"})
 	public void gd_Report_005_DefaultFolderLinks() throws InterruptedException {
 		waitForReportsPageLoaded();
-		ReportFolders folders = reports.getDefaultFolders();
+		ReportsFolders folders = reports.getDefaultFolders();
 		for (int i = 0; i < folders.getNumberOfFolders(); i++) {
 			Assert.assertTrue(folders.getFolderLink(i).endsWith(expectedDefaultFoldersLinksSuffix[i]));
 		}
@@ -90,7 +87,7 @@ public class ReportsPageTest extends AbstractTest {
 	@Test(dependsOnGroups = {"reportsInit"})
 	public void gd_Report_006_DefaultFoldersSwitching() throws InterruptedException {
 		waitForReportsPageLoaded();
-		ReportFolders folders = reports.getDefaultFolders();
+		ReportsFolders folders = reports.getDefaultFolders();
 		for (int i = 0; i < folders.getNumberOfFolders(); i++) {
 			folders.openFolder(i);
 			waitForReportsPageLoaded();

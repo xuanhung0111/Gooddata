@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReportFolders extends AbstractFragment {
+public class ReportsFolders extends AbstractFragment {
 	
 	@FindBy(tagName="li")
 	private List<WebElement> folders;

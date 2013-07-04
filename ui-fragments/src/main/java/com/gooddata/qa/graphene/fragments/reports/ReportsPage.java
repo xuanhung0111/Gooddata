@@ -13,10 +13,10 @@ public class ReportsPage extends AbstractFragment {
 	private static final By BY_ADD_FOLDER_SUBMIT_BUTTON = By.xpath("../div//button[contains(@class,'s-newSpaceButton')]");
 	
 	@FindBy(id="folderDomains")
-	private ReportFolders defaultFolders;
+	private ReportsFolders defaultFolders;
 	
 	@FindBy(id="sharedDomains")
-	private ReportFolders customFolders;
+	private ReportsFolders customFolders;
 	
 	@FindBy(xpath="//span[@id='newDomain']/button")
 	private WebElement addFolderButton;
@@ -27,12 +27,27 @@ public class ReportsPage extends AbstractFragment {
 	@FindBy(xpath="//div[@id='domain']/div/p[@class='description']")
 	private WebElement selectedFolderDescription;
 	
-	public ReportFolders getDefaultFolders() {
+	@FindBy(xpath="//div[@id='reportList']")
+	private ReportsList reportsList;
+	
+	@FindBy(xpath="//button[text()='Create Report']")
+	private WebElement createReportButton;
+	
+	public ReportsFolders getDefaultFolders() {
 		return defaultFolders;
 	}
 	
-	public ReportFolders getCustomFolders() {
+	public ReportsFolders getCustomFolders() {
 		return customFolders;
+	}
+	
+	public ReportsList getReportsList() {
+		return reportsList;
+	}
+	
+	public void startCreateReport() {
+		waitForElementVisible(createReportButton);
+		createReportButton.click();
 	}
 	
 	public void addNewFolder(String folderName) {

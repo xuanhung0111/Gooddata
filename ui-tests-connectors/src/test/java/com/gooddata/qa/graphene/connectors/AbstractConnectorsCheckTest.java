@@ -11,6 +11,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractTest;
+import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
@@ -32,15 +33,11 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	protected int projectCheckLimit = DEFAULT_PROJECT_CHECK_LIMIT;
 	protected int integrationProcessCheckLimit = DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT;
 	
-	private String authorizationToken;
-	
 	protected boolean integrationActivated = false;
 	
 	@BeforeClass
 	public void initStartPage() {
 		startPage = "gdc";
-		
-		authorizationToken = loadProperty("project.authorizationToken");
 	}
 	
 	public void initProject(String projectTitle, Connectors connectorType, int checkIterations) throws JSONException, InterruptedException {
@@ -101,28 +98,6 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	private String getProcessStatus(WebDriver browser) throws JSONException {
 		JSONObject json = loadJSON();
 		return json.getJSONObject("process").getJSONObject("status").getString("code");
-	}
-	
-	protected void verifyConnectorProjectDashboardTabs(int expectedNumberOfTabs, String[] expectedTabLabels) throws InterruptedException {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-		waitForElementVisible(BY_LOGGED_USER_BUTTON);
-		waitForDashboardPageLoaded();
-		Thread.sleep(5000);
-		DashboardsPage dashboards = Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
-		DashboardTabs tabs = dashboards.getTabs();
-		int numberOfTabs = tabs.getNumberOfTabs();
-		System.out.println("Number of tabs for connector project: " + numberOfTabs);
-		Assert.assertTrue(numberOfTabs == expectedNumberOfTabs, "Dashboards for connector project are present");
-		List<String> tabLabels = tabs.getAllTabNames();
-		System.out.println("These tabs are available for selected project: " + tabLabels.toString());
-		for (int i = 0; i < tabLabels.size(); i++) {
-			Assert.assertEquals(tabLabels.get(i), expectedTabLabels[i], "Expected tab name do not match, index:" + i + ", " + tabLabels.get(i));
-			tabs.openTab(i);
-			System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
-			waitForDashboardPageLoaded();
-			Screenshots.takeScreenshot(browser, "dashboards-tab-" + i + "-" + tabLabels.get(i), this.getClass());
-			Assert.assertTrue(tabs.isTabSelected(i)); 
-		}
 	}
 	
 	protected void disableIntegration(Connectors connectorType) throws JSONException {

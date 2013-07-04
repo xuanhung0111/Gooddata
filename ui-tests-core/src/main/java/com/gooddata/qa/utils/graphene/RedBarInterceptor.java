@@ -22,17 +22,18 @@ public class RedBarInterceptor implements Interceptor {
 	 * 
 	 */
 	
-	private static final By BY_RED_BAR = By.xpath("//div[@id='redbar']");
+	private static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
 
 	public Object intercept(final InvocationContext context) throws Throwable {
 		Method method = context.getMethod();
 		System.out.println("Invoking method..." + method.getName());
-		List<String> allowedMethods = new ArrayList<String>(Arrays.asList("get", "findElement"));
+		List<String> allowedMethods = new ArrayList<String>(Arrays.asList("get", "findElement", "getScreenshotAs"));
 		if (allowedMethods.contains(method.getName())) {
 			System.out.println("Checking for red bar....");
 			WebDriver driver = GrapheneContext.getProxy();
 			if (driver.findElements(BY_RED_BAR).size() > 0) {
-				throw new IllegalStateException("RED BAR appeared - failing!!!");
+				String errorMessage = driver.findElement(BY_RED_BAR).getText();
+				throw new IllegalStateException("RED BAR appeared - failing!!! Error: " + errorMessage);
 			}
 		}
 		return context.invoke();

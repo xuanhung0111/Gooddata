@@ -9,6 +9,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.Connectors;
+
 
 @Test(groups = { "connectors", "googleAnalytics" }, description = "Checklist tests for Google Analytics connector in GD platform")
 public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
@@ -97,7 +99,7 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		waitForIntegrationProcessSynchronized(browser, Connectors.GOOGLE_ANALYTICS, integrationProcessCheckLimit);
 		
 		// verify created project and count dashboard tabs
-		verifyConnectorProjectDashboardTabs(expectedGoogleAnalyticsTabs.length, expectedGoogleAnalyticsTabs);
+		verifyProjectDashboardTabs(expectedGoogleAnalyticsTabs.length, expectedGoogleAnalyticsTabs);
 	}
 	
 	@Test(dependsOnGroups = { "googleAnalyticsWalkthrough" }, alwaysRun = true)

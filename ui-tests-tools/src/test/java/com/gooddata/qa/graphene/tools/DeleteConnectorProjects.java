@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -20,10 +19,6 @@ import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
  */
 @Test(groups = { "tools" }, description = "Tools tests")
 public class DeleteConnectorProjects extends AbstractTest {
-	
-	private static final By BY_PROJECTS_PANEL = By.id("projectsCentral");
-	private static final By BY_PROJECT_PANEL = By.id("p-projectPage");
-	private static final By BY_PROJECTS_LIST = By.id("myProjects");
 	
 	@BeforeClass
 	public void initStartPage() {
