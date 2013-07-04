@@ -64,7 +64,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		scheduleIntegrationProcess(connectorType, integrationProcessCheckLimit);
 
 		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(expectedPardotTabs.length, expectedPardotTabs);
+		verifyProjectDashboardTabs(expectedPardotTabs.length, expectedPardotTabs, true);
 	}
 
 }

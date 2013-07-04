@@ -99,7 +99,7 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		waitForIntegrationProcessSynchronized(browser, Connectors.GOOGLE_ANALYTICS, integrationProcessCheckLimit);
 		
 		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(expectedGoogleAnalyticsTabs.length, expectedGoogleAnalyticsTabs);
+		verifyProjectDashboardTabs(expectedGoogleAnalyticsTabs.length, expectedGoogleAnalyticsTabs, true);
 	}
 	
 	@Test(dependsOnGroups = { "googleAnalyticsWalkthrough" }, alwaysRun = true)

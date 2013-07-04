@@ -60,7 +60,7 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		scheduleIntegrationProcess(Connectors.ZENDESK3, integrationProcessCheckLimit);
 		
 		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(expectedZendeskTabs.length, expectedZendeskTabs);
+		verifyProjectDashboardTabs(expectedZendeskTabs.length, expectedZendeskTabs, true);
 	}
 	
 	@Test(dependsOnGroups = { "zendesk3BasicWalkthrough" }, alwaysRun = true)

@@ -156,7 +156,11 @@ public abstract class AbstractTest extends Arquillian {
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
 	
-	protected void verifyProjectDashboardTabs(int expectedNumberOfTabs, String[] expectedTabLabels) throws InterruptedException {
+	protected void verifyProjectDashboardTabs(int expectedNumberOfTabs, String[] expectedTabLabels, boolean openPage) throws InterruptedException {
+		if (openPage) {
+			browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+			waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		}
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		waitForDashboardPageLoaded();

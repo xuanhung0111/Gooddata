@@ -48,13 +48,13 @@ public class GoodSalesProjectTest extends AbstractTest {
 		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
 		waitForElementVisible(BY_GP_FORM);
 		ProjectFragment project = Graphene.createPageFragment(ProjectFragment.class, browser.findElement(BY_GP_FORM));
-		projectId = project.createProject("GoodSales-test", "", GOODSALES_TEMPLATE, authorizationToken, 120);
+		projectId = project.createProject("GoodSales-test", "", GOODSALES_TEMPLATE, authorizationToken, 240);
 		Screenshots.takeScreenshot(browser, "GoodSales-project-created", this.getClass());
 	}
 	
 	@Test(dependsOnMethods = { "createProject" })
 	public void verifyDashboardTabs() throws InterruptedException {
-		verifyProjectDashboardTabs(expectedGoodSalesTabs.length, expectedGoodSalesTabs);
+		verifyProjectDashboardTabs(expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
 	}
 	
 	@Test(dependsOnMethods = { "createProject" })
