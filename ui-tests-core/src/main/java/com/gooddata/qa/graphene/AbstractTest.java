@@ -161,8 +161,6 @@ public abstract class AbstractTest extends Arquillian {
 			browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
 			waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		}
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		waitForDashboardPageLoaded();
 		Thread.sleep(5000);
 		DashboardsPage dashboards = Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
