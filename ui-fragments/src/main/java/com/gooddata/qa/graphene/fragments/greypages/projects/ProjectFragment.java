@@ -40,6 +40,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
 		if (template != null && template.length() > 0) this.projectTemplate.sendKeys(template);
 		this.authorizationToken.sendKeys(authorizationToken);
 		Graphene.guardHttp(submit).click();
+		waitForElementNotVisible(this.title);
 		waitForElementVisible(BY_GP_LINK);
 		Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
 		return waitForProjectStateEnabled(browser, checkIterations);

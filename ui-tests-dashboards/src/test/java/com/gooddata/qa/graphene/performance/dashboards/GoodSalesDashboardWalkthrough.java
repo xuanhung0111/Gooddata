@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "dashboardPerf" }, description = "Tests for performance od rendering dashboards in GoodSales project")
@@ -30,7 +31,6 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 	
 	@Test(groups = { "GoodSalesPerfInit" } )
 	public void init() throws JSONException {
-		// sign in with demo user
 		signInAtGreyPages(user, password);
 	}
 	
@@ -47,12 +47,21 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 	public void dashboardsWalkthrough() throws InterruptedException {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + projectId + "|projectDashboardPage");
 		waitForDashboardPageLoaded();
-		for (int i = 0; i < 2; i++) {
+		for (int i = 1; i <= 10; i++) {
 			System.out.println("Iteration:" + i);
 			verifyProjectDashboardTabs(expectedGoodSalesTabs.length, expectedGoodSalesTabs, false);
 		}
 		String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
 		createPerfOutputFile(output);
+	}
+	
+	@Test(dependsOnMethods = { "dashboardsWalkthrough" })
+	public void deleteProject() {
+		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
+		waitForProjectPageLoaded();
+		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PANEL));
+		System.out.println("Going to delete project: " + projectId);
+		projectPage.deteleProject();
 	}
 	
 	private void createPerfOutputFile(String csvContent) {
