@@ -166,7 +166,7 @@ public abstract class AbstractTest extends Arquillian {
 		DashboardsPage dashboards = Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
 		DashboardTabs tabs = dashboards.getTabs();
 		int numberOfTabs = tabs.getNumberOfTabs();
-		System.out.println("Number of tabs fo project: " + numberOfTabs);
+		System.out.println("Number of tabs for project: " + numberOfTabs);
 		Assert.assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
 		List<String> tabLabels = tabs.getAllTabNames();
 		System.out.println("These tabs are available for selected project: " + tabLabels.toString());

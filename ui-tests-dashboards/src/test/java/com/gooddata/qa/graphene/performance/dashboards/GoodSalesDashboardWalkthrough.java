@@ -74,7 +74,7 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 		File outputFile = new File(mavenProjectBuildDirectory, "perf.csv");
 		try {
             FileUtils.writeStringToFile(outputFile, csvContent);
-            System.out.println("Created performance statistics at /target/perf.csv");
+            System.out.println("Created performance statistics at ./target/perf.csv");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -99,6 +99,7 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 				result.append(metaValues).append(line).append("\n");
 			}
 			FileUtils.writeStringToFile(outputFile, result.toString());
+			System.out.println("Created performance statistics with metadata to be uploaded at GD platform (./target/perf_log.csv)");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
