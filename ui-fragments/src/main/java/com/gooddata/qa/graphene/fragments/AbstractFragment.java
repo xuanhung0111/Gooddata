@@ -10,6 +10,10 @@ public abstract class AbstractFragment {
 	@Root
 	protected WebElement root;
 	
+	public WebElement getRoot() {
+		return root;
+	}
+	
 	protected static final By BY_LINK = By.tagName("a");
 	
 	public void waitForElementVisible(WebElement element) {
@@ -30,6 +34,10 @@ public abstract class AbstractFragment {
 	
 	public void waitForElementPresent(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().present();
+	}
+	
+	public void waitForElementPresent(WebElement element) {
+		Graphene.waitGui().until().element(element).is().present();
 	}
 	
 	public void waitForElementNotPresent(By byElement) {
