@@ -21,7 +21,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
 		waitForElementVisible(deleteProjectButton);
 		deleteProjectButton.click();
 		waitForElementVisible(deleteProjectDialogButton);
-		Graphene.guardAjax(deleteProjectDialogButton).click();
+		deleteProjectDialogButton.click();
 		//redirect to projects page
 		waitForElementVisible(BY_PROJECTS_LIST);
 		System.out.println("Project deleted...");
