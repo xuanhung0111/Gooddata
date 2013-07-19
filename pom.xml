@@ -18,6 +18,7 @@
 		<module>ui-tests-tools</module>
 		<module>ui-fragments</module>
 		<module>ui-tests-ccc</module>
+		<module>ui-tests-upload</module>
 	</modules>
 
 	<properties>
@@ -25,6 +26,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<browser>firefox</browser>
+		<timeout>90</timeout> <!-- (seconds) -->
 		<testng.suite.xml>testng-basic.xml</testng.suite.xml>
 
 		<propertiesPath>${basedir}/ui-tests-core/src/test/resources/variables-env-test.properties</propertiesPath>
@@ -111,6 +113,7 @@
 			<version>1.0.0.Alpha2-SNAPSHOT</version>
 		</dependency> 
 		-->
+		
 	</dependencies>
 	
 	<!-- no tests by default -->
@@ -163,6 +166,10 @@
 											<property>
 												<name>browser</name>
 												<value>${browser}</value>
+											</property>
+											<property>
+												<name>timeout</name>
+												<value>${timeout}</value>
 											</property>
 											<property>
 												<name>propertiesPath</name>

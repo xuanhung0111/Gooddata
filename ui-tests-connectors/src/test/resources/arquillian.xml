@@ -6,7 +6,7 @@
 
 	<!-- possible options are listed at https://docs.jboss.org/author/display/ARQ/Drone -->
 	<extension qualifier="webdriver">
-		<property name="browserCapabilities">firefox</property> <!-- ${browser} use firefox directly if you want to run tests from IDE -->
+		<property name="browserCapabilities">${browser}</property> <!-- use firefox directly if you want to run tests from IDE -->
 		<property name="remoteReusable">false</property>
 		<property name="remoteAddress">http://localhost:4444/wd/hub</property>
 		<property name="chromeDriverBinary">/Applications/Google Chrome.app/Contents/MacOS/Google Chrome</property>
@@ -16,10 +16,10 @@
 	</extension>
 
 	<extension qualifier="graphene">
-		<property name="waitModelInterval">60</property>
-		<property name="waitGuiInterval">30</property>
-		<property name="waitAjaxInterval">30</property>
-		<property name="waitGuardInterval">30</property>
+		<property name="waitModelInterval">${timeout}</property>
+		<property name="waitGuiInterval">${timeout}</property>
+		<property name="waitAjaxInterval">${timeout}</property>
+		<property name="waitGuardInterval">${timeout}</property>
 	</extension>
 	
 	<extension qualifier="screenRecorder">
