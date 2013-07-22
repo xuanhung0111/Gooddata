@@ -51,7 +51,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@Test(dependsOnGroups = {"hdsInit"})
 	public void hdsResourceLinkNotAvailableAtBasicResource() {
 		browser.get(getRootUrl() + PAGE_GDC);
-		waitForElementVisible(By.xpath("//pre[text()='Use links to navigate the services.']"));
+		Assert.assertEquals(browser.getTitle(), "GoodData API root");
 		Assert.assertTrue(browser.findElements(By.partialLinkText("storages")).size() == 0, "Storages link is present at basic /gdc resource");
 	}
 	
