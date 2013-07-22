@@ -67,8 +67,9 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
 	
 	protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
-	protected static final String PAGE_GDC_PROJECTS = "gdc/projects";
-	protected static final String PAGE_ACCOUNT_LOGIN = "gdc/account/login";
+	protected static final String PAGE_GDC = "gdc";
+	protected static final String PAGE_GDC_PROJECTS = PAGE_GDC + "/projects";
+	protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
 	protected static final String PAGE_PROJECTS = "projects.html";
 	
 	@BeforeClass

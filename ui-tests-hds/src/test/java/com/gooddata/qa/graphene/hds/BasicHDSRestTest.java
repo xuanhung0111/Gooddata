@@ -4,6 +4,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -48,11 +49,18 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	}
 	
 	@Test(dependsOnGroups = {"hdsInit"})
+	public void hdsResourceLinkNotAvailableAtBasicResource() {
+		browser.get(getRootUrl() + PAGE_GDC);
+		waitForElementVisible(By.xpath("//pre[text()='Use links to navigate the services.']"));
+		Assert.assertTrue(browser.findElements(By.partialLinkText("storages")).size() == 0, "Storages link is present at basic /gdc resource");
+	}
+	
+	@Test(dependsOnGroups = {"hdsInit"})
 	public void verifyDefaultResource() throws JSONException {
 		verifyDefaultResourceJSON();
 	}
 	
-	/** ===================== Section with valid cases ================= */
+	/** ===================== Section with valid storage cases ================= */
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorage() throws JSONException {
@@ -131,7 +139,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		waitForElementPresent(BY_GP_PRE_JSON);
 	}
 	
-	/** ===================== Section with invalid cases ================= */
+	/** ===================== Section with invalid storage cases ================= */
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutTitle() throws JSONException {
