@@ -28,7 +28,7 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 	private static final By BY_BUTTON_ALLOW = By.name("allow");
 	private static final By BY_SELECT_ACCOUNT = By.name("account");
 	private static final By BY_IMPORT_BUTTON = By.xpath("//button[@id='cbtn']");
-	private static final String XPATH_OPTION_ACCOUNT = "//option[text()='${account}']";
+	private static final String XPATH_OPTION_ACCOUNT = "//option[contains(text(), '${account}')]";
 	private static final By BY_DIV_SYNCHRONIZATION_PROGRESS = By.xpath("//div[@class='connectorHeader']/span[text()='Please be patient, your data is now being loaded.']");
 	
 	
