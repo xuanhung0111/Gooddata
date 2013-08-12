@@ -17,7 +17,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
-import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "dashboardPerf" }, description = "Tests for performance od rendering dashboards in GoodSales project")
@@ -58,15 +57,12 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 		}
 		String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
 		createPerfOutputFile(output);
+		successfulTest = true;
 	}
 	
 	@Test(dependsOnMethods = { "dashboardsWalkthrough" })
 	public void deleteProject() {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
-		waitForProjectPageLoaded();
-		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PANEL));
-		System.out.println("Going to delete project: " + projectId);
-		projectPage.deteleProject();
+		deleteProjectByDeleteMode(successfulTest);
 	}
 	
 	private void createPerfOutputFile(String csvContent) throws JSONException {
