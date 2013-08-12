@@ -14,7 +14,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 @Test(groups = { "login" }, description = "Tests for basic login functionality in GD platform")
 public class LoginPageTest extends AbstractTest {
 
-	public static final By BY_LOGOUT_LINK = By.xpath("//a[@class='s-logout']/../../li[2]");
+	public static final By BY_LOGOUT_LINK = By.xpath("//a[@class='s-logout']");
 	
 	@FindBy(id="loginPanel")
 	LoginFragment loginFragment;
@@ -38,7 +38,7 @@ public class LoginPageTest extends AbstractTest {
 		browser.findElement(BY_LOGGED_USER_BUTTON).click();
 		waitForElementVisible(BY_LOGOUT_LINK);
 		browser.findElement(BY_LOGOUT_LINK).click();
-		waitForElementVisible(BY_LOGIN_PANEL);
+		waitForElementNotVisible(BY_LOGGED_USER_BUTTON);
 	}
 	
 	@Test(dependsOnGroups = {"loginInit"})
