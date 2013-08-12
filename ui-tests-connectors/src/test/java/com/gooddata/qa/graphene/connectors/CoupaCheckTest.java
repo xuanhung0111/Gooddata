@@ -88,10 +88,16 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
 		// verify created project and count dashboard tabs
 		verifyProjectDashboardTabs(expectedCoupaTabs.length, expectedCoupaTabs, true);
+		successfulTest = true;
 	}
 	
 	@Test(dependsOnGroups = { "coupaBasicWalkthrough" }, alwaysRun = true)
 	public void disableConnectorIntegration() throws JSONException {
 		disableIntegration(Connectors.COUPA);
+	}
+	
+	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
 	}
 }

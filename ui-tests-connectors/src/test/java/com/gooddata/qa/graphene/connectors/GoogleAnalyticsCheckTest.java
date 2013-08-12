@@ -100,10 +100,16 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		
 		// verify created project and count dashboard tabs
 		verifyProjectDashboardTabs(expectedGoogleAnalyticsTabs.length, expectedGoogleAnalyticsTabs, true);
+		successfulTest = true;
 	}
 	
 	@Test(dependsOnGroups = { "googleAnalyticsWalkthrough" }, alwaysRun = true)
 	public void disableConnectorIntegration() throws JSONException {
 		disableIntegration(Connectors.GOOGLE_ANALYTICS);
+	}
+	
+	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
 	}
 }

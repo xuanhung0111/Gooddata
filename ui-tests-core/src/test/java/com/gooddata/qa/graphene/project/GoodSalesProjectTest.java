@@ -12,7 +12,6 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
-import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -134,6 +133,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnGroups = { "goodsales-chart" })
 	public void verifyCreatedReports() {
+		successfulTest = true;
 		ReportsPage reports = initReportsPage();
 		Assert.assertEquals(reports.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
 		reports.getDefaultFolders().openFolder("My Reports");
@@ -157,23 +157,14 @@ public class GoodSalesProjectTest extends AbstractTest {
 		createdReportsCount++;
 	}
 	
+	@Test(dependsOnMethods = { "verifyCreatedReports" }, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
+	}
+	
 	private ReportsPage initReportsPage() {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage");
 		waitForReportsPageLoaded();
 		return Graphene.createPageFragment(ReportsPage.class, browser.findElement(BY_REPORTS_PANEL));
 	}
-	
-	/**
-	 * Do not delete project - can be used for manual verification after test
-	 * 
-	@Test(dependsOnMethods = { "verifyCreatedReports" })
-	public void deleteProject() {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
-		waitForProjectPageLoaded();
-		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PANEL));
-		System.out.println("Going to delete project: " + projectId);
-		projectPage.deteleProject();
-	}
-	*/
-	
 }

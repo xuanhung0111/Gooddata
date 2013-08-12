@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.utils.graphene.RedBarInterceptor;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
@@ -29,6 +30,21 @@ import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class})
 public abstract class AbstractTest extends Arquillian {
+	
+	public static enum DeleteMode {
+		DELETE_ALWAYS,
+		DELETE_IF_SUCCESSFUL,
+		DELETE_NEVER;
+		
+		public static DeleteMode getModeByName(String deleteMode) {
+			if (deleteMode != null && deleteMode.length() > 0) {
+				for (DeleteMode mode : values()) {
+					if (mode.toString().toLowerCase().equals(deleteMode)) return mode;
+				}
+			}
+			return DELETE_IF_SUCCESSFUL;
+		}
+	}
 	
 	protected Properties testVariables;
 	private String propertiesPath;
@@ -44,6 +60,9 @@ public abstract class AbstractTest extends Arquillian {
 	protected String authorizationToken;
 	
 	protected String startPage;
+	
+	protected DeleteMode deleteMode = DeleteMode.DELETE_IF_SUCCESSFUL;
+	protected boolean successfulTest = false;
 	
 	protected static final By BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']//button[2]");
 	protected static final By BY_LOGIN_PANEL = By.xpath("//div[@id='loginPanel']");
@@ -89,6 +108,8 @@ public abstract class AbstractTest extends Arquillian {
 		password = loadProperty("password");
 		authorizationToken = loadProperty("project.authorizationToken");
 		System.out.println("Basic properties initialized, host: " + host + ", user: " + user);
+		
+		deleteMode = DeleteMode.getModeByName(loadProperty("deleteMode"));
 	}
 	
 	/**
@@ -182,6 +203,40 @@ public abstract class AbstractTest extends Arquillian {
 				Assert.fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
 			}
 		}
+	}
+	
+	protected void deleteProjectByDeleteMode(boolean successfulTest) {
+		System.out.println("Delete mode is set to " + deleteMode.toString());
+		if (projectId != null && projectId.length() > 0) {
+			switch (deleteMode) {
+				case DELETE_ALWAYS:
+					System.out.println("Project will be deleted...");
+					deleteProject(projectId);
+					break;
+				case DELETE_IF_SUCCESSFUL:
+					if (successfulTest) {
+						System.out.println("Test was successful, project will be deleted...");
+						deleteProject(projectId);
+					} else {
+						System.out.println("Test wasn't successful, project won't be deleted...");
+					}
+					break;
+				case DELETE_NEVER: 
+					System.out.println("Delete mode set to NEVER, project won't be deleted...");
+					break;
+			}
+		} else {
+			System.out.println("No project created -> no delete...");
+		}
+	}
+	
+	protected void deleteProject(String projectId) {
+		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
+		waitForProjectPageLoaded();
+		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PANEL));
+		System.out.println("Going to delete project: " + projectId);
+		projectPage.deteleProject();
+		System.out.println("Deleted project: " + projectId);
 	}
 	
 	public JSONObject loadJSON() throws JSONException {

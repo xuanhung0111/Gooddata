@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
-import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 
 @Test(groups = { "projectSimple" }, description = "Tests for basic project functionality in GD platform")
 public class SimpleProjectTest extends AbstractTest {
@@ -30,15 +29,12 @@ public class SimpleProjectTest extends AbstractTest {
 		waitForElementVisible(BY_GP_FORM);
 		ProjectFragment project = Graphene.createPageFragment(ProjectFragment.class, browser.findElement(BY_GP_FORM));
 		projectId = project.createProject("simple-project", "", "", authorizationToken, 12);
+		successfulTest = true;
 	}
 	
-	@Test(dependsOnMethods = { "createSimpleProject" })
+	@Test(dependsOnMethods = { "createSimpleProject" }, alwaysRun = true)
 	public void deleteSimpleProject() {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
-		waitForProjectPageLoaded();
-		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PANEL));
-		System.out.println("Going to delete project: " + projectId);
-		projectPage.deteleProject();
+		deleteProjectByDeleteMode(successfulTest);
 	}
 
 }

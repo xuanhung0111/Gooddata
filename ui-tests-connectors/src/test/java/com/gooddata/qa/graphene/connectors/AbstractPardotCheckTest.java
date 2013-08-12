@@ -65,6 +65,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 
 		// verify created project and count dashboard tabs
 		verifyProjectDashboardTabs(expectedPardotTabs.length, expectedPardotTabs, true);
+		successfulTest = true;
 	}
 
 }

@@ -8,7 +8,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 /**
@@ -52,11 +51,7 @@ public class DeleteTestProjects extends AbstractTest {
 		List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
 		System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
 		for (String projectToDelete : projectsToDelete) {
-			browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectToDelete + "|projectPage");
-			waitForProjectPageLoaded();
-			ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PANEL));
-			System.out.println("Going to delete project: " + projectToDelete);
-			projectPage.deteleProject();
+			deleteProject(projectToDelete);
 		}
 	}
 	

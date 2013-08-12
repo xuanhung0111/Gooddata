@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.connectors;
 
-import java.util.List;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,11 +10,8 @@ import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.enums.Connectors;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
-import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class AbstractConnectorsCheckTest extends AbstractTest {
 	
@@ -110,5 +105,4 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 			System.out.println("Integration wasn't created - nothing to disable...");
 		}
 	}
-
 }

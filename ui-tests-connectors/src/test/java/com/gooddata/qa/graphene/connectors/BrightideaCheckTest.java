@@ -84,10 +84,17 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		
 		// verify created project and count dashboard tabs
 		verifyProjectDashboardTabs(expectedBrightideaTabs.length, expectedBrightideaTabs, true);		
+		
+		successfulTest = true;
 	}
 	
 	@Test(dependsOnGroups = { "brightideaWalkthrough" }, alwaysRun = true)
 	public void disableConnectorIntegration() throws JSONException {
 		disableIntegration(Connectors.BRIGHTIDEA);
+	}
+	
+	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
 	}
 }

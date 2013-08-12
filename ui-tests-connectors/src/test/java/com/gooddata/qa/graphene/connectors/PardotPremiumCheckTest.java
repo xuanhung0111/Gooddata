@@ -18,4 +18,9 @@ public class PardotPremiumCheckTest extends AbstractPardotCheckTest {
 	public void disableConnectorIntegration() throws JSONException {
 		disableIntegration(Connectors.PARDOT_PREMIUM);
 	}
+	
+	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
+	}
 }

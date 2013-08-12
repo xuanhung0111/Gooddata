@@ -61,10 +61,16 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		
 		// verify created project and count dashboard tabs
 		verifyProjectDashboardTabs(expectedZendeskTabs.length, expectedZendeskTabs, true);
+		successfulTest = true;
 	}
 	
 	@Test(dependsOnGroups = { "zendesk3BasicWalkthrough" }, alwaysRun = true)
 	public void disableConnectorIntegration() throws JSONException {
 		disableIntegration(Connectors.ZENDESK3);
+	}
+	
+	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
 	}
 }

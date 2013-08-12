@@ -18,4 +18,9 @@ public class PardotBaseCheckTest extends AbstractPardotCheckTest {
 	public void disableConnectorIntegration() throws JSONException {
 		disableIntegration(Connectors.PARDOT_BASE);
 	}
+	
+	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
+	}
 }

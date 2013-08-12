@@ -27,6 +27,9 @@
 
 		<browser>firefox</browser>
 		<timeout>90</timeout> <!-- (seconds) -->
+		
+		<deleteMode>delete_if_successful</deleteMode> <!-- Possible values are: delete_always, delete_if_successful, delete_never -->
+		
 		<testng.suite.xml>testng-basic.xml</testng.suite.xml>
 
 		<propertiesPath>${basedir}/ui-tests-core/src/test/resources/variables-env-test.properties</propertiesPath>

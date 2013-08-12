@@ -179,12 +179,12 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	/** ===================== Section with table cases ================= */
 	
-	@Test(dependsOnMethods = {"verifyStorage"}, groups = { "tables-tests" })
+	@Test(dependsOnMethods = {"updateStorage"}, groups = { "tables-tests" })
 	public void verifyTablesResource() throws JSONException {
 		verifyTablesResourceJSON();
 	}
 	
-	@Test(dependsOnMethods = { "verifyStorage" }, groups = { "tables-tests" })
+	@Test(dependsOnMethods = { "updateStorage" }, groups = { "tables-tests" })
 	public void verifyTableCreateFormPresentWithTrailingSlash() throws JSONException {
 		openTablesUrl();
 		browser.get(browser.getCurrentUrl() + "/");
