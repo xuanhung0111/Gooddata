@@ -35,7 +35,6 @@ public class TableFragment extends AbstractGreyPagesFragment {
 	
 	public String createTable(String name) throws JSONException {
 		fillCreateTableForm(name);
-		waitForElementNotVisible(BY_BUTTON_CREATE);
 		JSONObject json = loadJSON();
 		String tableUrl = json.getJSONObject("table").getJSONObject("links").getString("self");
 		System.out.println("Created table on URL " + tableUrl);

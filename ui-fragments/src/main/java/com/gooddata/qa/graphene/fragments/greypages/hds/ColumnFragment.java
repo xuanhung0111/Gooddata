@@ -74,7 +74,6 @@ public class ColumnFragment extends AbstractGreyPagesFragment {
 	
 	public String createColumn(String name, Types type, boolean primaryKey, String foreignKeyTable, String foreignKeyColumn) throws JSONException {
 		fillCreateColumnForm(name, type, primaryKey, foreignKeyTable, foreignKeyColumn);
-		waitForElementNotVisible(BY_BUTTON_CREATE);
 		JSONObject json = loadJSON();
 		String columnUrl = json.getJSONObject("column").getJSONObject("links").getString("self");
 		System.out.println("Created column on URL " + columnUrl);
