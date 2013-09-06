@@ -35,7 +35,6 @@ public class GoodSalesProjectTest extends AbstractTest {
 	private String exportedDashboardName;
 	private long expectedDashboardExportSize = 65000L;
 	
-	private String exportedReportName;
 	private long expectedLineChartExportPDFSize = 100000L;
 	private long expectedLineChartReportExportPNGSize = 36000L;
 	private long expectedLineChartReportExportXLSSize = 5000L;
@@ -117,7 +116,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "exportTabularReportToPDF" }, groups = { "tabular-report-exports" })
 	public void verifyExportedTabularReportPDF() {
-		verifyReportExport(ExportFormat.PDF, exportedReportName, expectedTabularReportExportPDFSize);
+		verifyReportExport(ExportFormat.PDF, "Simple tabular report", expectedTabularReportExportPDFSize);
 	}
 	
 	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
@@ -127,7 +126,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "exportTabularReportToXLS" }, groups = { "tabular-report-exports" })
 	public void verifyExportedTabularReportXLS() {
-		verifyReportExport(ExportFormat.EXCEL_XLS, exportedReportName, expectedTabularReportExportXLSSize);
+		verifyReportExport(ExportFormat.EXCEL_XLS, "Simple tabular report", expectedTabularReportExportXLSSize);
 	}
 	
 	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
@@ -137,7 +136,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "exportTabularReportToCSV" }, groups = { "tabular-report-exports" })
 	public void verifyExportedTabularReportCSV() {
-		verifyReportExport(ExportFormat.CSV, exportedReportName, expectedTabularReportExportCSVSize);
+		verifyReportExport(ExportFormat.CSV, "Simple tabular report", expectedTabularReportExportCSVSize);
 	}
 	
 	@Test(dependsOnMethods = { "verifyReportsPage" }, groups = { "goodsales-chart" })
@@ -157,7 +156,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "exportLineChartToPDF" }, groups = { "line-chart-exports" })
 	public void verifyExportedLineChartPDF() {
-		verifyReportExport(ExportFormat.PDF, exportedReportName, expectedLineChartExportPDFSize);
+		verifyReportExport(ExportFormat.PDF, "Simple line chart report", expectedLineChartExportPDFSize);
 	}
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
@@ -167,7 +166,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "exportLineChartToPNG" }, groups = { "line-chart-exports" })
 	public void verifyExportedLineChartPNG() {
-		verifyReportExport(ExportFormat.IMAGE_PNG, exportedReportName, expectedLineChartReportExportPNGSize);
+		verifyReportExport(ExportFormat.IMAGE_PNG, "Simple line chart report", expectedLineChartReportExportPNGSize);
 	}
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
@@ -177,7 +176,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "exportLineChartToXLS" }, groups = { "line-chart-exports" })
 	public void verifyExportedLineChartXLS() {
-		verifyReportExport(ExportFormat.EXCEL_XLS, exportedReportName, expectedLineChartReportExportXLSSize);
+		verifyReportExport(ExportFormat.EXCEL_XLS, "Simple line chart report", expectedLineChartReportExportXLSSize);
 	}
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
@@ -187,7 +186,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "exportLineChartToCSV" }, groups = { "line-chart-exports" })
 	public void verifyExportedLineChartCSV() {
-		verifyReportExport(ExportFormat.CSV, exportedReportName, expectedLineChartReportExportCSVSize);
+		verifyReportExport(ExportFormat.CSV, "Simple line chart report", expectedLineChartReportExportCSVSize);
 	}
 	
 	@Test(dependsOnMethods = { "verifyReportsPage" }, groups = { "goodsales-chart" })
@@ -280,7 +279,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	private void exportReport(String reportName, ExportFormat format, long exportTimeoutMillis) throws InterruptedException {
 		ReportPage report = initReportPage(reportName);
-		exportedReportName = report.exportReport(format, exportTimeoutMillis);
+		report.exportReport(format, exportTimeoutMillis);
 		checkRedBar();
 	}
 }
