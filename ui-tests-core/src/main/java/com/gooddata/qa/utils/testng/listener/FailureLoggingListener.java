@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jboss.arquillian.drone.api.annotation.Default;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.OutputType;
@@ -16,7 +17,6 @@ import com.gooddata.qa.utils.testng.TestInfo;
 
 public class FailureLoggingListener extends TestListenerAdapter {
 
-    private WebDriver driver = GrapheneContext.getProxyForInterfaces(TakesScreenshot.class);
     private File mavenProjectBuildDirectory = new File(System.getProperty("maven.project.build.directory", "./target/"));
     private File failuresOutputDir = new File(mavenProjectBuildDirectory, "failures");
 
@@ -26,7 +26,8 @@ public class FailureLoggingListener extends TestListenerAdapter {
 
     @Override
     public void onTestFailure(ITestResult result) {
-        if (driver == null) {
+    	WebDriver driver = GrapheneContext.getContextFor(Default.class).getWebDriver(TakesScreenshot.class);
+    	if (driver == null) {
             return;
         }
 

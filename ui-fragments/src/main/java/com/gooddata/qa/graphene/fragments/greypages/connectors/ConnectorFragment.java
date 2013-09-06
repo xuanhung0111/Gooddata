@@ -1,12 +1,10 @@
 package com.gooddata.qa.graphene.fragments.greypages.connectors;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
@@ -23,7 +21,6 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
 	private WebElement submitIntegrationButton;
 	
 	public void createIntegration(String template) throws JSONException {
-		WebDriver browser = GrapheneContext.getProxy();
 		waitForElementVisible(this.projectTemplateUri);
 		this.projectTemplateUri.sendKeys(template);
 		Graphene.guardHttp(submitIntegrationButton).click();

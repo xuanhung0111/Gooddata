@@ -3,9 +3,9 @@ package com.gooddata.qa.graphene.fragments.projects;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 

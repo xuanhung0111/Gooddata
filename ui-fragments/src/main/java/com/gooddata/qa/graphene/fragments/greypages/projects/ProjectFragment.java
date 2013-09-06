@@ -5,12 +5,10 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
@@ -33,7 +31,6 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
 	private WebElement submit;
 	
 	public String createProject(String title, String summary, String template, String authorizationToken, int checkIterations) throws JSONException, InterruptedException {
-		WebDriver browser = GrapheneContext.getProxy();
 		waitForElementVisible(this.title);
 		this.title.sendKeys(title);
 		if (summary != null && summary.length() > 0) this.summary.sendKeys(summary);
@@ -43,10 +40,10 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
 		waitForElementNotVisible(this.title);
 		waitForElementVisible(BY_GP_LINK);
 		Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
-		return waitForProjectStateEnabled(browser, checkIterations);
+		return waitForProjectStateEnabled(checkIterations);
 	}
 	
-	private String waitForProjectStateEnabled(WebDriver browser, int checkIterations) throws JSONException, InterruptedException {
+	private String waitForProjectStateEnabled(int checkIterations) throws JSONException, InterruptedException {
 		String projectUrl = browser.getCurrentUrl();
 		logProjectUrl(projectUrl);
 		System.out.println("Waiting for project enabled: " + projectUrl);

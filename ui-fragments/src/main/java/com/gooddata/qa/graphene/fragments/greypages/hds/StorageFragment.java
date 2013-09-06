@@ -1,13 +1,11 @@
 package com.gooddata.qa.graphene.fragments.greypages.hds;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
@@ -51,7 +49,6 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 	}
 	
 	public String createStorage(String title, String description, String authorizationToken, String copyOf) throws JSONException {
-		WebDriver browser = GrapheneContext.getProxy();
 		fillCreateStorageForm(title, description, authorizationToken, copyOf);
 		waitForElementNotVisible(this.title);
 		waitForElementPresent(BY_GP_PRE_JSON);
@@ -98,7 +95,7 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 		waitForElementVisible(submit);
 		Graphene.guardHttp(submit).click();
 		Graphene.waitGui().until().element(BY_BUTTON_CREATE).is().visible();
-		GrapheneContext.getProxy().getCurrentUrl().endsWith("/gdc/storages");
+		Assert.assertTrue(browser.getCurrentUrl().endsWith("/storages"), "Browser wasn't redirected to storages page");
 	}
 
 }

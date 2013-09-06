@@ -1,12 +1,11 @@
 package com.gooddata.qa.graphene.fragments.greypages.hds;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
@@ -68,7 +67,7 @@ public class TableFragment extends AbstractGreyPagesFragment {
 		waitForElementVisible(submit);
 		Graphene.guardHttp(submit).click();
 		Graphene.waitGui().until().element(BY_BUTTON_CREATE).is().visible();
-		GrapheneContext.getProxy().getCurrentUrl().endsWith("/tables");
+		Assert.assertTrue(browser.getCurrentUrl().endsWith("/tables"), "Browser wasn't redirected to tables page");
 	}
 
 }

@@ -1,12 +1,11 @@
 package com.gooddata.qa.graphene.fragments.greypages.hds;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.context.GrapheneContext;
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 
@@ -89,7 +88,7 @@ public class ColumnFragment extends AbstractGreyPagesFragment {
 		waitForElementVisible(this.foreignKeyTable);
 		waitForElementVisible(this.foreignKeyColumn);
 		Assert.assertEquals(submit.getAttribute("value"), "Update", "Submit button is not 'Update'");
-		Select typeSelect = new Select(GrapheneContext.getProxy().findElement(By.name("type")));
+		Select typeSelect = new Select(browser.findElement(By.name("type")));
 		return this.name.getAttribute("value").equals(name) && typeSelect.getFirstSelectedOption().getText().equals(type)
 				&& this.primary.isSelected() == primary && foreignKeyTable != null ? this.foreignKeyTable.getAttribute("value").equals(foreignKeyTable) : true
 				&& foreignKeyColumn != null ? this.foreignKeyColumn.getAttribute("value").equals(foreignKeyColumn) : true;
@@ -130,7 +129,7 @@ public class ColumnFragment extends AbstractGreyPagesFragment {
 		waitForElementVisible(submit);
 		Graphene.guardHttp(submit).click();
 		Graphene.waitGui().until().element(BY_BUTTON_CREATE).is().visible();
-		GrapheneContext.getProxy().getCurrentUrl().endsWith("/gdc/columns");
+		Assert.assertTrue(browser.getCurrentUrl().endsWith("/columns"), "Browser wasn't redirected to columns page");
 	}
 
 }

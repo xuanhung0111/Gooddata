@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jboss.arquillian.graphene.context.GrapheneContext;
+import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.proxy.Interceptor;
 import org.jboss.arquillian.graphene.proxy.InvocationContext;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 public class RedBarInterceptor implements Interceptor {
+	
+	@Drone
+	private WebDriver browser;
 	
 	/**
 	 * 
@@ -30,9 +33,8 @@ public class RedBarInterceptor implements Interceptor {
 		List<String> allowedMethods = new ArrayList<String>(Arrays.asList("get", "findElement", "getScreenshotAs"));
 		if (allowedMethods.contains(method.getName())) {
 			System.out.println("Checking for red bar....");
-			WebDriver driver = GrapheneContext.getProxy();
-			if (driver.findElements(BY_RED_BAR).size() > 0) {
-				String errorMessage = driver.findElement(BY_RED_BAR).getText();
+			if (browser.findElements(BY_RED_BAR).size() > 0) {
+				String errorMessage = browser.findElement(BY_RED_BAR).getText();
 				throw new IllegalStateException("RED BAR appeared - failing!!! Error: " + errorMessage);
 			}
 		}

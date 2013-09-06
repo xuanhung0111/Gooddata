@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;

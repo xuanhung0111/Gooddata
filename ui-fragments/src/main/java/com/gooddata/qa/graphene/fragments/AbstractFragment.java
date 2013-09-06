@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.fragments;
 
+import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.spi.annotations.Root;
+import org.jboss.arquillian.graphene.fragment.Root;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public abstract class AbstractFragment {
@@ -10,11 +12,18 @@ public abstract class AbstractFragment {
 	@Root
 	protected WebElement root;
 	
+	@Drone
+	protected WebDriver browser;
+	
 	public WebElement getRoot() {
 		return root;
 	}
 	
 	protected static final By BY_LINK = By.tagName("a");
+	
+	public void waitForDashboardPageLoaded() {
+		waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"));
+	}
 	
 	public void waitForElementVisible(WebElement element) {
 		Graphene.waitGui().until().element(element).is().visible();
