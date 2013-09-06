@@ -231,7 +231,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 		return Graphene.createPageFragment(ReportsPage.class, browser.findElement(BY_REPORTS_PANEL));
 	}
 	
-	public void selectFolder(ReportsPage reportsPage, String folderName) {
+	private void selectFolder(ReportsPage reportsPage, String folderName) {
 		reportsPage.getDefaultFolders().openFolder("My Reports");
 		waitForReportsPageLoaded();
 		Assert.assertEquals(reportsPage.getSelectedFolderName(), "My Reports", "Selected folder name doesn't match: " + reportsPage.getSelectedFolderName());

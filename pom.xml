@@ -27,6 +27,7 @@
 
 		<browser>firefox</browser>
 		<timeout>90</timeout> <!-- (seconds) -->
+		<browserDownloadFolder>${project.build.directory}/downloads</browserDownloadFolder>
 		
 		<deleteMode>delete_if_successful</deleteMode> <!-- Possible values are: delete_always, delete_if_successful, delete_never -->
 		
@@ -167,6 +168,10 @@
 											<property>
 												<name>propertiesPath</name>
 												<value>${propertiesPath}</value>
+											</property>
+											<property>
+												<name>browserDownloadFolder</name>
+												<value>${browserDownloadFolder}</value>
 											</property>
 										</systemProperties>
 									</configuration>

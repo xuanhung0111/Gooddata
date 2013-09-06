@@ -59,6 +59,8 @@ public abstract class AbstractTest extends Arquillian {
 	protected String password;
 	protected String authorizationToken;
 	
+	protected String downloadFolder;
+	
 	protected String startPage;
 	
 	protected DeleteMode deleteMode = DeleteMode.DELETE_IF_SUCCESSFUL;
@@ -110,6 +112,8 @@ public abstract class AbstractTest extends Arquillian {
 		System.out.println("Basic properties initialized, host: " + host + ", user: " + user);
 		
 		deleteMode = DeleteMode.getModeByName(loadProperty("deleteMode"));
+		
+		downloadFolder = loadProperty("browserDownloadFolder");
 	}
 	
 	/**
@@ -210,14 +214,14 @@ public abstract class AbstractTest extends Arquillian {
 	}
 	
 	protected void verifyDashboardExport(String dashboardName, long minimalSize) {
-		File pdfExport = new File("/tmp/ui-graphene-test-tmp/" + dashboardName + ".pdf");
+		File pdfExport = new File(downloadFolder + "/" + dashboardName + ".pdf");
 		long fileSize = pdfExport.length();
 		System.out.println("File size: " + fileSize);
 		Assert.assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
 	}
 	
 	protected void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
-		String fileURL = "/tmp/ui-graphene-test-tmp/" + reportName + "." + format.getName();
+		String fileURL = downloadFolder + "/" + reportName + "." + format.getName();
 		File export = new File(fileURL);
 		long fileSize = export.length();
 		System.out.println("File size: " + fileSize);

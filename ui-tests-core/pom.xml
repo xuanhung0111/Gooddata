@@ -22,7 +22,6 @@
 			<properties>
 				<testng.suite.xml>testng-core.xml</testng.suite.xml>
 				<propertiesPath>${basedir}/src/test/resources/variables-env-test.properties</propertiesPath>
-				<browserDownloadFolder>${project.build.directory}/downloads</browserDownloadFolder>
 			</properties>
 			<build>
 				<testResources>
