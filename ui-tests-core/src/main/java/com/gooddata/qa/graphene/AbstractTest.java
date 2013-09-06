@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -7,7 +8,6 @@ import java.util.Properties;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.proxy.GrapheneProxyInstance;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +18,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
+import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
-import com.gooddata.qa.utils.graphene.RedBarInterceptor;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
@@ -199,9 +199,33 @@ public abstract class AbstractTest extends Arquillian {
 			waitForDashboardPageLoaded();
 			Screenshots.takeScreenshot(browser, "dashboards-tab-" + i + "-" + tabLabels.get(i), this.getClass());
 			Assert.assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
-			if (browser.findElements(BY_RED_BAR).size() != 0) {
-				Assert.fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
-			}
+			checkRedBar();
+		}
+	}
+	
+	protected void checkRedBar() {
+		if (browser.findElements(BY_RED_BAR).size() != 0) {
+			Assert.fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
+		}
+	}
+	
+	protected void verifyDashboardExport(String dashboardName, long minimalSize) {
+		File pdfExport = new File("/tmp/ui-graphene-test-tmp/" + dashboardName + ".pdf");
+		long fileSize = pdfExport.length();
+		System.out.println("File size: " + fileSize);
+		Assert.assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+	}
+	
+	protected void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
+		String fileURL = "/tmp/ui-graphene-test-tmp/" + reportName + "." + format.getName();
+		File export = new File(fileURL);
+		long fileSize = export.length();
+		System.out.println("File size: " + fileSize);
+		Assert.assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+		if (format == ExportFormat.IMAGE_PNG) {
+			browser.get("file://" + fileURL);
+			Screenshots.takeScreenshot(browser, "export-report-" + reportName, this.getClass());
+			waitForElementPresent(By.xpath("//img[contains(@src, '/tmp/ui-graphene-test-tmp/')]"));
 		}
 	}
 	

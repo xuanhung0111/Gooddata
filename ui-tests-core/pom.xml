@@ -15,14 +15,34 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
-
+	
 	<profiles>
 		<profile>
 			<id>selenium</id>
 			<properties>
 				<testng.suite.xml>testng-core.xml</testng.suite.xml>
 				<propertiesPath>${basedir}/src/test/resources/variables-env-test.properties</propertiesPath>
+				<browserDownloadFolder>${project.build.directory}/downloads</browserDownloadFolder>
 			</properties>
+			<build>
+				<testResources>
+					<testResource>
+						<directory>src/test/resources</directory>
+						<filtering>true</filtering>
+						<includes>
+							<include>**/firefox-prefs.js</include>
+						</includes>
+					</testResource>
+					<testResource>
+						<directory>src/test/resources</directory>
+						<filtering>false</filtering>
+						<includes>
+							<include>**/*.xml</include>
+							<include>**/*.properties</include>
+						</includes>
+					</testResource>
+				</testResources>
+			</build>
 		</profile>
 	</profiles>
 </project>
