@@ -36,10 +36,13 @@ public class GoodSalesProjectTest extends AbstractTest {
 	private long expectedDashboardExportSize = 65000L;
 	
 	private String exportedReportName;
-	private long expectedReportExportPDFSize = 100000L;
-	private long expectedReportExportPNGSize = 35000L;
-	private long expectedReportExportXLSSize = 5000L;
-	private long expectedReportExportCSVSize = 100L;
+	private long expectedLineChartExportPDFSize = 100000L;
+	private long expectedLineChartReportExportPNGSize = 36000L;
+	private long expectedLineChartReportExportXLSSize = 5000L;
+	private long expectedLineChartReportExportCSVSize = 140L;
+	private long expectedTabularReportExportPDFSize = 20000L;
+	private long expectedTabularReportExportXLSSize = 5000L;
+	private long expectedTabularReportExportCSVSize = 150L;
 	
 	@BeforeClass
 	public void initStartPage() {
@@ -107,6 +110,36 @@ public class GoodSalesProjectTest extends AbstractTest {
 		prepareReport("Simple tabular report", ReportTypes.TABLE, what, how);
 	}
 	
+	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
+	public void exportTabularReportToPDF() throws InterruptedException {
+		exportReport("Simple tabular report", ExportFormat.PDF, 30000L);
+	}
+	
+	@Test(dependsOnMethods = { "exportTabularReportToPDF" }, groups = { "tabular-report-exports" })
+	public void verifyExportedTabularReportPDF() {
+		verifyReportExport(ExportFormat.PDF, exportedReportName, expectedTabularReportExportPDFSize);
+	}
+	
+	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
+	public void exportTabularReportToXLS() throws InterruptedException {
+		exportReport("Simple tabular report", ExportFormat.EXCEL_XLS, 20000L);
+	}
+	
+	@Test(dependsOnMethods = { "exportTabularReportToXLS" }, groups = { "tabular-report-exports" })
+	public void verifyExportedTabularReportXLS() {
+		verifyReportExport(ExportFormat.EXCEL_XLS, exportedReportName, expectedTabularReportExportXLSSize);
+	}
+	
+	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
+	public void exportTabularReportToCSV() throws InterruptedException {
+		exportReport("Simple tabular report", ExportFormat.CSV, 20000L);
+	}
+	
+	@Test(dependsOnMethods = { "exportTabularReportToCSV" }, groups = { "tabular-report-exports" })
+	public void verifyExportedTabularReportCSV() {
+		verifyReportExport(ExportFormat.CSV, exportedReportName, expectedTabularReportExportCSVSize);
+	}
+	
 	@Test(dependsOnMethods = { "verifyReportsPage" }, groups = { "goodsales-chart" })
 	public void createLineChartReport() throws InterruptedException {
 		List<String> what = new ArrayList<String>();
@@ -123,8 +156,8 @@ public class GoodSalesProjectTest extends AbstractTest {
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToPDF" }, groups = { "line-chart-exports" })
-	public void verifyExportedReportPDF() {
-		verifyReportExport(ExportFormat.PDF, exportedReportName, expectedReportExportPDFSize);
+	public void verifyExportedLineChartPDF() {
+		verifyReportExport(ExportFormat.PDF, exportedReportName, expectedLineChartExportPDFSize);
 	}
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
@@ -133,8 +166,8 @@ public class GoodSalesProjectTest extends AbstractTest {
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToPNG" }, groups = { "line-chart-exports" })
-	public void verifyExportedReportPNG() {
-		verifyReportExport(ExportFormat.IMAGE_PNG, exportedReportName, expectedReportExportPNGSize);
+	public void verifyExportedLineChartPNG() {
+		verifyReportExport(ExportFormat.IMAGE_PNG, exportedReportName, expectedLineChartReportExportPNGSize);
 	}
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
@@ -143,8 +176,8 @@ public class GoodSalesProjectTest extends AbstractTest {
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToXLS" }, groups = { "line-chart-exports" })
-	public void verifyExportedReportXLS() {
-		verifyReportExport(ExportFormat.EXCEL_XLS, exportedReportName, expectedReportExportXLSSize);
+	public void verifyExportedLineChartXLS() {
+		verifyReportExport(ExportFormat.EXCEL_XLS, exportedReportName, expectedLineChartReportExportXLSSize);
 	}
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
@@ -153,8 +186,8 @@ public class GoodSalesProjectTest extends AbstractTest {
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToCSV" }, groups = { "line-chart-exports" })
-	public void verifyExportedReportCSV() {
-		verifyReportExport(ExportFormat.CSV, exportedReportName, expectedReportExportCSVSize);
+	public void verifyExportedLineChartCSV() {
+		verifyReportExport(ExportFormat.CSV, exportedReportName, expectedLineChartReportExportCSVSize);
 	}
 	
 	@Test(dependsOnMethods = { "verifyReportsPage" }, groups = { "goodsales-chart" })
@@ -197,7 +230,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 		prepareReport("Simple stacked bar chart report", ReportTypes.STACKED_BAR, what, how);
 	}
 	
-	@Test(dependsOnGroups = { "goodsales-chart", "line-chart-exports", "dashboards-verification" })
+	@Test(dependsOnGroups = { "goodsales-chart", "line-chart-exports", "tabular-report-exports", "dashboards-verification" })
 	public void verifyCreatedReports() {
 		ReportsPage reports = initReportsPage();
 		Assert.assertEquals(reports.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
