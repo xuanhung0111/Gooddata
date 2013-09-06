@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -308,12 +309,20 @@ public abstract class AbstractTest extends Arquillian {
 		Graphene.waitGui().until().element(byElement).is().visible();
 	}
 	
+	public void waitForElementVisible(WebElement element) {
+		Graphene.waitGui().until().element(element).is().visible();
+	}
+	
 	public void waitForElementNotVisible(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().not().visible();
 	}
 	
 	public void waitForElementPresent(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().present();
+	}
+	
+	public void waitForElementPresent(WebElement element) {
+		Graphene.waitGui().until().element(element).is().present();
 	}
 	
 	public void waitForElementNotPresent(By byElement) {

@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.common;
 
-import org.jboss.arquillian.graphene.enricher.findby.FindBy;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -38,7 +38,7 @@ public class LoginPageTest extends AbstractTest {
 		browser.findElement(BY_LOGGED_USER_BUTTON).click();
 		waitForElementVisible(BY_LOGOUT_LINK);
 		browser.findElement(BY_LOGOUT_LINK).click();
-		waitForElementNotVisible(BY_LOGGED_USER_BUTTON);
+		waitForElementVisible(loginFragment.getRoot());
 	}
 	
 	@Test(dependsOnGroups = {"loginInit"})
