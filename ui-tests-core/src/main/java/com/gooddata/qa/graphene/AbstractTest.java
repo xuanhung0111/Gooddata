@@ -230,7 +230,7 @@ public abstract class AbstractTest extends Arquillian {
 		if (format == ExportFormat.IMAGE_PNG) {
 			browser.get("file://" + fileURL);
 			Screenshots.takeScreenshot(browser, "export-report-" + reportName, this.getClass());
-			waitForElementPresent(By.xpath("//img[contains(@src, '/tmp/ui-graphene-test-tmp/')]"));
+			waitForElementPresent(By.xpath("//img[contains(@src, '" + downloadFolder + "')]"));
 		}
 	}
 	
