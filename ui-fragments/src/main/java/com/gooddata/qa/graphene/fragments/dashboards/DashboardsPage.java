@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -130,7 +129,7 @@ public class DashboardsPage extends AbstractFragment {
 		waitForElementVisible(editExportEmbedButton);
 		editExportEmbedButton.click();
 		waitForElementVisible(exportPdfButton);
-		Graphene.guardAjax(exportPdfButton).click();
+		exportPdfButton.click();
 		waitForElementVisible(BY_EXPORTING_PANEL);
 		Thread.sleep(3000);
 		waitForElementNotPresent(BY_EXPORTING_PANEL);
