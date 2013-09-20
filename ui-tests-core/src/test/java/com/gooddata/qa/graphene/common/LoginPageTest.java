@@ -38,7 +38,8 @@ public class LoginPageTest extends AbstractTest {
 		browser.findElement(BY_LOGGED_USER_BUTTON).click();
 		waitForElementVisible(BY_LOGOUT_LINK);
 		browser.findElement(BY_LOGOUT_LINK).click();
-		waitForElementVisible(loginFragment.getRoot());
+		waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
+		Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
 	}
 	
 	@Test(dependsOnGroups = {"loginInit"})
