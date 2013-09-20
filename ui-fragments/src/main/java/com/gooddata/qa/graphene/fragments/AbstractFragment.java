@@ -52,4 +52,8 @@ public abstract class AbstractFragment {
 	public void waitForElementNotPresent(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().not().present();
 	}
+	
+	public void waitForElementNotPresent(WebElement element) {
+		Graphene.waitGui().until().element(element).is().not().present();
+	}
 }

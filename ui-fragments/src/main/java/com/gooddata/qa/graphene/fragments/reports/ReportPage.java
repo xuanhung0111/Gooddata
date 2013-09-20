@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -91,7 +92,7 @@ public class ReportPage extends AbstractFragment {
 		Assert.assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
 	}
 	
-	public String exportReport(ExportFormat format, long exportTimeoutMillis) throws InterruptedException {
+	public String exportReport(ExportFormat format) throws InterruptedException {
 		String reportName = getReportName();
 		waitForElementVisible(exportButton);
 		exportButton.click();
@@ -111,10 +112,10 @@ public class ReportPage extends AbstractFragment {
 			break;
 		}
 		waitForElementVisible(currentExportLink);
-		currentExportLink.click();
+		Graphene.guardAjax(currentExportLink).click();
 		waitForElementVisible(BY_EXPORTING_STATUS);
-		Thread.sleep(exportTimeoutMillis);
 		waitForElementVisible(exportButton);
+		Thread.sleep(3000);
 		System.out.println("Report " + reportName + " exported to " + format.getName());
 		return reportName;
 	}

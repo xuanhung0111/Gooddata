@@ -49,7 +49,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	}
 	
 	@Test(groups = { "GoodSalesInit" } )
-	public void init() throws JSONException {
+	public void init() throws JSONException, InterruptedException {
 		// sign in with demo user
 		signInAtUI(user, password);
 	}
@@ -75,7 +75,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		waitForDashboardPageLoaded();
 		DashboardsPage dashboards = Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
-		exportedDashboardName = dashboards.exportDashboard(0, 30000L);
+		exportedDashboardName = dashboards.exportDashboardTab(0);
 		checkRedBar();
 	}
 	
@@ -83,6 +83,45 @@ public class GoodSalesProjectTest extends AbstractTest {
 	public void verifyExportedDashboardPDF() {
 		verifyDashboardExport(exportedDashboardName, expectedDashboardExportSize);
 	}
+	
+	@Test(dependsOnMethods = { "verifyDashboardTabs" }, groups = { "dashboards-verification" })
+	public void addNewTab() throws InterruptedException {
+		addNewTabOnDashboard("Pipeline Analysis", "test", "GoodSales-new-tab");
+	}
+	
+	@Test(dependsOnMethods = { "verifyDashboardTabs" }, groups = { "dashboards-verification", "new-dashboard" })
+	public void addNewDashboard() throws InterruptedException {
+		DashboardsPage dashboards = initDashboardsPage();
+		String dashboardName = "test";
+		dashboards.addNewDashboard(dashboardName);
+		waitForDashboardPageLoaded();
+		waitForElementNotPresent(dashboards.getDashboardEditBar().getRoot());
+		Thread.sleep(5000);
+		checkRedBar();
+		Assert.assertEquals(dashboards.getDashboardsCount(), 2, "New dashboard is not present");
+		Assert.assertEquals(dashboards.getDashboardName(), dashboardName, "New dashboard has invalid name");
+		Screenshots.takeScreenshot(browser, "GoodSales-new-dashboard", this.getClass());
+	}
+	
+	@Test(dependsOnMethods = { "addNewDashboard" }, groups = { "dashboards-verification", "new-dashboard" })
+	public void addNewTabOnNewDashboard() throws InterruptedException {
+		addNewTabOnDashboard("test", "test2", "GoodSales-new-dashboard-new-tab");
+	}
+	
+	@Test(dependsOnGroups = { "new-dashboard" }, groups = { "dashboards-verification" })
+	public void deleteNewDashboard() throws InterruptedException {
+		DashboardsPage dashboards = initDashboardsPage();
+		int dashboardsCount = dashboards.getDashboardsCount();
+		if (dashboards.selectDashboard("test")) {
+			dashboards.deleteDashboard();
+			waitForDashboardPageLoaded();
+			Assert.assertEquals(dashboards.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
+			checkRedBar();
+		} else {
+			Assert.fail("Dashboard wasn't selected and not deleted");
+		}
+	}
+	
 	
 	@Test(dependsOnMethods = { "createProject" })
 	public void verifyReportsPage() throws InterruptedException {
@@ -111,7 +150,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
 	public void exportTabularReportToPDF() throws InterruptedException {
-		exportReport("Simple tabular report", ExportFormat.PDF, 30000L);
+		exportReport("Simple tabular report", ExportFormat.PDF);
 	}
 	
 	@Test(dependsOnMethods = { "exportTabularReportToPDF" }, groups = { "tabular-report-exports" })
@@ -121,7 +160,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
 	public void exportTabularReportToXLS() throws InterruptedException {
-		exportReport("Simple tabular report", ExportFormat.EXCEL_XLS, 20000L);
+		exportReport("Simple tabular report", ExportFormat.EXCEL_XLS);
 	}
 	
 	@Test(dependsOnMethods = { "exportTabularReportToXLS" }, groups = { "tabular-report-exports" })
@@ -131,7 +170,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
 	public void exportTabularReportToCSV() throws InterruptedException {
-		exportReport("Simple tabular report", ExportFormat.CSV, 20000L);
+		exportReport("Simple tabular report", ExportFormat.CSV);
 	}
 	
 	@Test(dependsOnMethods = { "exportTabularReportToCSV" }, groups = { "tabular-report-exports" })
@@ -149,9 +188,24 @@ public class GoodSalesProjectTest extends AbstractTest {
 		prepareReport("Simple line chart report", ReportTypes.LINE, what, how);
 	}
 	
+	@Test(dependsOnMethods = { "addNewTab", "createLineChartReport" }, groups = { "dashboards-verification" })
+	public void addReportOnTab() throws InterruptedException {
+		DashboardsPage dashboards = initDashboardsPage();
+		dashboards.selectDashboard("Pipeline Analysis");
+		waitForDashboardPageLoaded();
+		Thread.sleep(3000);
+		dashboards.getTabs().openTab(9);
+		waitForDashboardPageLoaded();
+		dashboards.editDashboard();
+		dashboards.getDashboardEditBar().addReportToDashboard("Simple line chart report");
+		dashboards.getDashboardEditBar().saveDashboard();
+		waitForDashboardPageLoaded();
+		Screenshots.takeScreenshot(browser, "GoodSales-new-tab-with-simple-chart", this.getClass());
+	}
+	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
 	public void exportLineChartToPDF() throws InterruptedException {
-		exportReport("Simple line chart report", ExportFormat.PDF, 30000L);
+		exportReport("Simple line chart report", ExportFormat.PDF);
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToPDF" }, groups = { "line-chart-exports" })
@@ -161,7 +215,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
 	public void exportLineChartToPNG() throws InterruptedException {
-		exportReport("Simple line chart report", ExportFormat.IMAGE_PNG, 30000L);
+		exportReport("Simple line chart report", ExportFormat.IMAGE_PNG);
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToPNG" }, groups = { "line-chart-exports" })
@@ -171,7 +225,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
 	public void exportLineChartToXLS() throws InterruptedException {
-		exportReport("Simple line chart report", ExportFormat.EXCEL_XLS, 20000L);
+		exportReport("Simple line chart report", ExportFormat.EXCEL_XLS);
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToXLS" }, groups = { "line-chart-exports" })
@@ -181,7 +235,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createLineChartReport" }, groups = { "line-chart-exports" })
 	public void exportLineChartToCSV() throws InterruptedException {
-		exportReport("Simple line chart report", ExportFormat.CSV, 20000L);
+		exportReport("Simple line chart report", ExportFormat.CSV);
 	}
 	
 	@Test(dependsOnMethods = { "exportLineChartToCSV" }, groups = { "line-chart-exports" })
@@ -245,6 +299,13 @@ public class GoodSalesProjectTest extends AbstractTest {
 		deleteProjectByDeleteMode(successfulTest);
 	}
 	
+	private DashboardsPage initDashboardsPage() {
+		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+		waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		waitForDashboardPageLoaded();
+		return Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
+	}
+	
 	private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how) throws InterruptedException {
 		ReportsPage reports = initReportsPage();
 		selectFolder(reports, "My Reports");
@@ -277,9 +338,31 @@ public class GoodSalesProjectTest extends AbstractTest {
 		return Graphene.createPageFragment(ReportPage.class, browser.findElement(BY_REPORT_PAGE));
 	}
 	
-	private void exportReport(String reportName, ExportFormat format, long exportTimeoutMillis) throws InterruptedException {
+	private void exportReport(String reportName, ExportFormat format) throws InterruptedException {
 		ReportPage report = initReportPage(reportName);
-		report.exportReport(format, exportTimeoutMillis);
+		report.exportReport(format);
 		checkRedBar();
+	}
+	
+	private void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) throws InterruptedException {
+		DashboardsPage dashboards = initDashboardsPage();
+		Assert.assertTrue(dashboards.selectDashboard(dashboardName), "Dashboard wasn't selected");
+		waitForDashboardPageLoaded();
+		Thread.sleep(3000);
+		int tabsCount = dashboards.getTabs().getNumberOfTabs();
+		dashboards.editDashboard();
+		waitForDashboardPageLoaded();
+		dashboards.addNewTab(tabName);
+		checkRedBar();
+		Assert.assertEquals(dashboards.getTabs().getNumberOfTabs(), tabsCount + 1, "New tab is not present");
+		Assert.assertTrue(dashboards.getTabs().isTabSelected(tabsCount), "New tab is not selected");
+		Assert.assertEquals(dashboards.getTabs().getTabLabel(tabsCount), tabName, "New tab has invalid label");
+		dashboards.getDashboardEditBar().saveDashboard();
+		waitForDashboardPageLoaded();
+		waitForElementNotPresent(dashboards.getDashboardEditBar().getRoot());
+		Assert.assertEquals(dashboards.getTabs().getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
+		Assert.assertTrue(dashboards.getTabs().isTabSelected(tabsCount), "New tab is not selected after Save");
+		Assert.assertEquals(dashboards.getTabs().getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
+		Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
 	}
 }
