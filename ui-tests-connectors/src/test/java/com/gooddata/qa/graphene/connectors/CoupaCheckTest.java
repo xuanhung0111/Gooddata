@@ -87,7 +87,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		scheduleIntegrationProcess(Connectors.COUPA, integrationProcessCheckLimit);
 
 		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(expectedCoupaTabs.length, expectedCoupaTabs, true);
+		verifyProjectDashboardTabs(true, expectedCoupaTabs.length, expectedCoupaTabs, true);
 		successfulTest = true;
 	}
 	

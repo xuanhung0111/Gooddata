@@ -183,7 +183,7 @@ public abstract class AbstractTest extends Arquillian {
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
 	
-	protected void verifyProjectDashboardTabs(int expectedNumberOfTabs, String[] expectedTabLabels, boolean openPage) throws InterruptedException {
+	protected void verifyProjectDashboardTabs(boolean validation, int expectedNumberOfTabs, String[] expectedTabLabels, boolean openPage) throws InterruptedException {
 		if (openPage) {
 			browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
 			waitForElementVisible(BY_LOGGED_USER_BUTTON);
@@ -194,11 +194,11 @@ public abstract class AbstractTest extends Arquillian {
 		DashboardTabs tabs = dashboards.getTabs();
 		int numberOfTabs = tabs.getNumberOfTabs();
 		System.out.println("Number of tabs for project: " + numberOfTabs);
-		Assert.assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
+		if (validation) Assert.assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
 		List<String> tabLabels = tabs.getAllTabNames();
 		System.out.println("These tabs are available for selected project: " + tabLabels.toString());
 		for (int i = 0; i < tabLabels.size(); i++) {
-			Assert.assertEquals(tabLabels.get(i), expectedTabLabels[i], "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
+			if (validation) Assert.assertEquals(tabLabels.get(i), expectedTabLabels[i], "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
 			tabs.openTab(i);
 			System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
 			waitForDashboardPageLoaded();

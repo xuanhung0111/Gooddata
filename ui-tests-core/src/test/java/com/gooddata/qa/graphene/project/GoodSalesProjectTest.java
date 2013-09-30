@@ -66,7 +66,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createProject" }, groups = { "dashboards-verification" })
 	public void verifyDashboardTabs() throws InterruptedException {
-		verifyProjectDashboardTabs(expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
+		verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
 	}
 	
 	@Test(dependsOnMethods = { "verifyDashboardTabs" }, groups = { "dashboards-verification" })

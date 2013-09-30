@@ -83,7 +83,7 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		waitForIntegrationProcessSynchronized(browser, Connectors.BRIGHTIDEA, integrationProcessCheckLimit);
 		
 		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(expectedBrightideaTabs.length, expectedBrightideaTabs, true);		
+		verifyProjectDashboardTabs(true, expectedBrightideaTabs.length, expectedBrightideaTabs, true);		
 		
 		successfulTest = true;
 	}

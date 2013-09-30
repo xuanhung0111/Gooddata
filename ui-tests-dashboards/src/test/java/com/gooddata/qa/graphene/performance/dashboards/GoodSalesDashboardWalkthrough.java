@@ -53,7 +53,7 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 		waitForDashboardPageLoaded();
 		for (int i = 1; i <= 10; i++) {
 			System.out.println("Iteration:" + i);
-			verifyProjectDashboardTabs(expectedGoodSalesTabs.length, expectedGoodSalesTabs, false);
+			verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, false);
 		}
 		String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
 		createPerfOutputFile(output);
