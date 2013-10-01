@@ -25,6 +25,10 @@ public abstract class AbstractFragment {
 		waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"));
 	}
 	
+	public void waitForAnalysisPageLoaded() {
+		waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"));
+	}
+	
 	public void waitForElementVisible(WebElement element) {
 		Graphene.waitGui().until().element(element).is().visible();
 	}

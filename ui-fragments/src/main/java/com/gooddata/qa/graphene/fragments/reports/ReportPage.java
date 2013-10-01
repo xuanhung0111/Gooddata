@@ -34,16 +34,16 @@ public class ReportPage extends AbstractFragment {
 	@FindBy(xpath="//button[contains(@class, 'exportButton')]")
 	private WebElement exportButton;
 	
-	@FindBy(xpath="//a[@class='s-to_pdf']")
+	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'pdf')]")
 	private WebElement exportToPDF;
 	
-	@FindBy(xpath="//a[@class='s-to_image__png_']")
+	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'png')]")
 	private WebElement exportToPNG;
 	
-	@FindBy(xpath="//a[@class='s-to_excel_xls']")
+	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'xls')]")
 	private WebElement exportToXLS;
 	
-	@FindBy(xpath="//a[@class='s-to_csv']")
+	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'csv')]")
 	private WebElement exportToCSV;
 	
 	private static final By BY_EXPORTING_STATUS = By.xpath("//span[@class='exportProgress']/span[text()='Exporting...']");
@@ -82,8 +82,9 @@ public class ReportPage extends AbstractFragment {
 		//TODO
 		
 		visualiser.selectReportVisualisation(reportType);
-		Thread.sleep(5000);
+		waitForAnalysisPageLoaded();
 		waitForElementVisible(createReportButton);
+		Thread.sleep(2000);
 		createReportButton.click();
 		waitForElementVisible(confirmDialogCreateButton);
 		confirmDialogCreateButton.click();

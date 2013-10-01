@@ -39,9 +39,9 @@ public class GoodSalesProjectTest extends AbstractTest {
 	private long expectedLineChartReportExportPNGSize = 36000L;
 	private long expectedLineChartReportExportXLSSize = 5000L;
 	private long expectedLineChartReportExportCSVSize = 140L;
-	private long expectedTabularReportExportPDFSize = 20000L;
-	private long expectedTabularReportExportXLSSize = 5000L;
-	private long expectedTabularReportExportCSVSize = 150L;
+	private long expectedTabularReportExportPDFSize = 28000L;
+	private long expectedTabularReportExportXLSSize = 8000L;
+	private long expectedTabularReportExportCSVSize = 1400L;
 	
 	@BeforeClass
 	public void initStartPage() {
@@ -122,7 +122,6 @@ public class GoodSalesProjectTest extends AbstractTest {
 		}
 	}
 	
-	
 	@Test(dependsOnMethods = { "createProject" })
 	public void verifyReportsPage() throws InterruptedException {
 		ReportsPage reports = initReportsPage();
@@ -145,6 +144,8 @@ public class GoodSalesProjectTest extends AbstractTest {
 		List<String> how = new ArrayList<String>();
 		how.add("Region");
 		how.add("Priority");
+		how.add("Sales Rep");
+		how.add("Department");
 		prepareReport("Simple tabular report", ReportTypes.TABLE, what, how);
 	}
 	
