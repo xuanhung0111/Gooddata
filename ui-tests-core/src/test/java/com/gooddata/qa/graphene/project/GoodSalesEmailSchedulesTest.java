@@ -28,7 +28,7 @@ public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "verifyEmptySchedules" }, groups = { "schedules" })
 	public void createReportSchedule() {
 		EmailSchedulePage schedulesPage = initEmailSchedulesPage();
-		schedulesPage.scheduleNewReportEmail(user, "UI-Graphene-core-Dashboard", "Scheduled email test - dashboard.", "Activities by Type", ExportFormat.ALL);
+		schedulesPage.scheduleNewReportEmail(user, "UI-Graphene-core-Report", "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);
 		checkRedBar();
 		Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
 	}
