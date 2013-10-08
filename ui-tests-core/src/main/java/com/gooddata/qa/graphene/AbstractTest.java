@@ -80,7 +80,8 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final By BY_IFRAME = By.tagName("iframe");
 	
 	protected static final By BY_PROJECTS_PANEL = By.id("projectsCentral");
-	protected static final By BY_PROJECT_PANEL = By.id("p-projectPage");
+	protected static final By BY_PROJECT_PAGE_PANEL = By.id("p-projectPage");
+	protected static final By BY_SCHEDULES_PAGE_PANEL = By.id("p-emailSchedulePage");
 	protected static final By BY_PROJECTS_LIST = By.id("myProjects");
 	
 	protected static final By BY_REPORTS_PANEL = By.id("p-domainPage");
@@ -262,7 +263,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected void deleteProject(String projectId) {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
 		waitForProjectPageLoaded();
-		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PANEL));
+		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PAGE_PANEL));
 		System.out.println("Going to delete project: " + projectId);
 		projectPage.deteleProject();
 		System.out.println("Deleted project: " + projectId);
@@ -303,6 +304,10 @@ public abstract class AbstractTest extends Arquillian {
 	
 	public void waitForAnalysisPageLoaded() {
 		waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"));
+	}
+	
+	public void waitForSchedulesPageLoaded() {
+		waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
 	}
 	
 	public void waitForElementVisible(By byElement) {

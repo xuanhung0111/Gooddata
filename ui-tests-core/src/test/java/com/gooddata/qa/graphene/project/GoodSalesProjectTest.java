@@ -4,31 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
-import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "projectGoodSales" }, description = "Tests for GoodSales project functionality in GD platform")
-public class GoodSalesProjectTest extends AbstractTest {
-	
-	private static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
-	
-	private static final String[] expectedGoodSalesTabs = {
-		"Outlook", "What's Changed", "Waterfall Analysis", "Leaderboards", "Activities", "Sales Velocity", "Quarterly Trends", "Seasonality", "...and more"
-	};
-	
-	private static final int expectedGoodSalesReportsCount = 103;
-	private static final int expectedGoodSalesReportsCustomFoldersCount = 9;
+public class GoodSalesProjectTest extends GoodSalesAbstractTest {
 	
 	private int createdReportsCount = 0;
 	
@@ -42,27 +29,6 @@ public class GoodSalesProjectTest extends AbstractTest {
 	private long expectedTabularReportExportPDFSize = 28000L;
 	private long expectedTabularReportExportXLSSize = 8000L;
 	private long expectedTabularReportExportCSVSize = 1400L;
-	
-	@BeforeClass
-	public void initStartPage() {
-		startPage = "projects.html";
-	}
-	
-	@Test(groups = { "GoodSalesInit" } )
-	public void init() throws JSONException, InterruptedException {
-		// sign in with demo user
-		signInAtUI(user, password);
-	}
-	
-	@Test(dependsOnGroups = { "GoodSalesInit" })
-	public void createProject() throws JSONException, InterruptedException {
-		waitForProjectsPageLoaded();
-		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
-		waitForElementVisible(BY_GP_FORM);
-		ProjectFragment project = Graphene.createPageFragment(ProjectFragment.class, browser.findElement(BY_GP_FORM));
-		projectId = project.createProject("GoodSales-test", "", GOODSALES_TEMPLATE, authorizationToken, 240);
-		Screenshots.takeScreenshot(browser, "GoodSales-project-created", this.getClass());
-	}
 	
 	@Test(dependsOnMethods = { "createProject" }, groups = { "dashboards-verification" })
 	public void verifyDashboardTabs() throws InterruptedException {
@@ -284,7 +250,7 @@ public class GoodSalesProjectTest extends AbstractTest {
 		prepareReport("Simple stacked bar chart report", ReportTypes.STACKED_BAR, what, how);
 	}
 	
-	@Test(dependsOnGroups = { "goodsales-chart", "line-chart-exports", "tabular-report-exports", "dashboards-verification" })
+	@Test(dependsOnGroups = { "goodsales-chart", "line-chart-exports", "tabular-report-exports", "dashboards-verification" }, groups = { "lastTest" })
 	public void verifyCreatedReports() {
 		ReportsPage reports = initReportsPage();
 		Assert.assertEquals(reports.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
@@ -293,11 +259,6 @@ public class GoodSalesProjectTest extends AbstractTest {
 		Assert.assertEquals(reports.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
 		Screenshots.takeScreenshot(browser, "GoodSales-new-reports", this.getClass());
 		successfulTest = true;
-	}
-	
-	@Test(dependsOnMethods = { "verifyCreatedReports" }, alwaysRun = true)
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
 	}
 	
 	private DashboardsPage initDashboardsPage() {

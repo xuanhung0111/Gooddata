@@ -2,10 +2,11 @@ package com.gooddata.qa.graphene.enums;
 
 public enum ExportFormat {
 	
-	PDF ("pdf", "To PDF"),
-	IMAGE_PNG ("png", "To image (PNG)"),
-	CSV ("csv", "To Excel XLS"),
-	EXCEL_XLS ("xls", "To CSV");
+	PDF ("pdf", "PDF"),
+	IMAGE_PNG ("png", "Image (PNG)"),
+	CSV ("csv", "Excel (XLS)"),
+	EXCEL_XLS ("xls", "CSV"),
+	ALL ("all", "Used for schedules...");
 	
 	private final String name;
 	private final String label;
