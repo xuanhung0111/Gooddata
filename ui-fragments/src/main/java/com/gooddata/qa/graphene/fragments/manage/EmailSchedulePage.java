@@ -76,6 +76,7 @@ public class EmailSchedulePage extends AbstractFragment {
 		emailSubjectInput.sendKeys(emailSubject);
 		emailMessageInput.sendKeys(emailBody);
 		waitForElementVisible(dashboardsSelector);
+		waitForEmailSchedulePageLoaded();
 		Assert.assertTrue(dashboardsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Dashboards selector is not selected by default");
 		selectDashboard(dashboardName);
 		// TODO - schedule (will be sent in the nearest time slot now)
@@ -95,6 +96,7 @@ public class EmailSchedulePage extends AbstractFragment {
 		emailMessageInput.sendKeys(emailBody);
 		waitForElementVisible(reportsSelector);
 		reportsSelector.click();
+		waitForEmailSchedulePageLoaded();
 		Assert.assertTrue(reportsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Reports selector is not selected");
 		selectReport(reportName);
 		selectReportFormat(format);
