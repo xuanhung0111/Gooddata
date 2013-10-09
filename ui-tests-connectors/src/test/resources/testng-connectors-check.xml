@@ -1,0 +1,70 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+	<test name="Zendesk3ConnectorCheck">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.connectors.Zendesk3CheckTest" />
+		</classes>
+	</test>
+	
+	<test name="PardotBaseConnectorCheck">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.connectors.PardotBaseCheckTest" />
+		</classes>
+	</test>
+	
+	<test name="PardotPremiumConnectorCheck">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.connectors.PardotPremiumCheckTest" />
+		</classes>
+	</test>
+	
+	<test name="BrightideaConnectorCheck">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.connectors.BrightideaCheckTest" />
+		</classes>
+	</test>
+	
+	<test name="CoupaConnectorCheck">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.connectors.CoupaCheckTest" />
+		</classes>
+	</test>
+	
+	<test name="GoogleAnalyticsConnectorCheck">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.connectors.GoogleAnalyticsCheckTest" />
+		</classes>
+	</test>
+	
+</suite>

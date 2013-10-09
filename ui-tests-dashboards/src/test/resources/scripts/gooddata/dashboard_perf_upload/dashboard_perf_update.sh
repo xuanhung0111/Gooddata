@@ -1,0 +1,1 @@
+$CL_TOOL_CMD -u david.vrzalik+cpt@gooddata.com -p wlcmttm2 -a INT000000GDENQA dashboard_perf_update.gdc

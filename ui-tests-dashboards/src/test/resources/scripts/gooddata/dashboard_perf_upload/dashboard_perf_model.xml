@@ -1,0 +1,59 @@
+<schema>
+  <name>dashboardperf</name>
+  <columns>
+    <column>
+      <name>time</name>
+      <title>time</title>
+      <ldmType>DATE</ldmType>
+      <datetime>true</datetime>
+      <format>yyyy-MM-dd_HH-mm-ss</format>
+      <schemaReference>jtime</schemaReference>
+    </column>
+    <column>
+      <name>branch</name>
+      <title>branch</title>
+      <ldmType>ATTRIBUTE</ldmType>
+    </column>
+    <column>
+      <name>build</name>
+      <title>build</title>
+      <ldmType>ATTRIBUTE</ldmType>
+    </column>
+    <column>
+      <name>builduri</name>
+      <title>build uri</title>
+      <ldmType>LABEL</ldmType>
+      <reference>build</reference>
+    </column>
+    <column>
+      <name>gitcommit</name>
+      <title>git commit</title>
+      <ldmType>ATTRIBUTE</ldmType>
+    </column>
+    <column>
+      <name>browser</name>
+      <title>browser</title>
+      <ldmType>ATTRIBUTE</ldmType>
+    </column>
+    <column>
+      <name>sessionid</name>
+      <title>session ID</title>
+      <ldmType>ATTRIBUTE</ldmType>
+    </column>
+    <column>
+      <name>start</name>
+      <title>start</title>
+      <ldmType>FACT</ldmType>
+    </column>
+    <column>
+      <name>duration</name>
+      <title>duration</title>
+      <ldmType>FACT</ldmType>
+    </column>
+    <column>
+      <name>action</name>
+      <title>action</title>
+      <ldmType>ATTRIBUTE</ldmType>
+    </column>
+  </columns>
+</schema>
