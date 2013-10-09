@@ -105,22 +105,28 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		Screenshots.takeScreenshot(browser, "hds-simple-storage", this.getClass());
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.has("storage"), "Storage element isn't present");
-		Assert.assertTrue(json.getJSONObject("storage").getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getString("authorizationToken").equals(STORAGE_AUTH_TOKEN), "Storage authorizationToken doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("tables").equals(storageUrl + "/tables"), "Storage tables link doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
-		Assert.assertTrue(json.getJSONObject("storage").getString("status").equals("ENABLED"), "Storage isn't enabled");
-		String creatorUrl = json.getJSONObject("storage").getString("creator");
+		JSONObject storage = json.getJSONObject("storage");
+		Assert.assertTrue(storage.getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
+		Assert.assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
+		Assert.assertTrue(storage.getString("authorizationToken").equals(STORAGE_AUTH_TOKEN), "Storage authorizationToken doesn't match");
+		Assert.assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
+		Assert.assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
+		Assert.assertTrue(storage.getJSONObject("links").getString("tables").equals(storageUrl + "/tables"), "Storage tables link doesn't match");
+		Assert.assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
+		Assert.assertTrue(storage.getString("status").equals("ENABLED"), "Storage isn't enabled");
+		String createdByUrl = storage.getString("createdBy");
+		String updatedByUrl = storage.getString("updatedBy");
+		Assert.assertEquals(updatedByUrl, createdByUrl, "Storage createdBy and updatedBy attributes do not match");
+		String createdDate = storage.getString("created");
+		String updatedDate = storage.getString("updated");
+		Assert.assertEquals(updatedDate, createdDate, "Storage created and updated dates do not match");
 		browser.get(getBasicRootUrl() + storageUrl + "/users");
 		JSONObject jsonUsers = loadJSON();
 		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("parent").equals(storageUrl), "Storage users parent link doesn't match");
 		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("self").equals(storageUrl + "/users"), "Storage users self link doesn't match");
 		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").length() == 1, "Number of users doesn't match");
-		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").getJSONObject(0).getJSONObject("user").getString("profile").equals(creatorUrl), "Creator in users doesn't match with creator in storage");
-		browser.get(getBasicRootUrl() + creatorUrl);
+		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").getJSONObject(0).getJSONObject("user").getString("profile").equals(createdByUrl), "Creator in users doesn't match with creator in storage");
+		browser.get(getBasicRootUrl() + createdByUrl);
 		JSONObject jsonUser = loadJSON();
 		Assert.assertTrue(jsonUser.getJSONObject("accountSetting").getString("login").equals(user), "Login of user in profile doesn't match");
 	}
@@ -211,10 +217,17 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		Screenshots.takeScreenshot(browser, "hds-simple-table", this.getClass());
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.has("table"), "Table element isn't present");
-		Assert.assertTrue(json.getJSONObject("table").getString("name").equals(TABLE_NAME), "Table title doesn't match");
-		Assert.assertTrue(json.getJSONObject("table").getJSONObject("links").getString("parent").endsWith("tables"), "Table parent link doesn't match");
-		Assert.assertTrue(json.getJSONObject("table").getJSONObject("links").getString("self").equals(tableUrl), "Table self link doesn't match");
-		Assert.assertTrue(json.getJSONObject("table").getJSONObject("links").getString("columns").equals(tableUrl + "/columns"), "Table columns link doesn't match");
+		JSONObject table = json.getJSONObject("table");
+		Assert.assertTrue(table.getString("name").equals(TABLE_NAME), "Table title doesn't match");
+		Assert.assertTrue(table.getJSONObject("links").getString("parent").endsWith("tables"), "Table parent link doesn't match");
+		Assert.assertTrue(table.getJSONObject("links").getString("self").equals(tableUrl), "Table self link doesn't match");
+		Assert.assertTrue(table.getJSONObject("links").getString("columns").equals(tableUrl + "/columns"), "Table columns link doesn't match");
+		String createdByUrl = table.getString("createdBy");
+		String updatedByUrl = table.getString("updatedBy");
+		Assert.assertEquals(updatedByUrl, createdByUrl, "Table createdBy and updatedBy attributes do not match");
+		String createdDate = table.getString("created");
+		String updatedDate = table.getString("updated");
+		Assert.assertEquals(updatedDate, createdDate, "Table created and updated dates do not match");
 	}
 	
 	@Test(dependsOnMethods = { "createTable" }, groups = { "tables-tests" })
@@ -294,11 +307,18 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		Screenshots.takeScreenshot(browser, "hds-simple-column", this.getClass());
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.has("column"), "Column element isn't present");
-		Assert.assertTrue(json.getJSONObject("column").getString("name").equals(COLUMN_NAME), "Column title doesn't match");
-		Assert.assertTrue(json.getJSONObject("column").getString("type").equals(ColumnFragment.Types.TEXT.getText()), "Column type doesn't match");
-		Assert.assertTrue(json.getJSONObject("column").getBoolean("primary") == Boolean.TRUE, "Column primary doesn't match");
-		Assert.assertTrue(json.getJSONObject("column").getJSONObject("links").getString("parent").endsWith("columns"), "Column parent link doesn't match");
-		Assert.assertTrue(json.getJSONObject("column").getJSONObject("links").getString("self").equals(columnUrl), "Column self link doesn't match");
+		JSONObject column = json.getJSONObject("column");
+		Assert.assertTrue(column.getString("name").equals(COLUMN_NAME), "Column title doesn't match");
+		Assert.assertTrue(column.getString("type").equals(ColumnFragment.Types.TEXT.getText()), "Column type doesn't match");
+		Assert.assertTrue(column.getBoolean("primary") == Boolean.TRUE, "Column primary doesn't match");
+		Assert.assertTrue(column.getJSONObject("links").getString("parent").endsWith("columns"), "Column parent link doesn't match");
+		Assert.assertTrue(column.getJSONObject("links").getString("self").equals(columnUrl), "Column self link doesn't match");
+		String createdByUrl = column.getString("createdBy");
+		String updatedByUrl = column.getString("updatedBy");
+		Assert.assertEquals(updatedByUrl, createdByUrl, "Column createdBy and updatedBy attributes do not match");
+		String createdDate = column.getString("created");
+		String updatedDate = column.getString("updated");
+		Assert.assertEquals(updatedDate, createdDate, "Column created and updated dates do not match");
 	}
 	
 	@Test(dependsOnMethods = { "createColumn" }, groups = { "columns-tests" })
@@ -410,17 +430,17 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "createColumn" }, groups = { "columns-tests" })
 	public void createColumnWithExistingName() throws JSONException {
-		createInvalidColumn(COLUMN_NAME, ColumnFragment.Types.TEXT, false, null, null, "The column \"" + COLUMN_NAME + "\" already exists in the table");
+		createInvalidColumn(COLUMN_NAME, ColumnFragment.Types.TEXT, false, null, null, "Column '" + COLUMN_NAME + "' already exists in table '" + TABLE_NAME + " updated' in storage with id");
 	}
 	
 	@Test(dependsOnMethods = { "createColumn" }, groups = { "columns-tests" })
 	public void createColumnWithNonExistingForeignKeyTable() throws JSONException {
-		createInvalidColumn(COLUMN_NAME + "-fkt", ColumnFragment.Types.TEXT, false, "nonex", "nonex", "Foreign key target table \"nonex\" does not exist");
+		createInvalidColumn(COLUMN_NAME + "-fkt", ColumnFragment.Types.TEXT, false, "nonex", "nonex", "Table 'nonex' not found in storage with id");
 	}
 	
 	@Test(dependsOnMethods = { "createColumn" }, groups = { "columns-tests" })
 	public void createColumnWithNonExistingForeignKeyColumn() throws JSONException {
-		createInvalidColumn(COLUMN_NAME + "-fkc", ColumnFragment.Types.TEXT, false, TABLE_NAME + " updated", "nonex", "Foreign key target column \"nonex\" in table \"" + TABLE_NAME + " updated" + "\" does not exist");
+		createInvalidColumn(COLUMN_NAME + "-fkc", ColumnFragment.Types.TEXT, false, TABLE_NAME + " updated", "nonex", "Column 'nonex' not found in table '" + TABLE_NAME + " updated' in storage with id");
 	}
 	
 	@Test(dependsOnMethods = { "createColumn" }, groups = { "columns-tests" })
