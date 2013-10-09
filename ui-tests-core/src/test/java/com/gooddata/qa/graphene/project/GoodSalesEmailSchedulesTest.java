@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.project;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -9,6 +10,8 @@ import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
+	
+	private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 	
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedules" })
 	public void verifyEmptySchedules() {
@@ -44,6 +47,7 @@ public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 	private EmailSchedulePage initEmailSchedulesPage() {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|emailSchedulePage");
 		waitForSchedulesPageLoaded();
+		waitForElementNotVisible(BY_SCHEDULES_LOADING);
 		return Graphene.createPageFragment(EmailSchedulePage.class, browser.findElement(BY_SCHEDULES_PAGE_PANEL));
 	}
 
