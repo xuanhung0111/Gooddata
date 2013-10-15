@@ -425,7 +425,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "createColumn" }, groups = { "columns-tests" })
 	public void createSecondPrimaryColumn() throws JSONException {
-		createInvalidColumn(COLUMN_NAME + "-another-primary", ColumnFragment.Types.TEXT, true, null, null, "Primary key column already exists in the table");
+		createInvalidColumn(COLUMN_NAME + "-another-primary", ColumnFragment.Types.TEXT, true, null, null, "Only one primary key per table is allowed");
 	}
 	
 	@Test(dependsOnMethods = { "createColumn" }, groups = { "columns-tests" })
