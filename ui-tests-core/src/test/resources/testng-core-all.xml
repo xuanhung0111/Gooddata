@@ -44,5 +44,16 @@
 			<class name="com.gooddata.qa.graphene.project.GoodSalesReportsTest" />
 		</classes>
 	</test>
+	
+	<test name="GoodSalesEmailSchedulesTest">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.project.GoodSalesEmailSchedulesTest" />
+		</classes>
+	</test>
 
 </suite>
