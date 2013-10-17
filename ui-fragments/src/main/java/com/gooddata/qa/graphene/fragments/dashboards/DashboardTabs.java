@@ -12,6 +12,8 @@ import java.util.List;
 public class DashboardTabs extends AbstractFragment {
 	
 	private static final By BY_TAB_LABEL_SPAN = By.xpath("div/span[@class='label']");
+	private static final By BY_TAB_DROP_DOWN_BUTTON = By.cssSelector(".tab-dropdown");
+	private static final By BY_TABS_SCROLL_RIGHT_BUTTON = By.cssSelector(".scroll-right");
 
 	@FindBy(className="yui3-dashboardtab")
 	private List<WebElement> tabs;
@@ -80,6 +82,15 @@ public class DashboardTabs extends AbstractFragment {
 			tabNames.add(getTabLabel(i));
 		}
 		return tabNames;
+	}
+	
+	public void selectDropDownMenu(int i) {
+		WebElement button = getTabWebElement(i).findElement(BY_TAB_DROP_DOWN_BUTTON);
+		waitForElementPresent(button);
+		while (!button.isDisplayed()) {
+			this.getRoot().findElement(BY_TABS_SCROLL_RIGHT_BUTTON).click();
+		}
+		button.click();
 	}
 	
 	private WebElement getTabWebElement(int i) {

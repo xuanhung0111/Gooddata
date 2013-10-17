@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
+@Test(groups = { "GoodSalesSchedules" }, description = "Tests for GoodSales project (email schedules functionality) in GD platform")
 public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 	
 	private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");

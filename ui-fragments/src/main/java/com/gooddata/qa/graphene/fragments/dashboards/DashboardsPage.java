@@ -11,7 +11,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 
 public class DashboardsPage extends AbstractFragment {
 	
-	@FindBy(xpath="//div[@id='abovePage']/div[contains(@class,'yui3-dashboardtabs-content')]/div[contains(@class,'c-collectionWidget')]/div")
+	@FindBy(xpath="//div[@id='abovePage']/div[contains(@class,'yui3-dashboardtabs-content')]")
 	private DashboardTabs tabs;
 	
 	@FindBy(css=".q-dashboardSwitcher")
@@ -50,8 +50,16 @@ public class DashboardsPage extends AbstractFragment {
 	@FindBy(xpath="//div[contains(@class,'dashboardTitleEditBox')]/input")
 	private WebElement newDashboardNameInput;
 	
+	@FindBy(xpath="//div[contains(@class, 'c-confirmDeleteDialog')]")
+	private WebElement dashboardTabDeleteDialog;
+	
+	@FindBy(xpath="//div[contains(@class, 'c-confirmDeleteDialog')]//button[text()='Delete']")
+	private WebElement dashboardTabDeleteConfirmButton;
+	
 	private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
 	private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
+	private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
+	private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//a[@class='s-delete']");
 	
 	public DashboardTabs getTabs() {
 		return tabs;
@@ -143,6 +151,21 @@ public class DashboardsPage extends AbstractFragment {
 		addNewTabButton.click();
 		waitForElementVisible(newTabDialog.getRoot());
 		newTabDialog.createTab(tabName);
+	}
+	
+	public void deleteDashboardTab(int tabIndex) throws InterruptedException {
+		tabs.openTab(tabIndex);
+		editDashboard();
+		tabs.selectDropDownMenu(tabIndex);
+		waitForElementVisible(BY_TAB_DROPDOWN_MENU);
+		browser.findElement(BY_TAB_DROPDOWN_MENU).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
+		waitForElementVisible(dashboardTabDeleteDialog);
+		waitForElementVisible(dashboardTabDeleteConfirmButton);
+		dashboardTabDeleteConfirmButton.click();
+		waitForElementNotVisible(dashboardTabDeleteDialog);
+		editDashboardBar.saveDashboard();
+		waitForElementNotPresent(editDashboardBar.getRoot());
+		waitForDashboardPageLoaded();
 	}
 	
 	public void addNewDashboard(String dashbordName) throws InterruptedException {
