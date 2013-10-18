@@ -114,7 +114,7 @@ public class ReportPage extends AbstractFragment {
 		waitForElementVisible(currentExportLink);
 		currentExportLink.click();
 		Thread.sleep(3000);
-		//waitForElementVisible(BY_EXPORTING_STATUS); this waiting is causing some unexpected issues in tests when the export is too fast
+		if (format == ExportFormat.PDF || format == ExportFormat.IMAGE_PNG) waitForElementVisible(BY_EXPORTING_STATUS); //this waiting is causing some unexpected issues in tests when the export (xls/csv) is too fast
 		waitForElementVisible(exportButton);
 		Thread.sleep(3000);
 		System.out.println("Report " + reportName + " exported to " + format.getName());
