@@ -23,14 +23,36 @@
 		</classes>
 	</test>
 	
-	<test name="GoodSalesProjectTest">
+	<test name="GoodSalesDashboardTest">
 		<groups>
 			<run>
 				<exclude name="brokenTest" />
 			</run>
 		</groups>
 		<classes>
-			<class name="com.gooddata.qa.graphene.project.GoodSalesProjectTest" />
+			<class name="com.gooddata.qa.graphene.project.GoodSalesDashboardTest" />
+		</classes>
+	</test>
+	
+	<test name="GoodSalesReportsTest">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.project.GoodSalesReportsTest" />
+		</classes>
+	</test>
+	
+	<test name="GoodSalesEmailSchedulesTest">
+		<groups>
+			<run>
+				<exclude name="brokenTest" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.project.GoodSalesEmailSchedulesTest" />
 		</classes>
 	</test>
 

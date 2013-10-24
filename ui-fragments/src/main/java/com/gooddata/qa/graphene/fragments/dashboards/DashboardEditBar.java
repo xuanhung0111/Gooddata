@@ -30,7 +30,7 @@ public class DashboardEditBar extends AbstractFragment {
 	@FindBy(xpath="//div[contains(@class,'s-report-picker')]//input")
 	private WebElement reportSearchInput;
 	
-	private static final String reportToAddLocator = "//div[contains(@class,'s-report-picker')]//div[contains(@class,'s-enabled')]/span[@title='${reportName}']";
+	private static final String reportToAddLocator = "//div[contains(@class,'s-report-picker')]//div[contains(@class,'yui3-c-label-content')]/span[@title='${reportName}']";
 	private static final String reportOnDashboardLocator = "//div[@id='p-projectDashboardPage']//div[contains(@class,'yui3-c-reportdashboardwidget')]//a[@title='${reportName}']";
 	
 	public void addReportToDashboard(String reportName) {
