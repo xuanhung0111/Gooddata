@@ -45,4 +45,4 @@ Currently there are following modules available (use them for tests of specific 
  * ui-tests-hds - for running HDS tests
  * ui-tests-reports - for running report tests
  * ui-tests-tools - for running extra tools tests (specific usage, no tests by default)
- 
+ * ui-tests-upload - for running csv upload tests (experimental)
