@@ -47,9 +47,8 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		// zendesk3 specific configuration of API Url (with specific upload user)
 		signInAtGreyPages(zendesk3UploadUser, zendesk3UploadUserPassword);
 		browser.get(settingsUrl);
-		waitForElementPresent(BY_INPUT_API_URL);
-		browser.findElement(BY_INPUT_API_URL).sendKeys(zendesk3ApiUrl);
-		Graphene.guardHttp(browser.findElement(BY_GP_BUTTON_SUBMIT)).click();
+		waitForElementPresent(BY_INPUT_API_URL).sendKeys(zendesk3ApiUrl);
+		Graphene.guardHttp(waitForElementPresent(BY_GP_BUTTON_SUBMIT)).click();
 		JSONObject json = loadJSON();
 		Assert.assertEquals(json.getJSONObject("settings").getString("apiUrl"), zendesk3ApiUrl, "Zendesk3 API URL was not set to expected value");
 		

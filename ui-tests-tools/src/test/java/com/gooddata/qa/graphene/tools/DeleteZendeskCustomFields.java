@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.tools;
 
 import java.util.List;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -34,10 +33,9 @@ public class DeleteZendeskCustomFields extends AbstractTest {
 	@Test
 	public void deleteZendeskCustomFields() {
 		//login
-		waitForElementVisible(By.id("user_email"));
-		browser.findElement(By.id("user_email")).sendKeys("qa@gooddata.com");
-		browser.findElement(By.id("user_password")).sendKeys("changeit321");
-		browser.findElement(By.xpath("//input[@name='commit']")).click();
+		waitForElementVisible(By.id("user_email")).sendKeys("qa@gooddata.com");
+		waitForElementVisible(By.id("user_password")).sendKeys("changeit321");
+		waitForElementVisible(By.xpath("//input[@name='commit']")).click();
 		waitForElementVisible(By.xpath("//h2[text()='Ticket fields']"));
 		
 		List<WebElement> fields = browser.findElements(By.xpath("//div[@id='fields']/div[@class='item']"));
@@ -48,8 +46,7 @@ public class DeleteZendeskCustomFields extends AbstractTest {
 				System.out.println("About to delete custom field " + title);
 				i++;
 				field.findElement(By.xpath("div[@class='item-actions']/a[@class='edit_this']")).click();
-				waitForElementVisible(By.xpath("//a[text()='Delete']"));
-				browser.findElement(By.xpath("//a[text()='Delete']")).click();
+				waitForElementVisible(By.xpath("//a[text()='Delete']")).click();
 				Alert javascriptAlert = browser.switchTo().alert();
 				javascriptAlert.accept();
 				waitForElementVisible(By.xpath("//h2[text()='Ticket fields']"));

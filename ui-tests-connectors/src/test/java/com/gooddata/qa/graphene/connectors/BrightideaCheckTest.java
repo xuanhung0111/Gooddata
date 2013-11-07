@@ -64,15 +64,13 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		waitForElementVisible(BY_IFRAME);
 		browser.switchTo().frame(browser.findElement(BY_IFRAME));
 		waitForElementVisible(BY_SPAN_WELCOME_BEFORE_CONFIG);
-		waitForElementVisible(BY_INPUT_API_KEY);
-		browser.findElement(BY_INPUT_API_KEY).sendKeys(brightideaApiKey);
-		browser.findElement(BY_INPUT_AFFILIATE_ID).sendKeys(brightideaAffiliateId);
-		browser.findElement(BY_INPUT_HOSTNAME).clear();
-		browser.findElement(BY_INPUT_HOSTNAME).sendKeys(brightideaHostname);
-		WebElement select = browser.findElement(BY_SELECT_TIMEZONE);
-		WebElement option = select.findElement(BY_SELECT_TIMEZONE_OPTION);
-		option.click();
-		browser.findElement(BY_FINISH_BUTTON).click();
+		waitForElementVisible(BY_INPUT_API_KEY).sendKeys(brightideaApiKey);
+		waitForElementVisible(BY_INPUT_AFFILIATE_ID).sendKeys(brightideaAffiliateId);
+		waitForElementVisible(BY_INPUT_HOSTNAME).clear();
+		waitForElementVisible(BY_INPUT_HOSTNAME).sendKeys(brightideaHostname);
+		WebElement select = waitForElementVisible(BY_SELECT_TIMEZONE);
+		select.findElement(BY_SELECT_TIMEZONE_OPTION).click();
+		waitForElementVisible(BY_FINISH_BUTTON).click();
 		waitForElementVisible(BY_SPAN_SYNCHRONIZATION_PROGRESS);
 		// process is scheduled automatically - check status
 		browser.get(getRootUrl() + PAGE_GDC_CONNECTORS_INTEGRATION_PROCESSES.replace("${projectId}", projectId).replace("${connectorType}", Connectors.BRIGHTIDEA.getConnectorId()));

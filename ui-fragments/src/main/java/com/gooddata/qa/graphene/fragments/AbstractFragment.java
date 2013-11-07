@@ -33,12 +33,14 @@ public abstract class AbstractFragment {
 		waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
 	}
 	
-	public void waitForElementVisible(WebElement element) {
+	public WebElement waitForElementVisible(WebElement element) {
 		Graphene.waitGui().until().element(element).is().visible();
+		return element;
 	}
 	
-	public void waitForElementVisible(By byElement) {
+	public WebElement waitForElementVisible(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().visible();
+		return browser.findElement(byElement);
 	}
 	
 	public void waitForElementNotVisible(WebElement element) {
@@ -49,12 +51,14 @@ public abstract class AbstractFragment {
 		Graphene.waitGui().until().element(byElement).is().not().visible();
 	}
 	
-	public void waitForElementPresent(By byElement) {
+	public WebElement waitForElementPresent(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().present();
+		return browser.findElement(byElement);
 	}
 	
-	public void waitForElementPresent(WebElement element) {
+	public WebElement waitForElementPresent(WebElement element) {
 		Graphene.waitGui().until().element(element).is().present();
+		return element;
 	}
 	
 	public void waitForElementNotPresent(By byElement) {

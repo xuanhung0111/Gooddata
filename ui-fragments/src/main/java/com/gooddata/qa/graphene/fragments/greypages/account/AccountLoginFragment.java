@@ -30,9 +30,8 @@ public class AccountLoginFragment extends AbstractGreyPagesFragment {
 	}
 	
 	public void fillLoginForm(String username, String password) {
-		waitForElementVisible(this.username);
-		this.username.sendKeys(username);
-		this.password.sendKeys(password);
+		waitForElementVisible(this.username).sendKeys(username);
+		waitForElementVisible(this.password).sendKeys(password);
 		Graphene.guardHttp(submitButton).click();
 	}
 

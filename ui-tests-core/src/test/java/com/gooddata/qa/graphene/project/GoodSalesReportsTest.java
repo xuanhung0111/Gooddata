@@ -3,14 +3,11 @@ package com.gooddata.qa.graphene.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.reports.ReportPage;
-import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "GoodSalesReports" }, description = "Tests for GoodSales project (reports functionality) in GD platform")
@@ -28,9 +25,9 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	@Test(dependsOnMethods = { "createProject" })
 	public void verifyReportsPage() throws InterruptedException {
-		ReportsPage reports = initReportsPage();
-		Assert.assertEquals(reports.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount, "Number of expected reports doesn't match");
-		Assert.assertEquals(reports.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount, "Number of expected report custom folders doesn't match");
+		initReportsPage();
+		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount, "Number of expected reports doesn't match");
+		Assert.assertEquals(reportsPage.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount, "Number of expected report custom folders doesn't match");
 		Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
 	}
 	
@@ -199,50 +196,50 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	@Test(dependsOnGroups = { "goodsales-chart", "chart-exports", "tabular-report-exports" }, groups = { "lastTest" })
 	public void verifyCreatedReports() {
-		ReportsPage reports = initReportsPage();
-		Assert.assertEquals(reports.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
-		selectFolder(reports, "My Reports");
+		initReportsPage();
+		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
+		selectFolder("My Reports");
 		waitForReportsPageLoaded();
-		Assert.assertEquals(reports.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
+		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
 		Screenshots.takeScreenshot(browser, "GoodSales-new-reports", this.getClass());
 		successfulTest = true;
 	}
 	
 	private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how) throws InterruptedException {
-		ReportsPage reports = initReportsPage();
-		selectFolder(reports, "My Reports");
-		reports.startCreateReport();
+		initReportsPage();
+		selectFolder("My Reports");
+		reportsPage.startCreateReport();
 		waitForAnalysisPageLoaded();
-		ReportPage report = Graphene.createPageFragment(ReportPage.class, browser.findElement(BY_REPORT_PAGE));
-		Assert.assertNotNull(report, "Report page not initialized!");
-		report.createReport(reportName, reportType, what, how);
+		waitForElementVisible(reportPage.getRoot());
+		Assert.assertNotNull(reportPage, "Report page not initialized!");
+		reportPage.createReport(reportName, reportType, what, how);
 		Screenshots.takeScreenshot(browser, "GoodSales-" + reportName + "-" + reportType.getName(), this.getClass());
 		createdReportsCount++;
 	}
 	
-	private ReportsPage initReportsPage() {
+	private void initReportsPage() {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage");
 		waitForReportsPageLoaded();
-		return Graphene.createPageFragment(ReportsPage.class, browser.findElement(BY_REPORTS_PANEL));
+		waitForElementVisible(reportsPage.getRoot());
 	}
 	
-	private void selectFolder(ReportsPage reportsPage, String folderName) {
+	private void selectFolder(String folderName) {
 		reportsPage.getDefaultFolders().openFolder("My Reports");
 		waitForReportsPageLoaded();
 		Assert.assertEquals(reportsPage.getSelectedFolderName(), "My Reports", "Selected folder name doesn't match: " + reportsPage.getSelectedFolderName());
 	}
 	
-	private ReportPage initReportPage(String reportName) {
-		ReportsPage reports = initReportsPage();
-		selectFolder(reports, "My Reports");
-		reports.getReportsList().openReport(reportName);
+	private void initReportPage(String reportName) {
+		initReportsPage();
+		selectFolder("My Reports");
+		reportsPage.getReportsList().openReport(reportName);
 		waitForAnalysisPageLoaded();
-		return Graphene.createPageFragment(ReportPage.class, browser.findElement(BY_REPORT_PAGE));
+		waitForElementVisible(reportPage.getRoot());
 	}
 	
 	private void exportReport(String reportName, ExportFormat format) throws InterruptedException {
-		ReportPage report = initReportPage(reportName);
-		report.exportReport(format);
+		initReportPage(reportName);
+		reportPage.exportReport(format);
 		checkRedBar();
 	}
 }

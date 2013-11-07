@@ -41,9 +41,8 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 	@Test(dependsOnGroups = { "GoodSalesPerfInit" })
 	public void createProject() throws JSONException, InterruptedException {
 		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
-		waitForElementVisible(BY_GP_FORM);
-		ProjectFragment project = Graphene.createPageFragment(ProjectFragment.class, browser.findElement(BY_GP_FORM));
-		projectId = project.createProject("GoodSales-perf-test", "", GOODSALES_TEMPLATE, authorizationToken, 240);
+		waitForElementVisible(gpProject.getRoot());
+		projectId = gpProject.createProject("GoodSales-perf-test", "", GOODSALES_TEMPLATE, authorizationToken, 240);
 		Screenshots.takeScreenshot(browser, "GoodSales-perf-project-created", this.getClass());
 	}
 	

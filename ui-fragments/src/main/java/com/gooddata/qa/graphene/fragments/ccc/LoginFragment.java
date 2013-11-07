@@ -18,9 +18,8 @@ public class LoginFragment extends AbstractFragment {
 	private WebElement signInButton;
 	
 	public void login(String username, String password) {
-		waitForElementVisible(this.username);
-		this.username.sendKeys(username);
-		this.password.sendKeys(password);
+		waitForElementVisible(this.username).sendKeys(username);
+		waitForElementVisible(this.password).sendKeys(password);
 		Graphene.guardAjax(signInButton).click();
 	}
 

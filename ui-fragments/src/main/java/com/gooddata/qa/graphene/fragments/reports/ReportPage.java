@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.reports;
 
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
@@ -46,20 +45,15 @@ public class ReportPage extends AbstractFragment {
 	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'csv')]")
 	private WebElement exportToCSV;
 	
-	private static final By BY_EXPORTING_STATUS = By.xpath("//span[@class='exportProgress']/span[text()='Exporting...']");
-	
 	public ReportVisualizer getVisualiser() {
 		return visualiser;
 	}
 	
 	public void setReportName(String reportName) {
-		waitForElementVisible(this.reportName);
-		this.reportName.click();
-		waitForElementVisible(reportNameInput);
-		reportNameInput.clear();
+		waitForElementVisible(this.reportName).click();
+		waitForElementVisible(reportNameInput).clear();
 		reportNameInput.sendKeys(reportName);
-		waitForElementVisible(reportNameSaveButton);
-		reportNameSaveButton.click();
+		waitForElementVisible(reportNameSaveButton).click();
 		waitForElementNotVisible(reportNameInput);
 		Assert.assertEquals(this.reportName.getText(), reportName, "Report name wasn't updated");
 	}
@@ -86,16 +80,14 @@ public class ReportPage extends AbstractFragment {
 		waitForElementVisible(createReportButton);
 		Thread.sleep(2000);
 		createReportButton.click();
-		waitForElementVisible(confirmDialogCreateButton);
-		confirmDialogCreateButton.click();
+		waitForElementVisible(confirmDialogCreateButton).click();
 		waitForElementNotVisible(confirmDialogCreateButton);
 		Assert.assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
 	}
 	
 	public String exportReport(ExportFormat format) throws InterruptedException {
 		String reportName = getReportName();
-		waitForElementVisible(exportButton);
-		exportButton.click();
+		waitForElementVisible(exportButton).click();
 		WebElement currentExportLink = null;
 		switch (format) {
 		case PDF:
@@ -110,9 +102,10 @@ public class ReportPage extends AbstractFragment {
 		case CSV:
 			currentExportLink = exportToCSV;
 			break;
+		default:
+			break;
 		}
-		waitForElementVisible(currentExportLink);
-		currentExportLink.click();
+		waitForElementVisible(currentExportLink).click();
 		Thread.sleep(5000);
 		// waitForElementVisible(BY_EXPORTING_STATUS); //this waiting is causing some unexpected issues in tests when the export (xls/csv) is too fast
 		waitForElementVisible(exportButton);

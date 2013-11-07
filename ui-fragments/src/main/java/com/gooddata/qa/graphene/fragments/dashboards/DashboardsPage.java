@@ -79,8 +79,7 @@ public class DashboardsPage extends AbstractFragment {
 	}
 	
 	public boolean selectDashboard(String dashboardName) {
-		waitForElementVisible(dashboardSwitcherButton);
-		dashboardSwitcherButton.click();
+		waitForElementVisible(dashboardSwitcherButton).click();
 		if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
 			for (WebElement elem : dashboardSelectors) {
 				if (elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title").equals(dashboardName)) {
@@ -94,8 +93,7 @@ public class DashboardsPage extends AbstractFragment {
 	}
 	
 	public boolean selectDashboard(int dashboardIndex) {
-		waitForElementVisible(dashboardSwitcherButton);
-		dashboardSwitcherButton.click();
+		waitForElementVisible(dashboardSwitcherButton).click();
 		if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
 			for (WebElement elem : dashboardSelectors) {
 				if (Integer.valueOf(elem.getAttribute("gdc:index")) == dashboardIndex) {
@@ -123,10 +121,8 @@ public class DashboardsPage extends AbstractFragment {
 	
 	public void editDashboard() {
 		waitForDashboardPageLoaded();
-		waitForElementVisible(editExportEmbedButton);
-		editExportEmbedButton.click();
-		waitForElementVisible(editButton);
-		editButton.click();
+		waitForElementVisible(editExportEmbedButton).click();
+		waitForElementVisible(editButton).click();
 		waitForElementPresent(editDashboardBar.getRoot());
 	}
 	
@@ -134,10 +130,8 @@ public class DashboardsPage extends AbstractFragment {
 		tabs.openTab(tabIndex);
 		waitForDashboardPageLoaded();
 		String tabName = tabs.getTabLabel(0);
-		waitForElementVisible(editExportEmbedButton);
-		editExportEmbedButton.click();
-		waitForElementVisible(exportPdfButton);
-		exportPdfButton.click();
+		waitForElementVisible(editExportEmbedButton).click();
+		waitForElementVisible(exportPdfButton).click();
 		waitForElementVisible(BY_EXPORTING_PANEL);
 		Thread.sleep(3000);
 		waitForElementNotPresent(BY_EXPORTING_PANEL);
@@ -147,8 +141,7 @@ public class DashboardsPage extends AbstractFragment {
 	}
 	
 	public void addNewTab(String tabName) {
-		waitForElementVisible(addNewTabButton);
-		addNewTabButton.click();
+		waitForElementVisible(addNewTabButton).click();
 		waitForElementVisible(newTabDialog.getRoot());
 		newTabDialog.createTab(tabName);
 	}
@@ -157,11 +150,9 @@ public class DashboardsPage extends AbstractFragment {
 		tabs.openTab(tabIndex);
 		editDashboard();
 		tabs.selectDropDownMenu(tabIndex);
-		waitForElementVisible(BY_TAB_DROPDOWN_MENU);
-		browser.findElement(BY_TAB_DROPDOWN_MENU).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
+		waitForElementVisible(BY_TAB_DROPDOWN_MENU).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
 		waitForElementVisible(dashboardTabDeleteDialog);
-		waitForElementVisible(dashboardTabDeleteConfirmButton);
-		dashboardTabDeleteConfirmButton.click();
+		waitForElementVisible(dashboardTabDeleteConfirmButton).click();
 		waitForElementNotVisible(dashboardTabDeleteDialog);
 		editDashboardBar.saveDashboard();
 		waitForElementNotPresent(editDashboardBar.getRoot());
@@ -169,12 +160,9 @@ public class DashboardsPage extends AbstractFragment {
 	}
 	
 	public void addNewDashboard(String dashbordName) throws InterruptedException {
-		waitForElementVisible(editExportEmbedButton);
-		editExportEmbedButton.click();
-		waitForElementVisible(addDashboardButton);
-		addDashboardButton.click();
-		waitForElementVisible(newDashboardNameInput);
-		newDashboardNameInput.clear();
+		waitForElementVisible(editExportEmbedButton).click();
+		waitForElementVisible(addDashboardButton).click();
+		waitForElementVisible(newDashboardNameInput).clear();
 		newDashboardNameInput.sendKeys(dashbordName);
 		Thread.sleep(5000); // name is empty if the save button is used immediately
 		editDashboardBar.saveDashboard();

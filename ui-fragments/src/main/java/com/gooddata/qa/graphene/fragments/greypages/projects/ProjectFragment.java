@@ -31,15 +31,13 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
 	private WebElement submit;
 	
 	public String createProject(String title, String summary, String template, String authorizationToken, int checkIterations) throws JSONException, InterruptedException {
-		waitForElementVisible(this.title);
-		this.title.sendKeys(title);
+		waitForElementVisible(this.title).sendKeys(title);
 		if (summary != null && summary.length() > 0) this.summary.sendKeys(summary);
 		if (template != null && template.length() > 0) this.projectTemplate.sendKeys(template);
 		this.authorizationToken.sendKeys(authorizationToken);
 		Graphene.guardHttp(submit).click();
 		waitForElementNotVisible(this.title);
-		waitForElementVisible(BY_GP_LINK);
-		Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
+		Graphene.guardHttp(waitForElementVisible(BY_GP_LINK)).click();
 		return waitForProjectStateEnabled(checkIterations);
 	}
 	

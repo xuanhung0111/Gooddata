@@ -4,7 +4,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -62,8 +61,7 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		
 		// ga specific configuration
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId);
-		waitForElementVisible(BY_IFRAME);
-		browser.switchTo().frame(browser.findElement(BY_IFRAME));
+		browser.switchTo().frame(waitForElementVisible(BY_IFRAME));
 		waitForElementVisible(BY_H3_BEFORE_GRANT_CONFIG);
 		waitForElementVisible(BY_BUTTON_GRANT_REDIRECT);
 		//Store the current window handle
@@ -74,28 +72,22 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		    if (!winHandle.equals(winHandleOrig)) browser.switchTo().window(winHandle);
 		}
 		waitForElementVisible(BY_SIGN_IN_BOX);
-		waitForElementVisible(BY_INPUT_EMAIL);
-		browser.findElement(BY_INPUT_EMAIL).sendKeys(googleAnalyticsUser);
-		browser.findElement(BY_INPUT_PASSWORD).sendKeys(googleAnalyticsUserPassword);
+		waitForElementVisible(BY_INPUT_EMAIL).sendKeys(googleAnalyticsUser);
+		waitForElementVisible(BY_INPUT_PASSWORD).sendKeys(googleAnalyticsUserPassword);
 		Graphene.guardHttp(browser.findElement(BY_BUTTON_SIGN_IN)).click();
-		waitForElementVisible(BY_BUTTON_ALLOW);
-		browser.findElement(BY_BUTTON_ALLOW).click();
+		waitForElementVisible(BY_BUTTON_ALLOW).click();
 		//Switch back to original browser (first window)
 		browser.switchTo().window(winHandleOrig);
-		waitForElementVisible(BY_IFRAME);
-		browser.switchTo().frame(browser.findElement(BY_IFRAME));
-		waitForElementVisible(BY_SELECT_ACCOUNT);
-		WebElement option = browser.findElement(BY_SELECT_ACCOUNT).findElement(By.xpath(XPATH_OPTION_ACCOUNT.replace("${account}", googleAnalyticsAccount)));
-		option.click();
-		Graphene.guardHttp(browser.findElement(BY_IMPORT_BUTTON)).click();
+		browser.switchTo().frame(waitForElementVisible(BY_IFRAME));
+		waitForElementVisible(BY_SELECT_ACCOUNT).findElement(By.xpath(XPATH_OPTION_ACCOUNT.replace("${account}", googleAnalyticsAccount))).click();
+		Graphene.guardHttp(waitForElementVisible(BY_IMPORT_BUTTON)).click();
 		waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
 		
 		// process is scheduled automatically - check status
 		browser.get(getRootUrl() + PAGE_GDC_CONNECTORS_INTEGRATION_PROCESSES.replace("${projectId}", projectId).replace("${connectorType}", Connectors.GOOGLE_ANALYTICS.getConnectorId()));
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
-		waitForElementVisible(BY_GP_LINK);
-		Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
+		Graphene.guardHttp(waitForElementVisible(BY_GP_LINK)).click();
 		waitForIntegrationProcessSynchronized(browser, Connectors.GOOGLE_ANALYTICS, integrationProcessCheckLimit);
 		
 		// verify created project and count dashboard tabs

@@ -17,10 +17,8 @@ public class ProjectAndUsersPage extends AbstractFragment {
 	private static final By BY_PROJECTS_LIST = By.className("userProjects");
 	
 	public void deteleProject() {
-		waitForElementVisible(deleteProjectButton);
-		deleteProjectButton.click();
-		waitForElementVisible(deleteProjectDialogButton);
-		deleteProjectDialogButton.click();
+		waitForElementVisible(deleteProjectButton).click();
+		waitForElementVisible(deleteProjectDialogButton).click();
 		//redirect to projects page
 		waitForElementVisible(BY_PROJECTS_LIST);
 		System.out.println("Project deleted...");

@@ -5,13 +5,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
-import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 
 public class AbstractConnectorsCheckTest extends AbstractTest {
 	
@@ -30,6 +30,9 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	
 	protected boolean integrationActivated = false;
 	
+	@FindBy(tagName="form")
+	protected ConnectorFragment connector;
+	
 	@BeforeClass
 	public void initStartPage() {
 		startPage = "gdc";
@@ -37,25 +40,22 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	
 	public void initProject(String projectTitle, Connectors connectorType, int checkIterations) throws JSONException, InterruptedException {
 		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
-		waitForElementVisible(BY_GP_FORM);
-		ProjectFragment project = Graphene.createPageFragment(ProjectFragment.class, browser.findElement(BY_GP_FORM));
-		projectId = project.createProject(projectTitle, "", connectorType.getTemplate(), authorizationToken, projectCheckLimit);
+		waitForElementVisible(gpProject.getRoot());
+		projectId = gpProject.createProject(projectTitle, "", connectorType.getTemplate(), authorizationToken, projectCheckLimit);
 		System.out.println("Project with ID enabled: " + projectId);
 	}
 	
 	public void initIntegration(Connectors connectorType) throws JSONException, InterruptedException {
 		browser.get(getRootUrl() + PAGE_GDC_CONNECTORS.replace("${projectId}", projectId) + "/" + connectorType.getConnectorId());
 		waitForElementPresent(BY_GP_PRE_JSON);
-		ConnectorFragment connector = Graphene.createPageFragment(ConnectorFragment.class, browser.findElement(BY_GP_FORM));
+		waitForElementPresent(connector.getRoot());
 		connector.createIntegration(connectorType.getTemplate());
 		integrationActivated = true;
 	}
 	
 	public String gotoIntegrationSettings() {
-		waitForElementVisible(BY_GP_CONFIG_LINK);
-		Graphene.guardHttp(browser.findElement(BY_GP_CONFIG_LINK)).click();
-		waitForElementVisible(BY_GP_SETTINGS_LINK);
-		Graphene.guardHttp(browser.findElement(BY_GP_SETTINGS_LINK)).click();
+		Graphene.guardHttp(waitForElementVisible(BY_GP_CONFIG_LINK)).click();
+		Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK)).click();
 		waitForElementVisible(BY_GP_FORM);
 		return browser.getCurrentUrl();
 	}
@@ -64,7 +64,7 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 		browser.get(getRootUrl() + PAGE_GDC_CONNECTORS_INTEGRATION_PROCESSES.replace("${projectId}", projectId).replace("${connectorType}", connectoryType.getConnectorId()));
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 0, "There are no processes for new project yet");
-		Graphene.guardHttp(browser.findElement(BY_GP_BUTTON_SUBMIT)).click();
+		Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
 		
 		waitForIntegrationProcessSynchronized(browser, connectoryType, checkIterations);
 	}
@@ -98,9 +98,8 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	protected void disableIntegration(Connectors connectorType) throws JSONException {
 		if (integrationActivated) {
 			browser.get(getRootUrl() + PAGE_GDC_CONNECTORS_INTEGRATION.replace("${projectId}", projectId).replace("${connectorType}", connectorType.getConnectorId()));
-			waitForElementVisible(BY_GP_FORM);
-			ConnectorFragment integration = Graphene.createPageFragment(ConnectorFragment.class, browser.findElement(BY_GP_FORM));
-			integration.disableIntegration();
+			waitForElementVisible(connector.getRoot());
+			connector.disableIntegration();
 		} else {
 			System.out.println("Integration wasn't created - nothing to disable...");
 		}

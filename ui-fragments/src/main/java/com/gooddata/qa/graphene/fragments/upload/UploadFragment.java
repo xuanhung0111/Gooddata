@@ -20,8 +20,7 @@ public class UploadFragment extends AbstractFragment {
 	private static final By BY_UPLOAD_COLUMNS = By.cssSelector(".table-lineList");
 	
 	public void uploadFile(String filePath) throws InterruptedException {
-		waitForElementPresent(uploadFile);
-		uploadFile.sendKeys(filePath);
+		waitForElementPresent(uploadFile).sendKeys(filePath);
 		waitForElementNotVisible(uploadFile);
 		waitForElementVisible(BY_UPLOAD_COLUMNS);
 	}
@@ -34,8 +33,7 @@ public class UploadFragment extends AbstractFragment {
 	}
 	
 	public void confirmloadCsv() {
-		waitForElementVisible(loadButton);
-		loadButton.click();
+		waitForElementVisible(loadButton).click();
 		waitForElementNotVisible(BY_UPLOAD_COLUMNS);
 	}
 }

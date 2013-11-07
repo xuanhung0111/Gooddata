@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -24,7 +25,12 @@ import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
+import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
+import com.gooddata.qa.graphene.fragments.reports.ReportPage;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
@@ -68,7 +74,6 @@ public abstract class AbstractTest extends Arquillian {
 	protected boolean successfulTest = false;
 	
 	protected static final By BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']//button[2]");
-	protected static final By BY_LOGIN_PANEL = By.xpath("//div[@id='loginPanel']");
 	protected static final By BY_PANEL_ROOT = By.id("root");
 	
 	protected static final By BY_GP_FORM = By.tagName("form");
@@ -94,6 +99,39 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final String PAGE_GDC_PROJECTS = PAGE_GDC + "/projects";
 	protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
 	protected static final String PAGE_PROJECTS = "projects.html";
+	
+	/** ----- UI fragmnets ----- */
+	
+	@FindBy(xpath="//div[@id='loginPanel']")
+	protected LoginFragment loginFragment;
+	
+	@FindBy(id="root")
+	protected DashboardsPage dashboardsPage;
+	
+	@FindBy(id="p-domainPage")
+	protected ReportsPage reportsPage;
+	
+	@FindBy(id="p-analysisPage")
+	protected ReportPage reportPage;
+	
+	@FindBy(id="p-projectPage")
+	protected ProjectAndUsersPage projectAndUsersPage;
+	
+	@FindBy(id="p-emailSchedulePage")
+	protected EmailSchedulePage emailSchedulesPage;
+	
+	@FindBy(id="projectsCentral")
+	protected ProjectsPage projectsPage;
+	
+	/** ----- Grey pages fragmnets ----- */
+	
+	@FindBy(tagName="form")
+	protected AccountLoginFragment gpLoginFragment;
+	
+	@FindBy(tagName="form")
+	protected ProjectFragment gpProject;
+	
+	/** ---------- */
 	
 	@BeforeClass
 	public void loadProperties() {
@@ -168,8 +206,7 @@ public abstract class AbstractTest extends Arquillian {
 	}
 	
 	public void signInAtUI(String username, String password) {
-		waitForElementVisible(BY_LOGIN_PANEL);
-		LoginFragment loginFragment = Graphene.createPageFragment(LoginFragment.class, browser.findElement(BY_LOGIN_PANEL));
+		waitForElementVisible(loginFragment.getRoot());
 		loginFragment.login(username, password);
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
@@ -178,9 +215,8 @@ public abstract class AbstractTest extends Arquillian {
 	
 	public void signInAtGreyPages(String username, String password) throws JSONException {
 		browser.get(getRootUrl() + PAGE_ACCOUNT_LOGIN);
-		waitForElementPresent(BY_GP_FORM);
-		AccountLoginFragment accountLoginFragment = Graphene.createPageFragment(AccountLoginFragment.class, browser.findElement(BY_GP_FORM));
-		accountLoginFragment.login(username, password);
+		waitForElementPresent(gpLoginFragment.getRoot());
+		gpLoginFragment.login(username, password);
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
 	
@@ -191,8 +227,8 @@ public abstract class AbstractTest extends Arquillian {
 		}
 		waitForDashboardPageLoaded();
 		Thread.sleep(5000);
-		DashboardsPage dashboards = Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
-		DashboardTabs tabs = dashboards.getTabs();
+		waitForElementVisible(dashboardsPage.getRoot());
+		DashboardTabs tabs = dashboardsPage.getTabs();
 		int numberOfTabs = tabs.getNumberOfTabs();
 		System.out.println("Number of tabs for project: " + numberOfTabs);
 		if (validation) Assert.assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
@@ -263,9 +299,9 @@ public abstract class AbstractTest extends Arquillian {
 	protected void deleteProject(String projectId) {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
 		waitForProjectPageLoaded();
-		ProjectAndUsersPage projectPage = Graphene.createPageFragment(ProjectAndUsersPage.class, browser.findElement(BY_PROJECT_PAGE_PANEL));
+		waitForElementVisible(projectAndUsersPage.getRoot());
 		System.out.println("Going to delete project: " + projectId);
-		projectPage.deteleProject();
+		projectAndUsersPage.deteleProject();
 		System.out.println("Deleted project: " + projectId);
 	}
 	
@@ -310,24 +346,28 @@ public abstract class AbstractTest extends Arquillian {
 		waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
 	}
 	
-	public void waitForElementVisible(By byElement) {
+	public WebElement waitForElementVisible(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().visible();
+		return browser.findElement(byElement);
 	}
 	
-	public void waitForElementVisible(WebElement element) {
+	public WebElement waitForElementVisible(WebElement element) {
 		Graphene.waitGui().until().element(element).is().visible();
+		return element;
 	}
 	
 	public void waitForElementNotVisible(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().not().visible();
 	}
 	
-	public void waitForElementPresent(By byElement) {
+	public WebElement waitForElementPresent(By byElement) {
 		Graphene.waitGui().until().element(byElement).is().present();
+		return browser.findElement(byElement);
 	}
 	
-	public void waitForElementPresent(WebElement element) {
+	public WebElement waitForElementPresent(WebElement element) {
 		Graphene.waitGui().until().element(element).is().present();
+		return element;
 	}
 	
 	public void waitForElementNotPresent(By byElement) {

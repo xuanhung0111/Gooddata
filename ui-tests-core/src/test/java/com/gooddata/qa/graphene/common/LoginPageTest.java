@@ -1,13 +1,11 @@
 package com.gooddata.qa.graphene.common;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 
@@ -16,9 +14,6 @@ public class LoginPageTest extends AbstractTest {
 
 	public static final By BY_LOGOUT_LINK = By.xpath("//a[@class='s-logout']");
 	
-	@FindBy(id="loginPanel")
-	LoginFragment loginFragment;
-	
 	@BeforeClass
 	public void initStartPage() {
 		startPage = "login.html";
@@ -26,18 +21,16 @@ public class LoginPageTest extends AbstractTest {
 	
 	@Test(groups = {"loginInit"})
 	public void gd_Login_001_LoginPanel() {
-		waitForElementVisible(BY_LOGIN_PANEL);
+		waitForElementVisible(loginFragment.getRoot());
 		Assert.assertTrue(loginFragment.allLoginElementsAvailable(), "Login panel with valid elements is available");
 	}
 	
 	@Test(dependsOnGroups = {"loginInit"})
 	public void gd_Login_002_SignInAndSignOut() throws InterruptedException {
 		loginFragment.login(user, password);
-		waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		waitForElementVisible(BY_LOGGED_USER_BUTTON).click();
 		Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
-		browser.findElement(BY_LOGGED_USER_BUTTON).click();
-		waitForElementVisible(BY_LOGOUT_LINK);
-		browser.findElement(BY_LOGOUT_LINK).click();
+		waitForElementVisible(BY_LOGOUT_LINK).click();
 		waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
 		Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
 	}

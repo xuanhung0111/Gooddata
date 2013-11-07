@@ -34,14 +34,11 @@ public class DashboardEditBar extends AbstractFragment {
 	private static final String reportOnDashboardLocator = "//div[@id='p-projectDashboardPage']//div[contains(@class,'yui3-c-reportdashboardwidget')]//a[@title='${reportName}']";
 	
 	public void addReportToDashboard(String reportName) {
-		waitForElementVisible(reportMenuButton);
-		reportMenuButton.click();
-		waitForElementVisible(reportSearchInput);
-		reportSearchInput.clear();
+		waitForElementVisible(reportMenuButton).click();
+		waitForElementVisible(reportSearchInput).clear();
 		reportSearchInput.sendKeys(reportName);
 		By reportToAdd = By.xpath(reportToAddLocator.replace("${reportName}", reportName));
-		waitForElementVisible(reportToAdd);
-		browser.findElement(reportToAdd).click();
+		waitForElementVisible(reportToAdd).click();
 		waitForDashboardPageLoaded();
 		By reportOnDashboard = By.xpath(reportOnDashboardLocator.replace("${reportName}", reportName));
 		waitForElementVisible(reportOnDashboard);
@@ -57,13 +54,10 @@ public class DashboardEditBar extends AbstractFragment {
 	}
 	
 	public void deleteDashboard() throws InterruptedException {
-		waitForElementVisible(actionsMenu);
-		actionsMenu.click();
-		waitForElementVisible(deleteButton);
-		deleteButton.click();
+		waitForElementVisible(actionsMenu).click();
+		waitForElementVisible(deleteButton).click();
 		Thread.sleep(3000);
-		waitForElementVisible(deleteDashboardDialogButton);
-		deleteDashboardDialogButton.click();
+		waitForElementVisible(deleteDashboardDialogButton).click();
 		waitForElementNotPresent(this.getRoot());
 	}
 
