@@ -15,8 +15,7 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
 	protected static final By BY_GP_BUTTON_SUBMIT = By.xpath("//div[@class='submit']/input");
 	
 	protected JSONObject loadJSON() throws JSONException {
-		waitForElementPresent(BY_GP_PRE_JSON);
-		return new JSONObject(browser.findElement(BY_GP_PRE_JSON).getText());
+		return new JSONObject(waitForElementPresent(BY_GP_PRE_JSON).getText());
 	}
 
 }

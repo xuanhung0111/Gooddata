@@ -4,6 +4,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -28,6 +29,9 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 	private static final String[] expectedCoupaTabs = {
 		"KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities", "Contracts", "Expenses", "Budgets", "All Spend"
 	};
+	
+	@FindBy(tagName="form")
+	private CoupaInstanceFragment coupaInstance;
 	
 	@BeforeClass
 	public void setCheckLimits() {
@@ -64,17 +68,15 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		gotoIntegrationSettings();
 
 		// coupa specific configuration
-		waitForElementVisible(BY_INPUT_TIMEZONE);
-		browser.findElement(BY_INPUT_TIMEZONE).sendKeys(COUPA_INTEGRATION_TIMEZONE);
+		waitForElementVisible(BY_INPUT_TIMEZONE).sendKeys(COUPA_INTEGRATION_TIMEZONE);
 		Graphene.guardHttp(browser.findElement(BY_GP_BUTTON_SUBMIT)).click();
 		Graphene.waitGui().until().element(BY_INPUT_TIMEZONE).value().equalTo(COUPA_INTEGRATION_TIMEZONE);
-		waitForElementVisible(BY_GP_LINK_INSTANCES);
-		Graphene.guardHttp(browser.findElement(BY_GP_LINK_INSTANCES)).click();
+		Graphene.guardHttp(waitForElementVisible(BY_GP_LINK_INSTANCES)).click();
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("coupaInstances").getJSONArray("items").length() == 0, "There are no coupa instances for new project yet");
 		
 		// create coupa instance
-		CoupaInstanceFragment coupaInstance = Graphene.createPageFragment(CoupaInstanceFragment.class, browser.findElement(BY_GP_FORM));
+		waitForElementPresent(coupaInstance.getRoot());
 		coupaInstance.createCoupaInstance(Connectors.COUPA.getConnectorId(), coupaInstanceApiUrl, coupaInstanceApiKey);
 		
 		// verify progress on Coupa dashboard

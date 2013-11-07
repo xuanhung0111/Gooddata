@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.upload;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -13,9 +13,10 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class SimpleUploadTest extends AbstractTest {
 	
-	private static final By BY_UPLOAD_PANEL = By.cssSelector(".l-primary");
-	
 	private String csvFilePath;
+	
+	@FindBy(css=".l-primary")
+	private UploadFragment upload;
 	
 	@BeforeClass
 	public void initStartPage() {
@@ -32,8 +33,7 @@ public class SimpleUploadTest extends AbstractTest {
 	
 	@Test(dependsOnGroups = { "SimpleUploadInit" })
 	public void testUploadFile() throws InterruptedException {
-		waitForElementVisible(BY_UPLOAD_PANEL);
-		UploadFragment upload = Graphene.createPageFragment(UploadFragment.class, browser.findElement(BY_UPLOAD_PANEL));
+		waitForElementVisible(upload.getRoot());
 		Screenshots.takeScreenshot(browser, "1-upload-csv", this.getClass());
 		// upload file
 		upload.uploadFile(csvFilePath);
@@ -51,5 +51,4 @@ public class SimpleUploadTest extends AbstractTest {
 		waitForDashboardPageLoaded();
 		Screenshots.takeScreenshot(browser, "3-upload-dashboard", this.getClass());
 	}
-
 }

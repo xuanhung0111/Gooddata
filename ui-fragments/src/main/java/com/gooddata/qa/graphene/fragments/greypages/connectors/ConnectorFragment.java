@@ -21,8 +21,7 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
 	private WebElement submitIntegrationButton;
 	
 	public void createIntegration(String template) throws JSONException {
-		waitForElementVisible(this.projectTemplateUri);
-		this.projectTemplateUri.sendKeys(template);
+		waitForElementVisible(projectTemplateUri).sendKeys(template);
 		Graphene.guardHttp(submitIntegrationButton).click();
 		Assert.assertTrue(browser.getCurrentUrl().endsWith("integration"), "Integration was created");
 		JSONObject json = loadJSON();

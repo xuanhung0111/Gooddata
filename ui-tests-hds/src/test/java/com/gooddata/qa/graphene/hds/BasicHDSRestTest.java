@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -21,6 +22,9 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	private static final String STORAGE_DESCRIPTION = "HDS description";
 	private static final String STORAGE_AUTH_TOKEN = "pgroup1";
 	private static final String STORAGE_COPY_OF = "/gdc/storages/${storageId}";
+	
+	@FindBy(tagName="form")
+	private StorageFragment storageForm;
 	
 	@BeforeClass
 	public void initStartPage() {
@@ -45,7 +49,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnGroups = {"hdsInit"})
 	public void gpFormsAvailable() {
-		waitForElementPresent(BY_GP_FORM);
+		waitForElementPresent(storageForm.getRoot());
 	}
 	
 	@Test(dependsOnGroups = {"hdsInit"})
@@ -65,15 +69,14 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void verifyStorageCreateFormPresentWithTrailingSlash() throws JSONException {
 		browser.get(getRootUrl() + PAGE_GDC_STORAGES + "/");
-		waitForElementVisible(BY_GP_FORM);
+		waitForElementVisible(storageForm.getRoot());
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorage() throws JSONException {
-		waitForElementVisible(BY_GP_FORM);
-		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
-		Assert.assertTrue(storage.verifyValidCreateStorageForm(), "Create form is invalid");
-		storageUrl = storage.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, null);
+		waitForElementVisible(storageForm.getRoot());
+		Assert.assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
+		storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, null);
 	}
 	
 	@Test(dependsOnMethods = {"createStorage"})
@@ -84,7 +87,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@Test(dependsOnMethods = { "createStorage" })
 	public void verifyStorageUpdateFormPresentWithTrailingSlash() throws JSONException {
 		browser.get(getBasicRootUrl() + storageUrl + "/");
-		waitForElementVisible(BY_GP_FORM);
+		waitForElementVisible(storageForm.getRoot());
 	}
 	
 	@Test(dependsOnMethods = { "createStorage" })
@@ -122,13 +125,12 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@Test(dependsOnMethods = { "verifyStorage" })
 	public void updateStorage() throws JSONException {
 		openStorageUrl();
-		waitForElementVisible(BY_GP_FORM);
-		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
+		waitForElementVisible(storageForm.getRoot());
 		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storage.verifyValidEditStorageForm(STORAGE_TITLE, "Some description."), "Edit form doesn't contain current values");
-		storage.updateStorage(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated");
+		//Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, "Some description."), "Edit form doesn't contain current values");
+		storageForm.updateStorage(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated");
 		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storage.verifyValidEditStorageForm(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated"), "Edit form doesn't contain expected values");
+		//Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated"), "Edit form doesn't contain expected values");
 		Screenshots.takeScreenshot(browser, "hds-updated-storage", this.getClass());
 	}
 	
@@ -177,25 +179,23 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	private void openStorageUrl() {
 		browser.get(getBasicRootUrl() + storageUrl);
-		waitForElementVisible(BY_GP_FORM);
+		waitForElementVisible(storageForm.getRoot());
 		waitForElementPresent(BY_GP_PRE_JSON);
 	}
 	
 	private void createInvalidStorage(String title, String description, String authorizationToken, String copyOf, String expectedErrorMessage) throws JSONException {
-		waitForElementVisible(BY_GP_FORM);
-		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
-		Assert.assertTrue(storage.verifyValidCreateStorageForm(), "Create form is invalid");
-		storage.fillCreateStorageForm(title, description, authorizationToken, copyOf);
+		waitForElementVisible(storageForm.getRoot());
+		Assert.assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
+		storageForm.fillCreateStorageForm(title, description, authorizationToken, copyOf);
 		verifyErrorMessage(expectedErrorMessage, PAGE_GDC_STORAGES);
 	}
 	
 	private void invalidUpdateOfStorage(String title, String description, String expectedErrorMessage) throws JSONException {
 		openStorageUrl();
-		waitForElementVisible(BY_GP_FORM);
-		StorageFragment storage = Graphene.createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM));
+		waitForElementVisible(storageForm.getRoot());
 		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storage.verifyValidEditStorageForm(STORAGE_TITLE, "Some description."), "Edit form doesn't contain current values");
-		storage.updateStorage(title, description);
+		//Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, "Some description."), "Edit form doesn't contain current values");
+		storageForm.updateStorage(title, description);
 		verifyErrorMessage(expectedErrorMessage, storageUrl);
 	}
 	

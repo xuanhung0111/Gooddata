@@ -6,7 +6,7 @@ public class LoginTest extends AbstractCCCTest {
 	
 	@Test(groups = { "cccLoginInit" })
 	public void loginPanelPresent() {
-		waitForElementVisible(BY_DIV_LOGIN_PANEL);
+		waitForElementVisible(loginFragment.getRoot());
 	}
 	
 	@Test(dependsOnGroups = { "cccLoginInit" })

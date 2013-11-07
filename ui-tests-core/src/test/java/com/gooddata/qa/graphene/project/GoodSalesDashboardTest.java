@@ -1,10 +1,9 @@
 package com.gooddata.qa.graphene.project;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "GoodSalesDashboard" }, description = "Tests for GoodSales project (dashboards functionality) in GD platform")
@@ -21,10 +20,9 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "verifyDashboardTabs" }, groups = { "dashboards-verification" })
 	public void exportFirstDashboard() throws InterruptedException {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		waitForDashboardPageLoaded();
-		DashboardsPage dashboards = Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
-		exportedDashboardName = dashboards.exportDashboardTab(0);
+		waitForElementVisible(dashboardsPage.getRoot());
+		exportedDashboardName = dashboardsPage.exportDashboardTab(0);
 		checkRedBar();
 	}
 	
@@ -41,43 +39,45 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	/** 
 	 * Temporarily disabled test for adding report on dashboard tab since there is a weird behavior
 	 *  - dialog for adding report and report itself is present, but webdriver can't use it since it's not visible (probably some css issue?)
+	 *  
 	@Test(dependsOnMethods = { "addNewTab" }, groups = { "dashboards-verification" })
 	public void addReportOnNewTab() throws InterruptedException {
-		DashboardsPage dashboards = initDashboardsPage();
-		dashboards.selectDashboard("Pipeline Analysis");
+		initDashboardsPage();
+		dashboardsPage.selectDashboard("Pipeline Analysis");
 		waitForDashboardPageLoaded();
 		Thread.sleep(3000);
-		dashboards.getTabs().openTab(9);
+		dashboardsPage.getTabs().openTab(9);
 		waitForDashboardPageLoaded();
-		dashboards.editDashboard();
-		dashboards.getDashboardEditBar().addReportToDashboard("Activities by Type");
-		dashboards.getDashboardEditBar().saveDashboard();
+		dashboardsPage.editDashboard();
+		dashboardsPage.getDashboardEditBar().addReportToDashboard("Activities by Type");
+		dashboardsPage.getDashboardEditBar().saveDashboard();
 		waitForDashboardPageLoaded();
 		Screenshots.takeScreenshot(browser, "GoodSales-new-tab-with-chart", this.getClass());
 	}
 	*/
 	
+	
 	@Test(dependsOnMethods = { "addNewTab" }, groups = { "dashboards-verification" })
 	public void deleteNewTab() throws InterruptedException {
-		DashboardsPage dashboards = initDashboardsPage();
-		Assert.assertTrue(dashboards.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
+		initDashboardsPage();
+		Assert.assertTrue(dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
 		waitForDashboardPageLoaded();
-		int tabsCount = dashboards.getTabs().getNumberOfTabs();
-		dashboards.deleteDashboardTab(expectedGoodSalesTabs.length);
-		Assert.assertEquals(dashboards.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
+		int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
+		dashboardsPage.deleteDashboardTab(expectedGoodSalesTabs.length);
+		Assert.assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
 	}
 	
 	@Test(dependsOnMethods = { "verifyDashboardTabs" }, groups = { "dashboards-verification", "new-dashboard" })
 	public void addNewDashboard() throws InterruptedException {
-		DashboardsPage dashboards = initDashboardsPage();
+		initDashboardsPage();
 		String dashboardName = "test";
-		dashboards.addNewDashboard(dashboardName);
+		dashboardsPage.addNewDashboard(dashboardName);
 		waitForDashboardPageLoaded();
-		waitForElementNotPresent(dashboards.getDashboardEditBar().getRoot());
+		waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
 		Thread.sleep(5000);
 		checkRedBar();
-		Assert.assertEquals(dashboards.getDashboardsCount(), 2, "New dashboard is not present");
-		Assert.assertEquals(dashboards.getDashboardName(), dashboardName, "New dashboard has invalid name");
+		Assert.assertEquals(dashboardsPage.getDashboardsCount(), 2, "New dashboard is not present");
+		Assert.assertEquals(dashboardsPage.getDashboardName(), dashboardName, "New dashboard has invalid name");
 		Screenshots.takeScreenshot(browser, "GoodSales-new-dashboard", this.getClass());
 	}
 	
@@ -88,12 +88,12 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	
 	@Test(dependsOnGroups = { "new-dashboard" }, groups = { "dashboards-verification" })
 	public void deleteNewDashboard() throws InterruptedException {
-		DashboardsPage dashboards = initDashboardsPage();
-		int dashboardsCount = dashboards.getDashboardsCount();
-		if (dashboards.selectDashboard("test")) {
-			dashboards.deleteDashboard();
+		initDashboardsPage();
+		int dashboardsCount = dashboardsPage.getDashboardsCount();
+		if (dashboardsPage.selectDashboard("test")) {
+			dashboardsPage.deleteDashboard();
 			waitForDashboardPageLoaded();
-			Assert.assertEquals(dashboards.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
+			Assert.assertEquals(dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
 			checkRedBar();
 		} else {
 			Assert.fail("Dashboard wasn't selected and not deleted");
@@ -105,32 +105,33 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 		verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
 	}
 	
-	private DashboardsPage initDashboardsPage() {
+	private void initDashboardsPage() {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		waitForDashboardPageLoaded();
-		return Graphene.createPageFragment(DashboardsPage.class, browser.findElement(BY_PANEL_ROOT));
+		waitForElementVisible(dashboardsPage.getRoot());
 	}
 	
 	private void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) throws InterruptedException {
-		DashboardsPage dashboards = initDashboardsPage();
-		Assert.assertTrue(dashboards.selectDashboard(dashboardName), "Dashboard wasn't selected");
+		initDashboardsPage();
+		Assert.assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
 		waitForDashboardPageLoaded();
 		Thread.sleep(3000);
-		int tabsCount = dashboards.getTabs().getNumberOfTabs();
-		dashboards.editDashboard();
+		DashboardTabs tabs = dashboardsPage.getTabs();
+		int tabsCount = tabs.getNumberOfTabs();
+		dashboardsPage.editDashboard();
 		waitForDashboardPageLoaded();
-		dashboards.addNewTab(tabName);
+		dashboardsPage.addNewTab(tabName);
 		checkRedBar();
-		Assert.assertEquals(dashboards.getTabs().getNumberOfTabs(), tabsCount + 1, "New tab is not present");
-		Assert.assertTrue(dashboards.getTabs().isTabSelected(tabsCount), "New tab is not selected");
-		Assert.assertEquals(dashboards.getTabs().getTabLabel(tabsCount), tabName, "New tab has invalid label");
-		dashboards.getDashboardEditBar().saveDashboard();
+		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
+		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
+		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
+		dashboardsPage.getDashboardEditBar().saveDashboard();
 		waitForDashboardPageLoaded();
-		waitForElementNotPresent(dashboards.getDashboardEditBar().getRoot());
-		Assert.assertEquals(dashboards.getTabs().getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
-		Assert.assertTrue(dashboards.getTabs().isTabSelected(tabsCount), "New tab is not selected after Save");
-		Assert.assertEquals(dashboards.getTabs().getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
+		waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
+		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
+		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
+		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
 		Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
 	}
 }

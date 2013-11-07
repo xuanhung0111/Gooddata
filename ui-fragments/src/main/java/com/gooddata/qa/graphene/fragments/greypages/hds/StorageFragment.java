@@ -70,9 +70,8 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 	}
 	
 	public void updateStorage(String newTitle, String newDescription) {
-		waitForElementVisible(this.title);
-		this.title.clear();
-		this.description.clear();
+		waitForElementVisible(this.title).clear();
+		waitForElementVisible(description).clear();
 		if (newTitle != null && newTitle.length() > 0) {
 			this.title.sendKeys(newTitle);
 		}
@@ -92,9 +91,8 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 	}
 	
 	public void deleteStorage() {
-		waitForElementVisible(submit);
-		Graphene.guardHttp(submit).click();
-		Graphene.waitGui().until().element(BY_BUTTON_CREATE).is().visible();
+		Graphene.guardHttp(waitForElementVisible(submit)).click();
+		waitForElementVisible(BY_BUTTON_CREATE);
 		Assert.assertTrue(browser.getCurrentUrl().endsWith("/storages"), "Browser wasn't redirected to storages page");
 	}
 

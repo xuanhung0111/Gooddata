@@ -24,9 +24,8 @@ public class LoginFragment extends AbstractFragment {
 	private static final By BY_VALIDATION_ICON = By.xpath("//div[contains(@class, 'validationIcon')]");
 	
 	public void login(String username, String password) {
-		waitForElementVisible(this.username);
-		this.username.sendKeys(username);
-		this.password.sendKeys(password);
+		waitForElementVisible(this.username).sendKeys(username);
+		waitForElementVisible(this.password).sendKeys(password);
 		signInButton.click();
 	}
 	

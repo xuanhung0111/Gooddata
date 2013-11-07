@@ -63,16 +63,13 @@ public class EmailSchedulePage extends AbstractFragment {
 	}
 	
 	public String getNoSchedulesMessage() {
-		waitForElementVisible(noSchedulesMessage);
-		return noSchedulesMessage.getText();
+		return waitForElementVisible(noSchedulesMessage).getText();
 	}
 	
 	public void scheduleNewDahboardEmail(String emailTo, String emailSubject, String emailBody, String dashboardName) {
-		waitForElementVisible(addScheduleButton);
-		Graphene.guardAjax(addScheduleButton).click();
+		Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
 		waitForElementVisible(scheduleDetail);
-		waitForElementVisible(emailToInput);
-		emailToInput.sendKeys(emailTo);
+		waitForElementVisible(emailToInput).sendKeys(emailTo);
 		emailSubjectInput.sendKeys(emailSubject);
 		emailMessageInput.sendKeys(emailBody);
 		waitForElementVisible(dashboardsSelector);
@@ -80,29 +77,24 @@ public class EmailSchedulePage extends AbstractFragment {
 		Assert.assertTrue(dashboardsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Dashboards selector is not selected by default");
 		selectDashboard(dashboardName);
 		// TODO - schedule (will be sent in the nearest time slot now)
-		waitForElementVisible(saveButton);
-		Graphene.guardAjax(saveButton).click();
+		Graphene.guardAjax(waitForElementVisible(saveButton)).click();
 		waitForElementNotVisible(scheduleDetail);
 		waitForElementVisible(schedulesTable);
 	}
 	
 	public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName, ExportFormat format) {
-		waitForElementVisible(addScheduleButton);
-		Graphene.guardAjax(addScheduleButton).click();
+		Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
 		waitForElementVisible(scheduleDetail);
-		waitForElementVisible(emailToInput);
-		emailToInput.sendKeys(emailTo);
+		waitForElementVisible(emailToInput).sendKeys(emailTo);
 		emailSubjectInput.sendKeys(emailSubject);
 		emailMessageInput.sendKeys(emailBody);
-		waitForElementVisible(reportsSelector);
-		reportsSelector.click();
+		waitForElementVisible(reportsSelector).click();
 		waitForEmailSchedulePageLoaded();
 		Assert.assertTrue(reportsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Reports selector is not selected");
 		selectReport(reportName);
 		selectReportFormat(format);
 		// TODO - schedule (will be sent in the nearest time slot now)
-		waitForElementVisible(saveButton);
-		Graphene.guardAjax(saveButton).click();
+		Graphene.guardAjax(waitForElementVisible(saveButton)).click();
 		waitForElementNotVisible(scheduleDetail);
 		waitForElementVisible(schedulesTable);
 	}

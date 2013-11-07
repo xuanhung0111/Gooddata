@@ -2,13 +2,11 @@ package com.gooddata.qa.graphene.tools;
 
 import java.util.List;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 
 /**
  * This is a helper class to delete test projects from required GD host
@@ -46,8 +44,7 @@ public class DeleteTestProjects extends AbstractTest {
 	
 	private void deleteProjects(String projectSubstring) {
 		browser.get(getRootUrl() + PAGE_PROJECTS);
-		waitForElementVisible(BY_PROJECTS_LIST);
-		ProjectsPage projectsPage = Graphene.createPageFragment(ProjectsPage.class, browser.findElement(BY_PROJECTS_PANEL));
+		waitForElementVisible(projectsPage.getRoot());
 		List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
 		System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
 		for (String projectToDelete : projectsToDelete) {

@@ -24,10 +24,9 @@ public class CoupaInstanceFragment extends AbstractGreyPagesFragment {
 	private WebElement createCoupaInstanceButton;
 	
 	public void createCoupaInstance(String name, String apiUrl, String apiKey) throws JSONException {
-		waitForElementVisible(this.name);
-		this.name.sendKeys(name);
-		this.apiUrl.sendKeys(apiUrl);
-		this.apiKey.sendKeys(apiKey);
+		waitForElementVisible(this.name).sendKeys(name);
+		waitForElementVisible(this.apiUrl).sendKeys(apiUrl);
+		waitForElementVisible(this.apiKey).sendKeys(apiKey);
 		Graphene.guardHttp(createCoupaInstanceButton).click();
 		JSONObject json = loadJSON();
 		Assert.assertEquals(json.getJSONObject("coupaInstance").getString("apiUrl"), apiUrl);

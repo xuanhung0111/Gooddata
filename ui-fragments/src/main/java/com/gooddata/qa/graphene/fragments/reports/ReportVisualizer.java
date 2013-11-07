@@ -45,12 +45,10 @@ public class ReportVisualizer extends AbstractFragment {
 	private WebElement reportVisualizationContainer;
 	
 	public void selectWhatArea(List<String> what) throws InterruptedException {
-		waitForElementVisible(whatButton);
-		whatButton.click();
+		waitForElementVisible(whatButton).click();
 		waitForElementVisible(BY_WHAT_AREA_METRICS_HEADER);
 		for (String metric : what) {
-			waitForElementVisible(metricFilterInput);
-			metricFilterInput.clear();
+			waitForElementVisible(metricFilterInput).clear();
 			metricFilterInput.sendKeys(metric);
 			By metricCheckbox = By.xpath(XPATH_METRIC_CHECKBOX.replace("${metric}", metric));
 			waitForElementVisible(metricCheckbox);
@@ -61,13 +59,11 @@ public class ReportVisualizer extends AbstractFragment {
 	}
 	
 	public void selectHowArea(List<String> how) {
-		waitForElementVisible(howButton);
-		howButton.click();
+		waitForElementVisible(howButton).click();
 		waitForElementVisible(BY_HOW_AREA_ATTRIBUTES_HEADER);
 		if (how != null) {
 			for (String attribute : how) {
-				waitForElementVisible(attributeFilterInput);
-				attributeFilterInput.clear();
+				waitForElementVisible(attributeFilterInput).clear();
 				attributeFilterInput.sendKeys(attribute);
 				By attributeCheckbox = By.xpath(XPATH_ATTRIBUTE_CHECKBOX.replace("${attribute}", attribute));
 				waitForElementVisible(attributeCheckbox);
@@ -78,14 +74,12 @@ public class ReportVisualizer extends AbstractFragment {
 	}
 	
 	public void selectFilterArea() {
-		waitForElementVisible(filterButton);
-		filterButton.click();
+		waitForElementVisible(filterButton).click();
 		waitForElementVisible(BY_FILTER_TAB);
 	}
 	
 	public void finishReportChanges() {
-		waitForElementVisible(doneButton);
-		doneButton.click();
+		waitForElementVisible(doneButton).click();
 		waitForElementNotVisible(doneButton);
 	}
 	

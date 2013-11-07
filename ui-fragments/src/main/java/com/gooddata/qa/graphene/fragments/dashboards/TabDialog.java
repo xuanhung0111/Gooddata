@@ -17,10 +17,8 @@ public class TabDialog extends AbstractFragment {
 	private WebElement cancelButton;
 	
 	public void createTab(String tabName) {
-		waitForElementVisible(title);
-		title.sendKeys(tabName);
-		waitForElementVisible(saveButton);
-		saveButton.click();
+		waitForElementVisible(title).sendKeys(tabName);
+		waitForElementVisible(saveButton).click();
 		waitForElementNotPresent(title);
 	}
 	
