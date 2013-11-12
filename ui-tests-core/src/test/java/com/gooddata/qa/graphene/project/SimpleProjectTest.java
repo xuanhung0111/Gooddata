@@ -31,7 +31,7 @@ public class SimpleProjectTest extends AbstractTest {
 		successfulTest = true;
 	}
 	
-	@Test(dependsOnMethods = { "projectSimpleInit" }, alwaysRun = true)
+	@Test(dependsOnMethods = { "createSimpleProject" }, alwaysRun = true)
 	public void deleteSimpleProject() {
 		deleteProjectByDeleteMode(successfulTest);
 	}
