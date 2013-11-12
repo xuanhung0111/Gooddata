@@ -28,6 +28,7 @@
 		<browser>firefox</browser>
 		<timeout>90</timeout> <!-- (seconds) -->
 		<browserDownloadFolder>${project.build.directory}/downloads</browserDownloadFolder>
+		<csvFilePath>${basedir}/src/test/resources</csvFilePath>
 		<video.recoring>false</video.recoring>
 		
 		<deleteMode>delete_if_successful</deleteMode> <!-- Possible values are: delete_always, delete_if_successful, delete_never -->
@@ -164,6 +165,10 @@
 											<property>
 												<name>browserDownloadFolder</name>
 												<value>${browserDownloadFolder}</value>
+											</property>
+											<property>
+												<name>csvFilePath</name>
+												<value>${csvFilePath}</value>
 											</property>
 										</systemProperties>
 									</configuration>

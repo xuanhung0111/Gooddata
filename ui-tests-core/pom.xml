@@ -22,6 +22,7 @@
 			<properties>
 				<testng.suite.xml>testng-core.xml</testng.suite.xml>
 				<propertiesPath>${basedir}/src/test/resources/variables-env-test.properties</propertiesPath>
+				<csvFilePath>${basedir}/src/test/resources/geochart-csv</csvFilePath>
 			</properties>
 			<build>
 				<testResources>

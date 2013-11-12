@@ -74,6 +74,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected boolean successfulTest = false;
 	
 	protected static final By BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']//button[2]");
+	protected static final By BY_LOGOUT_LINK = By.xpath("//a[@class='s-logout']");
 	protected static final By BY_PANEL_ROOT = By.id("root");
 	
 	protected static final By BY_GP_FORM = By.tagName("form");
@@ -99,6 +100,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final String PAGE_GDC_PROJECTS = PAGE_GDC + "/projects";
 	protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
 	protected static final String PAGE_PROJECTS = "projects.html";
+	protected static final String PAGE_UPLOAD = "upload.html";
 	
 	/** ----- UI fragmnets ----- */
 	
@@ -220,6 +222,12 @@ public abstract class AbstractTest extends Arquillian {
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
 	
+	public void logout() {
+		waitForElementVisible(BY_LOGGED_USER_BUTTON).click();
+		waitForElementVisible(BY_LOGOUT_LINK).click();
+		waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
+	}
+	
 	protected void verifyProjectDashboardTabs(boolean validation, int expectedNumberOfTabs, String[] expectedTabLabels, boolean openPage) throws InterruptedException {
 		if (openPage) {
 			browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
@@ -305,6 +313,36 @@ public abstract class AbstractTest extends Arquillian {
 		System.out.println("Deleted project: " + projectId);
 	}
 	
+	protected void initDashboardsPage() {
+		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+		waitForElementVisible(BY_LOGGED_USER_BUTTON);
+		waitForDashboardPageLoaded();
+		waitForElementVisible(dashboardsPage.getRoot());
+	}
+	
+	protected void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) throws InterruptedException {
+		initDashboardsPage();
+		Assert.assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
+		waitForDashboardPageLoaded();
+		Thread.sleep(3000);
+		DashboardTabs tabs = dashboardsPage.getTabs();
+		int tabsCount = tabs.getNumberOfTabs();
+		dashboardsPage.editDashboard();
+		waitForDashboardPageLoaded();
+		dashboardsPage.addNewTab(tabName);
+		checkRedBar();
+		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
+		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
+		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
+		dashboardsPage.getDashboardEditBar().saveDashboard();
+		waitForDashboardPageLoaded();
+		waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
+		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
+		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
+		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
+		Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
+	}
+	
 	public JSONObject loadJSON() throws JSONException {
 		waitForElementPresent(BY_GP_PRE_JSON);
 		return new JSONObject(browser.findElement(BY_GP_PRE_JSON).getText());
@@ -344,6 +382,10 @@ public abstract class AbstractTest extends Arquillian {
 	
 	public void waitForSchedulesPageLoaded() {
 		waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
+	}
+	
+	public void waitForObjectPageLoaded() {
+		waitForElementVisible(By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]"));
 	}
 	
 	public WebElement waitForElementVisible(By byElement) {

@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.fragments.upload;
 
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -15,25 +13,22 @@ public class UploadFragment extends AbstractFragment {
 	@FindBy(css="button.s-btn-load")
 	private WebElement loadButton;
 	
+	@FindBy(css="div.s-uploadPage-annotation table")
 	private UploadColumns uploadColumns;
 	
-	private static final By BY_UPLOAD_COLUMNS = By.cssSelector(".table-lineList");
-	
 	public void uploadFile(String filePath) throws InterruptedException {
+		System.out.println("Going to upload file: " + filePath);
 		waitForElementPresent(uploadFile).sendKeys(filePath);
 		waitForElementNotVisible(uploadFile);
-		waitForElementVisible(BY_UPLOAD_COLUMNS);
+		waitForElementVisible(uploadColumns.getRoot());
 	}
 	
 	public UploadColumns getUploadColumns() {
-		if (uploadColumns == null) {
-			uploadColumns = Graphene.createPageFragment(UploadColumns.class, this.root.findElement(BY_UPLOAD_COLUMNS));
-		}
 		return uploadColumns;
 	}
 	
 	public void confirmloadCsv() {
 		waitForElementVisible(loadButton).click();
-		waitForElementNotVisible(BY_UPLOAD_COLUMNS);
+		waitForElementNotVisible(uploadColumns.getRoot());
 	}
 }
