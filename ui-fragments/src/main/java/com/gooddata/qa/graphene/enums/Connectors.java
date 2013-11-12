@@ -7,7 +7,8 @@ public enum Connectors {
 	ZENDESK3 ("Zendesk3", "/projectTemplates/ZendeskAnalytics/9", "zendesk3"),
 	GOOGLE_ANALYTICS ("Google Analytics", "/projectTemplates/GoogleAnalytics/3", "googleanalytics"),
 	COUPA ("Coupa", "/projectTemplates/CoupaAnalytics/8", "coupa"),
-	BRIGHTIDEA ("Brightidea", "/projectTemplates/BrightideaAnalytics/2", "brightidea");
+	BRIGHTIDEA ("Brightidea", "/projectTemplates/BrightideaAnalytics/2", "brightidea"),
+	ZENDESK4 ("Zendesk4", "/projectTemplates/ZendeskAnalytics/9", "zendesk4");
 	
 	private final String name;
 	private final String template;

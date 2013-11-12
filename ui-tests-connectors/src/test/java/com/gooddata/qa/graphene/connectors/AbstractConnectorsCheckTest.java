@@ -104,4 +104,16 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 			System.out.println("Integration wasn't created - nothing to disable...");
 		}
 	}
+
+	protected String getConnectorUri(final Connectors connectorType) {
+		return PAGE_GDC_CONNECTORS.replace("${projectId}", projectId) + "/" + connectorType.getConnectorId();
+	}
+
+	protected String getIntegrationUri(final Connectors connectorType) {
+		return getConnectorUri(connectorType) + "/integration";
+	}
+
+	protected String getProcessesUri(final Connectors connectorType) {
+		return getIntegrationUri(connectorType) + "/processes";
+	}
 }
