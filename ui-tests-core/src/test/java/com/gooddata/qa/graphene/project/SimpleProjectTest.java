@@ -103,7 +103,7 @@ public class SimpleProjectTest extends AbstractTest {
 	private void configureAttributeLabel(String attributeName, String attributeLabelType) throws InterruptedException {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|attributes");
 		waitForElementVisible(attributesTable.getRoot());
-		System.out.println("Rows: " + attributesTable.getNumberOfRows());
+		waitForDataPageLoaded();
 		attributesTable.selectAttribute(attributeName);
 		waitForElementVisible(attributeDetailPage.getRoot());
 		waitForObjectPageLoaded();
@@ -120,6 +120,7 @@ public class SimpleProjectTest extends AbstractTest {
 		dashboardsPage.editDashboard();
 		dashboardsPage.getDashboardEditBar().addWidgetToDashboard(WidgetTypes.GEO_CHART, metric);
 		dashboardsPage.getDashboardEditBar().saveDashboard();
+		Thread.sleep(5000);
 		waitForDashboardPageLoaded();
 		Thread.sleep(5000);
 		Screenshots.takeScreenshot(browser, "geochart-new-tab-" + tabIndex, this.getClass());
