@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.project;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "GoodSalesDashboard" }, description = "Tests for GoodSales project (dashboards functionality) in GD platform")
@@ -103,35 +102,5 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	@Test(dependsOnGroups = { "dashboards-verification" }, groups = { "lastTest" })
 	public void verifyDashboardTabsAfter() throws InterruptedException {
 		verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
-	}
-	
-	private void initDashboardsPage() {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-		waitForElementVisible(BY_LOGGED_USER_BUTTON);
-		waitForDashboardPageLoaded();
-		waitForElementVisible(dashboardsPage.getRoot());
-	}
-	
-	private void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) throws InterruptedException {
-		initDashboardsPage();
-		Assert.assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
-		waitForDashboardPageLoaded();
-		Thread.sleep(3000);
-		DashboardTabs tabs = dashboardsPage.getTabs();
-		int tabsCount = tabs.getNumberOfTabs();
-		dashboardsPage.editDashboard();
-		waitForDashboardPageLoaded();
-		dashboardsPage.addNewTab(tabName);
-		checkRedBar();
-		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
-		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
-		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
-		dashboardsPage.getDashboardEditBar().saveDashboard();
-		waitForDashboardPageLoaded();
-		waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
-		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
-		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
-		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
-		Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
 	}
 }

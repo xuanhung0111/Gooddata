@@ -79,6 +79,10 @@ public class DashboardsPage extends AbstractFragment {
 	}
 	
 	public boolean selectDashboard(String dashboardName) {
+		if (getDashboardName().contains(dashboardName)) {
+			System.out.println("Dashboard '" + dashboardName + "'already selected");
+			return true;
+		}
 		waitForElementVisible(dashboardSwitcherButton).click();
 		if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
 			for (WebElement elem : dashboardSelectors) {

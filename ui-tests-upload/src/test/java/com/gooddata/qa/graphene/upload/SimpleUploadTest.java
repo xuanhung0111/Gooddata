@@ -20,7 +20,7 @@ public class SimpleUploadTest extends AbstractTest {
 	
 	@BeforeClass
 	public void initStartPage() {
-		startPage = "upload.html";
+		startPage = PAGE_UPLOAD;
 		
 		csvFilePath = loadProperty("upload.file.simple.csv");
 	}

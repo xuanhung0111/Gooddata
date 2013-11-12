@@ -38,6 +38,11 @@ public class DeleteTestProjects extends AbstractTest {
 	}
 	
 	@Test(dependsOnGroups = { "deleteProjectsInit" })
+	public void deleteAllSimpleGeoProjects() {
+		deleteProjects("simple-project-geo");
+	}
+	
+	@Test(dependsOnGroups = { "deleteProjectsInit" })
 	public void deleteAllGoodSalesPerfCheckProjects() {
 		deleteProjects("GoodSales-perf-test");
 	}

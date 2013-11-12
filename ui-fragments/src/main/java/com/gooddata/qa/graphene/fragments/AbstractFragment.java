@@ -6,6 +6,7 @@ import org.jboss.arquillian.graphene.fragment.Root;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 public abstract class AbstractFragment {
 	
@@ -36,6 +37,11 @@ public abstract class AbstractFragment {
 	public WebElement waitForElementVisible(WebElement element) {
 		Graphene.waitGui().until().element(element).is().visible();
 		return element;
+	}
+	
+	public Select waitForElementVisible(Select select) {
+		Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().visible();
+		return select;
 	}
 	
 	public WebElement waitForElementVisible(By byElement) {
