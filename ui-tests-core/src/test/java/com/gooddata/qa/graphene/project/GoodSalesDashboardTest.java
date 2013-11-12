@@ -55,14 +55,15 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	}
 	*/
 	
-	
 	@Test(dependsOnMethods = { "addNewTab" }, groups = { "dashboards-verification" })
 	public void deleteNewTab() throws InterruptedException {
 		initDashboardsPage();
 		Assert.assertTrue(dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
 		waitForDashboardPageLoaded();
+		Thread.sleep(5000);
 		int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
 		dashboardsPage.deleteDashboardTab(expectedGoodSalesTabs.length);
+		Thread.sleep(5000);
 		Assert.assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
 	}
 	
