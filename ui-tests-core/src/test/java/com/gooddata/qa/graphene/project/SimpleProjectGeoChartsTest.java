@@ -44,8 +44,7 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	
 	@Test(dependsOnGroups = { "projectSimpleGeoInit" })
 	public void createSimpleProjectGeo() throws JSONException, InterruptedException {
-		waitForProjectsPageLoaded();
-		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
+		openUrl(PAGE_GDC_PROJECTS);
 		waitForElementVisible(gpProject.getRoot());
 		projectId = gpProject.createProject("simple-project-geo", "", "", authorizationToken, 12);
 		Screenshots.takeScreenshot(browser, "simple-project-geo-created", this.getClass());
@@ -53,7 +52,7 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createSimpleProjectGeo" }, groups = { "geo-charts" })
 	public void uploadDataForGeoCharts() throws InterruptedException {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
 		waitForDashboardPageLoaded();
 		uploadFile(csvFilePath + "/geo_test.csv", 1);
 		uploadFile(csvFilePath + "/geo_test_pins.csv", 2);
@@ -87,7 +86,7 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	}
 	
 	private void uploadFile(String filePath, int order) throws InterruptedException {
-		browser.get(getRootUrl() + PAGE_UPLOAD);
+		openUrl(PAGE_UPLOAD);
 		waitForElementVisible(upload.getRoot());
 		upload.uploadFile(filePath);
 		Screenshots.takeScreenshot(browser, "simple-project-upload-" + order, this.getClass());
@@ -101,7 +100,7 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	}
 	
 	private void configureAttributeLabel(String attributeName, String attributeLabelType) throws InterruptedException {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|attributes");
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|attributes");
 		waitForElementVisible(attributesTable.getRoot());
 		waitForDataPageLoaded();
 		attributesTable.selectAttribute(attributeName);

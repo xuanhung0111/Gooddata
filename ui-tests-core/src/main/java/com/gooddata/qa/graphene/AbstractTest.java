@@ -94,6 +94,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final By BY_REPORT_PAGE = By.id("p-analysisPage");
 	
 	protected static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
+	protected static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
 	
 	protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
 	protected static final String PAGE_GDC = "gdc";
@@ -180,7 +181,11 @@ public abstract class AbstractTest extends Arquillian {
 		//GrapheneProxyInstance proxy = (GrapheneProxyInstance) browser;
 		//proxy.registerInterceptor(new RedBarInterceptor());
 		
-		String pageURL = getRootUrl() + (startPage != null ? startPage : "");
+		openUrl(startPage != null ? startPage : "");
+	}
+	
+	protected void openUrl(String url) {
+		String pageURL = getRootUrl() + url;
 		System.out.println("Loading page ... " + pageURL);
 		browser.get(pageURL);
 	}
@@ -256,6 +261,10 @@ public abstract class AbstractTest extends Arquillian {
 	protected void checkRedBar() {
 		if (browser.findElements(BY_RED_BAR).size() != 0) {
 			Assert.fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
+		}
+		//this kind of error appeared for the first time in geo chart
+		if (browser.findElements(BY_REPORT_ERROR).size() != 0 && browser.findElement(BY_REPORT_ERROR).isDisplayed()) {
+			Assert.fail("Report error APPEARED - " + browser.findElement(BY_REPORT_ERROR).getText());
 		}
 	}
 	
@@ -350,6 +359,7 @@ public abstract class AbstractTest extends Arquillian {
 	
 	public void waitForDashboardPageLoaded() {
 		waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"));
+		checkRedBar();
 	}
 	
 	public void waitForReportsPageLoaded() {
