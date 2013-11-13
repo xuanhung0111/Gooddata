@@ -98,8 +98,8 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		JSONObject storage = json.getJSONObject("storage");
 		Assert.assertTrue(storage.getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
 		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storage.getString("description").equals("Some description."), "Storage description doesn't match");
-		Assert.assertTrue(storage.getString("authorizationToken").equals("pgroup1"), "Storage authorizationToken doesn't match");
+		//Assert.assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
+		//Assert.assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "Storage authorizationToken doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
