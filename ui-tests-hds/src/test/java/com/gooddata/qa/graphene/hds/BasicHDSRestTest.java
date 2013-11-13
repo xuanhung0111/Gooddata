@@ -20,7 +20,6 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	private static final String STORAGE_TITLE = "HDS storage";
 	private static final String STORAGE_DESCRIPTION = "HDS description";
-	private static final String STORAGE_AUTH_TOKEN = "pgroup1";
 	private static final String STORAGE_COPY_OF = "/gdc/storages/${storageId}";
 	
 	@FindBy(tagName="form")
@@ -54,7 +53,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnGroups = {"hdsInit"})
 	public void hdsResourceLinkNotAvailableAtBasicResource() {
-		browser.get(getRootUrl() + PAGE_GDC);
+		openUrl(PAGE_GDC);
 		Assert.assertEquals(browser.getTitle(), "GoodData API root");
 		Assert.assertTrue(browser.findElements(By.partialLinkText("storages")).size() == 0, "Storages link is present at basic /gdc resource");
 	}
@@ -68,15 +67,15 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void verifyStorageCreateFormPresentWithTrailingSlash() throws JSONException {
-		browser.get(getRootUrl() + PAGE_GDC_STORAGES + "/");
+		openUrl(PAGE_GDC_STORAGES + "/");
 		waitForElementVisible(storageForm.getRoot());
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
-	public void createStorage() throws JSONException {
+	public void createStorage() throws JSONException, InterruptedException {
 		waitForElementVisible(storageForm.getRoot());
 		Assert.assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
-		storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, null);
+		storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken, null);
 	}
 	
 	@Test(dependsOnMethods = {"createStorage"})
@@ -100,7 +99,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		Assert.assertTrue(storage.getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
 		//TODO - wait for HDS C3 milestone 2 for fix (change description)
 		//Assert.assertTrue(storage.getString("description").equals("Some description."), "Storage description doesn't match");
-		Assert.assertTrue(storage.getString("authorizationToken").equals(STORAGE_AUTH_TOKEN), "Storage authorizationToken doesn't match");
+		Assert.assertTrue(storage.getString("authorizationToken").equals("pgroup1"), "Storage authorizationToken doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
@@ -147,12 +146,12 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutTitle() throws JSONException {
-		createInvalidStorage(null, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, null, "Validation failed");
+		createInvalidStorage(null, STORAGE_DESCRIPTION, authorizationToken, null, "Validation failed");
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutDescription() throws JSONException {
-		createInvalidStorage(STORAGE_TITLE, null, STORAGE_AUTH_TOKEN, null, "Validation failed");
+		createInvalidStorage(STORAGE_TITLE, null, authorizationToken, null, "Validation failed");
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
@@ -162,7 +161,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithInvalidCopyOfURI() throws JSONException {
-		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, STORAGE_AUTH_TOKEN, STORAGE_COPY_OF, "Malformed request");
+		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken, STORAGE_COPY_OF, "Malformed request");
 	}
 	
 	@Test(dependsOnMethods = { "createStorage" })
