@@ -48,16 +48,11 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 		Graphene.guardHttp(submit).click();
 	}
 	
-	public String createStorage(String title, String description, String authorizationToken, String copyOf) throws JSONException {
+	public String createStorage(String title, String description, String authorizationToken, String copyOf) throws JSONException, InterruptedException {
 		fillCreateStorageForm(title, description, authorizationToken, copyOf);
 		waitForElementNotVisible(this.title);
 		waitForElementPresent(BY_GP_PRE_JSON);
-		System.out.println("Related execution URL is " + browser.getCurrentUrl());
-		Assert.assertTrue(browser.getCurrentUrl().contains("executions"), "Storage creation didn't redirect to /executions/* page");
-		JSONObject json = loadJSON();
-		String storageUrl = json.getJSONObject("asyncTask").getJSONObject("links").getString("storage");
-		System.out.println("Created storage on URL " + storageUrl);
-		return storageUrl;
+		return waitForStorageCreated(10);
 	}
 	
 	public boolean verifyValidEditStorageForm(String title, String description) {
@@ -94,6 +89,30 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 		Graphene.guardHttp(waitForElementVisible(submit)).click();
 		waitForElementVisible(BY_BUTTON_CREATE);
 		Assert.assertTrue(browser.getCurrentUrl().endsWith("/storages"), "Browser wasn't redirected to storages page");
+	}
+	
+	private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
+		String executionUrl = browser.getCurrentUrl();
+		System.out.println("Related execution URL is " + executionUrl);
+		Assert.assertTrue(executionUrl.contains("executions"), "Storage creation didn't redirect to /executions/* page");
+		int i = 0;
+		boolean asyncTaskPoll = isAsyncTaskPoll();
+		while (asyncTaskPoll && i < checkIterations) {
+			System.out.println("Current storage execution is polling");
+			Thread.sleep(5000);
+			browser.get(executionUrl);
+			asyncTaskPoll = isAsyncTaskPoll();
+			i++;
+		}
+		JSONObject json = loadJSON();
+		String storageUrl = json.getJSONObject("asyncTask").getJSONObject("links").getString("storage");
+		System.out.println("Created storage on URL " + storageUrl);
+		return storageUrl;
+	}
+	
+	private boolean isAsyncTaskPoll() throws JSONException {
+		JSONObject json = loadJSON();
+		return json.getJSONObject("asyncTask").getJSONObject("links").has("poll");
 	}
 
 }
