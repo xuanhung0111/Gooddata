@@ -6,8 +6,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-
-import com.gooddata.qa.graphene.enums.Connectors;
+import org.testng.annotations.Test;
 
 public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTest {
 
@@ -16,10 +15,6 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 	protected String pardotAccountId;
 	protected String pardotUploadUser;
 	protected String pardotUploadUserPassword;
-	
-	protected static final String[] expectedPardotTabs = {
-		"Marketing KPIs", "Contribution", "Prospects", "Opportunities", "and more"
-	};
 	
 	@BeforeClass
 	public void setCheckLimits() {
@@ -32,19 +27,15 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		pardotAccountId = loadProperty("connectors.pardot.accountId");
 		pardotUploadUser = loadProperty("connectors.pardot.uploadUser");
 		pardotUploadUserPassword = loadProperty("connectors.pardot.uploadUserPassword");
-	}
-
-	protected void prepareProjectFromTemplate(String projectName, Connectors connectorType)
-			throws InterruptedException, JSONException {
-		// sign in with demo user
-		validSignInWithDemoUser(true);
 		
-		// create connector project
-		initProject(projectName, connectorType, projectCheckLimit);
-
-		// create integration
-		initIntegration(connectorType);
-
+		expectedDashboardTabs = new String[]{
+				"Marketing KPIs", "Contribution", "Prospects", "Opportunities", "and more"
+		};
+	}
+	
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
+	public void testPardotIntegrationConfiguration() throws InterruptedException, JSONException {
+		openUrl(getIntegrationUri());
 		// go to page with integration settings
 		String settingsUrl = gotoIntegrationSettings();
 
@@ -55,16 +46,13 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
 		JSONObject json = loadJSON();
 		Assert.assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId, "Pardot accountId was not set to expected value");
-		
+	}
+	
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testPardotIntegrationConfiguration" })
+	public void testPardotIntegration() throws InterruptedException, JSONException {
 		// sign in back with demo user
 		validSignInWithDemoUser(true);
-		
 		// process schedule
-		scheduleIntegrationProcess(connectorType, integrationProcessCheckLimit);
-
-		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(true, expectedPardotTabs.length, expectedPardotTabs, true);
-		successfulTest = true;
+		scheduleIntegrationProcess(integrationProcessCheckLimit);
 	}
-
 }

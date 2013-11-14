@@ -30,11 +30,6 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 	private static final String XPATH_OPTION_ACCOUNT = "//option[contains(text(), '${account}')]";
 	private static final By BY_DIV_SYNCHRONIZATION_PROGRESS = By.xpath("//div[@class='connectorHeader']/span[text()='Please be patient, your data is now being loaded.']");
 	
-	
-	private static final String[] expectedGoogleAnalyticsTabs = {
-		"Summaries", "Content", "Campaigns", "Browsers"
-	};
-	
 	@BeforeClass
 	public void setCheckLimits() {
 		projectCheckLimit = 120;
@@ -46,19 +41,15 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		googleAnalyticsUser = loadProperty("connectors.googleAnalytics.user");
 		googleAnalyticsUserPassword = loadProperty("connectors.googleAnalytics.userPassword");
 		googleAnalyticsAccount = loadProperty("connectors.googleAnalytics.account");
+		
+		connectorType = Connectors.GOOGLE_ANALYTICS;
+		expectedDashboardTabs = new String[]{
+				"Summaries", "Content", "Campaigns", "Browsers"
+		};
 	}
 	
-	@Test(groups = {"googleAnalyticsWalkthrough"})
-	public void gd_Connectors_GA_001_PrepareProjectFromTemplate() throws InterruptedException, JSONException {
-		// sign in with demo user
-		validSignInWithDemoUser(true);
-		
-		// create connector project
-		initProject("GoogleAnalyticsCheckConnector", Connectors.GOOGLE_ANALYTICS, projectCheckLimit);
-
-		// create integration
-		initIntegration(Connectors.GOOGLE_ANALYTICS);
-		
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
+	public void testGoogleAnalyticsIntegrationConfiguration() throws InterruptedException, JSONException {
 		// ga specific configuration
 		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		browser.switchTo().frame(waitForElementVisible(BY_IFRAME));
@@ -82,26 +73,15 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		waitForElementVisible(BY_SELECT_ACCOUNT).findElement(By.xpath(XPATH_OPTION_ACCOUNT.replace("${account}", googleAnalyticsAccount))).click();
 		Graphene.guardHttp(waitForElementVisible(BY_IMPORT_BUTTON)).click();
 		waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
-		
+	}
+	
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testGoogleAnalyticsIntegrationConfiguration" })
+	public void testGoogleAnalyticsIntegration() throws InterruptedException, JSONException {
 		// process is scheduled automatically - check status
-		openUrl(getProcessesUri(Connectors.GOOGLE_ANALYTICS));
+		openUrl(getProcessesUri());
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
 		Graphene.guardHttp(waitForElementVisible(BY_GP_LINK)).click();
-		waitForIntegrationProcessSynchronized(browser, Connectors.GOOGLE_ANALYTICS, integrationProcessCheckLimit);
-		
-		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(true, expectedGoogleAnalyticsTabs.length, expectedGoogleAnalyticsTabs, true);
-		successfulTest = true;
-	}
-	
-	@Test(dependsOnGroups = { "googleAnalyticsWalkthrough" }, alwaysRun = true)
-	public void disableConnectorIntegration() throws JSONException {
-		disableIntegration(Connectors.GOOGLE_ANALYTICS);
-	}
-	
-	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
+		waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
 	}
 }

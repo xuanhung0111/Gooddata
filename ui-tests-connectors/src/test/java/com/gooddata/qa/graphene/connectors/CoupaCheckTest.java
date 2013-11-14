@@ -26,10 +26,6 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 	private String coupaInstanceApiUrl;
 	private String coupaInstanceApiKey;
 	
-	private static final String[] expectedCoupaTabs = {
-		"KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities", "Contracts", "Expenses", "Budgets", "All Spend"
-	};
-	
 	@FindBy(tagName="form")
 	private CoupaInstanceFragment coupaInstance;
 	
@@ -43,20 +39,15 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 	public void loadRequiredProperties() {
 		coupaInstanceApiUrl = loadProperty("connectors.coupa.instance.apiUrl");
 		coupaInstanceApiKey = loadProperty("connectors.coupa.instance.apiKey");
+		
+		connectorType = Connectors.COUPA;
+		expectedDashboardTabs = new String[]{
+				"KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities", "Contracts", "Expenses", "Budgets", "All Spend"
+		};
 	}
-
-	@Test(groups = { "coupaBasicWalkthrough" })
-	public void gd_Connectors_CP_001_PrepareProjectFromTemplate() 
-			throws InterruptedException, JSONException {
-		// sign in with demo user
-		validSignInWithDemoUser(true);
-		
-		// create connector project
-		initProject("CoupaCheckConnector", Connectors.COUPA, projectCheckLimit);
-
-		// create integration
-		initIntegration(Connectors.COUPA);
-		
+	
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
+	public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
 		// verify empty Coupa dashboard
 		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		waitForElementVisible(BY_IFRAME);
@@ -64,7 +55,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		waitForElementVisible(BY_DIV_BEFORE_CONFIG);
 
 		// go to page with integration settings
-		browser.get(getRootUrl() + getIntegrationUri(Connectors.COUPA));
+		browser.get(getRootUrl() + getIntegrationUri());
 		gotoIntegrationSettings();
 
 		// coupa specific configuration
@@ -84,22 +75,11 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		waitForElementVisible(BY_IFRAME);
 		browser.switchTo().frame(browser.findElement(BY_IFRAME));
 		waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
-		
+	}
+	
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testCoupaIntegrationConfiguration" })
+	public void testCoupaIntegration() throws InterruptedException, JSONException {
 		// process schedule
-		scheduleIntegrationProcess(Connectors.COUPA, integrationProcessCheckLimit);
-
-		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(true, expectedCoupaTabs.length, expectedCoupaTabs, true);
-		successfulTest = true;
-	}
-	
-	@Test(dependsOnGroups = { "coupaBasicWalkthrough" }, alwaysRun = true)
-	public void disableConnectorIntegration() throws JSONException {
-		disableIntegration(Connectors.COUPA);
-	}
-	
-	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
+		scheduleIntegrationProcess(integrationProcessCheckLimit);
 	}
 }
