@@ -31,10 +31,6 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 	private static final By BY_SPAN_WELCOME_BEFORE_CONFIG = By.xpath("//span[text()='Welcome to GoodData for Brightidea!']");
 	private static final By BY_SPAN_SYNCHRONIZATION_PROGRESS = By.xpath("//span[text()='Almost There!']");
 	
-	private static final String[] expectedBrightideaTabs = {
-		"WebStorms", "Ideas", "Users", "Switchboard", "Pipeline", "Headlines", "Learn More"
-	};
-	
 	@BeforeClass
 	public void setCheckLimits() {
 		projectCheckLimit = 120;
@@ -46,19 +42,15 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		brightideaApiKey = loadProperty("connectors.brightidea.apiKey");
 		brightideaAffiliateId = loadProperty("connectors.brightidea.affiliateId");
 		brightideaHostname = loadProperty("connectors.brightidea.hostname");
+		
+		connectorType = Connectors.BRIGHTIDEA;
+		expectedDashboardTabs = new String[]{
+			"WebStorms", "Ideas", "Users", "Switchboard", "Pipeline", "Headlines", "Learn More"
+		};
 	}
 	
-	@Test(groups = {"brightideaWalkthrough"})
-	public void gd_Connectors_BI_001_PrepareProjectFromTemplate() throws InterruptedException, JSONException {
-		// sign in with demo user
-		validSignInWithDemoUser(true);
-		
-		// create connector project
-		initProject("BrightideaCheckConnector", Connectors.BRIGHTIDEA, projectCheckLimit);
-		
-		// create integration
-		initIntegration(Connectors.BRIGHTIDEA);
-		
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
+	public void testBrightideaIntegrationConfiguration() throws InterruptedException, JSONException {
 		// Brightidea specific configuration of integration (tfue page)
 		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		waitForElementVisible(BY_IFRAME);
@@ -72,27 +64,16 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		select.findElement(BY_SELECT_TIMEZONE_OPTION).click();
 		waitForElementVisible(BY_FINISH_BUTTON).click();
 		waitForElementVisible(BY_SPAN_SYNCHRONIZATION_PROGRESS);
+	}
+	
+	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testBrightideaIntegrationConfiguration" })
+	public void testBrightideaIntegration() throws InterruptedException, JSONException {
 		// process is scheduled automatically - check status
-		openUrl(getProcessesUri(Connectors.BRIGHTIDEA));
+		openUrl(getProcessesUri());
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
 		waitForElementVisible(BY_GP_LINK);
 		Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
-		waitForIntegrationProcessSynchronized(browser, Connectors.BRIGHTIDEA, integrationProcessCheckLimit);
-		
-		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(true, expectedBrightideaTabs.length, expectedBrightideaTabs, true);		
-		
-		successfulTest = true;
-	}
-	
-	@Test(dependsOnGroups = { "brightideaWalkthrough" }, alwaysRun = true)
-	public void disableConnectorIntegration() throws JSONException {
-		disableIntegration(Connectors.BRIGHTIDEA);
-	}
-	
-	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
+		waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
 	}
 }

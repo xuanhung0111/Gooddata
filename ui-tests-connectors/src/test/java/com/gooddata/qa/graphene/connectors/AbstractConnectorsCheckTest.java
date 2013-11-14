@@ -9,12 +9,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
 
-public class AbstractConnectorsCheckTest extends AbstractTest {
+public abstract class AbstractConnectorsCheckTest extends AbstractTest {
 	
 	protected static final String PAGE_GDC_CONNECTORS = "gdc/projects/${projectId}/connectors";
 	
@@ -29,6 +30,10 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 	
 	protected boolean integrationActivated = false;
 	
+	protected Connectors connectorType;
+	
+	protected String[] expectedDashboardTabs;
+	
 	@FindBy(tagName="form")
 	protected ConnectorFragment connector;
 	
@@ -37,15 +42,65 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 		startPage = "gdc";
 	}
 	
-	public void initProject(String projectTitle, final Connectors connectorType, int checkIterations) throws JSONException, InterruptedException {
+	/** ------------- Shared test methods ----------- */
+	
+	@Test(groups = {"connectorInit"})
+    public void createProject() throws JSONException, InterruptedException {
+        // sign in with demo user
+        validSignInWithDemoUser(true);
+        // create connector project
+        initProject(connectorType.getName() + "CheckConnector", projectCheckLimit);
+    }
+
+	@Test(groups = {"connectorInit"}, dependsOnMethods = {"createProject"})
+    public void createIntegration() throws JSONException, InterruptedException {
+        // verify that connector resource exist
+    	openUrl(getConnectorUri());
+        verifyConnectorResourceJSON();
+        // create integration
+        initIntegration();
+    }
+
+    @Test(groups = {"connectorBasicREST"}, dependsOnGroups = {"connectorInit"})
+    public void testConnectorIntegrationResource() throws JSONException {
+    	openUrl(getIntegrationUri());
+        verifyIntegrationResourceJSON();
+    }
+    
+    @Test(groups = {"connectorBasicREST"}, dependsOnGroups = {"connectorIntegration"})
+    public void testConnectorProcessesResource() throws JSONException {
+    	openUrl(getProcessesUri());
+        verifyProcessesResourceJSON();
+    }
+    
+    @Test(groups = {"connectorWalkthrough"}, dependsOnMethods = {"testConnectorProcessesResource"})
+	public void verifyProjectDashboards() throws InterruptedException {
+		// verify created project and count dashboard tabs
+		verifyProjectDashboardTabs(true, expectedDashboardTabs.length, expectedDashboardTabs, true);
+		successfulTest = true;
+	}
+    
+    @Test(dependsOnGroups = { "connectorWalkthrough" }, alwaysRun = true)
+	public void disableConnectorIntegration() throws JSONException {
+		disableIntegration();
+	}
+	
+	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	public void deleteProject() {
+		deleteProjectByDeleteMode(successfulTest);
+	}
+	
+	/** ------------------------ */
+	
+	public void initProject(String projectTitle, int checkIterations) throws JSONException, InterruptedException {
 		openUrl(PAGE_GDC_PROJECTS);
 		waitForElementVisible(gpProject.getRoot());
 		projectId = gpProject.createProject(projectTitle, "", connectorType.getTemplate(), authorizationToken, projectCheckLimit);
 		System.out.println("Project with ID enabled: " + projectId);
 	}
 	
-	public void initIntegration(final Connectors connectorType) throws JSONException, InterruptedException {
-		openUrl(getConnectorUri(connectorType));
+	public void initIntegration() throws JSONException, InterruptedException {
+		openUrl(getConnectorUri());
 		waitForElementPresent(BY_GP_PRE_JSON);
 		waitForElementPresent(connector.getRoot());
 		connector.createIntegration(connectorType.getTemplate());
@@ -59,16 +114,16 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 		return browser.getCurrentUrl();
 	}
 	
-	protected void scheduleIntegrationProcess(final Connectors connectorType, int checkIterations) throws JSONException, InterruptedException {
-		openUrl(getProcessesUri(connectorType));
+	protected void scheduleIntegrationProcess(int checkIterations) throws JSONException, InterruptedException {
+		openUrl(getProcessesUri());
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 0, "There are no processes for new project yet");
 		Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
 		
-		waitForIntegrationProcessSynchronized(browser, connectorType, checkIterations);
+		waitForIntegrationProcessSynchronized(browser, checkIterations);
 	}
 	
-	protected void waitForIntegrationProcessSynchronized(WebDriver browser, final Connectors connectorType, int checkIterations) throws JSONException, InterruptedException {
+	protected void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations) throws JSONException, InterruptedException {
 		String processUrl = browser.getCurrentUrl();
 		System.out.println("Waiting for process synchronized: " + processUrl);
 		int i = 0;
@@ -84,7 +139,7 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 		Assert.assertEquals(status, "SYNCHRONIZED", "Process is synchronized");
 		System.out.println("Integration was synchronized at +- " + (i * 5) + "seconds");
 		// may not be correct since another integration process can be scheduled automatically...
-		browser.get(getRootUrl() + getProcessesUri(connectorType));
+		browser.get(getRootUrl() + getProcessesUri());
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "There is one finished process");
 	}
@@ -94,9 +149,9 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 		return json.getJSONObject("process").getJSONObject("status").getString("code");
 	}
 	
-	protected void disableIntegration(final Connectors connectorType) throws JSONException {
+	protected void disableIntegration() throws JSONException {
 		if (integrationActivated) {
-			openUrl(getIntegrationUri(connectorType));
+			openUrl(getIntegrationUri());
 			waitForElementVisible(connector.getRoot());
 			connector.disableIntegration();
 		} else {
@@ -104,19 +159,19 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
 		}
 	}
 
-	protected String getConnectorUri(final Connectors connectorType) {
+	protected String getConnectorUri() {
 		return PAGE_GDC_CONNECTORS.replace("${projectId}", projectId) + "/" + connectorType.getConnectorId();
 	}
 
-	protected String getIntegrationUri(final Connectors connectorType) {
-		return getConnectorUri(connectorType) + "/integration";
+	protected String getIntegrationUri() {
+		return getConnectorUri() + "/integration";
 	}
 
-	protected String getProcessesUri(final Connectors connectorType) {
-		return getIntegrationUri(connectorType) + "/processes";
+	protected String getProcessesUri() {
+		return getIntegrationUri() + "/processes";
 	}
 	
-	protected void verifyConnectorResourceJSON(final Connectors connectorType) throws JSONException {
+	protected void verifyConnectorResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
         Assert.assertTrue(json.has("connector"), "connector object is missing");
 
@@ -125,10 +180,10 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
         Assert.assertTrue(connector.has("links"), "links object is missing");
 
         JSONObject links = connector.getJSONObject("links");
-        Assert.assertEquals(links.getString("integration"), "/" + getIntegrationUri(connectorType), "integration link");
+        Assert.assertEquals(links.getString("integration"), "/" + getIntegrationUri(), "integration link");
     }
 
-	protected void verifyIntegrationResourceJSON(final Connectors connectorType) throws JSONException {
+	protected void verifyIntegrationResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
         Assert.assertTrue(json.has("integration"), "integration object is missing");
 
@@ -141,11 +196,11 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
         Assert.assertTrue(integration.has("links"), "links object is missing");
 
         JSONObject links = integration.getJSONObject("links");
-        Assert.assertEquals(links.getString("self"), "/" + getIntegrationUri(connectorType), "self link");
-        Assert.assertEquals(links.getString("processes"), "/" + getProcessesUri(connectorType), "processes link");
+        Assert.assertEquals(links.getString("self"), "/" + getIntegrationUri(), "self link");
+        Assert.assertEquals(links.getString("processes"), "/" + getProcessesUri(), "processes link");
     }
 	
-	protected void verifyProcessesResourceJSON(final Connectors connectorType) throws JSONException {
+	protected void verifyProcessesResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
         Assert.assertTrue(json.has("processes"), "processes object is missing");
 
@@ -161,6 +216,6 @@ public class AbstractConnectorsCheckTest extends AbstractTest {
         Assert.assertTrue(process.getJSONObject("status").has("detail"), "detail key is missing");
         Assert.assertTrue(process.getJSONObject("status").has("description"), "description key is missing");
         Assert.assertTrue(process.getJSONObject("status").has("code"), "status code is missing");
-        Assert.assertTrue(process.getJSONObject("links").getString("self").startsWith("/" + getProcessesUri(connectorType)), "self link is incorrect");
+        Assert.assertTrue(process.getJSONObject("links").getString("self").startsWith("/" + getProcessesUri()), "self link is incorrect");
     }
 }
