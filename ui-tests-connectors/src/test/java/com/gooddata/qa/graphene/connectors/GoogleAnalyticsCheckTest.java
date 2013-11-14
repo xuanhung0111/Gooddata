@@ -60,7 +60,7 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		initIntegration(Connectors.GOOGLE_ANALYTICS);
 		
 		// ga specific configuration
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId);
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		browser.switchTo().frame(waitForElementVisible(BY_IFRAME));
 		waitForElementVisible(BY_H3_BEFORE_GRANT_CONFIG);
 		waitForElementVisible(BY_BUTTON_GRANT_REDIRECT);
@@ -84,7 +84,7 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
 		
 		// process is scheduled automatically - check status
-		browser.get(getRootUrl() + PAGE_GDC_CONNECTORS_INTEGRATION_PROCESSES.replace("${projectId}", projectId).replace("${connectorType}", Connectors.GOOGLE_ANALYTICS.getConnectorId()));
+		openUrl(getProcessesUri(Connectors.GOOGLE_ANALYTICS));
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
 		Graphene.guardHttp(waitForElementVisible(BY_GP_LINK)).click();

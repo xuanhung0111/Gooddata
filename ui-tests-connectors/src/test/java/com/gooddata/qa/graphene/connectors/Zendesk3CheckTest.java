@@ -30,17 +30,34 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		zendesk3UploadUserPassword = loadProperty("connectors.zendesk3.uploadUserPassword");
 	}
 	
-	@Test(groups = {"zendesk3BasicWalkthrough"})
-	public void gd_Connectors_ZD_001_PrepareProjectFromTemplate() throws InterruptedException, JSONException {
-		// sign in with demo user
-		validSignInWithDemoUser(true);
-		
-		// create connector project
-		initProject("Zendesk3CheckConnector", Connectors.ZENDESK3, projectCheckLimit);
-		
-		// create integration
-		initIntegration(Connectors.ZENDESK3);
-		
+	@Test(groups = {"zendesk3Init"})
+    public void createProject() throws JSONException, InterruptedException {
+        // sign in with demo user
+        validSignInWithDemoUser(true);
+
+        // create connector project
+        initProject("Zendesk3CheckConnector", Connectors.ZENDESK3, projectCheckLimit);
+    }
+
+    @Test(groups = {"zendesk3Init"}, dependsOnMethods = {"createProject"})
+    public void createIntegration() throws JSONException, InterruptedException {
+        // verify that zendesk4 resource exist
+    	openUrl(getConnectorUri(Connectors.ZENDESK3));
+        verifyConnectorResourceJSON(Connectors.ZENDESK3);
+
+        // create integration
+        initIntegration(Connectors.ZENDESK3);
+    }
+
+    @Test(groups = {"zendesk3BasicREST"}, dependsOnGroups = {"zendesk3Init"})
+    public void testZendesk3IntegrationResource() throws JSONException {
+    	openUrl(getIntegrationUri(Connectors.ZENDESK3));
+        verifyIntegrationResourceJSON(Connectors.ZENDESK3);
+    }
+	
+	@Test(groups = {"zendesk3BasicWalkthrough"}, dependsOnMethods = { "testZendesk3IntegrationResource" })
+	public void testZendesk3IntegrationConfiguration() throws InterruptedException, JSONException {
+		openUrl(getIntegrationUri(Connectors.ZENDESK3));
 		// go to page with integration settings
 		String settingsUrl = gotoIntegrationSettings();
 		
@@ -51,13 +68,24 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		Graphene.guardHttp(waitForElementPresent(BY_GP_BUTTON_SUBMIT)).click();
 		JSONObject json = loadJSON();
 		Assert.assertEquals(json.getJSONObject("settings").getString("apiUrl"), zendesk3ApiUrl, "Zendesk3 API URL was not set to expected value");
-		
+	}
+	
+	@Test(groups = {"zendesk3BasicWalkthrough"}, dependsOnMethods = { "testZendesk3IntegrationConfiguration" })
+	public void testZendesk3Integration() throws InterruptedException, JSONException {
 		// sign in back with demo user
 		validSignInWithDemoUser(true);
-		
 		// process schedule
 		scheduleIntegrationProcess(Connectors.ZENDESK3, integrationProcessCheckLimit);
-		
+	}
+	
+	@Test(groups = {"zendesk3BasicREST"}, dependsOnMethods = {"testZendesk3Integration"})
+    public void testZendesk3ProcessesResource() throws JSONException {
+    	openUrl(getProcessesUri(Connectors.ZENDESK3));
+        verifyProcessesResourceJSON(Connectors.ZENDESK3);
+    }
+	
+	@Test(groups = {"zendesk3BasicWalkthrough"}, dependsOnMethods = {"testZendesk3Integration"})
+	public void verifyProjectDashboards() throws InterruptedException {
 		// verify created project and count dashboard tabs
 		verifyProjectDashboardTabs(true, expectedZendeskTabs.length, expectedZendeskTabs, true);
 		successfulTest = true;

@@ -60,7 +60,7 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		initIntegration(Connectors.BRIGHTIDEA);
 		
 		// Brightidea specific configuration of integration (tfue page)
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId);
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		waitForElementVisible(BY_IFRAME);
 		browser.switchTo().frame(browser.findElement(BY_IFRAME));
 		waitForElementVisible(BY_SPAN_WELCOME_BEFORE_CONFIG);
@@ -73,7 +73,7 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		waitForElementVisible(BY_FINISH_BUTTON).click();
 		waitForElementVisible(BY_SPAN_SYNCHRONIZATION_PROGRESS);
 		// process is scheduled automatically - check status
-		browser.get(getRootUrl() + PAGE_GDC_CONNECTORS_INTEGRATION_PROCESSES.replace("${projectId}", projectId).replace("${connectorType}", Connectors.BRIGHTIDEA.getConnectorId()));
+		openUrl(getProcessesUri(Connectors.BRIGHTIDEA));
 		JSONObject json = loadJSON();
 		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
 		waitForElementVisible(BY_GP_LINK);
