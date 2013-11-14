@@ -58,13 +58,13 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		initIntegration(Connectors.COUPA);
 		
 		// verify empty Coupa dashboard
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId);
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		waitForElementVisible(BY_IFRAME);
 		browser.switchTo().frame(browser.findElement(BY_IFRAME));
 		waitForElementVisible(BY_DIV_BEFORE_CONFIG);
 
 		// go to page with integration settings
-		browser.get(getRootUrl() + PAGE_GDC_CONNECTORS_INTEGRATION.replace("${projectId}", projectId).replace("${connectorType}", Connectors.COUPA.getConnectorId()));
+		browser.get(getRootUrl() + getIntegrationUri(Connectors.COUPA));
 		gotoIntegrationSettings();
 
 		// coupa specific configuration
@@ -80,7 +80,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		coupaInstance.createCoupaInstance(Connectors.COUPA.getConnectorId(), coupaInstanceApiUrl, coupaInstanceApiKey);
 		
 		// verify progress on Coupa dashboard
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId);
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		waitForElementVisible(BY_IFRAME);
 		browser.switchTo().frame(browser.findElement(BY_IFRAME));
 		waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
