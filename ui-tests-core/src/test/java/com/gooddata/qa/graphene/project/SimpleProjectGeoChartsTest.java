@@ -52,8 +52,6 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createSimpleProjectGeo" }, groups = { "geo-charts" })
 	public void uploadDataForGeoCharts() throws InterruptedException {
-		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-		waitForDashboardPageLoaded();
 		uploadFile(csvFilePath + "/geo_test.csv", 1);
 		uploadFile(csvFilePath + "/geo_test_pins.csv", 2);
 	}
@@ -86,6 +84,8 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	}
 	
 	private void uploadFile(String filePath, int order) throws InterruptedException {
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+		waitForDashboardPageLoaded();
 		openUrl(PAGE_UPLOAD);
 		waitForElementVisible(upload.getRoot());
 		upload.uploadFile(filePath);
