@@ -20,7 +20,7 @@ public class Zendesk4CheckTest extends AbstractConnectorsCheckTest {
 		connectorType = Connectors.ZENDESK4;
 	}
 
-    @Test(groups = {"connectorBasicREST"}, dependsOnGroups = {"connectorInit"})
+    @Test(groups = {"connectorBasicREST", "connectorIntegration"}, dependsOnGroups = {"connectorInit"})
     public void testZendesk4ProcessesResource() throws JSONException {
         // schedule process
         scheduleNewProcess();
