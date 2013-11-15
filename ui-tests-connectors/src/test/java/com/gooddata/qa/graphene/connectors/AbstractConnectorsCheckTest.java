@@ -82,10 +82,27 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
     
     @Test(dependsOnGroups = { "connectorWalkthrough" }, alwaysRun = true)
 	public void disableConnectorIntegration() throws JSONException {
-		disableIntegration();
+        if (integrationActivated) {
+            openUrl(getIntegrationUri());
+            waitForElementVisible(connector.getRoot());
+            connector.disableIntegration();
+        } else {
+            System.out.println("Integration wasn't created - nothing to disable...");
+        }
 	}
+
+    @Test(dependsOnMethods = { "disableConnectorIntegration" }, alwaysRun = true)
+    public void deleteConnectorIntegration() throws JSONException {
+        if (integrationActivated) {
+            openUrl(getIntegrationUri());
+            waitForElementVisible(connector.getRoot());
+            connector.deleteIntegration();
+        } else {
+            System.out.println("Integration wasn't created - nothing to delete...");
+        }
+    }
 	
-	@Test(dependsOnMethods = { "disableConnectorIntegration"}, alwaysRun = true)
+	@Test(dependsOnMethods = { "deleteConnectorIntegration"}, alwaysRun = true)
 	public void deleteProject() {
 		deleteProjectByDeleteMode(successfulTest);
 	}
@@ -147,16 +164,6 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
 	private String getProcessStatus(WebDriver browser) throws JSONException {
 		JSONObject json = loadJSON();
 		return json.getJSONObject("process").getJSONObject("status").getString("code");
-	}
-	
-	protected void disableIntegration() throws JSONException {
-		if (integrationActivated) {
-			openUrl(getIntegrationUri());
-			waitForElementVisible(connector.getRoot());
-			connector.disableIntegration();
-		} else {
-			System.out.println("Integration wasn't created - nothing to disable...");
-		}
 	}
 
 	protected String getConnectorUri() {

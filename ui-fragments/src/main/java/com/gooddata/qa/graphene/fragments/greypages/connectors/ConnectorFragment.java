@@ -19,7 +19,10 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
 	
 	@FindBy(xpath="div[@class='submit']/input")
 	private WebElement submitIntegrationButton;
-	
+
+    @FindBy(xpath="//div[@class='submit']/input[@value='delete this integration']")
+    private WebElement deleteIntegrationButton;
+
 	public void createIntegration(String template) throws JSONException {
 		waitForElementVisible(projectTemplateUri).sendKeys(template);
 		Graphene.guardHttp(submitIntegrationButton).click();
@@ -38,4 +41,15 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
 		Assert.assertFalse(json.getJSONObject("integration").getBoolean("active"), "Integration wasn't disabled");
 		System.out.println("Integration disabled...");
 	}
+
+    public void deleteIntegration() throws JSONException {
+        waitForElementVisible(deleteIntegrationButton);
+        Graphene.guardHttp(deleteIntegrationButton).click();
+
+        Assert.assertFalse(browser.getCurrentUrl().contains("integration"), "Integration wasn't deleted");
+        JSONObject json = loadJSON();
+        Assert.assertTrue(json.getJSONObject("connector").has("connectorId"));
+
+        System.out.println("Integration deleted...");
+    }
 }
