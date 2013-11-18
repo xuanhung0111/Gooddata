@@ -8,8 +8,8 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ValidateFragment extends AbstractGreyPagesFragment {
-	
-	@FindBy
+
+    @FindBy
 	private WebElement invalid_objects;
 	
 	@FindBy
@@ -32,7 +32,6 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
 		waitForElementVisible(BY_GP_LINK);
 		Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
 		waitForElementNotPresent(BY_GP_PRE_JSON);
-		//TODO read result
-		return "";
+        return  waitForElementVisible(By.xpath(BY_SPAN_STATUS)).getText();
 	}
 }

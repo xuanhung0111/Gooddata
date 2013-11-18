@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import com.gooddata.qa.graphene.fragments.greypages.md.ValidateFragment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.testng.Arquillian;
@@ -133,7 +134,9 @@ public abstract class AbstractTest extends Arquillian {
 	
 	@FindBy(tagName="form")
 	protected ProjectFragment gpProject;
-	
+
+    @FindBy(tagName="form")
+    protected ValidateFragment validateFragment;
 	/** ---------- */
 	
 	@BeforeClass
@@ -226,8 +229,14 @@ public abstract class AbstractTest extends Arquillian {
 		gpLoginFragment.login(username, password);
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
-	
-	public void logout() {
+
+    public String validateProject(String projectId) throws JSONException {
+        browser.get(getRootUrl() + PAGE_GDC+"/md/"+ projectId + "/validate");
+        return validateFragment.validate();
+    }
+
+
+    public void logout() {
 		waitForElementVisible(BY_LOGGED_USER_BUTTON).click();
 		waitForElementVisible(BY_LOGOUT_LINK).click();
 		waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
