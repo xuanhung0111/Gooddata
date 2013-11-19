@@ -15,7 +15,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	private int createdReportsCount = 0;
 	
-	private long expectedLineChartExportPDFSize = 110000L;
+	private long expectedLineChartExportPDFSize = 90000L;
 	private long expectedAreaChartReportExportPNGSize = 43000L;
 	private long expectedStackedAreaChartReportExportXLSSize = 5500L;
 	private long expectedBarChartReportExportCSVSize = 300L;
@@ -197,12 +197,15 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	@Test(dependsOnGroups = { "goodsales-chart", "chart-exports", "tabular-report-exports" }, groups = { "lastTest" })
 	public void verifyCreatedReports() throws InterruptedException {
 		initReportsPage();
-		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
 		selectFolder("My Reports");
 		waitForReportsPageLoaded();
 		Thread.sleep(5000);
 		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
 		Screenshots.takeScreenshot(browser, "GoodSales-new-reports", this.getClass());
+		selectFolder("All");
+		waitForReportsPageLoaded();
+		Thread.sleep(5000);
+		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
 		successfulTest = true;
 	}
 	
@@ -225,9 +228,9 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	}
 	
 	private void selectFolder(String folderName) {
-		reportsPage.getDefaultFolders().openFolder("My Reports");
+		reportsPage.getDefaultFolders().openFolder(folderName);
 		waitForReportsPageLoaded();
-		Assert.assertEquals(reportsPage.getSelectedFolderName(), "My Reports", "Selected folder name doesn't match: " + reportsPage.getSelectedFolderName());
+		Assert.assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " + reportsPage.getSelectedFolderName());
 	}
 	
 	private void initReportPage(String reportName) {
