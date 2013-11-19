@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import com.gooddata.qa.graphene.fragments.greypages.md.ValidateFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.testng.Arquillian;
@@ -133,7 +135,9 @@ public abstract class AbstractTest extends Arquillian {
 	
 	@FindBy(tagName="form")
 	protected ProjectFragment gpProject;
-	
+
+    @FindBy(tagName="form")
+    protected ValidateFragment validateFragment;
 	/** ---------- */
 	
 	@BeforeClass
@@ -226,8 +230,24 @@ public abstract class AbstractTest extends Arquillian {
 		gpLoginFragment.login(username, password);
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
-	
-	public void logout() {
+
+    public String validateProject() throws JSONException {
+        browser.get(getRootUrl() + PAGE_GDC+"/md/"+ projectId + "/validate");
+        waitForElementPresent(validateFragment.getRoot());
+        String statusReturning = validateFragment.validate();
+        Screenshots.takeScreenshot(browser, projectId+"-validation", this.getClass());
+        return statusReturning;
+    }
+
+    public String validateProjectPartial(Validation... validationOptions) throws JSONException {
+        browser.get(getRootUrl() + PAGE_GDC+"/md/"+ projectId + "/validate");
+        waitForElementPresent(validateFragment.getRoot());
+        String statusReturning = validateFragment.validateOnly(validationOptions);
+        Screenshots.takeScreenshot(browser, projectId+"-validation-partial", this.getClass());
+        return statusReturning;
+    }
+
+    public void logout() {
 		waitForElementVisible(BY_LOGGED_USER_BUTTON).click();
 		waitForElementVisible(BY_LOGOUT_LINK).click();
 		waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
