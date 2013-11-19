@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.project;
 
+import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
 import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -29,16 +30,22 @@ public class SimpleProjectTest extends AbstractTest {
 		waitForElementVisible(gpProject.getRoot());
 		projectId = gpProject.createProject("simple-project", "", "", authorizationToken, 12);
 
-        String validationStatus = validateProject(projectId);
-        Assert.assertEquals(validationStatus,"OK");
-
         Screenshots.takeScreenshot(browser, "simple-project-created", this.getClass());
 		successfulTest = true;
 	}
 	
-	@Test(dependsOnMethods = { "createSimpleProject" }, alwaysRun = true)
+	@Test(dependsOnMethods = { "validateSimpleProject" }, alwaysRun = true)
 	public void deleteSimpleProject() {
 		deleteProjectByDeleteMode(successfulTest);
 	}
 
+    @Test(dependsOnMethods = { "createSimpleProject" })
+    public void validateSimpleProject() throws JSONException {
+
+        String validationStatus = validateProjectPartial(Validation.INVALID_OBJECTS, Validation.PMD__ELEM_VALIDATION);
+        Assert.assertEquals(validationStatus, "OK");
+
+        validationStatus = validateProject();
+        Assert.assertEquals(validationStatus, "OK");
+    }
 }

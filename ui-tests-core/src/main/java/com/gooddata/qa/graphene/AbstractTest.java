@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.gooddata.qa.graphene.fragments.greypages.md.ValidateFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.testng.Arquillian;
@@ -230,11 +231,21 @@ public abstract class AbstractTest extends Arquillian {
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
 
-    public String validateProject(String projectId) throws JSONException {
+    public String validateProject() throws JSONException {
         browser.get(getRootUrl() + PAGE_GDC+"/md/"+ projectId + "/validate");
-        return validateFragment.validate();
+        waitForElementPresent(validateFragment.getRoot());
+        String statusReturning = validateFragment.validate();
+        Screenshots.takeScreenshot(browser, projectId+"-validation", this.getClass());
+        return statusReturning;
     }
 
+    public String validateProjectPartial(Validation... validationOptions) throws JSONException {
+        browser.get(getRootUrl() + PAGE_GDC+"/md/"+ projectId + "/validate");
+        waitForElementPresent(validateFragment.getRoot());
+        String statusReturning = validateFragment.validateOnly(validationOptions);
+        Screenshots.takeScreenshot(browser, projectId+"-validation-partial", this.getClass());
+        return statusReturning;
+    }
 
     public void logout() {
 		waitForElementVisible(BY_LOGGED_USER_BUTTON).click();
