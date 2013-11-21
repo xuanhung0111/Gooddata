@@ -28,28 +28,29 @@ public class DeleteTestProjects extends AbstractTest {
 	}
 
 	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllConnectorCheckProjects() {
+	public void deleteAllConnectorCheckProjects() throws InterruptedException {
 		deleteProjects("CheckConnector");
 	}
 	
 	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllGoodSalesCheckProjects() {
+	public void deleteAllGoodSalesCheckProjects() throws InterruptedException {
 		deleteProjects("GoodSales-test");
 	}
 	
 	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllSimpleGeoProjects() {
+	public void deleteAllSimpleGeoProjects() throws InterruptedException {
 		deleteProjects("simple-project-geo");
 	}
 	
 	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllGoodSalesPerfCheckProjects() {
+	public void deleteAllGoodSalesPerfCheckProjects() throws InterruptedException {
 		deleteProjects("GoodSales-perf-test");
 	}
 	
-	private void deleteProjects(String projectSubstring) {
+	private void deleteProjects(String projectSubstring) throws InterruptedException {
 		browser.get(getRootUrl() + PAGE_PROJECTS);
 		waitForElementVisible(projectsPage.getRoot());
+		Thread.sleep(5000);
 		List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
 		System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
 		for (String projectToDelete : projectsToDelete) {
