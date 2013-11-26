@@ -107,9 +107,8 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		Assert.assertTrue(json.has("storage"), "Storage element isn't present");
 		JSONObject storage = json.getJSONObject("storage");
 		Assert.assertTrue(storage.getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
-		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
-		//Assert.assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "Storage authorizationToken doesn't match");
+		Assert.assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
+		Assert.assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "Storage authorizationToken doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
 		Assert.assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
@@ -135,11 +134,9 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	public void updateStorage() throws JSONException {
 		openStorageUrl();
 		waitForElementVisible(storageForm.getRoot());
-		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, "Some description."), "Edit form doesn't contain current values");
+		Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
 		storageForm.updateStorage(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated");
-		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated"), "Edit form doesn't contain expected values");
+		Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated"), "Edit form doesn't contain expected values");
 		takeScreenshot(browser, "hds-updated-storage", this.getClass());
 	}
 	
@@ -185,8 +182,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	}
 
     /** ===================== Section with storage users ============ */
-    // todo remove dependency on updateStorage
-    @Test(dependsOnMethods = {"verifyStorage", "updateStorage"})
+    @Test(dependsOnMethods = {"verifyStorage"})
     public void addUserToStorage() {
         openStorageUsersUrl();
 
@@ -272,8 +268,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	private void invalidUpdateOfStorage(String title, String description, String expectedErrorMessage) throws JSONException {
 		openStorageUrl();
 		waitForElementVisible(storageForm.getRoot());
-		//TODO - wait for HDS C3 milestone 2 for fix (change description)
-		//Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, "Some description."), "Edit form doesn't contain current values");
+		Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
 		storageForm.updateStorage(title, description);
 		verifyErrorMessage(expectedErrorMessage, storageUrl);
 	}

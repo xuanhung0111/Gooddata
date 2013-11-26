@@ -29,7 +29,7 @@
 		<timeout>90</timeout> <!-- (seconds) -->
 		<browserDownloadFolder>${project.build.directory}/downloads</browserDownloadFolder>
 		<csvFilePath>${basedir}/src/test/resources</csvFilePath>
-		<video.recoring>false</video.recoring>
+		<video.recording>false</video.recording>
 		
 		<deleteMode>delete_if_successful</deleteMode> <!-- Possible values are: delete_always, delete_if_successful, delete_never -->
 		
