@@ -100,6 +100,7 @@ public abstract class AbstractTest extends Arquillian {
 	
 	protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
 	protected static final String PAGE_GDC = "gdc";
+	protected static final String PAGE_GDC_MD = PAGE_GDC + "/md";
 	protected static final String PAGE_GDC_PROJECTS = PAGE_GDC + "/projects";
 	protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
 	protected static final String PAGE_PROJECTS = "projects.html";
@@ -225,14 +226,14 @@ public abstract class AbstractTest extends Arquillian {
 	}
 	
 	public void signInAtGreyPages(String username, String password) throws JSONException {
-		browser.get(getRootUrl() + PAGE_ACCOUNT_LOGIN);
+		openUrl(PAGE_ACCOUNT_LOGIN);
 		waitForElementPresent(gpLoginFragment.getRoot());
 		gpLoginFragment.login(username, password);
 		Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
 	}
 
     public String validateProject() throws JSONException {
-        browser.get(getRootUrl() + PAGE_GDC+"/md/"+ projectId + "/validate");
+    	openUrl(PAGE_GDC_MD + "/" + projectId + "/validate");
         waitForElementPresent(validateFragment.getRoot());
         String statusReturning = validateFragment.validate();
         Screenshots.takeScreenshot(browser, projectId+"-validation", this.getClass());
@@ -240,7 +241,7 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public String validateProjectPartial(Validation... validationOptions) throws JSONException {
-        browser.get(getRootUrl() + PAGE_GDC+"/md/"+ projectId + "/validate");
+        openUrl(PAGE_GDC_MD + "/" + projectId + "/validate");
         waitForElementPresent(validateFragment.getRoot());
         String statusReturning = validateFragment.validateOnly(validationOptions);
         Screenshots.takeScreenshot(browser, projectId+"-validation-partial", this.getClass());
@@ -334,7 +335,7 @@ public abstract class AbstractTest extends Arquillian {
 	}
 	
 	protected void deleteProject(String projectId) {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
 		waitForProjectPageLoaded();
 		waitForElementVisible(projectAndUsersPage.getRoot());
 		System.out.println("Going to delete project: " + projectId);
@@ -343,7 +344,7 @@ public abstract class AbstractTest extends Arquillian {
 	}
 	
 	protected void initDashboardsPage() {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		waitForDashboardPageLoaded();
 		waitForElementVisible(dashboardsPage.getRoot());

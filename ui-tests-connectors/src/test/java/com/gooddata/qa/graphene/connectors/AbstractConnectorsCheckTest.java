@@ -51,7 +51,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
         // create connector project
         initProject(connectorType.getName() + "CheckConnector", projectCheckLimit);
     }
-
+	
 	@Test(groups = {"connectorInit"}, dependsOnMethods = {"createProject"})
     public void createIntegration() throws JSONException, InterruptedException {
         // verify that connector resource exist
@@ -60,8 +60,8 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
         // create integration
         initIntegration();
     }
-
-    @Test(groups = {"connectorBasicREST"}, dependsOnGroups = {"connectorInit"})
+		
+	@Test(groups = {"connectorBasicREST"}, dependsOnGroups = {"connectorInit"})
     public void testConnectorIntegrationResource() throws JSONException {
     	openUrl(getIntegrationUri());
         verifyIntegrationResourceJSON();
@@ -101,8 +101,15 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
             System.out.println("Integration wasn't created - nothing to delete...");
         }
     }
-	
-	@Test(dependsOnMethods = { "deleteConnectorIntegration"}, alwaysRun = true)
+    
+    /** TODO ATP-945
+    @Test(dependsOnMethods = { "deleteConnectorIntegration"}, alwaysRun = true)
+	public void validateConnectorProjectEnd() throws JSONException {
+		Assert.assertEquals(validateProject(), "OK", "Validation issue appeared in the end of test");
+	}
+	*/
+    
+    @Test(dependsOnMethods = { "deleteConnectorIntegration"}, alwaysRun = true)
 	public void deleteProject() {
 		deleteProjectByDeleteMode(successfulTest);
 	}
