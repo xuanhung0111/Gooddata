@@ -15,9 +15,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	private int createdReportsCount = 0;
 	
-	// TODO chart export resolution has changed at R96.2, 
-	// setting temporarily to valid value (export looks OK), will be changed back at CL-2568
-	private long expectedLineChartExportPDFSize = 37000L;
+	private long expectedLineChartExportPDFSize = 110000L;
 	private long expectedAreaChartReportExportPNGSize = 43000L;
 	private long expectedStackedAreaChartReportExportXLSSize = 5500L;
 	private long expectedBarChartReportExportCSVSize = 300L;
