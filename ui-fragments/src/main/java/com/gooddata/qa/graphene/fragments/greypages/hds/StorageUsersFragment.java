@@ -52,8 +52,8 @@ public class StorageUsersFragment extends AbstractGreyPagesFragment {
         waitUntilFormIsVisible();
         assertEquals(submit.getAttribute("value"), "Update role", "Submit button is not 'Update role'");
         assertEquals(this.role.getFirstSelectedOption().getText(), role);
-//        assertEquals(this.profile.getText(), profile); // todo arquillian failing here
-//        assertEquals(this.profile.getAttribute("readonly"), "readonly"); // todo arquillian failing here
+        assertEquals(this.profile.getAttribute("value"), profile);
+        assertEquals(this.profile.getAttribute("readonly"), "true");
     }
 
     public void verifyValidDeleteUserForm() {
