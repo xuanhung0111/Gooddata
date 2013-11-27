@@ -13,12 +13,16 @@ import org.testng.annotations.Test;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 @Test(groups = { "hds" }, description = "Basic verification of hds restapi in GD platform")
 public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	private String storageUrl;
+	private String userCreatedByUrl;
+	
+	private String testUserId;
 	
 	private static final String STORAGE_TITLE = "HDS storage";
 	private static final String STORAGE_DESCRIPTION = "HDS description";
@@ -26,9 +30,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 
     private static final String NEW_USER_ROLE = "reader"; // todo change once DSS roles are modified
     private static final String NEW_USER_UPDATED_ROLE = "owner"; // todo change once DSS roles are modified
-    private static final String NEW_USER_ID = "015ba7e9b00ff2f1d1af252cf5bd29fb"; // todo load from properties file
-    private static final String NEW_USER_PROFILE_URI = "/gdc/account/profile/" + NEW_USER_ID;
-
+    
     @FindBy(tagName="form")
 	private StorageFragment storageForm;
 
@@ -38,12 +40,13 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@BeforeClass
 	public void initStartPage() {
 		startPage = PAGE_GDC_STORAGES;
+		testUserId = loadProperty("hds.storage.test.user.id");
 	}
 	
 	@Test(groups = {"hdsInit"})
 	public void resourceStoragesNotAvailableForAnonymous() throws JSONException {
 		waitForElementPresent(BY_GP_PRE_JSON);
-		Assert.assertTrue(browser.getCurrentUrl().contains("gdc/account/token"), "Redirect to /gdc/account/token wasn't done for anonymous user");
+		assertTrue(browser.getCurrentUrl().contains("gdc/account/token"), "Redirect to /gdc/account/token wasn't done for anonymous user");
 	}
 
 	@Test(groups = {"hdsInit"}, dependsOnMethods = { "resourceStoragesNotAvailableForAnonymous" })
@@ -52,7 +55,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		
 		loadPlatformPageBeforeTestMethod();
 		JSONObject json = loadJSON();
-		Assert.assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
+		assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
 		takeScreenshot(browser, "hds-base-resource", this.getClass());
 	}
 	
@@ -64,8 +67,8 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@Test(dependsOnGroups = {"hdsInit"})
 	public void hdsResourceLinkNotAvailableAtBasicResource() {
 		openUrl(PAGE_GDC);
-		Assert.assertEquals(browser.getTitle(), "GoodData API root");
-		Assert.assertTrue(browser.findElements(By.partialLinkText("storages")).size() == 0, "Storages link is present at basic /gdc resource");
+		assertEquals(browser.getTitle(), "GoodData API root");
+		assertTrue(browser.findElements(By.partialLinkText("storages")).size() == 0, "Storages link is present at basic /gdc resource");
 	}
 	
 	@Test(dependsOnGroups = {"hdsInit"})
@@ -84,7 +87,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorage() throws JSONException, InterruptedException {
 		waitForElementVisible(storageForm.getRoot());
-		Assert.assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
+		assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
 		storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken, null);
 	}
 	
@@ -104,39 +107,38 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		openStorageUrl();
 		takeScreenshot(browser, "hds-simple-storage", this.getClass());
 		JSONObject json = loadJSON();
-		Assert.assertTrue(json.has("storage"), "Storage element isn't present");
+		assertTrue(json.has("storage"), "Storage element isn't present");
 		JSONObject storage = json.getJSONObject("storage");
-		Assert.assertTrue(storage.getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
-		Assert.assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
-		Assert.assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "Storage authorizationToken doesn't match");
-		Assert.assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
-		Assert.assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
-		Assert.assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
-		Assert.assertTrue(storage.getString("status").equals("ENABLED"), "Storage isn't enabled");
-		String createdByUrl = storage.getString("createdBy");
+		assertTrue(storage.getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
+		assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
+		assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "Storage authorizationToken doesn't match");
+		assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
+		assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
+		assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
+		assertTrue(storage.getString("status").equals("ENABLED"), "Storage isn't enabled");
+		userCreatedByUrl = storage.getString("createdBy");
 		String updatedByUrl = storage.getString("updatedBy");
-		Assert.assertEquals(updatedByUrl, createdByUrl, "Storage createdBy and updatedBy attributes do not match");
-		String createdDate = storage.getString("created");
-		String updatedDate = storage.getString("updated");
-		Assert.assertEquals(updatedDate, createdDate, "Storage created and updated dates do not match");
-		browser.get(getBasicRootUrl() + storageUrl + "/users");
+		assertEquals(updatedByUrl, userCreatedByUrl, "Storage createdBy and updatedBy attributes do not match");
+		assertTrue(storage.has("created"), "Created time not present");
+		assertTrue(storage.has("updated"), "Updated time not present");
+		browser.get(getBasicRootUrl() + getStorageUsersUrl());
 		JSONObject jsonUsers = loadJSON();
-		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("parent").equals(storageUrl), "Storage users parent link doesn't match");
-		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("self").equals(storageUrl + "/users"), "Storage users self link doesn't match");
-		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").length() == 1, "Number of users doesn't match");
-		Assert.assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").getJSONObject(0).getJSONObject("user").getString("profile").equals(createdByUrl), "Creator in users doesn't match with creator in storage");
-		browser.get(getBasicRootUrl() + createdByUrl);
+		assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("parent").equals(storageUrl), "Storage users parent link doesn't match");
+		assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("self").equals(storageUrl + "/users"), "Storage users self link doesn't match");
+		assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").length() == 1, "Number of users doesn't match");
+		assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").getJSONObject(0).getJSONObject("user").getString("profile").equals(userCreatedByUrl), "Creator in users doesn't match with creator in storage");
+		browser.get(getBasicRootUrl() + userCreatedByUrl);
 		JSONObject jsonUser = loadJSON();
-		Assert.assertTrue(jsonUser.getJSONObject("accountSetting").getString("login").equals(user), "Login of user in profile doesn't match");
+		assertTrue(jsonUser.getJSONObject("accountSetting").getString("login").equals(user), "Login of user in profile doesn't match");
 	}
 	
 	@Test(dependsOnMethods = { "verifyStorage" })
 	public void updateStorage() throws JSONException {
 		openStorageUrl();
 		waitForElementVisible(storageForm.getRoot());
-		Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
+		assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
 		storageForm.updateStorage(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated");
-		Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated"), "Edit form doesn't contain expected values");
+		assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE + " updated", STORAGE_DESCRIPTION + " updated"), "Edit form doesn't contain expected values");
 		takeScreenshot(browser, "hds-updated-storage", this.getClass());
 	}
 	
@@ -145,7 +147,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		openStorageUrl();
 		waitForElementVisible(BY_GP_FORM_SECOND);
 		StorageFragment storage = createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM_SECOND));
-		Assert.assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
+		assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
 		storage.deleteStorage();
 	}
 	
@@ -181,16 +183,29 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		invalidUpdateOfStorage(STORAGE_TITLE, null, "Validation failed");
 	}
 
-    /** ===================== Section with storage users ============ */
-    @Test(dependsOnMethods = {"verifyStorage"})
+    /** ===================== Section with valid storage users cases ============ */
+    
+	@Test(dependsOnMethods = {"verifyStorage"})
     public void addUserToStorage() {
         openStorageUsersUrl();
-
+        assertTrue(testUserId != null, "Missing test user ID - provide property 'hds.storage.test.user.id'");
         storageUsersForm.verifyValidAddUserForm();
-        storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, NEW_USER_PROFILE_URI);
+        storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, getTestUserProfileUri());
         takeScreenshot(browser, "hds-add-user-filled-form", this.getClass());
         assertEquals(browser.getCurrentUrl(), getAddedUserUrlWithHost());
     }
+	
+	@Test(dependsOnMethods = { "verifyStorage" })
+	public void verifyStorageUsersAddFormPresentWithTrailingSlash() throws JSONException {
+		browser.get(getBasicRootUrl() + getStorageUsersUrl() + "/");
+		waitForElementVisible(storageUsersForm.getRoot());
+	}
+	
+	@Test(dependsOnMethods = { "addUserToStorage" })
+	public void verifyStorageUsersUpdateFormPresentWithTrailingSlash() throws JSONException {
+		browser.get(getAddedUserUrlWithHost() + "/");
+		waitForElementVisible(storageUsersForm.getRoot());
+	}
 
     @Test(dependsOnMethods = "addUserToStorage")
     public void verifyAddedUser() throws JSONException {
@@ -200,12 +215,12 @@ public class BasicHDSRestTest extends AbstractHDSTest {
     @Test(dependsOnMethods = "verifyAddedUser")
     public void updateUser() throws JSONException {
         browser.get(getAddedUserUrlWithHost());
-        storageUsersForm.verifyValidUpdateUserForm(NEW_USER_ROLE, NEW_USER_PROFILE_URI);
-        storageUsersForm.fillAddUserToStorageForm(NEW_USER_UPDATED_ROLE, NEW_USER_PROFILE_URI);
+        storageUsersForm.verifyValidUpdateUserForm(NEW_USER_ROLE, getTestUserProfileUri());
+        storageUsersForm.fillAddUserToStorageForm(NEW_USER_UPDATED_ROLE, getTestUserProfileUri());
         takeScreenshot(browser, "hds-update-user-filled-form", this.getClass());
         assertEquals(browser.getCurrentUrl(), getAddedUserUrlWithHost());
     }
-
+    
     @Test(dependsOnMethods = "updateUser")
     public void verifyUpdatedUser() throws JSONException {
         verifyUser(NEW_USER_UPDATED_ROLE, "hds-updated-user");
@@ -222,6 +237,44 @@ public class BasicHDSRestTest extends AbstractHDSTest {
         assertEquals(browser.getCurrentUrl(), getBasicRootUrl() + storageUrl + "/users");
         assertEquals(1, jsonObject.getJSONObject("users").getJSONArray("items").length());
     }
+    
+    /** ===================== Section with invalid storage users cases ============ */
+    
+    @Test(dependsOnMethods = { "verifyStorage" })
+	public void addUserWithEmptyProfile() throws JSONException {
+    	invalidUserAssignment(null, NEW_USER_ROLE, "URI can not be empty");
+	}
+    
+    @Test(dependsOnMethods = { "verifyStorage" })
+	public void addNonExistingUser() throws JSONException {
+    	invalidUserAssignment("/gdc/account/profile/nonexisting", NEW_USER_ROLE, "User 'nonexisting' has not been found");
+	}
+    
+    @Test(dependsOnMethods = { "verifyStorage" })
+	public void addUserWithInvalidURI() throws JSONException {
+    	invalidUserAssignment("/invalid/uri", NEW_USER_ROLE, "Validation failed");
+	}
+    
+    @Test(dependsOnMethods = { "verifyStorage" })
+	public void addUserWithInvalidURI2() throws JSONException {
+    	invalidUserAssignment("/gdc/account/profile", NEW_USER_ROLE, "Validation failed");
+	}
+    
+    /** TODO - enabled when DSS-241 is fixed
+    @Test(dependsOnMethods = { "verifyStorage" })
+	public void addUserWithInvalidURI3() throws JSONException {
+    	invalidUserAssignment("/gdc/account/profile/", NEW_USER_ROLE, "Validation failed");
+	}
+	*/
+    
+    @Test(dependsOnMethods = { "verifyStorage" })
+	public void addExistingUserToStorage() throws JSONException {
+    	invalidUserAssignment(userCreatedByUrl, NEW_USER_ROLE, "User '" + userCreatedByUrl + "' already exists in storage '");
+	}
+    
+    
+    
+    // TODO add next invalid cases when permissions are implemented
 
     /** ===================== HELP methods ================= */
 	
@@ -232,23 +285,30 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	}
 
     private void openStorageUsersUrl() {
-        browser.get(getBasicRootUrl() + storageUrl + "/users");
-        waitForElementVisible(storageForm.getRoot());
+        browser.get(getBasicRootUrl() + getStorageUsersUrl());
+        waitForElementVisible(storageUsersForm.getRoot());
         waitForElementPresent(BY_GP_PRE_JSON);
-
+    }
+    
+    private String getStorageUsersUrl() {
+    	return storageUrl + "/users";
+    }
+    
+    private String getTestUserProfileUri() {
+    	return "/gdc/account/profile/" + testUserId;
     }
 
     private String getAddedUserUrl() {
-        return storageUrl + "/users/" + NEW_USER_ID;
+        return getStorageUsersUrl() + "/" + testUserId;
     }
-
+    
     private String getAddedUserUrlWithHost() {
         return getBasicRootUrl() + getAddedUserUrl();
     }
 
     private void createInvalidStorage(String title, String description, String authorizationToken, String copyOf, String expectedErrorMessage) throws JSONException {
 		waitForElementVisible(storageForm.getRoot());
-		Assert.assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
+		assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
 		storageForm.fillCreateStorageForm(title, description, authorizationToken, copyOf);
 		verifyErrorMessage(expectedErrorMessage, PAGE_GDC_STORAGES);
 	}
@@ -260,12 +320,19 @@ public class BasicHDSRestTest extends AbstractHDSTest {
         takeScreenshot(browser, screenshotName, this.getClass());
         final JSONObject userObject = json.getJSONObject("user");
         assertEquals(role, userObject.getString("role"));
-        assertEquals(NEW_USER_PROFILE_URI, userObject.getString("profile"));
+        assertEquals(getTestUserProfileUri(), userObject.getString("profile"));
         assertEquals(getAddedUserUrl(), userObject.getJSONObject("links").getString("self"));
         assertEquals(storageUrl + "/users", userObject.getJSONObject("links").getString("parent"));
     }
-	
-	private void invalidUpdateOfStorage(String title, String description, String expectedErrorMessage) throws JSONException {
+    
+    private void invalidUserAssignment(String userProfile, String role, String expectedErrorMessage) throws JSONException {
+    	openStorageUsersUrl();
+    	storageUsersForm.verifyValidAddUserForm();
+		storageUsersForm.fillAddUserToStorageForm(role, userProfile);
+		verifyErrorMessage(expectedErrorMessage, storageUrl + "/users");
+	}
+    
+    private void invalidUpdateOfStorage(String title, String description, String expectedErrorMessage) throws JSONException {
 		openStorageUrl();
 		waitForElementVisible(storageForm.getRoot());
 		Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
