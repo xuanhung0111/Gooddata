@@ -260,19 +260,15 @@ public class BasicHDSRestTest extends AbstractHDSTest {
     	invalidUserAssignment("/gdc/account/profile", NEW_USER_ROLE, "Validation failed");
 	}
     
-    /** TODO - enabled when DSS-241 is fixed
     @Test(dependsOnMethods = { "verifyStorage" })
 	public void addUserWithInvalidURI3() throws JSONException {
     	invalidUserAssignment("/gdc/account/profile/", NEW_USER_ROLE, "Validation failed");
 	}
-	*/
-    
+	
     @Test(dependsOnMethods = { "verifyStorage" })
 	public void addExistingUserToStorage() throws JSONException {
     	invalidUserAssignment(userCreatedByUrl, NEW_USER_ROLE, "User '" + userCreatedByUrl + "' already exists in storage '");
 	}
-    
-    
     
     // TODO add next invalid cases when permissions are implemented
 
