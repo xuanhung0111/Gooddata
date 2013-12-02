@@ -28,8 +28,8 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	private static final String STORAGE_DESCRIPTION = "HDS description";
 	private static final String STORAGE_COPY_OF = "/gdc/storages/${storageId}";
 
-    private static final String NEW_USER_ROLE = "reader"; // todo change once DSS roles are modified
-    private static final String NEW_USER_UPDATED_ROLE = "owner"; // todo change once DSS roles are modified
+    private static final String NEW_USER_ROLE = "dataAdmin";
+    private static final String NEW_USER_UPDATED_ROLE = "admin";
     
     @FindBy(tagName="form")
 	private StorageFragment storageForm;
