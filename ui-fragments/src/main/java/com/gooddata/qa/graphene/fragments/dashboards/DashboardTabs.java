@@ -11,12 +11,11 @@ import java.util.List;
 
 public class DashboardTabs extends AbstractFragment {
 	
-	private static final By BY_TAB_LABEL_SPAN = By.xpath("div/span[@class='label']");
 	private static final By BY_TAB_DROP_DOWN_BUTTON = By.cssSelector(".tab-dropdown");
 	private static final By BY_TABS_SCROLL_RIGHT_BUTTON = By.cssSelector(".scroll-right");
 
 	@FindBy(className="yui3-dashboardtab")
-	private List<WebElement> tabs;
+	private List<DashboardTab> tabs;
 	
 	/**
 	 * Method to get number of dashboard tabs for selected project
@@ -43,7 +42,7 @@ public class DashboardTabs extends AbstractFragment {
 	 * @return true is tab with given index is selected
 	 */
 	public boolean isTabSelected(int i) {
-		return getTabWebElement(i).getAttribute("class").contains("yui3-dashboardtab-selected");
+		return tabs.get(i).isSelected();
 	}
 	
 	/**
@@ -67,8 +66,7 @@ public class DashboardTabs extends AbstractFragment {
 	 * @return label of tab with given index 
 	 */
 	public String getTabLabel(int i) {
-		WebElement elem = getTabWebElement(i).findElement(BY_TAB_LABEL_SPAN);
-		return elem.getText();
+		return tabs.get(i).getLabel();
 	}
 	
 	/**
@@ -79,7 +77,7 @@ public class DashboardTabs extends AbstractFragment {
 	public List<String> getAllTabNames() {
 		List<String> tabNames = new ArrayList<String>();
 		for (int i = 0; i < tabs.size(); i++) {
-			tabNames.add(getTabLabel(i));
+			tabNames.add(tabs.get(i).getLabel());
 		}
 		return tabNames;
 	}
@@ -93,7 +91,11 @@ public class DashboardTabs extends AbstractFragment {
 		button.click();
 	}
 	
-	private WebElement getTabWebElement(int i) {
+	public DashboardTab getTab(int i) {
 		return tabs.get(i);
+	}
+	
+	private WebElement getTabWebElement(int i) {
+		return tabs.get(i).getRoot();
 	}
 }

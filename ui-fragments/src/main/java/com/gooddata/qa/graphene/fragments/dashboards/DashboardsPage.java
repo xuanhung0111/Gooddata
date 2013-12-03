@@ -56,6 +56,9 @@ public class DashboardsPage extends AbstractFragment {
 	@FindBy(xpath="//div[contains(@class, 'c-confirmDeleteDialog')]//button[text()='Delete']")
 	private WebElement dashboardTabDeleteConfirmButton;
 	
+	@FindBy(className="yui3-c-filterdashboardwidget")
+	private List<FilterWidget> filters;
+	
 	private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
 	private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
 	private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
@@ -63,6 +66,10 @@ public class DashboardsPage extends AbstractFragment {
 	
 	public DashboardTabs getTabs() {
 		return tabs;
+	}
+	
+	public List<FilterWidget> getFilters() {
+		return filters;
 	}
 	
 	public DashboardEditBar getDashboardEditBar() {
