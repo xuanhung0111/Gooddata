@@ -19,6 +19,7 @@
 		<module>ui-fragments</module>
 		<module>ui-tests-ccc</module>
 		<module>ui-tests-upload</module>
+		<module>ui-tests-filters</module>
 	</modules>
 
 	<properties>
