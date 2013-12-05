@@ -399,10 +399,6 @@ public abstract class AbstractTest extends Arquillian {
 		waitForElementVisible(By.xpath("//div[@id='p-pulsePage' and contains(@class,'s-displayed')]"));
 	}
 	
-	public void waitForEmailSchedulePageLoaded() {
-		waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
-	}
-	
 	public void waitForProjectsPageLoaded() {
 		waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"));
 	}
