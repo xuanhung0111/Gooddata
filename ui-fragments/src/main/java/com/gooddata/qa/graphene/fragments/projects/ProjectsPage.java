@@ -16,7 +16,7 @@ public class ProjectsPage extends AbstractFragment {
 	
 	private static final By BY_SPAN_PROJECT_TITLE = By.xpath("span[@class='projectTitle']");
 	
-	public List<WebElement> getProjectsElemenets() {
+	public List<WebElement> getProjectsElements() {
 		return projects;
 	}
 	
