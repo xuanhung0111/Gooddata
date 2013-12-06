@@ -176,6 +176,10 @@
 												<name>csvFilePath</name>
 												<value>${csvFilePath}</value>
 											</property>
+											<property>
+												<name>user.home</name>
+												<value>${project.build.directory}</value>
+											</property>
 										</systemProperties>
 									</configuration>
 								</execution>
