@@ -9,7 +9,6 @@
 		<property name="browser">${browser}</property> <!-- use firefox directly if you want to run tests from IDE -->
 		<property name="remoteReusable">false</property>
 		<property name="remoteAddress">http://localhost:4444/wd/hub</property>
-		<property name="chromeDriverBinary">/Applications/Google Chrome.app/Contents/MacOS/Google Chrome</property>
 		<property name="firefoxUserPreferences">target/test-classes/firefox-prefs.js</property>
 	</extension>
 
