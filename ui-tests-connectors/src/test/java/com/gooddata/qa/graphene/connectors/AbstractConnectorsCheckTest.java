@@ -94,9 +94,26 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
     @Test(dependsOnMethods = { "disableConnectorIntegration" }, alwaysRun = true)
     public void deleteConnectorIntegration() throws JSONException {
         if (integrationActivated) {
-            openUrl(getIntegrationUri());
+        	openUrl(getIntegrationUri());
             waitForElementVisible(connector.getRoot());
-            connector.deleteIntegration();
+        	System.out.println("Delete mode is set to " + deleteMode.toString());
+        	switch (deleteMode) {
+				case DELETE_ALWAYS:
+					System.out.println("Integration will be deleted...");
+					connector.deleteIntegration();
+					break;
+				case DELETE_IF_SUCCESSFUL:
+					if (successfulTest) {
+						System.out.println("Test was successful, integration will be deleted...");
+						connector.deleteIntegration();
+					} else {
+						System.out.println("Test wasn't successful, integration won't be deleted...");
+					}
+					break;
+				case DELETE_NEVER: 
+					System.out.println("Delete mode set to NEVER, integration won't be deleted...");
+					break;
+			}
         } else {
             System.out.println("Integration wasn't created - nothing to delete...");
         }
