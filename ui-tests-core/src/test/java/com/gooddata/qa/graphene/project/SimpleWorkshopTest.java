@@ -29,7 +29,7 @@ public class SimpleWorkshopTest extends SimpleProjectAbstractTest {
 	}
 	
 	@Test(dependsOnMethods = { "uploadData" }, groups = { "simpleTests" })
-	public void addNewTabs() throws InterruptedException {
+	public void addNewTab() throws InterruptedException {
 		addNewTabOnDashboard("Default dashboard", "workshop", "simple-ws");
 	}
 	
@@ -60,8 +60,7 @@ public class SimpleWorkshopTest extends SimpleProjectAbstractTest {
 	@Test(dependsOnMethods = { "addReportOnDashboardTab" }, groups = { "simpleTests" })
 	public void verifyHeadlineReport() {
 		initDashboardsPage();
-		//Assert.assertEquals(1, dashboardsPage.getContent().getNumberOfReports(), "Report is not available on dashboard");
-		System.out.println("reports: " + dashboardsPage.getContent().getNumberOfReports());
+		Assert.assertEquals(1, dashboardsPage.getContent().getNumberOfReports(), "Invalid report(s) count on dashboard");
 		DashboardReportOneNumber report = Graphene.createPageFragment(DashboardReportOneNumber.class, dashboardsPage.getContent().getReport(0).getRoot());
 		Assert.assertEquals(report.getValue(), "7,252,542.63", "Invalid value in headline report");
 		Assert.assertEquals(report.getDescription(), "Sum of Amount", "Invalid description in headline report");
