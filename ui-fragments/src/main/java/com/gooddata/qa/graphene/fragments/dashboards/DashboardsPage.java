@@ -59,6 +59,9 @@ public class DashboardsPage extends AbstractFragment {
 	@FindBy(className="yui3-c-filterdashboardwidget")
 	private List<FilterWidget> filters;
 	
+	@FindBy(className="yui3-c-projectdashboard-content")
+	private DashboardContent content;
+	
 	private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
 	private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
 	private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
@@ -70,6 +73,10 @@ public class DashboardsPage extends AbstractFragment {
 	
 	public List<FilterWidget> getFilters() {
 		return filters;
+	}
+	
+	public DashboardContent getContent() {
+		return content;
 	}
 	
 	public DashboardEditBar getDashboardEditBar() {

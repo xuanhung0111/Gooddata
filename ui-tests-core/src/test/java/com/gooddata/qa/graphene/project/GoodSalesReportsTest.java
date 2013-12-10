@@ -197,12 +197,12 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	@Test(dependsOnGroups = { "goodsales-chart", "chart-exports", "tabular-report-exports" }, groups = { "lastTest" })
 	public void verifyCreatedReports() throws InterruptedException {
 		initReportsPage();
-		selectFolder("My Reports");
+		selectReportsDomainFolder("My Reports");
 		waitForReportsPageLoaded();
 		Thread.sleep(5000);
 		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
 		Screenshots.takeScreenshot(browser, "GoodSales-new-reports", this.getClass());
-		selectFolder("All");
+		selectReportsDomainFolder("All");
 		waitForReportsPageLoaded();
 		Thread.sleep(5000);
 		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
@@ -211,7 +211,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how) throws InterruptedException {
 		initReportsPage();
-		selectFolder("My Reports");
+		selectReportsDomainFolder("My Reports");
 		reportsPage.startCreateReport();
 		waitForAnalysisPageLoaded();
 		waitForElementVisible(reportPage.getRoot());
@@ -221,13 +221,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 		createdReportsCount++;
 	}
 	
-	private void initReportsPage() {
-		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage");
-		waitForReportsPageLoaded();
-		waitForElementVisible(reportsPage.getRoot());
-	}
-	
-	private void selectFolder(String folderName) {
+	private void selectReportsDomainFolder(String folderName) {
 		reportsPage.getDefaultFolders().openFolder(folderName);
 		waitForReportsPageLoaded();
 		Assert.assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " + reportsPage.getSelectedFolderName());
@@ -235,7 +229,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	private void initReportPage(String reportName) {
 		initReportsPage();
-		selectFolder("My Reports");
+		selectReportsDomainFolder("My Reports");
 		reportsPage.getReportsList().openReport(reportName);
 		waitForAnalysisPageLoaded();
 		waitForElementVisible(reportPage.getRoot());

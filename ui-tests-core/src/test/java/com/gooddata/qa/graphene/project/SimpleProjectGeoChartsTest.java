@@ -20,9 +20,6 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	
 	private String csvFilePath;
 	
-	@FindBy(css=".l-primary")
-	private UploadFragment upload;
-	
 	@FindBy(id="attributesTable")
 	private AttributesTable attributesTable;
 	
@@ -52,8 +49,8 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createSimpleProjectGeo" }, groups = { "geo-charts" })
 	public void uploadDataForGeoCharts() throws InterruptedException {
-		uploadFile(csvFilePath + "/geo_test.csv", 1);
-		uploadFile(csvFilePath + "/geo_test_pins.csv", 2);
+		uploadSimpleCSV(csvFilePath + "/geo_test.csv", "geo-1");
+		uploadSimpleCSV(csvFilePath + "/geo_test_pins.csv", "geo-2");
 	}
 	
 	@Test(dependsOnMethods = { "uploadDataForGeoCharts" }, groups = { "geo-charts" })
@@ -81,22 +78,6 @@ public class SimpleProjectGeoChartsTest extends AbstractTest {
 	@Test(dependsOnGroups = { "geo-charts" }, alwaysRun = true)
 	public void deleteSimpleProject() {
 		deleteProjectByDeleteMode(successfulTest);
-	}
-	
-	private void uploadFile(String filePath, int order) throws InterruptedException {
-		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-		waitForDashboardPageLoaded();
-		openUrl(PAGE_UPLOAD);
-		waitForElementVisible(upload.getRoot());
-		upload.uploadFile(filePath);
-		Screenshots.takeScreenshot(browser, "simple-project-upload-" + order, this.getClass());
-		UploadColumns uploadColumns = upload.getUploadColumns();
-		System.out.println(uploadColumns.getNumberOfColumns() + " columns are available for upload, " + uploadColumns.getColumnNames() + " ," + uploadColumns.getColumnTypes());
-		Screenshots.takeScreenshot(browser, "upload-definition", this.getClass());
-		upload.confirmloadCsv();
-		waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-		waitForDashboardPageLoaded();
-		Screenshots.takeScreenshot(browser, "simple-project-upload-" + order + "-dashboard", this.getClass());
 	}
 	
 	private void configureAttributeLabel(String attributeName, String attributeLabelType) throws InterruptedException {
