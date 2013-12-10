@@ -32,7 +32,6 @@ public abstract class SimpleProjectAbstractTest extends AbstractTest {
 		projectId = gpProject.createProject(projectTitle, "", "", authorizationToken, 12);
 
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
-		successfulTest = true;
 	}
 	
 	@Test(dependsOnGroups = { "simpleTests" })
@@ -42,6 +41,7 @@ public abstract class SimpleProjectAbstractTest extends AbstractTest {
 
         validationStatus = validateProject();
         Assert.assertEquals(validationStatus, "OK");
+        successfulTest = true;
     }
 	
 	@Test(dependsOnMethods = { "validateSimpleProject" }, alwaysRun = true)
