@@ -33,6 +33,8 @@ import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
+import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
@@ -108,7 +110,7 @@ public abstract class AbstractTest extends Arquillian {
 	
 	/** ----- UI fragmnets ----- */
 	
-	@FindBy(xpath="//div[@id='loginPanel']")
+	@FindBy(css="#loginPanel")
 	protected LoginFragment loginFragment;
 	
 	@FindBy(id="root")
@@ -128,6 +130,9 @@ public abstract class AbstractTest extends Arquillian {
 	
 	@FindBy(id="projectsCentral")
 	protected ProjectsPage projectsPage;
+	
+	@FindBy(css=".l-primary")
+	protected UploadFragment upload;
 	
 	/** ----- Grey pages fragmnets ----- */
 	
@@ -371,6 +376,28 @@ public abstract class AbstractTest extends Arquillian {
 		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
 		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
 		Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
+	}
+	
+	protected void initReportsPage() {
+		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage");
+		waitForReportsPageLoaded();
+		waitForElementVisible(reportsPage.getRoot());
+	}
+	
+	protected void uploadSimpleCSV(String filePath, String screenshotName) throws InterruptedException {
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+		waitForDashboardPageLoaded();
+		openUrl(PAGE_UPLOAD);
+		waitForElementVisible(upload.getRoot());
+		upload.uploadFile(filePath);
+		Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());
+		UploadColumns uploadColumns = upload.getUploadColumns();
+		System.out.println(uploadColumns.getNumberOfColumns() + " columns are available for upload, " + uploadColumns.getColumnNames() + " ," + uploadColumns.getColumnTypes());
+		Screenshots.takeScreenshot(browser, "upload-definition", this.getClass());
+		upload.confirmloadCsv();
+		waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"));
+		waitForDashboardPageLoaded();
+		Screenshots.takeScreenshot(browser, screenshotName + "-dashboard", this.getClass());
 	}
 	
 	public JSONObject loadJSON() throws JSONException {

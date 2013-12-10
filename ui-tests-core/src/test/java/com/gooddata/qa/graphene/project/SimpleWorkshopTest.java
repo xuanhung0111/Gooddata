@@ -1,23 +1,23 @@
 package com.gooddata.qa.graphene.project;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.FindBy;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
-import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
+import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardReportOneNumber;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "projectSimpleWS" }, description = "Tests for workshop simple project in GD platform")
 public class SimpleWorkshopTest extends AbstractTest {
 	
 	private String csvFilePath;
-	
-	@FindBy(css=".l-primary")
-	private UploadFragment upload;
 	
 	@BeforeClass
 	public void initStartPage() {
@@ -42,7 +42,7 @@ public class SimpleWorkshopTest extends AbstractTest {
 	
 	@Test(dependsOnMethods = { "createSimpleProjectWS" }, groups = { "ws-charts" })
 	public void uploadData() throws InterruptedException {
-		uploadFile(csvFilePath + "/payroll.csv", 1);
+		uploadSimpleCSV(csvFilePath + "/payroll.csv", "simple-ws");
 	}
 	
 	@Test(dependsOnMethods = { "uploadData" }, groups = { "ws-charts" })
@@ -50,24 +50,44 @@ public class SimpleWorkshopTest extends AbstractTest {
 		addNewTabOnDashboard("Default dashboard", "workshop", "simple-ws");
 	}
 	
+	@Test(dependsOnMethods = { "uploadData" }, groups = "ws-charts")
+	public void createBasicReport() throws InterruptedException {
+		initReportsPage();
+		reportsPage.startCreateReport();
+		waitForAnalysisPageLoaded();
+		waitForElementVisible(reportPage.getRoot());
+		List<String> what = new ArrayList<String>();
+		what.add("Sum of Amount");
+		reportPage.createReport("Headline test", ReportTypes.HEADLINE, what, null);
+		Screenshots.takeScreenshot(browser, "simple-ws-headline-report", this.getClass());
+	}
+	
+	@Test(dependsOnMethods = { "createBasicReport" }, groups = { "ws-charts" })
+	
+	public void addReportOnDashboardTab() throws InterruptedException {
+		initDashboardsPage();
+		dashboardsPage.getTabs().openTab(1);
+		waitForDashboardPageLoaded();
+		dashboardsPage.editDashboard();
+		dashboardsPage.getDashboardEditBar().addReportToDashboard("Headline test");
+		dashboardsPage.getDashboardEditBar().saveDashboard();
+		waitForDashboardPageLoaded();
+		Screenshots.takeScreenshot(browser, "simple-ws-headline-report-dashboard", this.getClass());
+	}
+	
+	@Test(dependsOnMethods = { "addReportOnDashboardTab" }, groups = { "ws-charts" })
+	public void verifyHeadlineReport() {
+		initDashboardsPage();
+		//Assert.assertEquals(1, dashboardsPage.getContent().getNumberOfReports(), "Report is not available on dashboard");
+		System.out.println("reports: " + dashboardsPage.getContent().getNumberOfReports());
+		DashboardReportOneNumber report = Graphene.createPageFragment(DashboardReportOneNumber.class, dashboardsPage.getContent().getReport(0).getRoot());
+		Assert.assertEquals(report.getValue(), "7,252,542.63", "Invalid value in headline report");
+		Assert.assertEquals(report.getDescription(), "Sum of Amount", "Invalid description in headline report");
+		successfulTest = true;
+	}
+	
 	@Test(dependsOnGroups = { "ws-charts" }, alwaysRun = true)
 	public void deleteSimpleProject() {
 		deleteProjectByDeleteMode(successfulTest);
-	}
-	
-	private void uploadFile(String filePath, int order) throws InterruptedException {
-		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-		waitForDashboardPageLoaded();
-		openUrl(PAGE_UPLOAD);
-		waitForElementVisible(upload.getRoot());
-		upload.uploadFile(filePath);
-		Screenshots.takeScreenshot(browser, "simple-project-upload-" + order, this.getClass());
-		UploadColumns uploadColumns = upload.getUploadColumns();
-		System.out.println(uploadColumns.getNumberOfColumns() + " columns are available for upload, " + uploadColumns.getColumnNames() + " ," + uploadColumns.getColumnTypes());
-		Screenshots.takeScreenshot(browser, "upload-definition", this.getClass());
-		upload.confirmloadCsv();
-		waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-		waitForDashboardPageLoaded();
-		Screenshots.takeScreenshot(browser, "simple-project-upload-" + order + "-dashboard", this.getClass());
 	}
 }

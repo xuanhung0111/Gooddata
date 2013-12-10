@@ -59,7 +59,7 @@ public class DashboardEditBar extends AbstractFragment {
 		waitForElementVisible(reportToAdd).click();
 		waitForDashboardPageLoaded();
 		By reportOnDashboard = By.xpath(reportOnDashboardLocator.replace("${reportName}", reportName));
-		waitForElementVisible(reportOnDashboard);
+		waitForElementPresent(reportOnDashboard);
 	}
 	
 	public void addWidgetToDashboard(WidgetTypes widgetype, String metricLabel) throws InterruptedException {
@@ -79,6 +79,7 @@ public class DashboardEditBar extends AbstractFragment {
 	public void saveDashboard() {
 		waitForElementVisible(saveButton);
 		Graphene.guardAjax(saveButton).click();
+		waitForElementNotVisible(this.getRoot());
 	}
 	
 	public void deleteDashboard() throws InterruptedException {
