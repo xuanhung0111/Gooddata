@@ -22,7 +22,7 @@ public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "verifyEmptySchedules" }, groups = { "schedules" })
 	public void createDashboardSchedule() {
 		initEmailSchedulesPage();
-		emailSchedulesPage.scheduleNewDahboardEmail(user, "UI-Graphene-core-Dashboard", "Scheduled email test - dashboard.", "Outlook");
+		emailSchedulesPage.scheduleNewDahboardEmail(user, "UI-Graphene-core-Dashboard: " + host, "Scheduled email test - dashboard.", "Outlook");
 		checkRedBar();
 		Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
 	}
@@ -30,7 +30,7 @@ public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "verifyEmptySchedules" }, groups = { "schedules" })
 	public void createReportSchedule() {
 		initEmailSchedulesPage();
-		emailSchedulesPage.scheduleNewReportEmail(user, "UI-Graphene-core-Report", "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);
+		emailSchedulesPage.scheduleNewReportEmail(user, "UI-Graphene-core-Report: " + host, "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);
 		checkRedBar();
 		Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
 	}
