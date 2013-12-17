@@ -21,7 +21,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	private long expectedBarChartReportExportCSVSize = 300L;
 	private long expectedTabularReportExportPDFSize = 28000L;
 	private long expectedTabularReportExportXLSSize = 11000L;
-	private long expectedTabularReportExportCSVSize = 1700L;
+	private long expectedTabularReportExportCSVSize = 1650L;
 	
 	@Test(dependsOnMethods = { "createProject" })
 	public void verifyReportsPage() throws InterruptedException {
@@ -63,7 +63,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "verifyReportsPage" }, groups = { "goodsales-chart" })
 	public void createTabularReport2() throws InterruptedException {
 		List<String> what = new ArrayList<String>();
-		what.add("# of Opportunities");
+		what.add("# of Won Opps.");
 		List<String> how = new ArrayList<String>();
 		how.add("Region");
 		how.add("Product");
@@ -85,7 +85,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "verifyReportsPage" }, groups = { "goodsales-chart" })
 	public void createTabularReport3() throws InterruptedException {
 		List<String> what = new ArrayList<String>();
-		what.add("# of Opportunities");
+		what.add("# of Lost Opps.");
 		List<String> how = new ArrayList<String>();
 		how.add("Region");
 		how.add("Product");
