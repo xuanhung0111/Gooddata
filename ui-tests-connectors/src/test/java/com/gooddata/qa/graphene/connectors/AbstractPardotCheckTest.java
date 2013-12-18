@@ -4,9 +4,10 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.*;
 
 public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTest {
 
@@ -45,7 +46,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		waitForElementVisible(BY_INPUT_PARDOT_ACCOUNT_ID).sendKeys(pardotAccountId);
 		Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
 		JSONObject json = loadJSON();
-		Assert.assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId, "Pardot accountId was not set to expected value");
+		assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId, "Pardot accountId was not set to expected value");
 	}
 	
 	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testPardotIntegrationConfiguration" })

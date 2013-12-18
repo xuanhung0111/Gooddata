@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.project;
 
 import org.openqa.selenium.By;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
+import static org.testng.Assert.*;
 
 @Test(groups = { "GoodSalesSchedules" }, description = "Tests for GoodSales project (email schedules functionality) in GD platform")
 public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
@@ -15,7 +16,7 @@ public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedules" })
 	public void verifyEmptySchedules() {
 		initEmailSchedulesPage();
-		Assert.assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
+		assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
 		Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
 	}
 	
@@ -35,10 +36,10 @@ public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 		Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
 	}
 	
-	@Test(groups = { "lastTest" }, dependsOnGroups = { "schedules" })
+	@Test(groups = { "tests" }, dependsOnGroups = { "schedules" })
 	public void verifyCreatedSchedules() {
 		initEmailSchedulesPage();
-		Assert.assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
+		assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
 		Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
 		successfulTest = true;
 	}

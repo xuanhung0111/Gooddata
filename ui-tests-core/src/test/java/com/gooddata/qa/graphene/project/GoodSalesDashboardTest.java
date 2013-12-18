@@ -1,9 +1,10 @@
 package com.gooddata.qa.graphene.project;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.utils.graphene.Screenshots;
+
+import static org.testng.Assert.*;
 
 @Test(groups = { "GoodSalesDashboard" }, description = "Tests for GoodSales project (dashboards functionality) in GD platform")
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
@@ -58,13 +59,13 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "addNewTab" }, groups = { "dashboards-verification" })
 	public void deleteNewTab() throws InterruptedException {
 		initDashboardsPage();
-		Assert.assertTrue(dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
+		assertTrue(dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
 		waitForDashboardPageLoaded();
 		Thread.sleep(5000);
 		int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
 		dashboardsPage.deleteDashboardTab(expectedGoodSalesTabs.length);
 		Thread.sleep(5000);
-		Assert.assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
+		assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
 	}
 	
 	@Test(dependsOnMethods = { "verifyDashboardTabs" }, groups = { "dashboards-verification", "new-dashboard" })
@@ -76,8 +77,8 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 		waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
 		Thread.sleep(5000);
 		checkRedBar();
-		Assert.assertEquals(dashboardsPage.getDashboardsCount(), 2, "New dashboard is not present");
-		Assert.assertEquals(dashboardsPage.getDashboardName(), dashboardName, "New dashboard has invalid name");
+		assertEquals(dashboardsPage.getDashboardsCount(), 2, "New dashboard is not present");
+		assertEquals(dashboardsPage.getDashboardName(), dashboardName, "New dashboard has invalid name");
 		Screenshots.takeScreenshot(browser, "GoodSales-new-dashboard", this.getClass());
 	}
 	
@@ -93,14 +94,14 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 		if (dashboardsPage.selectDashboard("test")) {
 			dashboardsPage.deleteDashboard();
 			waitForDashboardPageLoaded();
-			Assert.assertEquals(dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
+			assertEquals(dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
 			checkRedBar();
 		} else {
-			Assert.fail("Dashboard wasn't selected and not deleted");
+			fail("Dashboard wasn't selected and not deleted");
 		}
 	}
 	
-	@Test(dependsOnGroups = { "dashboards-verification" }, groups = { "lastTest" })
+	@Test(dependsOnGroups = { "dashboards-verification" }, groups = { "tests" })
 	public void verifyDashboardTabsAfter() throws InterruptedException {
 		verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
 	}

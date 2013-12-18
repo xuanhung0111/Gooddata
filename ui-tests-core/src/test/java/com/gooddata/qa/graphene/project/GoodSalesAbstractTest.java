@@ -1,13 +1,8 @@
 package com.gooddata.qa.graphene.project;
 
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.utils.graphene.Screenshots;
-
-public class GoodSalesAbstractTest extends AbstractTest {
+public class GoodSalesAbstractTest extends AbstractProjectTest {
 	
 	protected static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
 	
@@ -21,24 +16,7 @@ public class GoodSalesAbstractTest extends AbstractTest {
 	@BeforeClass
 	public void initStartPage() {
 		startPage = "projects.html";
-	}
-	
-	@Test(groups = { "GoodSalesInit" } )
-	public void signIn() throws JSONException, InterruptedException {
-		signInAtUI(user, password);
-	}
-	
-	@Test(dependsOnGroups = { "GoodSalesInit" })
-	public void createProject() throws JSONException, InterruptedException {
-		waitForProjectsPageLoaded();
-		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
-		waitForElementVisible(gpProject.getRoot());
-		projectId = gpProject.createProject("GoodSales-test", "", GOODSALES_TEMPLATE, authorizationToken, 240);
-		Screenshots.takeScreenshot(browser, "GoodSales-project-created", this.getClass());
-	}
-
-	@Test(dependsOnGroups = { "lastTest" }, alwaysRun = true)
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
+		projectTitle = "GoodSales-test";
+		projectTemplate = GOODSALES_TEMPLATE;
 	}
 }

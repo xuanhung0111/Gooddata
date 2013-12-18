@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene;
 
+import static org.testng.Assert.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import com.gooddata.qa.graphene.fragments.greypages.md.ValidateFragment;
-import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.testng.Arquillian;
@@ -17,7 +17,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
@@ -27,6 +26,8 @@ import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.ValidateFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
@@ -270,27 +271,27 @@ public abstract class AbstractTest extends Arquillian {
 		DashboardTabs tabs = dashboardsPage.getTabs();
 		int numberOfTabs = tabs.getNumberOfTabs();
 		System.out.println("Number of tabs for project: " + numberOfTabs);
-		if (validation) Assert.assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
+		if (validation) assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
 		List<String> tabLabels = tabs.getAllTabNames();
 		System.out.println("These tabs are available for selected project: " + tabLabels.toString());
 		for (int i = 0; i < tabLabels.size(); i++) {
-			if (validation) Assert.assertEquals(tabLabels.get(i), expectedTabLabels[i], "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
+			if (validation) assertEquals(tabLabels.get(i), expectedTabLabels[i], "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
 			tabs.openTab(i);
 			System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
 			waitForDashboardPageLoaded();
 			Screenshots.takeScreenshot(browser, "dashboards-tab-" + i + "-" + tabLabels.get(i), this.getClass());
-			Assert.assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
+			assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
 			checkRedBar();
 		}
 	}
 	
 	protected void checkRedBar() {
 		if (browser.findElements(BY_RED_BAR).size() != 0) {
-			Assert.fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
+			fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
 		}
 		//this kind of error appeared for the first time in geo chart
 		if (browser.findElements(BY_REPORT_ERROR).size() != 0 && browser.findElement(BY_REPORT_ERROR).isDisplayed()) {
-			Assert.fail("Report error APPEARED - " + browser.findElement(BY_REPORT_ERROR).getText());
+			fail("Report error APPEARED - " + browser.findElement(BY_REPORT_ERROR).getText());
 		}
 	}
 	
@@ -298,7 +299,7 @@ public abstract class AbstractTest extends Arquillian {
 		File pdfExport = new File(downloadFolder + "/" + dashboardName + ".pdf");
 		long fileSize = pdfExport.length();
 		System.out.println("File size: " + fileSize);
-		Assert.assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+		assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
 	}
 	
 	protected void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
@@ -306,7 +307,7 @@ public abstract class AbstractTest extends Arquillian {
 		File export = new File(fileURL);
 		long fileSize = export.length();
 		System.out.println("File size: " + fileSize);
-		Assert.assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+		assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
 		if (format == ExportFormat.IMAGE_PNG) {
 			browser.get("file://" + fileURL);
 			Screenshots.takeScreenshot(browser, "export-report-" + reportName, this.getClass());
@@ -357,7 +358,7 @@ public abstract class AbstractTest extends Arquillian {
 	
 	protected void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) throws InterruptedException {
 		initDashboardsPage();
-		Assert.assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
+		assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
 		waitForDashboardPageLoaded();
 		Thread.sleep(3000);
 		DashboardTabs tabs = dashboardsPage.getTabs();
@@ -366,15 +367,15 @@ public abstract class AbstractTest extends Arquillian {
 		waitForDashboardPageLoaded();
 		dashboardsPage.addNewTab(tabName);
 		checkRedBar();
-		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
-		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
-		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
+		assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present");
+		assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected");
+		assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label");
 		dashboardsPage.getDashboardEditBar().saveDashboard();
 		waitForDashboardPageLoaded();
 		waitForElementNotPresent(dashboardsPage.getDashboardEditBar().getRoot());
-		Assert.assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
-		Assert.assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
-		Assert.assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
+		assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
+		assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
+		assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
 		Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
 	}
 	
