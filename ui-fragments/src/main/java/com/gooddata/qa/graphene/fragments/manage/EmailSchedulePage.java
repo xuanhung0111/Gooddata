@@ -1,15 +1,15 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import java.util.List;
-
+import com.gooddata.qa.CssUtils;
+import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import java.util.List;
 
 public class EmailSchedulePage extends AbstractFragment {
 	
@@ -98,7 +98,18 @@ public class EmailSchedulePage extends AbstractFragment {
 		waitForElementNotVisible(scheduleDetail);
 		waitForElementVisible(schedulesTable);
 	}
-	
+
+	public String getScheduleMailUriByName(String scheduleName) {
+		waitForElementPresent(schedulesTable);
+
+		String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
+		WebElement aElement = schedulesTable.findElement(By.cssSelector(anchorSelector));
+		String hRef = aElement.getAttribute("href");
+
+		String[] hRefParts = hRef.split("\\|");
+		return hRefParts[hRefParts.length-1];
+	}
+
 	private void selectDashboard(String dashboardName) {
 		if (dashboardsList != null && dashboardsList.size() > 0) {
 			for (WebElement elem : dashboardsList) {
