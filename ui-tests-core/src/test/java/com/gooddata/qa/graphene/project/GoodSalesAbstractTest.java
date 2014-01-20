@@ -20,6 +20,6 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
 		startPage = "projects.html";
 		projectTitle = "GoodSales-test";
 		projectTemplate = GOODSALES_TEMPLATE;
-		projectCreateCheckIterations = 24;
+		projectCreateCheckIterations = 60; // 5 minutes
 	}
 }
