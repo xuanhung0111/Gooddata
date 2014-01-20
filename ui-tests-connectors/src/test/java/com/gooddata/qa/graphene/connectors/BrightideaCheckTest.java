@@ -5,12 +5,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.Connectors;
 
+import static org.testng.Assert.*;
 
 @Test(groups = { "connectors", "brightidea" }, description = "Checklist tests for Brightidea connector in GD platform")
 public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
@@ -71,7 +71,7 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		// process is scheduled automatically - check status
 		openUrl(getProcessesUri());
 		JSONObject json = loadJSON();
-		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
+		assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
 		waitForElementVisible(BY_GP_LINK);
 		Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
 		waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);

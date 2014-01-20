@@ -5,12 +5,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
+
+import static org.testng.Assert.*;
 
 @Test(groups = { "connectors", "coupa" }, description = "Checklist tests for Coupa connector in GD platform")
 public class CoupaCheckTest extends AbstractConnectorsCheckTest {
@@ -64,7 +65,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		Graphene.waitGui().until().element(BY_INPUT_TIMEZONE).value().equalTo(COUPA_INTEGRATION_TIMEZONE);
 		Graphene.guardHttp(waitForElementVisible(BY_GP_LINK_INSTANCES)).click();
 		JSONObject json = loadJSON();
-		Assert.assertTrue(json.getJSONObject("coupaInstances").getJSONArray("items").length() == 0, "There are no coupa instances for new project yet");
+		assertTrue(json.getJSONObject("coupaInstances").getJSONArray("items").length() == 0, "There are no coupa instances for new project yet");
 		
 		// create coupa instance
 		waitForElementPresent(coupaInstance.getRoot());

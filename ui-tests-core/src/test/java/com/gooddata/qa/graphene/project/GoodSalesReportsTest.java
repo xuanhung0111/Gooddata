@@ -3,12 +3,13 @@ package com.gooddata.qa.graphene.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
+import static org.testng.Assert.*;
 
 @Test(groups = { "GoodSalesReports" }, description = "Tests for GoodSales project (reports functionality) in GD platform")
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {
@@ -26,8 +27,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	@Test(dependsOnMethods = { "createProject" })
 	public void verifyReportsPage() throws InterruptedException {
 		initReportsPage();
-		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount, "Number of expected reports doesn't match");
-		Assert.assertEquals(reportsPage.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount, "Number of expected report custom folders doesn't match");
+		assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount, "Number of expected reports doesn't match");
+		assertEquals(reportsPage.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount, "Number of expected report custom folders doesn't match");
 		Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
 	}
 	
@@ -194,18 +195,18 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 		prepareReport("Simple stacked bar chart report", ReportTypes.STACKED_BAR, what, how);
 	}
 	
-	@Test(dependsOnGroups = { "goodsales-chart", "chart-exports", "tabular-report-exports" }, groups = { "lastTest" })
+	@Test(dependsOnGroups = { "goodsales-chart", "chart-exports", "tabular-report-exports" }, groups = { "tests" })
 	public void verifyCreatedReports() throws InterruptedException {
 		initReportsPage();
 		selectReportsDomainFolder("My Reports");
 		waitForReportsPageLoaded();
 		Thread.sleep(5000);
-		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
+		assertEquals(reportsPage.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
 		Screenshots.takeScreenshot(browser, "GoodSales-new-reports", this.getClass());
 		selectReportsDomainFolder("All");
 		waitForReportsPageLoaded();
 		Thread.sleep(5000);
-		Assert.assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
+		assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
 		successfulTest = true;
 	}
 	
@@ -215,7 +216,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 		reportsPage.startCreateReport();
 		waitForAnalysisPageLoaded();
 		waitForElementVisible(reportPage.getRoot());
-		Assert.assertNotNull(reportPage, "Report page not initialized!");
+		assertNotNull(reportPage, "Report page not initialized!");
 		reportPage.createReport(reportName, reportType, what, how);
 		Screenshots.takeScreenshot(browser, "GoodSales-" + reportName + "-" + reportType.getName(), this.getClass());
 		createdReportsCount++;
@@ -224,7 +225,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	private void selectReportsDomainFolder(String folderName) {
 		reportsPage.getDefaultFolders().openFolder(folderName);
 		waitForReportsPageLoaded();
-		Assert.assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " + reportsPage.getSelectedFolderName());
+		assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " + reportsPage.getSelectedFolderName());
 	}
 	
 	private void initReportPage(String reportName) {

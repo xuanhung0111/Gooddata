@@ -7,15 +7,16 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
+import com.gooddata.qa.graphene.project.AbstractProjectTest;
 
-public abstract class AbstractConnectorsCheckTest extends AbstractTest {
+import static org.testng.Assert.*;
+
+public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 	
 	protected static final String PAGE_GDC_CONNECTORS = "gdc/projects/${projectId}/connectors";
 	
@@ -40,17 +41,11 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
 	@BeforeClass
 	public void initStartPage() {
 		startPage = "gdc";
+		projectTitle = connectorType.getName() + "CheckConnector";
+		projectTemplate = connectorType.getTemplate();
 	}
 	
 	/** ------------- Shared test methods ----------- */
-	
-	@Test(groups = {"connectorInit"})
-    public void createProject() throws JSONException, InterruptedException {
-        // sign in with demo user
-        validSignInWithDemoUser(true);
-        // create connector project
-        initProject(connectorType.getName() + "CheckConnector", projectCheckLimit);
-    }
 	
 	@Test(groups = {"connectorInit"}, dependsOnMethods = {"createProject"})
     public void createIntegration() throws JSONException, InterruptedException {
@@ -91,7 +86,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
         }
 	}
 
-    @Test(dependsOnMethods = { "disableConnectorIntegration" }, alwaysRun = true)
+    @Test(dependsOnMethods = { "disableConnectorIntegration" }, groups = { "tests" }, alwaysRun = true)
     public void deleteConnectorIntegration() throws JSONException {
         if (integrationActivated) {
         	openUrl(getIntegrationUri());
@@ -119,26 +114,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
         }
     }
     
-    /** TODO ATP-945
-    @Test(dependsOnMethods = { "deleteConnectorIntegration"}, alwaysRun = true)
-	public void validateConnectorProjectEnd() throws JSONException {
-		Assert.assertEquals(validateProject(), "OK", "Validation issue appeared in the end of test");
-	}
-	*/
-    
-    @Test(dependsOnMethods = { "deleteConnectorIntegration"}, alwaysRun = true)
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
-	}
-	
-	/** ------------------------ */
-	
-	public void initProject(String projectTitle, int checkIterations) throws JSONException, InterruptedException {
-		openUrl(PAGE_GDC_PROJECTS);
-		waitForElementVisible(gpProject.getRoot());
-		projectId = gpProject.createProject(projectTitle, "", connectorType.getTemplate(), authorizationToken, projectCheckLimit);
-		System.out.println("Project with ID enabled: " + projectId);
-	}
+    /** ------------------------ */
 	
 	public void initIntegration() throws JSONException, InterruptedException {
 		openUrl(getConnectorUri());
@@ -158,7 +134,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
 	protected void scheduleIntegrationProcess(int checkIterations) throws JSONException, InterruptedException {
 		openUrl(getProcessesUri());
 		JSONObject json = loadJSON();
-		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 0, "There are no processes for new project yet");
+		assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 0, "There are no processes for new project yet");
 		Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
 		
 		waitForIntegrationProcessSynchronized(browser, checkIterations);
@@ -171,18 +147,18 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
 		String status = getProcessStatus(browser);
 		while (!"SYNCHRONIZED".equals(status) && i < checkIterations) {
 			System.out.println("Current process status is: " + status);
-			Assert.assertNotEquals(status, "ERROR", "Error status appeared");
+			assertNotEquals(status, "ERROR", "Error status appeared");
 			Thread.sleep(5000);
 			browser.get(processUrl);
 			status = getProcessStatus(browser);
 			i++;
 		}
-		Assert.assertEquals(status, "SYNCHRONIZED", "Process is synchronized");
+		assertEquals(status, "SYNCHRONIZED", "Process is synchronized");
 		System.out.println("Integration was synchronized at +- " + (i * 5) + "seconds");
 		// may not be correct since another integration process can be scheduled automatically...
 		browser.get(getRootUrl() + getProcessesUri());
 		JSONObject json = loadJSON();
-		Assert.assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "There is one finished process");
+		assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "There is one finished process");
 	}
 	
 	private String getProcessStatus(WebDriver browser) throws JSONException {
@@ -204,49 +180,49 @@ public abstract class AbstractConnectorsCheckTest extends AbstractTest {
 	
 	protected void verifyConnectorResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
-        Assert.assertTrue(json.has("connector"), "connector object is missing");
+        assertTrue(json.has("connector"), "connector object is missing");
 
         JSONObject connector = json.getJSONObject("connector");
-        Assert.assertEquals(connector.getString("connectorId"), connectorType.getConnectorId(), "connectorId");
-        Assert.assertTrue(connector.has("links"), "links object is missing");
+        assertEquals(connector.getString("connectorId"), connectorType.getConnectorId(), "connectorId");
+        assertTrue(connector.has("links"), "links object is missing");
 
         JSONObject links = connector.getJSONObject("links");
-        Assert.assertEquals(links.getString("integration"), "/" + getIntegrationUri(), "integration link");
+        assertEquals(links.getString("integration"), "/" + getIntegrationUri(), "integration link");
     }
 
 	protected void verifyIntegrationResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
-        Assert.assertTrue(json.has("integration"), "integration object is missing");
+        assertTrue(json.has("integration"), "integration object is missing");
 
         JSONObject integration = json.getJSONObject("integration");
-        Assert.assertEquals(integration.getBoolean("active"), true, "active integration");
-        Assert.assertEquals(integration.getString("projectTemplate"), connectorType.getTemplate(), "project template");
-        Assert.assertTrue(integration.has("lastFinishedProcess"), "lastFinishedProcess key is missing");
-        Assert.assertTrue(integration.has("lastSuccessfulProcess"), "lastSuccessfulProcess key is missing");
-        Assert.assertTrue(integration.has("runningProcess"), "runningProcess key is missing");
-        Assert.assertTrue(integration.has("links"), "links object is missing");
+        assertEquals(integration.getBoolean("active"), true, "active integration");
+        assertEquals(integration.getString("projectTemplate"), connectorType.getTemplate(), "project template");
+        assertTrue(integration.has("lastFinishedProcess"), "lastFinishedProcess key is missing");
+        assertTrue(integration.has("lastSuccessfulProcess"), "lastSuccessfulProcess key is missing");
+        assertTrue(integration.has("runningProcess"), "runningProcess key is missing");
+        assertTrue(integration.has("links"), "links object is missing");
 
         JSONObject links = integration.getJSONObject("links");
-        Assert.assertEquals(links.getString("self"), "/" + getIntegrationUri(), "self link");
-        Assert.assertEquals(links.getString("processes"), "/" + getProcessesUri(), "processes link");
+        assertEquals(links.getString("self"), "/" + getIntegrationUri(), "self link");
+        assertEquals(links.getString("processes"), "/" + getProcessesUri(), "processes link");
     }
 	
 	protected void verifyProcessesResourceJSON() throws JSONException {
         JSONObject json = loadJSON();
-        Assert.assertTrue(json.has("processes"), "processes object is missing");
+        assertTrue(json.has("processes"), "processes object is missing");
 
         JSONObject processes = json.getJSONObject("processes");
-        Assert.assertTrue(processes.has("items"), "items array is missing");
+        assertTrue(processes.has("items"), "items array is missing");
         JSONArray items = processes.getJSONArray("items");
-        Assert.assertTrue(items.length() > 0, "at least one process should exist");
-        Assert.assertTrue(items.getJSONObject(0).has("process"), "process object is missing");
+        assertTrue(items.length() > 0, "at least one process should exist");
+        assertTrue(items.getJSONObject(0).has("process"), "process object is missing");
 
         JSONObject process = items.getJSONObject(0).getJSONObject("process");
-        Assert.assertTrue(process.has("started"), "started key is missing");
-        Assert.assertTrue(process.has("finished"), "finished key is missing");
-        Assert.assertTrue(process.getJSONObject("status").has("detail"), "detail key is missing");
-        Assert.assertTrue(process.getJSONObject("status").has("description"), "description key is missing");
-        Assert.assertTrue(process.getJSONObject("status").has("code"), "status code is missing");
-        Assert.assertTrue(process.getJSONObject("links").getString("self").startsWith("/" + getProcessesUri()), "self link is incorrect");
+        assertTrue(process.has("started"), "started key is missing");
+        assertTrue(process.has("finished"), "finished key is missing");
+        assertTrue(process.getJSONObject("status").has("detail"), "detail key is missing");
+        assertTrue(process.getJSONObject("status").has("description"), "description key is missing");
+        assertTrue(process.getJSONObject("status").has("code"), "status code is missing");
+        assertTrue(process.getJSONObject("links").getString("self").startsWith("/" + getProcessesUri()), "self link is incorrect");
     }
 }

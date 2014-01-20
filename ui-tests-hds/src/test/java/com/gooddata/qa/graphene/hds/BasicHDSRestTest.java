@@ -7,14 +7,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 @Test(groups = { "hds" }, description = "Basic verification of hds restapi in GD platform")
 public class BasicHDSRestTest extends AbstractHDSTest {
@@ -331,33 +329,33 @@ public class BasicHDSRestTest extends AbstractHDSTest {
     private void invalidUpdateOfStorage(String title, String description, String expectedErrorMessage) throws JSONException {
 		openStorageUrl();
 		waitForElementVisible(storageForm.getRoot());
-		Assert.assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
+		assertTrue(storageForm.verifyValidEditStorageForm(STORAGE_TITLE, STORAGE_DESCRIPTION), "Edit form doesn't contain current values");
 		storageForm.updateStorage(title, description);
 		verifyErrorMessage(expectedErrorMessage, storageUrl);
 	}
 	
 	private void verifyErrorMessage(String messageSubstring, String expectedPage) throws JSONException {
-		Assert.assertTrue(browser.getCurrentUrl().endsWith(expectedPage), "Browser was redirected at another page");
+		assertTrue(browser.getCurrentUrl().endsWith(expectedPage), "Browser was redirected at another page");
 		JSONObject json = loadJSON();
 		String errorMessage = json.getJSONObject("error").getString("message");
-		Assert.assertTrue(errorMessage.contains(messageSubstring), "Another error message present: " + errorMessage + ", expected message substring: " + messageSubstring);
+		assertTrue(errorMessage.contains(messageSubstring), "Another error message present: " + errorMessage + ", expected message substring: " + messageSubstring);
 	}
 	
 	private void verifyStoragesResourceJSON() throws JSONException {
 		JSONObject json = loadJSON();
-		Assert.assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
+		assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
 		JSONArray storagesItems = json.getJSONObject("storages").getJSONArray("items");
 		if (storagesItems.length() > 0) {
 			JSONObject firstStorage = storagesItems.getJSONObject(0).getJSONObject("storage");
-			Assert.assertTrue(firstStorage.has("title"), "Storage title isn't present");
-			Assert.assertTrue(firstStorage.has("description"), "Storage description isn't present");
-			Assert.assertTrue(firstStorage.has("authorizationToken"), "Storage authorizationToken isn't present");
-			Assert.assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
-			Assert.assertTrue(firstStorage.getJSONObject("links").has("self"), "Storage self link isn't present");
-			Assert.assertTrue(firstStorage.getJSONObject("links").has("users"), "Storage users link isn't present");
-			Assert.assertTrue(firstStorage.has("status"), "Storage status isn't present");
+			assertTrue(firstStorage.has("title"), "Storage title isn't present");
+			assertTrue(firstStorage.has("description"), "Storage description isn't present");
+			assertTrue(firstStorage.has("authorizationToken"), "Storage authorizationToken isn't present");
+			assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
+			assertTrue(firstStorage.getJSONObject("links").has("self"), "Storage self link isn't present");
+			assertTrue(firstStorage.getJSONObject("links").has("users"), "Storage users link isn't present");
+			assertTrue(firstStorage.has("status"), "Storage status isn't present");
 		}
-		Assert.assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("parent").endsWith("gdc"), "Parent link doesn't match");
-		Assert.assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("self").substring(1).equals(PAGE_GDC_STORAGES), "Storages self link doesn't match");
+		assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("parent").endsWith("gdc"), "Parent link doesn't match");
+		assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("self").substring(1).equals(PAGE_GDC_STORAGES), "Storages self link doesn't match");
 	}
 }

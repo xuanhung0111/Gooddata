@@ -4,11 +4,12 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.Connectors;
+
+import static org.testng.Assert.*;
 
 @Test(groups = { "connectors", "zendesk3" }, description = "Checklist tests for Zendesk3 connector in GD platform")
 public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
@@ -43,7 +44,7 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		waitForElementPresent(BY_INPUT_API_URL).sendKeys(zendesk3ApiUrl);
 		Graphene.guardHttp(waitForElementPresent(BY_GP_BUTTON_SUBMIT)).click();
 		JSONObject json = loadJSON();
-		Assert.assertEquals(json.getJSONObject("settings").getString("apiUrl"), zendesk3ApiUrl, "Zendesk3 API URL was not set to expected value");
+		assertEquals(json.getJSONObject("settings").getString("apiUrl"), zendesk3ApiUrl, "Zendesk3 API URL was not set to expected value");
 	}
 	
 	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testZendesk3IntegrationConfiguration" })

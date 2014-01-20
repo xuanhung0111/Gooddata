@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.project;
 
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -10,8 +9,10 @@ import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.AttributesTable;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
+import static org.testng.Assert.*;
+
 @Test(groups = { "projectSimpleGeo" }, description = "Tests for geo charts on simple project in GD platform")
-public class SimpleProjectGeoChartsTest extends SimpleProjectAbstractTest {
+public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
 	
 	private String csvFilePath;
 	
@@ -45,7 +46,7 @@ public class SimpleProjectGeoChartsTest extends SimpleProjectAbstractTest {
 		addNewTabOnDashboard("Default dashboard", "geochart-pins", "simple-geo-2");
 	}
 	
-	@Test(dependsOnMethods = { "addNewTabs" }, groups = { "geo-charts", "simpleTests" })
+	@Test(dependsOnMethods = { "addNewTabs" }, groups = { "geo-charts", "tests" })
 	public void addGeoWidgetsOnTab() throws InterruptedException {
 		addGeoWidgetOnTab(2, "Sum of amount");
 		logout();
@@ -61,10 +62,10 @@ public class SimpleProjectGeoChartsTest extends SimpleProjectAbstractTest {
 		attributesTable.selectAttribute(attributeName);
 		waitForElementVisible(attributeDetailPage.getRoot());
 		waitForObjectPageLoaded();
-		Assert.assertEquals(attributeDetailPage.getAttributeName(), attributeName, "Invalid attribute name on detail page");
+		assertEquals(attributeDetailPage.getAttributeName(), attributeName, "Invalid attribute name on detail page");
 		attributeDetailPage.selectLabelType(attributeLabelType);
 		Thread.sleep(2000);
-		Assert.assertEquals(attributeDetailPage.getAttributeLabelType(), attributeLabelType, "Label type not set properly");
+		assertEquals(attributeDetailPage.getAttributeLabelType(), attributeLabelType, "Label type not set properly");
 	}
 	
 	private void addGeoWidgetOnTab(int tabIndex, String metric) throws InterruptedException {
