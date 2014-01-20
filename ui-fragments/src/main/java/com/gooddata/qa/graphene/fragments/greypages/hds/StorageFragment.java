@@ -94,7 +94,8 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 	private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
 		String executionUrl = browser.getCurrentUrl();
 		System.out.println("Related execution URL is " + executionUrl);
-		Assert.assertTrue(executionUrl.contains("executions"), "Storage creation didn't redirect to /executions/* page");
+		Assert.assertTrue(executionUrl.contains("executions"),
+                String.format("Storage creation didn't redirect to /executions/* page but to %s instead", executionUrl));
 		int i = 0;
 		boolean asyncTaskPoll = isAsyncTaskPoll();
 		while (asyncTaskPoll && i < checkIterations) {

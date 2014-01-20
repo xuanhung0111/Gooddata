@@ -17,6 +17,9 @@ public class StorageUsersFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement profile;
 
+    @FindBy
+    private WebElement login;
+
     @FindBy(xpath="div[@class='submit']/input")
     private WebElement submit;
 
@@ -27,7 +30,19 @@ public class StorageUsersFragment extends AbstractGreyPagesFragment {
         waitForElementVisible(submit);
     }
 
-    public void fillAddUserToStorageForm(final String role, final String profileUri) {
+    public void fillAddUserToStorageForm(final String role, final String profileUri, final String login) {
+        waitForElementVisible(this.role);
+        waitForElementVisible(this.profile);
+        waitForElementVisible(this.login);
+        waitForElementVisible(this.submit);
+
+        if(!isEmpty(role)) this.role.selectByValue(role);
+        if(!isEmpty(profileUri)) this.profile.sendKeys(profileUri);
+        if(!isEmpty(login)) this.login.sendKeys(login);
+        Graphene.guardHttp(submit).click();
+    }
+
+    public void fillUpdateUserForm(final String role, final String profileUri) {
         waitForElementVisible(this.role);
         waitForElementVisible(this.profile);
         waitForElementVisible(this.submit);
