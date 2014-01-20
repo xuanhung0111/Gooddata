@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.project;
 
 import org.testng.annotations.BeforeClass;
 
+import com.gooddata.qa.graphene.AbstractProjectTest;
+
 public class GoodSalesAbstractTest extends AbstractProjectTest {
 	
 	protected static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";

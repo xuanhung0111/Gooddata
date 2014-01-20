@@ -7,6 +7,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardReportOneNumber;
 import com.gooddata.qa.utils.graphene.Screenshots;
