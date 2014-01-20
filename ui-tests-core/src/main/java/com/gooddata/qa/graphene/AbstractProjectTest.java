@@ -1,11 +1,10 @@
-package com.gooddata.qa.graphene.project;
+package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;

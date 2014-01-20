@@ -10,9 +10,9 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
-import com.gooddata.qa.graphene.project.AbstractProjectTest;
 
 import static org.testng.Assert.*;
 
