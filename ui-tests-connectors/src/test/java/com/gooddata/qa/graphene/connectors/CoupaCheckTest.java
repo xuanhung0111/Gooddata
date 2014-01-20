@@ -32,7 +32,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 	
 	@BeforeClass
 	public void setCheckLimits() {
-		projectCheckLimit = 120;
+		projectCreateCheckIterations = 120;
 		integrationProcessCheckLimit = 720;
 	}
 	

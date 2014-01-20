@@ -13,6 +13,7 @@ public abstract class AbstractProjectTest extends AbstractTest {
 	
 	protected String projectTitle = "simple-project";
 	protected String projectTemplate = "";
+	protected int projectCreateCheckIterations = 12; // (12*5s = 1 minute)
 	
 	@BeforeClass
 	public void initStartPage() {
@@ -30,7 +31,7 @@ public abstract class AbstractProjectTest extends AbstractTest {
 		waitForProjectsPageLoaded();
 		openUrl(PAGE_GDC_PROJECTS);
 		waitForElementVisible(gpProject.getRoot());
-		projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, 12);
+		projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, projectCreateCheckIterations);
 		Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
 	}
 	
