@@ -19,7 +19,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 	
 	@BeforeClass
 	public void setCheckLimits() {
-		projectCheckLimit = 120;
+		projectCreateCheckIterations = 120;
 		integrationProcessCheckLimit = 240;
 	}
 	
