@@ -32,12 +32,6 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 	private static final By BY_SPAN_SYNCHRONIZATION_PROGRESS = By.xpath("//span[text()='Almost There!']");
 	
 	@BeforeClass
-	public void setCheckLimits() {
-		projectCreateCheckIterations = 120;
-		integrationProcessCheckLimit = 720;
-	}
-	
-	@BeforeClass
 	public void loadRequiredProperties() {
 		brightideaApiKey = loadProperty("connectors.brightidea.apiKey");
 		brightideaAffiliateId = loadProperty("connectors.brightidea.affiliateId");
@@ -47,6 +41,9 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		expectedDashboardTabs = new String[]{
 			"WebStorms", "Ideas", "Users", "Switchboard", "Pipeline", "Headlines", "Learn More"
 		};
+		
+		projectCreateCheckIterations = 120;
+		integrationProcessCheckLimit = 720;
 	}
 	
 	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })

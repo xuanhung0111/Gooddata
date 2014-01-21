@@ -32,12 +32,6 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 	private static final By BY_DIV_SYNCHRONIZATION_PROGRESS = By.xpath("//div[@class='connectorHeader']/span[text()='Please be patient, your data is now being loaded.']");
 	
 	@BeforeClass
-	public void setCheckLimits() {
-		projectCreateCheckIterations = 120;
-		integrationProcessCheckLimit = 720;
-	}
-	
-	@BeforeClass
 	public void loadRequiredProperties() {
 		googleAnalyticsUser = loadProperty("connectors.googleAnalytics.user");
 		googleAnalyticsUserPassword = loadProperty("connectors.googleAnalytics.userPassword");
@@ -47,6 +41,9 @@ public class GoogleAnalyticsCheckTest extends AbstractConnectorsCheckTest {
 		expectedDashboardTabs = new String[]{
 				"Summaries", "Content", "Campaigns", "Browsers"
 		};
+		
+		projectCreateCheckIterations = 120;
+		integrationProcessCheckLimit = 720;
 	}
 	
 	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })

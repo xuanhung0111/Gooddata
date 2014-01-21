@@ -23,12 +23,12 @@ public abstract class AbstractProjectTest extends AbstractTest {
 	@Test(groups = { "projectInit" } )
 	public void init() throws JSONException {
 		// sign in with demo user
+		openUrl(PAGE_LOGIN);
 		signInAtUI(user, password);
 	}
 	
 	@Test(dependsOnGroups = { "projectInit" }, groups = { "tests" })
 	public void createProject() throws JSONException, InterruptedException {
-		waitForProjectsPageLoaded();
 		openUrl(PAGE_GDC_PROJECTS);
 		waitForElementVisible(gpProject.getRoot());
 		projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, projectCreateCheckIterations);

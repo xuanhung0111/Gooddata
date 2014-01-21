@@ -18,12 +18,6 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 	protected String pardotUploadUserPassword;
 	
 	@BeforeClass
-	public void setCheckLimits() {
-		projectCreateCheckIterations = 120;
-		integrationProcessCheckLimit = 240;
-	}
-	
-	@BeforeClass
 	public void loadRequiredProperties() {
 		pardotAccountId = loadProperty("connectors.pardot.accountId");
 		pardotUploadUser = loadProperty("connectors.pardot.uploadUser");
@@ -32,6 +26,9 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		expectedDashboardTabs = new String[]{
 				"Marketing KPIs", "Contribution", "Prospects", "Opportunities", "and more"
 		};
+		
+		projectCreateCheckIterations = 120;
+		integrationProcessCheckLimit = 240;
 	}
 	
 	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
@@ -56,4 +53,12 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		// process schedule
 		scheduleIntegrationProcess(integrationProcessCheckLimit);
 	}
+	
+	@Override
+    @Test(dependsOnMethods = {"tests"})
+    public void validateProjectAfterTests() {
+        // TODO validations temporarily disabled on selected connectors - ATP-945
+		System.out.println("Validation for Pardot skipped - ATP-945");
+    }
+	
 }
