@@ -19,7 +19,8 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	private String storageUrl;
 	private String userCreatedByUrl;
-	
+	private String userCreatedById;
+
 	private String testUserId;
     private String testUserLogin;
 	
@@ -117,6 +118,8 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
 		assertTrue(storage.getString("status").equals("ENABLED"), "Storage isn't enabled");
 		userCreatedByUrl = storage.getString("createdBy");
+		userCreatedById = userCreatedByUrl.substring(userCreatedByUrl.lastIndexOf("/") + 1);
+
 		String updatedByUrl = storage.getString("updatedBy");
 		assertEquals(updatedByUrl, userCreatedByUrl, "Storage createdBy and updatedBy attributes do not match");
 		assertTrue(storage.has("created"), "Created time not present");
@@ -300,7 +303,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
     @Test(dependsOnMethods = { "verifyStorage" })
 	public void addExistingUserToStorage() throws JSONException {
-        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedByUrl + "' already exists in storage '");
+        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedById + "' already exists in storage '");
 	}
     
     // TODO add next invalid cases when permissions are implemented
