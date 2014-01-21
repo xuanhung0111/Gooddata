@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Part;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -41,11 +42,15 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
 	private String reportTitle = "UI-Graphene-core-Report";
 	private String dashboardTitle = "UI-Graphene-core-Dashboard";
 
+	private File attachmentsDirectory;
+
 	@BeforeClass
 	public void setUp() throws Exception {
 		String identification = ": " + host + " - " + testIdentification;
 		reportTitle = reportTitle + identification;
 		dashboardTitle = dashboardTitle + identification;
+
+		attachmentsDirectory = new File(System.getProperty("maven.project.build.directory", "./target/attachments"));
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedules" })
@@ -139,20 +144,27 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
 		assertEquals(reportAttachmentParts.size(), 3, "Expected 3 attachments for report");
 
 		Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
-		assertTrue(pdfPart.getSize() > 32000, "PDF is at least 32kB");
+		assertTrue(pdfPart.getSize() > 32000, "PDF is greater than 32kB");
 
 		Part xlsPart = findPartByContentType(reportAttachmentParts, "application/vnd.ms-excel");
-		assertTrue(xlsPart.getSize() > 7700, "XLS is at least 7.7kB");
+		assertTrue(xlsPart.getSize() > 7700, "XLS is greater than 7.7kB");
 
 		Part csvPart = findPartByContentType(reportAttachmentParts, "text/csv");
-		assertTrue(csvPart.getSize() > 120, "XLS is at least 120B");
+		assertTrue(csvPart.getSize() > 120, "CSV is greater than 120B");
+
+		System.out.println("Saving report messages ...");
+		ImapClient.saveMessageAttachments(reportMessages[0], attachmentsDirectory);
+
 
 		// DASHBOARD EXPORT
 		List<Part> dashboardAttachmentParts = ImapClient.getAttachmentParts(dashboardMessages[0]);
 		assertEquals(dashboardAttachmentParts.size(), 1, "Expected 1 attachment for dashboard");
 		assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
 				"Dashboard attachment has PDF content type");
-		assertTrue(dashboardAttachmentParts.get(0).getSize() > 96000, "PDF is at least 96kB");
+		assertTrue(dashboardAttachmentParts.get(0).getSize() > 67000, "PDF is greater than 67kB");
+
+		System.out.println("Saving dashboard message ...");
+		ImapClient.saveMessageAttachments(dashboardMessages[0], attachmentsDirectory);
 	}
 
 	private Part findPartByContentType(List<Part> parts, String contentType) throws MessagingException {
