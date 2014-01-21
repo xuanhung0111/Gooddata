@@ -55,7 +55,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 	}
 	
 	@Override
-    @Test(dependsOnMethods = {"tests"})
+    @Test(dependsOnGroups = {"tests"})
     public void validateProjectAfterTests() {
         // TODO validations temporarily disabled on selected connectors - ATP-945
 		System.out.println("Validation for Pardot skipped - ATP-945");
