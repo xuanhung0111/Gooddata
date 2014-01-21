@@ -26,7 +26,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	private static final String STORAGE_TITLE = "HDS storage";
 	private static final String STORAGE_DESCRIPTION = "HDS description";
-	private static final String STORAGE_COPY_OF = "/gdc/storages/${storageId}";
+	private static final String STORAGE_COPY_OF = "/gdc/dss/instances/${storageId}";
 
     private static final String NEW_USER_ROLE = "dataAdmin";
     private static final String NEW_USER_UPDATED_ROLE = "admin";
@@ -56,7 +56,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		
 		loadPlatformPageBeforeTestMethod();
 		JSONObject json = loadJSON();
-		assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
+		assertTrue(json.getJSONObject("dssInstances").has("items"), "DSS instances with items array is not available");
 		takeScreenshot(browser, "hds-base-resource", this.getClass());
 	}
 	
@@ -69,7 +69,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	public void hdsResourceLinkNotAvailableAtBasicResource() {
 		openUrl(PAGE_GDC);
 		assertEquals(browser.getTitle(), "GoodData API root");
-		assertTrue(browser.findElements(By.partialLinkText("storages")).size() == 0, "Storages link is present at basic /gdc resource");
+		assertTrue(browser.findElements(By.partialLinkText("dssInstances")).size() == 0, "DSS instances link is present at basic /gdc resource");
 	}
 	
 	@Test(dependsOnGroups = {"hdsInit"})
@@ -108,26 +108,26 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		openStorageUrl();
 		takeScreenshot(browser, "hds-simple-storage", this.getClass());
 		JSONObject json = loadJSON();
-		assertTrue(json.has("storage"), "Storage element isn't present");
-		JSONObject storage = json.getJSONObject("storage");
-		assertTrue(storage.getString("title").equals(STORAGE_TITLE), "Storage title doesn't match");
-		assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "Storage description doesn't match");
-		assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "Storage authorizationToken doesn't match");
-		assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
-		assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "Storage self link doesn't match");
-		assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "Storage users link doesn't match");
-		assertTrue(storage.getString("status").equals("ENABLED"), "Storage isn't enabled");
+		assertTrue(json.has("dssInstance"), "DSS instance element isn't present");
+		JSONObject storage = json.getJSONObject("dssInstance");
+		assertTrue(storage.getString("title").equals(STORAGE_TITLE), "DSS instance title doesn't match");
+		assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "DSS instance description doesn't match");
+		assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "DSS instance authorizationToken doesn't match");
+		assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "DSS instance parent link doesn't match");
+		assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "DSS instance self link doesn't match");
+		assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "DSS instance users link doesn't match");
+		assertTrue(storage.getString("status").equals("ENABLED"), "DSS instance isn't enabled");
 		userCreatedByUrl = storage.getString("createdBy");
 		userCreatedById = userCreatedByUrl.substring(userCreatedByUrl.lastIndexOf("/") + 1);
 
 		String updatedByUrl = storage.getString("updatedBy");
-		assertEquals(updatedByUrl, userCreatedByUrl, "Storage createdBy and updatedBy attributes do not match");
+		assertEquals(updatedByUrl, userCreatedByUrl, "DSS instance createdBy and updatedBy attributes do not match");
 		assertTrue(storage.has("created"), "Created time not present");
 		assertTrue(storage.has("updated"), "Updated time not present");
 		browser.get(getBasicRootUrl() + getStorageUsersUrl());
 		JSONObject jsonUsers = loadJSON();
-		assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("parent").equals(storageUrl), "Storage users parent link doesn't match");
-		assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("self").equals(storageUrl + "/users"), "Storage users self link doesn't match");
+		assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("parent").equals(storageUrl), "DSS instance users parent link doesn't match");
+		assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("self").equals(storageUrl + "/users"), "DSS instance users self link doesn't match");
 		assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").length() == 1, "Number of users doesn't match");
 		assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").getJSONObject(0).getJSONObject("user").getString("profile").equals(userCreatedByUrl), "Creator in users doesn't match with creator in storage");
 		browser.get(getBasicRootUrl() + userCreatedByUrl);
@@ -381,19 +381,19 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	private void verifyStoragesResourceJSON() throws JSONException {
 		JSONObject json = loadJSON();
-		assertTrue(json.getJSONObject("storages").has("items"), "storages with items array is not available");
-		JSONArray storagesItems = json.getJSONObject("storages").getJSONArray("items");
+		assertTrue(json.getJSONObject("dssInstances").has("items"), "DSS instances with items array is not available");
+		JSONArray storagesItems = json.getJSONObject("dssInstances").getJSONArray("items");
 		if (storagesItems.length() > 0) {
-			JSONObject firstStorage = storagesItems.getJSONObject(0).getJSONObject("storage");
-			assertTrue(firstStorage.has("title"), "Storage title isn't present");
-			assertTrue(firstStorage.has("description"), "Storage description isn't present");
-			assertTrue(firstStorage.has("authorizationToken"), "Storage authorizationToken isn't present");
-			assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "Storage parent link doesn't match");
-			assertTrue(firstStorage.getJSONObject("links").has("self"), "Storage self link isn't present");
-			assertTrue(firstStorage.getJSONObject("links").has("users"), "Storage users link isn't present");
-			assertTrue(firstStorage.has("status"), "Storage status isn't present");
+			JSONObject firstStorage = storagesItems.getJSONObject(0).getJSONObject("dssInstance");
+			assertTrue(firstStorage.has("title"), "DSS instance title isn't present");
+			assertTrue(firstStorage.has("description"), "DSS instance description isn't present");
+			assertTrue(firstStorage.has("authorizationToken"), "DSS instance authorizationToken isn't present");
+			assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "DSS instance parent link doesn't match");
+			assertTrue(firstStorage.getJSONObject("links").has("self"), "DSS instance self link isn't present");
+			assertTrue(firstStorage.getJSONObject("links").has("users"), "DSS instance users link isn't present");
+			assertTrue(firstStorage.has("status"), "DSS instance status isn't present");
 		}
-		assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("parent").endsWith("gdc"), "Parent link doesn't match");
-		assertTrue(json.getJSONObject("storages").getJSONObject("links").getString("self").substring(1).equals(PAGE_GDC_STORAGES), "Storages self link doesn't match");
+		assertTrue(json.getJSONObject("dssInstances").getJSONObject("links").getString("parent").endsWith("gdc"), "Parent link doesn't match");
+		assertTrue(json.getJSONObject("dssInstances").getJSONObject("links").getString("self").substring(1).equals(PAGE_GDC_STORAGES), "DSS instances self link doesn't match");
 	}
 }

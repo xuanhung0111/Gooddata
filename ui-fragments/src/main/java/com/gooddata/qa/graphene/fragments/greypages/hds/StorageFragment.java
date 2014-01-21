@@ -88,7 +88,7 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 	public void deleteStorage() {
 		Graphene.guardHttp(waitForElementVisible(submit)).click();
 		waitForElementVisible(BY_BUTTON_CREATE);
-		Assert.assertTrue(browser.getCurrentUrl().endsWith("/storages"), "Browser wasn't redirected to storages page");
+		Assert.assertTrue(browser.getCurrentUrl().endsWith("/dss/instances"), "Browser wasn't redirected to storages page");
 	}
 	
 	private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
@@ -106,7 +106,7 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 			i++;
 		}
 		JSONObject json = loadJSON();
-		String storageUrl = json.getJSONObject("asyncTask").getJSONObject("links").getString("storage");
+		String storageUrl = json.getJSONObject("asyncTask").getJSONObject("links").getString("dssInstance");
 		System.out.println("Created storage on URL " + storageUrl);
 		return storageUrl;
 	}
