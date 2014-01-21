@@ -9,7 +9,9 @@ import com.gooddata.qa.graphene.enums.Connectors;
 public class PardotBaseCheckTest extends AbstractPardotCheckTest {
 	
 	@BeforeClass
-	public void initConnectorType() {
+	@Override
+	public void loadRequiredProperties() {
+		super.loadRequiredProperties();
 		connectorType = Connectors.PARDOT_BASE;
 	}
 }

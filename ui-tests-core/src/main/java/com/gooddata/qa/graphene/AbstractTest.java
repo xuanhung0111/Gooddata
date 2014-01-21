@@ -108,6 +108,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
 	protected static final String PAGE_PROJECTS = "projects.html";
 	protected static final String PAGE_UPLOAD = "upload.html";
+	protected static final String PAGE_LOGIN = "login.html";
 	
 	/** ----- UI fragmnets ----- */
 	

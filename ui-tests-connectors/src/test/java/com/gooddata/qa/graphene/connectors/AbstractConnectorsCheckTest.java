@@ -37,7 +37,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 	@FindBy(tagName="form")
 	protected ConnectorFragment connector;
 	
-	@BeforeClass
+	@BeforeClass(dependsOnMethods = { "loadRequiredProperties" })
 	public void initStartPage() {
 		startPage = "gdc";
 		projectTitle = connectorType.getName() + "CheckConnector";
