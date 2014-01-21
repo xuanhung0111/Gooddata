@@ -1,26 +1,5 @@
 package com.gooddata.qa.graphene;
 
-import static org.testng.Assert.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
-
-import org.jboss.arquillian.drone.api.annotation.Drone;
-import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.testng.Arquillian;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Listeners;
-
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -37,8 +16,32 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
+import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.graphene.Graphene;
+import org.jboss.arquillian.testng.Arquillian;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
+
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class})
 public abstract class AbstractTest extends Arquillian {
@@ -70,7 +73,15 @@ public abstract class AbstractTest extends Arquillian {
 	protected String user;
 	protected String password;
 	protected String authorizationToken;
-	
+
+	protected RestApiClient restApiClient = null;
+
+	protected String imapHost;
+	protected String imapUser;
+	protected String imapPassword;
+
+	protected String testIdentification;
+
 	protected String downloadFolder;
 	
 	protected String startPage;
@@ -168,6 +179,15 @@ public abstract class AbstractTest extends Arquillian {
 		deleteMode = DeleteMode.getModeByName(loadProperty("deleteMode"));
 		
 		downloadFolder = loadProperty("browserDownloadFolder");
+
+		imapHost = loadProperty("imap.host");
+		imapUser = loadProperty("imap.user");
+		imapPassword = loadProperty("imap.password");
+
+		testIdentification = loadProperty("testIdentification");
+		if (testIdentification == null) {
+			testIdentification = UUID.randomUUID().toString();
+		}
 	}
 	
 	/**
@@ -405,7 +425,14 @@ public abstract class AbstractTest extends Arquillian {
 		waitForElementPresent(BY_GP_PRE_JSON);
 		return new JSONObject(browser.findElement(BY_GP_PRE_JSON).getText());
 	}
-	
+
+	public RestApiClient getRestApiClient() {
+		if (restApiClient == null) {
+			restApiClient = new RestApiClient(host, user, password);
+		}
+		return restApiClient;
+	}
+
 	public void waitForDashboardPageLoaded() {
 		waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"));
 		checkRedBar();
