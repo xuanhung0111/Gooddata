@@ -82,7 +82,6 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 	}
 	
 	@Override
-    @Test(dependsOnGroups = {"tests"})
     public void validateProjectAfterTests() {
         // TODO validations temporarily disabled on selected connectors - ATP-945
 		System.out.println("Validation for Coupa skipped - ATP-945");
