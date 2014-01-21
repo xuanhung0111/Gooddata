@@ -3,6 +3,10 @@
  */
 package com.gooddata.qa.utils.mail;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
 import javax.mail.BodyPart;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -12,11 +16,16 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.internet.MimeUtility;
 import javax.mail.search.AndTerm;
 import javax.mail.search.FromStringTerm;
 import javax.mail.search.SearchTerm;
 import javax.mail.search.SubjectTerm;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -120,6 +129,45 @@ public class ImapClient {
             throw new RuntimeException("Data handler exception when checking message attachments", e);
         } catch (MessagingException e) {
             throw new RuntimeException("Session issue when checking message attachments", e);
+        }
+    }
+
+    public static void saveMessageAttachments(Message message, File outputDirectory) {
+        List<Part> parts = ImapClient.getAttachmentParts(message);
+        for (Part part : parts) {
+            ImapClient.savePartAttachments(part, outputDirectory);
+        }
+    }
+
+    public static void savePartAttachments(Part part, File outputDirectory) {
+        try {
+            if (!Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
+                throw new RuntimeException("Part without attachment");
+            }
+            if (StringUtils.isEmpty(part.getFileName())) {
+                throw new RuntimeException("Attachment filename is empty");
+            }
+            File outputFile = new File(outputDirectory, MimeUtility.decodeText(part.getFileName()));
+            FileUtils.forceMkdir(outputDirectory);
+
+            saveFile(outputFile, part.getInputStream());
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Cannot get part disposition", e);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Unsupported encoding in filename of attachment", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot create directory or cannot get attachment stream", e);
+        }
+    }
+
+    private static void saveFile(File outputFile, InputStream input) {
+        try {
+            System.out.println("Saving attachment to file "+outputFile.getAbsolutePath());
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+            IOUtils.copy(input, fileOutputStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot save file "+outputFile.getAbsoluteFile(), e);
         }
     }
 }
