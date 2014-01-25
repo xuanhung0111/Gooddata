@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.greypages.hds;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -9,7 +9,7 @@ import org.openqa.selenium.support.ui.Select;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.testng.Assert.assertEquals;
 
-public class StorageUsersFragment extends AbstractGreyPagesFragment {
+public class StorageUsersFragment extends AbstractHDSFragment {
 
     @FindBy
     private Select role;
@@ -30,7 +30,7 @@ public class StorageUsersFragment extends AbstractGreyPagesFragment {
         waitForElementVisible(submit);
     }
 
-    public void fillAddUserToStorageForm(final String role, final String profileUri, final String login) {
+    public void fillAddUserToStorageForm(final String role, final String profileUri, final String login, final boolean poll) throws JSONException, InterruptedException {
         waitForElementVisible(this.role);
         waitForElementVisible(this.profile);
         waitForElementVisible(this.login);
@@ -40,6 +40,10 @@ public class StorageUsersFragment extends AbstractGreyPagesFragment {
         if(!isEmpty(profileUri)) this.profile.sendKeys(profileUri);
         if(!isEmpty(login)) this.login.sendKeys(login);
         Graphene.guardHttp(submit).click();
+        if (poll) {
+            waitForUserAdded(10);
+            waitForElementPresent(BY_GP_LINK).click();
+        }
     }
 
     public void fillUpdateUserForm(final String role, final String profileUri) {
@@ -52,9 +56,11 @@ public class StorageUsersFragment extends AbstractGreyPagesFragment {
         Graphene.guardHttp(submit).click();
     }
 
-    public void deleteUser() {
+    public void deleteUser() throws JSONException, InterruptedException {
         waitForElementVisible(submit);
         Graphene.guardHttp(submit).click();
+        waitTaskFinished(10);
+        waitForElementPresent(BY_GP_LINK).click();
     }
 
     public void verifyValidAddUserForm() {
@@ -75,5 +81,9 @@ public class StorageUsersFragment extends AbstractGreyPagesFragment {
         waitForElementVisible(this.getRoot());
         waitForElementVisible(submit);
         assertEquals(submit.getAttribute("value"), "Delete", "Submit button is not 'Delete'");
+    }
+
+    public String waitForUserAdded(int checkIterations) throws JSONException, InterruptedException {
+        return waitTaskSucceed(checkIterations, "user");
     }
 }
