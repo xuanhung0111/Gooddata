@@ -161,7 +161,7 @@ public abstract class AbstractTest extends Arquillian {
 	
 	@BeforeClass
 	public void loadProperties() {
-		propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") + "/../ui-tests-core/src/test/resources/variables-env-test.properties");
+		propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") + "/ui-tests-core/src/test/resources/variables-env-test.properties");
 		
 		testVariables = new Properties();
 		try {

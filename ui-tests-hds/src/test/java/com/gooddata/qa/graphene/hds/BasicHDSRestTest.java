@@ -189,11 +189,11 @@ public class BasicHDSRestTest extends AbstractHDSTest {
     /** ===================== Section with valid storage users cases ============ */
     
 	@Test(dependsOnMethods = {"verifyStorage"})
-    public void addUserToStorage() {
+    public void addUserToStorage() throws JSONException, InterruptedException {
         openStorageUsersUrl();
         assertTrue(testUserId != null, "Missing test user ID - provide property 'hds.storage.test.user.id'");
         storageUsersForm.verifyValidAddUserForm();
-        storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, getTestUserProfileUri(), null);
+        storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, getTestUserProfileUri(), null, true);
         takeScreenshot(browser, "hds-add-user-filled-form", this.getClass());
         assertEquals(browser.getCurrentUrl(), getAddedUserUrlWithHost());
     }
@@ -242,12 +242,12 @@ public class BasicHDSRestTest extends AbstractHDSTest {
     }
 
     @Test(dependsOnMethods = {"removeUserFromStorage"})
-    public void addUserToStorageByLogin() {
+    public void addUserToStorageByLogin() throws JSONException, InterruptedException {
         openStorageUsersUrl();
         assertTrue(testUserId != null, "Missing test user ID - provide property 'hds.storage.test.user.id'");
         assertTrue(testUserLogin != null, "Missing test user login - provide property 'hds.storage.test.user.login'");
         storageUsersForm.verifyValidAddUserForm();
-        storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, null, testUserLogin);
+        storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, null, testUserLogin, true);
         takeScreenshot(browser, "hds-add-user-filled-form-login", this.getClass());
         assertEquals(browser.getCurrentUrl(), getAddedUserUrlWithHost());
     }
@@ -265,44 +265,44 @@ public class BasicHDSRestTest extends AbstractHDSTest {
     /** ===================== Section with invalid storage users cases ============ */
     
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addUserWithEmptyProfileAndLogin() throws JSONException {
+	public void addUserWithEmptyProfileAndLogin() throws JSONException, InterruptedException {
         invalidUserAssignment(null, null, NEW_USER_ROLE, "One (and only one) of \"profile\" or \"login\" must be " +
             "provided.");
 	}
 
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addUserWithBothProfileAndLogin() throws JSONException {
+	public void addUserWithBothProfileAndLogin() throws JSONException, InterruptedException {
         invalidUserAssignment(getTestUserProfileUri(), testUserLogin, NEW_USER_ROLE,
                 "One (and only one) of \"profile\" or \"login\" must be provided.");
 	}
     
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addNonExistingUser() throws JSONException {
+	public void addNonExistingUser() throws JSONException, InterruptedException {
         invalidUserAssignment("/gdc/account/profile/nonexisting", null, NEW_USER_ROLE, "User 'nonexisting' has not been found");
 	}
     
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addUserWithInvalidURI() throws JSONException {
+	public void addUserWithInvalidURI() throws JSONException, InterruptedException {
         invalidUserAssignment("/invalid/uri", null, NEW_USER_ROLE, "Validation failed");
 	}
 
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addUserWithInvalidLogin() throws JSONException {
+	public void addUserWithInvalidLogin() throws JSONException, InterruptedException {
         invalidUserAssignment(null, "asdfasdfa", NEW_USER_ROLE, "must be a string matching the regular expression \".+@.+\\..+\"]]");
 	}
     
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addUserWithInvalidURI2() throws JSONException {
+	public void addUserWithInvalidURI2() throws JSONException, InterruptedException {
         invalidUserAssignment("/gdc/account/profile", null, NEW_USER_ROLE, "Validation failed");
 	}
     
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addUserWithInvalidURI3() throws JSONException {
+	public void addUserWithInvalidURI3() throws JSONException, InterruptedException {
         invalidUserAssignment("/gdc/account/profile/", null, NEW_USER_ROLE, "Validation failed");
 	}
 	
     @Test(dependsOnMethods = { "verifyStorage" })
-	public void addExistingUserToStorage() throws JSONException {
+	public void addExistingUserToStorage() throws JSONException, InterruptedException {
         invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedById + "' already exists in storage '");
 	}
     
@@ -357,10 +357,10 @@ public class BasicHDSRestTest extends AbstractHDSTest {
         assertEquals(storageUrl + "/users", userObject.getJSONObject("links").getString("parent"));
     }
     
-    private void invalidUserAssignment(String userProfile, String login, String role, String expectedErrorMessage) throws JSONException {
+    private void invalidUserAssignment(String userProfile, String login, String role, String expectedErrorMessage) throws JSONException, InterruptedException {
     	openStorageUsersUrl();
     	storageUsersForm.verifyValidAddUserForm();
-		storageUsersForm.fillAddUserToStorageForm(role, userProfile, login);
+		storageUsersForm.fillAddUserToStorageForm(role, userProfile, login, false);
 		verifyErrorMessage(expectedErrorMessage, storageUrl + "/users");
 	}
     

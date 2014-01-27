@@ -2,15 +2,12 @@ package com.gooddata.qa.graphene.fragments.greypages.hds;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
-
-public class StorageFragment extends AbstractGreyPagesFragment {
+public class StorageFragment extends AbstractHDSFragment {
 	
 	@FindBy
 	private WebElement title;
@@ -92,28 +89,7 @@ public class StorageFragment extends AbstractGreyPagesFragment {
 	}
 	
 	private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
-		String executionUrl = browser.getCurrentUrl();
-		System.out.println("Related execution URL is " + executionUrl);
-		Assert.assertTrue(executionUrl.contains("executions"),
-                String.format("Storage creation didn't redirect to /executions/* page but to %s instead", executionUrl));
-		int i = 0;
-		boolean asyncTaskPoll = isAsyncTaskPoll();
-		while (asyncTaskPoll && i < checkIterations) {
-			System.out.println("Current storage execution is polling");
-			Thread.sleep(5000);
-			browser.get(executionUrl);
-			asyncTaskPoll = isAsyncTaskPoll();
-			i++;
-		}
-		JSONObject json = loadJSON();
-		String storageUrl = json.getJSONObject("asyncTask").getJSONObject("links").getString("dssInstance");
-		System.out.println("Created storage on URL " + storageUrl);
-		return storageUrl;
-	}
-	
-	private boolean isAsyncTaskPoll() throws JSONException {
-		JSONObject json = loadJSON();
-		return json.getJSONObject("asyncTask").getJSONObject("links").has("poll");
+		return waitTaskSucceed(checkIterations, "dssInstance");
 	}
 
 }
