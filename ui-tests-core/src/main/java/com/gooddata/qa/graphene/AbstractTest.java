@@ -73,6 +73,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected String user;
 	protected String password;
 	protected String authorizationToken;
+	protected String dssAuthorizationToken;
 
 	protected RestApiClient restApiClient = null;
 
@@ -175,6 +176,7 @@ public abstract class AbstractTest extends Arquillian {
 		user = loadProperty("user");
 		password = loadProperty("password");
 		authorizationToken = loadProperty("project.authorizationToken");
+		dssAuthorizationToken = loadProperty("dss.authorizationToken");
 		System.out.println("Basic properties initialized, host: " + host + ", user: " + user);
 		
 		deleteMode = DeleteMode.getModeByName(loadProperty("deleteMode"));
