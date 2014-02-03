@@ -89,7 +89,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	public void createStorage() throws JSONException, InterruptedException {
 		waitForElementVisible(storageForm.getRoot());
 		assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
-		storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken, null);
+		storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, dssAuthorizationToken, null);
 	}
 	
 	@Test(dependsOnMethods = {"createStorage"})
@@ -112,7 +112,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		JSONObject storage = json.getJSONObject("dssInstance");
 		assertTrue(storage.getString("title").equals(STORAGE_TITLE), "DSS instance title doesn't match");
 		assertTrue(storage.getString("description").equals(STORAGE_DESCRIPTION), "DSS instance description doesn't match");
-		assertTrue(storage.getString("authorizationToken").equals(authorizationToken), "DSS instance authorizationToken doesn't match");
+		assertTrue(storage.getString("authorizationToken").equals(dssAuthorizationToken), "DSS instance authorizationToken doesn't match");
 		assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "DSS instance parent link doesn't match");
 		assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "DSS instance self link doesn't match");
 		assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "DSS instance users link doesn't match");
@@ -158,12 +158,12 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutTitle() throws JSONException {
-		createInvalidStorage(null, STORAGE_DESCRIPTION, authorizationToken, null, "Validation failed");
+		createInvalidStorage(null, STORAGE_DESCRIPTION, dssAuthorizationToken, null, "Validation failed");
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutDescription() throws JSONException {
-		createInvalidStorage(STORAGE_TITLE, null, authorizationToken, null, "Validation failed");
+		createInvalidStorage(STORAGE_TITLE, null, dssAuthorizationToken, null, "Validation failed");
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
@@ -172,8 +172,19 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void createStorageWithNonexistentAuthToken() throws JSONException {
+		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, "nonexistentAuthToken", null, "Project group with name 'nonexistentAuthToken' does not exists.");
+	}
+
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
+	public void createStorageWithNonDssAuthToken() throws JSONException {
+		// use non-dss-enabled authorization token to create new dss
+		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken, null, "DSS project group source is missing");
+	}
+
+	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithInvalidCopyOfURI() throws JSONException {
-		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken, STORAGE_COPY_OF, "Malformed request");
+		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, dssAuthorizationToken, STORAGE_COPY_OF, "Malformed request");
 	}
 	
 	@Test(dependsOnMethods = { "createStorage" })
