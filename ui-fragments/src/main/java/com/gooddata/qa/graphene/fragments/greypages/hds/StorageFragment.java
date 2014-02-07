@@ -82,13 +82,17 @@ public class StorageFragment extends AbstractHDSFragment {
 		return true;
 	}
 	
-	public void deleteStorage() {
-		Graphene.guardHttp(waitForElementVisible(submit)).click();
+	public void deleteStorageSuccess() {
+		deleteStorage();
 		waitForElementVisible(BY_BUTTON_CREATE);
 		Assert.assertTrue(browser.getCurrentUrl().endsWith("/dss/instances"), "Browser wasn't redirected to storages page");
 	}
-	
-	private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
+
+	public void deleteStorage() {
+		Graphene.guardHttp(waitForElementVisible(submit)).click();
+	}
+
+	 private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
 		return waitTaskSucceed(checkIterations, "dssInstance");
 	}
 
