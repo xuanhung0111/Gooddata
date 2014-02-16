@@ -31,8 +31,8 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 	private CoupaInstanceFragment coupaInstance;
 	
 	@BeforeClass
-	public void loadRequiredProperties() {
-		coupaInstanceApiUrl = loadProperty("connectors.coupa.instance.apiUrl");
+    public void loadRequiredProperties() {
+        coupaInstanceApiUrl = loadProperty("connectors.coupa.instance.apiUrl");
 		coupaInstanceApiKey = loadProperty("connectors.coupa.instance.apiKey");
 		
 		connectorType = Connectors.COUPA;
@@ -43,9 +43,9 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		projectCreateCheckIterations = 120;
 		integrationProcessCheckLimit = 720;
 	}
-	
-	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
-	public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
+    public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
 		// verify empty Coupa dashboard
 		openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
 		waitForElementVisible(BY_IFRAME);
@@ -80,10 +80,4 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		// process schedule
 		scheduleIntegrationProcess(integrationProcessCheckLimit);
 	}
-	
-	@Override
-    public void validateProjectAfterTests() {
-        // TODO validations temporarily disabled on selected connectors - ATP-945
-		System.out.println("Validation for Coupa skipped - ATP-945");
-    }
 }

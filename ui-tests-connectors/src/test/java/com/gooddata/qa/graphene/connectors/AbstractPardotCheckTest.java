@@ -54,10 +54,4 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		scheduleIntegrationProcess(integrationProcessCheckLimit);
 	}
 	
-	@Override
-    public void validateProjectAfterTests() {
-        // TODO validations temporarily disabled on selected connectors - ATP-945
-		System.out.println("Validation for Pardot skipped - ATP-945");
-    }
-	
 }
