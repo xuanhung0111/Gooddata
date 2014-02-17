@@ -140,11 +140,6 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
-	public void createStorageWithoutDescription() throws JSONException {
-		createInvalidStorage(STORAGE_TITLE, null, dssAuthorizationToken, null, "Validation failed");
-	}
-	
-	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutAuthToken() throws JSONException {
 		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, null, "Validation failed");
 	}
@@ -168,11 +163,6 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	@Test(dependsOnMethods = { "createStorage" })
 	public void updateStorageWithEmptyTitle() throws JSONException {
 		invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "Validation failed");
-	}
-	
-	@Test(dependsOnMethods = { "createStorage" })
-	public void updateStorageWithEmptyDescription() throws JSONException {
-		invalidUpdateOfStorage(STORAGE_TITLE, null, "Validation failed");
 	}
 
     /** ===================== Section with valid storage users cases ============ */
