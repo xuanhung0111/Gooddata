@@ -13,7 +13,7 @@ public class LoginPageTest extends AbstractTest {
 
 	@BeforeClass
 	public void initStartPage() {
-		startPage = "login.html";
+		startPage = PAGE_LOGIN;
 	}
 	
 	@Test(groups = {"loginInit"})
@@ -33,12 +33,18 @@ public class LoginPageTest extends AbstractTest {
 	@Test(dependsOnGroups = {"loginInit"})
 	public void gd_Login_003_SignInWithEmptyPassword() {
 		loginFragment.login(user, "");
-		loginFragment.waitForErrorMessageDisplayed();
+		loginFragment.checkPasswordInvalid();
 	}
 	
 	@Test(dependsOnGroups = {"loginInit"})
 	public void gd_Login_004_SignInWithInvalidPassword() {
 		loginFragment.login(user, "abcdefgh");
-		loginFragment.waitForErrorMessageDisplayed();
+        loginFragment.checkInvalidLogin();
 	}
+
+    @Test(dependsOnGroups = {"loginInit"})
+    public void gd_Login_005_SignInWithInvalidEmail() {
+        loginFragment.login("email_invalid_format", "abcdefgh");
+        loginFragment.checkEmailInvalid();
+    }
 }

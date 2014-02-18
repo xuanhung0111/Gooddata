@@ -120,12 +120,12 @@ public abstract class AbstractTest extends Arquillian {
 	protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
 	protected static final String PAGE_PROJECTS = "projects.html";
 	protected static final String PAGE_UPLOAD = "upload.html";
-	protected static final String PAGE_LOGIN = "login.html";
-	
+	protected static final String PAGE_LOGIN = "account.html#/login";
+
 	/** ----- UI fragmnets ----- */
 	
-	@FindBy(css="#loginPanel")
-	protected LoginFragment loginFragment;
+	@FindBy(css=".s-loginPage")
+    protected LoginFragment loginFragment;
 	
 	@FindBy(id="root")
 	protected DashboardsPage dashboardsPage;
@@ -247,8 +247,9 @@ public abstract class AbstractTest extends Arquillian {
 	}
 	
 	public void signInAtUI(String username, String password) {
+        openUrl(PAGE_LOGIN);
 		waitForElementVisible(loginFragment.getRoot());
-		loginFragment.login(username, password);
+        loginFragment.login(username, password);
 		waitForElementVisible(BY_LOGGED_USER_BUTTON);
 		Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
 		System.out.println("Successful login with user: " + username);
