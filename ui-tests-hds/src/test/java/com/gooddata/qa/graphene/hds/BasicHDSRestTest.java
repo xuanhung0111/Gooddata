@@ -50,8 +50,8 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(groups = {"hdsInit"})
 	public void resourceStoragesNotAvailableForAnonymous() throws JSONException {
-		waitForElementPresent(BY_GP_PRE_JSON);
-		assertTrue(browser.getCurrentUrl().contains("gdc/account/token"), "Redirect to /gdc/account/token wasn't done for anonymous user");
+        waitForElementPresent(gpLoginFragment.getRoot());
+        assertTrue(browser.getCurrentUrl().contains("gdc/account/login"), "Redirect to /gdc/account/login wasn't done for anonymous user");
 	}
 
 	@Test(groups = {"hdsInit"}, dependsOnMethods = { "resourceStoragesNotAvailableForAnonymous" })
