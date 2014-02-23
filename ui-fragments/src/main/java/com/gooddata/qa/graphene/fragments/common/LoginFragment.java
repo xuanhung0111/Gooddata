@@ -31,7 +31,7 @@ public class LoginFragment extends AbstractFragment {
     }
 
     public void checkEmailInvalid() {
-        Graphene.waitAjax().until().element(password).attribute("class").contains(ERROR_CLASS);
+        Graphene.waitAjax().until().element(email).attribute("class").contains(ERROR_CLASS);
     }
 
     public void checkPasswordInvalid() {
