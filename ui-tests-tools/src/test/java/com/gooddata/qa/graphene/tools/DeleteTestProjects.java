@@ -19,7 +19,7 @@ public class DeleteTestProjects extends AbstractTest {
 	
 	@BeforeClass
 	public void initStartPage() {
-		startPage = "login.html";
+		startPage = PAGE_LOGIN;
 	}
 	
 	@Test(groups = "deleteProjectsInit")

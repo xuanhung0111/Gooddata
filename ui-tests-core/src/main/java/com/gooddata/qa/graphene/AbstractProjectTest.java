@@ -23,7 +23,6 @@ public abstract class AbstractProjectTest extends AbstractTest {
 	@Test(groups = { "projectInit" } )
 	public void init() throws JSONException {
 		// sign in with demo user
-		openUrl(PAGE_LOGIN);
 		signInAtUI(user, password);
 	}
 	
