@@ -136,12 +136,12 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutTitle() throws JSONException {
-		createInvalidStorage(null, STORAGE_DESCRIPTION, dssAuthorizationToken, null, "Validation failed");
+		createInvalidStorage(null, STORAGE_DESCRIPTION, dssAuthorizationToken, null, "DSS instance title must not be empty.");
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void createStorageWithoutAuthToken() throws JSONException {
-		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, null, "Validation failed");
+		createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, null, "DSS instance authorization token must not be empty.");
 	}
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
@@ -162,7 +162,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "createStorage" })
 	public void updateStorageWithEmptyTitle() throws JSONException {
-		invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "Validation failed");
+		invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "DSS instance title must not be empty.");
 	}
 
     /** ===================== Section with valid storage users cases ============ */
