@@ -6,9 +6,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -43,7 +46,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@BeforeClass
 	public void initStartPage() {
-		startPage = PAGE_GDC_STORAGES;
+		startPage = PAGE_DSS_INSTANCES;
 		testUserId = loadProperty("hds.storage.test.user.id");
 		testUserLogin = loadProperty("hds.storage.test.user.login");
 	}
@@ -75,6 +78,26 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		assertEquals(browser.getTitle(), "GoodData API root");
 		assertTrue(browser.findElements(By.partialLinkText("dssInstances")).size() == 0, "DSS instances link is present at basic /gdc resource");
 	}
+
+	@Test(dependsOnGroups = {"hdsInit"})
+	public void verifyDssRoot() throws JSONException {
+		openUrl(PAGE_DSS_ROOT);
+
+		final JSONObject json = loadJSON();
+		final JSONObject dssObject = json.getJSONObject("dss");
+		final JSONObject linksObject = dssObject.getJSONObject("links");
+		assertEquals("/gdc/dss", linksObject.getString("self"));
+		assertEquals("/gdc", linksObject.getString("parent"));
+		assertEquals("/gdc/dss/instances", linksObject.getString("dssInstances"));
+
+		assertTrue(browser.findElements(By.linkText("/gdc/dss")).size() == 1, "DSS root does not contain self link");
+		assertTrue(browser.findElements(By.linkText("/gdc")).size() == 1, "DSS root does not contain parent link");
+		List<WebElement> instancesLink = browser.findElements(By.linkText("/gdc/dss/instances"));
+		assertTrue(instancesLink.size() == 1, "DSS root does not contain dssInstances link");
+		instancesLink.get(0).click();
+
+		assertEquals(getBasicRootUrl() + "/gdc/dss/instances", browser.getCurrentUrl());
+	}
 	
 	@Test(dependsOnGroups = {"hdsInit"})
 	public void verifyDefaultResource() throws JSONException {
@@ -85,7 +108,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 	
 	@Test(dependsOnMethods = { "gpFormsAvailable" })
 	public void verifyStorageCreateFormPresentWithTrailingSlash() throws JSONException {
-		openUrl(PAGE_GDC_STORAGES + "/");
+		openUrl(PAGE_DSS_INSTANCES + "/");
 		waitForElementVisible(storageForm.getRoot());
 	}
 	
@@ -364,7 +387,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		waitForElementVisible(storageForm.getRoot());
 		assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
 		storageForm.fillCreateStorageForm(title, description, authorizationToken, copyOf);
-		verifyErrorMessage(expectedErrorMessage, PAGE_GDC_STORAGES);
+		verifyErrorMessage(expectedErrorMessage, PAGE_DSS_INSTANCES);
 	}
 
     private void verifyUser(final String role, final String screenshotName) throws JSONException {
@@ -410,13 +433,13 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 			assertTrue(firstStorage.has("title"), "DSS instance title isn't present");
 			assertTrue(firstStorage.has("description"), "DSS instance description isn't present");
 			assertTrue(firstStorage.has("authorizationToken"), "DSS instance authorizationToken isn't present");
-			assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "DSS instance parent link doesn't match");
+			assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_DSS_INSTANCES), "DSS instance parent link doesn't match");
 			assertTrue(firstStorage.getJSONObject("links").has("self"), "DSS instance self link isn't present");
 			assertTrue(firstStorage.getJSONObject("links").has("users"), "DSS instance users link isn't present");
 			assertTrue(firstStorage.has("status"), "DSS instance status isn't present");
 		}
-		assertTrue(json.getJSONObject("dssInstances").getJSONObject("links").getString("parent").endsWith("gdc"), "Parent link doesn't match");
-		assertTrue(json.getJSONObject("dssInstances").getJSONObject("links").getString("self").substring(1).equals(PAGE_GDC_STORAGES), "DSS instances self link doesn't match");
+		assertTrue(json.getJSONObject("dssInstances").getJSONObject("links").getString("parent").endsWith("dss"), "Parent link doesn't match");
+		assertTrue(json.getJSONObject("dssInstances").getJSONObject("links").getString("self").substring(1).equals(PAGE_DSS_INSTANCES), "DSS instances self link doesn't match");
 	}
 
 	private void verifyStorage(final String title, final String description, final String state) throws JSONException {
@@ -428,7 +451,7 @@ public class BasicHDSRestTest extends AbstractHDSTest {
 		assertTrue(storage.getString("title").equals(title), "DSS instance title doesn't match");
 		assertTrue(storage.getString("description").equals(description), "DSS instance description doesn't match");
 		assertTrue(storage.getString("authorizationToken").equals(dssAuthorizationToken), "DSS instance authorizationToken doesn't match");
-		assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_GDC_STORAGES), "DSS instance parent link doesn't match");
+		assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_DSS_INSTANCES), "DSS instance parent link doesn't match");
 		assertTrue(storage.getJSONObject("links").getString("self").equals(storageUrl), "DSS instance self link doesn't match");
 		assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"), "DSS instance users link doesn't match");
 		final String currentState = storage.getString("status");
