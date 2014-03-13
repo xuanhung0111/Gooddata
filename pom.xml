@@ -237,4 +237,21 @@
 			</dependencies>
 		</profile>
 	</profiles>
+	<distributionManagement>
+            <repository>
+                <id>gooddata</id>
+                <url>https://nexus.intgdc.com/nexus/content/repositories/gooddata/</url>
+            </repository>
+            <snapshotRepository>
+                <id>gooddata-snapshots</id>
+                <url>https://nexus.intgdc.com/nexus/content/repositories/gooddata-snapshots/</url>
+            </snapshotRepository>
+	</distributionManagement>
+
+	<scm>
+	    <connection>scm:git:git@github.com:gooddata/graphene-tests.git</connection>
+	    <developerConnection>scm:git:git@github.com:gooddata/graphene-tests.git</developerConnection>
+	    <url>https://github.com/gooddata/graphene-tests</url>
+	    <tag>HEAD</tag>
+	</scm>
 </project>
