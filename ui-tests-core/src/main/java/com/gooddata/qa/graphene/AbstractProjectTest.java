@@ -36,6 +36,12 @@ public abstract class AbstractProjectTest extends AbstractTest {
 	
 	@Test(dependsOnGroups = { "tests" })
     public void validateProjectAfterTests() throws JSONException {
+        // TODO remove when ATP-1520, ATP-1519 are fixed
+        String testName = this.getClass().getSimpleName();
+        if (testName.contains("Coupa") || testName.contains("Pardot")) {
+            System.out.println("Validations are skipped for Coupa and Pardot projects");
+            return;
+        }
         String validationStatus = validateProjectPartial(Validation.INVALID_OBJECTS, Validation.PMD__ELEM_VALIDATION);
         assertEquals(validationStatus, "OK");
 
