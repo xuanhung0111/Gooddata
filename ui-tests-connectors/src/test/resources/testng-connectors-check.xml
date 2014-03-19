@@ -55,16 +55,5 @@
 			<class name="com.gooddata.qa.graphene.connectors.CoupaCheckTest" />
 		</classes>
 	</test>
-	
-	<test name="GoogleAnalyticsConnectorCheck">
-		<groups>
-			<run>
-				<exclude name="brokenTest" />
-			</run>
-		</groups>
-		<classes>
-			<class name="com.gooddata.qa.graphene.connectors.GoogleAnalyticsCheckTest" />
-		</classes>
-	</test>
-	
+
 </suite>
