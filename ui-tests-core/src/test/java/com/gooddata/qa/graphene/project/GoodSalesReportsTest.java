@@ -17,7 +17,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	private int createdReportsCount = 0;
 	
 	private long expectedLineChartExportPDFSize = 110000L;
-	private long expectedAreaChartReportExportPNGSize = 43000L;
+	private long expectedAreaChartReportExportPNGSize = 39000L;
 	private long expectedStackedAreaChartReportExportXLSSize = 5500L;
 	private long expectedBarChartReportExportCSVSize = 300L;
 	private long expectedTabularReportExportPDFSize = 28000L;
