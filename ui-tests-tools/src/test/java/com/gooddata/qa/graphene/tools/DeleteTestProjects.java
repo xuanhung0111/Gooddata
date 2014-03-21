@@ -36,6 +36,11 @@ public class DeleteTestProjects extends AbstractTest {
 	public void deleteAllGoodSalesCheckProjects() throws InterruptedException {
 		deleteProjects("GoodSales-test");
 	}
+
+    @Test(dependsOnGroups = { "deleteProjectsInit" })
+    public void deleteAllSimpleProjects() throws InterruptedException {
+        deleteProjects("simple-project");
+    }
 	
 	@Test(dependsOnGroups = { "deleteProjectsInit" })
 	public void deleteAllSimpleGeoProjects() throws InterruptedException {
