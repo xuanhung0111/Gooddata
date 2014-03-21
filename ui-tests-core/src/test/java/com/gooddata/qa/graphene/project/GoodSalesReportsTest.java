@@ -198,15 +198,11 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	@Test(dependsOnGroups = { "goodsales-chart", "chart-exports", "tabular-report-exports" }, groups = { "tests" })
 	public void verifyCreatedReports() throws InterruptedException {
 		initReportsPage();
-		selectReportsDomainFolder("My Reports");
-		waitForReportsPageLoaded();
-		Thread.sleep(5000);
-		assertEquals(reportsPage.getReportsList().getNumberOfReports(), createdReportsCount, "Number of expected reports (my reports) doesn't match");
-		Screenshots.takeScreenshot(browser, "GoodSales-new-reports", this.getClass());
 		selectReportsDomainFolder("All");
 		waitForReportsPageLoaded();
 		Thread.sleep(5000);
 		assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
+		Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
 		successfulTest = true;
 	}
 	
