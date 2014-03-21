@@ -8,8 +8,12 @@ import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment
 import com.gooddata.qa.graphene.fragments.greypages.md.ValidateFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.AttributesTable;
+import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
+import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
@@ -150,6 +154,20 @@ public abstract class AbstractTest extends Arquillian {
 	@FindBy(css=".l-primary")
 	protected UploadFragment upload;
 	
+	@FindBy(id="p-dataPage")
+	protected DataPage dataPage;
+	
+	@FindBy(id="attributesTable")
+	protected AttributesTable attributesTable;
+	
+	@FindBy(id="p-objectPage")
+	protected AttributeDetailPage attributeDetailPage;
+	
+	@FindBy(id="p-dataPage")
+	protected VariableDetailPage variableDetailPage;
+	
+	//end
+	
 	/** ----- Grey pages fragmnets ----- */
 	
 	@FindBy(tagName="form")
@@ -164,7 +182,7 @@ public abstract class AbstractTest extends Arquillian {
 	
 	@BeforeClass
 	public void loadProperties() {
-		propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") + "/ui-tests-core/src/test/resources/variables-env-test.properties");
+		propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") + "/../ui-tests-core/src/test/resources/variables-env-test.properties");
 		
 		testVariables = new Properties();
 		try {
@@ -348,6 +366,8 @@ public abstract class AbstractTest extends Arquillian {
 	
 	protected void verifyDashboardExport(String dashboardName, long minimalSize) {
 		File pdfExport = new File(downloadFolder + "/" + dashboardName + ".pdf");
+		System.out.println("pdfExport = " + pdfExport);
+		System.out.println(downloadFolder + "/" + dashboardName + ".pdf");
 		long fileSize = pdfExport.length();
 		System.out.println("File size: " + fileSize);
 		assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
