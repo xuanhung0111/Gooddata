@@ -7,6 +7,8 @@ import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+
 import static org.testng.Assert.*;
 
 public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTest {
@@ -22,10 +24,14 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 		pardotAccountId = loadProperty("connectors.pardot.accountId");
 		pardotUploadUser = loadProperty("connectors.pardot.uploadUser");
 		pardotUploadUserPassword = loadProperty("connectors.pardot.uploadUserPassword");
-		
-		expectedDashboardTabs = new String[]{
+
+        expectedDashboardsAndTabs = new HashMap<String, String[]>();
+        expectedDashboardsAndTabs.put("Pardot Analytics", new String[]{
 				"Marketing KPIs", "Contribution", "Prospects", "Opportunities", "and more"
-		};
+		});
+        expectedDashboardsAndTabs.put("Prospects Only", new String[]{
+                "Marketing KPIs", "Prospects", "Leaderboard", "and more"
+        });
 		
 		projectCreateCheckIterations = 120;
 		integrationProcessCheckLimit = 240;

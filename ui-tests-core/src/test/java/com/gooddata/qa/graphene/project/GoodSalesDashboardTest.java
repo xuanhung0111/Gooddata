@@ -14,9 +14,9 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	
 	@Test(dependsOnMethods = { "createProject" }, groups = { "dashboards-verification" })
 	public void verifyDashboardTabs() throws InterruptedException {
-		verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
+		verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
 	}
-	
+
 	@Test(dependsOnMethods = { "verifyDashboardTabs" }, groups = { "dashboards-verification" })
 	public void exportFirstDashboard() throws InterruptedException {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
@@ -55,7 +55,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 		Screenshots.takeScreenshot(browser, "GoodSales-new-tab-with-chart", this.getClass());
 	}
 	*/
-	
+
 	@Test(dependsOnMethods = { "addNewTab" }, groups = { "dashboards-verification" })
 	public void deleteNewTab() throws InterruptedException {
 		initDashboardsPage();
@@ -63,7 +63,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 		waitForDashboardPageLoaded();
 		Thread.sleep(5000);
 		int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
-		dashboardsPage.deleteDashboardTab(expectedGoodSalesTabs.length);
+		dashboardsPage.deleteDashboardTab(expectedGoodSalesDashboardsAndTabs.size());
 		Thread.sleep(5000);
 		assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
 	}
@@ -103,6 +103,6 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	
 	@Test(dependsOnGroups = { "dashboards-verification" }, groups = { "tests" })
 	public void verifyDashboardTabsAfter() throws InterruptedException {
-		verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, true);
+		verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
 	}
 }

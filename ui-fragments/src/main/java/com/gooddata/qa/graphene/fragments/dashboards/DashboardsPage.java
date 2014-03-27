@@ -102,6 +102,7 @@ public class DashboardsPage extends AbstractFragment {
 			for (WebElement elem : dashboardSelectors) {
 				if (elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title").equals(dashboardName)) {
 					elem.findElement(BY_LINK).click();
+                    waitForDashboardPageLoaded();
 					return true;
 				}
 			}
@@ -110,8 +111,9 @@ public class DashboardsPage extends AbstractFragment {
 		return false;
 	}
 	
-	public boolean selectDashboard(int dashboardIndex) {
+	public boolean selectDashboard(int dashboardIndex) throws InterruptedException {
 		waitForElementVisible(dashboardSwitcherButton).click();
+        Thread.sleep(3000);
 		if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
 			for (WebElement elem : dashboardSelectors) {
 				if (Integer.valueOf(elem.getAttribute("gdc:index")) == dashboardIndex) {

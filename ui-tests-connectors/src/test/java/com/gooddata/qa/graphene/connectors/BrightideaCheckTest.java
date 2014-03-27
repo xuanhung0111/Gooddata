@@ -10,6 +10,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.Connectors;
 
+import java.util.HashMap;
+
 import static org.testng.Assert.*;
 
 @Test(groups = { "connectors", "brightidea" }, description = "Checklist tests for Brightidea connector in GD platform")
@@ -38,9 +40,10 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 		brightideaHostname = loadProperty("connectors.brightidea.hostname");
 		
 		connectorType = Connectors.BRIGHTIDEA;
-		expectedDashboardTabs = new String[]{
-			"WebStorms", "Ideas", "Users", "Switchboard", "Pipeline", "Headlines", "Learn More"
-		};
+		expectedDashboardsAndTabs = new HashMap<String, String[]>();
+        expectedDashboardsAndTabs.put("Innovation Metrics", new String[]{
+                "WebStorms", "Ideas", "Users", "Switchboard", "Pipeline", "Headlines", "Learn More"
+        });
 		
 		projectCreateCheckIterations = 120;
 		integrationProcessCheckLimit = 720;

@@ -9,6 +9,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.Connectors;
 
+import java.util.HashMap;
+
 import static org.testng.Assert.*;
 
 @Test(groups = { "connectors", "zendesk3" }, description = "Checklist tests for Zendesk3 connector in GD platform")
@@ -27,9 +29,16 @@ public class Zendesk3CheckTest extends AbstractConnectorsCheckTest {
 		zendeskUploadUserPassword = loadProperty("connectors.zendesk.uploadUserPassword");
 		
 		connectorType = Connectors.ZENDESK3;
-		expectedDashboardTabs = new String[]{
-				"Overview", "Ticket Creation", "Ticket Distribution", "Performance", "Backlog", "Open Issues", "Customer Satisfaction"
-		};
+		expectedDashboardsAndTabs = new HashMap<String, String[]>();
+        expectedDashboardsAndTabs.put("Advanced Metrics", new String[]{
+                "Overview", "Ticket Creation", "Ticket Distribution", "Performance", "Backlog", "Open Issues", "Customer Satisfaction"
+        });
+        expectedDashboardsAndTabs.put("GoodData for Zendesk", new String[]{
+                "Ticket Creation", "Ticket Resolution", "Agent Performance", "Watch List"
+        });
+        expectedDashboardsAndTabs.put("Release 3 New Dashboards", new String[]{
+                "Overview w/ Business Hours", "Staffing and Volume Heat Maps"
+        });
 	}
 	
 	@Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })

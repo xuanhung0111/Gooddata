@@ -25,6 +25,7 @@ import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -36,6 +37,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -284,7 +286,8 @@ public abstract class AbstractTest extends Arquillian {
 		waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
 	}
 	
-	protected void verifyProjectDashboardTabs(boolean validation, int expectedNumberOfTabs, String[] expectedTabLabels, boolean openPage) throws InterruptedException {
+	protected void verifyProjectDashboardsAndTabs(boolean validation, Map<String, String[]> expectedDashboardsAndTabs,
+                                                  boolean openPage) throws InterruptedException {
 		if (openPage) {
 			browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
 			waitForElementVisible(BY_LOGGED_USER_BUTTON);
@@ -292,22 +295,46 @@ public abstract class AbstractTest extends Arquillian {
 		waitForDashboardPageLoaded();
 		Thread.sleep(5000);
 		waitForElementVisible(dashboardsPage.getRoot());
-		DashboardTabs tabs = dashboardsPage.getTabs();
-		int numberOfTabs = tabs.getNumberOfTabs();
-		System.out.println("Number of tabs for project: " + numberOfTabs);
-		if (validation) assertTrue(numberOfTabs == expectedNumberOfTabs, "Expected number of dashboard tabs for project is not present");
-		List<String> tabLabels = tabs.getAllTabNames();
-		System.out.println("These tabs are available for selected project: " + tabLabels.toString());
-		for (int i = 0; i < tabLabels.size(); i++) {
-			if (validation) assertEquals(tabLabels.get(i), expectedTabLabels[i], "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
-			tabs.openTab(i);
-			System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
-			waitForDashboardPageLoaded();
-			Screenshots.takeScreenshot(browser, "dashboards-tab-" + i + "-" + tabLabels.get(i), this.getClass());
-			assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
-			checkRedBar();
-		}
+        if (expectedDashboardsAndTabs == null) {
+            int dashboardsCount = dashboardsPage.getDashboardsCount();
+            for (int i = 1; i <= dashboardsCount; i++) {
+                dashboardsPage.selectDashboard(i);
+                Thread.sleep(5000);
+                System.out.println("Current dashboard index: " + i);
+                singleDashboardWalkthrough(validation, null, dashboardsPage.getDashboardName());
+            }
+        } else {
+            for (String dashboardName: expectedDashboardsAndTabs.keySet()) {
+                int dashboardsCount = dashboardsPage.getDashboardsCount();
+                assertEquals(dashboardsCount, expectedDashboardsAndTabs.size(), "Number of dashboards doesn't match");
+                dashboardsPage.selectDashboard(dashboardName);
+                Thread.sleep(5000);
+                String[] expectedTabs = expectedDashboardsAndTabs.get(dashboardName);
+                System.out.println("Current dashboard: " + dashboardName);
+                singleDashboardWalkthrough(validation, expectedTabs, dashboardName);
+            }
+        }
 	}
+
+    private void singleDashboardWalkthrough(boolean validation, String[] expectedTabs, String dashboardName) {
+        DashboardTabs tabs = dashboardsPage.getTabs();
+        int numberOfTabs = tabs.getNumberOfTabs();
+        System.out.println("Number of tabs on dashboard " + dashboardName + ": " + numberOfTabs);
+        if (validation) assertTrue(numberOfTabs == expectedTabs.length,
+                "Expected number of dashboard tabs for project is not present");
+        List<String> tabLabels = tabs.getAllTabNames();
+        System.out.println("These tabs are available for selected project: " + tabLabels.toString());
+        for (int i = 0; i < tabLabels.size(); i++) {
+            if (validation) assertEquals(tabLabels.get(i), expectedTabs[i],
+                    "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
+            tabs.openTab(i);
+            System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
+            waitForDashboardPageLoaded();
+            Screenshots.takeScreenshot(browser, dashboardName + "-tab-" + i + "-" + tabLabels.get(i), this.getClass());
+            assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
+            checkRedBar();
+        }
+    }
 	
 	protected void checkRedBar() {
 		if (browser.findElements(BY_RED_BAR).size() != 0) {

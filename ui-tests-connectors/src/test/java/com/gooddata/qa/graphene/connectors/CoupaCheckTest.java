@@ -11,6 +11,8 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
 
+import java.util.HashMap;
+
 import static org.testng.Assert.*;
 
 @Test(groups = { "connectors", "coupa" }, description = "Checklist tests for Coupa connector in GD platform")
@@ -36,9 +38,10 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 		coupaInstanceApiKey = loadProperty("connectors.coupa.instance.apiKey");
 		
 		connectorType = Connectors.COUPA;
-		expectedDashboardTabs = new String[]{
-				"KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities", "Contracts", "Expenses", "Budgets", "All Spend"
-		};
+		expectedDashboardsAndTabs = new HashMap<String, String[]>();
+        expectedDashboardsAndTabs.put("Coupa Spend Optimizer", new String[]{
+                "KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities", "Contracts", "Expenses", "Budgets", "All Spend"
+        });
 		
 		projectCreateCheckIterations = 120;
 		integrationProcessCheckLimit = 720;

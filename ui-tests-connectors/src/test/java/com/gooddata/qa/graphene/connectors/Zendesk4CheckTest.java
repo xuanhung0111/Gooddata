@@ -14,6 +14,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+
 import static org.testng.Assert.assertEquals;
 
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
@@ -30,9 +32,11 @@ public class Zendesk4CheckTest extends AbstractConnectorsCheckTest {
         zendeskUploadUserPassword = loadProperty("connectors.zendesk.uploadUserPassword");
 
         connectorType = Connectors.ZENDESK4;
-        expectedDashboardTabs = new String[]{
+        expectedDashboardsAndTabs = new HashMap<String, String[]>();
+        expectedDashboardsAndTabs.put("Agent Performance", new String[]{
                 "Public comments", "Comments by hour", "Group reassignments", "Comments by group"
-        };
+        });
+        //TODO
     }
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
