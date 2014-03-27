@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -21,14 +23,18 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 public class GoodSalesDashboardWalkthrough extends AbstractTest { 
 
 	private static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
-	
-	private static final String[] expectedGoodSalesTabs = {
-		"Outlook", "What's Changed", "Waterfall Analysis", "Leaderboards", "Activities", "Sales Velocity", "Quarterly Trends", "Seasonality", "...and more"
-	};
+
+    protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
 	
 	@BeforeClass
 	public void initStartPage() {
 		startPage = "gdc";
+
+        expectedGoodSalesDashboardsAndTabs = new HashMap<String, String[]>();
+        expectedGoodSalesDashboardsAndTabs.put("Pipeline Analysis", new String[]{
+                "Outlook", "What's Changed", "Waterfall Analysis", "Leaderboards", "Activities",
+                "Sales Velocity", "Quarterly Trends", "Seasonality", "...and more"
+        });
 	}
 	
 	@Test(groups = { "GoodSalesPerfInit" } )
@@ -50,7 +56,7 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 		waitForDashboardPageLoaded();
 		for (int i = 1; i <= 10; i++) {
 			System.out.println("Iteration:" + i);
-			verifyProjectDashboardTabs(true, expectedGoodSalesTabs.length, expectedGoodSalesTabs, false);
+			verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
 		}
 		String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
 		createPerfOutputFile(output);

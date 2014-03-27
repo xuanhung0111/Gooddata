@@ -14,6 +14,8 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
 
+import java.util.Map;
+
 import static org.testng.Assert.*;
 
 public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
@@ -32,7 +34,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 	
 	protected Connectors connectorType;
 	
-	protected String[] expectedDashboardTabs;
+	protected Map<String, String[]> expectedDashboardsAndTabs;
 	
 	@FindBy(tagName="form")
 	protected ConnectorFragment connector;
@@ -71,7 +73,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     @Test(groups = {"connectorWalkthrough"}, dependsOnMethods = {"testConnectorProcessesResource"})
 	public void verifyProjectDashboards() throws InterruptedException {
 		// verify created project and count dashboard tabs
-		verifyProjectDashboardTabs(true, expectedDashboardTabs.length, expectedDashboardTabs, true);
+		verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
 		successfulTest = true;
 	}
     
