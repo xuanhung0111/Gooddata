@@ -36,7 +36,15 @@ public class Zendesk4CheckTest extends AbstractConnectorsCheckTest {
         expectedDashboardsAndTabs.put("Agent Performance", new String[]{
                 "Public comments", "Comments by hour", "Group reassignments", "Comments by group"
         });
-        //TODO
+        expectedDashboardsAndTabs.put("Customer Support", new String[]{
+                "Open tickets", "Problem tickets", "Time metrics", "Channels", "Ticket trends", "(Beta) Explorers", "Monthly"
+        });
+        expectedDashboardsAndTabs.put("Events", new String[]{
+                "Events", "Update channel", "Satisfaction"
+        });
+        expectedDashboardsAndTabs.put("Users & Organizations", new String[]{
+                "Users created", "Last login", "Tickets by user", "Top time zones"
+        });
     }
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = { "testConnectorIntegrationResource" })
