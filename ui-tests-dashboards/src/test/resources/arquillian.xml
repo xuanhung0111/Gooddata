@@ -13,10 +13,10 @@
 	</extension>
 
 	<extension qualifier="graphene">
-		<property name="waitModelInterval">${timeout:30}</property>
-		<property name="waitGuiInterval">${timeout:30}</property>
-		<property name="waitAjaxInterval">${timeout:30}</property>
-		<property name="waitGuardInterval">${timeout:30}</property>
+		<property name="waitModelInterval">${timeout:180}</property>
+		<property name="waitGuiInterval">${timeout:180}</property>
+		<property name="waitAjaxInterval">${timeout:180}</property>
+		<property name="waitGuardInterval">${timeout:180}</property>
 	</extension>
 	
 </arquillian>
