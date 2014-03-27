@@ -13,5 +13,10 @@ public class PardotPremiumCheckTest extends AbstractPardotCheckTest {
 	public void loadRequiredProperties() {
 		super.loadRequiredProperties();
 		connectorType = Connectors.PARDOT_PREMIUM;
-	}
+
+        expectedDashboardsAndTabs.put("Premium", new String[]{
+                "Prospect Funnel", "Prospect Waterfalls", "Content Targeting", "Content Performance", "Lead Cohorts",
+                "Activities", "Duration / Velocity", "List Health", "Rep Analysis"
+        });
+    }
 }
