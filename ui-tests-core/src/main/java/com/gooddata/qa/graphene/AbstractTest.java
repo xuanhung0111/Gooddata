@@ -91,7 +91,7 @@ public abstract class AbstractTest extends Arquillian {
 	protected boolean successfulTest = false;
 	
 	protected static final By BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']//button[2]");
-	protected static final By BY_LOGOUT_LINK = By.xpath("//a[@class='s-logout']");
+	protected static final By BY_LOGOUT_LINK = By.cssSelector("li.s-logout a");
 	protected static final By BY_PANEL_ROOT = By.id("root");
 	
 	protected static final By BY_GP_FORM = By.tagName("form");

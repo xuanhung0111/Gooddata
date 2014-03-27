@@ -140,21 +140,21 @@ public class EmailSchedulePage extends AbstractFragment {
 	
 	private void selectReportFormat(ExportFormat format) {
 		if (formatsList != null && formatsList.size() > 0) {
-			By checkoxLocator = By.tagName("input");
+			By checkboxLocator = By.tagName("input");
 			switch (format) {
 			case ALL:
 				for (int i = 1; i < formatsList.size(); i++) {
-					formatsList.get(i).findElement(checkoxLocator).click();
+					formatsList.get(i).findElement(checkboxLocator).click();
 				}
 				break;
 			case PDF:
-				formatsList.get(1).findElement(checkoxLocator).click();
+				formatsList.get(1).findElement(checkboxLocator).click();
 				break;
 			case CSV:
-				formatsList.get(3).findElement(checkoxLocator).click();
+				formatsList.get(3).findElement(checkboxLocator).click();
 				break;
 			case EXCEL_XLS:
-				formatsList.get(2).findElement(checkoxLocator).click();
+				formatsList.get(2).findElement(checkboxLocator).click();
 				break;
 			default:
 				System.out.println("Invalid format!!!");

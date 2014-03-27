@@ -7,7 +7,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class TabDialog extends AbstractFragment {
 
-	@FindBy
+	@FindBy(tagName = "input")
 	private WebElement title;
 	
 	@FindBy(css=".s-btn-save")
