@@ -53,12 +53,12 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	@Test(dependsOnMethods = { "createTabularReport" }, groups = { "tabular-report-exports" })
 	public void exportTabularReportToPDF() throws InterruptedException {
-		exportReport("Simple tabular report", ExportFormat.PDF);
+		exportReport("Simple tabular report", ExportFormat.PDF_PORTRAIT);
 	}
 	
 	@Test(dependsOnMethods = { "exportTabularReportToPDF" }, groups = { "tabular-report-exports" })
 	public void verifyExportedTabularReportPDF() {
-		verifyReportExport(ExportFormat.PDF, "Simple tabular report", expectedTabularReportExportPDFSize);
+		verifyReportExport(ExportFormat.PDF_PORTRAIT, "Simple tabular report", expectedTabularReportExportPDFSize);
 	}
 	
 	@Test(dependsOnMethods = { "verifyReportsPage" }, groups = { "goodsales-chart" })

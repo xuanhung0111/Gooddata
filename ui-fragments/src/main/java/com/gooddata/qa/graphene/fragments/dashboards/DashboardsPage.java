@@ -41,7 +41,7 @@ public class DashboardsPage extends AbstractFragment {
 	@FindBy(xpath="//button[@title='Add a new tab']")
 	private WebElement addNewTabButton;
 	
-	@FindBy(xpath="//div[contains(@class,'c-editTitleDialog')]")
+	@FindBy(xpath="//div[contains(@class,'editTitleDialogView')]//div[contains(@class,'modal-dialog')]")
 	private TabDialog newTabDialog; 
 	
 	@FindBy(xpath="//div[contains(@class,'s-dashboard-edit-bar')]")
@@ -65,7 +65,7 @@ public class DashboardsPage extends AbstractFragment {
 	private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
 	private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
 	private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
-	private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//a[@class='s-delete']");
+	private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
 	
 	public DashboardTabs getTabs() {
 		return tabs;

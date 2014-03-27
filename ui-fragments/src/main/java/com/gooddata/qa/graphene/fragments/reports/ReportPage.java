@@ -32,18 +32,27 @@ public class ReportPage extends AbstractFragment {
 	
 	@FindBy(xpath="//button[contains(@class, 'exportButton')]")
 	private WebElement exportButton;
-	
-	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'pdf')]")
+
+    @FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-pdf')]//a")
 	private WebElement exportToPDF;
-	
-	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'png')]")
-	private WebElement exportToPNG;
-	
-	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'xls')]")
-	private WebElement exportToXLS;
-	
-	@FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//a[contains(@class, 'csv')]")
-	private WebElement exportToCSV;
+
+    @FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-pdf__portrait_')]//a")
+    private WebElement exportToPDFPortrait;
+
+    @FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-pdf__landscape_')]//a")
+    private WebElement exportToPDFLandscape;
+
+    @FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-image__png_')]//a")
+    private WebElement exportToPNG;
+
+    @FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-excel_xls')]//a")
+    private WebElement exportToXLS;
+
+    @FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-csv')]//a")
+    private WebElement exportToCSV;
+
+    @FindBy(xpath="//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-raw_data__csv_')]//a")
+    private WebElement exportToRawCSV;
 	
 	public ReportVisualizer getVisualiser() {
 		return visualiser;
@@ -93,6 +102,12 @@ public class ReportPage extends AbstractFragment {
 		case PDF:
 			currentExportLink = exportToPDF;
 			break;
+        case PDF_PORTRAIT:
+            currentExportLink = exportToPDFPortrait;
+            break;
+        case PDF_LANDSCAPE:
+            currentExportLink = exportToPDFLandscape;
+            break;
 		case IMAGE_PNG:
 			currentExportLink = exportToPNG;
 			break;
@@ -102,6 +117,9 @@ public class ReportPage extends AbstractFragment {
 		case CSV:
 			currentExportLink = exportToCSV;
 			break;
+        case RAW_CSV:
+            currentExportLink = exportToRawCSV;
+            break;
 		default:
 			break;
 		}
