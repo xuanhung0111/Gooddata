@@ -32,7 +32,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
         expectedDashboardsAndTabs.put("Prospects Only", new String[]{
                 "Marketing KPIs", "Prospects", "Leaderboard", "and more"
         });
-		
+
 		projectCreateCheckIterations = 120;
 		integrationProcessCheckLimit = 240;
 	}
