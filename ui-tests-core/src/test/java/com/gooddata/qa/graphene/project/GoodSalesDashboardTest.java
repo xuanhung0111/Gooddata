@@ -63,7 +63,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 		waitForDashboardPageLoaded();
 		Thread.sleep(5000);
 		int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
-		dashboardsPage.deleteDashboardTab(expectedGoodSalesDashboardsAndTabs.size());
+		dashboardsPage.deleteDashboardTab(tabsCount - 1);
 		Thread.sleep(5000);
 		assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
 	}
