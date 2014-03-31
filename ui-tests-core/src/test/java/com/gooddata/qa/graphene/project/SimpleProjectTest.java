@@ -4,7 +4,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 
-@Test(groups = { "projectSimple" }, description = "Tests for basic project functionality in GD platform")
+@Test(groups = {"projectSimple"}, description = "Tests for basic project functionality in GD platform")
 public class SimpleProjectTest extends AbstractProjectTest {
-	
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    public void dummyTestToSetStatus() throws InterruptedException {
+        successfulTest = true;
+    }
+
 }
