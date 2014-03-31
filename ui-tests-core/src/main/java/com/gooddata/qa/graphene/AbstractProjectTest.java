@@ -47,7 +47,6 @@ public abstract class AbstractProjectTest extends AbstractTest {
 
         validationStatus = validateProject();
         assertEquals(validationStatus, "OK");
-        successfulTest = true;
     }
 	
 	@Test(dependsOnMethods = { "validateProjectAfterTests" }, alwaysRun = true)
