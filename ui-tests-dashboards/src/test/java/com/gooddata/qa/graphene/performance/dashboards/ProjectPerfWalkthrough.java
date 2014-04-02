@@ -36,7 +36,6 @@ public class ProjectPerfWalkthrough extends AbstractTest {
     @Test(dependsOnGroups = {"perfInit"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
         browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + projectId + "|projectDashboardPage");
-        waitForDashboardPageLoaded();
         verifyProjectDashboardsAndTabs(false, null, false);
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output);

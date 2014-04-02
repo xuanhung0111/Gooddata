@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.project;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 

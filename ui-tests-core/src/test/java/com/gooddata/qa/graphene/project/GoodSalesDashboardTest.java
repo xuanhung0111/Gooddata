@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.project;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -10,7 +11,7 @@ import static org.testng.Assert.*;
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 	
 	private String exportedDashboardName;
-	private long expectedDashboardExportSize = 65000L;
+	private static final long expectedDashboardExportSize = 65000L;
 	
 	@Test(dependsOnMethods = { "createProject" }, groups = { "dashboards-verification" })
 	public void verifyDashboardTabs() throws InterruptedException {

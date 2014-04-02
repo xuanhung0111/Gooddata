@@ -21,7 +21,7 @@ public class ProjectWalktroughTest extends AbstractTest {
 		signInAtUI(user, password);
 	}
 	
-	@Test(dependsOnGroups = { "projectWalkthroughInit" }, alwaysRun = true)
+	@Test(dependsOnGroups = { "projectWalkthroughInit" })
 	public void verifyProject() throws InterruptedException {
 		verifyProjectDashboardsAndTabs(false, null, true);
 	}

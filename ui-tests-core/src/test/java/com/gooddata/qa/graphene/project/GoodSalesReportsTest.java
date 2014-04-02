@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.project;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ExportFormat;
@@ -16,13 +17,13 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 	
 	private int createdReportsCount = 0;
 	
-	private long expectedLineChartExportPDFSize = 110000L;
-	private long expectedAreaChartReportExportPNGSize = 43000L;
-	private long expectedStackedAreaChartReportExportXLSSize = 5500L;
-	private long expectedBarChartReportExportCSVSize = 300L;
-	private long expectedTabularReportExportPDFSize = 28000L;
-	private long expectedTabularReportExportXLSSize = 11000L;
-	private long expectedTabularReportExportCSVSize = 1650L;
+	private static final long expectedLineChartExportPDFSize = 110000L;
+	private static final long expectedAreaChartReportExportPNGSize = 43000L;
+	private static final long expectedStackedAreaChartReportExportXLSSize = 5500L;
+	private static final long expectedBarChartReportExportCSVSize = 300L;
+	private static final long expectedTabularReportExportPDFSize = 28000L;
+	private static final long expectedTabularReportExportXLSSize = 11000L;
+	private static final long expectedTabularReportExportCSVSize = 1650L;
 	
 	@Test(dependsOnMethods = { "createProject" })
 	public void verifyReportsPage() throws InterruptedException {

@@ -3,6 +3,7 @@
  */
 package com.gooddata.qa.graphene.project;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
