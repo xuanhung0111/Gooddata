@@ -34,6 +34,14 @@ public abstract class AbstractFragment {
 		waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
 	}
 	
+	public void waitForTableReportRendered(){
+		By girdContainerBody = By.xpath("//div[@id='gridContainerTab']/div[@id='gridContainer']/div[@class='containerBody']/div[contains(@class,'gridTab')]");
+		if (browser.findElements(girdContainerBody).size() > 0) {
+			waitForElementNotPresent(girdContainerBody);
+		}
+		waitForElementVisible(girdContainerBody);
+	}
+	
 	public WebElement waitForElementVisible(WebElement element) {
 		Graphene.waitGui().until().element(element).is().visible();
 		return element;

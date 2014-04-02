@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +84,7 @@ public class ReportPage extends AbstractFragment {
 
 	@FindBy(xpath = "//div[@id='filtersContainer']")
 	private ReportFilter reportFilter;
-
+	
 	public ReportVisualizer getVisualiser() {
 		return visualiser;
 	}
@@ -171,7 +175,7 @@ public class ReportPage extends AbstractFragment {
 		waitForElementVisible(reportFilter.getRoot());
 		String textOnFilterButton = waitForElementVisible(filterButton)
 				.getText();
-		int filterCountBefore = getFilterNumber(textOnFilterButton);
+		float filterCountBefore = getNumber(textOnFilterButton);	
 		switch (filterType) {
 		case ATTRIBUTE:
 			reportFilter.addFilterSelectList(data);
@@ -189,7 +193,7 @@ public class ReportPage extends AbstractFragment {
 			break;
 		}
 		textOnFilterButton = waitForElementVisible(filterButton).getText();
-		int filterCountAfter = getFilterNumber(textOnFilterButton);
+		float filterCountAfter = getNumber(textOnFilterButton);
 		Assert.assertEquals(filterCountAfter, filterCountBefore + 1,
 				"Filter wasn't added");
 		Thread.sleep(2000);
@@ -206,16 +210,16 @@ public class ReportPage extends AbstractFragment {
 				"Report wasn't saved");
 	}
 
-	public int getFilterNumber(String text) {
+	public static float getNumber(String text) {
 		String tmp = "";
-		int number = 0;
+		float number = 0;
 		for (int i = 0; i < text.length(); i++) {
-			if (text.charAt(i) > 47 && text.charAt(i) < 58) {
+			if (text.charAt(i) > 45 && text.charAt(i) < 58 && text.charAt(i)!= 47) {
 				tmp += text.charAt(i);
 			}
 		}
 		if (tmp.length() > 0) {
-			number = Integer.parseInt(tmp);
+			number = Float.parseFloat(tmp);
 		}
 		return number;
 	}

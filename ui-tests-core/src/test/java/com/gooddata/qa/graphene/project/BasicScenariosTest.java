@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.project;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -19,8 +22,9 @@ public class BasicScenariosTest extends SimpleProjectTest {
 	protected static final String FILTER_ATTRIBUTE_NAME = "County";
 	protected static final String REPORT_NAME = "Amount Overview table";
 	protected static final String METRIC_NAME = "Avg of Amount";
-
+	
 	private long expectedDashboardExportSize = 65000L;
+	private List<String> prompt_elements;
 
 	@BeforeClass
 	public void initStartPage() {
@@ -30,7 +34,7 @@ public class BasicScenariosTest extends SimpleProjectTest {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
 	public void uploadDataTest() throws InterruptedException {
 		String csvFilePath = loadProperty("csvFilePath");
-		uploadSimpleCSV(csvFilePath + "payroll-Tutorial.csv", "simple-ws");
+		uploadSimpleCSV(csvFilePath, "simple-ws");
 
 	}
 
@@ -38,8 +42,11 @@ public class BasicScenariosTest extends SimpleProjectTest {
 	public void createvariableTest() throws InterruptedException {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 				+ "|dataPage|variables");
+		prompt_elements = new ArrayList<String>();
+		prompt_elements.add("Bachelors Degree");
+		prompt_elements.add("Graduate Degree");
 		variableDetailPage.createFilterVariable(ATTRIBUTE_FOR_VARIABLE,
-				PROMPT_NAME);
+				PROMPT_NAME, prompt_elements);
 	}
 
 	@Test(dependsOnMethods = { "createvariableTest" }, groups = { "tests" })

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.testng.Assert;
@@ -13,9 +14,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.FilterTypes;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.ReportsList;
-import com.gooddata.qa.graphene.project.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-@Test(groups = { "GoodSalesReports" }, description = "Tests for GoodSales project (reports functionality) in GD platform")
+@Test(groups = { "GoodSalesReportFilters" }, description = "Tests for GoodSales project (reports functionality) in GD platform")
 public class FilterReportTest extends GoodSalesAbstractTest {
 
 	private String reportName;
@@ -23,7 +24,9 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 	private List<String> what;
 	private String attributeFilter;
 	private String metricFilter;
-	private String variableFilter;
+	private String variableName;
+	private String attributeForPrompt;
+	private List<String> promptList;
 	private String rankType;
 	private String rankSize;
 	Map<String, String> data;
@@ -44,10 +47,13 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 		how.add("Stage Name");
 		attributeFilter = "Stage Name";
 		metricFilter = "Amount";
-		variableFilter = "Status";
+		attributeForPrompt = "Stage Name";
+		variableName = "F Stage Name";
+		promptList = new ArrayList<String>();
 		rankType = "Top"; // (valid elements: "Top", "Bottom")
 		rankSize = "3"; // (valid elements: "1", "3", "5" , "10")
-
+		data = new HashMap<String, String>();
+		
 		reportsList = Graphene.createPageFragment(ReportsList.class,
 				browser.findElement(BY_PANEL_ROOT));
 		Assert.assertNotNull(reportsList, "Reports page not initialized!");
@@ -78,14 +84,35 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 		reportsList.openReport(this.reportName);
 		data = new HashMap<String, String>();
 		data.put("attribute", this.attributeFilter);
+		data.put("attributeElements", "Interest, Discovery, Short List");
 		data.put("metric", this.metricFilter);
 		data.put("type", this.rankType);
 		data.put("size", this.rankSize);
 		data.put("number", "100000");
-		data.put("variable", this.variableFilter);
 		reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
 		reportPage.addFilter(FilterTypes.RANK, data);
 		reportPage.addFilter(FilterTypes.RANGE, data);
+		reportPage.saveReport();
+		checkRedBar();
+	}
+	
+	@Test(dependsOnMethods = { "filterReportTest" }, groups = { "tests" })
+	public void promptFilterTest() throws InterruptedException {
+
+		promptList = new ArrayList<String>();
+		promptList.add("Interest");
+		promptList.add("Discovery");
+		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
+				+ "|dataPage|variables");
+		variableDetailPage.createFilterVariable(attributeForPrompt,
+				variableName, promptList);
+		String str = StringUtils.join(promptList, ", ");
+		System.out.println("String = " + str);
+		data.put("promptElements",str);
+		data.put("variable", this.variableName);
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage|");
+		waitForReportsPageLoaded();
+		reportsList.openReport(this.reportName);
 		reportPage.addFilter(FilterTypes.PROMPT, data);
 		reportPage.saveReport();
 		checkRedBar();

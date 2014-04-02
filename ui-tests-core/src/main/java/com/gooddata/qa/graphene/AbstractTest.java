@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.VariablesTable;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
@@ -162,6 +163,9 @@ public abstract class AbstractTest extends Arquillian {
 	
 	@FindBy(id="p-objectPage")
 	protected AttributeDetailPage attributeDetailPage;
+	
+	@FindBy(id="variablesTable")
+	protected VariablesTable variablesTable;
 	
 	@FindBy(id="p-dataPage")
 	protected VariableDetailPage variableDetailPage;
