@@ -92,7 +92,7 @@ public class DashboardsPage extends AbstractFragment {
 		return name;
 	}
 	
-	public boolean selectDashboard(String dashboardName) {
+	public boolean selectDashboard(String dashboardName) throws InterruptedException {
 		if (getDashboardName().contains(dashboardName)) {
 			System.out.println("Dashboard '" + dashboardName + "'already selected");
 			return true;
@@ -102,6 +102,7 @@ public class DashboardsPage extends AbstractFragment {
 			for (WebElement elem : dashboardSelectors) {
 				if (elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title").equals(dashboardName)) {
 					elem.findElement(BY_LINK).click();
+                    Thread.sleep(3000);
                     waitForDashboardPageLoaded();
 					return true;
 				}
@@ -118,6 +119,7 @@ public class DashboardsPage extends AbstractFragment {
 			for (WebElement elem : dashboardSelectors) {
 				if (Integer.valueOf(elem.getAttribute("gdc:index")) == dashboardIndex) {
 					elem.findElement(BY_LINK).click();
+                    Thread.sleep(3000);
 					waitForDashboardPageLoaded();
 					return true;
 				}
