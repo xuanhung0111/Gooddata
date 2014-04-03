@@ -15,9 +15,9 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 @Test(groups = { "report" }, description = "Tests for basic reports functionality in GD platform")
 public class ReportsPageTest extends AbstractTest {
 	
-	private String[] expectedDefaultFolderNames = {"All", "Favorites", "My Reports", "Unsorted"};
-	private String[] expectedDefaultFoldersLinksSuffix = {"all-reports", "favorites", "myreports", "unsorted"};
-	private String[] expectedDefaultFolderDescriptions = 
+	private static final String[] expectedDefaultFolderNames = {"All", "Favorites", "My Reports", "Unsorted"};
+	private static final String[] expectedDefaultFoldersLinksSuffix = {"all-reports", "favorites", "myreports", "unsorted"};
+	private static final String[] expectedDefaultFolderDescriptions =
 		   {"This folder contains all reports within the project.", 
 			"This folder contains your favorite reports. You can drag reports into this folder or open a report and click the \"Add to Favorites\" link.", 
 			"This folder contains all reports created by you.",

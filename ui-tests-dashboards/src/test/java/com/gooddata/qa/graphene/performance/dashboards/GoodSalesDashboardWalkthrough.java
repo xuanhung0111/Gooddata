@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.json.JSONArray;
@@ -20,37 +21,9 @@ import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = { "dashboardPerf" }, description = "Tests for performance od rendering dashboards in GoodSales project")
-public class GoodSalesDashboardWalkthrough extends AbstractTest { 
+public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
-	private static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
-
-    protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
-	
-	@BeforeClass
-	public void initStartPage() {
-		startPage = "gdc";
-
-        expectedGoodSalesDashboardsAndTabs = new HashMap<String, String[]>();
-        expectedGoodSalesDashboardsAndTabs.put("Pipeline Analysis", new String[]{
-                "Outlook", "What's Changed", "Waterfall Analysis", "Leaderboards", "Activities",
-                "Sales Velocity", "Quarterly Trends", "Seasonality", "...and more"
-        });
-	}
-	
-	@Test(groups = { "GoodSalesPerfInit" } )
-	public void init() throws JSONException {
-		signInAtGreyPages(user, password);
-	}
-	
-	@Test(dependsOnGroups = { "GoodSalesPerfInit" })
-	public void createProject() throws JSONException, InterruptedException {
-		browser.get(getRootUrl() + PAGE_GDC_PROJECTS);
-		waitForElementVisible(gpProject.getRoot());
-		projectId = gpProject.createProject("GoodSales-perf-test", "", GOODSALES_TEMPLATE, authorizationToken, 240);
-		Screenshots.takeScreenshot(browser, "GoodSales-perf-project-created", this.getClass());
-	}
-	
-	@Test(dependsOnMethods = { "createProject" })
+	@Test(dependsOnMethods = { "createProject" }, groups = {"tests"})
 	public void dashboardsWalkthrough() throws InterruptedException, JSONException {
 		browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + projectId + "|projectDashboardPage");
 		waitForDashboardPageLoaded();
@@ -61,11 +34,6 @@ public class GoodSalesDashboardWalkthrough extends AbstractTest {
 		String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
 		createPerfOutputFile(output);
 		successfulTest = true;
-	}
-	
-	@Test(dependsOnMethods = { "dashboardsWalkthrough" })
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
 	}
 	
 	private void createPerfOutputFile(String csvContent) throws JSONException {
