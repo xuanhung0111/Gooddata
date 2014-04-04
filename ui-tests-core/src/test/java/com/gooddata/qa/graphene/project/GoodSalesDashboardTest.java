@@ -94,6 +94,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 		int dashboardsCount = dashboardsPage.getDashboardsCount();
 		if (dashboardsPage.selectDashboard("test")) {
 			dashboardsPage.deleteDashboard();
+            Thread.sleep(3000);
 			waitForDashboardPageLoaded();
 			assertEquals(dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
 			checkRedBar();
