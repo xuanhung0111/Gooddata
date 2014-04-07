@@ -30,7 +30,6 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 	private String rankType;
 	private String rankSize;
 	Map<String, String> data;
-	private ReportsList reportsList;
 
 	@BeforeClass
 	public void setProjectTitle() {
@@ -53,11 +52,6 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 		rankType = "Top"; // (valid elements: "Top", "Bottom")
 		rankSize = "3"; // (valid elements: "1", "3", "5" , "10")
 		data = new HashMap<String, String>();
-		
-		reportsList = Graphene.createPageFragment(ReportsList.class,
-				browser.findElement(BY_PANEL_ROOT));
-		Assert.assertNotNull(reportsList, "Reports page not initialized!");
-
 	}
 
 	@Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
@@ -81,7 +75,7 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 
 		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage|");
 		waitForReportsPageLoaded();
-		reportsList.openReport(this.reportName);
+		reportsPage.getReportsList().openReport(this.reportName);
 		data = new HashMap<String, String>();
 		data.put("attribute", this.attributeFilter);
 		data.put("attributeElements", "Interest, Discovery, Short List");
@@ -112,7 +106,7 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 		data.put("variable", this.variableName);
 		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage|");
 		waitForReportsPageLoaded();
-		reportsList.openReport(this.reportName);
+		reportsPage.getReportsList().openReport(this.reportName);
 		reportPage.addFilter(FilterTypes.PROMPT, data);
 		reportPage.saveReport();
 		checkRedBar();

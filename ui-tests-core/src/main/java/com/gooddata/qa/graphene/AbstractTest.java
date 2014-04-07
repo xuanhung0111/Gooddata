@@ -170,8 +170,6 @@ public abstract class AbstractTest extends Arquillian {
 	@FindBy(id="p-dataPage")
 	protected VariableDetailPage variableDetailPage;
 	
-	//end
-	
 	/** ----- Grey pages fragmnets ----- */
 	
 	@FindBy(tagName="form")

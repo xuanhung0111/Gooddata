@@ -12,9 +12,6 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class VariableDetailPage extends AbstractFragment {
 
-	/**
-	 * @param args
-	 */
 	@FindBy(xpath = "//a[text()='Manage']")
 	private WebElement manageOption;
 

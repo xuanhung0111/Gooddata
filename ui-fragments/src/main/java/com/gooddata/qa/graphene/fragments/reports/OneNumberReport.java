@@ -1,9 +1,9 @@
-package com.gooddata.qa.graphene.fragments.dashboards;
+package com.gooddata.qa.graphene.fragments.reports;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class DashboardReportOneNumber extends DashboardReport {
+public class OneNumberReport extends AbstractReport {
 	
 	@FindBy(className = "number")
 	private WebElement number;

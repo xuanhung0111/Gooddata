@@ -13,10 +13,6 @@ import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardFilter;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardLineObject;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardTextObject;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardWebContent;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -39,7 +35,7 @@ public class DashboardEditBar extends AbstractFragment {
 	private WebElement widgetMenuButton;
 
 	@FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
-	private DashboardWidgets dashboardWidgets;
+	private DashboardAddWidgetPanel dashboardAddWidgetPanel;
 
 	@FindBy(xpath = "//span[text()='Web Content']")
 	private WebElement addwebContent;
@@ -48,7 +44,7 @@ public class DashboardEditBar extends AbstractFragment {
 	private DashboardWebContent dashboardWebContent;
 
 	@FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple')]")
-	private DashboardReport dashboardReport;
+	private DashboardAddReportPanel dashboardAddReportPanel;
 
 	@FindBy(xpath = "//button[contains(@class,'s-btn-text')]")
 	private WebElement addText;
@@ -77,19 +73,19 @@ public class DashboardEditBar extends AbstractFragment {
 	public void addReportToDashboard(String reportName) {
 		int widgetCountBefore = listDashboardWidgets.size();
 		waitForElementVisible(reportMenuButton).click();
-		waitForElementVisible(dashboardReport.getRoot());
-		dashboardReport.addReport(reportName);
+		waitForElementVisible(dashboardAddReportPanel.getRoot());
+		dashboardAddReportPanel.addReport(reportName);
 		int widgetCountAfter = listDashboardWidgets.size();
 		Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
 				"Widget wasn't added");
 	}
 
-	public void addWidgetToDashboard(WidgetTypes widgetype, String metricLabel)
+	public void addWidgetToDashboard(WidgetTypes widgetType, String metricLabel)
 			throws InterruptedException {
 		int widgetCountBefore = listDashboardWidgets.size();
 		waitForElementVisible(widgetMenuButton).click();
-		waitForElementVisible(dashboardWidgets.getRoot());
-		dashboardWidgets.addWidget(widgetype, metricLabel);
+		waitForElementVisible(dashboardAddWidgetPanel.getRoot());
+		dashboardAddWidgetPanel.addWidget(widgetType, metricLabel);
 		int widgetCountAfter = listDashboardWidgets.size();
 		Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
 				"Widget wasn't added");

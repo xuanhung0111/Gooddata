@@ -6,7 +6,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-public class DashboardWidgets extends AbstractFragment {
+public class DashboardAddWidgetPanel extends AbstractFragment {
 
 	@FindBy(xpath = "//div[contains(@class, 'yui3-c-dashboardwidgetconfigpanel')]")
 	private WebElement widgetConfigPanel;
@@ -20,10 +20,10 @@ public class DashboardWidgets extends AbstractFragment {
 	private static final String widgetLocator = "//div[contains(@class,'yui3-c-adddashboardwidgetpickerpanel')]//div[contains(@class,'add-dashboard-item')]/div[contains(text(), '${widgetLabel}')]/../button";
 	private static final String widgetMetricLocator = "//div[contains(@class,'yui3-widget-stacked shelterPlugin-plugged')]//div[contains(@class,'yui3-c-picker-content')]//div[contains(@class,'yui3-c-simplecolumn')]//div[contains(@class,'c-label') and contains(@class,'s-enabled')]/span[text()='${metricLabel}']";
 
-	public void addWidget(WidgetTypes widgetype, String metricLabel)
+	public void addWidget(WidgetTypes type, String metricLabel)
 			throws InterruptedException {
 		By widgetType = By.xpath(widgetLocator.replace("${widgetLabel}",
-				widgetype.getLabel()));
+                type.getLabel()));
 		waitForElementVisible(widgetType).click();
 		// TODO fragments for widget config panel + metric selection can be used
 		// - but better IDs and UI organization is required

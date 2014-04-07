@@ -12,8 +12,9 @@ import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
-public class BasicScenariosTest extends SimpleProjectTest {
-	protected static final String ATTRIBUTE_NAME = "State";
+public class DashboardObjectsTest extends SimpleProjectTest {
+
+    protected static final String ATTRIBUTE_NAME = "State";
 	protected static final String ATTRIBUTE_LABEL_TYPE = "US States (Name)";
 
 	protected static final String ATTRIBUTE_FOR_VARIABLE = "Education";
@@ -23,12 +24,12 @@ public class BasicScenariosTest extends SimpleProjectTest {
 	protected static final String REPORT_NAME = "Amount Overview table";
 	protected static final String METRIC_NAME = "Avg of Amount";
 	
-	private long expectedDashboardExportSize = 65000L;
+	private static final long expectedDashboardExportSize = 65000L;
 	private List<String> prompt_elements;
 
 	@BeforeClass
 	public void initStartPage() {
-		projectTitle = "Basic-scenario-test";
+		projectTitle = "simple-dashboard-objects-test";
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
@@ -66,7 +67,6 @@ public class BasicScenariosTest extends SimpleProjectTest {
 
 	}
 
-	// add widgets into Dashboard
 	@Test(dependsOnMethods = { "changeStateLabelTest" }, groups = { "tests" })
 	public void addDashboardObjectsTest() throws InterruptedException {
 		initDashboardsPage();
@@ -97,11 +97,16 @@ public class BasicScenariosTest extends SimpleProjectTest {
 		Thread.sleep(2000);
 		dashboardEditBar.addWebContentToDashboard();
 		dashboardEditBar.saveDashboard();
-		String exporteddashboardName = dashboardsPage.printDashboardTab(0);
-		verifyDashboardExport(exporteddashboardName.replace(" ", "_"),
-				expectedDashboardExportSize);
-		checkRedBar();
-		successfulTest = true;
 	}
+
+    @Test(dependsOnMethods = { "addDashboardObjectsTest" }, groups = { "tests" })
+    public void printDashboardTest() throws InterruptedException {
+        initDashboardsPage();
+        String exportedDashboardName = dashboardsPage.printDashboardTab(0);
+        verifyDashboardExport(exportedDashboardName.replace(" ", "_"),
+                expectedDashboardExportSize);
+        checkRedBar();
+        successfulTest = true;
+    }
 
 }

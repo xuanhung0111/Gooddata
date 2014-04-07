@@ -8,12 +8,12 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-public class TableReport extends AbstractFragment{
+public class TableReport extends AbstractReport {
 	
-	@FindBy(xpath = "//div[@id='gridContainerTab']/div[@id='gridContainer']/div[@class='containerBody']/div[4]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'element')]")
+	@FindBy(xpath = "//div[@class='containerBody']/div[4]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'element')]")
 	private List<WebElement> attributeElementInGrid;
 	
-	@FindBy(xpath = "//div[@id='gridContainerTab']/div[@id='gridContainer']/div[@class='containerBody']/div[5]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'data')]")
+	@FindBy(xpath = "//div[@class='containerBody']/div[5]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'data')]")
 	private List<WebElement> metricValuesInGrid;
 	
 	public List<String> getAttributeInGrid(){

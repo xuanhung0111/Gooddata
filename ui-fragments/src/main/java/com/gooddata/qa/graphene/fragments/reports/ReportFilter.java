@@ -251,4 +251,12 @@ public class ReportFilter extends AbstractFragment {
 		attrElementInGrid = report.getAttributeInGrid();
 		Assert.assertEquals(attrElementInGrid, lsPromptElements, "Report isn't applied filter correctly");
 	}
+
+    public void waitForTableReportRendered() {
+        By gridContainerBody = By.xpath("//div[@id='gridContainerTab']/div[@id='gridContainer']/div[@class='containerBody']/div[contains(@class,'gridTab')]");
+        if (browser.findElements(gridContainerBody).size() > 0) {
+            waitForElementNotPresent(gridContainerBody);
+        }
+        waitForElementVisible(gridContainerBody);
+    }
 }
