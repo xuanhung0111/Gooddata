@@ -32,6 +32,9 @@ public class DashboardsPage extends AbstractFragment {
 	@FindBy(css=".s-export_to_pdf")
 	private WebElement exportPdfButton;
 	
+	@FindBy(xpath = "//button[@title='Download PDF']")
+	private WebElement printPdfButton;
+	
 	@FindBy(css=".s-embed")
 	private WebElement embedButton;
 	
@@ -64,6 +67,7 @@ public class DashboardsPage extends AbstractFragment {
 	
 	private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
 	private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
+	private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
 	private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
 	private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
 	
@@ -162,6 +166,18 @@ public class DashboardsPage extends AbstractFragment {
 		return tabName;
 	}
 	
+	public String printDashboardTab(int tabIndex) throws InterruptedException {
+		tabs.openTab(tabIndex);
+		waitForDashboardPageLoaded();
+		String tabName = tabs.getTabLabel(0);
+		waitForDashboardPageLoaded();
+		waitForElementVisible(printPdfButton).click();
+		Thread.sleep(3000);
+		waitForElementNotPresent(BY_PRINTING_PANEL);
+		Thread.sleep(3000);
+		System.out.println("Dashboard " + tabName + " printed to Pdf");
+		return tabName;
+	}
 	public void addNewTab(String tabName) {
 		waitForElementVisible(addNewTabButton).click();
 		waitForElementVisible(newTabDialog.getRoot());

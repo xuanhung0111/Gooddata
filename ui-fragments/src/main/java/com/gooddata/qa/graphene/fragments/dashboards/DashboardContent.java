@@ -2,15 +2,16 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class DashboardContent extends AbstractFragment {
 	@FindBy(css = ".c-projectdashboard-items .yui3-c-reportdashboardwidget")
-	private List<DashboardReport> reports;
+	private List<AbstractReport> reports;
 	
-	public List<DashboardReport> getReports() {
+	public List<AbstractReport> getReports() {
 		return reports;
 	}
 	
@@ -18,7 +19,7 @@ public class DashboardContent extends AbstractFragment {
 		return getReports().size();
 	}
 	
-	public DashboardReport getReport(int reportIndex) {
+	public AbstractReport getReport(int reportIndex) {
 		return getReports().get(reportIndex);
 	}
 

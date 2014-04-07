@@ -3,13 +3,13 @@ package com.gooddata.qa.graphene.project;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardReportOneNumber;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
@@ -63,7 +63,7 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
 	public void verifyHeadlineReport() {
 		initDashboardsPage();
 		assertEquals(1, dashboardsPage.getContent().getNumberOfReports(), "Invalid report(s) count on dashboard");
-		DashboardReportOneNumber report = Graphene.createPageFragment(DashboardReportOneNumber.class, dashboardsPage.getContent().getReport(0).getRoot());
+		OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class, dashboardsPage.getContent().getReport(0).getRoot());
 		assertEquals(report.getValue(), "7,252,542.63", "Invalid value in headline report");
 		assertEquals(report.getDescription(), "Sum of Amount", "Invalid description in headline report");
 		successfulTest = true;
