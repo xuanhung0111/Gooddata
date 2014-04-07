@@ -37,7 +37,8 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
         integrationProcessCheckLimit = 240;
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testConnectorIntegrationResource"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testPardotIntegrationConfiguration() throws InterruptedException, JSONException {
         openUrl(getIntegrationUri());
         // go to page with integration settings
@@ -49,15 +50,17 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
         waitForElementVisible(BY_INPUT_PARDOT_ACCOUNT_ID).sendKeys(pardotAccountId);
         Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
         JSONObject json = loadJSON();
-        assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId, "Pardot accountId was not set to expected value");
+        assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId,
+                "Pardot accountId was not set to expected value");
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testPardotIntegrationConfiguration"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testPardotIntegrationConfiguration"})
     public void testPardotIntegration() throws InterruptedException, JSONException {
         // sign in back with demo user
         validSignInWithDemoUser(true);
         // process schedule
-        scheduleIntegrationProcess(integrationProcessCheckLimit);
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
     }
 
 }

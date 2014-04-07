@@ -137,16 +137,19 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         return browser.getCurrentUrl();
     }
 
-    protected void scheduleIntegrationProcess(int checkIterations) throws JSONException, InterruptedException {
+    protected void scheduleIntegrationProcess(int checkIterations, int expectedProcessesCount)
+            throws JSONException, InterruptedException {
         openUrl(getProcessesUri());
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 0, "There are no processes for new project yet");
+        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == expectedProcessesCount,
+                "There are no processes for new project yet");
         Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
 
         waitForIntegrationProcessSynchronized(browser, checkIterations);
     }
 
-    protected void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations) throws JSONException, InterruptedException {
+    protected void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations)
+            throws JSONException, InterruptedException {
         String processUrl = browser.getCurrentUrl();
         System.out.println("Waiting for process synchronized: " + processUrl);
         int i = 0;
@@ -164,7 +167,8 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         // may not be correct since another integration process can be scheduled automatically...
         browser.get(getRootUrl() + getProcessesUri());
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "There is one finished process");
+        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
+                "There is one finished process");
     }
 
     private String getProcessStatus(WebDriver browser) throws JSONException {
@@ -229,6 +233,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         assertTrue(process.getJSONObject("status").has("detail"), "detail key is missing");
         assertTrue(process.getJSONObject("status").has("description"), "description key is missing");
         assertTrue(process.getJSONObject("status").has("code"), "status code is missing");
-        assertTrue(process.getJSONObject("links").getString("self").startsWith("/" + getProcessesUri()), "self link is incorrect");
+        assertTrue(process.getJSONObject("links").getString("self").startsWith("/" + getProcessesUri()),
+                "self link is incorrect");
     }
 }

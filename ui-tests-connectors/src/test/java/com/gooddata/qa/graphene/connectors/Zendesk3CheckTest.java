@@ -16,7 +16,8 @@ public class Zendesk3CheckTest extends AbstractZendeskCheckTest {
         connectorType = Connectors.ZENDESK3;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
         expectedDashboardsAndTabs.put("Advanced Metrics", new String[]{
-                "Overview", "Ticket Creation", "Ticket Distribution", "Performance", "Backlog", "Open Issues", "Customer Satisfaction"
+                "Overview", "Ticket Creation", "Ticket Distribution", "Performance", "Backlog", "Open Issues",
+                "Customer Satisfaction"
         });
         expectedDashboardsAndTabs.put("GoodData for Zendesk", new String[]{
                 "Ticket Creation", "Ticket Resolution", "Agent Performance", "Watch List"
