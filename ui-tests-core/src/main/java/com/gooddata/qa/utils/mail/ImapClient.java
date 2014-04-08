@@ -120,7 +120,7 @@ public class ImapClient {
             Multipart multipart = (Multipart) message.getContent();
             for (int i = 0; i < multipart.getCount(); i++) {
                 BodyPart bodyPart = multipart.getBodyPart(i);
-                if(Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+                if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
                     partList.add(bodyPart);
                 }
             }
@@ -163,11 +163,11 @@ public class ImapClient {
 
     private static void saveFile(File outputFile, InputStream input) {
         try {
-            System.out.println("Saving attachment to file "+outputFile.getAbsolutePath());
+            System.out.println("Saving attachment to file " + outputFile.getAbsolutePath());
             FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
             IOUtils.copy(input, fileOutputStream);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot save file "+outputFile.getAbsoluteFile(), e);
+            throw new RuntimeException("Cannot save file " + outputFile.getAbsoluteFile(), e);
         }
     }
 }

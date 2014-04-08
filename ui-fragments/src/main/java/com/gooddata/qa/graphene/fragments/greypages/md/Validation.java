@@ -18,13 +18,13 @@ public enum Validation {
     PMD__PK_FK_CONSISTENCY(5),
     PMD__TRANSITIVITY(6);
 
-
-
     private final int validationID;
 
     Validation(int validationID) {
         this.validationID = validationID;
     }
 
-    public int getValidatioID() { return validationID;}
+    public int getValidatioID() {
+        return validationID;
+    }
 }

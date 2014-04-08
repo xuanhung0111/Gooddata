@@ -1,28 +1,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.gooddata.qa</groupId>
-		<artifactId>ui-tests-graphene</artifactId>
-		<version>1.0-SNAPSHOT</version>
-	</parent>
-	<artifactId>ui-tests-connectors</artifactId>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.gooddata.qa</groupId>
+        <artifactId>ui-tests-graphene</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>ui-tests-connectors</artifactId>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.gooddata.qa</groupId>
-			<artifactId>ui-tests-core</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>		
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.gooddata.qa</groupId>
+            <artifactId>ui-tests-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 
-	<profiles>
-		<profile>
-			<id>selenium</id>
-			<properties>
-				<testng.suite.xml>testng-connectors-check.xml</testng.suite.xml>
-				<propertiesPath>${basedir}/../ui-tests-core/src/test/resources/variables-env-test.properties</propertiesPath>
-			</properties>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>selenium</id>
+            <properties>
+                <testng.suite.xml>testng-connectors-check.xml</testng.suite.xml>
+                <propertiesPath>${basedir}/../ui-tests-core/src/test/resources/variables-env-test.properties
+                </propertiesPath>
+            </properties>
+        </profile>
+    </profiles>
 </project>

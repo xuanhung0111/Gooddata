@@ -1,26 +1,26 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests">
 
-	<test name="LoginTests">
-		<groups>
-			<run>
-				<exclude name="brokenTest" />
-			</run>
-		</groups>
-		<packages>
-			<package name="com.gooddata.qa.graphene.common.*" />
-		</packages>
-	</test>
+    <test name="LoginTests">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.gooddata.qa.graphene.common.*"/>
+        </packages>
+    </test>
 
-	<test name="SimpleProjectTest">
-		<groups>
-			<run>
-				<exclude name="brokenTest" />
-			</run>
-		</groups>
-		<classes>
-			<class name="com.gooddata.qa.graphene.project.SimpleProjectTest" />
-		</classes>
-	</test>
+    <test name="SimpleProjectTest">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.project.SimpleProjectTest"/>
+        </classes>
+    </test>
 
 </suite>

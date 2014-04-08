@@ -35,8 +35,7 @@ public class ConsoleStatusListener extends TestListenerAdapter {
     /**
      * This method will output method name and status on the standard output
      *
-     * @param result
-     *            from the fine-grained listener's method such as onTestFailure(ITestResult)
+     * @param result from the fine-grained listener's method such as onTestFailure(ITestResult)
      */
     private void logStatus(ITestResult result) {
         String message = getMessage(result);

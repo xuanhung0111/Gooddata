@@ -9,14 +9,14 @@ package com.gooddata.qa.utils.http;
  */
 public class InvalidStatusCodeException extends RuntimeException {
 
-	private int statusCode;
+    private int statusCode;
 
-	public InvalidStatusCodeException(String message, int statusCode) {
-		super(message);
-		this.statusCode = statusCode;
-	}
+    public InvalidStatusCodeException(String message, int statusCode) {
+        super(message);
+        this.statusCode = statusCode;
+    }
 
-	public int getStatusCode() {
-		return statusCode;
-	}
+    public int getStatusCode() {
+        return statusCode;
+    }
 }

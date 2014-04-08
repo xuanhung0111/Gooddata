@@ -10,57 +10,56 @@ import com.gooddata.qa.graphene.AbstractTest;
 
 /**
  * This is a helper class to delete test projects from required GD host
- * 
- * @author michal.vanco@gooddata.com
  *
+ * @author michal.vanco@gooddata.com
  */
-@Test(groups = { "tools" }, description = "Tools tests")
+@Test(groups = {"tools"}, description = "Tools tests")
 public class DeleteTestProjects extends AbstractTest {
-	
-	@BeforeClass
-	public void initStartPage() {
-		startPage = PAGE_LOGIN;
-	}
-	
-	@Test(groups = "deleteProjectsInit")
-	public void initTest() throws JSONException {
-		validSignInWithDemoUser(false);
-	}
 
-	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllConnectorCheckProjects() throws InterruptedException {
-		deleteProjects("CheckConnector");
-	}
-	
-	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllGoodSalesCheckProjects() throws InterruptedException {
-		deleteProjects("GoodSales-test");
-	}
+    @BeforeClass
+    public void initStartPage() {
+        startPage = PAGE_LOGIN;
+    }
 
-    @Test(dependsOnGroups = { "deleteProjectsInit" })
+    @Test(groups = "deleteProjectsInit")
+    public void initTest() throws JSONException {
+        validSignInWithDemoUser(false);
+    }
+
+    @Test(dependsOnGroups = {"deleteProjectsInit"})
+    public void deleteAllConnectorCheckProjects() throws InterruptedException {
+        deleteProjects("CheckConnector");
+    }
+
+    @Test(dependsOnGroups = {"deleteProjectsInit"})
+    public void deleteAllGoodSalesCheckProjects() throws InterruptedException {
+        deleteProjects("GoodSales-test");
+    }
+
+    @Test(dependsOnGroups = {"deleteProjectsInit"})
     public void deleteAllSimpleProjects() throws InterruptedException {
         deleteProjects("simple-project");
     }
-	
-	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllSimpleGeoProjects() throws InterruptedException {
-		deleteProjects("simple-project-geo");
-	}
-	
-	@Test(dependsOnGroups = { "deleteProjectsInit" })
-	public void deleteAllGoodSalesPerfCheckProjects() throws InterruptedException {
-		deleteProjects("GoodSales-perf-test");
-	}
-	
-	private void deleteProjects(String projectSubstring) throws InterruptedException {
-		browser.get(getRootUrl() + PAGE_PROJECTS);
-		waitForElementVisible(projectsPage.getRoot());
-		Thread.sleep(5000);
-		List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
-		System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
-		for (String projectToDelete : projectsToDelete) {
-			deleteProject(projectToDelete);
-		}
-	}
-	
+
+    @Test(dependsOnGroups = {"deleteProjectsInit"})
+    public void deleteAllSimpleGeoProjects() throws InterruptedException {
+        deleteProjects("simple-project-geo");
+    }
+
+    @Test(dependsOnGroups = {"deleteProjectsInit"})
+    public void deleteAllGoodSalesPerfCheckProjects() throws InterruptedException {
+        deleteProjects("GoodSales-perf-test");
+    }
+
+    private void deleteProjects(String projectSubstring) throws InterruptedException {
+        browser.get(getRootUrl() + PAGE_PROJECTS);
+        waitForElementVisible(projectsPage.getRoot());
+        Thread.sleep(5000);
+        List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
+        System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
+        for (String projectToDelete : projectsToDelete) {
+            deleteProject(projectToDelete);
+        }
+    }
+
 }
