@@ -20,7 +20,7 @@ public class StorageUsersFragment extends AbstractHDSFragment {
     @FindBy
     private WebElement login;
 
-    @FindBy(xpath="div[@class='submit']/input")
+    @FindBy(xpath = "div[@class='submit']/input")
     private WebElement submit;
 
     public void waitUntilFormIsVisible() {
@@ -36,9 +36,9 @@ public class StorageUsersFragment extends AbstractHDSFragment {
         waitForElementVisible(this.login);
         waitForElementVisible(this.submit);
 
-        if(!isEmpty(role)) this.role.selectByValue(role);
-        if(!isEmpty(profileUri)) this.profile.sendKeys(profileUri);
-        if(!isEmpty(login)) this.login.sendKeys(login);
+        if (!isEmpty(role)) this.role.selectByValue(role);
+        if (!isEmpty(profileUri)) this.profile.sendKeys(profileUri);
+        if (!isEmpty(login)) this.login.sendKeys(login);
         Graphene.guardHttp(submit).click();
         if (poll) {
             waitForUserAdded(10);
@@ -51,8 +51,8 @@ public class StorageUsersFragment extends AbstractHDSFragment {
         waitForElementVisible(this.profile);
         waitForElementVisible(this.submit);
 
-        if(!isEmpty(role)) this.role.selectByValue(role);
-        if(!isEmpty(profileUri)) this.profile.sendKeys(profileUri);
+        if (!isEmpty(role)) this.role.selectByValue(role);
+        if (!isEmpty(profileUri)) this.profile.sendKeys(profileUri);
         Graphene.guardHttp(submit).click();
     }
 

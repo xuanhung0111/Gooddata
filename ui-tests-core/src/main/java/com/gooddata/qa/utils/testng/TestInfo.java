@@ -27,8 +27,7 @@ public final class TestInfo {
     /**
      * Get package + class + method name from ITestResult
      *
-     * @param result
-     *            from the fine-grained listener's method such as onTestFailure(ITestResult)
+     * @param result from the fine-grained listener's method such as onTestFailure(ITestResult)
      * @return the package + class + method name in current context
      */
     public static String getPackageClassMethodName(ITestResult result) {
@@ -38,8 +37,7 @@ public final class TestInfo {
     /**
      * Get class + method name from ITestResult
      *
-     * @param result
-     *            from the fine-grained listener's method such as onTestFailure(ITestResult)
+     * @param result from the fine-grained listener's method such as onTestFailure(ITestResult)
      * @return the class + method name in current context
      */
     public static String getClassMethodName(ITestResult result) {
@@ -49,8 +47,7 @@ public final class TestInfo {
     /**
      * Get method name from ITestResult
      *
-     * @param result
-     *            from the fine-grained listener's method such as onTestFailure(ITestResult)
+     * @param result from the fine-grained listener's method such as onTestFailure(ITestResult)
      * @return the method name in current context
      */
     public static String getMethodName(ITestResult result) {
@@ -61,8 +58,7 @@ public final class TestInfo {
     /**
      * Get class name from ITestResult
      *
-     * @param result
-     *            from the fine-grained listener's method such as onTestFailure(ITestResult)
+     * @param result from the fine-grained listener's method such as onTestFailure(ITestResult)
      * @return the class name in current context
      */
     public static String getClassName(ITestResult result) {
@@ -73,8 +69,7 @@ public final class TestInfo {
     /**
      * Get last containing package name from ITestResult
      *
-     * @param result
-     *            from the fine-grained listener's method such as onTestFailure(ITestResult)
+     * @param result from the fine-grained listener's method such as onTestFailure(ITestResult)
      * @return the package name in current context
      */
     public static String getContainingPackageName(ITestResult result) {

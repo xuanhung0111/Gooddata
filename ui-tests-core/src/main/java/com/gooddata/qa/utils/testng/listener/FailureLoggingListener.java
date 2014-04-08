@@ -26,8 +26,8 @@ public class FailureLoggingListener extends TestListenerAdapter {
 
     @Override
     public void onTestFailure(ITestResult result) {
-    	WebDriver driver = GrapheneContext.getContextFor(Default.class).getWebDriver(TakesScreenshot.class);
-    	if (driver == null) {
+        WebDriver driver = GrapheneContext.getContextFor(Default.class).getWebDriver(TakesScreenshot.class);
+        if (driver == null) {
             return;
         }
 

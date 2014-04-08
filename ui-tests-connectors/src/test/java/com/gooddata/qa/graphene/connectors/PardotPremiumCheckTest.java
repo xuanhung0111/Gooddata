@@ -5,14 +5,14 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.Connectors;
 
-@Test(groups = { "connectors", "pardotPremium" }, description = "Checklist tests for Pardot Premium connector in GD platform")
+@Test(groups = {"connectors", "pardotPremium"}, description = "Checklist tests for Pardot Premium connector in GD platform")
 public class PardotPremiumCheckTest extends AbstractPardotCheckTest {
-	
-	@Override
-	@BeforeClass
-	public void loadRequiredProperties() {
-		super.loadRequiredProperties();
-		connectorType = Connectors.PARDOT_PREMIUM;
+
+    @Override
+    @BeforeClass
+    public void loadRequiredProperties() {
+        super.loadRequiredProperties();
+        connectorType = Connectors.PARDOT_PREMIUM;
 
         expectedDashboardsAndTabs.put("Premium", new String[]{
                 "Prospect Funnel", "Prospect Waterfalls", "Content Targeting", "Content Performance", "Lead Cohorts",

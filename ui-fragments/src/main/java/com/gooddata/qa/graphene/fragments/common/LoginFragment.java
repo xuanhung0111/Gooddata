@@ -13,7 +13,7 @@ public class LoginFragment extends AbstractFragment {
     @FindBy
     private WebElement password;
 
-    @FindBy(css=".s-login-button")
+    @FindBy(css = ".s-login-button")
     private WebElement signInButton;
 
     private final String ERROR_CLASS = "has-error";

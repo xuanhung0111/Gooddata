@@ -25,7 +25,7 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
     private WebElement pdm__elem_validation;
 
     @FindBy(id = "pdm::pdm_vs_dwh")
-    private WebElement pdm__pdm_vs_dwh ;
+    private WebElement pdm__pdm_vs_dwh;
 
     @FindBy(id = "pdm::pk_fk_consistency")
     private WebElement pdm__pk_fk_consistency;
@@ -43,7 +43,7 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
         waitForElementVisible(BY_GP_LINK);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         waitForElementNotPresent(BY_GP_PRE_JSON);
-        return  waitForElementVisible(By.xpath(BY_SPAN_STATUS)).getText();
+        return waitForElementVisible(By.xpath(BY_SPAN_STATUS)).getText();
 
     }
 
@@ -76,7 +76,7 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
                 default:
             }
         }
-       return validate();
+        return validate();
     }
 
     /**

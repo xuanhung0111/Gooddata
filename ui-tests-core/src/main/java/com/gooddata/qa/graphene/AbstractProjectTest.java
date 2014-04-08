@@ -10,31 +10,31 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import static org.testng.Assert.*;
 
 public abstract class AbstractProjectTest extends AbstractTest {
-	
-	protected String projectTitle = "simple-project";
-	protected String projectTemplate = "";
-	protected int projectCreateCheckIterations = 12; // (12*5s = 1 minute)
-	
-	@BeforeClass
-	public void initStartPage() {
-		startPage = "projects.html";
-	}
-	
-	@Test(groups = { "projectInit" } )
-	public void init() throws JSONException {
-		// sign in with demo user
-		signInAtUI(user, password);
-	}
-	
-	@Test(dependsOnGroups = { "projectInit" }, groups = { "tests" })
-	public void createProject() throws JSONException, InterruptedException {
-		openUrl(PAGE_GDC_PROJECTS);
-		waitForElementVisible(gpProject.getRoot());
-		projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, projectCreateCheckIterations);
-		Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
-	}
-	
-	@Test(dependsOnGroups = { "tests" })
+
+    protected String projectTitle = "simple-project";
+    protected String projectTemplate = "";
+    protected int projectCreateCheckIterations = 12; // (12*5s = 1 minute)
+
+    @BeforeClass
+    public void initStartPage() {
+        startPage = "projects.html";
+    }
+
+    @Test(groups = {"projectInit"})
+    public void init() throws JSONException {
+        // sign in with demo user
+        signInAtUI(user, password);
+    }
+
+    @Test(dependsOnGroups = {"projectInit"}, groups = {"tests"})
+    public void createProject() throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_PROJECTS);
+        waitForElementVisible(gpProject.getRoot());
+        projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, projectCreateCheckIterations);
+        Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
+    }
+
+    @Test(dependsOnGroups = {"tests"})
     public void validateProjectAfterTests() throws JSONException {
         // TODO remove when ATP-1520, ATP-1519 are fixed
         String testName = this.getClass().getSimpleName();
@@ -48,9 +48,9 @@ public abstract class AbstractProjectTest extends AbstractTest {
         validationStatus = validateProject();
         assertEquals(validationStatus, "OK");
     }
-	
-	@Test(dependsOnMethods = { "validateProjectAfterTests" }, alwaysRun = true)
-	public void deleteProject() {
-		deleteProjectByDeleteMode(successfulTest);
-	}
+
+    @Test(dependsOnMethods = {"validateProjectAfterTests"}, alwaysRun = true)
+    public void deleteProject() {
+        deleteProjectByDeleteMode(successfulTest);
+    }
 }
