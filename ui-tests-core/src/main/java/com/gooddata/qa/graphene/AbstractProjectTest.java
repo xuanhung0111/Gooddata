@@ -42,11 +42,8 @@ public abstract class AbstractProjectTest extends AbstractTest {
             System.out.println("Validations are skipped for Coupa and Pardot projects");
             return;
         }
-        String validationStatus = validateProjectPartial(Validation.INVALID_OBJECTS, Validation.PMD__ELEM_VALIDATION);
-        assertEquals(validationStatus, "OK");
 
-        validationStatus = validateProject();
-        assertEquals(validationStatus, "OK");
+        assertEquals(validateProject(), "OK");
     }
 
     @Test(dependsOnMethods = {"validateProjectAfterTests"}, alwaysRun = true)
