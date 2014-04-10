@@ -25,7 +25,8 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
         zendeskUploadUserPassword = loadProperty("connectors.zendesk.uploadUserPassword");
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testConnectorIntegrationResource"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testZendeskIntegrationConfiguration() throws InterruptedException, JSONException {
         openUrl(getIntegrationUri());
         // go to page with integration settings (differs for Zendesk3/4)
@@ -44,12 +45,13 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
                 String.format("%s API URL was not set to expected value", connectorType.getName()));
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testZendeskIntegrationConfiguration"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testZendeskIntegrationConfiguration"})
     public void testZendeskIntegration() throws InterruptedException, JSONException {
         // sign in back with demo user
         validSignInWithDemoUser(true);
         // process schedule
-        scheduleIntegrationProcess(integrationProcessCheckLimit);
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
     }
 
     public abstract String openZendeskSettingsUrl();

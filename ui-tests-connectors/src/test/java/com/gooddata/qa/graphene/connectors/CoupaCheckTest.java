@@ -40,14 +40,16 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         connectorType = Connectors.COUPA;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
         expectedDashboardsAndTabs.put("Coupa Spend Optimizer", new String[]{
-                "KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities", "Contracts", "Expenses", "Budgets", "All Spend"
+                "KPIs", "Requisitions", "Approvals", "Purchase Orders", "Suppliers", "Invoices", "Commodities",
+                "Contracts", "Expenses", "Budgets", "All Spend"
         });
 
         projectCreateCheckIterations = 120;
         integrationProcessCheckLimit = 720;
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testConnectorIntegrationResource"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
         // verify empty Coupa dashboard
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
@@ -65,7 +67,8 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         Graphene.waitGui().until().element(BY_INPUT_TIMEZONE).value().equalTo(COUPA_INTEGRATION_TIMEZONE);
         Graphene.guardHttp(waitForElementVisible(BY_GP_LINK_INSTANCES)).click();
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("coupaInstances").getJSONArray("items").length() == 0, "There are no coupa instances for new project yet");
+        assertTrue(json.getJSONObject("coupaInstances").getJSONArray("items").length() == 0,
+                "There are no coupa instances for new project yet");
 
         // create coupa instance
         waitForElementPresent(coupaInstance.getRoot());
@@ -78,9 +81,10 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testCoupaIntegrationConfiguration"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testCoupaIntegrationConfiguration"})
     public void testCoupaIntegration() throws InterruptedException, JSONException {
         // process schedule
-        scheduleIntegrationProcess(integrationProcessCheckLimit);
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
     }
 }

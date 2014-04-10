@@ -30,7 +30,8 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
     private static final By BY_SELECT_TIMEZONE_OPTION = By.xpath("//option[@value='" + BRIGHTIDEA_TIMEZONE + "']");
     private static final By BY_FINISH_BUTTON = By.xpath("//button[text()='Finish']");
 
-    private static final By BY_SPAN_WELCOME_BEFORE_CONFIG = By.xpath("//span[text()='Welcome to GoodData for Brightidea!']");
+    private static final By BY_SPAN_WELCOME_BEFORE_CONFIG =
+            By.xpath("//span[text()='Welcome to GoodData for Brightidea!']");
     private static final By BY_SPAN_SYNCHRONIZATION_PROGRESS = By.xpath("//span[text()='Almost There!']");
 
     @BeforeClass
@@ -49,7 +50,8 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
         integrationProcessCheckLimit = 720;
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testConnectorIntegrationResource"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testBrightideaIntegrationConfiguration() throws InterruptedException, JSONException {
         // Brightidea specific configuration of integration (tfue page)
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
@@ -66,12 +68,14 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
         waitForElementVisible(BY_SPAN_SYNCHRONIZATION_PROGRESS);
     }
 
-    @Test(groups = {"connectorWalkthrough", "connectorIntegration"}, dependsOnMethods = {"testBrightideaIntegrationConfiguration"})
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testBrightideaIntegrationConfiguration"})
     public void testBrightideaIntegration() throws InterruptedException, JSONException {
         // process is scheduled automatically - check status
         openUrl(getProcessesUri());
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1, "Integration process wasn't started...");
+        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
+                "Integration process wasn't started...");
         waitForElementVisible(BY_GP_LINK);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);

@@ -489,7 +489,7 @@ public abstract class AbstractTest extends Arquillian {
 
     public RestApiClient getRestApiClient() {
         if (restApiClient == null) {
-            restApiClient = new RestApiClient(host, user, password);
+            restApiClient = new RestApiClient(host, user, password, true);
         }
         return restApiClient;
     }

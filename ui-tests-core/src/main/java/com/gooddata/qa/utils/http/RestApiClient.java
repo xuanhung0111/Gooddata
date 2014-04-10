@@ -9,6 +9,9 @@ import com.gooddata.http.client.LoginSSTRetrievalStrategy;
 import com.gooddata.http.client.SSTRetrievalStrategy;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -18,6 +21,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
@@ -37,9 +41,9 @@ public class RestApiClient {
     private final HttpHost httpHost;
     private final HttpClient httpClient;
 
-    public RestApiClient(String host, String user, String password) {
+    public RestApiClient(String host, String user, String password, boolean useSST) {
         httpHost = new HttpHost(host, 443, "https");
-        httpClient = getGooddataHttpClient(httpHost, user, password);
+        httpClient = getGooddataHttpClient(httpHost, user, password, useSST);
     }
 
     public HttpHost getHttpHost() {
@@ -107,8 +111,17 @@ public class RestApiClient {
         requestBase.addHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
     }
 
-    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password) {
-        SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(new DefaultHttpClient(), hostGoodData, user, password);
-        return new GoodDataHttpClient(new DefaultHttpClient(), sstStrategy);
+    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password, boolean useSST) {
+        if (useSST) {
+            SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(new DefaultHttpClient(), hostGoodData, user, password);
+            return new GoodDataHttpClient(new DefaultHttpClient(), sstStrategy);
+        } else {
+            CredentialsProvider provider = new BasicCredentialsProvider();
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(user, password);
+            provider.setCredentials(AuthScope.ANY, credentials);
+            DefaultHttpClient client = new DefaultHttpClient();
+            client.setCredentialsProvider(provider);
+            return client;
+        }
     }
 }
