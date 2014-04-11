@@ -6,9 +6,9 @@ public enum ExportFormat {
     PDF_PORTRAIT("pdf", "PDF (Portrait)"),
     PDF_LANDSCAPE("pdf", "PDF (Landscape)"),
     IMAGE_PNG("png", "Image (PNG)"),
-    CSV("csv", "Excel (XLS)"),
+    CSV("csv", "CSV"),
     RAW_CSV("csv", "Raw data (CSV)"),
-    EXCEL_XLS("xls", "CSV"),
+    EXCEL_XLS("xls", "Excel (XLS)"),
     ALL("all", "Used for schedules...");
 
     private final String name;
