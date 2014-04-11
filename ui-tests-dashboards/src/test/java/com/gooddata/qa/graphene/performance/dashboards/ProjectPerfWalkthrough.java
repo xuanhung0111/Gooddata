@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 public class ProjectPerfWalkthrough extends AbstractTest {
 
     private int startDashboardIndex = 1;
+    private boolean singleDashboardComputation = false;
     private boolean clearCaches = false;
 
     public static final Pattern REPORT_PATTERN =
@@ -34,6 +35,7 @@ public class ProjectPerfWalkthrough extends AbstractTest {
         projectId = loadProperty("projectId");
         startDashboardIndex = Integer.valueOf(loadProperty("startDashboardIndex"));
         clearCaches = Boolean.valueOf(loadProperty("clearCaches"));
+        singleDashboardComputation = Boolean.valueOf(loadProperty("singleDashboardComputation"));
     }
 
     @Test(groups = {"perfInit"})
@@ -69,6 +71,10 @@ public class ProjectPerfWalkthrough extends AbstractTest {
             Thread.sleep(5000);
             System.out.println("Current dashboard index: " + i);
             singleDashboardWalkthrough(i, dashboardsPage.getDashboardName());
+            if (singleDashboardComputation) {
+                System.out.println("Single dashboard computation was required, following dashboards won't be computed");
+                return;
+            }
         }
     }
 
