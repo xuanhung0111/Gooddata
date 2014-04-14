@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -87,6 +88,8 @@ public abstract class AbstractTest extends Arquillian {
     protected String imapHost;
     protected String imapUser;
     protected String imapPassword;
+
+    protected GoodData goodDataClient = null;
 
     protected String testIdentification;
 
@@ -191,7 +194,7 @@ public abstract class AbstractTest extends Arquillian {
 
     @BeforeClass
     public void loadProperties() {
-        propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") + "/../ui-tests-core/src/test/resources/variables-env-test.properties");
+        propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") + "/ui-tests-core/src/test/resources/variables-env-test.properties");
 
         testVariables = new Properties();
         try {
@@ -492,6 +495,13 @@ public abstract class AbstractTest extends Arquillian {
             restApiClient = new RestApiClient(host, user, password, true);
         }
         return restApiClient;
+    }
+
+    public GoodData getGoodDataClient() {
+        if (goodDataClient == null) {
+            goodDataClient = new GoodData(host, user, password);
+        }
+        return goodDataClient;
     }
 
     public void waitForDashboardPageLoaded() {
