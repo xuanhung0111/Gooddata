@@ -23,7 +23,7 @@ public class ZendeskHelper {
     public static final String USER_OBJECT_NAME = "user";
     public static final String ORGANIZATION_OBJECT_NAME = "organization";
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
 
     public ZendeskHelper(RestApiClient apiClient) {
         this.apiClient = apiClient;
