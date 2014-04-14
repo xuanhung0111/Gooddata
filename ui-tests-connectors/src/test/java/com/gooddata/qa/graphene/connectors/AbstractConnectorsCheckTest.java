@@ -164,11 +164,6 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         }
         assertEquals(status, "SYNCHRONIZED", "Process is synchronized");
         System.out.println("Integration was synchronized at +- " + (i * 5) + "seconds");
-        // may not be correct since another integration process can be scheduled automatically...
-        browser.get(getRootUrl() + getProcessesUri());
-        JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
-                "There is one finished process");
     }
 
     private String getProcessStatus(WebDriver browser) throws JSONException {
