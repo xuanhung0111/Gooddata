@@ -12,7 +12,6 @@ import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
 import com.gooddata.qa.utils.http.RestApiClient;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -22,8 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.testng.Assert.*;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
 public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
@@ -32,6 +31,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private String zendeskAPIPassword;
 
     private ZendeskHelper zendeskHelper;
+    private boolean useApiProxy;
 
     private static final By BY_ONE_NUMBER_REPORT = By.id("oneNumberContainer");
 
@@ -73,6 +73,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         });
         zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
+        useApiProxy = Boolean.parseBoolean(loadProperty("http.client.useApiProxy"));
     }
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
@@ -107,8 +108,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void initZendeskApiClient() {
         if (zendeskApiUrl.contains("staging") && !zendeskAPIUser.isEmpty() && !zendeskAPIPassword.isEmpty()) {
-            zendeskHelper = new ZendeskHelper(
-                new RestApiClient(zendeskApiUrl.replace("https://", ""), zendeskAPIUser, zendeskAPIPassword, false));
+            zendeskHelper = new ZendeskHelper(new RestApiClient(zendeskApiUrl.replace("https://", ""),
+                    zendeskAPIUser, zendeskAPIPassword, false, useApiProxy));
         } else {
             fail("Zendesk staging API is not used, tests for adding new objects will be skipped");
         }
