@@ -13,6 +13,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -21,8 +22,9 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.*;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -38,12 +40,14 @@ import java.io.UnsupportedEncodingException;
  */
 public class RestApiClient {
 
+    public static final String API_PROXY_HOST = "na-apiproxy-dev.na.getgooddata.com";
+
     private final HttpHost httpHost;
     private final HttpClient httpClient;
 
-    public RestApiClient(String host, String user, String password, boolean useSST) {
+    public RestApiClient(String host, String user, String password, boolean useSST, boolean useApiProxy) {
         httpHost = new HttpHost(host, 443, "https");
-        httpClient = getGooddataHttpClient(httpHost, user, password, useSST);
+        httpClient = getGooddataHttpClient(httpHost, user, password, useSST, useApiProxy);
     }
 
     public HttpHost getHttpHost() {
@@ -111,17 +115,27 @@ public class RestApiClient {
         requestBase.addHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
     }
 
-    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password, boolean useSST) {
+    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password, boolean useSST, boolean useApiProxy) {
         if (useSST) {
             SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(new DefaultHttpClient(), hostGoodData, user, password);
             return new GoodDataHttpClient(new DefaultHttpClient(), sstStrategy);
         } else {
-            CredentialsProvider provider = new BasicCredentialsProvider();
-            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(user, password);
+            final CredentialsProvider provider = new BasicCredentialsProvider();
+            final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(user, password);
             provider.setCredentials(AuthScope.ANY, credentials);
-            DefaultHttpClient client = new DefaultHttpClient();
-            client.setCredentialsProvider(provider);
-            return client;
+            if (useApiProxy) {
+                System.out.println("Creating a client with basic authentication and proxy to " + API_PROXY_HOST);
+                final HttpHost proxyHost = new HttpHost(API_PROXY_HOST, 80);
+                final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+                httpClientBuilder.setProxy(proxyHost);
+                httpClientBuilder.setDefaultCredentialsProvider(provider);
+                return httpClientBuilder.build();
+            } else {
+                System.out.println("Creating a client with basic authentication...");
+                final DefaultHttpClient client = new DefaultHttpClient();
+                client.setCredentialsProvider(provider);
+                return client;
+            }
         }
     }
 }

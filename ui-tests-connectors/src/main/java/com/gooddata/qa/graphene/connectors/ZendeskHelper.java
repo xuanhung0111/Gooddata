@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static org.testng.Assert.assertEquals;
+
 public class ZendeskHelper {
 
     private final RestApiClient apiClient;
@@ -70,7 +72,8 @@ public class ZendeskHelper {
             throws IOException, JSONException {
         HttpRequestBase postRequest = apiClient.newPostMethod(url, jsonContent);
         try {
-            HttpResponse postResponse = apiClient.execute(postRequest, 201);
+            HttpResponse postResponse = apiClient.execute(postRequest);
+            checkStatusCode(postResponse, 201);
             String result = EntityUtils.toString(postResponse.getEntity());
             JSONObject json = new JSONObject(result);
             int id = json.getJSONObject(objectName).getInt("id");
@@ -84,7 +87,8 @@ public class ZendeskHelper {
     private int getZendeskEntityCount(String url) throws JSONException, IOException {
         HttpRequestBase getRequest = apiClient.newGetMethod(url);
         try {
-            HttpResponse getResponse = apiClient.execute(getRequest, 200);
+            HttpResponse getResponse = apiClient.execute(getRequest);
+            checkStatusCode(getResponse, 200);
             String result = EntityUtils.toString(getResponse.getEntity());
             JSONObject json = new JSONObject(result);
             int count = json.getInt("count");
@@ -100,7 +104,8 @@ public class ZendeskHelper {
         HttpRequestBase deleteRequest = apiClient.newDeleteMethod(objectUrl);
         try {
             System.out.println("Going to delete object on url " + objectUrl);
-            apiClient.execute(deleteRequest, 200);
+            HttpResponse deleteResponse = apiClient.execute(deleteRequest);
+            checkStatusCode(deleteResponse, 200);
             System.out.println("Deleted object on url " + objectUrl);
         } finally {
             deleteRequest.releaseConnection();
@@ -109,7 +114,7 @@ public class ZendeskHelper {
 
     public static void main(String[] args) throws IOException, JSONException {
         ZendeskHelper helper = new ZendeskHelper(new RestApiClient("gooddataqa3.zendesk-staging.com",
-                "qa@gooddata.com", "12345", false));
+                "qa@gooddata.com", "12345", false, true));
         System.out.println(helper.getNumberOfTickets());
         System.out.println(helper.getNumberOfOrganizations());
         System.out.println(helper.getNumberOfUsers());
@@ -134,5 +139,9 @@ public class ZendeskHelper {
 
     public static String getCurrentTimeIdentifier() {
         return dateFormat.format(new Date());
+    }
+
+    private void checkStatusCode(HttpResponse reponse, int expectedStatus) {
+        assertEquals(reponse.getStatusLine().getStatusCode(), expectedStatus, "Invalid status code");
     }
 }
