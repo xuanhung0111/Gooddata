@@ -124,7 +124,7 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         Message[] dashboardMessages = new Message[0];
         int loops = 0;
 
-        while (!bothEmailsArrived(reportMessages, dashboardMessages) && (loops < 15)) {  // 2,5 min
+        while (!bothEmailsArrived(reportMessages, dashboardMessages) && (loops < 24)) {  // 4 min
             System.out.println("Waiting for messages, try " + (loops + 1));
             reportMessages = imapClient.getMessagesFromInbox(FROM, reportTitle);
             dashboardMessages = imapClient.getMessagesFromInbox(FROM, dashboardTitle);
