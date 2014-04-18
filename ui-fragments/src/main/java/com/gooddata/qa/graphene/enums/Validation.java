@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.greypages.md;
+package com.gooddata.qa.graphene.enums;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

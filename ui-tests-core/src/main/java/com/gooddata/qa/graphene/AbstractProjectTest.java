@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.utils.graphene.Screenshots;
+import java.io.IOException;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 public abstract class AbstractProjectTest extends AbstractTest {
 
@@ -27,12 +27,13 @@ public abstract class AbstractProjectTest extends AbstractTest {
     }
 
     @Test(dependsOnGroups = {"projectInit"}, groups = {"tests"})
-    public void createProject() throws JSONException, InterruptedException {
+    public void createProject() throws JSONException, InterruptedException, IOException {
         openUrl(PAGE_GDC_PROJECTS);
         waitForElementVisible(gpProject.getRoot());
         projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, projectCreateCheckIterations);
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
     }
+
 
     @Test(dependsOnGroups = {"tests"})
     public void validateProjectAfterTests() throws JSONException {
