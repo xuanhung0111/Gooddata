@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.AttributesTable;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
@@ -18,7 +18,7 @@ public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
     private String csvFilePath;
 
     @FindBy(id = "attributesTable")
-    private AttributesTable attributesTable;
+    private ObjectsTable attributesTable;
 
     @FindBy(id = "p-objectPage")
     private AttributeDetailPage attributeDetailPage;
@@ -60,7 +60,7 @@ public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|attributes");
         waitForElementVisible(attributesTable.getRoot());
         waitForDataPageLoaded();
-        attributesTable.selectAttribute(attributeName);
+        attributesTable.selectObject(attributeName);
         waitForElementVisible(attributeDetailPage.getRoot());
         waitForObjectPageLoaded();
         assertEquals(attributeDetailPage.getAttributeName(), attributeName, "Invalid attribute name on detail page");

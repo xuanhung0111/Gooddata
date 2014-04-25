@@ -53,7 +53,7 @@ public class DashboardObjectsTest extends SimpleProjectTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|attributes");
         waitForElementVisible(attributesTable.getRoot());
         waitForDataPageLoaded();
-        attributesTable.selectAttribute(ATTRIBUTE_NAME);
+        attributesTable.selectObject(ATTRIBUTE_NAME);
         waitForElementVisible(attributeDetailPage.getRoot());
         waitForObjectPageLoaded();
         Assert.assertEquals(attributeDetailPage.getAttributeName(),

@@ -13,15 +13,13 @@ import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment
 import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.AttributesTable;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
 import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
-import com.gooddata.qa.graphene.fragments.manage.MetricsTable;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.VariablesTable;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
@@ -172,19 +170,16 @@ public abstract class AbstractTest extends Arquillian {
     protected DataPage dataPage;
 
     @FindBy(id = "attributesTable")
-    protected AttributesTable attributesTable;
+    protected ObjectsTable attributesTable;
 
     @FindBy(id = "p-objectPage")
     protected AttributeDetailPage attributeDetailPage;
-
-    @FindBy(id = "variablesTable")
-    protected VariablesTable variablesTable;
 
     @FindBy(id = "p-dataPage")
     protected VariableDetailPage variableDetailPage;
 
     @FindBy(id = "metricsTable")
-    protected MetricsTable metricsTable;
+    protected ObjectsTable metricsTable;
     
     @FindBy(id = "p-objectPage")
     protected MetricDetailsPage metricDetailPage;
