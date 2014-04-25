@@ -8,7 +8,8 @@ import com.gooddata.qa.graphene.fragments.AbstractTable;
 public class ObjectsTable extends AbstractTable {
 
     public static final By BY_OBJECT_LINK = By.cssSelector("td.title a");
-    public static final By BY_OBJECT_DETAIL_PAGE = By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]");
+    public static final By BY_OBJECT_DETAIL_PAGE =
+            By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]");
 
     public boolean selectObject(String objectName) {
         for (int i = 0; i < getNumberOfRows(); i++) {

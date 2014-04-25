@@ -6,8 +6,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
-import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
@@ -16,12 +14,6 @@ import static org.testng.Assert.*;
 public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
 
     private String csvFilePath;
-
-    @FindBy(id = "attributesTable")
-    private ObjectsTable attributesTable;
-
-    @FindBy(id = "p-objectPage")
-    private AttributeDetailPage attributeDetailPage;
 
     @BeforeClass
     public void initProperties() {

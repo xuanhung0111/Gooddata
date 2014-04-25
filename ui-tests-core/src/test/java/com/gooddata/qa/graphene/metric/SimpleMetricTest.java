@@ -10,11 +10,11 @@ import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import com.gooddata.qa.graphene.enums.AggregationMetricTypes;
-import com.gooddata.qa.graphene.enums.FilterMetricTypes;
-import com.gooddata.qa.graphene.enums.GranularityMetricTypes;
-import com.gooddata.qa.graphene.enums.LogicalMetricTypes;
-import com.gooddata.qa.graphene.enums.NumericMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.AggregationMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.FilterMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.GranularityMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.LogicalMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.NumericMetricTypes;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
 @Test(groups = { "GoodSalesMetrics" }, description = "Tests for GoodSales project (metric creation functionality) in GD platform")
@@ -27,13 +27,14 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     private String fact;
     private String ratioMetric1;
     private String ratioMetric2;
-    Map<String, String> data;
+    private Map<String, String> data;
 
-    private final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    private static final String DATE_FORMAT_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_PATTERN);
 
     @BeforeClass
     public void setProjectTitle() {
-	projectTitle = "Simple-metric-test";
+        projectTitle = "Simple-metric-test";
     }
 
     @Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
@@ -45,8 +46,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	fact = "Amount";
 	ratioMetric1 = "# of Won Opps.";
 	ratioMetric2 = "# of Open Opps.";
-	data = new HashMap<String, String>();
-    }
+	}
 
     @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
     public void createShareMetric() throws InterruptedException {
@@ -121,6 +121,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     public void createAggreationMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
+        data = new HashMap<String, String>();
 	data.put("attrFolder0", this.attrFolder);
 	data.put("attrFolder1", this.attrFolder);
 	data.put("fact0", this.fact);
@@ -132,7 +133,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	metricType.add(AggregationMetricTypes.COUNT);
 	metricType.add(AggregationMetricTypes.CORREL);
 	for (AggregationMetricTypes type : metricType) {
-	    String metricName = type.getlabel() + " " + getCurrentDateString();
+	    String metricName = type.getLabel() + " " + getCurrentDateString();
 	    metricEditorPage.createAggregationMetric(type, metricName, data);
 	}
     }
@@ -141,14 +142,15 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     public void createNumericMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
+        data = new HashMap<String, String>();
 	data.put("fact0", this.fact);
-	ArrayList<NumericMetricTypes> metricType = new ArrayList<NumericMetricTypes>();
-	metricType.add(NumericMetricTypes.ABS);
-	metricType.add(NumericMetricTypes.EXP);
-	metricType.add(NumericMetricTypes.FLOOR);
-	for (NumericMetricTypes type : metricType) {
-	    String metricName = type.getlabel() + " " + getCurrentDateString();
-	    metricEditorPage.createNumericMetric(type, metricName, data);
+	ArrayList<NumericMetricTypes> metricTypes = new ArrayList<NumericMetricTypes>();
+	metricTypes.add(NumericMetricTypes.ABS);
+	metricTypes.add(NumericMetricTypes.EXP);
+	metricTypes.add(NumericMetricTypes.FLOOR);
+	for (NumericMetricTypes metricType : metricTypes) {
+	    String metricName = metricType.getLabel() + " " + getCurrentDateString();
+	    metricEditorPage.createNumericMetric(metricType, metricName, data);
 	}
     }
 
@@ -156,19 +158,20 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     public void createGranularityMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
+        data = new HashMap<String, String>();
 	data.put("attrFolder0", this.attrFolder);
 	data.put("fact0", this.fact);
 	data.put("metric0", this.metric);
 	data.put("metric1", this.metric);
 	data.put("attribute0", this.attr);
-	ArrayList<GranularityMetricTypes> metricType = new ArrayList<GranularityMetricTypes>();
-	metricType.add(GranularityMetricTypes.BY_ALL_ATTRIBUTE);
-	metricType.add(GranularityMetricTypes.FOR_NEXT);
-	metricType.add(GranularityMetricTypes.BY_ALL);
-	metricType.add(GranularityMetricTypes.WITHIN);
-	for (GranularityMetricTypes type : metricType) {
-	    String metricName = type.getlabel() + " " + getCurrentDateString();
-	    metricEditorPage.createGranularityMetric(type, metricName, data);
+	ArrayList<GranularityMetricTypes> metricTypes = new ArrayList<GranularityMetricTypes>();
+	metricTypes.add(GranularityMetricTypes.BY_ALL_ATTRIBUTE);
+	metricTypes.add(GranularityMetricTypes.FOR_NEXT);
+	metricTypes.add(GranularityMetricTypes.BY_ALL);
+	metricTypes.add(GranularityMetricTypes.WITHIN);
+	for (GranularityMetricTypes metricType : metricTypes) {
+	    String metricName = metricType.getLabel() + " " + getCurrentDateString();
+	    metricEditorPage.createGranularityMetric(metricType, metricName, data);
 	}
     }
 
@@ -176,6 +179,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     public void createLogicalMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
+        data = new HashMap<String, String>();
 	data.put("attrFolder0", this.attrFolder);
 	data.put("attrFolder1", this.attrFolder);
 	data.put("metric0", this.metric);
@@ -186,14 +190,14 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	data.put("attribute1", this.attr);
 	data.put("attrValue0", this.attrValue);
 	data.put("attrValue1", this.attrValue);
-	ArrayList<LogicalMetricTypes> metricType = new ArrayList<LogicalMetricTypes>();
-	metricType.add(LogicalMetricTypes.AND);
-	metricType.add(LogicalMetricTypes.NOT);
-	metricType.add(LogicalMetricTypes.CASE);
-	metricType.add(LogicalMetricTypes.IF);
-	for (LogicalMetricTypes type : metricType) {
-	    String metricName = type.getlabel() + " " + getCurrentDateString();
-	    metricEditorPage.createLogicalMetric(type, metricName, data);
+	ArrayList<LogicalMetricTypes> metricTypes = new ArrayList<LogicalMetricTypes>();
+	metricTypes.add(LogicalMetricTypes.AND);
+	metricTypes.add(LogicalMetricTypes.NOT);
+	metricTypes.add(LogicalMetricTypes.CASE);
+	metricTypes.add(LogicalMetricTypes.IF);
+	for (LogicalMetricTypes metricType : metricTypes) {
+	    String metricName = metricType.getLabel() + " " + getCurrentDateString();
+	    metricEditorPage.createLogicalMetric(metricType, metricName, data);
 	}
     }
 
@@ -201,6 +205,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     public void createFilterMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
+        data = new HashMap<String, String>();
 	data.put("attrFolder0", this.attrFolder);
 	data.put("attrFolder1", this.attrFolder);
 	data.put("fact0", this.fact);
@@ -211,20 +216,18 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	data.put("attribute1", this.attr);
 	data.put("attrValue0", this.attrValue);
 	data.put("attrValue1", this.attrValue);
-	ArrayList<FilterMetricTypes> metricType = new ArrayList<FilterMetricTypes>();
-	metricType.add(FilterMetricTypes.EQUAL);
-	metricType.add(FilterMetricTypes.NOT_IN);
-	metricType.add(FilterMetricTypes.BOTTOM);
-	metricType.add(FilterMetricTypes.WITHOUT_PF);
-	for (FilterMetricTypes type : metricType) {
-	    String metricName = type.getlabel() + " " + getCurrentDateString();
-	    metricEditorPage.createFilterMetric(type, metricName, data);
+	ArrayList<FilterMetricTypes> metricTypes = new ArrayList<FilterMetricTypes>();
+	metricTypes.add(FilterMetricTypes.EQUAL);
+	metricTypes.add(FilterMetricTypes.NOT_IN);
+	metricTypes.add(FilterMetricTypes.BOTTOM);
+	metricTypes.add(FilterMetricTypes.WITHOUT_PF);
+	for (FilterMetricTypes metricType : metricTypes) {
+	    String metricName = metricType.getLabel() + " " + getCurrentDateString();
+	    metricEditorPage.createFilterMetric(metricType, metricName, data);
 	}
     }
 
     public String getCurrentDateString() {
-	DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-	Date date = new Date();
-	return dateFormat.format(date);
+        return DATE_FORMAT.format(new Date());
     }
 }

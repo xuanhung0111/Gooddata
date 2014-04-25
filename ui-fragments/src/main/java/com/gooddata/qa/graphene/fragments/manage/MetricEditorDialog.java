@@ -5,11 +5,11 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import com.gooddata.qa.graphene.enums.AggregationMetricTypes;
-import com.gooddata.qa.graphene.enums.FilterMetricTypes;
-import com.gooddata.qa.graphene.enums.GranularityMetricTypes;
-import com.gooddata.qa.graphene.enums.LogicalMetricTypes;
-import com.gooddata.qa.graphene.enums.NumericMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.AggregationMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.FilterMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.GranularityMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.LogicalMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.NumericMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class MetricEditorDialog extends AbstractFragment {
@@ -217,7 +217,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(maqlReferenceGuideHelp);
 	waitForElementVisible(aggregationTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
-		metricType.getlabel()));
+		metricType.getLabel()));
 	waitForElementVisible(metricLink).click();
 	switch (metricType) {
 	case AVG:
@@ -268,7 +268,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(maqlReferenceGuideHelp);
 	waitForElementVisible(numericTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
-		metricType.getlabel()));
+		metricType.getLabel()));
 	waitForElementVisible(metricLink).click();
 	selectMetrics(data, 1);
 	waitForElementVisible(customMetricNameInput).sendKeys(metricName);
@@ -289,7 +289,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(maqlReferenceGuideHelp);
 	waitForElementVisible(GranularityTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
-		metricType.getlabel()));
+		metricType.getLabel()));
 	waitForElementVisible(metricLink).click();
 	switch (metricType) {
 	case BY:
@@ -334,7 +334,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(maqlReferenceGuideHelp);
 	waitForElementVisible(LogicalTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
-		metricType.getlabel()));
+		metricType.getLabel()));
 	waitForElementVisible(metricLink).click();
 	switch (metricType) {
 	case AND:
@@ -375,7 +375,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(maqlReferenceGuideHelp);
 	waitForElementVisible(FiltersTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
-		metricType.getlabel()));
+		metricType.getLabel()));
 	waitForElementVisible(metricLink).click();
 	switch (metricType) {
 	case EQUAL:

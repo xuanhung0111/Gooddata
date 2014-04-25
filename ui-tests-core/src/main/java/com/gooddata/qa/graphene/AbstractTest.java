@@ -118,14 +118,6 @@ public abstract class AbstractTest extends Arquillian {
 
     protected static final By BY_IFRAME = By.tagName("iframe");
 
-    protected static final By BY_PROJECTS_PANEL = By.id("projectsCentral");
-    protected static final By BY_PROJECT_PAGE_PANEL = By.id("p-projectPage");
-    protected static final By BY_SCHEDULES_PAGE_PANEL = By.id("p-emailSchedulePage");
-    protected static final By BY_PROJECTS_LIST = By.id("myProjects");
-
-    protected static final By BY_REPORTS_PANEL = By.id("p-domainPage");
-    protected static final By BY_REPORT_PAGE = By.id("p-analysisPage");
-
     protected static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
     protected static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
 
@@ -188,7 +180,7 @@ public abstract class AbstractTest extends Arquillian {
     protected MetricEditorDialog metricEditorPage;
     
     /**
-     * ----- Grey pages fragmnets -----
+     * ----- Grey pages fragments -----
      */
 
     @FindBy(tagName = "form")

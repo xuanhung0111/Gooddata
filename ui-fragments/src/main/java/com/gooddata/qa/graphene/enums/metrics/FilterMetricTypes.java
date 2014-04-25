@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.metrics;
 
 public enum FilterMetricTypes {
     EQUAL("= (equals)", 3),
@@ -14,18 +14,18 @@ public enum FilterMetricTypes {
     NEXT("{Next}", 2);
     
     private final String label;
-    private final int parameter;
+    private final int parametersCount;
 
-    private FilterMetricTypes(String label, int parameter) {
+    private FilterMetricTypes(String label, int parametersCount) {
         this.label = label;
-        this.parameter = parameter;
+        this.parametersCount = parametersCount;
     }
 
-    public String getlabel() {
+    public String getLabel() {
         return label;
     }
     
-    public int getParameter() {
-        return parameter;
+    public int getParametersCount() {
+        return parametersCount;
     }
 }

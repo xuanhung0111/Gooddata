@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.metrics;
 
 public enum GranularityMetricTypes {
     BY("BY", 3),
@@ -13,18 +13,18 @@ public enum GranularityMetricTypes {
     WITHIN("WITHIN", 2);
     
     private final String label;
-    private final int parameter;
+    private final int parametersCount;
 
-    private GranularityMetricTypes(String label, int parameter) {
+    private GranularityMetricTypes(String label, int parametersCount) {
         this.label = label;
-        this.parameter = parameter;
+        this.parametersCount = parametersCount;
     }
 
-    public String getlabel() {
+    public String getLabel() {
         return label;
     }
     
-    public int getParameter() {
-        return parameter;
+    public int getParametersCount() {
+        return parametersCount;
     }
 }

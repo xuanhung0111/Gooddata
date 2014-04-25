@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.metrics;
 
 public enum NumericMetricTypes {
     ABS("ABS",1),
@@ -16,18 +16,18 @@ public enum NumericMetricTypes {
     SQRT("SQRT", 1);
     
     private final String label;
-    private final int parameter;
+    private final int parametersCount;
 
-    private NumericMetricTypes(String label, int parameter) {
+    private NumericMetricTypes(String label, int parametersCount) {
         this.label = label;
-        this.parameter = parameter;
+        this.parametersCount = parametersCount;
     }
 
-    public String getlabel() {
+    public String getLabel() {
         return label;
     }
     
-    public int getParameter() {
-        return parameter;
+    public int getParametersCount() {
+        return parametersCount;
     }
 }
