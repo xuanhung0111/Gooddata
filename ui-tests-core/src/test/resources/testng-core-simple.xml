@@ -23,4 +23,15 @@
         </classes>
     </test>
 
+    <test name="SimpleProjectEtlTest">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.project.SimpleProjectEtlTest"/>
+        </classes>
+    </test>
+
 </suite>

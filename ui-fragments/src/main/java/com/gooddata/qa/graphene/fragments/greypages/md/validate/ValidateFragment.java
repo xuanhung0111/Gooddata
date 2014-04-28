@@ -1,5 +1,6 @@
-package com.gooddata.qa.graphene.fragments.greypages.md;
+package com.gooddata.qa.graphene.fragments.greypages.md.validate;
 
+import com.gooddata.qa.graphene.enums.Validation;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

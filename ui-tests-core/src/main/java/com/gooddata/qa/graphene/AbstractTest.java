@@ -6,8 +6,11 @@ import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
-import com.gooddata.qa.graphene.fragments.greypages.md.ValidateFragment;
-import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
+import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.etl.pull.PullFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
+import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.AttributesTable;
@@ -25,13 +28,13 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
+import com.gooddata.qa.utils.webdav.WebDavClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.testng.Arquillian;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -42,6 +45,8 @@ import org.testng.annotations.Listeners;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -188,6 +193,15 @@ public abstract class AbstractTest extends Arquillian {
     @FindBy(tagName = "form")
     protected ValidateFragment validateFragment;
 
+    @FindBy(className = "param")
+    protected GdcFragment gdcFragment;
+
+    @FindBy(tagName = "form")
+    protected Manage2Fragment manage2Fragment;
+
+    @FindBy(tagName = "form")
+    protected PullFragment pullFragment;
+
     /**
      * ----------
      */
@@ -301,6 +315,33 @@ public abstract class AbstractTest extends Arquillian {
         String statusReturning = validateFragment.validate();
         Screenshots.takeScreenshot(browser, projectId + "-validation", this.getClass());
         return statusReturning;
+    }
+
+    public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + projectId + "/ldm/manage2");
+        waitForElementPresent(manage2Fragment.getRoot());
+        assertTrue(manage2Fragment.postMAQL(maql, statusPollingCheckIterations), "MAQL was not successfully processed");
+    }
+
+    public String uploadFileToWebDav(URL resourcePath, String webContainer) throws URISyntaxException {
+        WebDavClient webDav = new WebDavClient(user, password);
+        File resourceFile = new File(resourcePath.toURI());
+        if (webContainer == null) {
+            openUrl(PAGE_GDC);
+            waitForElementPresent(gdcFragment.getRoot());
+            assertTrue(webDav.createStructure(gdcFragment.getUserUploadsURL()), " Create WebDav storage structure");
+        } else webDav.setWebDavStructure(webContainer);
+
+        webDav.uploadFile(resourceFile);
+        return webDav.getWebDavStructure();
+    }
+
+    public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations)
+            throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + projectId + "/etl/pull");
+        waitForElementPresent(pullFragment.getRoot());
+        assertTrue(pullFragment.invokePull(integrationEntry, statusPollingCheckIterations),
+                "ETL PULL was not successfully processed");
     }
 
     public String validateProjectPartial(Validation... validationOptions) throws JSONException {

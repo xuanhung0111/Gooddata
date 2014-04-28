@@ -1,17 +1,14 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+import java.io.File;
+import java.io.IOException;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
 
@@ -45,25 +42,13 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         String projectUrl = browser.getCurrentUrl();
         logProjectUrl(projectUrl);
         System.out.println("Waiting for project enabled: " + projectUrl);
-        int i = 0;
-        String state = getProjectState();
-        while (!"ENABLED".equals(state) && i < checkIterations) {
-            System.out.println("Current project state is: " + state);
-            Assert.assertNotEquals(state, "ERROR", "Error state appeared");
-            Assert.assertNotEquals(state, "DELETED", "Deleted status appeared");
-            Thread.sleep(5000);
-            browser.get(projectUrl);
-            state = getProjectState();
-            i++;
-        }
-        Assert.assertEquals(state, "ENABLED", "Project is enabled");
-        System.out.println("Project was created at +- " + (i * 5) + "seconds");
+        waitForPollState("ENABLED", checkIterations);
         return projectUrl.substring(projectUrl.lastIndexOf("/") + 1);
     }
 
-    private String getProjectState() throws JSONException {
-        JSONObject json = loadJSON();
-        return json.getJSONObject("project").getJSONObject("content").getString("state");
+    @Override
+    protected String getPollState() throws JSONException {
+        return loadJSON().getJSONObject("project").getJSONObject("content").getString("state");
     }
 
     private void logProjectUrl(String projectUrl) {

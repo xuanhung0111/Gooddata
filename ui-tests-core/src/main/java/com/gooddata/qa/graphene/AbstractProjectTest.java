@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.qa.graphene.fragments.greypages.md.Validation;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.utils.graphene.Screenshots;
+import java.io.IOException;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 public abstract class AbstractProjectTest extends AbstractTest {
 
@@ -39,10 +39,9 @@ public abstract class AbstractProjectTest extends AbstractTest {
         // TODO remove when ATP-1520, ATP-1519, ATP-1822 are fixed
         String testName = this.getClass().getSimpleName();
         if (testName.contains("Coupa") || testName.contains("Pardot") || testName.contains("Zendesk4")) {
-            System.out.println("Validations are skipped for Coupa and Pardot projects");
+            System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects");
             return;
         }
-
         assertEquals(validateProject(), "OK");
     }
 

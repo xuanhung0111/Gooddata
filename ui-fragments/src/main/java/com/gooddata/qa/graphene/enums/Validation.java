@@ -1,13 +1,5 @@
-package com.gooddata.qa.graphene.fragments.greypages.md;
+package com.gooddata.qa.graphene.enums;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
-/**
- * User: peter.lesko@gooddata.com
- * Date: 11/18/13
- * Time: 5:02 PM
- */
 public enum Validation {
 
     INVALID_OBJECTS(0),
@@ -20,7 +12,7 @@ public enum Validation {
 
     private final int validationID;
 
-    Validation(int validationID) {
+    private Validation(int validationID) {
         this.validationID = validationID;
     }
 
