@@ -13,12 +13,13 @@ import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment
 import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.AttributesTable;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
+import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
+import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.VariablesTable;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
@@ -117,14 +118,6 @@ public abstract class AbstractTest extends Arquillian {
 
     protected static final By BY_IFRAME = By.tagName("iframe");
 
-    protected static final By BY_PROJECTS_PANEL = By.id("projectsCentral");
-    protected static final By BY_PROJECT_PAGE_PANEL = By.id("p-projectPage");
-    protected static final By BY_SCHEDULES_PAGE_PANEL = By.id("p-emailSchedulePage");
-    protected static final By BY_PROJECTS_LIST = By.id("myProjects");
-
-    protected static final By BY_REPORTS_PANEL = By.id("p-domainPage");
-    protected static final By BY_REPORT_PAGE = By.id("p-analysisPage");
-
     protected static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
     protected static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
 
@@ -169,19 +162,25 @@ public abstract class AbstractTest extends Arquillian {
     protected DataPage dataPage;
 
     @FindBy(id = "attributesTable")
-    protected AttributesTable attributesTable;
+    protected ObjectsTable attributesTable;
 
     @FindBy(id = "p-objectPage")
     protected AttributeDetailPage attributeDetailPage;
 
-    @FindBy(id = "variablesTable")
-    protected VariablesTable variablesTable;
-
     @FindBy(id = "p-dataPage")
     protected VariableDetailPage variableDetailPage;
 
+    @FindBy(id = "metricsTable")
+    protected ObjectsTable metricsTable;
+    
+    @FindBy(id = "p-objectPage")
+    protected MetricDetailsPage metricDetailPage;
+    
+    @FindBy(id = "new")
+    protected MetricEditorDialog metricEditorPage;
+    
     /**
-     * ----- Grey pages fragmnets -----
+     * ----- Grey pages fragments -----
      */
 
     @FindBy(tagName = "form")
