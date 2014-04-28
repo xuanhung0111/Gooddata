@@ -18,8 +18,6 @@ public class StorageFragment extends AbstractHDSFragment {
     @FindBy
     private WebElement authorizationToken;
 
-    @FindBy
-    private WebElement copyOf;
 
     @FindBy(xpath = "div[@class='submit']/input")
     private WebElement submit;
@@ -29,25 +27,23 @@ public class StorageFragment extends AbstractHDSFragment {
     public boolean verifyValidCreateStorageForm() {
         waitForElementVisible(title);
         waitForElementVisible(description);
-        waitForElementVisible(copyOf);
         waitForElementVisible(authorizationToken);
         Assert.assertEquals(submit.getAttribute("value"), "Create", "Submit button is not 'Create'");
         return true;
     }
 
-    public void fillCreateStorageForm(String title, String description, String authorizationToken, String copyOf) {
+    public void fillCreateStorageForm(String title, String description, String authorizationToken) {
         waitForElementVisible(this.title);
         if (title != null && title.length() > 0) this.title.sendKeys(title);
         if (description != null && description.length() > 0) this.description.sendKeys(description);
         if (authorizationToken != null && authorizationToken.length() > 0)
             this.authorizationToken.sendKeys(authorizationToken);
-        if (copyOf != null && copyOf.length() > 0) this.copyOf.sendKeys(copyOf);
         Assert.assertEquals(submit.getAttribute("value"), "Create", "Submit button is not 'Create'");
         Graphene.guardHttp(submit).click();
     }
 
-    public String createStorage(String title, String description, String authorizationToken, String copyOf) throws JSONException, InterruptedException {
-        fillCreateStorageForm(title, description, authorizationToken, copyOf);
+    public String createStorage(String title, String description, String authorizationToken) throws JSONException, InterruptedException {
+        fillCreateStorageForm(title, description, authorizationToken);
         waitForElementNotVisible(this.title);
         waitForElementPresent(BY_GP_PRE_JSON);
         return waitForStorageCreated(10);
@@ -56,7 +52,6 @@ public class StorageFragment extends AbstractHDSFragment {
     public boolean verifyValidEditStorageForm(String title, String description) {
         waitForElementVisible(this.title);
         waitForElementVisible(this.description);
-        waitForElementNotVisible(copyOf);
         waitForElementNotVisible(authorizationToken);
         Assert.assertEquals(submit.getAttribute("value"), "Update", "Submit button is not 'Update'");
         return this.title.getAttribute("value").equals(title) && this.description.getAttribute("value").equals(description);
@@ -77,7 +72,6 @@ public class StorageFragment extends AbstractHDSFragment {
     public boolean verifyValidDeleteStorageForm() {
         waitForElementNotVisible(title);
         waitForElementNotVisible(description);
-        waitForElementNotVisible(copyOf);
         waitForElementNotVisible(authorizationToken);
         Assert.assertEquals(submit.getAttribute("value"), "Delete", "Submit button is not 'Delete'");
         return true;
