@@ -7,7 +7,7 @@ public enum Connectors {
     ZENDESK3("Zendesk3", "/projectTemplates/ZendeskAnalytics/9", "zendesk3"),
     COUPA("Coupa", "/projectTemplates/CoupaAnalytics/8", "coupa"),
     BRIGHTIDEA("Brightidea", "/projectTemplates/BrightideaAnalytics/2", "brightidea"),
-    ZENDESK4("Zendesk4", "/projectTemplates/ZendeskAnalytics/10", "zendesk4");
+    ZENDESK4("Zendesk4", "/projectTemplates/ZendeskAnalytics/11", "zendesk4");
 
     private final String name;
     private final String template;
