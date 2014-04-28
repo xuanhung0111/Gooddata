@@ -19,12 +19,6 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
     protected String zendeskUploadUserPassword;
     protected String zendeskApiUrl;
 
-    public void loadRequiredProperties() {
-        zendeskApiUrl = loadProperty("connectors.zendesk.apiUrl");
-        zendeskUploadUser = loadProperty("connectors.zendesk.uploadUser");
-        zendeskUploadUserPassword = loadProperty("connectors.zendesk.uploadUserPassword");
-    }
-
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testZendeskIntegrationConfiguration() throws InterruptedException, JSONException {
