@@ -135,11 +135,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	String expectedMaql = "SELECT " + usedMetric + " / (SELECT "
 		+ usedMetric + " BY " + attr + ", ALL OTHER WITHOUT PF)";
 	String expectedFormat = "#,##0.00";
-	waitForElementVisible(metricsTable.getRoot());
-	waitForDataPageLoaded();
-	metricsTable.selectObject(metricName);
-	waitForObjectPageLoaded();
-	metricDetailPage.checkCreatedMetric(metricName, expectedMaql, expectedFormat);
+	verifyMetric(metricName, expectedMaql, expectedFormat);
     }
 
     public void createDifferentMetric(String metricName, String usedMetric,
@@ -172,11 +168,7 @@ public class MetricEditorDialog extends AbstractFragment {
 		+ usedMetric + " BY ALL " + attr + " WHERE " + attr + " IN ("
 		+ attrValue + ") WITHOUT PF)";
 	String expectedFormat = "#,##0.00";
-	waitForElementVisible(metricsTable.getRoot());
-	waitForDataPageLoaded();
-	metricsTable.selectObject(metricName);
-	waitForObjectPageLoaded();
-	metricDetailPage.checkCreatedMetric(metricName, expectedMaql, expectedFormat);
+	verifyMetric(metricName, expectedMaql, expectedFormat);
     }
 
     public void createRatioMetric(String metricName, String usedMetric1,
@@ -200,11 +192,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(dataLink).click();
 	String expectedMaql = "SELECT " + usedMetric1 + " / " + usedMetric2;
 	String expectedFormat = "#,##0.00";
-	waitForElementVisible(metricsTable.getRoot());
-	waitForDataPageLoaded();
-	metricsTable.selectObject(metricName);
-	waitForObjectPageLoaded();
-	metricDetailPage.checkCreatedMetric(metricName, expectedMaql, expectedFormat);
+	verifyMetric(metricName, expectedMaql, expectedFormat);
     }
 
     public void createAggregationMetric(AggregationMetricTypes metricType,
@@ -476,6 +464,16 @@ public class MetricEditorDialog extends AbstractFragment {
 	    waitForElementNotPresent(selectedMetric);
 	    waitForElementVisible(customCategoryList);
 	}
+    }
+
+    public void verifyMetric(String metricName, String expectedMaql,
+	    String expectedFormat) {
+	waitForElementVisible(metricsTable.getRoot());
+	waitForDataPageLoaded();
+	metricsTable.selectObject(metricName);
+	waitForObjectPageLoaded();
+	metricDetailPage.checkCreatedMetric(metricName, expectedMaql,
+		expectedFormat);
     }
 
 }
