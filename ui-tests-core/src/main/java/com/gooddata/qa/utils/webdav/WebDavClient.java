@@ -30,21 +30,21 @@ public class WebDavClient {
     }
 
     public boolean createStructure(String userUploads){
-        webDavStructure = userUploads+ "/"+UUID.randomUUID().toString();
+        webDavStructure = userUploads+ "/" + UUID.randomUUID().toString();
         try {
             sardine.createDirectory(webDavStructure);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
-        System.out.println("Created WebDavClient structure on "+ webDavStructure);
+        System.out.println("Created WebDavClient structure on " + webDavStructure);
         return true;
     }
 
     public boolean uploadFile(File file) {
         try {
             InputStream fis = new FileInputStream(file);
-            System.out.println("Using "+ webDavStructure +" to upload "+file.getName());
+            System.out.println("Using " + webDavStructure + " to upload " + file.getName());
             sardine.put(webDavStructure + "/" + file.getName(), IOUtils.toByteArray(fis));
             sardine.shutdown();
             fis.close();

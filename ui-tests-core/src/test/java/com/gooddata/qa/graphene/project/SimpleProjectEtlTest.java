@@ -17,7 +17,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void loadProject() throws JSONException, URISyntaxException, IOException, InterruptedException {
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
-        postMAQL(IOUtils.toString(maqlResource),statusPollingCheckIterations);
+        postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
 
         URL csvResource = getClass().getResource("/etl/invoice.csv");
         String webdavURL = uploadFileToWebDav(csvResource, null);
@@ -25,7 +25,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         URL uploadInfoResource = getClass().getResource("/etl/upload_info.json");
         uploadFileToWebDav(uploadInfoResource, webdavURL);
 
-        postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/")+1,webdavURL.length()),statusPollingCheckIterations);
+        postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), statusPollingCheckIterations);
         successfulTest = true;
     }
 }

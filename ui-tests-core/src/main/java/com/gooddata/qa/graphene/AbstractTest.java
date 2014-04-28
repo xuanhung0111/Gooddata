@@ -320,13 +320,13 @@ public abstract class AbstractTest extends Arquillian {
     public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException, InterruptedException {
         openUrl(PAGE_GDC_MD + "/" + projectId + "/ldm/manage2");
         waitForElementPresent(manage2Fragment.getRoot());
-        assertTrue(manage2Fragment.postMAQL(maql,statusPollingCheckIterations), "MAQL was not successfully processed");
+        assertTrue(manage2Fragment.postMAQL(maql, statusPollingCheckIterations), "MAQL was not successfully processed");
     }
 
     public String uploadFileToWebDav(URL resourcePath, String webContainer) throws URISyntaxException {
         WebDavClient webDav = new WebDavClient(user, password);
         File resourceFile = new File(resourcePath.toURI());
-        if (webContainer==null) {
+        if (webContainer == null) {
             openUrl(PAGE_GDC);
             waitForElementPresent(gdcFragment.getRoot());
             assertTrue(webDav.createStructure(gdcFragment.getUserUploadsURL()), " Create WebDav storage structure");
@@ -336,10 +336,12 @@ public abstract class AbstractTest extends Arquillian {
         return webDav.getWebDavStructure();
     }
 
-    public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations) throws JSONException, InterruptedException {
+    public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations)
+            throws JSONException, InterruptedException {
         openUrl(PAGE_GDC_MD + "/" + projectId + "/etl/pull");
         waitForElementPresent(pullFragment.getRoot());
-        assertTrue(pullFragment.invokePull(integrationEntry,statusPollingCheckIterations), "ETL PULL was not successfully processed");
+        assertTrue(pullFragment.invokePull(integrationEntry, statusPollingCheckIterations),
+                "ETL PULL was not successfully processed");
     }
 
     public String validateProjectPartial(Validation... validationOptions) throws JSONException {

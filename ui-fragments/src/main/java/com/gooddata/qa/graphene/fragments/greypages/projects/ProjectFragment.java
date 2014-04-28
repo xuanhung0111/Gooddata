@@ -1,17 +1,14 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+import java.io.File;
+import java.io.IOException;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
 
@@ -45,7 +42,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         String projectUrl = browser.getCurrentUrl();
         logProjectUrl(projectUrl);
         System.out.println("Waiting for project enabled: " + projectUrl);
-        waitForPollState("ENABLED",checkIterations);
+        waitForPollState("ENABLED", checkIterations);
         return projectUrl.substring(projectUrl.lastIndexOf("/") + 1);
     }
 
