@@ -33,7 +33,6 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     public static final String UPDATED_STORAGE_TITLE = STORAGE_TITLE + " updated";
     private static final String STORAGE_DESCRIPTION = "HDS description";
     public static final String UPDATED_STORAGE_DESCRIPTION = STORAGE_DESCRIPTION + " updated";
-    private static final String STORAGE_COPY_OF = "/gdc/dss/instances/${storageId}";
 
     private static final String NEW_USER_ROLE = "dataAdmin";
     private static final String NEW_USER_UPDATED_ROLE = "admin";
@@ -120,7 +119,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     public void createStorage() throws JSONException, InterruptedException {
         waitForElementVisible(storageForm.getRoot());
         assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
-        storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, dssAuthorizationToken, null);
+        storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, dssAuthorizationToken);
     }
 
     @Test(dependsOnMethods = {"createStorage"})
@@ -167,33 +166,27 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnMethods = {"gpFormsAvailable"})
     public void createStorageWithoutTitle() throws JSONException {
-        createInvalidStorage(null, STORAGE_DESCRIPTION, dssAuthorizationToken, null,
+        createInvalidStorage(null, STORAGE_DESCRIPTION, dssAuthorizationToken,
                 "DSS instance title must not be empty.");
     }
 
     @Test(dependsOnMethods = {"gpFormsAvailable"})
     public void createStorageWithoutAuthToken() throws JSONException {
-        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, null,
+        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null,
                 "DSS instance authorization token must not be empty.");
     }
 
     @Test(dependsOnMethods = {"gpFormsAvailable"})
     public void createStorageWithNonexistentAuthToken() throws JSONException {
-        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, "nonexistentAuthToken", null,
+        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, "nonexistentAuthToken",
                 "Project group with name 'nonexistentAuthToken' does not exists.");
     }
 
     @Test(dependsOnMethods = {"gpFormsAvailable"})
     public void createStorageWithNonDssAuthToken() throws JSONException {
         // use non-dss-enabled authorization token to create new dss
-        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken, null,
+        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken,
                 "DSS project group source is missing");
-    }
-
-    @Test(dependsOnMethods = {"gpFormsAvailable"})
-    public void createStorageWithInvalidCopyOfURI() throws JSONException {
-        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, dssAuthorizationToken, STORAGE_COPY_OF,
-                "Malformed request");
     }
 
     @Test(dependsOnMethods = {"createStorage"})
@@ -408,11 +401,11 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         return getBasicRootUrl() + getAddedUserUrl();
     }
 
-    private void createInvalidStorage(String title, String description, String authorizationToken, String copyOf,
+    private void createInvalidStorage(String title, String description, String authorizationToken,
                                       String expectedErrorMessage) throws JSONException {
         waitForElementVisible(storageForm.getRoot());
         assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
-        storageForm.fillCreateStorageForm(title, description, authorizationToken, copyOf);
+        storageForm.fillCreateStorageForm(title, description, authorizationToken);
         verifyErrorMessage(expectedErrorMessage, PAGE_DSS_INSTANCES);
     }
 
