@@ -76,6 +76,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         useApiProxy = Boolean.parseBoolean(loadProperty("http.client.useApiProxy"));
     }
 
+    /**
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createTicketsCountMetric() {
         goodDataClient = getGoodDataClient();
@@ -89,20 +90,21 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         Metric m = md.createObj(project, metric);
         System.out.println("Metric for testing of non-deleted tickets created, id: " + m.getMeta().getIdentifier());
     }
+    **/
 
-    @Test(dependsOnMethods = {"createTicketsCountMetric"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createZendeskTicketsReport() throws InterruptedException {
-        createBasicReport("Count tickets without deleted", TICKETS_REPORT_NAME);
+        createBasicReport("# Tickets", TICKETS_REPORT_NAME);
     }
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createZendeskUsersReport() throws InterruptedException {
-        createBasicReport("Count all users", USERS_REPORT_NAME);
+        createBasicReport("# Users", USERS_REPORT_NAME);
     }
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
-    public void createZendeskOrganizationsReports() throws InterruptedException {
-        createBasicReport("Count organizations", ORGANIZATIONS_REPORT_NAME);
+    public void createZendeskOrganizationsReport() throws InterruptedException {
+        createBasicReport("# Organizations", ORGANIZATIONS_REPORT_NAME);
     }
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
@@ -129,7 +131,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 ZendeskHelper.USER_OBJECT_NAME);
     }
 
-    @Test(dependsOnMethods = {"initZendeskApiClient", "createZendeskOrganizationsReports"},
+    @Test(dependsOnMethods = {"initZendeskApiClient", "createZendeskOrganizationsReport"},
             groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testOrganizationsCount() throws IOException, JSONException {
         compareObjectsCount(getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME), zendeskHelper.getNumberOfOrganizations(),
