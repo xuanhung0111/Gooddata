@@ -56,6 +56,9 @@ public class ReportPage extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-excel_xls')]//a")
     private WebElement exportToXLS;
 
+    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-excel_xlsx')]//a")
+    private WebElement exportToXLSX;
+
     @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-csv')]//a")
     private WebElement exportToCSV;
 
@@ -147,6 +150,9 @@ public class ReportPage extends AbstractFragment {
                 break;
             case EXCEL_XLS:
                 currentExportLink = exportToXLS;
+                break;
+            case EXCEL_XLSX:
+                currentExportLink = exportToXLSX;
                 break;
             case CSV:
                 currentExportLink = exportToCSV;
