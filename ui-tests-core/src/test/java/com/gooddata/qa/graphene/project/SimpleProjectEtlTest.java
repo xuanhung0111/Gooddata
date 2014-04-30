@@ -13,6 +13,8 @@ import java.net.URL;
 public class SimpleProjectEtlTest extends AbstractProjectTest {
 
     protected int statusPollingCheckIterations = 60; // (60*5s)
+    private static final boolean exportUsers = true;
+    private static final boolean exportData = true;
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void loadProject() throws JSONException, URISyntaxException, IOException, InterruptedException {
@@ -26,6 +28,20 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         uploadFileToWebDav(uploadInfoResource, webdavURL);
 
         postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), statusPollingCheckIterations);
+    }
+
+    @Test(dependsOnMethods = {"loadProject"}, groups = {"tests"})
+    public void exportImportProject() throws JSONException, InterruptedException {
+        String exportToken = exportProject(exportUsers, exportData, statusPollingCheckIterations);
+        String parentProjectId = projectId;
+
+        // New projectID is needed here. Load it from export, validate, delete and restore original one
+        createProject();
+        importProject(exportToken,statusPollingCheckIterations);
+        validateProject();
+        deleteProject();
+
+        projectId = parentProjectId;
         successfulTest = true;
     }
 }

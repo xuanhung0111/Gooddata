@@ -9,6 +9,8 @@ import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment
 import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.etl.pull.PullFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp.ExportFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.imp.ImportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
 import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
@@ -172,13 +174,13 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(id = "metricsTable")
     protected ObjectsTable metricsTable;
-    
+
     @FindBy(id = "p-objectPage")
     protected MetricDetailsPage metricDetailPage;
-    
+
     @FindBy(id = "new")
     protected MetricEditorDialog metricEditorPage;
-    
+
     /**
      * ----- Grey pages fragments -----
      */
@@ -197,6 +199,12 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(tagName = "form")
     protected Manage2Fragment manage2Fragment;
+
+    @FindBy(tagName = "form")
+    protected ExportFragment exportFragment;
+
+    @FindBy(tagName = "form")
+    protected ImportFragment importFragment;
 
     @FindBy(tagName = "form")
     protected PullFragment pullFragment;
@@ -333,6 +341,20 @@ public abstract class AbstractTest extends Arquillian {
 
         webDav.uploadFile(resourceFile);
         return webDav.getWebDavStructure();
+    }
+
+    public String exportProject(boolean exportUsers, boolean exportData, int statusPollingCheckIterations) throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + projectId + "/maintenance/export");
+        waitForElementPresent(exportFragment.getRoot());
+        return exportFragment.invokeExport(exportUsers, exportData, statusPollingCheckIterations);
+    }
+
+    public void importProject(String exportToken, int statusPollingCheckIterations)
+            throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + projectId + "/maintenance/import");
+        waitForElementPresent(importFragment.getRoot());
+        assertTrue(importFragment.invokeImport(exportToken, statusPollingCheckIterations),
+                "Project import failed");
     }
 
     public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations)
