@@ -43,7 +43,13 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     public void initStartPage() {
         startPage = "gdc";
         projectTitle = connectorType.getName() + "CheckConnector";
-        projectTemplate = connectorType.getTemplate();
+        String projectTemplateOverride = System.getProperty("projectTemplate");
+        if (projectTemplateOverride != null && !projectTemplateOverride.isEmpty()) {
+            projectTemplate = projectTemplateOverride;
+        } else {
+            projectTemplate = connectorType.getTemplate();
+        }
+        System.out.println(String.format("Template %s will be for project creation...", projectTemplate));
         projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
     }
 
