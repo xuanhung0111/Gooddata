@@ -144,13 +144,17 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
 
         // REPORT EXPORT
         List<Part> reportAttachmentParts = ImapClient.getAttachmentParts(reportMessages[0]);
-        assertEquals(reportAttachmentParts.size(), 3, "Expected 3 attachments for report");
+        assertEquals(reportAttachmentParts.size(), 4, "Expected 4 attachments for report");
 
         Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
         assertTrue(pdfPart.getSize() > 32000, "PDF is greater than 32kB");
 
         Part xlsPart = findPartByContentType(reportAttachmentParts, "application/vnd.ms-excel");
         assertTrue(xlsPart.getSize() > 7700, "XLS is greater than 7.7kB");
+
+        Part xlsxPart = findPartByContentType(reportAttachmentParts,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        assertTrue(xlsxPart.getSize() > 7700, "XLSX is greater than 7.7kB");
 
         Part csvPart = findPartByContentType(reportAttachmentParts, "text/csv");
         assertTrue(csvPart.getSize() > 120, "CSV is greater than 120B");

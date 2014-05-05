@@ -150,11 +150,14 @@ public class EmailSchedulePage extends AbstractFragment {
                 case PDF:
                     formatsList.get(1).findElement(checkboxLocator).click();
                     break;
-                case CSV:
-                    formatsList.get(3).findElement(checkboxLocator).click();
-                    break;
                 case EXCEL_XLS:
                     formatsList.get(2).findElement(checkboxLocator).click();
+                    break;
+                case EXCEL_XLSX:
+                    formatsList.get(3).findElement(checkboxLocator).click();
+                    break;
+                case CSV:
+                    formatsList.get(4).findElement(checkboxLocator).click();
                     break;
                 default:
                     System.out.println("Invalid format!!!");
