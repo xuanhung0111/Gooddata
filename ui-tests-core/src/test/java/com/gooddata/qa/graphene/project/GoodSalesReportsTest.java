@@ -23,6 +23,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     private static final long expectedBarChartReportExportCSVSize = 300L;
     private static final long expectedTabularReportExportPDFSize = 28000L;
     private static final long expectedTabularReportExportXLSSize = 11000L;
+    private static final long expectedTabularReportExportXLSXSize = 7000L;
     private static final long expectedTabularReportExportCSVSize = 1650L;
 
     @Test(dependsOnMethods = {"createProject"})
@@ -106,6 +107,28 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"exportTabularReportToXLS"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportXLS() {
         verifyReportExport(ExportFormat.EXCEL_XLS, "Simple tabular report - 3", expectedTabularReportExportXLSSize);
+    }
+
+    @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
+    public void createTabularReport4() throws InterruptedException {
+        List<String> what = new ArrayList<String>();
+        what.add("# of Opportunities");
+        List<String> how = new ArrayList<String>();
+        how.add("Region");
+        how.add("Product");
+        how.add("Sales Rep");
+        how.add("Department");
+        prepareReport("Simple tabular report - 4", ReportTypes.TABLE, what, how);
+    }
+
+    @Test(dependsOnMethods = {"createTabularReport4"}, groups = {"tabular-report-exports"})
+    public void exportTabularReportToXLSX() throws InterruptedException {
+        exportReport("Simple tabular report - 4", ExportFormat.EXCEL_XLSX);
+    }
+
+    @Test(dependsOnMethods = {"exportTabularReportToXLSX"}, groups = {"tabular-report-exports"})
+    public void verifyExportedTabularReportXLSX() {
+        verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4", expectedTabularReportExportXLSXSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
