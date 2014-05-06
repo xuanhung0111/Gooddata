@@ -24,7 +24,8 @@ public class LoginPageTest extends AbstractTest {
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_002_SignInAndSignOut() throws InterruptedException {
-        loginFragment.login(user, password);
+        waitForElementVisible(loginFragment.getRoot());
+        loginFragment.login(user, password, true);
         Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
         logout();
         Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
@@ -32,19 +33,22 @@ public class LoginPageTest extends AbstractTest {
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_003_SignInWithEmptyPassword() {
-        loginFragment.login(user, "");
+        waitForElementVisible(loginFragment.getRoot());
+        loginFragment.login(user, "", false);
         loginFragment.checkPasswordInvalid();
     }
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_004_SignInWithInvalidPassword() {
-        loginFragment.login(user, "abcdefgh");
+        waitForElementVisible(loginFragment.getRoot());
+        loginFragment.login(user, "abcdefgh", false);
         loginFragment.checkInvalidLogin();
     }
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_005_SignInWithInvalidEmail() {
-        loginFragment.login("email_invalid_format", "abcdefgh");
+        waitForElementVisible(loginFragment.getRoot());
+        loginFragment.login("email_invalid_format", "abcdefgh", false);
         loginFragment.checkEmailInvalid();
     }
 }
