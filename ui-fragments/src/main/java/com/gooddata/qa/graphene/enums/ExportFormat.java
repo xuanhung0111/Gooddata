@@ -9,6 +9,7 @@ public enum ExportFormat {
     CSV("csv", "CSV"),
     RAW_CSV("csv", "Raw data (CSV)"),
     EXCEL_XLS("xls", "Excel (XLS)"),
+    EXCEL_XLSX("xlsx", "Excel (XLSX)"),
     ALL("all", "Used for schedules...");
 
     private final String name;
