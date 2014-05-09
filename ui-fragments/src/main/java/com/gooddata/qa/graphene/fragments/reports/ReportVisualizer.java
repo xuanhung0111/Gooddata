@@ -20,8 +20,8 @@ public class ReportVisualizer extends AbstractFragment {
     private static final String XPATH_METRIC_CHECKBOX = "//div[contains(@class, 'sndMetric') and text()='${metric}']/input[@type='checkbox']";
     private static final String XPATH_METRIC_CHECKBOX_CHECKED = "//div[contains(@class, 'sndMetric') and text()='${metric}']/input[@type='checkbox' and @checked='checked']";
 
-    private static final String XPATH_ATTRIBUTE_CHECKBOX = "//div[contains(@class, 's-snd-AttributesContainer')]//div[contains(@class, 'element') and text()='${attribute}']/input[@type='checkbox']";
-    private static final String XPATH_ATTRIBUTE_CHECKBOX_CHECKED = "//div[contains(@class, 'AttributesContainer')]//div[contains(@class, 'element') and text()='${attribute}']/input[@type='checkbox' and @checked='checked']";
+    private static final String XPATH_ATTRIBUTE_CHECKBOX = "//div[contains(@class, 's-snd-AttributesContainer')]//div[contains(@class, 'element') and contains(text(), '${attribute}')]/input[@type='checkbox']";
+    private static final String XPATH_ATTRIBUTE_CHECKBOX_CHECKED = "//div[contains(@class, 'AttributesContainer')]//div[contains(@class, 'element') and contains(text(), '${attribute}')]/input[@type='checkbox' and @checked='checked']";
 
     @FindBy(xpath = "//div[contains(@class, 'reportEditorWhatArea')]/button")
     private WebElement whatButton;
@@ -58,7 +58,7 @@ public class ReportVisualizer extends AbstractFragment {
         }
     }
 
-    public void selectHowArea(List<String> how) {
+    public void selectHowArea(List<String> how) throws InterruptedException {
         waitForElementVisible(howButton).click();
         waitForElementVisible(BY_HOW_AREA_ATTRIBUTES_HEADER);
         if (how != null) {
@@ -67,6 +67,7 @@ public class ReportVisualizer extends AbstractFragment {
                 attributeFilterInput.sendKeys(attribute);
                 By attributeCheckbox = By.xpath(XPATH_ATTRIBUTE_CHECKBOX.replace("${attribute}", attribute));
                 waitForElementVisible(attributeCheckbox);
+                Thread.sleep(2000);
                 root.findElement(attributeCheckbox).click();
                 waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_CHECKBOX_CHECKED.replace("${attribute}", attribute)));
             }

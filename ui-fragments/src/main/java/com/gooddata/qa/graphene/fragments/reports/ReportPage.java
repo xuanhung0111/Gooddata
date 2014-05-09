@@ -220,7 +220,7 @@ public class ReportPage extends AbstractFragment {
         String tmp = "";
         float number = 0;
         for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) > 45 && text.charAt(i) < 58 && text.charAt(i) != 47) {
+            if (text.charAt(i) > 44 && text.charAt(i) < 58 && text.charAt(i) != 47) {
                 tmp += text.charAt(i);
             }
         }
