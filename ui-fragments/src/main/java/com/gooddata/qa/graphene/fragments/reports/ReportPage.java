@@ -32,7 +32,7 @@ public class ReportPage extends AbstractFragment {
     @FindBy(xpath = "//div[@id='reportSaveButtonContainer']/button")
     private WebElement createReportButton;
 
-    @FindBy(xpath = "//div[contains(@class, 's-saveReportDialog')]//div[@class='bd_controls']//button[text()='Create']")
+    @FindBy(xpath = "//div[contains(@class, 's-saveReportDialog')]//footer[@class='buttons']//button[contains(@class, 's-btn-create')]")
     private WebElement confirmDialogCreateButton;
 
     @FindBy(id = "reportVisualizer")
