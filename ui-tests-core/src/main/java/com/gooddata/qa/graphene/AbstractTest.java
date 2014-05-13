@@ -330,7 +330,7 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public String uploadFileToWebDav(URL resourcePath, String webContainer) throws URISyntaxException {
-        WebDavClient webDav = new WebDavClient(user, password);
+        WebDavClient webDav = WebDavClient.getInstance(user, password);
         File resourceFile = new File(resourcePath.toURI());
         if (webContainer == null) {
             openUrl(PAGE_GDC);
@@ -340,6 +340,10 @@ public abstract class AbstractTest extends Arquillian {
 
         webDav.uploadFile(resourceFile);
         return webDav.getWebDavStructure();
+    }
+    public java.io.InputStream getFileFromWebDav(String webContainer,URL resourcePath) throws URISyntaxException, IOException {
+        File resourceFile = new File(resourcePath.toURI());
+        return WebDavClient.getInstance(user, password).getFile(webContainer+"/"+resourceFile.getName());
     }
 
     public String exportProject(boolean exportUsers, boolean exportData, int statusPollingCheckIterations) throws JSONException, InterruptedException {

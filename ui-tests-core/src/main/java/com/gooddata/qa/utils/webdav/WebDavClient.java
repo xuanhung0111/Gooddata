@@ -13,12 +13,19 @@ import java.util.UUID;
 
 public class WebDavClient {
 
+    private static WebDavClient instance = null;
     private Sardine sardine;
+    private String webDavStructure;
 
-    String webDavStructure;
-
-    public WebDavClient(String user, String password) {
+    private WebDavClient(String user, String password) {
         sardine = SardineFactory.begin(user, password);
+    }
+
+    public static WebDavClient getInstance(String user, String password) {
+        if(instance == null) {
+            instance = new WebDavClient(user,password);
+        }
+        return instance;
     }
 
     public void setWebDavStructure(String webDavStructure) {
@@ -46,12 +53,15 @@ public class WebDavClient {
             InputStream fis = new FileInputStream(file);
             System.out.println("Using " + webDavStructure + " to upload " + file.getName());
             sardine.put(webDavStructure + "/" + file.getName(), IOUtils.toByteArray(fis));
-            sardine.shutdown();
             fis.close();
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
         return true;
+    }
+
+    public InputStream getFile(String webContainer) throws IOException {
+        return sardine.get(webContainer);
     }
 }
