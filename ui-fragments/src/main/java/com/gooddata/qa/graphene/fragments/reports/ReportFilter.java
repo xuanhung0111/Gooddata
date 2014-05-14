@@ -30,7 +30,7 @@ public class ReportFilter extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'c-AttributeFilterPicker afp-list')]")
     private List<WebElement> simpleColumnList;
 
-    @FindBy(xpath = "//button[text()='Select']")
+    @FindBy(xpath = "//button[(text()='Select') and not (contains(@class,'yui3-c-button-disabled'))]")
     private WebElement selectElementButtonDialog;
 
     @FindBy(xpath = "//button[text()='All']")
@@ -47,9 +47,6 @@ public class ReportFilter extends AbstractFragment {
 
     @FindBy(xpath = "//div[@title='Slider']/div/select")
     private Select rankSizeSelect;
-
-    @FindBy(xpath = "//div[21]/div/div[2]/div/div[6]/div/button[2]")
-    private WebElement selectMetricButtonDialog;
 
     @FindBy(css = ".s-rangeFilter")
     private WebElement rangeFilterLink;
@@ -178,7 +175,7 @@ public class ReportFilter extends AbstractFragment {
                 metric.trim().toLowerCase().replaceAll(" ", "_")));
         waitForElementVisible(listOfMetric);
         selectElement(metric);
-        waitForElementVisible(selectMetricButtonDialog).click();
+        waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
         waitForTableReportRendered();
@@ -210,7 +207,7 @@ public class ReportFilter extends AbstractFragment {
                 metric.trim().toLowerCase().replaceAll(" ", "_")));
         waitForElementVisible(listOfMetric);
         selectElement(metric);
-        waitForElementVisible(selectMetricButtonDialog).click();
+        waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(rangeNumberInput).clear();
         rangeNumberInput.sendKeys(number);
         waitForElementVisible(confirmApplyButton).click();
