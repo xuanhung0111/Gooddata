@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment
 import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
@@ -181,6 +182,12 @@ public abstract class AbstractTest extends Arquillian {
     @FindBy(id = "new")
     protected MetricEditorDialog metricEditorPage;
 
+    @FindBy(id = "factsTable")
+    protected ObjectsTable factsTable;
+    
+    @FindBy(id = "p-objectPage")
+    protected FactDetailPage factDetailPage;
+    
     /**
      * ----- Grey pages fragments -----
      */
