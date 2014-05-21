@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.metric;
+package com.gooddata.qa.graphene.manage;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,7 +46,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	ratioMetric2 = "# of Open Opps.";
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createShareMetric() throws InterruptedException {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
 	String metricName = "Share % " + getCurrentDateString();
@@ -54,7 +54,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 		.createShareMetric(metricName, metric, attrFolder, attr);
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createDifferentMetricTest() throws InterruptedException {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
 	String metricName = "Difference " + getCurrentDateString();
@@ -62,7 +62,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 		attr, attrValue);
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createRatioMetricTest() throws InterruptedException {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
 	String metricName = "Ratio " + getCurrentDateString();
@@ -70,7 +70,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 		ratioMetric2);
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createAggreationMetricTest() throws InterruptedException {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
 	String fact0 = "Probability";
@@ -113,7 +113,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	}
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createNumericMetricTest() throws InterruptedException {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
 	String metric = "Best Case";
@@ -140,7 +140,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	}
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createGranularityMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
@@ -189,7 +189,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	}
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createLogicalMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
@@ -246,7 +246,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	}
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
     public void createFilterMetricTest() throws InterruptedException {
 	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
 		+ "|dataPage|metrics");
@@ -305,4 +305,8 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 	return DATE_FORMAT.format(new Date());
     }
 
+    @Test(dependsOnGroups = { "metric-tests" }, groups = { "tests" })
+    public void finalTest() {
+	successfulTest = true;
+    }
 }
