@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
@@ -24,6 +25,7 @@ import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
 import com.gooddata.qa.graphene.fragments.manage.MetricEditorDialog;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
@@ -170,8 +172,11 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(id = "p-objectPage")
     protected AttributeDetailPage attributeDetailPage;
-
+    
     @FindBy(id = "p-dataPage")
+    protected VariablesPage variablePage;
+
+    @FindBy(id = "p-objectPage")
     protected VariableDetailPage variableDetailPage;
 
     @FindBy(id = "metricsTable")
@@ -188,6 +193,9 @@ public abstract class AbstractTest extends Arquillian {
     
     @FindBy(id = "p-objectPage")
     protected FactDetailPage factDetailPage;
+    
+    @FindBy(id = "p-objectPage")
+    protected ObjectPropertiesPage objectDetailPage;
     
     /**
      * ----- Grey pages fragments -----
@@ -652,5 +660,10 @@ public abstract class AbstractTest extends Arquillian {
 
     public void waitForElementNotPresent(WebElement element) {
         Graphene.waitGui().until().element(element).is().not().present();
+    }
+
+    public void initObject(String variableName) {
+	// TODO Auto-generated method stub
+	
     }
 }

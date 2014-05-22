@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.FilterTypes;
 import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.fragments.reports.ReportsList;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
@@ -91,19 +92,22 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"filterReportTest"}, groups = {"tests"})
     public void promptFilterTest() throws InterruptedException {
-
+	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|variables");
+        data = new HashMap<String, String>();
+        data.put("userValueFlag", "false");
+        data.put("variableName", variableName);
+        data.put("attribute", attributeForPrompt);
         promptList = new ArrayList<String>();
         promptList.add("Interest");
         promptList.add("Discovery");
-        browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|variables");
-        variableDetailPage.createFilterVariable(attributeForPrompt, variableName, promptList);
         String str = StringUtils.join(promptList, ", ");
-        System.out.println("String = " + str);
-        data.put("promptElements", str);
-        data.put("variable", this.variableName);
+        data.put("attrElements", str);
+        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage|");
         waitForReportsPageLoaded();
         reportsPage.getReportsList().openReport(this.reportName);
+        data.put("variable", this.variableName);
+        data.put("promptElements", str);
         reportPage.addFilter(FilterTypes.PROMPT, data);
         reportPage.saveReport();
         checkRedBar();

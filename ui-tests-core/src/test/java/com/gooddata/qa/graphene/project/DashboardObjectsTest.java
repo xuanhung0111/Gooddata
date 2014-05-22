@@ -1,14 +1,18 @@
 package com.gooddata.qa.graphene.project;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.TextObject;
+import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
@@ -26,6 +30,7 @@ public class DashboardObjectsTest extends SimpleProjectTest {
 
     private static final long expectedDashboardExportSize = 65000L;
     private List<String> prompt_elements;
+    private Map<String, String> data;
 
     @BeforeClass
     public void initStartPage() {
@@ -42,10 +47,16 @@ public class DashboardObjectsTest extends SimpleProjectTest {
     @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
     public void createvariableTest() throws InterruptedException {
         browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|variables");
+        data = new HashMap<String, String>();
+        data.put("variableName", PROMPT_NAME);
+	data.put("attribute", ATTRIBUTE_FOR_VARIABLE);
         prompt_elements = new ArrayList<String>();
         prompt_elements.add("Bachelors Degree");
         prompt_elements.add("Graduate Degree");
-        variableDetailPage.createFilterVariable(ATTRIBUTE_FOR_VARIABLE, PROMPT_NAME, prompt_elements);
+	String str = StringUtils.join(prompt_elements, ", ");
+	data.put("attrElements", str);
+	data.put("userValueFlag", "false");
+        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
     @Test(dependsOnMethods = {"createvariableTest"}, groups = {"tests"})
