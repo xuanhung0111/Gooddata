@@ -1,4 +1,4 @@
-tab_inv_item.col_quantity,tab_inv_item.col_total,tab_inv.col_total,tab_inv.col_name,tab_inv.dt_invoice,tab_pers.aaaaaaaaaa,tab_pers.col_fn,tab_pers.col_sn
+tab_Inv_Item.col_quantity,tab_Inv_Item.col_total,tab_Inv.col_total,tab_Inv.col_name,tab_Inv.inv_date_id,tab_pers.aaaaaaaaaa,tab_pers.col_fn,tab_pers.col_sn
 -1,-14,-0.0,-invA55,"2013-02-19",-bn3_(rč3),"-Jiří",-Svoboda
 2,-26,40,invA05,"2013-01-02",bn3_(rč3),"Jiří",Svoboda
 3,-12,30,invA04,"2013-01-03",bn2,Petr,"Dvořák"
