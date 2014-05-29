@@ -54,6 +54,9 @@ public class ObjectPropertiesPage extends AbstractFragment {
     @FindBy(xpath = "//p[@class = 'folderText']/a")
     private WebElement locatedInFolder;
 
+	@FindBy(css = "div#p-objectPage h1 a span")
+	private WebElement backDataPageLink;
+
     private final String folderLocator = "//div[@class = 'autocompletion']/div[@class = 'suggestions']/ul/li[text() = '${folder}']";
 
     public void changeObjectFolder(String newFolderName) {
@@ -129,5 +132,13 @@ public class ObjectPropertiesPage extends AbstractFragment {
 		"Change name doesn't work properly");
 	assertEquals(waitForElementVisible(descriptionIpe).getText(), description,
 		"Add description doesn't work properly");
+    }
+    
+    public String getObjectName() {
+    	return objectNameIpe.getText();
+    }
+    
+    public WebElement getBackDataPageLink() {
+    	return backDataPageLink;
     }
 }
