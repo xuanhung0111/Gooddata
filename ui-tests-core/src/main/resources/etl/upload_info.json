@@ -2,28 +2,28 @@
    "dataSetSLIManifest" : {
       "parts" : [
          {
-            "columnName" : "tab_inv_item.col_quantity",
+            "columnName" : "tab_Inv_Item.col_quantity",
             "populates" : [
                "fact.item_quantity"
             ],
             "mode" : "FULL"
          },
          {
-            "columnName" : "tab_inv_item.col_total",
+            "columnName" : "tab_Inv_Item.col_total",
             "populates" : [
                "fact.item_total"
             ],
             "mode" : "FULL"
          },
          {
-            "columnName" : "tab_inv.col_total",
+            "columnName" : "tab_Inv.col_total",
             "populates" : [
                "fact.invoice_total"
             ],
             "mode" : "FULL"
          },
          {
-            "columnName" : "tab_inv.col_name",
+            "columnName" : "tab_Inv.col_name",
             "populates" : [
                "l_inv.invoice_name"
             ],
@@ -31,10 +31,10 @@
             "referenceKey" : 1
          },
          {
-            "columnName" : "tab_inv.dt_invoice",
+            "columnName" : "tab_Inv.inv_date_id",
             "constraints" : { "date" : "yyyy-MM-dd" },
             "populates" : [
-               "dt_invoice.date.mdyy"
+               "dt_invoice.date.eddmmyyyy"
             ],
             "mode" : "FULL",
             "referenceKey" : 1

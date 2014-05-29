@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment
 import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.etl.pull.PullFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.ldm.singleloadinterface.SingleLoadInterfaceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp.ExportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.imp.ImportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
@@ -216,6 +217,8 @@ public abstract class AbstractTest extends Arquillian {
     @FindBy(tagName = "form")
     protected PullFragment pullFragment;
 
+    @FindBy(tagName = "form")
+    protected SingleLoadInterfaceFragment singleLoadInterfaceFragment;
     /**
      * ----------
      */
@@ -373,6 +376,12 @@ public abstract class AbstractTest extends Arquillian {
         waitForElementPresent(pullFragment.getRoot());
         assertTrue(pullFragment.invokePull(integrationEntry, statusPollingCheckIterations),
                 "ETL PULL was not successfully processed");
+    }
+
+    public JSONObject fetchSLIManifest(String dataset) throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + projectId + "/ldm/singleloadinterface");
+        waitForElementPresent(singleLoadInterfaceFragment.getRoot());
+        return singleLoadInterfaceFragment.postDataset(dataset);
     }
 
     public String validateProjectPartial(Validation... validationOptions) throws JSONException {
