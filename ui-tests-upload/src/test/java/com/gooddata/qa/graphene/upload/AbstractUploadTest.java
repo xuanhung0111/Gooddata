@@ -14,12 +14,12 @@ import org.testng.annotations.BeforeClass;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
-import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
+import com.gooddata.qa.graphene.fragments.upload.*;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
 
-public class AbstractUploadTest extends AbstractProjectTest {
+public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	protected String csvFilePath;
 
@@ -78,7 +78,6 @@ public class AbstractUploadTest extends AbstractProjectTest {
 		waitForDataPageLoaded();
 		datasetsTable.selectObject(datasetName);
 		datasetDetailPage.deleteDataset();
-		waitForDataPageLoaded();
 	}
 
 	protected void deleteDashboard() throws InterruptedException {
@@ -133,43 +132,39 @@ public class AbstractUploadTest extends AbstractProjectTest {
 		Screenshots.takeScreenshot(browser, "check-incorrect-csv-file-upload",
 				this.getClass());
 		if (errorTitle != null){
-			assertEquals(errorMessageElement.findElement(
-						By.cssSelector(".s-uploadIndex-errorTitle")).getText(), errorTitle);
+			assertEquals(upload.getErrorTitle(errorMessageElement).getText(), errorTitle);
 		}
 		if (errorMessage != null){
-			assertEquals(errorMessageElement.findElement(
-							By.cssSelector(".s-uploadIndex-errorMessage")).getText(), errorMessage);
+			assertEquals(upload.getErrorMessage(errorMessageElement).getText(), errorMessage);
 		}
 		if(errorSupport != null){
-			assertEquals(errorMessageElement.findElement(
-							By.cssSelector(".s-uploadIndex-errorSupport"))
-							.getText(), errorSupport);
+			assertEquals(upload.getErrorSupport(errorMessageElement).getText(), errorSupport);
 		}
 	}
 
-	protected void assertMetricValuesInReport(List<Integer> metricIndexs,
+	protected void assertMetricValuesInReport(List<Integer> metricIndexes,
 			List<Float> metricValues, List<Double> expectedMetricValues) {
 		int index = 0;
-		for (int metricIndex : metricIndexs) {
+		for (int metricIndex : metricIndexes) {
 			assertEquals(metricValues.get(metricIndex).doubleValue(),
 					expectedMetricValues.get(index));
 			index++;
 		}
 	}
 
-	protected void assertEmptyMetricInReport(List<Integer> metricIndexs,
+	protected void assertEmptyMetricInReport(List<Integer> metricIndexes,
 			List<Float> metricValues) {
-		for (int metricIndex : metricIndexs) {
+		for (int metricIndex : metricIndexes) {
 			assertEquals(metricValues.get(metricIndex).doubleValue(), 
 					0.0);
 		}
 	}
 
 	protected void assertAttributeElementsInReport(
-			List<Integer> attributeIndexs, List<String> attributeElements,
+			List<Integer> attributeIndexes, List<String> attributeElements,
 			List<String> expectedAttribueElements) {
 		int index = 0;
-		for (int attributeIndex : attributeIndexs) {
+		for (int attributeIndex : attributeIndexes) {
 			assertEquals(attributeElements.get(attributeIndex).toString(),
 					expectedAttribueElements.get(index).toString());
 			index++;
@@ -206,14 +201,14 @@ public class AbstractUploadTest extends AbstractProjectTest {
 				+ uploadFileName, this.getClass());
 		UploadColumns uploadColumns = upload.getUploadColumns();
 		assertEquals(uploadColumns.getNumberOfColumns(), 9);
-		List<Integer> columnIndexs = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
+		List<Integer> columnIndexes = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
 		List<String> guessedDataTypes = Arrays.asList("TEXT", "TEXT", "TEXT",
 				"TEXT", "TEXT", "TEXT", "TEXT", "DATE", "NUMBER");
 		List<String> expectedColumnNames = Arrays.asList("Lastname",
 				"Firstname", "Education", "Position", "Store", "State",
 				"County", "Paydate", "Amount");
-		upload.assertColumnsType(uploadColumns, columnIndexs, guessedDataTypes);
-		upload.assertColumnsName(uploadColumns, columnIndexs,
+		uploadColumns.assertColumnsType(columnIndexes, guessedDataTypes);
+		uploadColumns.assertColumnsName(columnIndexes,
 				expectedColumnNames);
 		upload.confirmloadCsv();
 		waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"));

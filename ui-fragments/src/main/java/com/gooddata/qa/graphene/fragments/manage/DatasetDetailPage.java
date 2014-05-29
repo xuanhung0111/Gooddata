@@ -16,5 +16,6 @@ public class DatasetDetailPage extends AbstractFragment {
     	waitForElementVisible(datasetDeleteButton).click();
     	Thread.sleep(3000);
     	waitForElementVisible(confirmDeleteButton).click();
+    	waitForDataPageLoaded();
     }
 }

@@ -1,9 +1,6 @@
 package com.gooddata.qa.graphene.fragments.upload;
 
-import static org.testng.Assert.assertEquals;
-
-import java.util.List;
-
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -11,6 +8,10 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class UploadFragment extends AbstractFragment {
 
+	private static final By BY_ERROR_TITLE = By.cssSelector(".s-uploadIndex-errorTitle");
+	private static final By BY_ERROR_MESSAGE = By.cssSelector(".s-uploadIndex-errorMessage");
+	private static final By BY_ERROR_SUPPORT = By.cssSelector(".s-uploadIndex-errorSupport");
+	
     @FindBy
     private WebElement uploadFile;
 
@@ -31,34 +32,20 @@ public class UploadFragment extends AbstractFragment {
         return uploadColumns;
     }
     
-    public void setColumnsType(UploadColumns uploadColumns, List<Integer> columnIndexs, List<String> dataTypes) throws InterruptedException {
-		int index = 0;
-    	for(int columnIndex : columnIndexs) {
-    		String dataType = dataTypes.get(index);
-    		uploadColumns.setColumnType(columnIndex, UploadColumns.OptionDataType.valueOf(dataType));
-    		index++;
-    	}
-    }
-    
-    public void assertColumnsType(UploadColumns uploadColumns, List<Integer> columnIndexs, List<String> dataTypes) throws InterruptedException {
-		int index = 0;
-		for(int columnIndex : columnIndexs) {
-    		String dataType = dataTypes.get(index);
-    		assertEquals(uploadColumns.getColumnType(columnIndex), UploadColumns.OptionDataType.valueOf(dataType).getOptionLabel());
-    		index++;
-    	}
-    }
-    
-    public void assertColumnsName(UploadColumns uploadColumns, List<Integer> columnIndexs, List<String> columnNames) throws InterruptedException {
-		int index = 0;
-		for(int columnIndex : columnIndexs) {
-    		assertEquals(uploadColumns.getColumnName(columnIndex), columnNames.get(index));
-    		index++;
-    	}
-    }
-
     public void confirmloadCsv() {
         waitForElementVisible(loadButton).click();
         waitForElementNotVisible(uploadColumns.getRoot());
+    }
+    
+    public WebElement getErrorTitle(WebElement errorMessageElement) {
+    	return errorMessageElement.findElement(BY_ERROR_TITLE);
+    }
+    
+    public WebElement getErrorMessage(WebElement errorMessageElement) {
+    	return errorMessageElement.findElement(BY_ERROR_MESSAGE);
+    }
+    
+    public WebElement getErrorSupport(WebElement errorMessageElement) {
+    	return errorMessageElement.findElement(BY_ERROR_SUPPORT);
     }
 }

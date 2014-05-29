@@ -20,31 +20,31 @@ public class UploadTests extends AbstractUploadTest {
 		uploadFileAndClean("delimiter-colon");
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = {
+	@Test(dependsOnMethods = { "createProject" }, groups = {
 			"upload-delimiter", "valid-delimiter" })
 	public void uploadDelimiterComma() throws InterruptedException {
 		uploadFileAndClean("delimiter-comma");
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = {
+	@Test(dependsOnMethods = { "createProject" }, groups = {
 			"upload-delimiter", "valid-delimiter" })
 	public void uploadDelimiterPipe() throws InterruptedException {
 		uploadFileAndClean("delimiter-pipe");
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = {
+	@Test(dependsOnMethods = { "createProject" }, groups = {
 			"upload-delimiter", "valid-delimiter" })
 	public void uploadDelimiterSemicolon() throws InterruptedException {
 		uploadFileAndClean("delimiter-semicolon");
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = {
+	@Test(dependsOnMethods = { "createProject" }, groups = {
 			"upload-delimiter", "valid-delimiter" })
 	public void uploadDelimiterTab() throws InterruptedException {
 		uploadFileAndClean("delimiter-tab");
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-case" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-case" })
 	public void uploadSpecialUnicodeCharacterColumnName()
 			throws InterruptedException {
 		try {
@@ -76,7 +76,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-case" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-case" })
 	public void uploadNegativeNumber() throws InterruptedException {
 		try {
 			selectFileToUpload("payroll-negative-number");
@@ -108,10 +108,10 @@ public class UploadTests extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser, "report-with-negative-number",
 					this.getClass());
 			System.out.println("Check the negative number in report!");
-			List<Integer> metricIndexs = Arrays.asList(0, 1, 2, 3, 4);
+			List<Integer> metricIndexes = Arrays.asList(0, 1, 2, 3, 4);
 			List<Double> expectedMetricValues = Arrays.asList(-6080.0,
 					-10230.0, -3330.0, -6630.0, -4670.0);
-			this.assertMetricValuesInReport(metricIndexs, metricValues,
+			this.assertMetricValuesInReport(metricIndexes, metricValues,
 					expectedMetricValues);
 			System.out
 					.println("Negative numbers are displayed well in report!");
@@ -122,7 +122,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-case" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-case" })
 	public void uploadNullNumber() throws InterruptedException {
 		try {
 			this.selectFileToUpload("payroll-null-number");
@@ -154,8 +154,8 @@ public class UploadTests extends AbstractUploadTest {
 					this.getClass());
 			List<Float> metricValues = report.getMetricInGrid();
 			System.out.println("Check the null number in report!");
-			List<Integer> metricIndexs = Arrays.asList(0, 2, 4, 5, 6, 7, 8);
-			this.assertEmptyMetricInReport(metricIndexs, metricValues);
+			List<Integer> metricIndexes = Arrays.asList(0, 2, 4, 5, 6, 7, 8);
+			this.assertEmptyMetricInReport(metricIndexes, metricValues);
 			System.out.println("Null numbers are displayed well in report!");
 		} finally {
 			List<String> datasets = Arrays.asList("payroll-null-number",
@@ -165,24 +165,22 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-change-column-type" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-change-column-type" })
 	public void uploadChangeColumnType() throws InterruptedException {
 		try {
 			selectFileToUpload("change-column-type");
 			Screenshots.takeScreenshot(browser,
 					"change-column-type-csv-upload", this.getClass());
 			UploadColumns uploadColumns = upload.getUploadColumns();
-			List<Integer> columnIndexs = Arrays.asList(2, 3, 4);
+			List<Integer> columnIndexes = Arrays.asList(2, 3, 4);
 			List<String> expectedDataTypes = Arrays.asList("TEXT", "TEXT",
 					"NUMBER");
 			List<String> guessedDataTypes = Arrays.asList("DATE", "NUMBER",
 					"TEXT");
 			System.out.print("Check the auto-guessed data type!");
-			upload.assertColumnsType(uploadColumns, columnIndexs,
-					guessedDataTypes);
+			uploadColumns.assertColumnsType(columnIndexes, guessedDataTypes);
 			System.out.print("Change column data type!");
-			upload.setColumnsType(uploadColumns, columnIndexs,
-					expectedDataTypes);
+			uploadColumns.setColumnsType(columnIndexes, expectedDataTypes);
 			Screenshots.takeScreenshot(browser, "upload-definition",
 					this.getClass());
 			upload.confirmloadCsv();
@@ -203,8 +201,8 @@ public class UploadTests extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"report-with-null-matric-value", this.getClass());
 			List<Float> metricValues = report.getMetricInGrid();
-			List<Integer> metricIndexs = Arrays.asList(2, 4, 6, 9, 13, 14, 16);
-			assertEmptyMetricInReport(metricIndexs, metricValues);
+			List<Integer> metricIndexes = Arrays.asList(2, 4, 6, 9, 13, 14, 16);
+			assertEmptyMetricInReport(metricIndexes, metricValues);
 			System.out
 					.print("Non-number values are ignored, they are displayed as null cell in report.");
 		} finally {
@@ -214,7 +212,7 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-error" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-error" })
 	public void uploadCheckEmptyColumnName() throws InterruptedException {
 		this.selectFileToUpload("payroll");
 		Screenshots.takeScreenshot(browser, "check-empty-field-csv-upload",
@@ -227,7 +225,7 @@ public class UploadTests extends AbstractUploadTest {
 				this.getClass());
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-error" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-error" })
 	public void uploadCheckUniqueColumnName() throws InterruptedException {
 		this.selectFileToUpload("payroll");
 		Screenshots.takeScreenshot(browser, "check-unique-field-csv-upload",
@@ -242,7 +240,7 @@ public class UploadTests extends AbstractUploadTest {
 				this.getClass());
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-error" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-error" })
 	public void uploadIncorrectCSVFile() throws InterruptedException {
 		uploadInvalidCSVFile(
 				"payroll-incorrect-header",
@@ -251,26 +249,26 @@ public class UploadTests extends AbstractUploadTest {
 				"See CSV formatting guidelines or contact Support if problems persist.");
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-error" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-error" })
 	public void uploadTooLargeCSVFile() throws InterruptedException {
 		uploadInvalidCSVFile("payroll-too-large",
 				"THIS FILE IS TOO BIG TO UPLOAD.",
 				"The maximum upload size is 20MB.", null);
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
 	public void uploadNoHeaderCSV() throws InterruptedException {
 		try {
 			this.selectFileToUpload("payroll-no-header");
 			Screenshots.takeScreenshot(browser, "no-header-csv-upload",
 					this.getClass());
 			UploadColumns uploadColumns = upload.getUploadColumns();
-			List<Integer> columnIndexs = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7,
+			List<Integer> columnIndexes = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7,
 					8);
 			List<String> columnNames = Arrays.asList("Nowmer", "Sheri",
 					"Graduate Degree", "President", "Foodz, Inc.",
 					"Washington", "Spokane", "2006-01-01", "10230");
-			upload.assertColumnsName(uploadColumns, columnIndexs, columnNames);
+			uploadColumns.assertColumnsName(columnIndexes, columnNames);
 			Screenshots.takeScreenshot(browser, "upload-definition",
 					this.getClass());
 			upload.confirmloadCsv();
@@ -288,7 +286,7 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
 	public void uploadWithoutFactCSV() throws InterruptedException {
 		try {
 			this.selectFileToUpload("payroll-without-fact");
@@ -296,10 +294,10 @@ public class UploadTests extends AbstractUploadTest {
 					this.getClass());
 			UploadColumns uploadColumns = upload.getUploadColumns();
 			assertEquals(uploadColumns.getNumberOfColumns(), 7);
-			List<Integer> columnIndexs = Arrays.asList(0, 1, 2, 3, 4, 5, 6);
+			List<Integer> columnIndexes = Arrays.asList(0, 1, 2, 3, 4, 5, 6);
 			List<String> dataTypes = Arrays.asList("TEXT", "TEXT", "TEXT",
 					"TEXT", "TEXT", "TEXT", "TEXT");
-			upload.assertColumnsType(uploadColumns, columnIndexs, dataTypes);
+			uploadColumns.assertColumnsType(columnIndexes, dataTypes);
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -315,7 +313,7 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
 	public void uploadWithoutAttributeCSV() throws InterruptedException {
 		try {
 			this.selectFileToUpload("without-attribute");
@@ -341,7 +339,7 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
 	public void uploadDateEUCSV() throws InterruptedException {
 		try {
 			this.selectFileToUpload("payroll-Date-EU");
@@ -366,7 +364,7 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
 	public void uploadDateUSCSV() throws InterruptedException {
 		try {
 			this.selectFileToUpload("payroll-Date-US");
@@ -391,7 +389,7 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-special-kind-of-csv" })
 	public void uploadWithoutDateCSV() throws InterruptedException {
 		try {
 			this.selectFileToUpload("without-Date");
@@ -399,10 +397,10 @@ public class UploadTests extends AbstractUploadTest {
 					this.getClass());
 			UploadColumns uploadColumns = upload.getUploadColumns();
 			assertEquals(uploadColumns.getNumberOfColumns(), 4);
-			List<Integer> columnIndexs = Arrays.asList(0, 1, 2, 3);
+			List<Integer> columnIndexes = Arrays.asList(0, 1, 2, 3);
 			List<String> dataTypes = Arrays.asList("TEXT", "TEXT", "TEXT",
 					"NUMBER");
-			upload.assertColumnsType(uploadColumns, columnIndexs, dataTypes);
+			uploadColumns.assertColumnsType(columnIndexes, dataTypes);
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -417,7 +415,7 @@ public class UploadTests extends AbstractUploadTest {
 
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
 	public void uploadDifferentDate1() throws InterruptedException {
 		try {
 			uploadDifferentDateFormat("payroll-dd-mm-yy");
@@ -428,7 +426,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
 	public void uploadDifferentDate2() throws InterruptedException {
 		try {
 			uploadDifferentDateFormat("payroll-ddmmyy");
@@ -439,7 +437,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
 	public void uploadDifferentDate3() throws InterruptedException {
 		try {
 			uploadDifferentDateFormat("payroll-mm-dd-yy");
@@ -450,7 +448,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
 	public void uploadDifferentDate4() throws InterruptedException {
 		try {
 			uploadDifferentDateFormat("payroll-mmddyy");
@@ -461,7 +459,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-different-date-formats" })
 	public void uploadDifferentDate5() throws InterruptedException {
 		try {
 			uploadDifferentDateFormat("payroll-yyyymmdd");
@@ -472,7 +470,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "auto-guessed-ID-column" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "auto-guessed-ID-column" })
 	public void uploadAutoGuessedID() throws InterruptedException {
 		try {
 			this.selectFileToUpload("auto-guessed-ID");
@@ -502,10 +500,10 @@ public class UploadTests extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser, "report-with-auto-guessed-ID",
 					this.getClass());
 			System.out.println("Check the auto-guessed ID in report!");
-			List<Integer> attributeIndexs = Arrays.asList(0, 1, 2, 3);
+			List<Integer> attributeIndexes = Arrays.asList(0, 1, 2, 3);
 			List<String> expectedAttribueElements = Arrays.asList("0120",
 					"0124", "0223", "0423");
-			this.assertAttributeElementsInReport(attributeIndexs,
+			this.assertAttributeElementsInReport(attributeIndexes,
 					attributeElements, expectedAttribueElements);
 			System.out
 					.println("Auto-guessed ID field is displayed well in report!");
@@ -515,7 +513,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "auto-guessed-ID-column" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "auto-guessed-ID-column" })
 	public void uploadAutoGuessedManyID() throws InterruptedException {
 		try {
 			this.selectFileToUpload("many-column-ID");
@@ -551,14 +549,14 @@ public class UploadTests extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"report-with-auto-guessed-many-ID", this.getClass());
 			System.out.println("Check the auto-guessed many ID in report!");
-			List<Integer> indexs = Arrays.asList(0, 1, 2, 3);
+			List<Integer> indexes = Arrays.asList(0, 1, 2, 3);
 			List<String> expectedAttribueElements = Arrays.asList("012", "053",
 					"12", "5");
-			this.assertAttributeElementsInReport(indexs, attributeElements,
+			this.assertAttributeElementsInReport(indexes, attributeElements,
 					expectedAttribueElements);
 			List<Double> expectedMetricValues = Arrays.asList(102.0, 17.0,
 					13.0, 8.0);
-			this.assertMetricValuesInReport(indexs, metricValues,
+			this.assertMetricValuesInReport(indexes, metricValues,
 					expectedMetricValues);
 			System.out
 					.println("Auto-guessed ID field is displayed well in report!");
@@ -568,7 +566,7 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = { "crazy-footer" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "crazy-footer" })
 	public void uploadDataWithCrazyFooter() throws InterruptedException {
 		try {
 			this.selectFileToUpload("data-with-crazy-footer");
@@ -582,14 +580,14 @@ public class UploadTests extends AbstractUploadTest {
 					"Total first year expected", "Age", "Close Date",
 					"Effective Contract End Date", "Reason for Renewal Status",
 					"Created Date", "Next Step", "Product Line", "Stage");
-			List<Integer> columnIndexs = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7,
+			List<Integer> columnIndexes = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7,
 					8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
-			upload.assertColumnsName(uploadColumns, columnIndexs, columnNames);
+			uploadColumns.assertColumnsName(columnIndexes, columnNames);
 			List<String> dataTypes = Arrays.asList("TEXT", "TEXT", "TEXT",
 					"TEXT", "TEXT", "TEXT", "TEXT", "NUMBER", "NUMBER",
 					"NUMBER", "TEXT", "DATE", "DATE", "TEXT", "DATE", "TEXT",
 					"TEXT", "TEXT");
-			upload.assertColumnsType(uploadColumns, columnIndexs, dataTypes);
+			uploadColumns.assertColumnsType(columnIndexes, dataTypes);
 			Screenshots.takeScreenshot(browser, "upload-definition",
 					this.getClass());
 			upload.confirmloadCsv();
@@ -609,8 +607,11 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(alwaysRun = true, dependsOnMethods = { "createProject" }, groups = {
-			"upload-delimiter", "invalid-delimiter" })
+	@Test(dependsOnMethods = { "createProject" }, dependsOnGroups = {
+			"upload-delimiter", "valid-delimiter", "upload-special-case",
+			"upload-change-column-type", "upload-error",
+			"upload-special-kind-of-csv", "upload-different-date-formats",
+			"auto-guessed-ID-column", "crazy-footer" }, groups = { "tests" })
 	public void uploadInvalidDelimiter() throws InterruptedException {
 		try {
 			this.selectFileToUpload("delimiter-invalid");
@@ -632,5 +633,6 @@ public class UploadTests extends AbstractUploadTest {
 			List<String> datasets = Arrays.asList("delimiter-invalid");
 			this.cleanDashboardAndDatasets(datasets);
 		}
+		successfulTest = true;
 	}
 }
