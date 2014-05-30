@@ -12,9 +12,6 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class VariableDetailPage extends AbstractFragment {
 
-    @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//input[@class = 'ipeEditor']")
-    private WebElement variableNameInput;
-
     @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//button[text()='Ok']")
     private WebElement okNameButton;
 
@@ -98,8 +95,7 @@ public class VariableDetailPage extends AbstractFragment {
 
     public void createNumericVariable(String variableName, int number)
 	    throws InterruptedException {
-	waitForElementVisible(variableNameInput);
-	variableNameInput.sendKeys(variableName);
+	waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(variableName);
 	waitForElementVisible(okNameButton).click();
 	waitForElementVisible(numericalVariable).click();
 	waitForElementVisible(scalarValueInput)
@@ -113,8 +109,7 @@ public class VariableDetailPage extends AbstractFragment {
     public void createFilterVariable(String attribute, String variableName,
 	    List<String> elements, boolean userValueSet)
 	    throws InterruptedException {
-	waitForElementVisible(variableNameInput);
-	variableNameInput.sendKeys(variableName);
+	waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(variableName);
 	waitForElementVisible(okNameButton).click();
 	waitForElementVisible(filterVariable).click();
 	waitForElementVisible(selectAttribute).click();

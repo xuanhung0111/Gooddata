@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.VariableTypes;
 
+@Test(groups = { "GoodSalesVariables" }, description = "Tests for GoodSales project (create/view and edit variable functionality) in GD platform")
 public class SimpleVariableTest extends ObjectAbstractTest {
 
     private String attrName;
@@ -78,8 +79,4 @@ public class SimpleVariableTest extends ObjectAbstractTest {
 	variablePage.openVariableFromList(variableName);
     }
 
-    @Test(dependsOnGroups = { "final-tests" }, groups = { "tests" })
-    public void finalTest() {
-	successfulTest = true;
-    }
 }

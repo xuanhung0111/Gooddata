@@ -26,8 +26,8 @@ public class VariablesPage extends AbstractFragment {
 	String variableName = data.get("variableName");
 	waitForElementVisible(createVariableButton).click();
 	waitForObjectPageLoaded();
-	String VariableDetailsWindowHandle = browser.getWindowHandle();
-	browser.switchTo().window(VariableDetailsWindowHandle);
+	String variableDetailsWindowHandle = browser.getWindowHandle();
+	browser.switchTo().window(variableDetailsWindowHandle);
 	switch (type) {
 	case ATTRIBUTE:
 	    String attribute = data.get("attribute");
@@ -59,8 +59,8 @@ public class VariablesPage extends AbstractFragment {
     }
 
     public void openVariableFromList(String variableName) {
-	waitForElementVisible(variablesTable.getRoot());
 	waitForDataPageLoaded();
+	waitForElementVisible(variablesTable.getRoot());
 	variablesTable.selectObject(variableName);
 	waitForObjectPageLoaded();
     }

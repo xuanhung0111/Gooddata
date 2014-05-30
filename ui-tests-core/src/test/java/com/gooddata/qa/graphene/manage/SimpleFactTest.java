@@ -5,6 +5,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 
+@Test(groups = { "GoodSalesFacts" }, description = "Tests for GoodSales project (view and edit fact functionality) in GD platform")
 public class SimpleFactTest extends ObjectAbstractTest {
 
     private String factFolder;
@@ -14,7 +15,7 @@ public class SimpleFactTest extends ObjectAbstractTest {
 	projectTitle = "Simple-fact-test";
     }
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
+    @Test(dependsOnMethods = { "createProject" }, groups = { "tests", "object-tests" })
     public void initialize() throws InterruptedException, JSONException {
 	name = "Amount";
 	this.factFolder = "Stage History";
@@ -22,7 +23,7 @@ public class SimpleFactTest extends ObjectAbstractTest {
 	tagName = "Graphene-test";
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "object-tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "property-object-tests" })
     public void factAggregationsTest() throws InterruptedException {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|facts");
 	waitForElementVisible(factsTable.getRoot());
@@ -33,22 +34,17 @@ public class SimpleFactTest extends ObjectAbstractTest {
 	}
     }
 
-    @Override
-    public void initObject(String factName) {
-	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|facts");
-	waitForElementVisible(factsTable.getRoot());
-	waitForDataPageLoaded();
-	factsTable.selectObject(factName);
-    }
-
-    @Test(dependsOnMethods = { "initialize" }, groups = { "object-tests" })
+    @Test(dependsOnMethods = { "initialize" }, groups = { "property-object-tests" })
     public void changeFactFolderTest() throws InterruptedException {
 	initObject(name);
 	factDetailPage.changeFactFolder(factFolder);
     }
 
-    @Test(dependsOnGroups = { "final-tests" }, groups = { "tests" })
-    public void finalTest() {
-	successfulTest = true;
+    @Override
+    public void initObject(String factName) {
+	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|facts");
+	waitForDataPageLoaded();
+	waitForElementVisible(factsTable.getRoot());
+	factsTable.selectObject(factName);
     }
 }

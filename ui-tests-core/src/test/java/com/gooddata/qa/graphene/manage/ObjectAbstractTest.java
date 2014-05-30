@@ -13,8 +13,7 @@ public abstract class ObjectAbstractTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "object-tests" }, groups = { "property-object-tests" })
     public void changeNameTest() throws InterruptedException {
 	initObject(name);
-	String newName = name + "changed";
-	name = objectDetailPage.changeObjectName(newName);
+	name = objectDetailPage.changeObjectName(name + "changed");
     }
 
     @Test(dependsOnGroups = { "object-tests" }, groups = { "property-object-tests" })
@@ -27,13 +26,21 @@ public abstract class ObjectAbstractTest extends GoodSalesAbstractTest {
     public void addTagTest() throws InterruptedException {
 	initObject(name);
 	objectDetailPage.addTag(tagName);
-	String tagNameWithSpaces = "graphene test adding tag";
-	objectDetailPage.addTag(tagNameWithSpaces);
+	objectDetailPage.addTag("graphene test adding tag");
     }
 
     @Test(dependsOnGroups = { "property-object-tests" }, groups = { "final-tests" })
     public void verifyAllPropertiesTest() {
 	initObject(name);
 	objectDetailPage.verifyAllPropertiesAtOnce(name, description, tagName);
+    }
+
+    @Test(dependsOnGroups = { "final-tests" }, groups = { "tests" })
+    public void finalTest() {
+	successfulTest = true;
+    }
+    
+    public void initObject(String variableName) {
+
     }
 }

@@ -662,8 +662,4 @@ public abstract class AbstractTest extends Arquillian {
         Graphene.waitGui().until().element(element).is().not().present();
     }
 
-    public void initObject(String variableName) {
-	// TODO Auto-generated method stub
-	
-    }
 }

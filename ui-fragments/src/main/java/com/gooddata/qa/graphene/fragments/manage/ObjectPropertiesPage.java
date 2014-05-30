@@ -16,7 +16,7 @@ public class ObjectPropertiesPage extends AbstractFragment {
     private WebElement objectNameIpe;
 
     @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//input[@class = 'ipeEditor']")
-    private WebElement objectNameInput;
+    protected WebElement objectNameInput;
 
     @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//button[text() = 'Save']")
     private WebElement objectNameSave;
