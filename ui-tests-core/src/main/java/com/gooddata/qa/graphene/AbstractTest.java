@@ -112,7 +112,7 @@ public abstract class AbstractTest extends Arquillian {
     protected DeleteMode deleteMode = DeleteMode.DELETE_IF_SUCCESSFUL;
     protected boolean successfulTest = false;
 
-    protected static final By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu");
+    protected By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu");
     protected static final By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
     protected static final By BY_PANEL_ROOT = By.id("root");
 
@@ -322,6 +322,7 @@ public abstract class AbstractTest extends Arquillian {
         openUrl(PAGE_LOGIN);
         waitForElementVisible(loginFragment.getRoot());
         loginFragment.login(username, password, true);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON);
         Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
