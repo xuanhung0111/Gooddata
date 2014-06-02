@@ -5,8 +5,6 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.testng.Assert.assertEquals;
 
 public abstract class AbstractProjectTest extends AbstractTest {
@@ -30,7 +28,7 @@ public abstract class AbstractProjectTest extends AbstractTest {
     public void createProject() throws JSONException, InterruptedException {
         openUrl(PAGE_GDC_PROJECTS);
         waitForElementVisible(gpProject.getRoot());
-        projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, projectCreateCheckIterations);
+        projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, dwhDriver, projectCreateCheckIterations);
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
     }
 

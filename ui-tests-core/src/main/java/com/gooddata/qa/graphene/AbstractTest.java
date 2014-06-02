@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene;
 
 import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.DWHDriver;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -95,8 +96,9 @@ public abstract class AbstractTest extends Arquillian {
     protected String user;
     protected String password;
     protected String authorizationToken;
+    protected String authorizationToken2;
     protected String dssAuthorizationToken;
-
+    protected DWHDriver dwhDriver = DWHDriver.PG;
     protected RestApiClient restApiClient = null;
 
     protected String imapHost;
@@ -254,7 +256,9 @@ public abstract class AbstractTest extends Arquillian {
         host = loadProperty("host");
         user = loadProperty("user");
         password = loadProperty("password");
+        dwhDriver = DWHDriver.getDriverByName(loadProperty("project.dwhDriver"));
         authorizationToken = loadProperty("project.authorizationToken");
+        authorizationToken2 = loadProperty("project.authorizationToken2");
         dssAuthorizationToken = loadProperty("dss.authorizationToken");
         System.out.println("Basic properties initialized, host: " + host + ", user: " + user);
 
