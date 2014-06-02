@@ -26,6 +26,7 @@ public class LoginPageTest extends AbstractTest {
     public void gd_Login_002_SignInAndSignOut() throws InterruptedException {
         waitForElementVisible(loginFragment.getRoot());
         loginFragment.login(user, password, true);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON);
         Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
         logout();
         Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());

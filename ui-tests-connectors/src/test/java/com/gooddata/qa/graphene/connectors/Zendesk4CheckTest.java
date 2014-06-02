@@ -76,6 +76,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
         useApiProxy = Boolean.parseBoolean(loadProperty("http.client.useApiProxy"));
+        BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
     }
 
     /**

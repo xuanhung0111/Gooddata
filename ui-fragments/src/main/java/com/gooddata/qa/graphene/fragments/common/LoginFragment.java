@@ -19,8 +19,6 @@ public class LoginFragment extends AbstractFragment {
 
     private static final String ERROR_CLASS = "has-error";
 
-    private static final By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu");
-
     public void login(String username, String password, boolean validLogin) {
         waitForElementVisible(this.email).clear();
         waitForElementVisible(this.password).clear();
@@ -29,7 +27,7 @@ public class LoginFragment extends AbstractFragment {
         signInButton.click();
         if (validLogin) {
             waitForElementNotVisible(this.getRoot());
-            waitForElementVisible(BY_LOGGED_USER_BUTTON);
+            waitForElementNotVisible(email);
         }
     }
 
