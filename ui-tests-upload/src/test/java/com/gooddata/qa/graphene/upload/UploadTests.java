@@ -54,7 +54,8 @@ public class UploadTests extends AbstractUploadTest {
 			UploadColumns uploadColumns = upload.getUploadColumns();
 			uploadColumns.setColumnName(0, "~!@#$%^&*()<>/?;'");
 			uploadColumns.setColumnName(1, "kiểm tra ký tự đặc biệt");
-			Screenshots.takeScreenshot(browser, "upload-definition",
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-check-special-character-column-name",
 					this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
@@ -85,7 +86,8 @@ public class UploadTests extends AbstractUploadTest {
 			UploadColumns uploadColumns = upload.getUploadColumns();
 			assertEquals(uploadColumns.getColumnType(8),
 					UploadColumns.OptionDataType.NUMBER.getOptionLabel());
-			Screenshots.takeScreenshot(browser, "upload-definition",
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-payroll-negative-number",
 					this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
@@ -131,8 +133,8 @@ public class UploadTests extends AbstractUploadTest {
 			UploadColumns uploadColumns = upload.getUploadColumns();
 			assertEquals(uploadColumns.getColumnType(8),
 					UploadColumns.OptionDataType.NUMBER.getOptionLabel());
-			Screenshots.takeScreenshot(browser, "upload-definition",
-					this.getClass());
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-payroll-null-number", this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -181,8 +183,8 @@ public class UploadTests extends AbstractUploadTest {
 			uploadColumns.assertColumnsType(columnIndexes, guessedDataTypes);
 			System.out.print("Change column data type!");
 			uploadColumns.setColumnsType(columnIndexes, expectedDataTypes);
-			Screenshots.takeScreenshot(browser, "upload-definition",
-					this.getClass());
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-change-column-type", this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -269,8 +271,8 @@ public class UploadTests extends AbstractUploadTest {
 					"Graduate Degree", "President", "Foodz, Inc.",
 					"Washington", "Spokane", "2006-01-01", "10230");
 			uploadColumns.assertColumnsName(columnIndexes, columnNames);
-			Screenshots.takeScreenshot(browser, "upload-definition",
-					this.getClass());
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-payroll-no-header", this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -480,8 +482,8 @@ public class UploadTests extends AbstractUploadTest {
 			assertEquals(uploadColumns.getColumnName(2), "AttrID");
 			assertEquals(uploadColumns.getColumnType(2),
 					UploadColumns.OptionDataType.TEXT.getOptionLabel());
-			Screenshots.takeScreenshot(browser, "upload-definition",
-					this.getClass());
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-auto-guessed-ID", this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -526,8 +528,8 @@ public class UploadTests extends AbstractUploadTest {
 			assertEquals(uploadColumns.getColumnName(2), "NumID");
 			assertEquals(uploadColumns.getColumnType(2),
 					UploadColumns.OptionDataType.NUMBER.getOptionLabel());
-			Screenshots.takeScreenshot(browser, "upload-definition",
-					this.getClass());
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-auto-guessed-many-ID", this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -588,8 +590,10 @@ public class UploadTests extends AbstractUploadTest {
 					"NUMBER", "TEXT", "DATE", "DATE", "TEXT", "DATE", "TEXT",
 					"TEXT", "TEXT");
 			uploadColumns.assertColumnsType(columnIndexes, dataTypes);
-			Screenshots.takeScreenshot(browser, "upload-definition",
-					this.getClass());
+			Screenshots
+					.takeScreenshot(browser,
+							"upload-definition-data-with-crazy-footer",
+							this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -607,11 +611,8 @@ public class UploadTests extends AbstractUploadTest {
 		}
 	}
 
-	@Test(dependsOnMethods = { "createProject" }, dependsOnGroups = {
-			"upload-delimiter", "valid-delimiter", "upload-special-case",
-			"upload-change-column-type", "upload-error",
-			"upload-special-kind-of-csv", "upload-different-date-formats",
-			"auto-guessed-ID-column", "crazy-footer" }, groups = { "tests" })
+	@Test(dependsOnMethods = { "createProject" }, groups = {
+			"upload-delimiter", "invalid-delimiter" })
 	public void uploadInvalidDelimiter() throws InterruptedException {
 		try {
 			this.selectFileToUpload("delimiter-invalid");
@@ -622,8 +623,8 @@ public class UploadTests extends AbstractUploadTest {
 			assertEquals(uploadColumns.getColumnName(0), "Name/Value/Value2");
 			assertEquals(uploadColumns.getColumnType(0),
 					UploadColumns.OptionDataType.TEXT.getOptionLabel());
-			Screenshots.takeScreenshot(browser, "upload-definition",
-					this.getClass());
+			Screenshots.takeScreenshot(browser,
+					"upload-definition-delimiter-invalid", this.getClass());
 			upload.confirmloadCsv();
 			waitForElementVisible(By
 					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
@@ -633,6 +634,13 @@ public class UploadTests extends AbstractUploadTest {
 			List<String> datasets = Arrays.asList("delimiter-invalid");
 			this.cleanDashboardAndDatasets(datasets);
 		}
+	}
+
+	@Test(dependsOnGroups = { "upload-delimiter", "valid-delimiter",
+			"upload-special-case", "upload-change-column-type", "upload-error",
+			"upload-special-kind-of-csv", "upload-different-date-formats",
+			"auto-guessed-ID-column", "crazy-footer", "invalid-delimiter" }, groups = { "tests" })
+	public void endOfTests() {
 		successfulTest = true;
 	}
 }
