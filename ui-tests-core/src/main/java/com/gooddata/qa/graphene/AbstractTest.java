@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
+import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.DataPage;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
@@ -36,6 +37,7 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.testng.Arquillian;
@@ -169,10 +171,16 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(id = "attributesTable")
     protected ObjectsTable attributesTable;
+    
+    @FindBy(id = "uploadsTable")
+    protected ObjectsTable datasetsTable;
 
     @FindBy(id = "p-objectPage")
     protected AttributeDetailPage attributeDetailPage;
     
+    @FindBy(id = "p-objectPage")
+    protected DatasetDetailPage datasetDetailPage;
+
     @FindBy(id = "p-dataPage")
     protected VariablesPage variablePage;
 

@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.upload;
 
+import static org.testng.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,4 +87,30 @@ public class UploadColumns extends AbstractFragment {
         }
         return columnTypes;
     }
+
+	public void setColumnsType(List<Integer> columnIndexes, List<String> dataTypes) throws InterruptedException {
+		int index = 0;
+		for(int columnIndex : columnIndexes) {
+			String dataType = dataTypes.get(index);
+			setColumnType(columnIndex, OptionDataType.valueOf(dataType));
+			index++;
+		}
+	}
+
+	public void assertColumnsType(List<Integer> columnIndexes, List<String> dataTypes) throws InterruptedException {
+		int index = 0;
+		for(int columnIndex : columnIndexes) {
+			String dataType = dataTypes.get(index);
+			assertEquals(getColumnType(columnIndex), OptionDataType.valueOf(dataType).getOptionLabel());
+			index++;
+		}
+	}
+
+	public void assertColumnsName(List<Integer> columnIndexes, List<String> columnNames) throws InterruptedException {
+		int index = 0;
+		for(int columnIndex : columnIndexes) {
+			assertEquals(getColumnName(columnIndex), columnNames.get(index));
+			index++;
+		}
+	}
 }
