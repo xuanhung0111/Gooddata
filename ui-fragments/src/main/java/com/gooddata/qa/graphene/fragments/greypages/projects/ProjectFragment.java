@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
+import com.gooddata.qa.graphene.enums.DWHDriver;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.graphene.Graphene;
@@ -24,13 +25,30 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement authorizationToken;
 
+    @FindBy (id="Vertica")
+    private WebElement vertica;
+
+    @FindBy (id="MYSQL")
+    private WebElement mysql;
+
+    @FindBy (id="PGSQL")
+    private WebElement pg;
+
     @FindBy
     private WebElement submit;
 
-    public String createProject(String title, String summary, String template, String authorizationToken, int checkIterations) throws JSONException, InterruptedException {
+    public String createProject(String title, String summary, String template, String authorizationToken, DWHDriver dwhDriver, int checkIterations) throws JSONException, InterruptedException {
         waitForElementVisible(this.title).sendKeys(title);
         if (summary != null && summary.length() > 0) this.summary.sendKeys(summary);
         if (template != null && template.length() > 0) this.projectTemplate.sendKeys(template);
+
+        switch (dwhDriver) {
+            case PG: this.pg.click(); break;
+            case VERTICA: this.vertica.click(); break;
+            case MYSQL: this.mysql.click(); break;
+            default: this.pg.click();
+        }
+
         this.authorizationToken.sendKeys(authorizationToken);
         Graphene.guardHttp(submit).click();
         waitForElementNotVisible(this.title);
