@@ -22,10 +22,6 @@ public class DISCProjectsList extends AbstractTable {
 	@FindBy(xpath = "//div[@class='error-bar']/div[@class='error-bar-title']")
 	private WebElement errorBar;
 
-	public WebElement getCheckAllCheckbox() {
-		return checkAllCheckbox;
-	}
-
 	public WebElement getDeployProcessButton() {
 		return deployProcessButton;
 	}

@@ -7,11 +7,11 @@ public enum DISCProcessTypes {
 	RUBY("Ruby scripts", "script");
 	
 	private String processTypeOption;
-	private String processTypeExectuable;
+	private String processTypeExecutable;
 	
-	private DISCProcessTypes (String processTypeOption, String processTypeExectuable) {
+	private DISCProcessTypes (String processTypeOption, String processTypeExecutable) {
 		this.processTypeOption = processTypeOption;
-		this.processTypeExectuable = processTypeExectuable;
+		this.processTypeExecutable = processTypeExecutable;
 	}
 	
 	public String getProcessTypeOption() {
@@ -19,6 +19,6 @@ public enum DISCProcessTypes {
 	}
 	
 	public String getProcessTypeExecutable() {
-		return processTypeExectuable;
+		return processTypeExecutable;
 	}
 }

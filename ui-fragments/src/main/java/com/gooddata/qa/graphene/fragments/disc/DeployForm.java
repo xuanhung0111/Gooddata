@@ -44,8 +44,7 @@ public class DeployForm extends AbstractFragment {
 	protected WebElement deployCancelButton;
 
 	public String getDeployDialogHeader() {
-		String deployDialogHeader = waitForElementVisible(BY_DEPLOY_DIALOG_HEADER, browser).getText();
-		return deployDialogHeader;
+		return waitForElementVisible(BY_DEPLOY_DIALOG_HEADER, browser).getText();
 	}
 
 	public void setZipFile(String zipFilePath) {

@@ -20,9 +20,6 @@ public class ProjectDetailPage extends AbstractFragment {
 
 	private final static By BY_PROCESS_NAME = By.cssSelector(".secondary-title");
 
-	@FindBy(xpath = "//div[@class='project-header']")
-	protected WebElement projectDetailHeader;
-
 	@FindBy(css = ".page-header .s-btn-deploy_process")
 	protected WebElement deployProcessButton;
 
@@ -35,12 +32,8 @@ public class ProjectDetailPage extends AbstractFragment {
     @FindBy(css = ".error_dialog .dialog-body")
     protected WebElement deployErrorDialog;
 
-	public WebElement getDeployProcessButton() {
-		return deployProcessButton;
-	}
-
-	public List<WebElement> getProcessesList() {
-		return processes;
+	public void clickOnDeployProcessButton() {
+		waitForElementPresent(deployProcessButton).click();
 	}
 	
 	public WebElement getDeployErrorDialog() {
@@ -80,11 +73,11 @@ public class ProjectDetailPage extends AbstractFragment {
 		return getProcess(getNumberOfProcesses()-1).findElement(By.xpath(XPATH_PROCESS_REDEPLOY_BUTTON.replace("${processIndex}", "not found")));
 	}
 	
-	protected void assertExecutablesList(DISCProcessTypes processType, List<String> executablesList) {
-		executablesTable.assertExecutablesList(processType, executablesList);
+	protected void assertExecutablesList(DISCProcessTypes processType, List<String> executables) {
+		executablesTable.assertExecutablesList(processType, executables);
 	}
 
-	public boolean assertProcessInList(String processName, DISCProcessTypes processType, List<String> executablesList) {
+	public boolean assertProcessInList(String processName, DISCProcessTypes processType, List<String> executables) {
 		for (int i = 0; i < this.getNumberOfProcesses(); i++ ) {
 			if (getProcess(i).findElement(BY_PROCESS_NAME).getText().equals(processName))
 			{
@@ -92,11 +85,11 @@ public class ProjectDetailPage extends AbstractFragment {
 				Assert.assertEquals(getScheduleTab(i+1).getText(), "0 schedules");
 				getExecutableTab(i+1).click();
 				String executableTitle = processType.getProcessTypeExecutable();
-				if(executablesList.size() > 1)
+				if(executables.size() > 1)
 					executableTitle = processType.getProcessTypeExecutable() + "s";
-				Assert.assertEquals(getExecutableTab(i+1).getText(), String.format("%d %s total", executablesList.size(), executableTitle));
+				Assert.assertEquals(getExecutableTab(i+1).getText(), String.format("%d %s total", executables.size(), executableTitle));
 				waitForElementVisible(executablesTable.getRoot());
-				assertExecutablesList(processType, executablesList);
+				assertExecutablesList(processType, executables);
 				return true;
 			}
 		}
