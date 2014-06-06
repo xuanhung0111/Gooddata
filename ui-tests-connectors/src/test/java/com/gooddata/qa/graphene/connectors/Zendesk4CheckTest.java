@@ -60,18 +60,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
         connectorType = Connectors.ZENDESK4;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
-        expectedDashboardsAndTabs.put("Agent Performance", new String[]{
-                "Public comments", "Comments by hour", "Group reassignments", "Comments by group"
+        expectedDashboardsAndTabs.put("Copy of Default Dashboard - View Only", new String[]{
+                "Operational", "Tickets", "Time Metrics", "Backlog", "Performance", "Groups", "Leaderboard",
+                "Users & Orgs", "Satisfaction", "NPS", "Problems", "Tags"
         });
-        expectedDashboardsAndTabs.put("Customer Support", new String[]{
-                "Open tickets", "Problem tickets", "Time metrics", "Channels", "Ticket trends", "(Beta) Explorers",
-                "Monthly"
-        });
-        expectedDashboardsAndTabs.put("Events", new String[]{
-                "Events", "Update channel", "Satisfaction"
-        });
-        expectedDashboardsAndTabs.put("Users & Organizations", new String[]{
-                "Users created", "Last login", "Tickets by user", "Top time zones"
+        expectedDashboardsAndTabs.put("Default Dashboard - View Only", new String[]{
+                "Operational", "Tickets", "Time Metrics", "Backlog", "Performance", "Groups", "Leaderboard",
+                "Users & Orgs", "Satisfaction", "NPS", "Problems", "Tags"
         });
         zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
