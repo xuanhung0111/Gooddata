@@ -132,7 +132,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         openUrl(getConnectorUri());
         waitForElementPresent(BY_GP_PRE_JSON);
         waitForElementPresent(connector.getRoot());
-        connector.createIntegration(connectorType.getTemplate());
+        connector.createIntegration(projectTemplate);
         integrationActivated = true;
     }
 
@@ -207,7 +207,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 
         JSONObject integration = json.getJSONObject("integration");
         assertEquals(integration.getBoolean("active"), true, "active integration");
-        assertEquals(integration.getString("projectTemplate"), connectorType.getTemplate(), "project template");
+        assertEquals(integration.getString("projectTemplate"), projectTemplate, "project template");
         assertTrue(integration.has("lastFinishedProcess"), "lastFinishedProcess key is missing");
         assertTrue(integration.has("lastSuccessfulProcess"), "lastSuccessfulProcess key is missing");
         assertTrue(integration.has("runningProcess"), "runningProcess key is missing");
