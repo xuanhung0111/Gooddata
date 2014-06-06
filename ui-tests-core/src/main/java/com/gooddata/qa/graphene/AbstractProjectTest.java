@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.qa.graphene.enums.DWHDriver;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -28,7 +29,19 @@ public abstract class AbstractProjectTest extends AbstractTest {
     public void createProject() throws JSONException, InterruptedException {
         openUrl(PAGE_GDC_PROJECTS);
         waitForElementVisible(gpProject.getRoot());
-        projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, dwhDriver, projectCreateCheckIterations);
+
+        projectTitle+="-" + dwhDriver.name();
+        projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, DWHDriver.PG, projectCreateCheckIterations);
+
+        if (dwhDriver.equals(DWHDriver.VERTICA)) {
+            String exportToken = exportProject(true, true, projectCreateCheckIterations*5);
+            deleteProject(projectId);
+
+            openUrl(PAGE_GDC_PROJECTS);
+            waitForElementVisible(gpProject.getRoot());
+            projectId = gpProject.createProject(projectTitle, projectTitle, null, authorizationToken2, dwhDriver, projectCreateCheckIterations);
+            importProject(exportToken,projectCreateCheckIterations*5);
+        }
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
     }
 
