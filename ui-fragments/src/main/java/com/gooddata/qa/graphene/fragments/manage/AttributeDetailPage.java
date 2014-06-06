@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -26,21 +27,35 @@ public class AttributeDetailPage extends AbstractFragment {
     @FindBy(css = "button.s-labelSaveButton")
     private WebElement labelSaveButton;
 
+    private By externalPageLink = By.cssSelector("button.s-btn-external_page");
+
+    @FindBy(css = "button.s-btn-clear")
+    private WebElement clearExternalPageButton;
+
     public String getAttributeName() {
-        return waitForElementVisible(attributeName).getText();
+	return waitForElementVisible(attributeName).getText();
     }
 
     public String getAttributeLabelType() {
-        return waitForElementVisible(labelType).getText();
+	return waitForElementVisible(labelType).getText();
+    }
+
+    public boolean isHyperLink() {
+	return browser.findElements(externalPageLink).size() > 0;
+    }
+
+    public void setDrillToExternalPage() {
+	waitForElementVisible(externalPageLink).click();
+	waitForElementVisible(clearExternalPageButton);
     }
 
     public void selectLabelType(String labelType) throws InterruptedException {
-        waitForElementVisible(labelEditButton).click();
-        waitForElementVisible(labelTypeSelect);
-        Thread.sleep(2000);
-        labelTypeSelect.selectByVisibleText(labelType);
-        Thread.sleep(2000);
-        waitForElementVisible(labelSaveButton).click();
-        waitForElementNotVisible(labelTitleInput);
+	waitForElementVisible(labelEditButton).click();
+	waitForElementVisible(labelTypeSelect);
+	Thread.sleep(2000);
+	labelTypeSelect.selectByVisibleText(labelType);
+	Thread.sleep(2000);
+	waitForElementVisible(labelSaveButton).click();
+	waitForElementNotVisible(labelTitleInput);
     }
 }

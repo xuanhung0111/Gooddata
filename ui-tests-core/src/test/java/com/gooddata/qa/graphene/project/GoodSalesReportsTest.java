@@ -236,22 +236,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
             throws InterruptedException {
-        initReportsPage();
-        selectReportsDomainFolder("My Reports");
-        reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded();
-        waitForElementVisible(reportPage.getRoot());
-        assertNotNull(reportPage, "Report page not initialized!");
-        reportPage.createReport(reportName, reportType, what, how);
-        Screenshots.takeScreenshot(browser, "GoodSales-" + reportName + "-" + reportType.getName(), this.getClass());
+	createReport(reportName, reportType, what, how, "GoodSales");
         createdReportsCount++;
-    }
-
-    private void selectReportsDomainFolder(String folderName) {
-        reportsPage.getDefaultFolders().openFolder(folderName);
-        waitForReportsPageLoaded();
-        assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " +
-                reportsPage.getSelectedFolderName());
     }
 
     private void initReportPage(String reportName) {

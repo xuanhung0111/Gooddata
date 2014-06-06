@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene;
 import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.DWHDriver;
+import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -17,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment
 import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.AttributePage;
 import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
@@ -49,6 +51,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
@@ -58,11 +61,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -181,6 +186,9 @@ public abstract class AbstractTest extends Arquillian {
     @FindBy(id = "variablesTable")
     protected ObjectsTable variablesTable;
 
+    @FindBy(id = "p-dataPage")
+    protected AttributePage attributePage;
+    
     @FindBy(id = "p-objectPage")
     protected AttributeDetailPage attributeDetailPage;
     
@@ -575,6 +583,25 @@ public abstract class AbstractTest extends Arquillian {
         waitForElementVisible(reportsPage.getRoot());
     }
 
+    protected void createReport(String reportName, ReportTypes reportType, List<String> what, List<String> how, String screenshotName ) throws InterruptedException{
+        initReportsPage();
+        selectReportsDomainFolder("My Reports");
+        reportsPage.startCreateReport();
+        waitForAnalysisPageLoaded();
+        waitForElementVisible(reportPage.getRoot());
+        assertNotNull(reportPage, "Report page not initialized!");
+        reportPage.createReport(reportName, reportType, what, how);
+        Screenshots.takeScreenshot(browser, screenshotName + "-" + reportName + "-" + reportType.getName(), this.getClass());
+	checkRedBar();
+    }
+    
+    protected void selectReportsDomainFolder(String folderName) {
+        reportsPage.getDefaultFolders().openFolder(folderName);
+        waitForReportsPageLoaded();
+        assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " +
+                reportsPage.getSelectedFolderName());
+    }
+    
     protected void uploadCSV(String filePath, Map<Integer, OptionDataType> columnsWithExpectedType, String screenshotName) throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
         waitForDashboardPageLoaded();
@@ -684,5 +711,4 @@ public abstract class AbstractTest extends Arquillian {
     public void waitForElementNotPresent(WebElement element) {
         Graphene.waitGui().until().element(element).is().not().present();
     }
-
 }

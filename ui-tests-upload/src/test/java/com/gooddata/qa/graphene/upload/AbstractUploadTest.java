@@ -224,7 +224,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 		how.add("Month/Year");
 		prepareReport("Report with " + uploadFileName, ReportTypes.TABLE, what,
 				how);
-		List<String> attributeElements = report.getAttributeInGrid();
+		List<String> attributeElements = report.getAttributeElements();
 		Screenshots.takeScreenshot(browser, "report-with-" + uploadFileName,
 				this.getClass());
 		System.out.println("Check the date format in report!");
