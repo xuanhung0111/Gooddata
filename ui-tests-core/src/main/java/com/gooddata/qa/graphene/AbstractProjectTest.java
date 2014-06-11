@@ -31,16 +31,20 @@ public abstract class AbstractProjectTest extends AbstractTest {
         waitForElementVisible(gpProject.getRoot());
 
         projectTitle+="-" + dwhDriver.name();
-        projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, DWHDriver.PG, projectCreateCheckIterations);
+        if (projectTemplate.isEmpty()){
+            projectId = gpProject.createProject(projectTitle, projectTitle, null, authorizationToken, dwhDriver, projectCreateCheckIterations);
+        } else {
+            projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, DWHDriver.PG, projectCreateCheckIterations);
 
-        if (dwhDriver.equals(DWHDriver.VERTICA)) {
-            String exportToken = exportProject(true, true, projectCreateCheckIterations*5);
-            deleteProject(projectId);
+            if (dwhDriver.equals(DWHDriver.VERTICA)) {
+                String exportToken = exportProject(true, true, projectCreateCheckIterations * 5);
+                deleteProject(projectId);
 
-            openUrl(PAGE_GDC_PROJECTS);
-            waitForElementVisible(gpProject.getRoot());
-            projectId = gpProject.createProject(projectTitle, projectTitle, null, authorizationToken2, dwhDriver, projectCreateCheckIterations);
-            importProject(exportToken,projectCreateCheckIterations*5);
+                openUrl(PAGE_GDC_PROJECTS);
+                waitForElementVisible(gpProject.getRoot());
+                projectId = gpProject.createProject(projectTitle, projectTitle, null, authorizationToken2, dwhDriver, projectCreateCheckIterations);
+                importProject(exportToken, projectCreateCheckIterations * 5);
+            }
         }
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
     }
