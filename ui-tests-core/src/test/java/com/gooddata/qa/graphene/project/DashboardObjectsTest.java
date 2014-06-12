@@ -40,7 +40,7 @@ public class DashboardObjectsTest extends SimpleProjectTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void uploadDataTest() throws InterruptedException {
         String csvFilePath = loadProperty("csvFilePath");
-        uploadSimpleCSV(csvFilePath, "simple-ws");
+        uploadCSV(csvFilePath, null, "simple-ws");
 
     }
 

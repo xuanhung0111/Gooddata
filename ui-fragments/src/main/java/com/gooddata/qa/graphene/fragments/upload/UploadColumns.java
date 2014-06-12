@@ -88,15 +88,6 @@ public class UploadColumns extends AbstractFragment {
         return columnTypes;
     }
 
-	public void setColumnsType(List<Integer> columnIndexes, List<String> dataTypes) throws InterruptedException {
-		int index = 0;
-		for(int columnIndex : columnIndexes) {
-			String dataType = dataTypes.get(index);
-			setColumnType(columnIndex, OptionDataType.valueOf(dataType));
-			index++;
-		}
-	}
-
 	public void assertColumnsType(List<Integer> columnIndexes, List<String> dataTypes) throws InterruptedException {
 		int index = 0;
 		for(int columnIndex : columnIndexes) {

@@ -2,12 +2,16 @@ package com.gooddata.qa.graphene.upload;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
+import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
@@ -170,29 +174,11 @@ public class UploadTests extends AbstractUploadTest {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "upload-change-column-type" })
 	public void uploadChangeColumnType() throws InterruptedException {
 		try {
-			selectFileToUpload("change-column-type");
-			Screenshots.takeScreenshot(browser,
-					"change-column-type-csv-upload", this.getClass());
-			UploadColumns uploadColumns = upload.getUploadColumns();
-			List<Integer> columnIndexes = Arrays.asList(2, 3, 4);
-			List<String> expectedDataTypes = Arrays.asList("TEXT", "TEXT",
-					"NUMBER");
-			List<String> guessedDataTypes = Arrays.asList("DATE", "NUMBER",
-					"TEXT");
-			System.out.print("Check the auto-guessed data type!");
-			uploadColumns.assertColumnsType(columnIndexes, guessedDataTypes);
-			System.out.print("Change column data type!");
-			uploadColumns.setColumnsType(columnIndexes, expectedDataTypes);
-			Screenshots.takeScreenshot(browser,
-					"upload-definition-change-column-type", this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			waitForDashboardPageLoaded();
-			this.verifyProjectDashboardsAndTabs(true,
-					expectedDashboardsAndTabs, false);
-			Screenshots.takeScreenshot(browser, "change-column-type-csv-upload"
-					+ "-dashboard", this.getClass());
+			Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
+			columnIndexAndType.put(2, OptionDataType.TEXT);
+			columnIndexAndType.put(3, OptionDataType.TEXT);
+			columnIndexAndType.put(4, OptionDataType.NUMBER);
+			uploadCSV(csvFilePath + "change-column-type.csv", columnIndexAndType, "change-column-type");
 
 			// Check non-number value in report
 			List<String> what = new ArrayList<String>();

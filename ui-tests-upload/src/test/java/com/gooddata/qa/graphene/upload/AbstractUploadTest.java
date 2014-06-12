@@ -81,8 +81,6 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	}
 
 	protected void deleteDashboard() throws InterruptedException {
-		initDashboardsPage();
-		Thread.sleep(3000);
 		dashboardsPage.deleteDashboard();
 		waitForDashboardPageLoaded();
 		verifyProjectDashboardsAndTabs(true, emptyDashboardsAndTabs, false);
@@ -173,11 +171,12 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	public void uploadFileAndClean(String fileName) throws InterruptedException {
 		try {
-			uploadSimpleCSV(csvFilePath + fileName + ".csv", "simple-upload-"
-					+ fileName);
+			uploadCSV(csvFilePath + fileName + ".csv", null, "simple-upload-"
+							+ fileName);
 			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 		} finally {
+	        waitForDashboardPageLoaded();
 			deleteDashboard();
 			deleteDataset(fileName);
 			waitForElementVisible(BY_EMPTY_DATASET);
@@ -186,6 +185,8 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	protected void cleanDashboardAndDatasets(List<String> datasets)
 			throws InterruptedException {
+		openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
+        waitForDashboardPageLoaded();
 		deleteDashboard();
 		for (String dataset : datasets) {
 			deleteDataset(dataset);

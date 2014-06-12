@@ -27,7 +27,7 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createSimpleProject"}, groups = {"tests"})
     public void uploadData() throws InterruptedException {
-        uploadSimpleCSV(csvFilePath + "/payroll.csv", "simple-ws");
+        uploadCSV(csvFilePath + "/payroll.csv", null, "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadData"}, groups = {"tests"})
