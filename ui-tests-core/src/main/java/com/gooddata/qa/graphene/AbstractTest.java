@@ -32,6 +32,7 @@ import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
+import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
@@ -571,7 +572,7 @@ public abstract class AbstractTest extends Arquillian {
         waitForElementVisible(reportsPage.getRoot());
     }
 
-    protected void uploadSimpleCSV(String filePath, String screenshotName) throws InterruptedException {
+    protected void uploadCSV(String filePath, Map<Integer, OptionDataType> columnsWithExpectedType, String screenshotName) throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
         waitForDashboardPageLoaded();
         openUrl(PAGE_UPLOAD);
@@ -579,7 +580,13 @@ public abstract class AbstractTest extends Arquillian {
         upload.uploadFile(filePath);
         Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());
         UploadColumns uploadColumns = upload.getUploadColumns();
-        System.out.println(uploadColumns.getNumberOfColumns() + " columns are available for upload, " + uploadColumns.getColumnNames() + " ," + uploadColumns.getColumnTypes());
+        if(columnsWithExpectedType != null){
+        	Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-before-changing-column-type", this.getClass());
+    		for(int columnIndex : columnsWithExpectedType.keySet()) {
+    			uploadColumns.setColumnType(columnIndex, columnsWithExpectedType.get(columnIndex));
+    		}
+    		Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-after-changing-column-type", this.getClass());
+        }
         Screenshots.takeScreenshot(browser, "upload-definition", this.getClass());
         upload.confirmloadCsv();
         waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"));

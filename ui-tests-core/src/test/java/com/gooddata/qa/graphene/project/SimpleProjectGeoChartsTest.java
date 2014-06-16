@@ -23,8 +23,8 @@ public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"geo-charts"})
     public void uploadDataForGeoCharts() throws InterruptedException {
-        uploadSimpleCSV(csvFilePath + "/geo_test.csv", "geo-1");
-        uploadSimpleCSV(csvFilePath + "/geo_test_pins.csv", "geo-2");
+        uploadCSV(csvFilePath + "/geo_test.csv", null, "geo-1");
+        uploadCSV(csvFilePath + "/geo_test_pins.csv", null, "geo-2");
     }
 
     @Test(dependsOnMethods = {"uploadDataForGeoCharts"}, groups = {"geo-charts"})
