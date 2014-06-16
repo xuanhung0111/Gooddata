@@ -178,6 +178,9 @@ public abstract class AbstractTest extends Arquillian {
     @FindBy(id = "uploadsTable")
     protected ObjectsTable datasetsTable;
 
+    @FindBy(id = "variablesTable")
+    protected ObjectsTable variablesTable;
+
     @FindBy(id = "p-objectPage")
     protected AttributeDetailPage attributeDetailPage;
     
