@@ -110,7 +110,7 @@ public class UploadTests extends AbstractUploadTest {
 			how.add("Education");
 			prepareReport("Report with negative number", ReportTypes.TABLE,
 					what, how);
-			List<Float> metricValues = report.getMetricInGrid();
+			List<Float> metricValues = report.getMetricElements();
 			Screenshots.takeScreenshot(browser, "report-with-negative-number",
 					this.getClass());
 			System.out.println("Check the negative number in report!");
@@ -158,7 +158,7 @@ public class UploadTests extends AbstractUploadTest {
 					how);
 			Screenshots.takeScreenshot(browser, "report-with-null-number",
 					this.getClass());
-			List<Float> metricValues = report.getMetricInGrid();
+			List<Float> metricValues = report.getMetricElements();
 			System.out.println("Check the null number in report!");
 			List<Integer> metricIndexes = Arrays.asList(0, 2, 4, 5, 6, 7, 8);
 			this.assertEmptyMetricInReport(metricIndexes, metricValues);
@@ -188,7 +188,7 @@ public class UploadTests extends AbstractUploadTest {
 			prepareReport("Report with Age", ReportTypes.TABLE, what, how);
 			Screenshots.takeScreenshot(browser,
 					"report-with-null-matric-value", this.getClass());
-			List<Float> metricValues = report.getMetricInGrid();
+			List<Float> metricValues = report.getMetricElements();
 			List<Integer> metricIndexes = Arrays.asList(2, 4, 6, 9, 13, 14, 16);
 			assertEmptyMetricInReport(metricIndexes, metricValues);
 			System.out
@@ -484,7 +484,7 @@ public class UploadTests extends AbstractUploadTest {
 			how.add("AttrID");
 			prepareReport("Report with auto-guessed ID field",
 					ReportTypes.TABLE, what, how);
-			List<String> attributeElements = report.getAttributeInGrid();
+			List<String> attributeElements = report.getAttributeElements();
 			Screenshots.takeScreenshot(browser, "report-with-auto-guessed-ID",
 					this.getClass());
 			System.out.println("Check the auto-guessed ID in report!");
@@ -532,8 +532,8 @@ public class UploadTests extends AbstractUploadTest {
 			how.add("NumberID");
 			prepareReport("Report with auto-guessed ID field",
 					ReportTypes.TABLE, what, how);
-			List<String> attributeElements = report.getAttributeInGrid();
-			List<Float> metricValues = report.getMetricInGrid();
+			List<String> attributeElements = report.getAttributeElements();
+			List<Float> metricValues = report.getMetricElements();
 			Screenshots.takeScreenshot(browser,
 					"report-with-auto-guessed-many-ID", this.getClass());
 			System.out.println("Check the auto-guessed many ID in report!");

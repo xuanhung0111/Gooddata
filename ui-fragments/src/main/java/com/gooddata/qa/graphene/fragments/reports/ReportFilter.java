@@ -107,7 +107,7 @@ public class ReportFilter extends AbstractFragment {
         waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
         waitForElementVisible(report.getRoot());
-        List<String> attributeElementsInGrid = report.getAttributeInGrid();
+        List<String> attributeElementsInGrid = report.getAttributeElements();
         Collections.sort(attributeElementsInGrid);
         Assert.assertEquals(attributeElementsInGrid, lsAttributeElements, "Report isn't applied filter correctly");
     }
@@ -136,7 +136,7 @@ public class ReportFilter extends AbstractFragment {
         String size = data.get("size");
         String[] array = {"1", "3", "5", "10"};
         waitForElementVisible(report.getRoot());
-        List<Float> metricValuesinGrid = report.getMetricInGrid();
+        List<Float> metricValuesinGrid = report.getMetricElements();
         Collections.sort(metricValuesinGrid);
         if (type == "Top") {
             Collections.reverse(metricValuesinGrid);
@@ -180,7 +180,7 @@ public class ReportFilter extends AbstractFragment {
         waitForElementNotVisible(confirmApplyButton);
         waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
-        metricValuesinGrid = report.getMetricInGrid();
+        metricValuesinGrid = report.getMetricElements();
         Collections.sort(metricValuesinGrid);
         Assert.assertEquals(metricValuesinGrid, rankedMetric, "Report isn't applied filter correctly");
 
@@ -215,7 +215,7 @@ public class ReportFilter extends AbstractFragment {
         waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
         waitForElementVisible(report.getRoot());
-        List<Float> metricValuesInGrid = report.getMetricInGrid();
+        List<Float> metricValuesInGrid = report.getMetricElements();
         int rangeNumber = Integer.parseInt(number);
         for (int i = 0; i < metricValuesInGrid.size(); i++) {
             Assert.assertTrue(metricValuesInGrid.get(i) >= rangeNumber, "Report isn't applied filter correctly");
@@ -229,7 +229,7 @@ public class ReportFilter extends AbstractFragment {
         String promptElements = data.get("promptElements");
         List<String> lsPromptElements = Arrays.asList(promptElements.split(", "));
         waitForElementVisible(report.getRoot());
-        List<String> attrElementInGrid = report.getAttributeInGrid();
+        List<String> attrElementInGrid = report.getAttributeElements();
         lsPromptElements.retainAll(attrElementInGrid);
         if (waitForElementVisible(addFilterButton).isDisplayed()) {
             waitForElementVisible(addFilterButton).click();
@@ -245,7 +245,7 @@ public class ReportFilter extends AbstractFragment {
         waitForElementNotVisible(confirmApplyButton);
         waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
-        attrElementInGrid = report.getAttributeInGrid();
+        attrElementInGrid = report.getAttributeElements();
         Assert.assertEquals(attrElementInGrid, lsPromptElements, "Report isn't applied filter correctly");
     }
 

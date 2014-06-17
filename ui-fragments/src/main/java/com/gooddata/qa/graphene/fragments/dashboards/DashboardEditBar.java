@@ -90,6 +90,12 @@ public class DashboardEditBar extends AbstractFragment {
         Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
                 "Widget wasn't added");
     }
+    
+    public void verifyGeoLayersList(String metricLabel, List<String> layersList) throws InterruptedException{
+	waitForElementVisible(widgetMenuButton).click();
+        waitForElementVisible(dashboardAddWidgetPanel.getRoot());
+        dashboardAddWidgetPanel.verifyLayersList(metricLabel, layersList);
+    }
 
     public void addWebContentToDashboard() throws InterruptedException {
         int widgetCountBefore = listDashboardWidgets.size();
