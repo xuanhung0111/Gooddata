@@ -152,14 +152,14 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 	successfulTest = true;
     }
 
-    public void initReport(String reportName) {
+    private void initReport(String reportName) {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage|");
 	waitForReportsPageLoaded();
 	reportsPage.getReportsList().openReport(reportName);
 	waitForAnalysisPageLoaded();
     }
 
-    public void changeAttributeLabel(String attribute, AttributeLabelTypes label)
+    private void changeAttributeLabel(String attribute, AttributeLabelTypes label)
 	    throws InterruptedException {
 	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|attributes");
 	attributePage.configureAttributeLabel(attribute, label);
