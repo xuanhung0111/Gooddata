@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gooddata.qa.graphene.AbstractProjectTest;
 import org.apache.commons.lang.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -17,7 +18,7 @@ import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
 @Test(groups = {"dashboardObjects"}, description = "Tests for simple project and dashboard objects functionality in GD platform")
-public class DashboardObjectsTest extends SimpleProjectTest {
+public class DashboardObjectsTest extends AbstractProjectTest {
 
     protected static final String ATTRIBUTE_NAME = "State";
     protected static final String ATTRIBUTE_LABEL_TYPE = "US States (Name)";
