@@ -17,7 +17,7 @@ import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.fragments.reports.ReportsList;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-@Test(groups = {"GoodSalesReportFilters"}, description = "Tests for GoodSales project (reports functionality) in GD platform")
+@Test(groups = {"GoodSalesReportFilters"}, description = "Tests for GoodSales project (report filters functionality) in GD platform")
 public class FilterReportTest extends GoodSalesAbstractTest {
 
     private String reportName;

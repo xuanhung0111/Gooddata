@@ -16,6 +16,7 @@ import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
+@Test(groups = {"dashboardObjects"}, description = "Tests for simple project and dashboard objects functionality in GD platform")
 public class DashboardObjectsTest extends SimpleProjectTest {
 
     protected static final String ATTRIBUTE_NAME = "State";

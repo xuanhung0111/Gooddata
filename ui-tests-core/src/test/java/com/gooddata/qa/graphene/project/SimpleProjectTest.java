@@ -3,7 +3,7 @@ package com.gooddata.qa.graphene.project;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import org.testng.annotations.Test;
 
-@Test(groups = {"projectSimpleETL"}, description = "Tests for basic project and ETL functionality in GD platform")
+@Test(groups = {"projectSimple"}, description = "Tests for basic project creation in GD platform")
 public class SimpleProjectTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
