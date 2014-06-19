@@ -15,7 +15,6 @@ import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-@Test(groups = { "ManageObjects" }, description = "Tests for list, filter and sort objects in GD platform")
 public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
 	protected static final List<String> attributesList = Arrays.asList("Account", "Activity",

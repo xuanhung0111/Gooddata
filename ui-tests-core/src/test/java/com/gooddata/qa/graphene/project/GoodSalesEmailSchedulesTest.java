@@ -9,7 +9,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
 
-@Test(groups = {"GoodSalesSchedules"}, description = "Tests for GoodSales project (email schedules functionality) in GD platform")
+@Test(groups = {"GoodSalesSchedulesFull"}, description = "Tests for GoodSales project (email schedules functionality, incl. imap verification) in GD platform")
 public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");

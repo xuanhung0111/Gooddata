@@ -19,7 +19,7 @@ import java.util.zip.CRC32;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-@Test(groups = {"projectSimple"}, description = "Tests for basic ETL functionality in GD platform")
+@Test(groups = {"projectSimpleETL"}, description = "Tests for basic ETL functionality in GD platform")
 public class SimpleProjectEtlTest extends AbstractProjectTest {
 
     protected int statusPollingCheckIterations = 60; // (60*5s)

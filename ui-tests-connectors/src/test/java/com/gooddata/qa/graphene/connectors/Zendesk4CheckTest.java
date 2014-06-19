@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -60,13 +61,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
         connectorType = Connectors.ZENDESK4;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
-        expectedDashboardsAndTabs.put("Copy of Default Dashboard - View Only", new String[]{
-                "Operational", "Tickets", "Time Metrics", "Backlog", "Performance", "Groups", "Leaderboard",
-                "Users & Orgs", "Satisfaction", "NPS", "Problems", "Tags"
-        });
-        expectedDashboardsAndTabs.put("Default Dashboard - View Only", new String[]{
-                "Operational", "Tickets", "Time Metrics", "Backlog", "Performance", "Groups", "Leaderboard",
-                "Users & Orgs", "Satisfaction", "NPS", "Problems", "Tags"
+        expectedDashboardsAndTabs.put("Insights Dashboard - View Only", new String[]{
+                "Operational", "Yearly", "Time Metrics", "Backlog", "Agents", "Groups", "Leaderboard",
+                "Users & Orgs", "Satisfaction", "Problems", "Tags"
         });
         zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
@@ -88,6 +85,18 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         Metric m = md.createObj(project, metric);
         System.out.println("Metric for testing of non-deleted tickets created, id: " + m.getMeta().getIdentifier());
     }
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
+    public void createOrganizationsCountMetric() {
+        goodDataClient = getGoodDataClient();
+        Project project = goodDataClient.getProjectService().getProjectById(projectId);
+        MetadataService md = goodDataClient.getMetadataService();
+        Metric metric = new Metric("# Organizations - not deleted",
+            String.format("SELECT [/gdc/md/%s/obj/18676] WHERE " +
+                "[/gdc/md/%s/obj/27238] <> " +
+                "[/gdc/md/%s/obj/27238/elements?id=1]", projectId, projectId, projectId), "#,##0");
+        Metric m = md.createObj(project, metric);
+        System.out.println("Metric for testing of non-deleted organizations created, id: " + m.getMeta().getIdentifier());
+     }
     **/
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
@@ -225,13 +234,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private void createBasicReport(String metric, String reportName) throws InterruptedException {
-        initReportsPage();
-        reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded();
-        waitForElementVisible(reportPage.getRoot());
         List<String> what = new ArrayList<String>();
         what.add(metric);
-        reportPage.createReport(reportName, ReportTypes.HEADLINE, what, null);
+        createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
         waitForElementVisible(BY_ONE_NUMBER_REPORT);
     }
 

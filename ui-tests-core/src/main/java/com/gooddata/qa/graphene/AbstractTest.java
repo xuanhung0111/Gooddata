@@ -604,7 +604,7 @@ public abstract class AbstractTest extends Arquillian {
     
     protected void uploadCSV(String filePath, Map<Integer, OptionDataType> columnsWithExpectedType, String screenshotName) throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
-        waitForDashboardPageLoaded();
+        Thread.sleep(3000);
         openUrl(PAGE_UPLOAD);
         waitForElementVisible(upload.getRoot());
         upload.uploadFile(filePath);
