@@ -135,6 +135,7 @@ public abstract class AbstractTest extends Arquillian {
     protected static final By BY_IFRAME = By.tagName("iframe");
 
     protected static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
+    protected static final By BY_RED_BAR_WARNING = By.cssSelector("div.c-status.box-warning");
     protected static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
 
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
@@ -484,6 +485,9 @@ public abstract class AbstractTest extends Arquillian {
     protected void checkRedBar() {
         if (browser.findElements(BY_RED_BAR).size() != 0) {
             fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
+        }
+        if (browser.findElements(BY_RED_BAR_WARNING).size() != 0) {
+            fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR_WARNING).getText());
         }
         //this kind of error appeared for the first time in geo chart
         if (browser.findElements(BY_REPORT_ERROR).size() != 0 && browser.findElement(BY_REPORT_ERROR).isDisplayed()) {
