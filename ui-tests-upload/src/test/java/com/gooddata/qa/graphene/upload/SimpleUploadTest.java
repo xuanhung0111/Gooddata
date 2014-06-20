@@ -11,6 +11,7 @@ import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
+@Test(groups = { "uploadTests", "brokenTest" }, description = "Simple upload test (using upload.html page) - deprecated, replaced with UploadTests")
 public class SimpleUploadTest extends AbstractTest {
 
     private String csvFilePath;
