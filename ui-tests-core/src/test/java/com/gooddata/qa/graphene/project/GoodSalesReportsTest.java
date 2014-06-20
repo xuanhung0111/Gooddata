@@ -8,8 +8,16 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.testng.Assert;
 
+
+import java.io.IOException;
+import java.net.URL;
 import static org.testng.Assert.*;
 
 @Test(groups = {"GoodSalesReports"}, description = "Tests for GoodSales project (reports functionality) in GD platform")
@@ -26,6 +34,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     private static final long expectedTabularReportExportXLSXSize = 7000L;
     private static final long expectedTabularReportExportCSVSize = 1650L;
 
+    private String regionLocator = "//div[@*[local-name() = 'gdc:region']='0,0,0,0']/span";
+
     @Test(dependsOnMethods = {"createProject"})
     public void verifyReportsPage() throws InterruptedException {
         initReportsPage();
@@ -34,6 +44,40 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         assertEquals(reportsPage.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount,
                 "Number of expected report custom folders doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    public void createComputedAttributesTabularReport() throws InterruptedException, IOException, JSONException {
+
+        By includeArea = By.xpath("//div[@title='Include']");
+        By excludeArea = By.xpath("//div[@title='Exclude']");
+        String expectedValue = "31,110.00";
+
+        URL maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple.txt");
+        postMAQL(IOUtils.toString(maqlResource), 60);
+
+        initReportsPage();
+        reportsPage.startCreateReport();
+        reportPage.createSimpleMetric(SimpleMetricTypes.SUM, "Duration", null, true);
+
+        List<String> what = new ArrayList<String>();
+        what.add("Duration [Sum]");
+        List<String> how = new ArrayList<String>();
+        how.add("Forecast Category");
+
+        prepareReport("Simple CA report", ReportTypes.TABLE, what, how);
+        String bucketRegion = waitForElementPresent(includeArea).getAttribute("gdc:region").replace('0','1');
+        String computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion))).getText();
+        Assert.assertEquals(computedAttr,expectedValue);
+
+        /*** invert condition and check if it's reflected on report ***/
+        maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple-inv.txt");
+        postMAQL(IOUtils.toString(maqlResource), 60);
+
+        initReportPage("Simple CA report");
+        bucketRegion = waitForElementPresent(excludeArea).getAttribute("gdc:region").replace('0','1');
+        computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion))).getText();
+        Assert.assertEquals(computedAttr,expectedValue);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -253,4 +297,5 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         reportPage.exportReport(format);
         checkRedBar();
     }
+
 }

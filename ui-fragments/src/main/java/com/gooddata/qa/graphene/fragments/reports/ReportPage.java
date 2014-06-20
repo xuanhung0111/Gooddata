@@ -1,22 +1,17 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.FilterTypes;
+import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.enums.FilterTypes;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.reports.ReportFilter;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import java.util.List;
+import java.util.Map;
 
 public class ReportPage extends AbstractFragment {
 
@@ -127,8 +122,13 @@ public class ReportPage extends AbstractFragment {
         createReportButton.click();
         waitForElementVisible(confirmDialogCreateButton).click();
         waitForElementNotVisible(confirmDialogCreateButton);
-        Assert.assertEquals(createReportButton.getText(), "Saved",
-                "Report wasn't saved");
+        Assert.assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
+    }
+
+    public void createSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal){
+        waitForAnalysisPageLoaded();
+        waitForElementVisible(this.getRoot());
+        visualiser.addSimpleMetric(metricOperation, metricOnFact, metricName, addToGlobal);
     }
 
     public String exportReport(ExportFormat format) throws InterruptedException {

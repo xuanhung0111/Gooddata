@@ -2,12 +2,14 @@ package com.gooddata.qa.graphene.fragments.reports;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.support.ui.Select;
 
 public class ReportVisualizer extends AbstractFragment {
 
@@ -44,6 +46,24 @@ public class ReportVisualizer extends AbstractFragment {
     @FindBy
     private WebElement reportVisualizationContainer;
 
+    @FindBy(xpath = "//button[contains(@class,'sndCreateMetric')]")
+    private WebElement createMetricButton;
+
+    @FindBy(xpath = "//select[contains(@class,'s-sme-fnSelect')]")
+    private Select metricOperationSelect;
+
+    @FindBy(xpath = "//select[contains(@class,'s-sme-objSelect')]")
+    private Select performOperationSelect;
+
+    @FindBy(xpath = "//input[contains(@class,'s-sme-global')]")
+    private WebElement addToGlobalInput;
+
+    @FindBy(xpath = "//input[contains(@class,'s-sme-title')]")
+    private WebElement metricTitleInput;
+
+    @FindBy(xpath = "//button[contains(@class,'s-sme-addButton')]")
+    private WebElement addMetricButton;
+
     public void selectWhatArea(List<String> what) throws InterruptedException {
         waitForElementVisible(whatButton).click();
         waitForElementVisible(BY_WHAT_AREA_METRICS_HEADER);
@@ -72,6 +92,22 @@ public class ReportVisualizer extends AbstractFragment {
                 waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_CHECKBOX_CHECKED.replace("${attribute}", attribute)));
             }
         }
+    }
+
+    public void addSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal) {
+        waitForElementVisible(whatButton).click();
+        waitForElementVisible(BY_WHAT_AREA_METRICS_HEADER);
+
+        waitForElementVisible(createMetricButton).click();
+        waitForElementVisible(metricOperationSelect).selectByVisibleText(metricOperation.name());
+        waitForElementVisible(performOperationSelect).selectByVisibleText(metricOnFact);
+
+        if (metricName!=null) {
+            waitForElementVisible(metricTitleInput).clear();
+            metricTitleInput.sendKeys(metricName);
+        }
+        if (addToGlobal) waitForElementVisible(addToGlobalInput).click();
+        waitForElementVisible(addMetricButton).click();
     }
 
     public void selectFilterArea() {
