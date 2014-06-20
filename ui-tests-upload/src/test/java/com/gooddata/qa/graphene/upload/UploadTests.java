@@ -16,6 +16,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
 
+@Test(groups= { "uploadTests" }, description = "Overall tests for upload.html page in GD platform")
 public class UploadTests extends AbstractUploadTest {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = {
