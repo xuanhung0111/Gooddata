@@ -8,7 +8,6 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class DashboardTextObject extends AbstractFragment{
 
-	private String textLabelLocator = "//span[@title='${textLabel}']";
 
 	private String textWidgetLocator = "//div[@class='c-projectdashboard-items']/div[contains(@class,'s-active-tab')]/div/div[contains(@class,'${textWidgetType}')]";
 
@@ -26,9 +25,6 @@ public class DashboardTextObject extends AbstractFragment{
 
 	public void addText(TextObject textObject, String text,
 			String link) throws InterruptedException {
-		By textLabel = By.xpath(textLabelLocator.replace(
-				"${textLabel}", textObject.getName()));
-		waitForElementVisible(textLabel).click();
 		waitForElementVisible(addLinkButton).click();
 		waitForElementVisible(addLinkTitle);
 		addLinkTitle.sendKeys(text);
