@@ -46,7 +46,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"tests"})
     public void createComputedAttributesTabularReport() throws InterruptedException, IOException, JSONException {
 
         By includeArea = By.xpath("//div[@title='Include']");
