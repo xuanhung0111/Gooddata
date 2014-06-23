@@ -5,6 +5,7 @@ import java.util.List;
 import org.testng.Assert;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -43,13 +44,15 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'yui3-d-modaldialog')]")
     private DashboardWebContent dashboardWebContent;
 
-    @FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple')]")
+    @FindBy(xpath = "//div[contains(@class,'reportPicker')]")
     private DashboardAddReportPanel dashboardAddReportPanel;
 
     @FindBy(xpath = "//button[contains(@class,'s-btn-text')]")
     private WebElement addText;
+    
+    private String textLabelLocator = "//div[contains(@class,'gdc-menu-simple')]//span[@title='${textLabel}']";
 
-    @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]")
+    @FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
     private DashboardTextObject dashboardTextObject;
 
     @FindBy(xpath = "//span[text()='Line']")
@@ -66,9 +69,15 @@ public class DashboardEditBar extends AbstractFragment {
 
     @FindBy(xpath = "//span[text()='Filter']")
     private WebElement addFilterMenu;
+    
+    @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]//span[text()='Attribute']")
+    private WebElement attributeFilter;
 
-    @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]")
+    @FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
     private DashboardFilter dashboardFilter;
+    
+    @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]//span[text()='Date']")
+    private WebElement dateFilter;
 
     public void addReportToDashboard(String reportName) {
         int widgetCountBefore = listDashboardWidgets.size();
@@ -112,6 +121,7 @@ public class DashboardEditBar extends AbstractFragment {
             throws InterruptedException {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addFilterMenu).click();
+        waitForElementVisible(attributeFilter).click();
         waitForElementVisible(dashboardFilter.getRoot());
         dashboardFilter.addListFilter(type, name);
         int widgetCountAfter = listDashboardWidgets.size();
@@ -119,12 +129,14 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addTimeFilterToDashboard(int dateDimensionIndex)
+    public void addTimeFilterToDashboard(int dateDimensionIndex, String dateRange)
             throws InterruptedException {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addFilterMenu).click();
+        waitForElementVisible(dateFilter).click();
+        Thread.sleep(2000);
         waitForElementVisible(dashboardFilter.getRoot());
-        dashboardFilter.addTimeFilter(dateDimensionIndex);
+        dashboardFilter.addTimeFilter(dateDimensionIndex, dateRange);
         int widgetCountAfter = listDashboardWidgets.size();
         Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
                 "Widget wasn't added");
@@ -134,6 +146,9 @@ public class DashboardEditBar extends AbstractFragment {
                                    String link) throws InterruptedException {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addText).click();
+	By textLabel = By.xpath(textLabelLocator.replace(
+		"${textLabel}", textObject.getName()));
+	waitForElementVisible(textLabel).click();
         waitForElementVisible(dashboardTextObject.getRoot());
         dashboardTextObject.addText(textObject, text, link);
         int widgetCountAfter = listDashboardWidgets.size();

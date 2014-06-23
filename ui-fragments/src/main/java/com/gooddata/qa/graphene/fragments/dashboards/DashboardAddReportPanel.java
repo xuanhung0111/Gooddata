@@ -7,7 +7,7 @@ import org.openqa.selenium.support.FindBy;
 
 public class DashboardAddReportPanel extends AbstractFragment {
 
-    @FindBy(xpath = "//div[contains(@class,'s-report-picker')]//input")
+    @FindBy(xpath = "//div[contains(@class,'reportPicker')]//input")
     private WebElement reportSearchInput;
 
     @FindBy(xpath = "//div[@class='c-projectdashboard-items']/div[contains(@class,'s-active-tab')]/div/div[contains(@class,'yui3-c-reportdashboardwidget')]")
@@ -16,7 +16,7 @@ public class DashboardAddReportPanel extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'yui3-selectionbox-resize-r')]")
     private WebElement resizeIcon;
 
-    private static final String reportToAddLocator = "//div[contains(@class,'s-report-picker')]//div[contains(@class,'yui3-c-label-content')]/span[@title='${reportName}']";
+    private static final String reportToAddLocator = "//div[contains(@class,'reportPicker')]//span[text()='${reportName}']";
     private static final String reportOnDashboardLocator = "//div[@id='p-projectDashboardPage']//div[contains(@class,'yui3-c-reportdashboardwidget')]//a[@title='${reportName}']";
 
     public void addReport(String reportName) {
