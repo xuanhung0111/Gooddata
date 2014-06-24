@@ -17,7 +17,6 @@
         <module>ui-tests-reports</module>
         <module>ui-tests-tools</module>
         <module>ui-fragments</module>
-        <module>ui-tests-ccc</module>
         <module>ui-tests-upload</module>
         <module>ui-tests-filters</module>
     </modules>

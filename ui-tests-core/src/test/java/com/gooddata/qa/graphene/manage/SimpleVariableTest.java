@@ -37,12 +37,12 @@ public class SimpleVariableTest extends ObjectAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"object-tests"})
     public void createNumericVariableTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|variables");
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         name = "Test variable" + System.currentTimeMillis();
         data.put("variableName", name);
         data.put("defaultNumber", this.defaultNumber);
         data.put("userNumber", this.userNumber);
-        variablePage.createVariable(VariableTypes.NUMERIC, data);
+        uiUtils.variablePage.createVariable(VariableTypes.NUMERIC, data);
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"object-tests"})
@@ -50,7 +50,7 @@ public class SimpleVariableTest extends ObjectAbstractTest {
             throws InterruptedException {
         initAttributeVariable();
         data.put("userValueFlag", "false");
-        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        uiUtils.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"object-tests"})
@@ -58,11 +58,11 @@ public class SimpleVariableTest extends ObjectAbstractTest {
             throws InterruptedException {
         initAttributeVariable();
         data.put("userValueFlag", "true");
-        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        uiUtils.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
     private void initAttributeVariable() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|variables");
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         name = "Test variable" + System.currentTimeMillis();
         data.put("variableName", name);
         data.put("attribute", this.attrName);
@@ -75,7 +75,7 @@ public class SimpleVariableTest extends ObjectAbstractTest {
 
     @Override
     public void initObject(String variableName) {
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|variables");
-        variablePage.openVariableFromList(variableName);
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        uiUtils.variablePage.openVariableFromList(variableName);
     }
 }

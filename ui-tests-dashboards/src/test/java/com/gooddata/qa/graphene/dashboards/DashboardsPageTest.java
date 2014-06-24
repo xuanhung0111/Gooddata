@@ -18,10 +18,9 @@ public class DashboardsPageTest extends AbstractTest {
 
     @BeforeClass
     public void initStartPage() {
-        projectId = loadProperty("projectId");
-        projectName = loadProperty("projectName");
+        testParams.setProjectId(testParams.loadProperty("projectId"));
 
-        startPage = PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage";
+        startPage = uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage";
     }
 
     /**
@@ -36,28 +35,28 @@ public class DashboardsPageTest extends AbstractTest {
         //TODO - redirect
         Thread.sleep(5000);
         validSignInWithDemoUser(false);
-        waitForDashboardPageLoaded();
-        waitForElementVisible(dashboardsPage.getRoot());
-        Assert.assertNotNull(dashboardsPage, "Dashboard page not initialized!");
+        checkUtils.waitForDashboardPageLoaded();
+        waitForElementVisible(uiUtils.dashboardsPage.getRoot());
+        Assert.assertNotNull(uiUtils.dashboardsPage, "Dashboard page not initialized!");
     }
 
     @Test(dependsOnGroups = {"dashboardInit"})
     public void gd_Dashboard_002_GetNumberOfTabs() {
-        waitForDashboardPageLoaded();
-        int numberOfTabs = dashboardsPage.getTabs().getNumberOfTabs();
+        checkUtils.waitForDashboardPageLoaded();
+        int numberOfTabs = uiUtils.dashboardsPage.getTabs().getNumberOfTabs();
         System.out.println("Number of tabs for selected project: " + numberOfTabs);
         Assert.assertTrue(numberOfTabs > 0);
     }
 
     @Test(dependsOnGroups = {"dashboardInit"})
     public void gd_Dashboard_003_TabsSwitching() {
-        waitForDashboardPageLoaded();
-        DashboardTabs tabs = dashboardsPage.getTabs();
+        checkUtils.waitForDashboardPageLoaded();
+        DashboardTabs tabs = uiUtils.dashboardsPage.getTabs();
         int numberOfTabs = tabs.getNumberOfTabs();
         for (int i = 0; i < numberOfTabs; i++) {
             tabs.openTab(i);
             System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
-            waitForDashboardPageLoaded();
+            checkUtils.waitForDashboardPageLoaded();
             Screenshots.takeScreenshot(browser, "dashboards-tab-" + i + "-" + tabs.getTabLabel(i), this.getClass());
             Assert.assertTrue(tabs.isTabSelected(i));
         }
@@ -65,23 +64,23 @@ public class DashboardsPageTest extends AbstractTest {
 
     @Test(dependsOnGroups = {"dashboardInit"})
     public void gd_Dashboard_004_GetTabLabels() {
-        waitForDashboardPageLoaded();
-        List<String> tabLabels = dashboardsPage.getTabs().getAllTabNames();
+        checkUtils.waitForDashboardPageLoaded();
+        List<String> tabLabels = uiUtils.dashboardsPage.getTabs().getAllTabNames();
         System.out.println("These tabs are available for selected project: " + tabLabels.toString());
         Assert.assertTrue(tabLabels.size() > 0 && tabLabels.get(0).length() > 0);
     }
 
     @Test(dependsOnGroups = {"dashboardInit"})
     public void gd_Dashboard_005_SameTabIsSelectedAfterRefresh() {
-        waitForDashboardPageLoaded();
-        DashboardTabs tabs = dashboardsPage.getTabs();
+        checkUtils.waitForDashboardPageLoaded();
+        DashboardTabs tabs = uiUtils.dashboardsPage.getTabs();
         int numberOfTabs = tabs.getNumberOfTabs();
         int selectedTab = new Random().nextInt(numberOfTabs);
         System.out.println("Randomly selected tab: " + selectedTab);
         tabs.openTab(selectedTab);
-        waitForDashboardPageLoaded();
+        checkUtils.waitForDashboardPageLoaded();
         loadPlatformPageBeforeTestMethod(); // to refresh browser and initial page
-        waitForDashboardPageLoaded();
+        checkUtils.waitForDashboardPageLoaded();
         Assert.assertTrue(tabs.isTabSelected(selectedTab));
     }
 }

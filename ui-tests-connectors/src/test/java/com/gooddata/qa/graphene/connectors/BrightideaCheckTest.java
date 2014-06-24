@@ -36,9 +36,9 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
 
     @BeforeClass
     public void loadRequiredProperties() {
-        brightideaApiKey = loadProperty("connectors.brightidea.apiKey");
-        brightideaAffiliateId = loadProperty("connectors.brightidea.affiliateId");
-        brightideaHostname = loadProperty("connectors.brightidea.hostname");
+        brightideaApiKey = testParams.loadProperty("connectors.brightidea.apiKey");
+        brightideaAffiliateId = testParams.loadProperty("connectors.brightidea.affiliateId");
+        brightideaHostname = testParams.loadProperty("connectors.brightidea.hostname");
 
         connectorType = Connectors.BRIGHTIDEA;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
@@ -54,9 +54,9 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testBrightideaIntegrationConfiguration() throws InterruptedException, JSONException {
         // Brightidea specific configuration of integration (tfue page)
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId);
-        waitForElementVisible(BY_IFRAME);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME));
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
+        waitForElementVisible(uiUtils.BY_IFRAME);
+        browser.switchTo().frame(browser.findElement(uiUtils.BY_IFRAME));
         waitForElementVisible(BY_SPAN_WELCOME_BEFORE_CONFIG);
         waitForElementVisible(BY_INPUT_API_KEY).sendKeys(brightideaApiKey);
         waitForElementVisible(BY_INPUT_AFFILIATE_ID).sendKeys(brightideaAffiliateId);
@@ -73,11 +73,11 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
     public void testBrightideaIntegration() throws InterruptedException, JSONException {
         // process is scheduled automatically - check status
         openUrl(getProcessesUri());
-        JSONObject json = loadJSON();
+        JSONObject json = greyPageUtils.loadJSON();
         assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
                 "Integration process wasn't started...");
-        waitForElementVisible(BY_GP_LINK);
-        Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
+        waitForElementVisible(greyPageUtils.BY_GP_LINK);
+        Graphene.guardHttp(browser.findElement(greyPageUtils.BY_GP_LINK)).click();
         waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
     }
 }

@@ -25,11 +25,11 @@ public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
-        openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + projectId + "|projectDashboardPage");
-        waitForDashboardPageLoaded();
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
+        checkUtils.waitForDashboardPageLoaded();
         for (int i = 1; i <= 10; i++) {
             System.out.println("Iteration:" + i);
-            verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
+            uiUtils.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
         }
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output);
@@ -77,8 +77,8 @@ public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
     }
 
     private String getClientVersion() throws JSONException {
-        browser.get(getRootUrl() + "/gdc/releaseInfo");
-        JSONObject json = loadJSON();
+        openUrl("/gdc/releaseInfo");
+        JSONObject json = greyPageUtils.loadJSON();
         JSONArray components = json.getJSONObject("release").getJSONArray("components");
         for (int i = 0; i < components.length(); i++) {
             JSONObject component = components.getJSONObject(i);

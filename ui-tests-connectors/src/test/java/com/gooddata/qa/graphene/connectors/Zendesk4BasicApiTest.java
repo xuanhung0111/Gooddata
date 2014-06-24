@@ -39,15 +39,15 @@ public class Zendesk4BasicApiTest extends AbstractTest {
 
     @BeforeClass
     public void loadRequiredProperties() {
-        zendeskApiUrl = loadProperty("connectors.zendesk.apiUrl");
-        zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
-        zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
-        useApiProxy = Boolean.parseBoolean(loadProperty("http.client.useApiProxy"));
+        zendeskApiUrl = testParams.loadProperty("connectors.zendesk.apiUrl");
+        zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
+        zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
+        useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
     }
 
     @Test
     public void initGd() throws JSONException {
-        signInAtGreyPages(user, password);
+        greyPageUtils.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnMethods = {"initGd"}, groups = {"zendeskApiTests"})

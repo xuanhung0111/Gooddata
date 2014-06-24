@@ -18,7 +18,7 @@ public class DeleteTestProjects extends AbstractTest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = PAGE_LOGIN;
+        startPage = uiUtils.PAGE_LOGIN;
     }
 
     @Test(groups = "deleteProjectsInit")
@@ -52,13 +52,13 @@ public class DeleteTestProjects extends AbstractTest {
     }
 
     private void deleteProjects(String projectSubstring) throws InterruptedException {
-        browser.get(getRootUrl() + PAGE_PROJECTS);
-        waitForElementVisible(projectsPage.getRoot());
+        openUrl(uiUtils.PAGE_PROJECTS);
+        waitForElementVisible(uiUtils.projectsPage.getRoot());
         Thread.sleep(5000);
-        List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
+        List<String> projectsToDelete = uiUtils.projectsPage.getProjectsIds(projectSubstring);
         System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
         for (String projectToDelete : projectsToDelete) {
-            deleteProject(projectToDelete);
+            uiUtils.deleteProject(projectToDelete);
         }
     }
 

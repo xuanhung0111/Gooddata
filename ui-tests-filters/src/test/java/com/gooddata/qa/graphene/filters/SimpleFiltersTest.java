@@ -31,10 +31,9 @@ public class SimpleFiltersTest extends AbstractTest {
 
     @BeforeClass
     public void initStartPage() {
-        projectId = loadProperty("projectId");
-        projectName = loadProperty("projectName");
+        testParams.setProjectId(testParams.loadProperty("projectId"));
 
-        startPage = PAGE_UI_PROJECT_PREFIX + projectId
+        startPage = uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
                 + "|projectDashboardPage";
     }
 
@@ -70,9 +69,9 @@ public class SimpleFiltersTest extends AbstractTest {
         // TODO - redirect
         Thread.sleep(5000);
         validSignInWithDemoUser(false);
-        waitForDashboardPageLoaded();
+        checkUtils.waitForDashboardPageLoaded();
         dashboards = Graphene.createPageFragment(DashboardsPage.class,
-                browser.findElement(BY_PANEL_ROOT));
+                browser.findElement(uiUtils.BY_PANEL_ROOT));
         Assert.assertNotNull(dashboards, "Dashboard page not initialized!");
 
         DashboardTabs tabs = dashboards.getTabs();

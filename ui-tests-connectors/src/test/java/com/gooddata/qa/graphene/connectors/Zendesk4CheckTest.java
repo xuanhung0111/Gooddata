@@ -53,9 +53,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @BeforeClass
     public void loadRequiredProperties() {
-        zendeskApiUrl = loadProperty("connectors.zendesk.apiUrl");
-        zendeskUploadUser = loadProperty("connectors.zendesk4.uploadUser");
-        zendeskUploadUserPassword = loadProperty("connectors.zendesk4.uploadUserPassword");
+        zendeskApiUrl = testParams.loadProperty("connectors.zendesk.apiUrl");
+        zendeskUploadUser = testParams.loadProperty("connectors.zendesk4.uploadUser");
+        zendeskUploadUserPassword = testParams.loadProperty("connectors.zendesk4.uploadUserPassword");
 
         connectorType = Connectors.ZENDESK4;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
@@ -63,10 +63,10 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 "Operational", "Yearly", "Time Metrics", "Backlog", "Agents", "Groups", "Leaderboard",
                 "Users & Orgs", "Satisfaction", "Problems", "Tags"
         });
-        zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
-        zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
-        useApiProxy = Boolean.parseBoolean(loadProperty("http.client.useApiProxy"));
-        BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
+        zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
+        zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
+        useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
+        uiUtils.BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
     }
 
     /**
@@ -99,15 +99,15 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createOrganizationMetric() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         Map<String, String> data = new HashMap<String, String>();
-        data.put("metric0", "# Organizations");
-        data.put("attrFolder0", "Organizations");
-        data.put("attribute0", "Organization Deleted");
+        data.put("metric1", "# Organizations");
         data.put("attrFolder1", "Organizations");
         data.put("attribute1", "Organization Deleted");
-        data.put("attrValue0", "false");
+        data.put("attrFolder2", "Organizations");
+        data.put("attribute2", "Organization Deleted");
         data.put("attrValue1", "false");
+        data.put("attrValue2", "false");
         metricEditorPage.createFilterMetric(FilterMetricTypes.NOT_IN, "# Non-deleted organizations", data);
     }
 
@@ -248,15 +248,15 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private void createBasicReport(String metric, String reportName) throws InterruptedException {
         List<String> what = new ArrayList<String>();
         what.add(metric);
-        createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
+        uiUtils.createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
         waitForElementVisible(BY_ONE_NUMBER_REPORT);
     }
 
     private int getNumberFromGDReport(String reportName) {
-        initReportsPage();
-        reportsPage.getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded();
-        waitForElementVisible(reportPage.getRoot());
+        uiUtils.initReportsPage();
+        uiUtils.reportsPage.getReportsList().openReport(reportName);
+        checkUtils.waitForAnalysisPageLoaded();
+        waitForElementVisible(uiUtils.reportPage.getRoot());
         OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class, browser.findElement(
                 BY_ONE_NUMBER_REPORT));
         return Integer.valueOf(report.getValue().replace(".00", ""));

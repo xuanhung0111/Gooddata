@@ -47,7 +47,7 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        String identification = ": " + host + " - " + testIdentification;
+        String identification = ": " + testParams.getHost() + " - " + testParams.getTestIdentification();
         reportTitle = reportTitle + identification;
         dashboardTitle = dashboardTitle + identification;
 
@@ -57,32 +57,32 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
     public void verifyEmptySchedules() {
         initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
+        assertEquals(uiUtils.emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
         Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createDashboardSchedule() {
         initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewDahboardEmail(user, dashboardTitle, "Scheduled email test - dashboard.",
+        uiUtils.emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle, "Scheduled email test - dashboard.",
                 "Outlook");
-        checkRedBar();
+        checkUtils.checkRedBar();
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage();
-        emailSchedulesPage.scheduleNewReportEmail(user, reportTitle, "Scheduled email test - report.",
+        uiUtils.emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportTitle, "Scheduled email test - report.",
                 "Activities by Type", ExportFormat.ALL);
-        checkRedBar();
+        checkUtils.checkRedBar();
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
     }
 
     @Test(dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
         initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
+        assertEquals(uiUtils.emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
     }
 
@@ -90,15 +90,15 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     public void updateScheduledMailRecurrency() throws Exception {
         initEmailSchedulesPage();
 
-        String reportScheduleUri = emailSchedulesPage.getScheduleMailUriByName(reportTitle);
-        String dashboardScheduleUri = emailSchedulesPage.getScheduleMailUriByName(dashboardTitle);
+        String reportScheduleUri = uiUtils.emailSchedulesPage.getScheduleMailUriByName(reportTitle);
+        String dashboardScheduleUri = uiUtils.emailSchedulesPage.getScheduleMailUriByName(dashboardTitle);
         updateRecurrencyString(reportScheduleUri);
         updateRecurrencyString(dashboardScheduleUri);
     }
 
     @Test(groups = {"tests"}, dependsOnMethods = {"updateScheduledMailRecurrency"})
     public void waitForMessages() throws Exception {
-        ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), projectId);
+        ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
         try {
             System.out.println("ACCELERATE scheduled mails processing");
@@ -113,10 +113,10 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     }
 
     private void initEmailSchedulesPage() {
-        browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId + "|emailSchedulePage");
-        waitForSchedulesPageLoaded();
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
+        checkUtils.waitForSchedulesPageLoaded();
         waitForElementNotVisible(BY_SCHEDULES_LOADING);
-        waitForElementVisible(emailSchedulesPage.getRoot());
+        waitForElementVisible(uiUtils.emailSchedulesPage.getRoot());
     }
 
     private void checkMailbox(ImapClient imapClient) throws Exception {

@@ -27,10 +27,9 @@ public class ReportsPageTest extends AbstractTest {
 
     @BeforeClass
     public void initStartPage() {
-        projectId = loadProperty("projectId");
-        projectName = loadProperty("projectName");
+        testParams.setProjectId(testParams.loadProperty("projectId"));
 
-        startPage = PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage";
+        startPage = uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage";
     }
 
     /**
@@ -44,30 +43,30 @@ public class ReportsPageTest extends AbstractTest {
     public void gd_Report_001_ReportsElements() throws InterruptedException, JSONException {
         Thread.sleep(5000);
         validSignInWithDemoUser(false);
-        waitForReportsPageLoaded();
-        waitForElementVisible(reportsPage.getRoot());
-        Assert.assertNotNull(reportsPage, "Reports page not initialized!");
+        checkUtils.waitForReportsPageLoaded();
+        waitForElementVisible(uiUtils.reportsPage.getRoot());
+        Assert.assertNotNull(uiUtils.reportsPage, "Reports page not initialized!");
     }
 
     @Test(dependsOnGroups = {"reportsInit"})
     public void gd_Report_002_GetNumberOfDefaultFolders() throws InterruptedException {
-        waitForReportsPageLoaded();
-        int numberOfFolders = reportsPage.getDefaultFolders().getNumberOfFolders();
+        checkUtils.waitForReportsPageLoaded();
+        int numberOfFolders = uiUtils.reportsPage.getDefaultFolders().getNumberOfFolders();
         Assert.assertTrue(numberOfFolders == 4, "4 default folders are present");
     }
 
     @Test(dependsOnGroups = {"reportsInit"})
     public void gd_Report_003_GetNumberOfCustomFolders() throws InterruptedException {
-        waitForReportsPageLoaded();
-        int numberOfFolders = reportsPage.getCustomFolders().getNumberOfFolders();
+        checkUtils.waitForReportsPageLoaded();
+        int numberOfFolders = uiUtils.reportsPage.getCustomFolders().getNumberOfFolders();
         System.out.println("Number of custom folders for selected project: " + numberOfFolders);
         Assert.assertTrue(numberOfFolders >= 0);
     }
 
     @Test(dependsOnGroups = {"reportsInit"})
     public void gd_Report_004_DefaultFolderNames() throws InterruptedException {
-        waitForReportsPageLoaded();
-        List<String> folderNames = reportsPage.getDefaultFolders().getAllFolderNames();
+        checkUtils.waitForReportsPageLoaded();
+        List<String> folderNames = uiUtils.reportsPage.getDefaultFolders().getAllFolderNames();
         Assert.assertTrue(folderNames.size() == 4);
         for (int i = 0; i < folderNames.size(); i++) {
             Assert.assertEquals(folderNames.get(i), expectedDefaultFolderNames[i], "Default folder name match - " +
@@ -77,8 +76,8 @@ public class ReportsPageTest extends AbstractTest {
 
     @Test(dependsOnGroups = {"reportsInit"})
     public void gd_Report_005_DefaultFolderLinks() throws InterruptedException {
-        waitForReportsPageLoaded();
-        ReportsFolders folders = reportsPage.getDefaultFolders();
+        checkUtils.waitForReportsPageLoaded();
+        ReportsFolders folders = uiUtils.reportsPage.getDefaultFolders();
         for (int i = 0; i < folders.getNumberOfFolders(); i++) {
             Assert.assertTrue(folders.getFolderLink(i).endsWith(expectedDefaultFoldersLinksSuffix[i]));
         }
@@ -86,21 +85,21 @@ public class ReportsPageTest extends AbstractTest {
 
     @Test(dependsOnGroups = {"reportsInit"})
     public void gd_Report_006_DefaultFoldersSwitching() throws InterruptedException {
-        waitForReportsPageLoaded();
-        ReportsFolders folders = reportsPage.getDefaultFolders();
+        checkUtils.waitForReportsPageLoaded();
+        ReportsFolders folders = uiUtils.reportsPage.getDefaultFolders();
         for (int i = 0; i < folders.getNumberOfFolders(); i++) {
             folders.openFolder(i);
-            waitForReportsPageLoaded();
+            checkUtils.waitForReportsPageLoaded();
             if (i > 0) { //all-reports isn't added at URL on first access
                 Assert.assertTrue(browser.getCurrentUrl().endsWith(expectedDefaultFoldersLinksSuffix[i]),
                         "Current Browser URL match: " + browser.getCurrentUrl());
             }
-            Screenshots.takeScreenshot(browser, "reports-folder-" + i + "-" + reportsPage.getSelectedFolderName(),
+            Screenshots.takeScreenshot(browser, "reports-folder-" + i + "-" + uiUtils.reportsPage.getSelectedFolderName(),
                     this.getClass());
-            Assert.assertEquals(reportsPage.getSelectedFolderName(), expectedDefaultFolderNames[i],
-                    "Selected folder name match: " + reportsPage.getSelectedFolderName());
-            Assert.assertEquals(reportsPage.getSelectedFolderDescription(), expectedDefaultFolderDescriptions[i],
-                    "Selected folder description match: " + reportsPage.getSelectedFolderDescription());
+            Assert.assertEquals(uiUtils.reportsPage.getSelectedFolderName(), expectedDefaultFolderNames[i],
+                    "Selected folder name match: " + uiUtils.reportsPage.getSelectedFolderName());
+            Assert.assertEquals(uiUtils.reportsPage.getSelectedFolderDescription(), expectedDefaultFolderDescriptions[i],
+                    "Selected folder description match: " + uiUtils.reportsPage.getSelectedFolderDescription());
         }
     }
     /**

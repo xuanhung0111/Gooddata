@@ -17,14 +17,14 @@ public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
 
     @BeforeClass
     public void initProperties() {
-        csvFilePath = loadProperty("csvFilePath");
+        csvFilePath = testParams.loadProperty("csvFilePath");
         projectTitle = "simple-project-geo";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"geo-charts"})
     public void uploadDataForGeoCharts() throws InterruptedException {
-        uploadCSV(csvFilePath + "/geo_test.csv", null, "geo-1");
-        uploadCSV(csvFilePath + "/geo_test_pins.csv", null, "geo-2");
+        uiUtils.uploadCSV(csvFilePath + "/geo_test.csv", null, "geo-1");
+        uiUtils.uploadCSV(csvFilePath + "/geo_test_pins.csv", null, "geo-2");
     }
 
     @Test(dependsOnMethods = {"uploadDataForGeoCharts"}, groups = {"geo-charts"})
@@ -35,41 +35,41 @@ public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"configureGeoAttributes"}, groups = {"geo-charts"})
     public void addNewTabs() throws InterruptedException {
-        addNewTabOnDashboard("Default dashboard", "geochart", "simple-geo-1");
-        addNewTabOnDashboard("Default dashboard", "geochart-pins", "simple-geo-2");
+        uiUtils.addNewTabOnDashboard("Default dashboard", "geochart", "simple-geo-1");
+        uiUtils.addNewTabOnDashboard("Default dashboard", "geochart-pins", "simple-geo-2");
     }
 
     @Test(dependsOnMethods = {"addNewTabs"}, groups = {"geo-charts", "tests"})
     public void addGeoWidgetsOnTab() throws InterruptedException {
         addGeoWidgetOnTab(2, "Sum of amount");
-        logout();
-        signInAtUI(user, password);
+        uiUtils.logout();
+        uiUtils.signInAtUI(testParams.getUser(), testParams.getPassword());
         addGeoWidgetOnTab(3, "Avg of hodnota");
         successfulTest = true;
     }
 
     private void configureAttributeLabel(String attributeName, String attributeLabelType) throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|attributes");
-        waitForElementVisible(attributesTable.getRoot());
-        waitForDataPageLoaded();
-        attributesTable.selectObject(attributeName);
-        waitForElementVisible(attributeDetailPage.getRoot());
-        waitForObjectPageLoaded();
-        assertEquals(attributeDetailPage.getAttributeName(), attributeName, "Invalid attribute name on detail page");
-        attributeDetailPage.selectLabelType(attributeLabelType);
+        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        waitForElementVisible(uiUtils.attributesTable.getRoot());
+        checkUtils.waitForDataPageLoaded();
+        uiUtils.attributesTable.selectObject(attributeName);
+        waitForElementVisible(uiUtils.attributeDetailPage.getRoot());
+        checkUtils.waitForObjectPageLoaded();
+        assertEquals(uiUtils.attributeDetailPage.getAttributeName(), attributeName, "Invalid attribute name on detail page");
+        uiUtils.attributeDetailPage.selectLabelType(attributeLabelType);
         Thread.sleep(2000);
-        assertEquals(attributeDetailPage.getAttributeLabelType(), attributeLabelType, "Label type not set properly");
+        assertEquals(uiUtils.attributeDetailPage.getAttributeLabelType(), attributeLabelType, "Label type not set properly");
     }
 
     private void addGeoWidgetOnTab(int tabIndex, String metric) throws InterruptedException {
-        initDashboardsPage();
-        dashboardsPage.getTabs().openTab(tabIndex);
-        waitForDashboardPageLoaded();
-        dashboardsPage.editDashboard();
-        dashboardsPage.getDashboardEditBar().addWidgetToDashboard(WidgetTypes.GEO_CHART, metric);
-        dashboardsPage.getDashboardEditBar().saveDashboard();
+        uiUtils.initDashboardsPage();
+        uiUtils.dashboardsPage.getTabs().openTab(tabIndex);
+        checkUtils.waitForDashboardPageLoaded();
+        uiUtils.dashboardsPage.editDashboard();
+        uiUtils.dashboardsPage.getDashboardEditBar().addWidgetToDashboard(WidgetTypes.GEO_CHART, metric);
+        uiUtils.dashboardsPage.getDashboardEditBar().saveDashboard();
         Thread.sleep(5000);
-        waitForDashboardPageLoaded();
+        checkUtils.waitForDashboardPageLoaded();
         Thread.sleep(5000);
         Screenshots.takeScreenshot(browser, "geochart-new-tab-" + tabIndex, this.getClass());
     }

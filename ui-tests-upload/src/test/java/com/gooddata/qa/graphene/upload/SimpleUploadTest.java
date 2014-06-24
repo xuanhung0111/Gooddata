@@ -21,9 +21,9 @@ public class SimpleUploadTest extends AbstractTest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = PAGE_UPLOAD;
+        startPage = uiUtils.PAGE_UPLOAD;
 
-        csvFilePath = loadProperty("upload.file.simple.csv");
+        csvFilePath = testParams.loadProperty("upload.file.simple.csv");
     }
 
     @Test(groups = {"SimpleUploadInit"})
@@ -50,7 +50,7 @@ public class SimpleUploadTest extends AbstractTest {
         upload.confirmloadCsv();
         //verify redirect to dashboard
         waitForElementVisible(By.cssSelector(".s-we_made_some_kpis_for_you"));
-        waitForDashboardPageLoaded();
+        checkUtils.waitForDashboardPageLoaded();
         Screenshots.takeScreenshot(browser, "3-upload-dashboard", this.getClass());
     }
 }

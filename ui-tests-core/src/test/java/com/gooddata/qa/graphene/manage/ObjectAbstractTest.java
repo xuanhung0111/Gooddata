@@ -13,26 +13,26 @@ public abstract class ObjectAbstractTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
     public void changeNameTest() throws InterruptedException {
         initObject(name);
-        name = objectDetailPage.changeObjectName(name + "changed");
+        name = uiUtils.objectDetailPage.changeObjectName(name + "changed");
     }
 
     @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
     public void addDescriptionTest() throws InterruptedException {
         initObject(name);
-        objectDetailPage.addDescription(description);
+        uiUtils.objectDetailPage.addDescription(description);
     }
 
     @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
     public void addTagTest() throws InterruptedException {
         initObject(name);
-        objectDetailPage.addTag(tagName);
-        objectDetailPage.addTag("graphene test adding tag");
+        uiUtils.objectDetailPage.addTag(tagName);
+        uiUtils.objectDetailPage.addTag("graphene test adding tag");
     }
 
     @Test(dependsOnGroups = {"property-object-tests"}, groups = {"final-tests"})
     public void verifyAllPropertiesTest() {
         initObject(name);
-        objectDetailPage.verifyAllPropertiesAtOnce(name, description, tagName);
+        uiUtils.objectDetailPage.verifyAllPropertiesAtOnce(name, description, tagName);
     }
 
     @Test(dependsOnGroups = {"final-tests"}, groups = {"tests"})

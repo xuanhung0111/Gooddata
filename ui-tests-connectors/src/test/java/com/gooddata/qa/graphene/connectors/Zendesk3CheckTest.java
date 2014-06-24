@@ -11,9 +11,9 @@ public class Zendesk3CheckTest extends AbstractZendeskCheckTest {
 
     @BeforeClass
     public void loadRequiredProperties() {
-        zendeskApiUrl = loadProperty("connectors.zendesk.apiUrl");
-        zendeskUploadUser = loadProperty("connectors.zendesk.uploadUser");
-        zendeskUploadUserPassword = loadProperty("connectors.zendesk.uploadUserPassword");
+        zendeskApiUrl = testParams.loadProperty("connectors.zendesk.apiUrl");
+        zendeskUploadUser = testParams.loadProperty("connectors.zendesk.uploadUser");
+        zendeskUploadUserPassword = testParams.loadProperty("connectors.zendesk.uploadUserPassword");
 
         connectorType = Connectors.ZENDESK3;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();

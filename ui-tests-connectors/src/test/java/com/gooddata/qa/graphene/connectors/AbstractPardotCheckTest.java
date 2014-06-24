@@ -21,9 +21,9 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 
     @BeforeClass
     public void loadRequiredProperties() {
-        pardotAccountId = loadProperty("connectors.pardot.accountId");
-        pardotUploadUser = loadProperty("connectors.pardot.uploadUser");
-        pardotUploadUserPassword = loadProperty("connectors.pardot.uploadUserPassword");
+        pardotAccountId = testParams.loadProperty("connectors.pardot.accountId");
+        pardotUploadUser = testParams.loadProperty("connectors.pardot.uploadUser");
+        pardotUploadUserPassword = testParams.loadProperty("connectors.pardot.uploadUserPassword");
 
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
         expectedDashboardsAndTabs.put("Pardot Analytics", new String[]{
@@ -45,11 +45,11 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
         String settingsUrl = gotoIntegrationSettings();
 
         // pardot specific configuration of API Url (with specific upload user)
-        signInAtGreyPages(pardotUploadUser, pardotUploadUserPassword);
+        greyPageUtils.signInAtGreyPages(pardotUploadUser, pardotUploadUserPassword);
         browser.get(settingsUrl);
         waitForElementVisible(BY_INPUT_PARDOT_ACCOUNT_ID).sendKeys(pardotAccountId);
-        Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
-        JSONObject json = loadJSON();
+        Graphene.guardHttp(waitForElementVisible(greyPageUtils.BY_GP_BUTTON_SUBMIT)).click();
+        JSONObject json = greyPageUtils.loadJSON();
         assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId,
                 "Pardot accountId was not set to expected value");
     }
