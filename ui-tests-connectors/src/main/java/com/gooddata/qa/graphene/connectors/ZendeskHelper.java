@@ -4,6 +4,7 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,15 +16,29 @@ import static org.testng.Assert.assertEquals;
 
 public class ZendeskHelper {
 
+    public static enum ZendeskObject {
+        TICKET,
+        USER,
+        ORGANIZATION;
+
+        public String getName() {
+            return this.toString().toLowerCase();
+        }
+
+        public String getPluralName() {
+            return this.getName() + "s";
+        }
+    }
+
     private final RestApiClient apiClient;
+
+    private static final String TICKETS_INC_URL = "/api/v2/incremental/tickets.json?start_time=0";
+    private static final String USERS_INC_URL = "/api/v2/incremental/users.json?start_time=0";
+    private static final String ORGANIZATIONS_INC_URL = "/api/v2/incremental/organizations.json?start_time=0";
 
     private static final String TICKETS_URL = "/api/v2/tickets";
     private static final String USERS_URL = "/api/v2/users";
     private static final String ORGANIZATIONS_URL = "/api/v2/organizations";
-
-    public static final String TICKET_OBJECT_NAME = "ticket";
-    public static final String USER_OBJECT_NAME = "user";
-    public static final String ORGANIZATION_OBJECT_NAME = "organization";
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
 
@@ -32,28 +47,28 @@ public class ZendeskHelper {
         System.out.println("Initialized client for " + this.apiClient.getHttpHost());
     }
 
-    public int getNumberOfTickets() throws IOException, JSONException {
-        return getZendeskEntityCount(TICKETS_URL);
+    public int getNumberOfTickets() throws IOException, JSONException, InterruptedException {
+        return getZendeskEntityCount(TICKETS_INC_URL, ZendeskObject.TICKET);
     }
 
-    public int getNumberOfUsers() throws IOException, JSONException {
-        return getZendeskEntityCount(USERS_URL);
+    public int getNumberOfUsers() throws IOException, JSONException, InterruptedException {
+        return getZendeskEntityCount(USERS_INC_URL, ZendeskObject.USER);
     }
 
-    public int getNumberOfOrganizations() throws IOException, JSONException {
-        return getZendeskEntityCount(ORGANIZATIONS_URL);
+    public int getNumberOfOrganizations() throws IOException, JSONException, InterruptedException {
+        return getZendeskEntityCount(ORGANIZATIONS_INC_URL, ZendeskObject.ORGANIZATION);
     }
 
     public int createNewTicket(String jsonTicket) throws IOException, JSONException {
-        return createNewZendeskObject(TICKETS_URL, jsonTicket, TICKET_OBJECT_NAME);
+        return createNewZendeskObject(TICKETS_URL, jsonTicket, ZendeskObject.TICKET);
     }
 
     public int createNewUser(String jsonUser) throws IOException, JSONException {
-        return createNewZendeskObject(USERS_URL, jsonUser, USER_OBJECT_NAME);
+        return createNewZendeskObject(USERS_URL, jsonUser, ZendeskObject.USER);
     }
 
     public int createNewOrganization(String jsonOrganization) throws IOException, JSONException {
-        return createNewZendeskObject(ORGANIZATIONS_URL, jsonOrganization, ORGANIZATION_OBJECT_NAME);
+        return createNewZendeskObject(ORGANIZATIONS_URL, jsonOrganization, ZendeskObject.ORGANIZATION);
     }
 
     public void deleteTicket(int ticketId) throws IOException {
@@ -68,7 +83,7 @@ public class ZendeskHelper {
         deleteZendeskEntity(ORGANIZATIONS_URL, organizationId);
     }
 
-    public int createNewZendeskObject(String url, String jsonContent, String objectName)
+    public int createNewZendeskObject(String url, String jsonContent, ZendeskObject objectName)
             throws IOException, JSONException {
         HttpRequestBase postRequest = apiClient.newPostMethod(url, jsonContent);
         try {
@@ -76,24 +91,51 @@ public class ZendeskHelper {
             checkStatusCode(postResponse, 201);
             String result = EntityUtils.toString(postResponse.getEntity());
             JSONObject json = new JSONObject(result);
-            int id = json.getJSONObject(objectName).getInt("id");
-            System.out.println("New Zendesk " + objectName + " created, id: " + id);
+            int id = json.getJSONObject(objectName.getName()).getInt("id");
+            System.out.println("New Zendesk " + objectName.getName() + " created, id: " + id);
             return id;
         } finally {
             postRequest.releaseConnection();
         }
     }
 
-    private int getZendeskEntityCount(String url) throws JSONException, IOException {
+    private int getZendeskEntityCount(String url, ZendeskObject objectType) throws JSONException, IOException, InterruptedException {
         HttpRequestBase getRequest = apiClient.newGetMethod(url);
         try {
             HttpResponse getResponse = apiClient.execute(getRequest);
+            int retryCounter = 0;
+            while (getResponse.getStatusLine().getStatusCode() == 429 && retryCounter < 5) {
+                System.out.println("API limits reached, retrying ... ");
+                Thread.sleep(30000);
+                getRequest.releaseConnection();
+                getRequest = apiClient.newGetMethod(url);
+                getResponse = apiClient.execute(getRequest);
+                retryCounter++;
+            }
             checkStatusCode(getResponse, 200);
             String result = EntityUtils.toString(getResponse.getEntity());
             JSONObject json = new JSONObject(result);
             int count = json.getInt("count");
-            System.out.println(count + " objects returned from " + url);
-            return count;
+            System.out.println(count + " " + objectType.getPluralName() + "returned from " + url);
+            int deletedObjects = 0;
+            JSONArray array = json.getJSONArray(objectType.getPluralName());
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                switch (objectType) {
+                    case TICKET:
+                        if (object.getString("status").equals("deleted")) deletedObjects++;
+                        break;
+                    case USER:
+                        if (object.getBoolean("active") == false) deletedObjects++;
+                        break;
+                    case ORGANIZATION:
+                        if (!object.getString("deleted_at").isEmpty() && !object.getString("deleted_at").equals("null")) deletedObjects++;
+                        break;
+                }
+            }
+            int nonDeletedObjectsCount = count - deletedObjects;
+            System.out.println("Found " + deletedObjects + " deleted " + objectType.getPluralName() + ", returning " + nonDeletedObjectsCount + " " + objectType.getPluralName());
+            return nonDeletedObjectsCount;
         } finally {
             getRequest.releaseConnection();
         }
@@ -112,13 +154,13 @@ public class ZendeskHelper {
         }
     }
 
-    public static void main(String[] args) throws IOException, JSONException {
+    public static void main(String[] args) throws IOException, JSONException, InterruptedException {
         ZendeskHelper helper = new ZendeskHelper(new RestApiClient("gooddataqa3.zendesk-staging.com",
-                "qa@gooddata.com", "12345", false, true));
-        System.out.println(helper.getNumberOfTickets());
+                "qa@gooddata.com", "12345", false, false));
+        //System.out.println(helper.getNumberOfTickets());
         System.out.println(helper.getNumberOfOrganizations());
-        System.out.println(helper.getNumberOfUsers());
-
+        //System.out.println(helper.getNumberOfUsers());
+/**
         final String JSON_TICKET_CREATE = "{\"ticket\":{\"subject\":\"GD test ticket\", " +
                 "\"comment\": { \"body\": \"Description of automatically created ticket\" }}}";
 
@@ -135,13 +177,14 @@ public class ZendeskHelper {
         helper.deleteTicket(ticket);
         helper.deleteOrganization(organization);
         helper.deleteUser(user);
+ */
     }
 
     public static String getCurrentTimeIdentifier() {
         return dateFormat.format(new Date());
     }
 
-    private void checkStatusCode(HttpResponse reponse, int expectedStatus) {
-        assertEquals(reponse.getStatusLine().getStatusCode(), expectedStatus, "Invalid status code");
+    private void checkStatusCode(HttpResponse response, int expectedStatus) {
+        assertEquals(response.getStatusLine().getStatusCode(), expectedStatus, "Invalid status code");
     }
 }
