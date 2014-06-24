@@ -10,36 +10,36 @@ public abstract class ObjectAbstractTest extends GoodSalesAbstractTest {
     protected static String description = "";
     protected static String tagName = "";
 
-    @Test(dependsOnGroups = { "object-tests" }, groups = { "property-object-tests" })
+    @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
     public void changeNameTest() throws InterruptedException {
-	initObject(name);
-	name = objectDetailPage.changeObjectName(name + "changed");
+        initObject(name);
+        name = objectDetailPage.changeObjectName(name + "changed");
     }
 
-    @Test(dependsOnGroups = { "object-tests" }, groups = { "property-object-tests" })
+    @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
     public void addDescriptionTest() throws InterruptedException {
-	initObject(name);
-	objectDetailPage.addDescription(description);
+        initObject(name);
+        objectDetailPage.addDescription(description);
     }
 
-    @Test(dependsOnGroups = { "object-tests" }, groups = { "property-object-tests" })
+    @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
     public void addTagTest() throws InterruptedException {
-	initObject(name);
-	objectDetailPage.addTag(tagName);
-	objectDetailPage.addTag("graphene test adding tag");
+        initObject(name);
+        objectDetailPage.addTag(tagName);
+        objectDetailPage.addTag("graphene test adding tag");
     }
 
-    @Test(dependsOnGroups = { "property-object-tests" }, groups = { "final-tests" })
+    @Test(dependsOnGroups = {"property-object-tests"}, groups = {"final-tests"})
     public void verifyAllPropertiesTest() {
-	initObject(name);
-	objectDetailPage.verifyAllPropertiesAtOnce(name, description, tagName);
+        initObject(name);
+        objectDetailPage.verifyAllPropertiesAtOnce(name, description, tagName);
     }
 
-    @Test(dependsOnGroups = { "final-tests" }, groups = { "tests" })
+    @Test(dependsOnGroups = {"final-tests"}, groups = {"tests"})
     public void finalTest() {
-	successfulTest = true;
+        successfulTest = true;
     }
-    
+
     public void initObject(String variableName) {
 
     }

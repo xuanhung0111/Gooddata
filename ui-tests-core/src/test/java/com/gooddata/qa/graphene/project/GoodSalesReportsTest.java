@@ -18,12 +18,15 @@ import org.testng.Assert;
 
 import java.io.IOException;
 import java.net.URL;
+
 import static org.testng.Assert.*;
 
 @Test(groups = {"GoodSalesReports"}, description = "Tests for GoodSales project (reports functionality) in GD platform")
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private int createdReportsCount = 0;
+    protected static final int expectedGoodSalesReportsCount = 103;
+    protected static final int expectedGoodSalesReportsCustomFoldersCount = 9;
 
     private static final long expectedLineChartExportPDFSize = 110000L;
     private static final long expectedAreaChartReportExportPNGSize = 43000L;
@@ -66,18 +69,18 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         how.add("Forecast Category");
 
         prepareReport("Simple CA report", ReportTypes.TABLE, what, how);
-        String bucketRegion = waitForElementPresent(includeArea).getAttribute("gdc:region").replace('0','1');
+        String bucketRegion = waitForElementPresent(includeArea).getAttribute("gdc:region").replace('0', '1');
         String computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion))).getText();
-        Assert.assertEquals(computedAttr,expectedValue);
+        Assert.assertEquals(computedAttr, expectedValue);
 
         /*** invert condition and check if it's reflected on report ***/
         maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple-inv.txt");
         postMAQL(IOUtils.toString(maqlResource), 60);
 
         initReportPage("Simple CA report");
-        bucketRegion = waitForElementPresent(excludeArea).getAttribute("gdc:region").replace('0','1');
+        bucketRegion = waitForElementPresent(excludeArea).getAttribute("gdc:region").replace('0', '1');
         computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion))).getText();
-        Assert.assertEquals(computedAttr,expectedValue);
+        Assert.assertEquals(computedAttr, expectedValue);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -280,7 +283,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
             throws InterruptedException {
-	createReport(reportName, reportType, what, how, "GoodSales");
+        createReport(reportName, reportType, what, how, "GoodSales");
         createdReportsCount++;
     }
 

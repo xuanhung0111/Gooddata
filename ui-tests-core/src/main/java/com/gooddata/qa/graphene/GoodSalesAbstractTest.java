@@ -13,9 +13,6 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
 
     protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
 
-    protected static final int expectedGoodSalesReportsCount = 103;
-    protected static final int expectedGoodSalesReportsCustomFoldersCount = 9;
-
     @BeforeClass
     public void initStartPage() {
         startPage = "projects.html";

@@ -39,22 +39,23 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     /**
      * Temporarily disabled test for adding report on dashboard tab since there is a weird behavior
-     *  - dialog for adding report and report itself is present, but webdriver can't use it since it's not visible (probably some css issue?)
-    @Test(dependsOnMethods = {"addNewTab"}, groups = {"dashboards-verification"})
-    public void addReportOnNewTab() throws InterruptedException {
-        initDashboardsPage();
-        dashboardsPage.selectDashboard("Pipeline Analysis");
-        waitForDashboardPageLoaded();
-        Thread.sleep(3000);
-        dashboardsPage.getTabs().openTab(9);
-        waitForDashboardPageLoaded();
-        dashboardsPage.editDashboard();
-        dashboardsPage.getDashboardEditBar().addReportToDashboard("Activities by Type");
-        dashboardsPage.getDashboardEditBar().saveDashboard();
-        waitForDashboardPageLoaded();
-        Screenshots.takeScreenshot(browser, "GoodSales-new-tab-with-chart", this.getClass());
-    }
-    */
+     * - dialog for adding report and report itself is present, but webdriver can't use it since it's not visible (probably some css issue?)
+     *
+     * @Test(dependsOnMethods = {"addNewTab"}, groups = {"dashboards-verification"})
+     * public void addReportOnNewTab() throws InterruptedException {
+     * initDashboardsPage();
+     * dashboardsPage.selectDashboard("Pipeline Analysis");
+     * waitForDashboardPageLoaded();
+     * Thread.sleep(3000);
+     * dashboardsPage.getTabs().openTab(9);
+     * waitForDashboardPageLoaded();
+     * dashboardsPage.editDashboard();
+     * dashboardsPage.getDashboardEditBar().addReportToDashboard("Activities by Type");
+     * dashboardsPage.getDashboardEditBar().saveDashboard();
+     * waitForDashboardPageLoaded();
+     * Screenshots.takeScreenshot(browser, "GoodSales-new-tab-with-chart", this.getClass());
+     * }
+     */
 
     @Test(dependsOnMethods = {"addNewTab"}, groups = {"dashboards-verification"})
     public void deleteNewTab() throws InterruptedException {

@@ -22,8 +22,8 @@ public class WebDavClient {
     }
 
     public static WebDavClient getInstance(String user, String password) {
-        if(instance == null) {
-            instance = new WebDavClient(user,password);
+        if (instance == null) {
+            instance = new WebDavClient(user, password);
         }
         return instance;
     }
@@ -36,8 +36,8 @@ public class WebDavClient {
         return webDavStructure;
     }
 
-    public boolean createStructure(String userUploads){
-        webDavStructure = userUploads+ "/" + UUID.randomUUID().toString();
+    public boolean createStructure(String userUploads) {
+        webDavStructure = userUploads + "/" + UUID.randomUUID().toString();
         try {
             sardine.createDirectory(webDavStructure);
         } catch (IOException e) {

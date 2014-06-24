@@ -23,84 +23,81 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 
     @BeforeClass
     public void setProjectTitle() {
-	projectTitle = "GoodSales-filter-test";
+        projectTitle = "GoodSales-filter-test";
     }
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void initialize() throws InterruptedException, JSONException {
-	reportName = "Test Filter";
-	variableName = "F Stage Name";
-	data = new HashMap<String, String>();
-	data.put("attribute", "Stage Name");
-	data.put("attributeElements", "Interest, Discovery, Short List, Negotiation, Closed Won, Closed Lost");
-	data.put("metric", "Amount");
-	data.put("type", "Top"); // (valid elements: "Top", "Bottom")
-	data.put("size", "3"); // (valid elements: "1", "3", "5" , "10")
-	data.put("number", "100000");
-	promptElements = "Interest, Discovery, Short List, Negotiation";
+        reportName = "Test Filter";
+        variableName = "F Stage Name";
+        data = new HashMap<String, String>();
+        data.put("attribute", "Stage Name");
+        data.put("attributeElements", "Interest, Discovery, Short List, Negotiation, Closed Won, Closed Lost");
+        data.put("metric", "Amount");
+        data.put("type", "Top"); // (valid elements: "Top", "Bottom")
+        data.put("size", "3"); // (valid elements: "1", "3", "5" , "10")
+        data.put("number", "100000");
+        promptElements = "Interest, Discovery, Short List, Negotiation";
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createReportTest() throws InterruptedException {
-	List<String> what = Arrays.asList("Amount");
-	List<String> how = Arrays.asList("Stage Name");
-	createReport(reportName, ReportTypes.TABLE, what, how,
-		"Simple filter report");
+        List<String> what = Arrays.asList("Amount");
+        List<String> how = Arrays.asList("Stage Name");
+        createReport(reportName, ReportTypes.TABLE, what, how, "Simple filter report");
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createVariableTest() throws InterruptedException {
-	browser.get(getRootUrl() + PAGE_UI_PROJECT_PREFIX + projectId
-		+ "|dataPage|variables");
-	data.put("variableName", this.variableName);
-	data.put("userValueFlag", "false");
-	data.put("attrElements", promptElements);
-	variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|variables");
+        data.put("variableName", this.variableName);
+        data.put("userValueFlag", "false");
+        data.put("attrElements", promptElements);
+        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
-    @Test(dependsOnMethods = { "createReportTest" }, groups = { "filter-tests" })
+    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void attributeFilterTest() throws InterruptedException {
-	initReport();
-	reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
-	reportPage.saveReport();
-	checkRedBar();
+        initReport();
+        reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
+        reportPage.saveReport();
+        checkRedBar();
     }
 
-    @Test(dependsOnMethods = { "createReportTest" }, groups = { "filter-tests" })
+    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rankingFilterTest() throws InterruptedException {
-	initReport();
-	reportPage.addFilter(FilterTypes.RANK, data);
-	reportPage.saveReport();
-	checkRedBar();
+        initReport();
+        reportPage.addFilter(FilterTypes.RANK, data);
+        reportPage.saveReport();
+        checkRedBar();
     }
 
-    @Test(dependsOnMethods = { "createReportTest" }, groups = { "filter-tests" })
+    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rangeFilterTest() throws InterruptedException {
-	initReport();
-	reportPage.addFilter(FilterTypes.RANGE, data);
-	reportPage.saveReport();
-	checkRedBar();
+        initReport();
+        reportPage.addFilter(FilterTypes.RANGE, data);
+        reportPage.saveReport();
+        checkRedBar();
     }
 
-    @Test(dependsOnMethods = { "createReportTest", "createVariableTest" }, groups = { "filter-tests" })
+    @Test(dependsOnMethods = {"createReportTest", "createVariableTest"}, groups = {"filter-tests"})
     public void promptFilterTest() throws InterruptedException {
-	initReport();
-	data.put("variable", this.variableName);
-	data.put("promptElements", promptElements);
-	reportPage.addFilter(FilterTypes.PROMPT, data);
-	reportPage.saveReport();
-	checkRedBar();
+        initReport();
+        data.put("variable", this.variableName);
+        data.put("promptElements", promptElements);
+        reportPage.addFilter(FilterTypes.PROMPT, data);
+        reportPage.saveReport();
+        checkRedBar();
     }
 
-    @Test(dependsOnGroups = { "filter-tests" }, groups = { "tests" })
+    @Test(dependsOnGroups = {"filter-tests"}, groups = {"tests"})
     public void finalTest() throws InterruptedException {
-	successfulTest = true;
+        successfulTest = true;
     }
 
     private void initReport() {
-	openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage|");
-	waitForReportsPageLoaded();
-	reportsPage.getReportsList().openReport(this.reportName);
+        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|domainPage|");
+        waitForReportsPageLoaded();
+        reportsPage.getReportsList().openReport(this.reportName);
     }
-
 }

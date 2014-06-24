@@ -162,7 +162,7 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(id = "attributesTable")
     protected ObjectsTable attributesTable;
-    
+
     @FindBy(id = "uploadsTable")
     protected ObjectsTable datasetsTable;
 
@@ -171,10 +171,10 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(id = "p-dataPage")
     protected AttributePage attributePage;
-    
+
     @FindBy(id = "p-objectPage")
     protected AttributeDetailPage attributeDetailPage;
-    
+
     @FindBy(id = "p-objectPage")
     protected DatasetDetailPage datasetDetailPage;
 
@@ -195,13 +195,13 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(id = "factsTable")
     protected ObjectsTable factsTable;
-    
+
     @FindBy(id = "p-objectPage")
     protected FactDetailPage factDetailPage;
-    
+
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectDetailPage;
-    
+
     /**
      * ----- Grey pages fragments -----
      */
@@ -232,6 +232,7 @@ public abstract class AbstractTest extends Arquillian {
 
     @FindBy(tagName = "form")
     protected SingleLoadInterfaceFragment singleLoadInterfaceFragment;
+
     /**
      * ----------
      */
@@ -367,9 +368,10 @@ public abstract class AbstractTest extends Arquillian {
         webDav.uploadFile(resourceFile);
         return webDav.getWebDavStructure();
     }
-    public java.io.InputStream getFileFromWebDav(String webContainer,URL resourcePath) throws URISyntaxException, IOException {
+
+    public java.io.InputStream getFileFromWebDav(String webContainer, URL resourcePath) throws URISyntaxException, IOException {
         File resourceFile = new File(resourcePath.toURI());
-        return WebDavClient.getInstance(user, password).getFile(webContainer+"/"+resourceFile.getName());
+        return WebDavClient.getInstance(user, password).getFile(webContainer + "/" + resourceFile.getName());
     }
 
     public String exportProject(boolean exportUsers, boolean exportData, int statusPollingCheckIterations) throws JSONException, InterruptedException {
@@ -569,7 +571,7 @@ public abstract class AbstractTest extends Arquillian {
         waitForElementVisible(reportsPage.getRoot());
     }
 
-    protected void createReport(String reportName, ReportTypes reportType, List<String> what, List<String> how, String screenshotName ) throws InterruptedException{
+    protected void createReport(String reportName, ReportTypes reportType, List<String> what, List<String> how, String screenshotName) throws InterruptedException {
         initReportsPage();
         selectReportsDomainFolder("My Reports");
         reportsPage.startCreateReport();
@@ -578,16 +580,16 @@ public abstract class AbstractTest extends Arquillian {
         assertNotNull(reportPage, "Report page not initialized!");
         reportPage.createReport(reportName, reportType, what, how);
         Screenshots.takeScreenshot(browser, screenshotName + "-" + reportName + "-" + reportType.getName(), this.getClass());
-	checkRedBar();
+        checkRedBar();
     }
-    
+
     protected void selectReportsDomainFolder(String folderName) {
         reportsPage.getDefaultFolders().openFolder(folderName);
         waitForReportsPageLoaded();
         assertEquals(reportsPage.getSelectedFolderName(), folderName, "Selected folder name doesn't match: " +
                 reportsPage.getSelectedFolderName());
     }
-    
+
     protected void uploadCSV(String filePath, Map<Integer, OptionDataType> columnsWithExpectedType, String screenshotName) throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectDashboardPage");
         Thread.sleep(3000);
@@ -596,12 +598,12 @@ public abstract class AbstractTest extends Arquillian {
         upload.uploadFile(filePath);
         Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());
         UploadColumns uploadColumns = upload.getUploadColumns();
-        if(columnsWithExpectedType != null){
-        	Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-before-changing-column-type", this.getClass());
-    		for(int columnIndex : columnsWithExpectedType.keySet()) {
-    			uploadColumns.setColumnType(columnIndex, columnsWithExpectedType.get(columnIndex));
-    		}
-    		Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-after-changing-column-type", this.getClass());
+        if (columnsWithExpectedType != null) {
+            Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-before-changing-column-type", this.getClass());
+            for (int columnIndex : columnsWithExpectedType.keySet()) {
+                uploadColumns.setColumnType(columnIndex, columnsWithExpectedType.get(columnIndex));
+            }
+            Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-after-changing-column-type", this.getClass());
         }
         Screenshots.takeScreenshot(browser, "upload-definition", this.getClass());
         upload.confirmloadCsv();

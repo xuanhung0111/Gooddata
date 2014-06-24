@@ -30,8 +30,8 @@ public abstract class AbstractProjectTest extends AbstractTest {
         openUrl(PAGE_GDC_PROJECTS);
         waitForElementVisible(gpProject.getRoot());
 
-        projectTitle+="-" + dwhDriver.name();
-        if (projectTemplate.isEmpty()){
+        projectTitle += "-" + dwhDriver.name();
+        if (projectTemplate.isEmpty()) {
             projectId = gpProject.createProject(projectTitle, projectTitle, null, authorizationToken, dwhDriver, projectCreateCheckIterations);
         } else {
             projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, DWHDriver.PG, projectCreateCheckIterations);

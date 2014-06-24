@@ -69,7 +69,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"loadProject"}, groups = {"tests"})
     public void sliManifestsCompare() throws JSONException, IOException, InterruptedException {
-        HashSet<Object>  sliParts = new HashSet<Object>();
+        HashSet<Object> sliParts = new HashSet<Object>();
 
         /** parse uploaded manifest first **/
         URL uploadInfoResource = this.getClass().getResource("/etl/upload_info.json");
@@ -89,8 +89,8 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         /** check generated sli manifest **/
         dataSetSLIManifest = fetchSLIManifest(uploadInfoDataset).getJSONObject("dataSetSLIManifest");
         jsonPartsArray = dataSetSLIManifest.getJSONArray("parts");
-        assertEquals(jsonPartsArray.length(), sliParts.size(),"SLIManifest parts count doesn't match");
-        assertEquals(dataSetSLIManifest.getString("file"), "dataset.ds_"+uploadInfoFile, "SLIManifest file names doesn't match");
+        assertEquals(jsonPartsArray.length(), sliParts.size(), "SLIManifest parts count doesn't match");
+        assertEquals(dataSetSLIManifest.getString("file"), "dataset.ds_" + uploadInfoFile, "SLIManifest file names doesn't match");
         assertEquals(dataSetSLIManifest.getString("dataSet"), uploadInfoDataset, "SLIManifest dataset names doesn't match");
 
         for (int i = 0; i < jsonPartsArray.length(); i++) {
@@ -107,7 +107,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
 
         // New projectID is needed here. Load it from export, validate, delete and restore original one
         createProject();
-        importProject(exportToken,statusPollingCheckIterations);
+        importProject(exportToken, statusPollingCheckIterations);
         validateProject();
         deleteProject();
 
