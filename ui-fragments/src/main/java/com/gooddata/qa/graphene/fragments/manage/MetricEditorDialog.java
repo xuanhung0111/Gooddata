@@ -48,8 +48,8 @@ public class MetricEditorDialog extends AbstractFragment {
 
     private String metricLinkLocator = "${metricType}";
 
-    @FindBy(css = "div.maqlReferenceGuideHelp")
-    private WebElement maqlReferenceGuideHelp;
+    @FindBy(css = "div.maql-editor")
+    private WebElement maqlEditor;
 
     @FindBy(xpath = "//a[contains(@class,'metrics') and text()='...']")
     private WebElement placeHolderMetric;
@@ -202,7 +202,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	String parentWindowHandle = browser.getWindowHandle();
 	browser.switchTo().frame(waitForElementVisible(metricEditorPopup));
 	waitForElementVisible(customMetric).click();
-	waitForElementVisible(maqlReferenceGuideHelp);
+	waitForElementVisible(maqlEditor);
 	waitForElementVisible(aggregationTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
@@ -253,7 +253,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	String parentWindowHandle = browser.getWindowHandle();
 	browser.switchTo().frame(waitForElementVisible(metricEditorPopup));
 	waitForElementVisible(customMetric).click();
-	waitForElementVisible(maqlReferenceGuideHelp);
+	waitForElementVisible(maqlEditor);
 	waitForElementVisible(numericTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
@@ -274,7 +274,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	String parentWindowHandle = browser.getWindowHandle();
 	browser.switchTo().frame(waitForElementVisible(metricEditorPopup));
 	waitForElementVisible(customMetric).click();
-	waitForElementVisible(maqlReferenceGuideHelp);
+	waitForElementVisible(maqlEditor);
 	waitForElementVisible(GranularityTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
@@ -319,7 +319,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	String parentWindowHandle = browser.getWindowHandle();
 	browser.switchTo().frame(waitForElementVisible(metricEditorPopup));
 	waitForElementVisible(customMetric).click();
-	waitForElementVisible(maqlReferenceGuideHelp);
+	waitForElementVisible(maqlEditor);
 	waitForElementVisible(LogicalTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
@@ -360,7 +360,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	String parentWindowHandle = browser.getWindowHandle();
 	browser.switchTo().frame(waitForElementVisible(metricEditorPopup));
 	waitForElementVisible(customMetric).click();
-	waitForElementVisible(maqlReferenceGuideHelp);
+	waitForElementVisible(maqlEditor);
 	waitForElementVisible(FiltersTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));

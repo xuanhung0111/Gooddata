@@ -101,13 +101,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     public void createOrganizationMetric() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
         Map<String, String> data = new HashMap<String, String>();
-        data.put("metric1", "# Organizations");
+        data.put("metric0", "# Organizations");
+        data.put("attrFolder0", "Organizations");
+        data.put("attribute0", "Organization Deleted");
         data.put("attrFolder1", "Organizations");
         data.put("attribute1", "Organization Deleted");
-        data.put("attrFolder2", "Organizations");
-        data.put("attribute2", "Organization Deleted");
+        data.put("attrValue0", "false");
         data.put("attrValue1", "false");
-        data.put("attrValue2", "false");
         metricEditorPage.createFilterMetric(FilterMetricTypes.NOT_IN, "# Non-deleted organizations", data);
     }
 
@@ -259,7 +259,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         waitForElementVisible(reportPage.getRoot());
         OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class, browser.findElement(
                 BY_ONE_NUMBER_REPORT));
-        return Integer.valueOf(report.getValue());
+        return Integer.valueOf(report.getValue().replace(".00", ""));
     }
 
     private void compareObjectsCount(int actual, int expected, ZendeskHelper.ZendeskObject objectName) {
