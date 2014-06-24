@@ -14,7 +14,6 @@
         <module>ui-tests-hds</module>
         <module>ui-tests-connectors</module>
         <module>ui-tests-dashboards</module>
-        <module>ui-tests-reports</module>
         <module>ui-tests-tools</module>
         <module>ui-fragments</module>
         <module>ui-tests-upload</module>
