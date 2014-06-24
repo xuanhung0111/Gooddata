@@ -14,7 +14,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 public class ProjectDetailPage extends AbstractFragment {
 
 	private final static String XPATH_PROCESS_TAB_BUTTON = "//div[@class='project-detail-content']//div[${processIndex}]//div[contains(@class, 'tab-buttons')]/a[${index}]";
-	private final static String XPATH_PROCESS_REDEPLOY_BUTTON = "//div[@class='project-detail-content']/div/div[${processIndex}]//a[text()='Re-deploy']";
+	private final static String XPATH_PROCESS_REDEPLOY_BUTTON = "//div[@class='ait-project-process-list']/div[${processIndex}]//a[text()='Re-deploy']";
 
 	private final static By BY_PROCESS_NAME = By.cssSelector(".secondary-title");
 
@@ -27,11 +27,8 @@ public class ProjectDetailPage extends AbstractFragment {
 	@FindBy(css = ".process-detail")
 	protected List<WebElement> processes;
     
-    @FindBy(css = ".executables-table")
+    @FindBy(css = ".ait-process-executable-list")
     protected ExecutablesTable executablesTable;
-    
-    @FindBy(xpath = "//div[@class='project-detail-content']/div/div[${processIndex}]//a[text()='Re-deploy']")
-    protected WebElement redeployButton;
     
     @FindBy(css = ".error_dialog .dialog-body")
     protected WebElement deployErrorDialog;
