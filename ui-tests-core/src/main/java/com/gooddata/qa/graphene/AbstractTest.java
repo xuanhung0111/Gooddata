@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.GoodData;
-import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.enums.DWHDriver;
-import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.*;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -15,7 +13,6 @@ import com.gooddata.qa.graphene.fragments.greypages.md.ldm.singleloadinterface.S
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp.ExportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.imp.ImportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
-import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.AttributePage;
@@ -74,21 +71,6 @@ import static org.testng.Assert.fail;
 
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class})
 public abstract class AbstractTest extends Arquillian {
-
-    public static enum DeleteMode {
-        DELETE_ALWAYS,
-        DELETE_IF_SUCCESSFUL,
-        DELETE_NEVER;
-
-        public static DeleteMode getModeByName(String deleteMode) {
-            if (deleteMode != null && deleteMode.length() > 0) {
-                for (DeleteMode mode : values()) {
-                    if (mode.toString().toLowerCase().equals(deleteMode)) return mode;
-                }
-            }
-            return DELETE_IF_SUCCESSFUL;
-        }
-    }
 
     protected Properties testVariables;
     private String propertiesPath;
