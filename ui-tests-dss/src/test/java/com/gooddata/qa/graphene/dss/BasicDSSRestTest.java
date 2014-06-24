@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.hds;
+package com.gooddata.qa.graphene.dss;
 
 import com.gooddata.qa.graphene.fragments.greypages.hds.StorageFragment;
 import com.gooddata.qa.graphene.fragments.greypages.hds.StorageUsersFragment;

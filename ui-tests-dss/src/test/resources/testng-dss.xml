@@ -8,7 +8,7 @@
             </run>
         </groups>
         <packages>
-            <package name="com.gooddata.qa.graphene.hds.*"/>
+            <package name="com.gooddata.qa.graphene.dss.*"/>
         </packages>
     </test>
 

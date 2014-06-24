@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.hds;
+package com.gooddata.qa.graphene.dss;
 
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.common.GreyPageUtils;

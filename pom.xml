@@ -11,7 +11,7 @@
 
     <modules>
         <module>ui-tests-core</module>
-        <module>ui-tests-hds</module>
+        <module>ui-tests-dss</module>
         <module>ui-tests-connectors</module>
         <module>ui-tests-dashboards</module>
         <module>ui-tests-tools</module>
