@@ -24,8 +24,6 @@ public class Zendesk4BasicApiTest extends AbstractTest {
 
     private ZendeskHelper zendeskHelper;
 
-    private static final By BY_ONE_NUMBER_REPORT = By.id("oneNumberContainer");
-
     private static final String JSON_TICKET_CREATE = "{\"ticket\":{\"subject\":\"GD test ticket - %s\", " +
             "\"comment\": { \"body\": \"Description of automatically created ticket\" }}}";
 
@@ -34,10 +32,6 @@ public class Zendesk4BasicApiTest extends AbstractTest {
 
     private static final String JSON_ORGANIZATION_CREATE =
             "{\"organization\": {\"name\": \"GD test organization - %s\"}}";
-
-    private static final String TICKETS_REPORT_NAME = "Tickets count";
-    private static final String USERS_REPORT_NAME = "Users count";
-    private static final String ORGANIZATIONS_REPORT_NAME = "Organizations count";
 
     private int createdZendeskTicketId;
     private int createdZendeskUserId;
@@ -67,18 +61,18 @@ public class Zendesk4BasicApiTest extends AbstractTest {
     }
 
     @Test(dependsOnMethods = {"initZendeskApiClient", "initGd"}, groups = {"zendeskApiTests"})
-    public void testTicketsCount() throws IOException, JSONException {
+    public void testTicketsCount() throws IOException, JSONException, InterruptedException {
         zendeskHelper.getNumberOfTickets();
     }
 
     @Test(dependsOnMethods = {"initZendeskApiClient", "initGd"}, groups = {"zendeskApiTests"})
-    public void testUsersCount() throws IOException, JSONException {
+    public void testUsersCount() throws IOException, JSONException, InterruptedException {
         zendeskHelper.getNumberOfUsers();
     }
 
     @Test(dependsOnMethods = {"initZendeskApiClient", "initGd"},
             groups = {"zendeskApiTests"})
-    public void testOrganizationsCount() throws IOException, JSONException {
+    public void testOrganizationsCount() throws IOException, JSONException, InterruptedException {
         zendeskHelper.getNumberOfOrganizations();
     }
 
