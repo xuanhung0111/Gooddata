@@ -48,28 +48,28 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createShareMetric() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metricName = "Share % " + getCurrentDateString();
-        uiUtils.metricEditorPage.createShareMetric(metricName, metric, attrFolder, attr);
+        ui.metricEditorPage.createShareMetric(metricName, metric, attrFolder, attr);
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createDifferentMetricTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metricName = "Difference " + getCurrentDateString();
-        uiUtils.metricEditorPage.createDifferentMetric(metricName, metric, attrFolder, attr, attrValue);
+        ui.metricEditorPage.createDifferentMetric(metricName, metric, attrFolder, attr, attrValue);
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createRatioMetricTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metricName = "Ratio " + getCurrentDateString();
-        uiUtils.metricEditorPage.createRatioMetric(metricName, ratioMetric1, ratioMetric2);
+        ui.metricEditorPage.createRatioMetric(metricName, ratioMetric1, ratioMetric2);
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createAggreationMetricTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String fact0 = "Probability";
         String fact1 = "Velocity";
         String attrFolder0 = "Stage";
@@ -101,16 +101,16 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
             System.out.println(String.format(
                     "Creating %s metric, name: %s, data: %s", type, metricName,
                     data.toString()));
-            uiUtils.metricEditorPage.createAggregationMetric(type, metricName, data);
-            uiUtils.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
+            ui.metricEditorPage.createAggregationMetric(type, metricName, data);
+            ui.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             i++;
-            openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+            openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createNumericMetricTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metric = "Best Case";
         data = new HashMap<String, String>();
         data.put("metric0", metric);
@@ -125,17 +125,17 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
             System.out.println(String.format(
                     "Creating %s metric, name: %s, data: %s", metricType,
                     metricName, data.toString()));
-            uiUtils.metricEditorPage.createNumericMetric(metricType, metricName, data);
+            ui.metricEditorPage.createNumericMetric(metricType, metricName, data);
             expectedMaql = "SELECT " + metricType + "(" + metric + ")";
-            uiUtils.metricEditorPage.verifyMetric(metricName, expectedMaql, expectedFormat);
-            openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+            ui.metricEditorPage.verifyMetric(metricName, expectedMaql, expectedFormat);
+            openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
 
         }
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createGranularityMetricTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String fact0 = "Probability";
         String attrFolder0 = "Stage";
         String attr0 = "Status";
@@ -169,16 +169,16 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
             System.out.println(String.format(
                     "Creating %s metric, name: %s, data: %s", metricType,
                     metricName, data.toString()));
-            uiUtils.metricEditorPage.createGranularityMetric(metricType, metricName, data);
-            uiUtils.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
+            ui.metricEditorPage.createGranularityMetric(metricType, metricName, data);
+            ui.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             i++;
-            openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+            openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createLogicalMetricTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String attrFolder0 = "Date dimension (Snapshot)";
         String attr0 = "Year (Snapshot)";
         String attrValue0 = "2009";
@@ -223,16 +223,16 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
             System.out.println(String.format(
                     "Creating %s metric, name: %s, data: %s", metricType,
                     metricName, data.toString()));
-            uiUtils.metricEditorPage.createLogicalMetric(metricType, metricName, data);
-            uiUtils.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
+            ui.metricEditorPage.createLogicalMetric(metricType, metricName, data);
+            ui.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             i++;
-            openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+            openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createFilterMetricTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String attrFolder = "Date dimension (Snapshot)";
         String attr = "Year (Snapshot)";
         String attrValue0 = "2009";
@@ -275,10 +275,10 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
             System.out.println(String.format(
                     "Creating %s metric, name: %s, data: %s", metricType,
                     metricName, data.toString()));
-            uiUtils.metricEditorPage.createFilterMetric(metricType, metricName, data);
-            uiUtils.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
+            ui.metricEditorPage.createFilterMetric(metricType, metricName, data);
+            ui.metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             i++;
-            openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+            openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 

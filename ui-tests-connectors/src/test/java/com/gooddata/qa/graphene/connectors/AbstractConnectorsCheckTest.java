@@ -81,7 +81,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     @Test(groups = {"connectorWalkthrough"}, dependsOnMethods = {"testConnectorProcessesResource"})
     public void verifyProjectDashboards() throws InterruptedException {
         // verify created project and count dashboard tabs
-        uiUtils.verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
+        ui.verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
         successfulTest = true;
     }
 
@@ -130,7 +130,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 
     public void initIntegration() throws JSONException, InterruptedException {
         openUrl(getConnectorUri());
-        waitForElementPresent(greyPageUtils.BY_GP_PRE_JSON);
+        waitForElementPresent(greyPages.BY_GP_PRE_JSON);
         waitForElementPresent(connector.getRoot());
         connector.createIntegration(projectTemplate);
         integrationActivated = true;
@@ -139,17 +139,17 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     public String gotoIntegrationSettings() {
         Graphene.guardHttp(waitForElementVisible(BY_GP_CONFIG_LINK)).click();
         Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK)).click();
-        waitForElementVisible(greyPageUtils.BY_GP_FORM);
+        waitForElementVisible(greyPages.BY_GP_FORM);
         return browser.getCurrentUrl();
     }
 
     protected void scheduleIntegrationProcess(int checkIterations, int expectedProcessesCount)
             throws JSONException, InterruptedException {
         openUrl(getProcessesUri());
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == expectedProcessesCount,
                 "There are no processes for new project yet");
-        Graphene.guardHttp(waitForElementVisible(greyPageUtils.BY_GP_BUTTON_SUBMIT)).click();
+        Graphene.guardHttp(waitForElementVisible(greyPages.BY_GP_BUTTON_SUBMIT)).click();
 
         waitForIntegrationProcessSynchronized(browser, checkIterations);
     }
@@ -173,7 +173,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     private String getProcessStatus(WebDriver browser) throws JSONException {
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         return json.getJSONObject("process").getJSONObject("status").getString("code");
     }
 
@@ -190,7 +190,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     protected void verifyConnectorResourceJSON() throws JSONException {
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         assertTrue(json.has("connector"), "connector object is missing");
 
         JSONObject connector = json.getJSONObject("connector");
@@ -202,7 +202,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     protected void verifyIntegrationResourceJSON() throws JSONException {
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         assertTrue(json.has("integration"), "integration object is missing");
 
         JSONObject integration = json.getJSONObject("integration");
@@ -219,7 +219,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     protected void verifyProcessesResourceJSON() throws JSONException {
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         assertTrue(json.has("processes"), "processes object is missing");
 
         JSONObject processes = json.getJSONObject("processes");

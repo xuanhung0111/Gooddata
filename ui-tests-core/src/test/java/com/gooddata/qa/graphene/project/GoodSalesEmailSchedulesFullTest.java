@@ -57,14 +57,14 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
     public void verifyEmptySchedules() {
         initEmailSchedulesPage();
-        assertEquals(uiUtils.emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
+        assertEquals(ui.emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
         Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createDashboardSchedule() {
         initEmailSchedulesPage();
-        uiUtils.emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle, "Scheduled email test - dashboard.",
+        ui.emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle, "Scheduled email test - dashboard.",
                 "Outlook");
         checkUtils.checkRedBar();
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
@@ -73,7 +73,7 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createReportSchedule() {
         initEmailSchedulesPage();
-        uiUtils.emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportTitle, "Scheduled email test - report.",
+        ui.emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportTitle, "Scheduled email test - report.",
                 "Activities by Type", ExportFormat.ALL);
         checkUtils.checkRedBar();
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
@@ -82,7 +82,7 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
         initEmailSchedulesPage();
-        assertEquals(uiUtils.emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
+        assertEquals(ui.emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
     }
 
@@ -90,8 +90,8 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     public void updateScheduledMailRecurrency() throws Exception {
         initEmailSchedulesPage();
 
-        String reportScheduleUri = uiUtils.emailSchedulesPage.getScheduleMailUriByName(reportTitle);
-        String dashboardScheduleUri = uiUtils.emailSchedulesPage.getScheduleMailUriByName(dashboardTitle);
+        String reportScheduleUri = ui.emailSchedulesPage.getScheduleMailUriByName(reportTitle);
+        String dashboardScheduleUri = ui.emailSchedulesPage.getScheduleMailUriByName(dashboardTitle);
         updateRecurrencyString(reportScheduleUri);
         updateRecurrencyString(dashboardScheduleUri);
     }
@@ -113,10 +113,10 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
     }
 
     private void initEmailSchedulesPage() {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
         checkUtils.waitForSchedulesPageLoaded();
         waitForElementNotVisible(BY_SCHEDULES_LOADING);
-        waitForElementVisible(uiUtils.emailSchedulesPage.getRoot());
+        waitForElementVisible(ui.emailSchedulesPage.getRoot());
     }
 
     private void checkMailbox(ImapClient imapClient) throws Exception {

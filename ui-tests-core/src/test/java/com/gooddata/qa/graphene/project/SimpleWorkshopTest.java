@@ -27,44 +27,44 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createSimpleProject"}, groups = {"tests"})
     public void uploadData() throws InterruptedException {
-        uiUtils.uploadCSV(csvFilePath + "/payroll.csv", null, "simple-ws");
+        ui.uploadCSV(csvFilePath + "/payroll.csv", null, "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadData"}, groups = {"tests"})
     public void addNewTab() throws InterruptedException {
-        uiUtils.addNewTabOnDashboard("Default dashboard", "workshop", "simple-ws");
+        ui.addNewTabOnDashboard("Default dashboard", "workshop", "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadData"}, groups = "tests")
     public void createBasicReport() throws InterruptedException {
-        uiUtils.initReportsPage();
-        uiUtils.reportsPage.startCreateReport();
+        ui.initReportsPage();
+        ui.reportsPage.startCreateReport();
         checkUtils.waitForAnalysisPageLoaded();
-        waitForElementVisible(uiUtils.reportPage.getRoot());
+        waitForElementVisible(ui.reportPage.getRoot());
         List<String> what = new ArrayList<String>();
         what.add("Sum of Amount");
-        uiUtils.reportPage.createReport("Headline test", ReportTypes.HEADLINE, what, null);
+        ui.reportPage.createReport("Headline test", ReportTypes.HEADLINE, what, null);
         Screenshots.takeScreenshot(browser, "simple-ws-headline-report", this.getClass());
     }
 
     @Test(dependsOnMethods = {"createBasicReport"}, groups = {"tests"})
     public void addReportOnDashboardTab() throws InterruptedException {
-        uiUtils.initDashboardsPage();
-        uiUtils.dashboardsPage.getTabs().openTab(1);
+        ui.initDashboardsPage();
+        ui.dashboardsPage.getTabs().openTab(1);
         checkUtils.waitForDashboardPageLoaded();
-        uiUtils.dashboardsPage.editDashboard();
-        uiUtils.dashboardsPage.getDashboardEditBar().addReportToDashboard("Headline test");
-        uiUtils.dashboardsPage.getDashboardEditBar().saveDashboard();
+        ui.dashboardsPage.editDashboard();
+        ui.dashboardsPage.getDashboardEditBar().addReportToDashboard("Headline test");
+        ui.dashboardsPage.getDashboardEditBar().saveDashboard();
         checkUtils.waitForDashboardPageLoaded();
         Screenshots.takeScreenshot(browser, "simple-ws-headline-report-dashboard", this.getClass());
     }
 
     @Test(dependsOnMethods = {"addReportOnDashboardTab"}, groups = {"tests"})
     public void verifyHeadlineReport() {
-        uiUtils.initDashboardsPage();
-        assertEquals(1, uiUtils.dashboardsPage.getContent().getNumberOfReports(), "Invalid report(s) count on dashboard");
+        ui.initDashboardsPage();
+        assertEquals(1, ui.dashboardsPage.getContent().getNumberOfReports(), "Invalid report(s) count on dashboard");
         OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class,
-                uiUtils.dashboardsPage.getContent().getReport(0).getRoot());
+                ui.dashboardsPage.getContent().getReport(0).getRoot());
         assertEquals(report.getValue(), "7,252,542.63", "Invalid value in headline report");
         assertEquals(report.getDescription(), "Sum of Amount", "Invalid description in headline report");
         successfulTest = true;

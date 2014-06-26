@@ -13,43 +13,43 @@ public class LoginPageTest extends AbstractTest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = uiUtils.PAGE_LOGIN;
+        startPage = ui.PAGE_LOGIN;
     }
 
     @Test(groups = {"loginInit"})
     public void gd_Login_001_LoginPanel() {
-        waitForElementVisible(uiUtils.loginFragment.getRoot());
-        Assert.assertTrue(uiUtils.loginFragment.allLoginElementsAvailable(), "Login panel with valid elements is available");
+        waitForElementVisible(ui.loginFragment.getRoot());
+        Assert.assertTrue(ui.loginFragment.allLoginElementsAvailable(), "Login panel with valid elements is available");
     }
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_002_SignInAndSignOut() throws InterruptedException {
-        waitForElementVisible(uiUtils.loginFragment.getRoot());
-        uiUtils.loginFragment.login(testParams.getUser(), testParams.getPassword(), true);
-        waitForElementVisible(uiUtils.BY_LOGGED_USER_BUTTON);
+        waitForElementVisible(ui.loginFragment.getRoot());
+        ui.loginFragment.login(testParams.getUser(), testParams.getPassword(), true);
+        waitForElementVisible(ui.BY_LOGGED_USER_BUTTON);
         Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
-        uiUtils.logout();
+        ui.logout();
         Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
     }
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_003_SignInWithEmptyPassword() {
-        waitForElementVisible(uiUtils.loginFragment.getRoot());
-        uiUtils.loginFragment.login(testParams.getUser(), "", false);
-        uiUtils.loginFragment.checkPasswordInvalid();
+        waitForElementVisible(ui.loginFragment.getRoot());
+        ui.loginFragment.login(testParams.getUser(), "", false);
+        ui.loginFragment.checkPasswordInvalid();
     }
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_004_SignInWithInvalidPassword() {
-        waitForElementVisible(uiUtils.loginFragment.getRoot());
-        uiUtils.loginFragment.login(testParams.getUser(), "abcdefgh", false);
-        uiUtils.loginFragment.checkInvalidLogin();
+        waitForElementVisible(ui.loginFragment.getRoot());
+        ui.loginFragment.login(testParams.getUser(), "abcdefgh", false);
+        ui.loginFragment.checkInvalidLogin();
     }
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_005_SignInWithInvalidEmail() {
-        waitForElementVisible(uiUtils.loginFragment.getRoot());
-        uiUtils.loginFragment.login("email_invalid_format", "abcdefgh", false);
-        uiUtils.loginFragment.checkEmailInvalid();
+        waitForElementVisible(ui.loginFragment.getRoot());
+        ui.loginFragment.login("email_invalid_format", "abcdefgh", false);
+        ui.loginFragment.checkEmailInvalid();
     }
 }

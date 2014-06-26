@@ -52,9 +52,9 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
         // verify empty Coupa dashboard
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(uiUtils.BY_IFRAME);
-        browser.switchTo().frame(browser.findElement(uiUtils.BY_IFRAME));
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
+        waitForElementVisible(ui.BY_IFRAME);
+        browser.switchTo().frame(browser.findElement(ui.BY_IFRAME));
         waitForElementVisible(BY_DIV_BEFORE_CONFIG);
 
         // go to page with integration settings
@@ -63,10 +63,10 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
         // coupa specific configuration
         waitForElementVisible(BY_INPUT_TIMEZONE).sendKeys(COUPA_INTEGRATION_TIMEZONE);
-        Graphene.guardHttp(browser.findElement(greyPageUtils.BY_GP_BUTTON_SUBMIT)).click();
+        Graphene.guardHttp(browser.findElement(greyPages.BY_GP_BUTTON_SUBMIT)).click();
         Graphene.waitGui().until().element(BY_INPUT_TIMEZONE).value().equalTo(COUPA_INTEGRATION_TIMEZONE);
         Graphene.guardHttp(waitForElementVisible(BY_GP_LINK_INSTANCES)).click();
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         assertTrue(json.getJSONObject("coupaInstances").getJSONArray("items").length() == 0,
                 "There are no coupa instances for new project yet");
 
@@ -75,9 +75,9 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         coupaInstance.createCoupaInstance(Connectors.COUPA.getConnectorId(), coupaInstanceApiUrl, coupaInstanceApiKey);
 
         // verify progress on Coupa dashboard
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(uiUtils.BY_IFRAME);
-        browser.switchTo().frame(browser.findElement(uiUtils.BY_IFRAME));
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
+        waitForElementVisible(ui.BY_IFRAME);
+        browser.switchTo().frame(browser.findElement(ui.BY_IFRAME));
         waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
     }
 

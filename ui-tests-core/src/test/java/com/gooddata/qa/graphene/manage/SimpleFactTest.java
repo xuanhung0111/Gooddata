@@ -25,26 +25,26 @@ public class SimpleFactTest extends ObjectAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests"})
     public void factAggregationsTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
-        waitForElementVisible(uiUtils.factsTable.getRoot());
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
+        waitForElementVisible(ui.factsTable.getRoot());
         checkUtils.waitForDataPageLoaded();
-        uiUtils.factsTable.selectObject(name);
+        ui.factsTable.selectObject(name);
         for (SimpleMetricTypes metricType : SimpleMetricTypes.values()) {
-            uiUtils.factDetailPage.createSimpleMetric(metricType, name);
+            ui.factDetailPage.createSimpleMetric(metricType, name);
         }
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests"})
     public void changeFactFolderTest() throws InterruptedException {
         initObject(name);
-        uiUtils.factDetailPage.changeFactFolder(factFolder);
+        ui.factDetailPage.changeFactFolder(factFolder);
     }
 
     @Override
     public void initObject(String factName) {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
         checkUtils.waitForDataPageLoaded();
-        waitForElementVisible(uiUtils.factsTable.getRoot());
-        uiUtils.factsTable.selectObject(factName);
+        waitForElementVisible(ui.factsTable.getRoot());
+        ui.factsTable.selectObject(factName);
     }
 }

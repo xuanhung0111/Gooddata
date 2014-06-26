@@ -54,9 +54,9 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testBrightideaIntegrationConfiguration() throws InterruptedException, JSONException {
         // Brightidea specific configuration of integration (tfue page)
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(uiUtils.BY_IFRAME);
-        browser.switchTo().frame(browser.findElement(uiUtils.BY_IFRAME));
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
+        waitForElementVisible(ui.BY_IFRAME);
+        browser.switchTo().frame(browser.findElement(ui.BY_IFRAME));
         waitForElementVisible(BY_SPAN_WELCOME_BEFORE_CONFIG);
         waitForElementVisible(BY_INPUT_API_KEY).sendKeys(brightideaApiKey);
         waitForElementVisible(BY_INPUT_AFFILIATE_ID).sendKeys(brightideaAffiliateId);
@@ -73,11 +73,11 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
     public void testBrightideaIntegration() throws InterruptedException, JSONException {
         // process is scheduled automatically - check status
         openUrl(getProcessesUri());
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
                 "Integration process wasn't started...");
-        waitForElementVisible(greyPageUtils.BY_GP_LINK);
-        Graphene.guardHttp(browser.findElement(greyPageUtils.BY_GP_LINK)).click();
+        waitForElementVisible(greyPages.BY_GP_LINK);
+        Graphene.guardHttp(browser.findElement(greyPages.BY_GP_LINK)).click();
         waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
     }
 }

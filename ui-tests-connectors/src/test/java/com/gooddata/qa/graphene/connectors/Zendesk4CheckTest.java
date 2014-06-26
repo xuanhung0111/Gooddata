@@ -3,9 +3,6 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.FilterMetricTypes;
@@ -66,7 +63,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
         useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
-        uiUtils.BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
+        ui.BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
     }
 
     /**
@@ -99,7 +96,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createOrganizationMetric() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         Map<String, String> data = new HashMap<String, String>();
         data.put("metric1", "# Organizations");
         data.put("attrFolder1", "Organizations");
@@ -248,15 +245,15 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private void createBasicReport(String metric, String reportName) throws InterruptedException {
         List<String> what = new ArrayList<String>();
         what.add(metric);
-        uiUtils.createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
+        ui.createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
         waitForElementVisible(BY_ONE_NUMBER_REPORT);
     }
 
     private int getNumberFromGDReport(String reportName) {
-        uiUtils.initReportsPage();
-        uiUtils.reportsPage.getReportsList().openReport(reportName);
+        ui.initReportsPage();
+        ui.reportsPage.getReportsList().openReport(reportName);
         checkUtils.waitForAnalysisPageLoaded();
-        waitForElementVisible(uiUtils.reportPage.getRoot());
+        waitForElementVisible(ui.reportPage.getRoot());
         OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class, browser.findElement(
                 BY_ONE_NUMBER_REPORT));
         return Integer.valueOf(report.getValue().replace(".00", ""));

@@ -76,11 +76,11 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     protected void createNewFolder(ObjectsTable objectsTable, ObjectTypes objectType,
                                    String newFolderName) throws InterruptedException {
         if (objectType == ObjectTypes.ATTRIBUTE) {
-            uiUtils.dataPage.getAddDimensionButton().click();
-            createNewFolderForObjects(uiUtils.dataPage.getDimensionList(), newFolderName);
+            ui.dataPage.getAddDimensionButton().click();
+            createNewFolderForObjects(ui.dataPage.getDimensionList(), newFolderName);
         } else {
-            uiUtils.dataPage.getAddFolderButton().click();
-            createNewFolderForObjects(uiUtils.dataPage.getFoldersList(), newFolderName);
+            ui.dataPage.getAddFolderButton().click();
+            createNewFolderForObjects(ui.dataPage.getFoldersList(), newFolderName);
         }
         Screenshots.takeScreenshot(browser, "create-new-folder-for-"
                 + objectType.getObjectsTableID(), this.getClass());
@@ -88,28 +88,28 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void createNewFolderForObjects(WebElement listOfFoldersDimensions,
                                              String newFolderName) throws InterruptedException {
-        waitForElementVisible(uiUtils.dataPage.getAddFolderDialog());
-        uiUtils.dataPage.setNewFolderTitle(newFolderName);
-        uiUtils.dataPage.getConfirmAddFolderButton().click();
+        waitForElementVisible(ui.dataPage.getAddFolderDialog());
+        ui.dataPage.setNewFolderTitle(newFolderName);
+        ui.dataPage.getConfirmAddFolderButton().click();
         waitForElementVisible(listOfFoldersDimensions);
         Thread.sleep(3000);
-        Assert.assertTrue(uiUtils.dataPage.getFolderDimension(listOfFoldersDimensions, newFolderName)
+        Assert.assertTrue(ui.dataPage.getFolderDimension(listOfFoldersDimensions, newFolderName)
                 .isDisplayed());
     }
 
     protected String moveObjectsBySelectFolderName(ObjectTypes objectType,
                                                    String targetFolderIndex, List<String> objectsList) {
-        uiUtils.dataPage.getMoveObjectsButton().click();
-        waitForElementVisible(uiUtils.dataPage.getMoveObjectsDialog());
-        String targetFolderName = waitForElementVisible(uiUtils.dataPage.getTargetFolder(targetFolderIndex))
+        ui.dataPage.getMoveObjectsButton().click();
+        waitForElementVisible(ui.dataPage.getMoveObjectsDialog());
+        String targetFolderName = waitForElementVisible(ui.dataPage.getTargetFolder(targetFolderIndex))
                 .getText();
-        uiUtils.dataPage.getTargetFolder(targetFolderIndex).click();
-        waitForElementVisible(uiUtils.dataPage.getProgressMessageBox());
-        Assert.assertTrue(uiUtils.dataPage.getProgressMessageBox().getText().contains("Moving "));
+        ui.dataPage.getTargetFolder(targetFolderIndex).click();
+        waitForElementVisible(ui.dataPage.getProgressMessageBox());
+        Assert.assertTrue(ui.dataPage.getProgressMessageBox().getText().contains("Moving "));
         String message = String.format("Success! %d %s(s) moved to \"%s\" folder.",
                 objectsList.size(), objectType.getName(), targetFolderName);
-        waitForElementVisible(uiUtils.dataPage.getStatusMessageOnGreenBar());
-        Assert.assertEquals(uiUtils.dataPage.getStatusMessageOnGreenBar().getText(), message);
+        waitForElementVisible(ui.dataPage.getStatusMessageOnGreenBar());
+        Assert.assertEquals(ui.dataPage.getStatusMessageOnGreenBar().getText(), message);
         Screenshots.takeScreenshot(browser,
                 "move-objects-by-select-folder-name-in-" + objectType.getObjectsTableID(),
                 this.getClass());
@@ -118,17 +118,17 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void moveObjectsByTypeFolderName(ObjectTypes objectType, String targetFolder,
                                                List<String> objectsList) {
-        uiUtils.dataPage.getMoveObjectsButton().click();
-        waitForElementVisible(uiUtils.dataPage.getMoveObjectsDialog());
-        uiUtils.dataPage.getMoveObjectsDialogInput().sendKeys(targetFolder);
-        uiUtils.dataPage.getMoveObjectsDialogConfirmButton().click();
-        waitForElementVisible(uiUtils.dataPage.getProgressMessageBox());
+        ui.dataPage.getMoveObjectsButton().click();
+        waitForElementVisible(ui.dataPage.getMoveObjectsDialog());
+        ui.dataPage.getMoveObjectsDialogInput().sendKeys(targetFolder);
+        ui.dataPage.getMoveObjectsDialogConfirmButton().click();
+        waitForElementVisible(ui.dataPage.getProgressMessageBox());
 
-        Assert.assertTrue(uiUtils.dataPage.getProgressMessageBox().getText().contains("Moving"));
+        Assert.assertTrue(ui.dataPage.getProgressMessageBox().getText().contains("Moving"));
         String message = String.format("Success! %d %s(s) moved to \"%s\" folder.",
                 objectsList.size(), objectType.getName(), targetFolder);
-        waitForElementVisible(uiUtils.dataPage.getStatusMessageOnGreenBar());
-        Assert.assertEquals(uiUtils.dataPage.getStatusMessageOnGreenBar().getText(), message);
+        waitForElementVisible(ui.dataPage.getStatusMessageOnGreenBar());
+        Assert.assertEquals(ui.dataPage.getStatusMessageOnGreenBar().getText(), message);
         Screenshots.takeScreenshot(browser,
                 "move-objects-by-enter-folder-name-in-" + objectType.getObjectsTableID(),
                 this.getClass());
@@ -161,15 +161,15 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void checkDeleteConfirmDialog(ObjectTypes objectType, ObjectsTable objectsTable,
                                             List<String> deletedObjects) throws InterruptedException {
-        uiUtils.dataPage.getDeleteObjectsButton().click();
-        waitForElementVisible(uiUtils.dataPage.getDeleteConfirmDialog());
+        ui.dataPage.getDeleteObjectsButton().click();
+        waitForElementVisible(ui.dataPage.getDeleteConfirmDialog());
         String deleteConfirmDialogTitle = String.format("Delete %s(s)", objectType.getName());
         String deleteConfirmDialogMessage = String.format(
                 "Are you sure you want to delete %d %s(s)", deletedObjects.size(),
                 objectType.getName());
-        Assert.assertEquals(uiUtils.dataPage.getDeleteConfirmDialogHeader().getText(),
+        Assert.assertEquals(ui.dataPage.getDeleteConfirmDialogHeader().getText(),
                 deleteConfirmDialogTitle);
-        Assert.assertTrue(uiUtils.dataPage.getDeleteConfirmDialogMessage().getText()
+        Assert.assertTrue(ui.dataPage.getDeleteConfirmDialogMessage().getText()
                 .contains(deleteConfirmDialogMessage));
         Screenshots.takeScreenshot(browser,
                 "delete-confirm-dialog-for-" + objectType.getObjectsTableID(), this.getClass());
@@ -180,13 +180,13 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         checkDeleteConfirmDialog(objectType, objectsTable, deletedObjects);
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-before-deleting-selected-objects", this.getClass());
-        uiUtils.dataPage.getDeleteConfirmButton().click();
-        Assert.assertTrue(waitForElementVisible(uiUtils.dataPage.getProgressMessageBox()).getText()
+        ui.dataPage.getDeleteConfirmButton().click();
+        Assert.assertTrue(waitForElementVisible(ui.dataPage.getProgressMessageBox()).getText()
                 .contains("Deleting "));
-        waitForElementNotPresent(uiUtils.dataPage.getProgressMessageBox());
+        waitForElementNotPresent(ui.dataPage.getProgressMessageBox());
         String message = String.format("%d %s(s) deleted.", deletedObjects.size(),
                 objectType.getName());
-        Assert.assertEquals(waitForElementVisible(uiUtils.dataPage.getStatusMessageOnGreenBar()).getText(),
+        Assert.assertEquals(waitForElementVisible(ui.dataPage.getStatusMessageOnGreenBar()).getText(),
                 message);
         waitForElementVisible(objectsTable.getRoot());
         this.assertRowTitles(objectsTable, existingObjects);
@@ -198,7 +198,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
                                        List<String> deletedObjects, List<String> defaultObjectsList)
             throws InterruptedException {
         checkDeleteConfirmDialog(objectType, objectsTable, deletedObjects);
-        uiUtils.dataPage.getCancelDeleteButton().click();
+        ui.dataPage.getCancelDeleteButton().click();
         this.assertRowTitles(objectsTable, defaultObjectsList);
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-after-canceling-deleting-objects", this.getClass());
@@ -206,7 +206,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected boolean assertMovedObjectsInTargetFolder(String targetFolderName, ObjectsTable objectsTable,
                                                        List<String> movedObjects) throws InterruptedException {
-        uiUtils.dataPage.getFolder(targetFolderName).click();
+        ui.dataPage.getFolder(targetFolderName).click();
         waitForElementVisible(objectsTable.getRoot());
         checkUtils.waitForDataPageLoaded();
         boolean assertResult = false;
@@ -225,9 +225,9 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void openObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType) {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage");
         checkUtils.waitForDataPageLoaded();
-        waitForElementVisible(uiUtils.dataPage.getMenuItem(objectType)).click();
+        waitForElementVisible(ui.dataPage.getMenuItem(objectType)).click();
         checkUtils.waitForDataPageLoaded();
         waitForElementVisible(objectsTable.getRoot());
         Screenshots.takeScreenshot(browser, "open-" + objectsTable.getRoot().getAttribute("id"),
@@ -239,7 +239,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         openObjectsTable(objectsTable, objectType);
         objectsTable.assertTableHeader();
         objectsTable.assertCheckboxes(true, false);
-        uiUtils.dataPage.assertMassActions();
+        ui.dataPage.assertMassActions();
         Screenshots.takeScreenshot(browser, "view-" + objectsTable.getRoot().getAttribute("id"),
                 this.getClass());
     }
@@ -254,7 +254,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     protected void checkObjectLinkInTable(ObjectsTable objectsTable, String selectedObjectName) {
         objectsTable.selectObject(selectedObjectName);
         checkUtils.waitForObjectPageLoaded();
-        Assert.assertEquals(uiUtils.objectDetailPage.getObjectName(), selectedObjectName);
+        Assert.assertEquals(ui.objectDetailPage.getObjectName(), selectedObjectName);
     }
 
     protected void assertRowTitles(ObjectsTable objectsTable, List<String> rowTitles)
@@ -273,21 +273,21 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         objectsTable.selectObject(objectName);
         checkUtils.waitForObjectPageLoaded();
         for (String tagName : tagsList) {
-            uiUtils.objectDetailPage.addTag(tagName);
+            ui.objectDetailPage.addTag(tagName);
         }
     }
 
     protected void filterObjectByTagCloud(ObjectsTable objectsTable,
                                           List<String> filteredObjectTitles, Map<String, List<String>> tagsCloud)
             throws InterruptedException {
-        if (uiUtils.dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as Cloud"))
-            uiUtils.dataPage.getShowAsCloudButton().click();
+        if (ui.dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as Cloud"))
+            ui.dataPage.getShowAsCloudButton().click();
         for (String tagName : tagsCloud.keySet()) {
             String fontSize = tagsCloud.get(tagName).get(1);
-            uiUtils.dataPage.getTagByCloud(tagName, fontSize).click();
+            ui.dataPage.getTagByCloud(tagName, fontSize).click();
         }
         assertRowTitles(objectsTable, filteredObjectTitles);
-        uiUtils.dataPage.getDeselectAllButton().click();
+        ui.dataPage.getDeselectAllButton().click();
         Screenshots.takeScreenshot(browser, objectsTable.getRoot().getAttribute("id")
                 + "-filtered-by-tags-cloud", this.getClass());
     }
@@ -295,14 +295,14 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     protected void filterObjectByTagList(ObjectsTable objectsTable,
                                          List<String> filteredObjectTitles, Map<String, List<String>> tagsList)
             throws InterruptedException {
-        if (uiUtils.dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as List"))
-            uiUtils.dataPage.getShowAsListButton().click();
+        if (ui.dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as List"))
+            ui.dataPage.getShowAsListButton().click();
         for (String tagName : tagsList.keySet()) {
             String index = tagsList.get(tagName).get(0);
-            uiUtils.dataPage.getTagByList(tagName, index).click();
+            ui.dataPage.getTagByList(tagName, index).click();
         }
         assertRowTitles(objectsTable, filteredObjectTitles);
-        uiUtils.dataPage.getDeselectAllButton().click();
+        ui.dataPage.getDeselectAllButton().click();
         Screenshots.takeScreenshot(browser, objectsTable.getRoot().getAttribute("id")
                 + "-filtered-by-tags-list", this.getClass());
     }
@@ -314,7 +314,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         for (String objectName : objectNames) {
             addTagsToObject(objectsTable, objectName, taggedObjects.get(objectName));
             Thread.sleep(3000);
-            uiUtils.objectDetailPage.getBackDataPageLink().click();
+            ui.objectDetailPage.getBackDataPageLink().click();
             checkUtils.waitForDataPageLoaded();
         }
         this.filterObjectByTagList(objectsTable, filterObjectsList, tagsMap);
@@ -322,12 +322,12 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void checkAllCheckboxes(ObjectsTable objectsTable) throws InterruptedException {
-        uiUtils.dataPage.getAllAction().click();
+        ui.dataPage.getAllAction().click();
         objectsTable.assertCheckboxes(true, true);
     }
 
     protected void checkNoneCheckboxes(ObjectsTable objectsTable) throws InterruptedException {
-        uiUtils.dataPage.getNoneAction().click();
+        ui.dataPage.getNoneAction().click();
         objectsTable.assertCheckboxes(true, false);
     }
 }

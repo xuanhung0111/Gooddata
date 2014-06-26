@@ -44,39 +44,39 @@ public class FilterReportTest extends GoodSalesAbstractTest {
     public void createReportTest() throws InterruptedException {
         List<String> what = Arrays.asList("Amount");
         List<String> how = Arrays.asList("Stage Name");
-        uiUtils.createReport(reportName, ReportTypes.TABLE, what, how, "Simple filter report");
+        ui.createReport(reportName, ReportTypes.TABLE, what, how, "Simple filter report");
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createVariableTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         data.put("variableName", this.variableName);
         data.put("userValueFlag", "false");
         data.put("attrElements", promptElements);
-        uiUtils.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        ui.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void attributeFilterTest() throws InterruptedException {
         initReport();
-        uiUtils.reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
-        uiUtils.reportPage.saveReport();
+        ui.reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
+        ui.reportPage.saveReport();
         checkUtils.checkRedBar();
     }
 
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rankingFilterTest() throws InterruptedException {
         initReport();
-        uiUtils.reportPage.addFilter(FilterTypes.RANK, data);
-        uiUtils.reportPage.saveReport();
+        ui.reportPage.addFilter(FilterTypes.RANK, data);
+        ui.reportPage.saveReport();
         checkUtils.checkRedBar();
     }
 
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rangeFilterTest() throws InterruptedException {
         initReport();
-        uiUtils.reportPage.addFilter(FilterTypes.RANGE, data);
-        uiUtils.reportPage.saveReport();
+        ui.reportPage.addFilter(FilterTypes.RANGE, data);
+        ui.reportPage.saveReport();
         checkUtils.checkRedBar();
     }
 
@@ -85,8 +85,8 @@ public class FilterReportTest extends GoodSalesAbstractTest {
         initReport();
         data.put("variable", this.variableName);
         data.put("promptElements", promptElements);
-        uiUtils.reportPage.addFilter(FilterTypes.PROMPT, data);
-        uiUtils.reportPage.saveReport();
+        ui.reportPage.addFilter(FilterTypes.PROMPT, data);
+        ui.reportPage.saveReport();
         checkUtils.checkRedBar();
     }
 
@@ -96,8 +96,8 @@ public class FilterReportTest extends GoodSalesAbstractTest {
     }
 
     private void initReport() {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
         checkUtils.waitForReportsPageLoaded();
-        uiUtils.reportsPage.getReportsList().openReport(this.reportName);
+        ui.reportsPage.getReportsList().openReport(this.reportName);
     }
 }

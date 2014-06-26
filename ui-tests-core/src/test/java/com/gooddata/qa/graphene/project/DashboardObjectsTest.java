@@ -27,33 +27,33 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void uploadDataTest() throws InterruptedException {
         String csvFilePath = testParams.loadProperty("csvFilePath");
-        uiUtils.uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
+        ui.uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
     public void createvariableTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         Map<String, String> data = new HashMap<String, String>();
         data.put("variableName", this.variableName);
         data.put("attribute", "Education");
         data.put("attrElements", "Bachelors Degree, Graduate Degree");
         data.put("userValueFlag", "false");
-        uiUtils.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        ui.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
     public void changeStateLabelTest() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
-        uiUtils.attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        ui.attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
     }
 
     @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"}, groups = {"tests"})
     public void addDashboardObjectsTest() throws InterruptedException {
-        uiUtils.initDashboardsPage();
-        DashboardEditBar dashboardEditBar = uiUtils.dashboardsPage.getDashboardEditBar();
+        ui.initDashboardsPage();
+        DashboardEditBar dashboardEditBar = ui.dashboardsPage.getDashboardEditBar();
         String dashboardName = "Test";
-        uiUtils.dashboardsPage.addNewDashboard(dashboardName);
-        uiUtils.dashboardsPage.editDashboard();
+        ui.dashboardsPage.addNewDashboard(dashboardName);
+        ui.dashboardsPage.editDashboard();
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, this.variableName);
         dashboardEditBar.addTimeFilterToDashboard(0, "7 ago");
@@ -73,9 +73,9 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"addDashboardObjectsTest"}, groups = {"tests"})
     public void printDashboardTest() throws InterruptedException {
-        uiUtils.initDashboardsPage();
-        String exportedDashboardName = uiUtils.dashboardsPage.printDashboardTab(0);
-        uiUtils.verifyDashboardExport(exportedDashboardName.replace(" ", "_"), expectedDashboardExportSize);
+        ui.initDashboardsPage();
+        String exportedDashboardName = ui.dashboardsPage.printDashboardTab(0);
+        ui.verifyDashboardExport(exportedDashboardName.replace(" ", "_"), expectedDashboardExportSize);
         checkUtils.checkRedBar();
         successfulTest = true;
     }

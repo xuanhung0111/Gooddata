@@ -40,15 +40,15 @@ public class ProjectPerfWalkthrough extends AbstractTest {
 
     @Test(groups = {"perfInit"})
     public void init() throws JSONException {
-        greyPageUtils.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        greyPages.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {"perfInit"})
     public void clearCaches() throws JSONException {
         if (clearCaches) {
             System.out.println("Going to clear caches in project: " + testParams.getProjectId());
-            openUrl(greyPageUtils.PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/clearCaches");
-            ClearCaches clearCaches = Graphene.createPageFragment(ClearCaches.class, browser.findElement(greyPageUtils.BY_GP_FORM));
+            openUrl(greyPages.PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/clearCaches");
+            ClearCaches clearCaches = Graphene.createPageFragment(ClearCaches.class, browser.findElement(greyPages.BY_GP_FORM));
             clearCaches.clearCaches(0);
         } else {
             System.out.println("Caches clear wasn't required");
@@ -57,20 +57,20 @@ public class ProjectPerfWalkthrough extends AbstractTest {
 
     @Test(dependsOnGroups = {"perfInit"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
         verifyProjectDashboardsAndTabs(startDashboardIndex);
     }
 
     protected void verifyProjectDashboardsAndTabs(int dashboardStartIndex) throws InterruptedException, JSONException {
         checkUtils.waitForDashboardPageLoaded();
         Thread.sleep(5000);
-        waitForElementVisible(uiUtils.dashboardsPage.getRoot());
-        int dashboardsCount = uiUtils.dashboardsPage.getDashboardsCount();
+        waitForElementVisible(ui.dashboardsPage.getRoot());
+        int dashboardsCount = ui.dashboardsPage.getDashboardsCount();
         for (int i = dashboardStartIndex; i <= dashboardsCount; i++) {
-            uiUtils.dashboardsPage.selectDashboard(i);
+            ui.dashboardsPage.selectDashboard(i);
             Thread.sleep(5000);
             System.out.println("Current dashboard index: " + i);
-            singleDashboardWalkthrough(i, uiUtils.dashboardsPage.getDashboardName());
+            singleDashboardWalkthrough(i, ui.dashboardsPage.getDashboardName());
             if (singleDashboardComputation) {
                 System.out.println("Single dashboard computation was required, following dashboards won't be computed");
                 return;
@@ -79,7 +79,7 @@ public class ProjectPerfWalkthrough extends AbstractTest {
     }
 
     private void singleDashboardWalkthrough(int dashboardIndex, String dashboardName) throws JSONException {
-        DashboardTabs tabs = uiUtils.dashboardsPage.getTabs();
+        DashboardTabs tabs = ui.dashboardsPage.getTabs();
         int numberOfTabs = tabs.getNumberOfTabs();
         System.out.println("Number of tabs on dashboard " + dashboardName + ": " + numberOfTabs);
         List<String> tabLabels = tabs.getAllTabNames();

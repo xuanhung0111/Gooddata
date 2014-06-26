@@ -18,12 +18,12 @@ public class ProjectWalktroughTest extends AbstractTest {
     @Test(groups = {"projectWalkthroughInit"})
     public void userLogin() throws JSONException {
         // sign in with demo user
-        uiUtils.signInAtUI(testParams.getUser(), testParams.getPassword());
+        ui.signInAtUI(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnGroups = {"projectWalkthroughInit"})
     public void verifyProject() throws InterruptedException {
-        uiUtils.verifyProjectDashboardsAndTabs(false, null, true);
+        ui.verifyProjectDashboardsAndTabs(false, null, true);
     }
 
 }

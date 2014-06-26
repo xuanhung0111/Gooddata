@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.apache.commons.io.FileUtils;
@@ -14,22 +12,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"dashboardPerf"}, description = "Tests for performance od rendering dashboards in GoodSales project")
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
         checkUtils.waitForDashboardPageLoaded();
         for (int i = 1; i <= 10; i++) {
             System.out.println("Iteration:" + i);
-            uiUtils.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
+            ui.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
         }
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output);
@@ -78,7 +72,7 @@ public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     private String getClientVersion() throws JSONException {
         openUrl("/gdc/releaseInfo");
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = greyPages.loadJSON();
         JSONArray components = json.getJSONObject("release").getJSONArray("components");
         for (int i = 0; i < components.length(); i++) {
             JSONObject component = components.getJSONObject(i);

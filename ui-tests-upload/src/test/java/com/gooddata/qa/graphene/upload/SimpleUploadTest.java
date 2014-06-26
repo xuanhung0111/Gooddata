@@ -21,7 +21,7 @@ public class SimpleUploadTest extends AbstractTest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = uiUtils.PAGE_UPLOAD;
+        startPage = ui.PAGE_UPLOAD;
 
         csvFilePath = testParams.loadProperty("upload.file.simple.csv");
     }

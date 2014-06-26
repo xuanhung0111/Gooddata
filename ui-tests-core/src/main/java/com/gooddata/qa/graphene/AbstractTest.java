@@ -28,8 +28,8 @@ public abstract class AbstractTest extends Arquillian {
     protected TestParameters testParams;
     protected CheckUtils checkUtils;
     protected CommonUtils commonUtils;
-    protected UITestUtils uiUtils;
-    protected GreyPageUtils greyPageUtils;
+    protected UITestUtils ui;
+    protected GreyPageUtils greyPages;
 
     @Drone
     protected WebDriver browser;
@@ -60,8 +60,8 @@ public abstract class AbstractTest extends Arquillian {
         testParams = new TestParameters(testVariables);
         checkUtils = new CheckUtils(browser);
         commonUtils = new CommonUtils(browser, checkUtils, testParams);
-        uiUtils = new UITestUtils(browser, checkUtils, testParams);
-        greyPageUtils = new GreyPageUtils(browser, checkUtils, testParams);
+        ui = new UITestUtils(browser, checkUtils, testParams);
+        greyPages = new GreyPageUtils(browser, checkUtils, testParams);
 
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
@@ -89,9 +89,9 @@ public abstract class AbstractTest extends Arquillian {
      */
     protected void validSignInWithDemoUser(boolean greyPages) throws JSONException {
         if (greyPages) {
-            greyPageUtils.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            this.greyPages.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
         } else {
-            uiUtils.signInAtUI(testParams.getUser(), testParams.getPassword());
+            ui.signInAtUI(testParams.getUser(), testParams.getPassword());
         }
     }
 

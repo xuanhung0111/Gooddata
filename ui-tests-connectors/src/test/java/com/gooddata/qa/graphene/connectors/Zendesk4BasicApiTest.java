@@ -6,7 +6,6 @@ package com.gooddata.qa.graphene.connectors;
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.http.RestApiClient;
 import org.json.JSONException;
-import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -47,7 +46,7 @@ public class Zendesk4BasicApiTest extends AbstractTest {
 
     @Test
     public void initGd() throws JSONException {
-        greyPageUtils.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        greyPages.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnMethods = {"initGd"}, groups = {"zendeskApiTests"})

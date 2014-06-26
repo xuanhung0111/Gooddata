@@ -5,9 +5,7 @@ import java.util.List;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.sonatype.aether.util.filter.PatternExclusionsDependencyFilter;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -33,7 +31,7 @@ public class SimpleFiltersTest extends AbstractTest {
     public void initStartPage() {
         testParams.setProjectId(testParams.loadProperty("projectId"));
 
-        startPage = uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
+        startPage = ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
                 + "|projectDashboardPage";
     }
 
@@ -71,7 +69,7 @@ public class SimpleFiltersTest extends AbstractTest {
         validSignInWithDemoUser(false);
         checkUtils.waitForDashboardPageLoaded();
         dashboards = Graphene.createPageFragment(DashboardsPage.class,
-                browser.findElement(uiUtils.BY_PANEL_ROOT));
+                browser.findElement(ui.BY_PANEL_ROOT));
         Assert.assertNotNull(dashboards, "Dashboard page not initialized!");
 
         DashboardTabs tabs = dashboards.getTabs();

@@ -15,26 +15,26 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"dashboards-verification"})
     public void verifyDashboardTabs() throws InterruptedException {
-        uiUtils.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
+        ui.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
     public void exportFirstDashboard() throws InterruptedException {
-        openUrl(uiUtils.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
+        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
         checkUtils.waitForDashboardPageLoaded();
-        waitForElementVisible(uiUtils.dashboardsPage.getRoot());
-        exportedDashboardName = uiUtils.dashboardsPage.exportDashboardTab(0);
+        waitForElementVisible(ui.dashboardsPage.getRoot());
+        exportedDashboardName = ui.dashboardsPage.exportDashboardTab(0);
         checkUtils.checkRedBar();
     }
 
     @Test(dependsOnMethods = {"exportFirstDashboard"}, groups = {"dashboards-verification"})
     public void verifyExportedDashboardPDF() {
-        uiUtils.verifyDashboardExport(exportedDashboardName, expectedDashboardExportSize);
+        ui.verifyDashboardExport(exportedDashboardName, expectedDashboardExportSize);
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
     public void addNewTab() throws InterruptedException {
-        uiUtils.addNewTabOnDashboard("Pipeline Analysis", "test", "GoodSales-new-tab");
+        ui.addNewTabOnDashboard("Pipeline Analysis", "test", "GoodSales-new-tab");
     }
 
     /**
@@ -59,44 +59,44 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"addNewTab"}, groups = {"dashboards-verification"})
     public void deleteNewTab() throws InterruptedException {
-        uiUtils.initDashboardsPage();
-        assertTrue(uiUtils.dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
+        ui.initDashboardsPage();
+        assertTrue(ui.dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
         checkUtils.waitForDashboardPageLoaded();
         Thread.sleep(5000);
-        int tabsCount = uiUtils.dashboardsPage.getTabs().getNumberOfTabs();
-        uiUtils.dashboardsPage.deleteDashboardTab(tabsCount - 1);
+        int tabsCount = ui.dashboardsPage.getTabs().getNumberOfTabs();
+        ui.dashboardsPage.deleteDashboardTab(tabsCount - 1);
         Thread.sleep(5000);
-        assertEquals(uiUtils.dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
+        assertEquals(ui.dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification", "new-dashboard"})
     public void addNewDashboard() throws InterruptedException {
-        uiUtils.initDashboardsPage();
+        ui.initDashboardsPage();
         String dashboardName = "test";
-        uiUtils.dashboardsPage.addNewDashboard(dashboardName);
+        ui.dashboardsPage.addNewDashboard(dashboardName);
         checkUtils.waitForDashboardPageLoaded();
-        waitForElementNotPresent(uiUtils.dashboardsPage.getDashboardEditBar().getRoot());
+        waitForElementNotPresent(ui.dashboardsPage.getDashboardEditBar().getRoot());
         Thread.sleep(5000);
         checkUtils.checkRedBar();
-        assertEquals(uiUtils.dashboardsPage.getDashboardsCount(), 2, "New dashboard is not present");
-        assertEquals(uiUtils.dashboardsPage.getDashboardName(), dashboardName, "New dashboard has invalid name");
+        assertEquals(ui.dashboardsPage.getDashboardsCount(), 2, "New dashboard is not present");
+        assertEquals(ui.dashboardsPage.getDashboardName(), dashboardName, "New dashboard has invalid name");
         Screenshots.takeScreenshot(browser, "GoodSales-new-dashboard", this.getClass());
     }
 
     @Test(dependsOnMethods = {"addNewDashboard"}, groups = {"dashboards-verification", "new-dashboard"})
     public void addNewTabOnNewDashboard() throws InterruptedException {
-        uiUtils.addNewTabOnDashboard("test", "test2", "GoodSales-new-dashboard-new-tab");
+        ui.addNewTabOnDashboard("test", "test2", "GoodSales-new-dashboard-new-tab");
     }
 
     @Test(dependsOnGroups = {"new-dashboard"}, groups = {"dashboards-verification"})
     public void deleteNewDashboard() throws InterruptedException {
-        uiUtils.initDashboardsPage();
-        int dashboardsCount = uiUtils.dashboardsPage.getDashboardsCount();
-        if (uiUtils.dashboardsPage.selectDashboard("test")) {
-            uiUtils.dashboardsPage.deleteDashboard();
+        ui.initDashboardsPage();
+        int dashboardsCount = ui.dashboardsPage.getDashboardsCount();
+        if (ui.dashboardsPage.selectDashboard("test")) {
+            ui.dashboardsPage.deleteDashboard();
             Thread.sleep(3000);
             checkUtils.waitForDashboardPageLoaded();
-            assertEquals(uiUtils.dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
+            assertEquals(ui.dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
             checkUtils.checkRedBar();
         } else {
             fail("Dashboard wasn't selected and not deleted");
@@ -105,6 +105,6 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"dashboards-verification"}, groups = {"tests"})
     public void verifyDashboardTabsAfter() throws InterruptedException {
-        uiUtils.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
+        ui.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
     }
 }
