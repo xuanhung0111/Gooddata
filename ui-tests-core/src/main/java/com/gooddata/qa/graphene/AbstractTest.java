@@ -51,10 +51,6 @@ public abstract class AbstractTest extends Arquillian {
         }
 
         testParams = new TestParameters(testVariables);
-
-        imapHost = testParams.loadProperty("imap.host");
-        imapUser = testParams.loadProperty("imap.user");
-        imapPassword = testParams.loadProperty("imap.password");
     }
 
     @BeforeMethod
@@ -82,12 +78,5 @@ public abstract class AbstractTest extends Arquillian {
             restApiClient = new RestApiClient(testParams.getHost(), testParams.getUser(), testParams.getPassword(), true, false);
         }
         return restApiClient;
-    }
-
-    public GoodData getGoodDataClient() {
-        if (goodDataClient == null) {
-            goodDataClient = new GoodData(testParams.getHost(), testParams.getUser(), testParams.getPassword());
-        }
-        return goodDataClient;
     }
 }

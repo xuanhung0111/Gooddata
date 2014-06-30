@@ -91,7 +91,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 "[/gdc/md/%s/obj/27238/elements?id=1]", projectId, projectId, projectId), "#,##0");
         Metric m = md.createObj(project, metric);
         System.out.println("Metric for testing of non-deleted organizations created, id: " + m.getMeta().getIdentifier());
-     }
+    }
+    private GoodData getGoodDataClient() {
+        if (goodDataClient == null) {
+            goodDataClient = new GoodData(testParams.getHost(), testParams.getUser(), testParams.getPassword());
+        }
+        return goodDataClient;
+    }
     **/
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})

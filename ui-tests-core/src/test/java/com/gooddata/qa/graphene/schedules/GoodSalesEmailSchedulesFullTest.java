@@ -52,6 +52,10 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         dashboardTitle = dashboardTitle + identification;
 
         attachmentsDirectory = new File(System.getProperty("maven.project.build.directory", "./target/attachments"));
+
+        imapHost = testParams.loadProperty("imap.host");
+        imapUser = testParams.loadProperty("imap.user");
+        imapPassword = testParams.loadProperty("imap.password");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
