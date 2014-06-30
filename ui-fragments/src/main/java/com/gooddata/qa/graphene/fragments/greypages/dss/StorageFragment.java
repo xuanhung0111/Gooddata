@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.greypages.hds;
+package com.gooddata.qa.graphene.fragments.greypages.dss;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -9,7 +9,7 @@ import org.testng.Assert;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-public class StorageFragment extends AbstractHDSFragment {
+public class StorageFragment extends AbstractDSSFragment {
 
     @FindBy
     private WebElement title;

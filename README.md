@@ -38,11 +38,9 @@ Done - see more details on above confluence page.
 ## UI Tests modules
 Currently there are following modules available (use them for tests of specific area and feel free to add new):
  * ui-fragments - includes all Graphene page/object fragmnets (used across all tests)
- * ui-tests-ccc - for running CCC tests
  * ui-tests-connectors - for running connectors tests
  * ui-tests-core - includes common classes for all tests and basic tests
  * ui-tests-dashboards - for running dashboard tests
- * ui-tests-hds - for running HDS tests
- * ui-tests-reports - for running report tests
+ * ui-tests-dss - for running DSS tests
  * ui-tests-tools - for running extra tools tests (specific usage, no tests by default)
  * ui-tests-upload - for running csv upload tests (experimental)

@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.dss;
 
-import com.gooddata.qa.graphene.fragments.greypages.hds.StorageFragment;
-import com.gooddata.qa.graphene.fragments.greypages.hds.StorageUsersFragment;
+import com.gooddata.qa.graphene.fragments.greypages.dss.StorageFragment;
+import com.gooddata.qa.graphene.fragments.greypages.dss.StorageUsersFragment;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-@Test(groups = {"hds"}, description = "Basic verification of hds restapi in GD platform")
+@Test(groups = {"dss"}, description = "Basic verification of dss restapi in GD platform")
 public class BasicDSSRestTest extends AbstractDSSTest {
 
     private String storageUrl;
@@ -31,9 +31,9 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     private String testUserLogin;
     private String dssAuthorizationToken;
 
-    private static final String STORAGE_TITLE = "HDS storage";
+    private static final String STORAGE_TITLE = "DSS storage";
     public static final String UPDATED_STORAGE_TITLE = STORAGE_TITLE + " updated";
-    private static final String STORAGE_DESCRIPTION = "HDS description";
+    private static final String STORAGE_DESCRIPTION = "DSS description";
     public static final String UPDATED_STORAGE_DESCRIPTION = STORAGE_DESCRIPTION + " updated";
 
     private static final String NEW_USER_ROLE = "dataAdmin";
@@ -48,42 +48,42 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     @BeforeClass
     public void initStartPage() {
         startPage = PAGE_DSS_INSTANCES;
-        testUserId = testParams.loadProperty("hds.storage.test.user.id");
-        testUserLogin = testParams.loadProperty("hds.storage.test.user.login");
+        testUserId = testParams.loadProperty("dss.storage.test.user.id");
+        testUserLogin = testParams.loadProperty("dss.storage.test.user.login");
         dssAuthorizationToken = testParams.loadProperty("dss.authorizationToken");
     }
 
-    @Test(groups = {"hdsInit"})
+    @Test(groups = {"dssInit"})
     public void resourceStoragesNotAvailableForAnonymous() throws JSONException {
         waitForElementPresent(gpLoginFragment.getRoot());
         assertTrue(browser.getCurrentUrl().contains("gdc/account/login"),
                 "Redirect to /gdc/account/login wasn't done for anonymous user");
     }
 
-    @Test(groups = {"hdsInit"}, dependsOnMethods = {"resourceStoragesNotAvailableForAnonymous"})
+    @Test(groups = {"dssInit"}, dependsOnMethods = {"resourceStoragesNotAvailableForAnonymous"})
     public void resourceStoragesAvailable() throws JSONException {
         signInAtGreyPages(testParams.getUser(), testParams.getPassword());
 
         loadPlatformPageBeforeTestMethod();
         JSONObject json = loadJSON();
         assertTrue(json.getJSONObject("dssInstances").has("items"), "DSS instances with items array is not available");
-        takeScreenshot(browser, "hds-base-resource", this.getClass());
+        takeScreenshot(browser, "dss-base-resource", this.getClass());
     }
 
-    @Test(dependsOnGroups = {"hdsInit"})
+    @Test(dependsOnGroups = {"dssInit"})
     public void gpFormsAvailable() {
         waitForElementPresent(storageForm.getRoot());
     }
 
-    @Test(dependsOnGroups = {"hdsInit"})
-    public void hdsResourceLinkNotAvailableAtBasicResource() {
+    @Test(dependsOnGroups = {"dssInit"})
+    public void dssResourceLinkNotAvailableAtBasicResource() {
         openUrl(PAGE_GDC);
         assertEquals(browser.getTitle(), "GoodData API root");
         assertTrue(browser.findElements(By.partialLinkText("dssInstances")).size() == 0,
                 "DSS instances link is present at basic /gdc resource");
     }
 
-    @Test(dependsOnGroups = {"hdsInit"})
+    @Test(dependsOnGroups = {"dssInit"})
     public void verifyDssRoot() throws JSONException {
         openUrl(PAGE_DSS_ROOT);
 
@@ -103,7 +103,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         assertEquals(getBasicRootUrl() + "/gdc/dss/instances", browser.getCurrentUrl());
     }
 
-    @Test(dependsOnGroups = {"hdsInit"})
+    @Test(dependsOnGroups = {"dssInit"})
     public void verifyDefaultResource() throws JSONException {
         verifyStoragesResourceJSON();
     }
@@ -151,7 +151,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         storageForm.updateStorage(UPDATED_STORAGE_TITLE, UPDATED_STORAGE_DESCRIPTION);
         assertTrue(storageForm.verifyValidEditStorageForm(UPDATED_STORAGE_TITLE, UPDATED_STORAGE_DESCRIPTION),
                 "Edit form doesn't contain expected values");
-        takeScreenshot(browser, "hds-updated-storage", this.getClass());
+        takeScreenshot(browser, "dss-updated-storage", this.getClass());
     }
 
     @Test(dependsOnMethods = {"updateStorage", "removeUserFromStorageByLogin"}, alwaysRun = true)
@@ -204,10 +204,10 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     @Test(dependsOnMethods = {"verifyStorageEnabled"})
     public void addUserToStorage() throws JSONException, InterruptedException {
         openStorageUsersUrl();
-        assertTrue(testUserId != null, "Missing test user ID - provide property 'hds.storage.test.user.id'");
+        assertTrue(testUserId != null, "Missing test user ID - provide property 'dss.storage.test.user.id'");
         storageUsersForm.verifyValidAddUserForm();
         storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, getTestUserProfileUri(), null, true);
-        takeScreenshot(browser, "hds-add-user-filled-form", this.getClass());
+        takeScreenshot(browser, "dss-add-user-filled-form", this.getClass());
         assertEquals(browser.getCurrentUrl(), getAddedUserUrlWithHost());
     }
 
@@ -225,7 +225,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnMethods = "addUserToStorage")
     public void verifyAddedUser() throws JSONException {
-        verifyUser(NEW_USER_ROLE, "hds-added-user");
+        verifyUser(NEW_USER_ROLE, "dss-added-user");
     }
 
     @Test(dependsOnMethods = "verifyAddedUser")
@@ -233,13 +233,13 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         browser.get(getAddedUserUrlWithHost());
         storageUsersForm.verifyValidUpdateUserForm(NEW_USER_ROLE, getTestUserProfileUri());
         storageUsersForm.fillUpdateUserForm(NEW_USER_UPDATED_ROLE, getTestUserProfileUri());
-        takeScreenshot(browser, "hds-update-user-filled-form", this.getClass());
+        takeScreenshot(browser, "dss-update-user-filled-form", this.getClass());
         assertEquals(browser.getCurrentUrl(), getAddedUserUrlWithHost());
     }
 
     @Test(dependsOnMethods = "updateUser")
     public void verifyUpdatedUser() throws JSONException {
-        verifyUser(NEW_USER_UPDATED_ROLE, "hds-updated-user");
+        verifyUser(NEW_USER_UPDATED_ROLE, "dss-updated-user");
     }
 
     @Test(dependsOnMethods = {"verifyUpdatedUser"})
@@ -257,11 +257,11 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     @Test(dependsOnMethods = {"removeUserFromStorage"})
     public void addUserToStorageByLogin() throws JSONException, InterruptedException {
         openStorageUsersUrl();
-        assertTrue(testUserId != null, "Missing test user ID - provide property 'hds.storage.test.user.id'");
-        assertTrue(testUserLogin != null, "Missing test user login - provide property 'hds.storage.test.user.login'");
+        assertTrue(testUserId != null, "Missing test user ID - provide property 'dss.storage.test.user.id'");
+        assertTrue(testUserLogin != null, "Missing test user login - provide property 'dss.storage.test.user.login'");
         storageUsersForm.verifyValidAddUserForm();
         storageUsersForm.fillAddUserToStorageForm(NEW_USER_ROLE, null, testUserLogin, true);
-        takeScreenshot(browser, "hds-add-user-filled-form-login", this.getClass());
+        takeScreenshot(browser, "dss-add-user-filled-form-login", this.getClass());
         assertEquals(browser.getCurrentUrl(), getAddedUserUrlWithHost());
     }
 
@@ -473,7 +473,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     private void verifyStorage(final String title, final String description, final String state) throws JSONException {
         openStorageUrl();
-        takeScreenshot(browser, "hds-simple-storage", this.getClass());
+        takeScreenshot(browser, "dss-simple-storage", this.getClass());
         JSONObject json = loadJSON();
         assertTrue(json.has("dssInstance"), "DSS instance element isn't present");
         JSONObject storage = json.getJSONObject("dssInstance");

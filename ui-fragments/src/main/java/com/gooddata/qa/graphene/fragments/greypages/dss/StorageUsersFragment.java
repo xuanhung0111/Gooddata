@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.greypages.hds;
+package com.gooddata.qa.graphene.fragments.greypages.dss;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -10,7 +10,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-public class StorageUsersFragment extends AbstractHDSFragment {
+public class StorageUsersFragment extends AbstractDSSFragment {
 
     @FindBy
     private Select role;
