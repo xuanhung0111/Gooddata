@@ -50,21 +50,21 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void loadProject() throws JSONException, URISyntaxException, IOException, InterruptedException {
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
-        greyPages.postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
+        postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
 
         URL csvResource = getClass().getResource("/etl/invoice.csv");
-        String webdavURL = greyPages.uploadFileToWebDav(csvResource, null);
-        InputStream fileFromWebDav = greyPages.getFileFromWebDav(webdavURL, csvResource);
+        String webdavURL = uploadFileToWebDav(csvResource, null);
+        InputStream fileFromWebDav = getFileFromWebDav(webdavURL, csvResource);
         System.out.println("Checking local and remote CRC");
         assertEquals(getCRC(csvResource.openStream()), getCRC(fileFromWebDav), "Local and remote file CRC do not match");
 
         URL uploadInfoResource = getClass().getResource("/etl/upload_info.json");
-        greyPages.uploadFileToWebDav(uploadInfoResource, webdavURL);
-        fileFromWebDav = greyPages.getFileFromWebDav(webdavURL, uploadInfoResource);
+        uploadFileToWebDav(uploadInfoResource, webdavURL);
+        fileFromWebDav = getFileFromWebDav(webdavURL, uploadInfoResource);
         System.out.println("Checking local and remote CRC");
         assertEquals(getCRC(uploadInfoResource.openStream()), getCRC(fileFromWebDav), "Local and remote file CRC checksum do not match");
 
-        greyPages.postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), statusPollingCheckIterations);
+        postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), statusPollingCheckIterations);
     }
 
     @Test(dependsOnMethods = {"loadProject"}, groups = {"tests"})
@@ -87,7 +87,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         }
 
         /** check generated sli manifest **/
-        dataSetSLIManifest = greyPages.fetchSLIManifest(uploadInfoDataset).getJSONObject("dataSetSLIManifest");
+        dataSetSLIManifest = fetchSLIManifest(uploadInfoDataset).getJSONObject("dataSetSLIManifest");
         jsonPartsArray = dataSetSLIManifest.getJSONArray("parts");
         assertEquals(jsonPartsArray.length(), sliParts.size(), "SLIManifest parts count doesn't match");
         assertEquals(dataSetSLIManifest.getString("file"), "dataset.ds_" + uploadInfoFile, "SLIManifest file names doesn't match");
@@ -102,13 +102,13 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"loadProject"}, groups = {"tests"})
     public void exportImportProject() throws JSONException, InterruptedException {
-        String exportToken = greyPages.exportProject(exportUsers, exportData, statusPollingCheckIterations);
+        String exportToken = exportProject(exportUsers, exportData, statusPollingCheckIterations);
         String parentProjectId = testParams.getProjectId();
 
         // New projectID is needed here. Load it from export, validate, delete and restore original one
         createProject();
-        greyPages.importProject(exportToken, statusPollingCheckIterations);
-        greyPages.validateProject();
+        importProject(exportToken, statusPollingCheckIterations);
+        validateProject();
         deleteProject();
 
         testParams.setProjectId(parentProjectId);

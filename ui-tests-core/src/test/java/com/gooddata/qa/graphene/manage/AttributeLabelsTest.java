@@ -22,6 +22,8 @@ import com.gooddata.qa.graphene.fragments.reports.ReportWithImage;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = {"projectSimpleAttribute"}, description = "Tests for configuration of attribute labels functionality on simple project in GD platform")
 public class AttributeLabelsTest extends AbstractProjectTest {
 
@@ -54,13 +56,13 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     public void initDataTest() throws InterruptedException {
         Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
         columnIndexAndType.put(12, OptionDataType.TEXT);
-        ui.uploadCSV(csvFilePath + "attribute_labels.csv", columnIndexAndType, "attribute-labels");
+        uploadCSV(csvFilePath + "attribute_labels.csv", columnIndexAndType, "attribute-labels");
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void setSFDCCredentialsTest() throws InterruptedException,
             JSONException {
-        openUrl(greyPages.PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/credentials/sfdc");
+        openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/credentials/sfdc");
         waitForElementVisible(sfdc.getRoot());
         sfdc.setSFDCCredentials(testParams.loadProperty("sfdc.email"),
                 testParams.loadProperty("sfdc.password") + testParams.loadProperty("sfdc.securityToken"));
@@ -96,15 +98,15 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"initDataTest"}, groups = {"tests"})
     public void changeAttributeToHyperlinkTest() throws InterruptedException {
         changeAttributeLabel(hyperlinkAttr, AttributeLabelTypes.HYPERLINK);
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
-        ui.attributePage.verifyHyperLink(hyperlinkAttr);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        attributePage.verifyHyperLink(hyperlinkAttr);
     }
 
     @Test(dependsOnMethods = {"changeAttributeToHyperlinkTest"}, groups = {
             "tests"})
     public void configDrillToExternalPageTest() throws InterruptedException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
-        ui.attributePage.configureDrillToExternalPage(hyperlinkAttr);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        attributePage.configureDrillToExternalPage(hyperlinkAttr);
     }
 
     @Test(dependsOnMethods = {"configDrillToExternalPageTest"}, groups = {
@@ -112,7 +114,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     public void createReportWithHyperlinkTest() throws InterruptedException {
         List<String> what = Arrays.asList("Count of Image");
         List<String> how = Arrays.asList(hyperlinkAttr);
-        ui.createReport(hyperlinkReport, ReportTypes.TABLE, what, how, "Simple hyperlink report");
+        createReport(hyperlinkReport, ReportTypes.TABLE, what, how, "Simple hyperlink report");
     }
 
     @Test(dependsOnMethods = {"createReportWithHyperlinkTest"}, groups = {
@@ -135,10 +137,10 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"changeAttributeToGeoStateTest"}, groups = {"tests"})
     public void verifyGeoLayersTest() throws InterruptedException {
-        ui.initDashboardsPage();
-        DashboardEditBar dashboardEditBar = ui.dashboardsPage.getDashboardEditBar();
-        ui.dashboardsPage.addNewDashboard("Test");
-        ui.dashboardsPage.editDashboard();
+        initDashboardsPage();
+        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+        dashboardsPage.addNewDashboard("Test");
+        dashboardsPage.editDashboard();
         dashboardEditBar.verifyGeoLayersList("Sum of Amount", attributesList);
     }
 
@@ -148,16 +150,16 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     private void initReport(String reportName) {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
-        checkUtils.waitForReportsPageLoaded();
-        ui.reportsPage.getReportsList().openReport(reportName);
-        checkUtils.waitForAnalysisPageLoaded();
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
+        waitForReportsPageLoaded(browser);
+        reportsPage.getReportsList().openReport(reportName);
+        waitForAnalysisPageLoaded(browser);
     }
 
     private void changeAttributeLabel(String attribute, AttributeLabelTypes label)
             throws InterruptedException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
-        ui.attributePage.configureAttributeLabel(attribute, label);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        attributePage.configureAttributeLabel(attribute, label);
     }
 
     public List<AttributeLabelTypes> getGeoLabels() {

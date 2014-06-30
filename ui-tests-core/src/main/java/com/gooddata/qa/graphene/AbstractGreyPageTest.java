@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.common;
+package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
@@ -15,96 +15,93 @@ import com.gooddata.qa.utils.webdav.WebDavClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static org.testng.Assert.assertTrue;
 
-public class GreyPageUtils extends CommonUtils {
+public class AbstractGreyPageTest extends AbstractTest {
 
-    public GreyPageUtils(WebDriver browser, CheckUtils checkUtils, TestParameters testParameters) {
-        super(browser, checkUtils, testParameters);
-    }
+    protected static final By BY_GP_FORM = By.tagName("form");
+    protected static final By BY_GP_FORM_SECOND = By.xpath("//div[@class='form'][2]/form");
+    protected static final By BY_GP_PRE_JSON = By.tagName("pre");
+    protected static final By BY_GP_LINK = By.tagName("a");
+    protected static final By BY_GP_BUTTON_SUBMIT = By.xpath("//div[@class='submit']/input");
 
-    public static final By BY_GP_FORM = By.tagName("form");
-    public static final By BY_GP_FORM_SECOND = By.xpath("//div[@class='form'][2]/form");
-    public static final By BY_GP_PRE_JSON = By.tagName("pre");
-    public static final By BY_GP_LINK = By.tagName("a");
-    public static final By BY_GP_BUTTON_SUBMIT = By.xpath("//div[@class='submit']/input");
-
-    public static final String PAGE_GDC = "gdc";
-    public static final String PAGE_GDC_MD = PAGE_GDC + "/md";
-    public static final String PAGE_GDC_PROJECTS = PAGE_GDC + "/projects";
-    public static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
+    protected static final String PAGE_GDC = "gdc";
+    protected static final String PAGE_GDC_MD = PAGE_GDC + "/md";
+    protected static final String PAGE_GDC_PROJECTS = PAGE_GDC + "/projects";
+    protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
 
     /**
      * ----- Grey pages fragments -----
      */
 
     @FindBy(tagName = "form")
-    public AccountLoginFragment gpLoginFragment;
+    protected AccountLoginFragment gpLoginFragment;
 
     @FindBy(tagName = "form")
-    public ProjectFragment gpProject;
+    protected ProjectFragment gpProject;
 
     @FindBy(tagName = "form")
-    public ValidateFragment validateFragment;
+    protected ValidateFragment validateFragment;
 
     @FindBy(className = "param")
-    public GdcFragment gdcFragment;
+    protected GdcFragment gdcFragment;
 
     @FindBy(tagName = "form")
-    public Manage2Fragment manage2Fragment;
+    protected Manage2Fragment manage2Fragment;
 
     @FindBy(tagName = "form")
-    public ExportFragment exportFragment;
+    protected ExportFragment exportFragment;
 
     @FindBy(tagName = "form")
-    public ImportFragment importFragment;
+    protected ImportFragment importFragment;
 
     @FindBy(tagName = "form")
-    public PullFragment pullFragment;
+    protected PullFragment pullFragment;
 
     @FindBy(tagName = "form")
-    public SingleLoadInterfaceFragment singleLoadInterfaceFragment;
+    protected SingleLoadInterfaceFragment singleLoadInterfaceFragment;
 
     public JSONObject loadJSON() throws JSONException {
-        checkUtils.waitForElementPresent(BY_GP_PRE_JSON);
+        waitForElementPresent(BY_GP_PRE_JSON, browser);
         return new JSONObject(browser.findElement(BY_GP_PRE_JSON).getText());
     }
 
     public void signInAtGreyPages(String username, String password) throws JSONException {
         openUrl(PAGE_ACCOUNT_LOGIN);
-        checkUtils.waitForElementPresent(gpLoginFragment.getRoot());
+        waitForElementPresent(gpLoginFragment.getRoot());
         gpLoginFragment.login(username, password);
         Screenshots.takeScreenshot(browser, "login-gp", this.getClass());
     }
 
     public String validateProject() throws JSONException {
-        openUrl(PAGE_GDC_MD + "/" + testParameters.getProjectId() + "/validate");
-        checkUtils.waitForElementPresent(validateFragment.getRoot());
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
+        waitForElementPresent(validateFragment.getRoot());
         String statusReturning = validateFragment.validate();
-        Screenshots.takeScreenshot(browser, testParameters.getProjectId() + "-validation", this.getClass());
+        Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation", this.getClass());
         return statusReturning;
     }
 
     public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException, InterruptedException {
-        openUrl(PAGE_GDC_MD + "/" + testParameters.getProjectId() + "/ldm/manage2");
-        checkUtils.waitForElementPresent(manage2Fragment.getRoot());
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/ldm/manage2");
+        waitForElementPresent(manage2Fragment.getRoot());
         assertTrue(manage2Fragment.postMAQL(maql, statusPollingCheckIterations), "MAQL was not successfully processed");
     }
 
     public String uploadFileToWebDav(URL resourcePath, String webContainer) throws URISyntaxException {
-        WebDavClient webDav = WebDavClient.getInstance(testParameters.getUser(), testParameters.getPassword());
+        WebDavClient webDav = WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
         File resourceFile = new File(resourcePath.toURI());
         if (webContainer == null) {
             openUrl(PAGE_GDC);
-            checkUtils.waitForElementPresent(gdcFragment.getRoot());
+            waitForElementPresent(gdcFragment.getRoot());
             assertTrue(webDav.createStructure(gdcFragment.getUserUploadsURL()), " Create WebDav storage structure");
         } else webDav.setWebDavStructure(webContainer);
 
@@ -112,44 +109,44 @@ public class GreyPageUtils extends CommonUtils {
         return webDav.getWebDavStructure();
     }
 
-    public java.io.InputStream getFileFromWebDav(String webContainer, URL resourcePath) throws URISyntaxException, IOException {
+    public InputStream getFileFromWebDav(String webContainer, URL resourcePath) throws URISyntaxException, IOException {
         File resourceFile = new File(resourcePath.toURI());
-        return WebDavClient.getInstance(testParameters.getUser(), testParameters.getPassword()).getFile(webContainer + "/" + resourceFile.getName());
+        return WebDavClient.getInstance(testParams.getUser(), testParams.getPassword()).getFile(webContainer + "/" + resourceFile.getName());
     }
 
     public String exportProject(boolean exportUsers, boolean exportData, int statusPollingCheckIterations) throws JSONException, InterruptedException {
-        openUrl(PAGE_GDC_MD + "/" + testParameters.getProjectId() + "/maintenance/export");
-        checkUtils.waitForElementPresent(exportFragment.getRoot());
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/export");
+        waitForElementPresent(exportFragment.getRoot());
         return exportFragment.invokeExport(exportUsers, exportData, statusPollingCheckIterations);
     }
 
     public void importProject(String exportToken, int statusPollingCheckIterations)
             throws JSONException, InterruptedException {
-        openUrl(PAGE_GDC_MD + "/" + testParameters.getProjectId() + "/maintenance/import");
-        checkUtils.waitForElementPresent(importFragment.getRoot());
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/import");
+        waitForElementPresent(importFragment.getRoot());
         assertTrue(importFragment.invokeImport(exportToken, statusPollingCheckIterations),
                 "Project import failed");
     }
 
     public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations)
             throws JSONException, InterruptedException {
-        openUrl(PAGE_GDC_MD + "/" + testParameters.getProjectId() + "/etl/pull");
-        checkUtils.waitForElementPresent(pullFragment.getRoot());
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/etl/pull");
+        waitForElementPresent(pullFragment.getRoot());
         assertTrue(pullFragment.invokePull(integrationEntry, statusPollingCheckIterations),
                 "ETL PULL was not successfully processed");
     }
 
     public JSONObject fetchSLIManifest(String dataset) throws JSONException, InterruptedException {
-        openUrl(PAGE_GDC_MD + "/" + testParameters.getProjectId() + "/ldm/singleloadinterface");
-        checkUtils.waitForElementPresent(singleLoadInterfaceFragment.getRoot());
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/ldm/singleloadinterface");
+        waitForElementPresent(singleLoadInterfaceFragment.getRoot());
         return singleLoadInterfaceFragment.postDataset(dataset);
     }
 
     public String validateProjectPartial(Validation... validationOptions) throws JSONException {
-        openUrl(PAGE_GDC_MD + "/" + testParameters.getProjectId() + "/validate");
-        checkUtils.waitForElementPresent(validateFragment.getRoot());
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
+        waitForElementPresent(validateFragment.getRoot());
         String statusReturning = validateFragment.validateOnly(validationOptions);
-        Screenshots.takeScreenshot(browser, testParameters.getProjectId() + "-validation-partial", this.getClass());
+        Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation-partial", this.getClass());
         return statusReturning;
     }
 }

@@ -5,6 +5,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = {"GoodSalesFacts"}, description = "Tests for GoodSales project (view and edit fact functionality) in GD platform")
 public class SimpleFactTest extends ObjectAbstractTest {
 
@@ -25,26 +27,26 @@ public class SimpleFactTest extends ObjectAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests"})
     public void factAggregationsTest() throws InterruptedException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
-        waitForElementVisible(ui.factsTable.getRoot());
-        checkUtils.waitForDataPageLoaded();
-        ui.factsTable.selectObject(name);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
+        waitForElementVisible(factsTable.getRoot());
+        waitForDataPageLoaded(browser);
+        factsTable.selectObject(name);
         for (SimpleMetricTypes metricType : SimpleMetricTypes.values()) {
-            ui.factDetailPage.createSimpleMetric(metricType, name);
+            factDetailPage.createSimpleMetric(metricType, name);
         }
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests"})
     public void changeFactFolderTest() throws InterruptedException {
         initObject(name);
-        ui.factDetailPage.changeFactFolder(factFolder);
+        factDetailPage.changeFactFolder(factFolder);
     }
 
     @Override
     public void initObject(String factName) {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
-        checkUtils.waitForDataPageLoaded();
-        waitForElementVisible(ui.factsTable.getRoot());
-        ui.factsTable.selectObject(factName);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
+        waitForDataPageLoaded(browser);
+        waitForElementVisible(factsTable.getRoot());
+        factsTable.selectObject(factName);
     }
 }

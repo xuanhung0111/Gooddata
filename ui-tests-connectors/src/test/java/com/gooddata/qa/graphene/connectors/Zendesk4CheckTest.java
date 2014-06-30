@@ -17,8 +17,8 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.*;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
 public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
@@ -63,7 +63,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
         useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
-        ui.BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
+        BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
     }
 
     /**
@@ -96,7 +96,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createOrganizationMetric() throws InterruptedException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         Map<String, String> data = new HashMap<String, String>();
         data.put("metric1", "# Organizations");
         data.put("attrFolder1", "Organizations");
@@ -245,15 +245,15 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private void createBasicReport(String metric, String reportName) throws InterruptedException {
         List<String> what = new ArrayList<String>();
         what.add(metric);
-        ui.createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
-        waitForElementVisible(BY_ONE_NUMBER_REPORT);
+        createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
+        waitForElementVisible(BY_ONE_NUMBER_REPORT, browser);
     }
 
     private int getNumberFromGDReport(String reportName) {
-        ui.initReportsPage();
-        ui.reportsPage.getReportsList().openReport(reportName);
-        checkUtils.waitForAnalysisPageLoaded();
-        waitForElementVisible(ui.reportPage.getRoot());
+        initReportsPage();
+        reportsPage.getReportsList().openReport(reportName);
+        waitForAnalysisPageLoaded(browser);
+        waitForElementVisible(reportPage.getRoot());
         OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class, browser.findElement(
                 BY_ONE_NUMBER_REPORT));
         return Integer.valueOf(report.getValue().replace(".00", ""));
@@ -266,7 +266,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Override
     public String openZendeskSettingsUrl() {
         openUrl(getIntegrationUri());
-        Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK)).click();
+        Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK, browser)).click();
         return browser.getCurrentUrl();
     }
 }

@@ -14,16 +14,18 @@ import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
 import org.testng.annotations.Test;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = {"dashboardPerf"}, description = "Tests for performance od rendering dashboards in GoodSales project")
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
-        checkUtils.waitForDashboardPageLoaded();
+        openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
+        waitForDashboardPageLoaded(browser);
         for (int i = 1; i <= 10; i++) {
             System.out.println("Iteration:" + i);
-            ui.verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
+            verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
         }
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output);
@@ -72,7 +74,7 @@ public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     private String getClientVersion() throws JSONException {
         openUrl("/gdc/releaseInfo");
-        JSONObject json = greyPages.loadJSON();
+        JSONObject json = loadJSON();
         JSONArray components = json.getJSONObject("release").getJSONArray("components");
         for (int i = 0; i < components.length(); i++) {
             JSONObject component = components.getJSONObject(i);

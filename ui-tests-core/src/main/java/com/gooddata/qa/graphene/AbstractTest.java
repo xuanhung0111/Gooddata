@@ -1,16 +1,13 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.GoodData;
-import com.gooddata.qa.graphene.common.*;
+import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
-import org.json.JSONException;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
@@ -26,10 +23,6 @@ public abstract class AbstractTest extends Arquillian {
     private String propertiesPath;
 
     protected TestParameters testParams;
-    protected CheckUtils checkUtils;
-    protected CommonUtils commonUtils;
-    protected UITestUtils ui;
-    protected GreyPageUtils greyPages;
 
     @Drone
     protected WebDriver browser;
@@ -58,10 +51,6 @@ public abstract class AbstractTest extends Arquillian {
         }
 
         testParams = new TestParameters(testVariables);
-        checkUtils = new CheckUtils(browser);
-        commonUtils = new CommonUtils(browser, checkUtils, testParams);
-        ui = new UITestUtils(browser, checkUtils, testParams);
-        greyPages = new GreyPageUtils(browser, checkUtils, testParams);
 
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
@@ -70,29 +59,22 @@ public abstract class AbstractTest extends Arquillian {
 
     @BeforeMethod
     public void loadPlatformPageBeforeTestMethod() {
-        // register RedBasInterceptor - to check errors in UI
-        //GrapheneProxyInstance proxy = (GrapheneProxyInstance) browser;
-        //proxy.registerInterceptor(new RedBarInterceptor());
-
         openUrl(startPage != null ? startPage : "");
     }
 
-    protected void openUrl(String url) {
-        commonUtils.openUrl(url);
+    public void openUrl(String url) {
+        String pageURL = getRootUrl() + url;
+        System.out.println("Loading page ... " + pageURL);
+        browser.get(pageURL);
     }
 
-    /**
-     * Help method which provides verification if login page is present a sign in a demo user if needed
-     *
-     * @param greyPages - indicator for login at greyPages/UI
-     * @throws JSONException
-     */
-    protected void validSignInWithDemoUser(boolean greyPages) throws JSONException {
-        if (greyPages) {
-            this.greyPages.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
-        } else {
-            ui.signInAtUI(testParams.getUser(), testParams.getPassword());
-        }
+    public String getRootUrl() {
+        return "https://" + testParams.getHost() + "/";
+    }
+
+    public String getBasicRootUrl() {
+        String rootUrl = getRootUrl();
+        return getRootUrl().substring(0, rootUrl.length() - 1);
     }
 
     public RestApiClient getRestApiClient() {
@@ -107,33 +89,5 @@ public abstract class AbstractTest extends Arquillian {
             goodDataClient = new GoodData(testParams.getHost(), testParams.getUser(), testParams.getPassword());
         }
         return goodDataClient;
-    }
-
-    public WebElement waitForElementVisible(By byElement) {
-        return checkUtils.waitForElementVisible(byElement);
-    }
-
-    public WebElement waitForElementVisible(WebElement element) {
-        return checkUtils.waitForElementVisible(element);
-    }
-
-    public void waitForElementNotVisible(By byElement) {
-        checkUtils.waitForElementNotVisible(byElement);
-    }
-
-    public WebElement waitForElementPresent(By byElement) {
-        return checkUtils.waitForElementPresent(byElement);
-    }
-
-    public WebElement waitForElementPresent(WebElement element) {
-        return checkUtils.waitForElementPresent(element);
-    }
-
-    public void waitForElementNotPresent(By byElement) {
-        checkUtils.waitForElementNotPresent(byElement);
-    }
-
-    public void waitForElementNotPresent(WebElement element) {
-        checkUtils.waitForElementNotPresent(element);
     }
 }

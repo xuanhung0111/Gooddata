@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.performance.dashboards;
 
-import com.gooddata.qa.graphene.AbstractTest;
+import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ClearCaches;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = {"projectDashboardPerf"}, description = "Tests for performance of rendering dashboards of given project")
-public class ProjectPerfWalkthrough extends AbstractTest {
+public class ProjectPerfWalkthrough extends AbstractUITest {
 
     private int startDashboardIndex = 1;
     private boolean singleDashboardComputation = false;
@@ -40,15 +42,15 @@ public class ProjectPerfWalkthrough extends AbstractTest {
 
     @Test(groups = {"perfInit"})
     public void init() throws JSONException {
-        greyPages.signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        signInAtGreyPages(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {"perfInit"})
     public void clearCaches() throws JSONException {
         if (clearCaches) {
             System.out.println("Going to clear caches in project: " + testParams.getProjectId());
-            openUrl(greyPages.PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/clearCaches");
-            ClearCaches clearCaches = Graphene.createPageFragment(ClearCaches.class, browser.findElement(greyPages.BY_GP_FORM));
+            openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/clearCaches");
+            ClearCaches clearCaches = Graphene.createPageFragment(ClearCaches.class, browser.findElement(BY_GP_FORM));
             clearCaches.clearCaches(0);
         } else {
             System.out.println("Caches clear wasn't required");
@@ -57,20 +59,20 @@ public class ProjectPerfWalkthrough extends AbstractTest {
 
     @Test(dependsOnGroups = {"perfInit"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
+        openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
         verifyProjectDashboardsAndTabs(startDashboardIndex);
     }
 
     protected void verifyProjectDashboardsAndTabs(int dashboardStartIndex) throws InterruptedException, JSONException {
-        checkUtils.waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         Thread.sleep(5000);
-        waitForElementVisible(ui.dashboardsPage.getRoot());
-        int dashboardsCount = ui.dashboardsPage.getDashboardsCount();
+        waitForElementVisible(dashboardsPage.getRoot());
+        int dashboardsCount = dashboardsPage.getDashboardsCount();
         for (int i = dashboardStartIndex; i <= dashboardsCount; i++) {
-            ui.dashboardsPage.selectDashboard(i);
+            dashboardsPage.selectDashboard(i);
             Thread.sleep(5000);
             System.out.println("Current dashboard index: " + i);
-            singleDashboardWalkthrough(i, ui.dashboardsPage.getDashboardName());
+            singleDashboardWalkthrough(i, dashboardsPage.getDashboardName());
             if (singleDashboardComputation) {
                 System.out.println("Single dashboard computation was required, following dashboards won't be computed");
                 return;
@@ -79,7 +81,7 @@ public class ProjectPerfWalkthrough extends AbstractTest {
     }
 
     private void singleDashboardWalkthrough(int dashboardIndex, String dashboardName) throws JSONException {
-        DashboardTabs tabs = ui.dashboardsPage.getTabs();
+        DashboardTabs tabs = dashboardsPage.getTabs();
         int numberOfTabs = tabs.getNumberOfTabs();
         System.out.println("Number of tabs on dashboard " + dashboardName + ": " + numberOfTabs);
         List<String> tabLabels = tabs.getAllTabNames();
@@ -87,10 +89,10 @@ public class ProjectPerfWalkthrough extends AbstractTest {
         for (int i = 0; i < tabLabels.size(); i++) {
             tabs.openTab(i);
             System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
-            checkUtils.waitForDashboardPageLoaded();
+            waitForDashboardPageLoaded(browser);
             Screenshots.takeScreenshot(browser, dashboardName + "-tab-" + i + "-" + tabLabels.get(i), this.getClass());
             Assert.assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
-            checkUtils.checkRedBar();
+            checkRedBar(browser);
         }
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output, dashboardIndex, dashboardName);

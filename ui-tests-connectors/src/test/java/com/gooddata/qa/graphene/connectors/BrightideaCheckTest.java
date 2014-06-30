@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.enums.Connectors;
 import java.util.HashMap;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"connectors", "brightidea"}, description = "Checklist tests for Brightidea connector in GD platform")
 public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
@@ -54,18 +55,18 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testBrightideaIntegrationConfiguration() throws InterruptedException, JSONException {
         // Brightidea specific configuration of integration (tfue page)
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(ui.BY_IFRAME);
-        browser.switchTo().frame(browser.findElement(ui.BY_IFRAME));
-        waitForElementVisible(BY_SPAN_WELCOME_BEFORE_CONFIG);
-        waitForElementVisible(BY_INPUT_API_KEY).sendKeys(brightideaApiKey);
-        waitForElementVisible(BY_INPUT_AFFILIATE_ID).sendKeys(brightideaAffiliateId);
-        waitForElementVisible(BY_INPUT_HOSTNAME).clear();
-        waitForElementVisible(BY_INPUT_HOSTNAME).sendKeys(brightideaHostname);
-        WebElement select = waitForElementVisible(BY_SELECT_TIMEZONE);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
+        waitForElementVisible(BY_IFRAME, browser);
+        browser.switchTo().frame(browser.findElement(BY_IFRAME));
+        waitForElementVisible(BY_SPAN_WELCOME_BEFORE_CONFIG, browser);
+        waitForElementVisible(BY_INPUT_API_KEY, browser).sendKeys(brightideaApiKey);
+        waitForElementVisible(BY_INPUT_AFFILIATE_ID, browser).sendKeys(brightideaAffiliateId);
+        waitForElementVisible(BY_INPUT_HOSTNAME, browser).clear();
+        waitForElementVisible(BY_INPUT_HOSTNAME, browser).sendKeys(brightideaHostname);
+        WebElement select = waitForElementVisible(BY_SELECT_TIMEZONE, browser);
         select.findElement(BY_SELECT_TIMEZONE_OPTION).click();
-        waitForElementVisible(BY_FINISH_BUTTON).click();
-        waitForElementVisible(BY_SPAN_SYNCHRONIZATION_PROGRESS);
+        waitForElementVisible(BY_FINISH_BUTTON, browser).click();
+        waitForElementVisible(BY_SPAN_SYNCHRONIZATION_PROGRESS, browser);
     }
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
@@ -73,11 +74,11 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
     public void testBrightideaIntegration() throws InterruptedException, JSONException {
         // process is scheduled automatically - check status
         openUrl(getProcessesUri());
-        JSONObject json = greyPages.loadJSON();
+        JSONObject json = loadJSON();
         assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
                 "Integration process wasn't started...");
-        waitForElementVisible(greyPages.BY_GP_LINK);
-        Graphene.guardHttp(browser.findElement(greyPages.BY_GP_LINK)).click();
+        waitForElementVisible(BY_GP_LINK, browser);
+        Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
     }
 }

@@ -13,6 +13,8 @@ import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = {"GoodSalesReportFilters"}, description = "Tests for GoodSales project (report filters functionality) in GD platform")
 public class FilterReportTest extends GoodSalesAbstractTest {
 
@@ -44,40 +46,40 @@ public class FilterReportTest extends GoodSalesAbstractTest {
     public void createReportTest() throws InterruptedException {
         List<String> what = Arrays.asList("Amount");
         List<String> how = Arrays.asList("Stage Name");
-        ui.createReport(reportName, ReportTypes.TABLE, what, how, "Simple filter report");
+        createReport(reportName, ReportTypes.TABLE, what, how, "Simple filter report");
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createVariableTest() throws InterruptedException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         data.put("variableName", this.variableName);
         data.put("userValueFlag", "false");
         data.put("attrElements", promptElements);
-        ui.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void attributeFilterTest() throws InterruptedException {
         initReport();
-        ui.reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
-        ui.reportPage.saveReport();
-        checkUtils.checkRedBar();
+        reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
+        reportPage.saveReport();
+        checkRedBar(browser);
     }
 
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rankingFilterTest() throws InterruptedException {
         initReport();
-        ui.reportPage.addFilter(FilterTypes.RANK, data);
-        ui.reportPage.saveReport();
-        checkUtils.checkRedBar();
+        reportPage.addFilter(FilterTypes.RANK, data);
+        reportPage.saveReport();
+        checkRedBar(browser);
     }
 
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rangeFilterTest() throws InterruptedException {
         initReport();
-        ui.reportPage.addFilter(FilterTypes.RANGE, data);
-        ui.reportPage.saveReport();
-        checkUtils.checkRedBar();
+        reportPage.addFilter(FilterTypes.RANGE, data);
+        reportPage.saveReport();
+        checkRedBar(browser);
     }
 
     @Test(dependsOnMethods = {"createReportTest", "createVariableTest"}, groups = {"filter-tests"})
@@ -85,9 +87,9 @@ public class FilterReportTest extends GoodSalesAbstractTest {
         initReport();
         data.put("variable", this.variableName);
         data.put("promptElements", promptElements);
-        ui.reportPage.addFilter(FilterTypes.PROMPT, data);
-        ui.reportPage.saveReport();
-        checkUtils.checkRedBar();
+        reportPage.addFilter(FilterTypes.PROMPT, data);
+        reportPage.saveReport();
+        checkRedBar(browser);
     }
 
     @Test(dependsOnGroups = {"filter-tests"}, groups = {"tests"})
@@ -96,8 +98,8 @@ public class FilterReportTest extends GoodSalesAbstractTest {
     }
 
     private void initReport() {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
-        checkUtils.waitForReportsPageLoaded();
-        ui.reportsPage.getReportsList().openReport(this.reportName);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
+        waitForReportsPageLoaded(browser);
+        reportsPage.getReportsList().openReport(this.reportName);
     }
 }

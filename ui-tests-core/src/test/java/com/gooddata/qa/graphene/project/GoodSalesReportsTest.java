@@ -15,11 +15,11 @@ import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 
-
 import java.io.IOException;
 import java.net.URL;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"GoodSalesReports"}, description = "Tests for GoodSales project (reports functionality) in GD platform")
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {
@@ -41,10 +41,10 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void verifyReportsPage() throws InterruptedException {
-        ui.initReportsPage();
-        assertEquals(ui.reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount,
+        initReportsPage();
+        assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount,
                 "Number of expected reports doesn't match");
-        assertEquals(ui.reportsPage.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount,
+        assertEquals(reportsPage.getCustomFolders().getNumberOfFolders(), expectedGoodSalesReportsCustomFoldersCount,
                 "Number of expected report custom folders doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
     }
@@ -57,11 +57,11 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         String expectedValue = "31,110.00";
 
         URL maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple.txt");
-        greyPages.postMAQL(IOUtils.toString(maqlResource), 60);
+        postMAQL(IOUtils.toString(maqlResource), 60);
 
-        ui.initReportsPage();
-        ui.reportsPage.startCreateReport();
-        ui.reportPage.createSimpleMetric(SimpleMetricTypes.SUM, "Duration", null, true);
+        initReportsPage();
+        reportsPage.startCreateReport();
+        reportPage.createSimpleMetric(SimpleMetricTypes.SUM, "Duration", null, true);
 
         List<String> what = new ArrayList<String>();
         what.add("Duration [Sum]");
@@ -69,17 +69,17 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         how.add("Forecast Category");
 
         prepareReport("Simple CA report", ReportTypes.TABLE, what, how);
-        String bucketRegion = waitForElementPresent(includeArea).getAttribute("gdc:region").replace('0', '1');
-        String computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion))).getText();
+        String bucketRegion = waitForElementPresent(includeArea, browser).getAttribute("gdc:region").replace('0', '1');
+        String computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion)), browser).getText();
         Assert.assertEquals(computedAttr, expectedValue);
 
         /*** invert condition and check if it's reflected on report ***/
         maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple-inv.txt");
-        greyPages.postMAQL(IOUtils.toString(maqlResource), 60);
+        postMAQL(IOUtils.toString(maqlResource), 60);
 
         initReportPage("Simple CA report");
-        bucketRegion = waitForElementPresent(excludeArea).getAttribute("gdc:region").replace('0', '1');
-        computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion))).getText();
+        bucketRegion = waitForElementPresent(excludeArea, browser).getAttribute("gdc:region").replace('0', '1');
+        computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion)), browser).getText();
         Assert.assertEquals(computedAttr, expectedValue);
     }
 
@@ -109,7 +109,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportTabularReportToPDF"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportPDF() {
-        ui.verifyReportExport(ExportFormat.PDF_PORTRAIT, "Simple tabular report", expectedTabularReportExportPDFSize);
+        verifyReportExport(ExportFormat.PDF_PORTRAIT, "Simple tabular report", expectedTabularReportExportPDFSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -131,7 +131,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportTabularReportToCSV"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportCSV() {
-        ui.verifyReportExport(ExportFormat.CSV, "Simple tabular report - 2", expectedTabularReportExportCSVSize);
+        verifyReportExport(ExportFormat.CSV, "Simple tabular report - 2", expectedTabularReportExportCSVSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -153,7 +153,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportTabularReportToXLS"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportXLS() {
-        ui.verifyReportExport(ExportFormat.EXCEL_XLS, "Simple tabular report - 3", expectedTabularReportExportXLSSize);
+        verifyReportExport(ExportFormat.EXCEL_XLS, "Simple tabular report - 3", expectedTabularReportExportXLSSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -175,7 +175,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportTabularReportToXLSX"}, groups = {"tabular-report-exports"})
     public void verifyExportedTabularReportXLSX() {
-        ui.verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4", expectedTabularReportExportXLSXSize);
+        verifyReportExport(ExportFormat.EXCEL_XLSX, "Simple tabular report - 4", expectedTabularReportExportXLSXSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -195,7 +195,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportLineChartToPDF"}, groups = {"chart-exports"})
     public void verifyExportedLineChartPDF() {
-        ui.verifyReportExport(ExportFormat.PDF, "Simple line chart report", expectedLineChartExportPDFSize);
+        verifyReportExport(ExportFormat.PDF, "Simple line chart report", expectedLineChartExportPDFSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -215,7 +215,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportAreaChartToPNG"}, groups = {"chart-exports"})
     public void verifyExportedAreaChartPNG() {
-        ui.verifyReportExport(ExportFormat.IMAGE_PNG, "Simple area chart report", expectedAreaChartReportExportPNGSize);
+        verifyReportExport(ExportFormat.IMAGE_PNG, "Simple area chart report", expectedAreaChartReportExportPNGSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -235,7 +235,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportStackedAreaChartToXLS"}, groups = {"chart-exports"})
     public void verifyExportedStackedAreaChartXLS() {
-        ui.verifyReportExport(ExportFormat.EXCEL_XLS, "Simple stacked area chart report",
+        verifyReportExport(ExportFormat.EXCEL_XLS, "Simple stacked area chart report",
                 expectedStackedAreaChartReportExportXLSSize);
     }
 
@@ -256,7 +256,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportBarChartToCSV"}, groups = {"chart-exports"})
     public void verifyExportedBarChartCSV() {
-        ui.verifyReportExport(ExportFormat.CSV, "Simple bar chart report", expectedBarChartReportExportCSVSize);
+        verifyReportExport(ExportFormat.CSV, "Simple bar chart report", expectedBarChartReportExportCSVSize);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
@@ -271,11 +271,11 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"goodsales-chart", "chart-exports", "tabular-report-exports"}, groups = {"tests"})
     public void verifyCreatedReports() throws InterruptedException {
-        ui.initReportsPage();
-        ui.selectReportsDomainFolder("All");
-        checkUtils.waitForReportsPageLoaded();
+        initReportsPage();
+        selectReportsDomainFolder("All");
+        waitForReportsPageLoaded(browser);
         Thread.sleep(5000);
-        assertEquals(ui.reportsPage.getReportsList().getNumberOfReports(),
+        assertEquals(reportsPage.getReportsList().getNumberOfReports(),
                 expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
         successfulTest = true;
@@ -283,22 +283,22 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
             throws InterruptedException {
-        ui.createReport(reportName, reportType, what, how, "GoodSales");
+        createReport(reportName, reportType, what, how, "GoodSales");
         createdReportsCount++;
     }
 
     private void initReportPage(String reportName) {
-        ui.initReportsPage();
-        ui.selectReportsDomainFolder("My Reports");
-        ui.reportsPage.getReportsList().openReport(reportName);
-        checkUtils.waitForAnalysisPageLoaded();
-        waitForElementVisible(ui.reportPage.getRoot());
+        initReportsPage();
+        selectReportsDomainFolder("My Reports");
+        reportsPage.getReportsList().openReport(reportName);
+        waitForAnalysisPageLoaded(browser);
+        waitForElementVisible(reportPage.getRoot());
     }
 
     private void exportReport(String reportName, ExportFormat format) throws InterruptedException {
         initReportPage(reportName);
-        ui.reportPage.exportReport(format);
-        checkUtils.checkRedBar();
+        reportPage.exportReport(format);
+        checkRedBar(browser);
     }
 
 }

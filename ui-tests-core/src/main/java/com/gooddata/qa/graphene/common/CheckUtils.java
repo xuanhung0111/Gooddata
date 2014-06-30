@@ -7,17 +7,13 @@ import org.openqa.selenium.WebElement;
 
 import static org.testng.Assert.fail;
 
-public class CheckUtils extends CommonUtils {
-
-    public CheckUtils(WebDriver browser) {
-        super(browser, null, null);
-    }
+public class CheckUtils {
 
     private static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
     private static final By BY_RED_BAR_WARNING = By.cssSelector("div.c-status.box-warning");
     private static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
 
-    public void checkRedBar() {
+    public static void checkRedBar(WebDriver browser) {
         if (browser.findElements(BY_RED_BAR).size() != 0) {
             fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
         }
@@ -30,72 +26,72 @@ public class CheckUtils extends CommonUtils {
         }
     }
 
-    public void waitForDashboardPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"));
-        checkRedBar();
+    public static void waitForDashboardPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"), browser);
+        checkRedBar(browser);
     }
 
-    public void waitForReportsPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-domainPage' and contains(@class,'s-displayed')]"));
+    public static void waitForReportsPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-domainPage' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public void waitForDataPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-dataPage' and contains(@class,'s-displayed')]"));
+    public static void waitForDataPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-dataPage' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public void waitForProjectPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"));
+    public static void waitForProjectPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public void waitForPulsePageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-pulsePage' and contains(@class,'s-displayed')]"));
+    public static void waitForPulsePageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-pulsePage' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public void waitForProjectsPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"));
+    public static void waitForProjectsPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public void waitForAnalysisPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"));
+    public static void waitForAnalysisPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public void waitForSchedulesPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"));
+    public static void waitForSchedulesPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public void waitForObjectPageLoaded() {
-        waitForElementVisible(By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]"));
+    public static void waitForObjectPageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]"), browser);
     }
 
-    public WebElement waitForElementVisible(By byElement) {
+    public static WebElement waitForElementVisible(By byElement, WebDriver browser) {
         Graphene.waitGui().until().element(byElement).is().visible();
         return browser.findElement(byElement);
     }
 
-    public WebElement waitForElementVisible(WebElement element) {
+    public static WebElement waitForElementVisible(WebElement element) {
         Graphene.waitGui().until().element(element).is().visible();
         return element;
     }
 
-    public void waitForElementNotVisible(By byElement) {
+    public static void waitForElementNotVisible(By byElement) {
         Graphene.waitGui().until().element(byElement).is().not().visible();
     }
 
-    public WebElement waitForElementPresent(By byElement) {
+    public static WebElement waitForElementPresent(By byElement, WebDriver browser) {
         Graphene.waitGui().until().element(byElement).is().present();
         return browser.findElement(byElement);
     }
 
-    public WebElement waitForElementPresent(WebElement element) {
+    public static WebElement waitForElementPresent(WebElement element) {
         Graphene.waitGui().until().element(element).is().present();
         return element;
     }
 
-    public void waitForElementNotPresent(By byElement) {
+    public static void waitForElementNotPresent(By byElement) {
         Graphene.waitGui().until().element(byElement).is().not().present();
     }
 
-    public void waitForElementNotPresent(WebElement element) {
+    public static void waitForElementNotPresent(WebElement element) {
         Graphene.waitGui().until().element(element).is().not().present();
     }
 }

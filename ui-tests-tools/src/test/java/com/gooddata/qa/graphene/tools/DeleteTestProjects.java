@@ -2,11 +2,12 @@ package com.gooddata.qa.graphene.tools;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.AbstractUITest;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 /**
  * This is a helper class to delete test projects from required GD host
@@ -14,11 +15,11 @@ import com.gooddata.qa.graphene.AbstractTest;
  * @author michal.vanco@gooddata.com
  */
 @Test(groups = {"tools"}, description = "Tools tests")
-public class DeleteTestProjects extends AbstractTest {
+public class DeleteTestProjects extends AbstractUITest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = ui.PAGE_LOGIN;
+        startPage = PAGE_LOGIN;
     }
 
     @Test(groups = "deleteProjectsInit")
@@ -52,13 +53,13 @@ public class DeleteTestProjects extends AbstractTest {
     }
 
     private void deleteProjects(String projectSubstring) throws InterruptedException {
-        openUrl(ui.PAGE_PROJECTS);
-        waitForElementVisible(ui.projectsPage.getRoot());
+        openUrl(PAGE_PROJECTS);
+        waitForElementVisible(projectsPage.getRoot());
         Thread.sleep(5000);
-        List<String> projectsToDelete = ui.projectsPage.getProjectsIds(projectSubstring);
+        List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
         System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
         for (String projectToDelete : projectsToDelete) {
-            ui.deleteProject(projectToDelete);
+            deleteProject(projectToDelete);
         }
     }
 

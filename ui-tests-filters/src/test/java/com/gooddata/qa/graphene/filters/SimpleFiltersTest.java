@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.filters;
 
 import java.util.List;
 
+import com.gooddata.qa.graphene.AbstractUITest;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -12,12 +13,13 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
 
-public class SimpleFiltersTest extends AbstractTest {
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
+public class SimpleFiltersTest extends AbstractUITest {
 
     DashboardsPage dashboards;
 
@@ -31,7 +33,7 @@ public class SimpleFiltersTest extends AbstractTest {
     public void initStartPage() {
         testParams.setProjectId(testParams.loadProperty("projectId"));
 
-        startPage = ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
+        startPage = PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
                 + "|projectDashboardPage";
     }
 
@@ -67,9 +69,9 @@ public class SimpleFiltersTest extends AbstractTest {
         // TODO - redirect
         Thread.sleep(5000);
         validSignInWithDemoUser(false);
-        checkUtils.waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         dashboards = Graphene.createPageFragment(DashboardsPage.class,
-                browser.findElement(ui.BY_PANEL_ROOT));
+                browser.findElement(BY_PANEL_ROOT));
         Assert.assertNotNull(dashboards, "Dashboard page not initialized!");
 
         DashboardTabs tabs = dashboards.getTabs();

@@ -7,8 +7,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-public abstract class AbstractProjectTest extends AbstractTest {
+public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected String projectTitle = "simple-project";
     protected String projectTemplate = "";
@@ -22,28 +23,28 @@ public abstract class AbstractProjectTest extends AbstractTest {
     @Test(groups = {"projectInit"})
     public void init() throws JSONException {
         // sign in with demo user
-        ui.signInAtUI(testParams.getUser(), testParams.getPassword());
+        signInAtUI(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnGroups = {"projectInit"}, groups = {"tests"})
     public void createProject() throws JSONException, InterruptedException {
-        openUrl(greyPages.PAGE_GDC_PROJECTS);
-        checkUtils.waitForElementVisible(greyPages.gpProject.getRoot());
+        openUrl(PAGE_GDC_PROJECTS);
+        waitForElementVisible(gpProject.getRoot());
 
         projectTitle += "-" + testParams.getDwhDriver().name();
         if (projectTemplate.isEmpty()) {
-            testParams.setProjectId(greyPages.gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken(), testParams.getDwhDriver(), projectCreateCheckIterations));
+            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken(), testParams.getDwhDriver(), projectCreateCheckIterations));
         } else {
-            testParams.setProjectId(greyPages.gpProject.createProject(projectTitle, projectTitle, projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG, projectCreateCheckIterations));
+            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG, projectCreateCheckIterations));
 
             if (testParams.getDwhDriver().equals(DWHDriver.VERTICA)) {
-                String exportToken = greyPages.exportProject(true, true, projectCreateCheckIterations * 5);
-                ui.deleteProject(testParams.getProjectId());
+                String exportToken = exportProject(true, true, projectCreateCheckIterations * 5);
+                deleteProject(testParams.getProjectId());
 
-                openUrl(greyPages.PAGE_GDC_PROJECTS);
-                waitForElementVisible(greyPages.gpProject.getRoot());
-                testParams.setProjectId(greyPages.gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken2(), testParams.getDwhDriver(), projectCreateCheckIterations));
-                greyPages.importProject(exportToken, projectCreateCheckIterations * 5);
+                openUrl(PAGE_GDC_PROJECTS);
+                waitForElementVisible(gpProject.getRoot());
+                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken2(), testParams.getDwhDriver(), projectCreateCheckIterations));
+                importProject(exportToken, projectCreateCheckIterations * 5);
             }
         }
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
@@ -57,11 +58,11 @@ public abstract class AbstractProjectTest extends AbstractTest {
             System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects");
             return;
         }
-        assertEquals(greyPages.validateProject(), "OK");
+        assertEquals(validateProject(), "OK");
     }
 
     @Test(dependsOnMethods = {"validateProjectAfterTests"}, alwaysRun = true)
     public void deleteProject() {
-        ui.deleteProjectByDeleteMode(successfulTest);
+        deleteProjectByDeleteMode(successfulTest);
     }
 }

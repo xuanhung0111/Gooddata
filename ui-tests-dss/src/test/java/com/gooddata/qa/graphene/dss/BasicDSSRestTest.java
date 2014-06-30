@@ -18,6 +18,7 @@ import static java.lang.String.format;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"hds"}, description = "Basic verification of hds restapi in GD platform")
 public class BasicDSSRestTest extends AbstractDSSTest {
@@ -54,17 +55,17 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(groups = {"hdsInit"})
     public void resourceStoragesNotAvailableForAnonymous() throws JSONException {
-        waitForElementPresent(greyPageUtils.gpLoginFragment.getRoot());
+        waitForElementPresent(gpLoginFragment.getRoot());
         assertTrue(browser.getCurrentUrl().contains("gdc/account/login"),
                 "Redirect to /gdc/account/login wasn't done for anonymous user");
     }
 
     @Test(groups = {"hdsInit"}, dependsOnMethods = {"resourceStoragesNotAvailableForAnonymous"})
     public void resourceStoragesAvailable() throws JSONException {
-        validSignInWithDemoUser(true);
+        signInAtGreyPages(testParams.getUser(), testParams.getPassword());
 
         loadPlatformPageBeforeTestMethod();
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = loadJSON();
         assertTrue(json.getJSONObject("dssInstances").has("items"), "DSS instances with items array is not available");
         takeScreenshot(browser, "hds-base-resource", this.getClass());
     }
@@ -76,7 +77,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnGroups = {"hdsInit"})
     public void hdsResourceLinkNotAvailableAtBasicResource() {
-        openUrl(greyPageUtils.PAGE_GDC);
+        openUrl(PAGE_GDC);
         assertEquals(browser.getTitle(), "GoodData API root");
         assertTrue(browser.findElements(By.partialLinkText("dssInstances")).size() == 0,
                 "DSS instances link is present at basic /gdc resource");
@@ -86,7 +87,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     public void verifyDssRoot() throws JSONException {
         openUrl(PAGE_DSS_ROOT);
 
-        final JSONObject json = greyPageUtils.loadJSON();
+        final JSONObject json = loadJSON();
         final JSONObject dssObject = json.getJSONObject("dss");
         final JSONObject linksObject = dssObject.getJSONObject("links");
         assertEquals("/gdc/dss", linksObject.getString("self"));
@@ -99,7 +100,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         assertTrue(instancesLink.size() == 1, "DSS root does not contain dssInstances link");
         instancesLink.get(0).click();
 
-        assertEquals(commonUtils.getBasicRootUrl() + "/gdc/dss/instances", browser.getCurrentUrl());
+        assertEquals(getBasicRootUrl() + "/gdc/dss/instances", browser.getCurrentUrl());
     }
 
     @Test(dependsOnGroups = {"hdsInit"})
@@ -131,7 +132,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnMethods = {"createStorage"})
     public void verifyStorageUpdateFormPresentWithTrailingSlash() throws JSONException {
-        browser.get(commonUtils.getBasicRootUrl() + storageUrl + "/");
+        browser.get(getBasicRootUrl() + storageUrl + "/");
         waitForElementVisible(storageForm.getRoot());
     }
 
@@ -156,8 +157,8 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     @Test(dependsOnMethods = {"updateStorage", "removeUserFromStorageByLogin"}, alwaysRun = true)
     public void deleteStorage() throws JSONException {
         openStorageUrl();
-        waitForElementVisible(greyPageUtils.BY_GP_FORM_SECOND);
-        StorageFragment storage = createPageFragment(StorageFragment.class, browser.findElement(greyPageUtils.BY_GP_FORM_SECOND));
+        waitForElementVisible(BY_GP_FORM_SECOND, browser);
+        StorageFragment storage = createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM_SECOND));
         assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
         storage.deleteStorageSuccess();
     }
@@ -212,7 +213,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnMethods = {"verifyStorageEnabled"})
     public void verifyStorageUsersAddFormPresentWithTrailingSlash() throws JSONException {
-        browser.get(commonUtils.getBasicRootUrl() + getStorageUsersUrl() + "/");
+        browser.get(getBasicRootUrl() + getStorageUsersUrl() + "/");
         waitForElementVisible(storageUsersForm.getRoot());
     }
 
@@ -245,11 +246,11 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     public void removeUserFromStorage() throws Exception {
         browser.get(getAddedUserUrlWithHost());
         final StorageUsersFragment deleteFragment =
-                createPageFragment(StorageUsersFragment.class, browser.findElement(greyPageUtils.BY_GP_FORM_SECOND));
+                createPageFragment(StorageUsersFragment.class, browser.findElement(BY_GP_FORM_SECOND));
         deleteFragment.verifyValidDeleteUserForm();
         deleteFragment.deleteUser();
-        final JSONObject jsonObject = greyPageUtils.loadJSON();
-        assertEquals(browser.getCurrentUrl(), commonUtils.getBasicRootUrl() + storageUrl + "/users");
+        final JSONObject jsonObject = loadJSON();
+        assertEquals(browser.getCurrentUrl(), getBasicRootUrl() + storageUrl + "/users");
         assertEquals(1, jsonObject.getJSONObject("users").getJSONArray("items").length());
     }
 
@@ -336,8 +337,8 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     @Test(dependsOnMethods = {"verifyDeletedStorage"})
     public void deleteDeletedStorage() throws JSONException, InterruptedException {
         openStorageUrl();
-        waitForElementVisible(greyPageUtils.BY_GP_FORM_SECOND);
-        StorageFragment storage = createPageFragment(StorageFragment.class, browser.findElement(greyPageUtils.BY_GP_FORM_SECOND));
+        waitForElementVisible(BY_GP_FORM_SECOND, browser);
+        StorageFragment storage = createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM_SECOND));
         assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
         storage.deleteStorage();
         verifyStorageNotReady(storageUrl);
@@ -345,13 +346,13 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnMethods = {"deleteDeletedStorage"})
     public void getUsersInDeletedStorage() throws JSONException {
-        browser.get(commonUtils.getBasicRootUrl() + getStorageUsersUrl());
+        browser.get(getBasicRootUrl() + getStorageUsersUrl());
         verifyStorageNotReady(getStorageUsersUrl());
     }
 
     @Test(dependsOnMethods = {"deleteDeletedStorage"})
     public void getJdbcInfoInDeletedStorage() throws JSONException {
-        browser.get(commonUtils.getBasicRootUrl() + getStorageJdbcUrl());
+        browser.get(getBasicRootUrl() + getStorageJdbcUrl());
         verifyStorageNotReady(getStorageJdbcUrl());
     }
 
@@ -372,15 +373,15 @@ public class BasicDSSRestTest extends AbstractDSSTest {
      */
 
     private void openStorageUrl() {
-        browser.get(commonUtils.getBasicRootUrl() + storageUrl);
+        browser.get(getBasicRootUrl() + storageUrl);
         waitForElementVisible(storageForm.getRoot());
-        waitForElementPresent(greyPageUtils.BY_GP_PRE_JSON);
+        waitForElementPresent(BY_GP_PRE_JSON, browser);
     }
 
     private void openStorageUsersUrl() {
-        browser.get(commonUtils.getBasicRootUrl() + getStorageUsersUrl());
+        browser.get(getBasicRootUrl() + getStorageUsersUrl());
         waitForElementVisible(storageUsersForm.getRoot());
-        waitForElementPresent(greyPageUtils.BY_GP_PRE_JSON);
+        waitForElementPresent(BY_GP_PRE_JSON, browser);
     }
 
     private String getStorageUsersUrl() {
@@ -400,7 +401,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     }
 
     private String getAddedUserUrlWithHost() {
-        return commonUtils.getBasicRootUrl() + getAddedUserUrl();
+        return getBasicRootUrl() + getAddedUserUrl();
     }
 
     private void createInvalidStorage(String title, String description, String authorizationToken,
@@ -414,7 +415,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     private void verifyUser(final String role, final String screenshotName) throws JSONException {
         browser.get(getAddedUserUrlWithHost());
 
-        final JSONObject json = greyPageUtils.loadJSON();
+        final JSONObject json = loadJSON();
         takeScreenshot(browser, screenshotName, this.getClass());
         final JSONObject userObject = json.getJSONObject("user");
         assertEquals(role, userObject.getString("role"));
@@ -443,14 +444,14 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     private void verifyErrorMessage(String messageSubstring, String expectedPage) throws JSONException {
         assertTrue(browser.getCurrentUrl().endsWith(expectedPage), "Browser was redirected at another page");
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = loadJSON();
         String errorMessage = json.getJSONObject("error").getString("message");
         assertTrue(errorMessage.contains(messageSubstring), "Another error message present: " + errorMessage +
                 ", expected message substring: " + messageSubstring);
     }
 
     private void verifyStoragesResourceJSON() throws JSONException {
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = loadJSON();
         assertTrue(json.getJSONObject("dssInstances").has("items"), "DSS instances with items array is not available");
         JSONArray storagesItems = json.getJSONObject("dssInstances").getJSONArray("items");
         if (storagesItems.length() > 0) {
@@ -473,7 +474,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     private void verifyStorage(final String title, final String description, final String state) throws JSONException {
         openStorageUrl();
         takeScreenshot(browser, "hds-simple-storage", this.getClass());
-        JSONObject json = greyPageUtils.loadJSON();
+        JSONObject json = loadJSON();
         assertTrue(json.has("dssInstance"), "DSS instance element isn't present");
         JSONObject storage = json.getJSONObject("dssInstance");
         assertTrue(storage.getString("title").equals(title), "DSS instance title doesn't match");
@@ -495,11 +496,11 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         assertEquals(updatedByUrl, userCreatedByUrl, "DSS instance createdBy and updatedBy attributes do not match");
         assertTrue(storage.has("created"), "Created time not present");
         assertTrue(storage.has("updated"), "Updated time not present");
-        browser.get(commonUtils.getBasicRootUrl() + getStorageUsersUrl());
+        browser.get(getBasicRootUrl() + getStorageUsersUrl());
     }
 
     private void verifyStorageUsers() throws JSONException {
-        JSONObject jsonUsers = greyPageUtils.loadJSON();
+        JSONObject jsonUsers = loadJSON();
         assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("parent").equals(storageUrl),
                 "DSS instance users parent link doesn't match");
         assertTrue(jsonUsers.getJSONObject("users").getJSONObject("links").getString("self").equals(
@@ -509,8 +510,8 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         assertTrue(jsonUsers.getJSONObject("users").getJSONArray("items").getJSONObject(0).getJSONObject("user")
                 .getString("profile").equals(userCreatedByUrl),
                 "Creator in users doesn't match with creator in storage");
-        browser.get(commonUtils.getBasicRootUrl() + userCreatedByUrl);
-        JSONObject jsonUser = greyPageUtils.loadJSON();
+        browser.get(getBasicRootUrl() + userCreatedByUrl);
+        JSONObject jsonUser = loadJSON();
         assertTrue(jsonUser.getJSONObject("accountSetting").getString("login").equals(testParams.getUser()),
                 "Login of user in profile doesn't match");
     }

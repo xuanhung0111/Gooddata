@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.upload.*;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractUploadTest extends AbstractProjectTest {
 
@@ -26,12 +27,11 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	protected Map<String, String[]> expectedDashboardsAndTabs;
 	protected Map<String, String[]> emptyDashboardsAndTabs;
 
-	protected static final By BY_INPUT = By
-			.xpath("//input[contains(@class, 'has-error')]");
+	protected static final By BY_INPUT = By.xpath("//input[contains(@class, 'has-error')]");
 	protected static final By BY_BUBBLE = By
 			.xpath("//div[contains(@class, 'bubble-negative') and contains(@class, 'isActive')]");
-	protected static final By BY_BUBBLE_CONTENT = By
-			.xpath("//div[@class='content']");
+	protected static final By BY_BUBBLE_CONTENT = By.xpath("//div[@class='content']");
+    protected static final By BY_UPLOAD_DASHBOARD = By.xpath("//iframe[contains(@src,'Auto-Tab')]");
 
 	@FindBy(xpath = "//div[@id='gridContainerTab']")
 	protected TableReport report;
@@ -63,45 +63,45 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	protected void prepareReport(String reportName, ReportTypes reportType,
 			List<String> what, List<String> how) throws InterruptedException {
-		ui.initReportsPage();
-        ui.reportsPage.startCreateReport();
-		checkUtils.waitForAnalysisPageLoaded();
-		waitForElementVisible(ui.reportPage.getRoot());
-		assertNotNull(ui.reportPage, "Report page not initialized!");
-        ui.reportPage.createReport(reportName, reportType, what, how);
+		initReportsPage();
+        reportsPage.startCreateReport();
+		waitForAnalysisPageLoaded(browser);
+		waitForElementVisible(reportPage.getRoot());
+		assertNotNull(reportPage, "Report page not initialized!");
+        reportPage.createReport(reportName, reportType, what, how);
 	}
 
 	protected void deleteDataset(String datasetName)
 			throws InterruptedException {
-		openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|dataSet");
-		waitForElementVisible(ui.datasetsTable.getRoot());
-		checkUtils.waitForDataPageLoaded();
-        ui.datasetsTable.selectObject(datasetName);
-        ui.datasetDetailPage.deleteDataset();
+		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|dataSet");
+		waitForElementVisible(datasetsTable.getRoot());
+		waitForDataPageLoaded(browser);
+        datasetsTable.selectObject(datasetName);
+        datasetDetailPage.deleteDataset();
 	}
 
 	protected void deleteDashboard() throws InterruptedException {
-        ui.dashboardsPage.deleteDashboard();
-		checkUtils.waitForDashboardPageLoaded();
-        ui.verifyProjectDashboardsAndTabs(true, emptyDashboardsAndTabs, false);
+        dashboardsPage.deleteDashboard();
+		waitForDashboardPageLoaded(browser);
+        verifyProjectDashboardsAndTabs(true, emptyDashboardsAndTabs, false);
 	}
 
 	protected void checkAttributeName(String attributeName)
 			throws InterruptedException {
-		openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
-		waitForElementVisible(ui.attributesTable.getRoot());
-		checkUtils.waitForDataPageLoaded();
+		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+		waitForElementVisible(attributesTable.getRoot());
+		waitForDataPageLoaded(browser);
 		System.out.println("Check attribute name is displayed well.");
-		assertTrue(ui.attributesTable.selectObject(attributeName));
+		assertTrue(attributesTable.selectObject(attributeName));
 	}
 
 	protected void selectFileToUpload(String fileName)
 			throws InterruptedException {
-		openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-		checkUtils.waitForDashboardPageLoaded();
-		openUrl(ui.PAGE_UPLOAD);
-		waitForElementVisible(ui.upload.getRoot());
-        ui.upload.uploadFile(csvFilePath + fileName + ".csv");
+		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
+		waitForDashboardPageLoaded(browser);
+		openUrl(PAGE_UPLOAD);
+		waitForElementVisible(upload.getRoot());
+        upload.uploadFile(csvFilePath + fileName + ".csv");
 	}
 	
 	protected void checkErrorColumn(UploadColumns uploadColumns, int columnIndex, boolean hasBubble, String bubbleMessage){
@@ -117,10 +117,10 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	}
 	
 	protected void uploadInvalidCSVFile(String fileName, String errorTitle, String errorMessage, String errorSupport) throws InterruptedException{
-		openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-		checkUtils.waitForDashboardPageLoaded();
-		openUrl(ui.PAGE_UPLOAD);
-		waitForElementVisible(ui.upload.getRoot());
+		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
+		waitForDashboardPageLoaded(browser);
+		openUrl(PAGE_UPLOAD);
+		waitForElementVisible(upload.getRoot());
 		String filePath = csvFilePath + fileName + ".csv";
 		System.out.println("Going to upload file: " + filePath);
 		waitForElementPresent(uploadFile).sendKeys(filePath);
@@ -130,13 +130,13 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 		Screenshots.takeScreenshot(browser, "check-incorrect-csv-file-upload",
 				this.getClass());
 		if (errorTitle != null){
-			assertEquals(ui.upload.getErrorTitle(errorMessageElement).getText(), errorTitle);
+			assertEquals(upload.getErrorTitle(errorMessageElement).getText(), errorTitle);
 		}
 		if (errorMessage != null){
-			assertEquals(ui.upload.getErrorMessage(errorMessageElement).getText(), errorMessage);
+			assertEquals(upload.getErrorMessage(errorMessageElement).getText(), errorMessage);
 		}
 		if(errorSupport != null){
-			assertEquals(ui.upload.getErrorSupport(errorMessageElement).getText(), errorSupport);
+			assertEquals(upload.getErrorSupport(errorMessageElement).getText(), errorSupport);
 		}
 	}
 
@@ -171,26 +171,26 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	public void uploadFileAndClean(String fileName) throws InterruptedException {
 		try {
-            ui.uploadCSV(csvFilePath + fileName + ".csv", null, "simple-upload-"
+            uploadCSV(csvFilePath + fileName + ".csv", null, "simple-upload-"
 							+ fileName);
-            ui.verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, false);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, false);
 		} finally {
-	        checkUtils.waitForDashboardPageLoaded();
+	        waitForDashboardPageLoaded(browser);
 			deleteDashboard();
 			deleteDataset(fileName);
-			waitForElementVisible(BY_EMPTY_DATASET);
+			waitForElementVisible(BY_EMPTY_DATASET, browser);
 		}
 	}
 
 	protected void cleanDashboardAndDatasets(List<String> datasets)
 			throws InterruptedException {
-		openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-        checkUtils.waitForDashboardPageLoaded();
+		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
+        waitForDashboardPageLoaded(browser);
 		deleteDashboard();
 		for (String dataset : datasets) {
 			deleteDataset(dataset);
 		}
-		assertTrue(ui.dataPage.getRoot().findElement(BY_EMPTY_DATASET).isDisplayed());
+		assertTrue(dataPage.getRoot().findElement(BY_EMPTY_DATASET).isDisplayed());
 	}
 
 	protected void uploadDifferentDateFormat(String uploadFileName)
@@ -198,7 +198,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 		selectFileToUpload(uploadFileName);
 		Screenshots.takeScreenshot(browser, "different-date-format-csv-upload-"
 				+ uploadFileName, this.getClass());
-		UploadColumns uploadColumns = ui.upload.getUploadColumns();
+		UploadColumns uploadColumns = upload.getUploadColumns();
 		assertEquals(uploadColumns.getNumberOfColumns(), 9);
 		List<Integer> columnIndexes = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8);
 		List<String> guessedDataTypes = Arrays.asList("TEXT", "TEXT", "TEXT",
@@ -209,9 +209,9 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 		uploadColumns.assertColumnsType(columnIndexes, guessedDataTypes);
 		uploadColumns.assertColumnsName(columnIndexes,
 				expectedColumnNames);
-        ui.upload.confirmloadCsv();
-		waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-        ui.verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
+        upload.confirmloadCsv();
+		waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"), browser);
+        verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
 		Screenshots.takeScreenshot(browser, uploadFileName + "-dashboard",
 				this.getClass());
 

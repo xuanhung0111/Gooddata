@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 import java.util.HashMap;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTest {
 
@@ -45,11 +46,11 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
         String settingsUrl = gotoIntegrationSettings();
 
         // pardot specific configuration of API Url (with specific upload user)
-        greyPages.signInAtGreyPages(pardotUploadUser, pardotUploadUserPassword);
+        signInAtGreyPages(pardotUploadUser, pardotUploadUserPassword);
         browser.get(settingsUrl);
-        waitForElementVisible(BY_INPUT_PARDOT_ACCOUNT_ID).sendKeys(pardotAccountId);
-        Graphene.guardHttp(waitForElementVisible(greyPages.BY_GP_BUTTON_SUBMIT)).click();
-        JSONObject json = greyPages.loadJSON();
+        waitForElementVisible(BY_INPUT_PARDOT_ACCOUNT_ID, browser).sendKeys(pardotAccountId);
+        Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
+        JSONObject json = loadJSON();
         assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId,
                 "Pardot accountId was not set to expected value");
     }

@@ -1,13 +1,12 @@
 package com.gooddata.qa.graphene.project;
 
+import com.gooddata.qa.graphene.AbstractUITest;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
-
 @Test(groups = {"projectWalkthrough"}, description = "Tests for verification of existing project - test goes over all dashboard tabs and create screenshots")
-public class ProjectWalktroughTest extends AbstractTest {
+public class ProjectWalktroughTest extends AbstractUITest {
 
     @BeforeClass
     public void initStartPage() {
@@ -18,12 +17,12 @@ public class ProjectWalktroughTest extends AbstractTest {
     @Test(groups = {"projectWalkthroughInit"})
     public void userLogin() throws JSONException {
         // sign in with demo user
-        ui.signInAtUI(testParams.getUser(), testParams.getPassword());
+        signInAtUI(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnGroups = {"projectWalkthroughInit"})
     public void verifyProject() throws InterruptedException {
-        ui.verifyProjectDashboardsAndTabs(false, null, true);
+        verifyProjectDashboardsAndTabs(false, null, true);
     }
 
 }

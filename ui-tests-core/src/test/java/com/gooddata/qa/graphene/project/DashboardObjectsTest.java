@@ -13,6 +13,8 @@ import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = {"dashboardObjects"}, description = "Tests for simple project and dashboard objects functionality in GD platform")
 public class DashboardObjectsTest extends AbstractProjectTest {
 
@@ -27,33 +29,33 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void uploadDataTest() throws InterruptedException {
         String csvFilePath = testParams.loadProperty("csvFilePath");
-        ui.uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
+        uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
     public void createvariableTest() throws InterruptedException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         Map<String, String> data = new HashMap<String, String>();
         data.put("variableName", this.variableName);
         data.put("attribute", "Education");
         data.put("attrElements", "Bachelors Degree, Graduate Degree");
         data.put("userValueFlag", "false");
-        ui.variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
     public void changeStateLabelTest() throws InterruptedException {
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
-        ui.attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
     }
 
     @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"}, groups = {"tests"})
     public void addDashboardObjectsTest() throws InterruptedException {
-        ui.initDashboardsPage();
-        DashboardEditBar dashboardEditBar = ui.dashboardsPage.getDashboardEditBar();
+        initDashboardsPage();
+        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         String dashboardName = "Test";
-        ui.dashboardsPage.addNewDashboard(dashboardName);
-        ui.dashboardsPage.editDashboard();
+        dashboardsPage.addNewDashboard(dashboardName);
+        dashboardsPage.editDashboard();
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, this.variableName);
         dashboardEditBar.addTimeFilterToDashboard(0, "7 ago");
@@ -73,10 +75,10 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"addDashboardObjectsTest"}, groups = {"tests"})
     public void printDashboardTest() throws InterruptedException {
-        ui.initDashboardsPage();
-        String exportedDashboardName = ui.dashboardsPage.printDashboardTab(0);
-        ui.verifyDashboardExport(exportedDashboardName.replace(" ", "_"), expectedDashboardExportSize);
-        checkUtils.checkRedBar();
+        initDashboardsPage();
+        String exportedDashboardName = dashboardsPage.printDashboardTab(0);
+        verifyDashboardExport(exportedDashboardName.replace(" ", "_"), expectedDashboardExportSize);
+        checkRedBar(browser);
         successfulTest = true;
     }
 }

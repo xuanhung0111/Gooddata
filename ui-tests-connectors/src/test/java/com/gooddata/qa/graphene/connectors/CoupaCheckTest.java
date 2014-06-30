@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFrag
 import java.util.HashMap;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"connectors", "coupa"}, description = "Checklist tests for Coupa connector in GD platform")
 public class CoupaCheckTest extends AbstractConnectorsCheckTest {
@@ -52,21 +53,21 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
         // verify empty Coupa dashboard
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(ui.BY_IFRAME);
-        browser.switchTo().frame(browser.findElement(ui.BY_IFRAME));
-        waitForElementVisible(BY_DIV_BEFORE_CONFIG);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
+        waitForElementVisible(BY_IFRAME, browser);
+        browser.switchTo().frame(browser.findElement(BY_IFRAME));
+        waitForElementVisible(BY_DIV_BEFORE_CONFIG, browser);
 
         // go to page with integration settings
         openUrl(getIntegrationUri());
         gotoIntegrationSettings();
 
         // coupa specific configuration
-        waitForElementVisible(BY_INPUT_TIMEZONE).sendKeys(COUPA_INTEGRATION_TIMEZONE);
-        Graphene.guardHttp(browser.findElement(greyPages.BY_GP_BUTTON_SUBMIT)).click();
+        waitForElementVisible(BY_INPUT_TIMEZONE, browser).sendKeys(COUPA_INTEGRATION_TIMEZONE);
+        Graphene.guardHttp(browser.findElement(BY_GP_BUTTON_SUBMIT)).click();
         Graphene.waitGui().until().element(BY_INPUT_TIMEZONE).value().equalTo(COUPA_INTEGRATION_TIMEZONE);
-        Graphene.guardHttp(waitForElementVisible(BY_GP_LINK_INSTANCES)).click();
-        JSONObject json = greyPages.loadJSON();
+        Graphene.guardHttp(waitForElementVisible(BY_GP_LINK_INSTANCES, browser)).click();
+        JSONObject json = loadJSON();
         assertTrue(json.getJSONObject("coupaInstances").getJSONArray("items").length() == 0,
                 "There are no coupa instances for new project yet");
 
@@ -75,10 +76,10 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         coupaInstance.createCoupaInstance(Connectors.COUPA.getConnectorId(), coupaInstanceApiUrl, coupaInstanceApiKey);
 
         // verify progress on Coupa dashboard
-        openUrl(ui.PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForElementVisible(ui.BY_IFRAME);
-        browser.switchTo().frame(browser.findElement(ui.BY_IFRAME));
-        waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS);
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
+        waitForElementVisible(BY_IFRAME, browser);
+        browser.switchTo().frame(browser.findElement(BY_IFRAME));
+        waitForElementVisible(BY_DIV_SYNCHRONIZATION_PROGRESS, browser);
     }
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
