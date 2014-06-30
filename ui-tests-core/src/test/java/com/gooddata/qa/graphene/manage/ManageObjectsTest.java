@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.project;
+package com.gooddata.qa.graphene.manage;
 
 import java.util.Arrays;
 import java.util.HashMap;

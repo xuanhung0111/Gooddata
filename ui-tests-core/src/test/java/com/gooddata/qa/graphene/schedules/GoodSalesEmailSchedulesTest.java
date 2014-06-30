@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.project;
+package com.gooddata.qa.graphene.schedules;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.openqa.selenium.By;

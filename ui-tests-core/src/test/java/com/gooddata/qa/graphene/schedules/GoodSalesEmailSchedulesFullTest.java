@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
  */
-package com.gooddata.qa.graphene.project;
+package com.gooddata.qa.graphene.schedules;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ExportFormat;

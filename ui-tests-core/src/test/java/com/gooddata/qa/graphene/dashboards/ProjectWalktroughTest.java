@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.project;
+package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import org.json.JSONException;

@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.project;
+package com.gooddata.qa.graphene.reports;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
