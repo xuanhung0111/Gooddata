@@ -91,6 +91,10 @@ public class CheckUtils {
         Graphene.waitGui().until().element(byElement).is().not().visible();
     }
 
+    public static void waitForElementNotVisible(Select select) {
+        Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().not().visible();
+    }
+
     public static WebElement waitForElementPresent(By byElement, WebDriver browser) {
         Graphene.waitGui().until().element(byElement).is().present();
         return browser.findElement(byElement);
@@ -101,11 +105,20 @@ public class CheckUtils {
         return element;
     }
 
+    public static Select waitForElementPresent(Select select) {
+        Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().present();
+        return select;
+    }
+
     public static void waitForElementNotPresent(By byElement) {
         Graphene.waitGui().until().element(byElement).is().not().present();
     }
 
     public static void waitForElementNotPresent(WebElement element) {
         Graphene.waitGui().until().element(element).is().not().present();
+    }
+
+    public static void waitForElementNotPresent(Select select) {
+        Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().not().present();
     }
 }
