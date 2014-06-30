@@ -6,6 +6,8 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ProjectAndUsersPage extends AbstractFragment {
 
     @FindBy(xpath = "//span[@class='deleteProject']/button")
@@ -20,7 +22,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(deleteProjectButton).click();
         waitForElementVisible(deleteProjectDialogButton).click();
         //redirect to projects page
-        waitForElementVisible(BY_PROJECTS_LIST);
+        waitForElementVisible(BY_PROJECTS_LIST, browser);
         System.out.println("Project deleted...");
     }
 

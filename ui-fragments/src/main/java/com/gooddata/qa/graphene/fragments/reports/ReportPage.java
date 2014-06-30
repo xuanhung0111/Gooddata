@@ -13,6 +13,8 @@ import org.testng.Assert;
 import java.util.List;
 import java.util.Map;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ReportPage extends AbstractFragment {
 
     @FindBy(id = "analysisReportTitle")
@@ -116,7 +118,7 @@ public class ReportPage extends AbstractFragment {
         // TODO
 
         visualiser.selectReportVisualisation(reportType);
-        waitForAnalysisPageLoaded();
+        waitForAnalysisPageLoaded(browser);
         waitForElementVisible(createReportButton);
         Thread.sleep(2000);
         createReportButton.click();
@@ -126,7 +128,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public void createSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal){
-        waitForAnalysisPageLoaded();
+        waitForAnalysisPageLoaded(browser);
         waitForElementVisible(this.getRoot());
         visualiser.addSimpleMetric(metricOperation, metricOnFact, metricName, addToGlobal);
     }
@@ -176,7 +178,7 @@ public class ReportPage extends AbstractFragment {
 
     public void addFilter(FilterTypes filterType, Map<String, String> data)
             throws InterruptedException {
-        waitForAnalysisPageLoaded();
+        waitForAnalysisPageLoaded(browser);
         waitForElementVisible(filterButton).click();
         waitForElementVisible(reportFilter.getRoot());
         String textOnFilterButton = waitForElementVisible(filterButton)
@@ -206,7 +208,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public void saveReport() throws InterruptedException {
-        waitForAnalysisPageLoaded();
+        waitForAnalysisPageLoaded(browser);
         waitForElementVisible(createReportButton).click();
         if (browser.findElements(By.xpath(confirmSaveDialogLocator)).size() > 0) {
             waitForElementVisible(confirmSaveButton).click();

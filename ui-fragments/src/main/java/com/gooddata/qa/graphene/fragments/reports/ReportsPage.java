@@ -7,6 +7,8 @@ import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ReportsPage extends AbstractFragment {
 
     private static final By BY_ADD_FOLDER_INPUT = By.xpath("..//input");

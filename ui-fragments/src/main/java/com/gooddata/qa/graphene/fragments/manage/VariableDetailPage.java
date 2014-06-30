@@ -10,6 +10,8 @@ import static org.testng.Assert.*;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class VariableDetailPage extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class,'s-name-ipe-editor')]//button[text()='Ok']")
@@ -118,10 +120,10 @@ public class VariableDetailPage extends AbstractFragment {
 	By listOfAttribute = By.xpath(listOfAttributeLocator
 		.replace("${label}",
 			attribute.trim().toLowerCase().replaceAll(" ", "_")));
-	waitForElementVisible(listOfAttribute);
+	waitForElementVisible(listOfAttribute, browser);
 	By attributeToAdd = By.xpath(attributeToAddLocator.replace(
 		"${variableName}", attribute));
-	waitForElementVisible(attributeToAdd).click();
+	waitForElementVisible(attributeToAdd, browser).click();
 	waitForElementVisible(selectButton).click();
 	if (userValueSet) {
 	    waitForElementVisible(chooseButton).click();
@@ -141,7 +143,7 @@ public class VariableDetailPage extends AbstractFragment {
 	for (int i = 0; i < elements.size(); i++) {
 	    listOfElement = By.xpath(listOfElementLocator.replace("${label}",
 		    elements.get(i).trim().toLowerCase().replaceAll(" ", "_")));
-	    waitForElementVisible(listOfElement).click();
+	    waitForElementVisible(listOfElement, browser).click();
 	}
 	waitForElementVisible(setButton).click();
 	waitForElementNotVisible(setButton);

@@ -15,6 +15,8 @@ import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class DashboardEditBar extends AbstractFragment {
 
     @FindBy(css = ".s-btn-save")
@@ -148,7 +150,7 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(addText).click();
 	By textLabel = By.xpath(textLabelLocator.replace(
 		"${textLabel}", textObject.getName()));
-	waitForElementVisible(textLabel).click();
+	waitForElementVisible(textLabel, browser).click();
         waitForElementVisible(dashboardTextObject.getRoot());
         dashboardTextObject.addText(textObject, text, link);
         int widgetCountAfter = listDashboardWidgets.size();

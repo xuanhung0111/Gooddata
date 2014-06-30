@@ -7,6 +7,8 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class AttributePage extends AbstractFragment {
 
     @FindBy(id = "attributesTable")
@@ -39,9 +41,9 @@ public class AttributePage extends AbstractFragment {
 
     public void initAttribute(String attributeName) {
 	waitForElementVisible(attributesTable.getRoot());
-	waitForDataPageLoaded();
+	waitForDataPageLoaded(browser);
 	attributesTable.selectObject(attributeName);
-	waitForObjectPageLoaded();
+	waitForObjectPageLoaded(browser);
 	String variableDetailsWindowHandle = browser.getWindowHandle();
 	browser.switchTo().window(variableDetailsWindowHandle);
 	waitForElementVisible(attributeDetailPage.getRoot());

@@ -8,6 +8,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class SingleLoadInterfaceFragment extends AbstractGreyPagesFragment {
 
     @FindBy
@@ -19,7 +21,7 @@ public class SingleLoadInterfaceFragment extends AbstractGreyPagesFragment {
     public JSONObject postDataset(String datasetName) throws JSONException, InterruptedException {
         waitForElementVisible(this.dataset).sendKeys(datasetName);
         Graphene.guardHttp(submit).click();
-        waitForElementVisible(BY_GP_LINK);
+        waitForElementVisible(BY_GP_LINK, browser);
         String string = loadJSON().getJSONObject("sliLinks").getJSONObject("manifest").getString("uri");
         Graphene.guardHttp(browser.findElement(By.linkText(string))).click();
         return loadJSON();

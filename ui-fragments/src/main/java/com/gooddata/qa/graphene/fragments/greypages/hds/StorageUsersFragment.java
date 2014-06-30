@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class StorageUsersFragment extends AbstractHDSFragment {
 
@@ -42,7 +43,7 @@ public class StorageUsersFragment extends AbstractHDSFragment {
         Graphene.guardHttp(submit).click();
         if (poll) {
             waitForUserAdded(10);
-            waitForElementPresent(BY_GP_LINK).click();
+            waitForElementPresent(BY_GP_LINK, browser).click();
         }
     }
 
@@ -60,7 +61,7 @@ public class StorageUsersFragment extends AbstractHDSFragment {
         waitForElementVisible(submit);
         Graphene.guardHttp(submit).click();
         waitTaskFinished(10);
-        waitForElementPresent(BY_GP_LINK).click();
+        waitForElementPresent(BY_GP_LINK, browser).click();
     }
 
     public void verifyValidAddUserForm() {

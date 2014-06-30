@@ -9,6 +9,8 @@ import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class AccountLoginFragment extends AbstractGreyPagesFragment {
 
     @FindBy(name = "USER")

@@ -7,6 +7,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class StorageFragment extends AbstractHDSFragment {
 
     @FindBy
@@ -45,7 +47,7 @@ public class StorageFragment extends AbstractHDSFragment {
     public String createStorage(String title, String description, String authorizationToken) throws JSONException, InterruptedException {
         fillCreateStorageForm(title, description, authorizationToken);
         waitForElementNotVisible(this.title);
-        waitForElementPresent(BY_GP_PRE_JSON);
+        waitForElementPresent(BY_GP_PRE_JSON, browser);
         return waitForStorageCreated(10);
     }
 
@@ -79,7 +81,7 @@ public class StorageFragment extends AbstractHDSFragment {
 
     public void deleteStorageSuccess() {
         deleteStorage();
-        waitForElementVisible(BY_BUTTON_CREATE);
+        waitForElementVisible(BY_BUTTON_CREATE, browser);
         Assert.assertTrue(browser.getCurrentUrl().endsWith("/dss/instances"), "Browser wasn't redirected to storages page");
     }
 

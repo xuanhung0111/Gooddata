@@ -6,6 +6,8 @@ import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class Manage2Fragment extends AbstractGreyPagesFragment {
 
     @FindBy(name = "maql")
@@ -17,7 +19,7 @@ public class Manage2Fragment extends AbstractGreyPagesFragment {
     public boolean postMAQL(String maql, int checkIterations) throws JSONException, InterruptedException {
         waitForElementVisible(this.maql).sendKeys(maql);
         Graphene.guardHttp(submit).click();
-        waitForElementVisible(BY_GP_LINK);
+        waitForElementVisible(BY_GP_LINK, browser);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         return waitForPollState("OK", checkIterations);
     }

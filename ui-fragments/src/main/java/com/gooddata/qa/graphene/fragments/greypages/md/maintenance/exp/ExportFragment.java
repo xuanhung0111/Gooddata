@@ -7,6 +7,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class ExportFragment extends AbstractGreyPagesFragment {
 
@@ -25,7 +26,7 @@ public class ExportFragment extends AbstractGreyPagesFragment {
         Graphene.guardHttp(submit).click();
         String exportToken = getExportToken();
 
-        waitForElementVisible(BY_GP_LINK);
+        waitForElementVisible(BY_GP_LINK, browser);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         assertTrue(waitForPollState("OK", checkIterations));
         return exportToken;

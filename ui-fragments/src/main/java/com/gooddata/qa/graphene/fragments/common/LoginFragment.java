@@ -2,9 +2,10 @@ package com.gooddata.qa.graphene.fragments.common;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class LoginFragment extends AbstractFragment {
 

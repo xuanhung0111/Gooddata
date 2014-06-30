@@ -10,6 +10,8 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class VariablesPage extends AbstractFragment {
 
     @FindBy(css = ".s-btn-create_variable")
@@ -25,7 +27,7 @@ public class VariablesPage extends AbstractFragment {
 	    throws InterruptedException {
 	String variableName = data.get("variableName");
 	waitForElementVisible(createVariableButton).click();
-	waitForObjectPageLoaded();
+	waitForObjectPageLoaded(browser);
 	String variableDetailsWindowHandle = browser.getWindowHandle();
 	browser.switchTo().window(variableDetailsWindowHandle);
 	switch (type) {
@@ -59,10 +61,10 @@ public class VariablesPage extends AbstractFragment {
     }
 
     public void openVariableFromList(String variableName) {
-	waitForDataPageLoaded();
+	waitForDataPageLoaded(browser);
 	waitForElementVisible(variablesTable.getRoot());
 	variablesTable.selectObject(variableName);
-	waitForObjectPageLoaded();
+	waitForObjectPageLoaded(browser);
     }
 
 }

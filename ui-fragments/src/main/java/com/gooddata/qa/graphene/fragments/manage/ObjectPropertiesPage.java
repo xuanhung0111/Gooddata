@@ -11,6 +11,8 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ObjectPropertiesPage extends AbstractFragment {
     @FindBy(css = ".s-name")
     private WebElement objectNameIpe;
@@ -63,7 +65,7 @@ public class ObjectPropertiesPage extends AbstractFragment {
 	waitForElementVisible(changeFolderButton).click();
 	By objectFolder = By.xpath(folderLocator.replace("${folder}",
 		newFolderName));
-	waitForElementVisible(objectFolder).click();
+	waitForElementVisible(objectFolder, browser).click();
 	waitForElementVisible(loadingWheelFolder);
 	waitForElementNotPresent(loadingWheelFolder);
 	assertEquals(locatedInFolder.getText(), newFolderName,

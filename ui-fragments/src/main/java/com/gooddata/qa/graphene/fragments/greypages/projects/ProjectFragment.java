@@ -11,6 +11,8 @@ import org.openqa.selenium.support.FindBy;
 import java.io.File;
 import java.io.IOException;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ProjectFragment extends AbstractGreyPagesFragment {
 
     @FindBy
@@ -52,7 +54,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         this.authorizationToken.sendKeys(authorizationToken);
         Graphene.guardHttp(submit).click();
         waitForElementNotVisible(this.title);
-        Graphene.guardHttp(waitForElementVisible(BY_GP_LINK)).click();
+        Graphene.guardHttp(waitForElementVisible(BY_GP_LINK, browser)).click();
         return waitForProjectStateEnabled(checkIterations);
     }
 

@@ -9,6 +9,8 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class DashboardTabs extends AbstractFragment {
 
     private static final By BY_TAB_DROP_DOWN_BUTTON = By.cssSelector(".tab-dropdown");

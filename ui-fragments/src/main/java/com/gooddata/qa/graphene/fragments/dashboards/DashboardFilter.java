@@ -8,6 +8,8 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class DashboardFilter extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class, 'attributes sliding')]/div[@class='input']/div/input")
@@ -51,13 +53,13 @@ public class DashboardFilter extends AbstractFragment {
 	    By selectedPrompt = By.xpath(selectedPromptLocator.replace(
 		    "${promptName}", name.toLowerCase()));
 	    waitForElementVisible(promptSearchInput).sendKeys(name);
-	    waitForElementVisible(selectedPrompt).click();
+	    waitForElementVisible(selectedPrompt, browser).click();
 
 	} else {
 	    By selectedAttribute = By.xpath(selectedAttributeLocator.replace(
 		    "${attributeName}", "s-item-" + name.toLowerCase()));
 	    waitForElementVisible(attributeSearchInput).sendKeys(name);
-	    waitForElementVisible(selectedAttribute).click();
+	    waitForElementVisible(selectedAttribute, browser).click();
 	}
 	waitForElementVisible(addFilterButton).click();
 	Thread.sleep(2000);

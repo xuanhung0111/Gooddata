@@ -11,6 +11,8 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class FactDetailPage extends AbstractFragment {
     @FindBy(xpath = "//table[@class = 'factAggregations']")
     private WebElement factAggregationTable;
@@ -35,11 +37,11 @@ public class FactDetailPage extends AbstractFragment {
     private MetricDetailsPage metricDetailPage;
 
     public void createSimpleMetric(SimpleMetricTypes metricType, String factName) {
-	waitForObjectPageLoaded();
+	waitForObjectPageLoaded(browser);
 	String operation = metricType.getLabel();
 	By metricButton = By.xpath(metricButtonLocator.replace("${metricType}",
 		operation));
-	waitForElementVisible(metricButton).click();
+	waitForElementVisible(metricButton, browser).click();
 	waitForElementNotPresent(metricButton);
 	String operationInElement = operation.substring(0, 1).toUpperCase()
 		+ operation.substring(1).toLowerCase();
@@ -47,7 +49,7 @@ public class FactDetailPage extends AbstractFragment {
 		operationInElement);
 	By createdMetric = By.xpath(createdMetricLocator.replace(
 		"${metricType}", operation));
-	waitForElementVisible(createdMetric);
+	waitForElementVisible(createdMetric, browser);
 	assertEquals(browser.findElement(createdMetric).getText(),
 		expectedMetricName, "Metric is not created properly");
 	verifyUsedInMetric(metricType, factName, expectedMetricName);
@@ -63,7 +65,7 @@ public class FactDetailPage extends AbstractFragment {
 	}
 	By metricLink = By.xpath(metricLinkLocator.replace("${metricName}",
 		metricName));
-	waitForElementVisible(metricLink).click();
+	waitForElementVisible(metricLink, browser).click();
 	String expectedMaql = String.format("SELECT %s(%s)", metricType,
 		factName);
 	String expectedFormat = "#,##0.00";
@@ -72,7 +74,7 @@ public class FactDetailPage extends AbstractFragment {
     }
 
     public void changeFactFolder(String newFolderName) {
-	waitForObjectPageLoaded();
+	waitForObjectPageLoaded(browser);
 	waitForElementVisible(factAggregationTable);
 	objectPropertiesPage.changeObjectFolder(newFolderName);
     }

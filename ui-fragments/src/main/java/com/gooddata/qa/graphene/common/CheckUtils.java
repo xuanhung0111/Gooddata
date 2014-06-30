@@ -4,6 +4,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import static org.testng.Assert.fail;
 
@@ -51,6 +52,10 @@ public class CheckUtils {
         waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"), browser);
     }
 
+    public static void waitForEmailSchedulePageLoaded(WebDriver browser) {
+        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), browser);
+    }
+
     public static void waitForAnalysisPageLoaded(WebDriver browser) {
         waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"), browser);
     }
@@ -71,6 +76,15 @@ public class CheckUtils {
     public static WebElement waitForElementVisible(WebElement element) {
         Graphene.waitGui().until().element(element).is().visible();
         return element;
+    }
+
+    public static Select waitForElementVisible(Select select) {
+        Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().visible();
+        return select;
+    }
+
+    public static void waitForElementNotVisible(WebElement element) {
+        Graphene.waitGui().until().element(element).is().not().visible();
     }
 
     public static void waitForElementNotVisible(By byElement) {

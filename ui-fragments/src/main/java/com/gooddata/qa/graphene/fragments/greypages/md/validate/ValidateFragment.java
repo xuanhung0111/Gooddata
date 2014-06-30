@@ -8,10 +8,11 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ValidateFragment extends AbstractGreyPagesFragment {
 
-    protected static final String BY_SPAN_STATUS = "//*[local-name() = 'p'][3]//*[local-name() = 'span']";
-
+    protected static final String LOCATOR_SPAN_STATUS = "//*[local-name() = 'p'][3]//*[local-name() = 'span']";
 
     @FindBy(id = "invalid_objects")
     private WebElement invalid_objects;
@@ -41,10 +42,10 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
         waitForElementVisible(submit);
         Graphene.guardHttp(submit).click();
         waitForElementNotVisible(submit);
-        waitForElementVisible(BY_GP_LINK);
+        waitForElementVisible(BY_GP_LINK, browser);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         waitForElementNotPresent(BY_GP_PRE_JSON);
-        return waitForElementVisible(By.xpath(BY_SPAN_STATUS)).getText();
+        return waitForElementVisible(By.xpath(LOCATOR_SPAN_STATUS), browser).getText();
 
     }
 
