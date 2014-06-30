@@ -8,6 +8,8 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class AbstractDeployProcesses extends AbstractProjectTest {
 
 	protected String zipFilePath;

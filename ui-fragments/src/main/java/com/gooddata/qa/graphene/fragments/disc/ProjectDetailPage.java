@@ -11,6 +11,8 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ProjectDetailPage extends AbstractFragment {
 
 	private final static String XPATH_PROCESS_TAB_BUTTON = "//div[@class='project-detail-content']//div[${processIndex}]//div[contains(@class, 'tab-buttons')]/a[${index}]";
@@ -60,11 +62,11 @@ public class ProjectDetailPage extends AbstractFragment {
 	}
 
 	public WebElement getScheduleTab(int processIndex) {
-		return waitForElementVisible(By.xpath(XPATH_PROCESS_TAB_BUTTON.replace("${processIndex}", String.valueOf(processIndex)).replace("${index}", "1")));
+		return waitForElementVisible(By.xpath(XPATH_PROCESS_TAB_BUTTON.replace("${processIndex}", String.valueOf(processIndex)).replace("${index}", "1")), browser);
 	}
 	
 	public WebElement getExecutableTab(int processIndex) {
-		return waitForElementVisible(By.xpath(XPATH_PROCESS_TAB_BUTTON.replace("${processIndex}", String.valueOf(processIndex)).replace("${index}", "2")));
+		return waitForElementVisible(By.xpath(XPATH_PROCESS_TAB_BUTTON.replace("${processIndex}", String.valueOf(processIndex)).replace("${index}", "2")), browser);
 	}
 	
 	public WebElement getRedeployButton(String processName) {

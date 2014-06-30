@@ -8,12 +8,14 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class DeployForm extends AbstractFragment {
+
 	private static final By BY_DEPLOY_DIALOG_HEADER = By
 			.xpath("//div[@class='deploy-process-dialog-area']/h2[@class='main-dialog-title']");
 	private static final By BY_FILE_INPUT_ERROR = By.cssSelector(".select-zip .zip-name-text input");
 	private static final By BY_INPUT_ERROR_BUBBLE = By.cssSelector(".bubble-overlay");
-
 
 	private static final String XPATH_PROCESS_TYPE_OPTION = "//select/option[@value='${processType}']";
 
@@ -42,7 +44,7 @@ public class DeployForm extends AbstractFragment {
 	protected WebElement deployCancelButton;
 
 	public String getDeployDialogHeader() {
-		String deployDialogHeader = waitForElementVisible(BY_DEPLOY_DIALOG_HEADER).getText();
+		String deployDialogHeader = waitForElementVisible(BY_DEPLOY_DIALOG_HEADER, browser).getText();
 		return deployDialogHeader;
 	}
 
