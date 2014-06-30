@@ -10,6 +10,7 @@ import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTest {
 
@@ -32,8 +33,8 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
         // zendesk specific configuration of API Url (with specific upload user)
         signInAtGreyPages(zendeskUploadUser, zendeskUploadUserPassword);
         browser.get(settingsUrl);
-        waitForElementPresent(BY_INPUT_API_URL).sendKeys(zendeskApiUrl);
-        Graphene.guardHttp(waitForElementPresent(BY_GP_BUTTON_SUBMIT)).click();
+        waitForElementPresent(BY_INPUT_API_URL, browser).sendKeys(zendeskApiUrl);
+        Graphene.guardHttp(waitForElementPresent(BY_GP_BUTTON_SUBMIT, browser)).click();
         json = loadJSON();
         assertEquals(json.getJSONObject("settings").getString("apiUrl"), zendeskApiUrl,
                 String.format("%s API URL was not set to expected value", connectorType.getName()));

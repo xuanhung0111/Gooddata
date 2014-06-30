@@ -3,10 +3,10 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
+import com.gooddata.qa.graphene.AbstractGreyPageTest;
 import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.http.RestApiClient;
 import org.json.JSONException;
-import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
 import static org.testng.Assert.fail;
 
 @Test(groups = {"connectors", "zendesk4", "apiTests"}, description = "Checklist tests for Zendesk Helper")
-public class Zendesk4BasicApiTest extends AbstractTest {
+public class Zendesk4BasicApiTest extends AbstractGreyPageTest {
 
     private String zendeskAPIUser;
     private String zendeskAPIPassword;
@@ -39,15 +39,15 @@ public class Zendesk4BasicApiTest extends AbstractTest {
 
     @BeforeClass
     public void loadRequiredProperties() {
-        zendeskApiUrl = loadProperty("connectors.zendesk.apiUrl");
-        zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
-        zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
-        useApiProxy = Boolean.parseBoolean(loadProperty("http.client.useApiProxy"));
+        zendeskApiUrl = testParams.loadProperty("connectors.zendesk.apiUrl");
+        zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
+        zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
+        useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
     }
 
     @Test
     public void initGd() throws JSONException {
-        signInAtGreyPages(user, password);
+        signInAtGreyPages(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnMethods = {"initGd"}, groups = {"zendeskApiTests"})

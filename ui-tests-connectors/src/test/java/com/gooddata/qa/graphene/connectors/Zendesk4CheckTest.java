@@ -3,9 +3,6 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.FilterMetricTypes;
@@ -20,8 +17,8 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.*;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
 public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
@@ -53,9 +50,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @BeforeClass
     public void loadRequiredProperties() {
-        zendeskApiUrl = loadProperty("connectors.zendesk.apiUrl");
-        zendeskUploadUser = loadProperty("connectors.zendesk4.uploadUser");
-        zendeskUploadUserPassword = loadProperty("connectors.zendesk4.uploadUserPassword");
+        zendeskApiUrl = testParams.loadProperty("connectors.zendesk.apiUrl");
+        zendeskUploadUser = testParams.loadProperty("connectors.zendesk4.uploadUser");
+        zendeskUploadUserPassword = testParams.loadProperty("connectors.zendesk4.uploadUserPassword");
 
         connectorType = Connectors.ZENDESK4;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
@@ -63,9 +60,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 "Operational", "Yearly", "Time Metrics", "Backlog", "Agents", "Groups", "Leaderboard",
                 "Users & Orgs", "Satisfaction", "Problems", "Tags"
         });
-        zendeskAPIUser = loadProperty("connectors.zendesk.apiUser");
-        zendeskAPIPassword = loadProperty("connectors.zendesk.apiUserPassword");
-        useApiProxy = Boolean.parseBoolean(loadProperty("http.client.useApiProxy"));
+        zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
+        zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
+        useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
         BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']/div/button[2]");
     }
 
@@ -94,20 +91,26 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 "[/gdc/md/%s/obj/27238/elements?id=1]", projectId, projectId, projectId), "#,##0");
         Metric m = md.createObj(project, metric);
         System.out.println("Metric for testing of non-deleted organizations created, id: " + m.getMeta().getIdentifier());
-     }
+    }
+    private GoodData getGoodDataClient() {
+        if (goodDataClient == null) {
+            goodDataClient = new GoodData(testParams.getHost(), testParams.getUser(), testParams.getPassword());
+        }
+        return goodDataClient;
+    }
     **/
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createOrganizationMetric() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         Map<String, String> data = new HashMap<String, String>();
-        data.put("metric0", "# Organizations");
-        data.put("attrFolder0", "Organizations");
-        data.put("attribute0", "Organization Deleted");
+        data.put("metric1", "# Organizations");
         data.put("attrFolder1", "Organizations");
         data.put("attribute1", "Organization Deleted");
-        data.put("attrValue0", "false");
+        data.put("attrFolder2", "Organizations");
+        data.put("attribute2", "Organization Deleted");
         data.put("attrValue1", "false");
+        data.put("attrValue2", "false");
         metricEditorPage.createFilterMetric(FilterMetricTypes.NOT_IN, "# Non-deleted organizations", data);
     }
 
@@ -249,13 +252,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         List<String> what = new ArrayList<String>();
         what.add(metric);
         createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
-        waitForElementVisible(BY_ONE_NUMBER_REPORT);
+        waitForElementVisible(BY_ONE_NUMBER_REPORT, browser);
     }
 
     private int getNumberFromGDReport(String reportName) {
         initReportsPage();
         reportsPage.getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded();
+        waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
         OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class, browser.findElement(
                 BY_ONE_NUMBER_REPORT));
@@ -269,7 +272,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Override
     public String openZendeskSettingsUrl() {
         openUrl(getIntegrationUri());
-        Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK)).click();
+        Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK, browser)).click();
         return browser.getCurrentUrl();
     }
 }

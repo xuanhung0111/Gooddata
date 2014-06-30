@@ -11,6 +11,8 @@ import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ObjectsTable extends AbstractTable {
 
     public static final String SORT_ASC = "ASC";
@@ -44,7 +46,7 @@ public class ObjectsTable extends AbstractTable {
             WebElement link = row.findElement(BY_OBJECT_LINK);
             if (link.getText().equals(objectName)) {
                 link.click();
-                waitForElementVisible(BY_OBJECT_DETAIL_PAGE);
+                waitForElementVisible(BY_OBJECT_DETAIL_PAGE, browser);
                 return true;
             }
         }

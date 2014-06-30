@@ -5,6 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class DashboardAddReportPanel extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class,'reportPicker')]//input")
@@ -22,12 +24,11 @@ public class DashboardAddReportPanel extends AbstractFragment {
     public void addReport(String reportName) {
         waitForElementVisible(reportSearchInput).clear();
         reportSearchInput.sendKeys(reportName);
-        By reportToAdd = By.xpath(reportToAddLocator.replace("${reportName}",
-                reportName));
-        waitForElementVisible(reportToAdd).click();
-        waitForDashboardPageLoaded();
+        By reportToAdd = By.xpath(reportToAddLocator.replace("${reportName}", reportName));
+        waitForElementVisible(reportToAdd, browser).click();
+        waitForDashboardPageLoaded(browser);
         By reportOnDashboard = By.xpath(reportOnDashboardLocator.replace(
                 "${reportName}", reportName));
-        waitForElementPresent(reportOnDashboard);
+        waitForElementPresent(reportOnDashboard, browser);
     }
 }

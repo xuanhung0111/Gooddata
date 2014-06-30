@@ -11,6 +11,8 @@ import org.testng.Assert;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class EmailSchedulePage extends AbstractFragment {
 
     @FindBy(css = ".s-btn-schedule_new_email")
@@ -73,7 +75,7 @@ public class EmailSchedulePage extends AbstractFragment {
         emailSubjectInput.sendKeys(emailSubject);
         emailMessageInput.sendKeys(emailBody);
         waitForElementVisible(dashboardsSelector);
-        waitForEmailSchedulePageLoaded();
+        waitForEmailSchedulePageLoaded(browser);
         Assert.assertTrue(dashboardsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Dashboards selector is not selected by default");
         selectDashboard(dashboardName);
         // TODO - schedule (will be sent in the nearest time slot now)
@@ -89,7 +91,7 @@ public class EmailSchedulePage extends AbstractFragment {
         emailSubjectInput.sendKeys(emailSubject);
         emailMessageInput.sendKeys(emailBody);
         waitForElementVisible(reportsSelector).click();
-        waitForEmailSchedulePageLoaded();
+        waitForEmailSchedulePageLoaded(browser);
         Assert.assertTrue(reportsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Reports selector is not selected");
         selectReport(reportName);
         selectReportFormat(format);

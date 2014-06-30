@@ -14,6 +14,8 @@ import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ReportFilter extends AbstractFragment {
 
     private By addFilterButton = By.cssSelector(".s-btn-add_filter");
@@ -87,20 +89,20 @@ public class ReportFilter extends AbstractFragment {
         List<String> lsAttributeElements = Arrays.asList(attributeElements.split(", "));
         Collections.sort(lsAttributeElements);
         if (browser.findElements(addFilterButton).size() > 0) {
-            waitForElementVisible(addFilterButton).click();
+            waitForElementVisible(addFilterButton, browser).click();
         }// displayed if at least one filter added.
         waitForElementVisible(filterPicker);
         waitForElementVisible(attributeFilterLink).click();
         By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}",
                 attribute.trim().toLowerCase().replaceAll(" ", "_")));
-        waitForElementVisible(listOfAttribute);
+        waitForElementVisible(listOfAttribute, browser);
         selectElement(attribute);
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(listOfElementWithCheckbox);
         for (int i = 0; i < lsAttributeElements.size(); i++) {
             By attributeElement = By.xpath(attributeElementLocator.replace("${element}",
                     lsAttributeElements.get(i).trim().toLowerCase().replaceAll(" ", "_")));
-            waitForElementVisible(attributeElement).click();
+            waitForElementVisible(attributeElement, browser).click();
         }
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
@@ -148,7 +150,7 @@ public class ReportFilter extends AbstractFragment {
         }
         Collections.sort(rankedMetric);
         if (browser.findElements(addFilterButton).size() > 0) {
-            waitForElementVisible(addFilterButton).click();
+            waitForElementVisible(addFilterButton, browser).click();
         } // displayed if at least one filter added.
         waitForElementVisible(filterPicker);
         waitForElementVisible(rankFilterLink).click();
@@ -167,13 +169,13 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(selectAttributeButton).click();
         By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}",
                 attribute.trim().toLowerCase().replaceAll(" ", "_")));
-        waitForElementVisible(listOfAttribute);
+        waitForElementVisible(listOfAttribute, browser);
         selectElement(attribute);
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(selectMetricButton).click();
         By listOfMetric = By.xpath(listOfElementLocator.replace("${label}",
                 metric.trim().toLowerCase().replaceAll(" ", "_")));
-        waitForElementVisible(listOfMetric);
+        waitForElementVisible(listOfMetric, browser);
         selectElement(metric);
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(confirmApplyButton).click();
@@ -193,19 +195,19 @@ public class ReportFilter extends AbstractFragment {
         String metric = data.get("metric");
         String number = data.get("number");
         if (browser.findElements(addFilterButton).size() > 0) {
-            waitForElementVisible(addFilterButton).click();
+            waitForElementVisible(addFilterButton, browser).click();
         }// displayed if at least one filter added.
         waitForElementVisible(rangeFilterLink).click();
         waitForElementVisible(selectAttributeButton).click();
         By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}",
                 attribute.trim().toLowerCase().replaceAll(" ", "_")));
-        waitForElementVisible(listOfAttribute);
+        waitForElementVisible(listOfAttribute, browser);
         selectElement(attribute);
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(selectMetricButton).click();
         By listOfMetric = By.xpath(listOfElementLocator.replace("${label}",
                 metric.trim().toLowerCase().replaceAll(" ", "_")));
-        waitForElementVisible(listOfMetric);
+        waitForElementVisible(listOfMetric, browser);
         selectElement(metric);
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(rangeNumberInput).clear();
@@ -231,14 +233,14 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(report.getRoot());
         List<String> attrElementInGrid = report.getAttributeElements();
         lsPromptElements.retainAll(attrElementInGrid);
-        if (waitForElementVisible(addFilterButton).isDisplayed()) {
-            waitForElementVisible(addFilterButton).click();
+        if (waitForElementVisible(addFilterButton, browser).isDisplayed()) {
+            waitForElementVisible(addFilterButton, browser).click();
         }// displayed if at least one filter added.
         waitForElementVisible(promptFilterLink).click();
         waitForElementVisible(selectVariableButton).click();
         By listOfPrompt = By.xpath(listOfElementLocator.replace("${label}",
                 variable.trim().toLowerCase().replaceAll(" ", "_")));
-        waitForElementVisible(listOfPrompt);
+        waitForElementVisible(listOfPrompt, browser);
         selectElement(variable);
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(confirmApplyButton).click();
@@ -254,6 +256,6 @@ public class ReportFilter extends AbstractFragment {
         if (browser.findElements(gridContainerBody).size() > 0) {
             waitForElementNotPresent(gridContainerBody);
         }
-        waitForElementVisible(gridContainerBody);
+        waitForElementVisible(gridContainerBody, browser);
     }
 }

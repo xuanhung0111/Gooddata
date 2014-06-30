@@ -2,8 +2,6 @@ package com.gooddata.qa.graphene;
 
 import org.testng.annotations.BeforeClass;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +10,6 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     protected static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
 
     protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
-
-    protected static final int expectedGoodSalesReportsCount = 103;
-    protected static final int expectedGoodSalesReportsCustomFoldersCount = 9;
 
     @BeforeClass
     public void initStartPage() {

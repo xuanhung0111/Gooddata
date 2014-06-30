@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.apache.commons.io.FileUtils;
@@ -14,19 +12,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.utils.graphene.Screenshots;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"dashboardPerf"}, description = "Tests for performance od rendering dashboards in GoodSales project")
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
-        openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + projectId + "|projectDashboardPage");
-        waitForDashboardPageLoaded();
+        openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
+        waitForDashboardPageLoaded(browser);
         for (int i = 1; i <= 10; i++) {
             System.out.println("Iteration:" + i);
             verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, false);
@@ -77,7 +73,7 @@ public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
     }
 
     private String getClientVersion() throws JSONException {
-        browser.get(getRootUrl() + "/gdc/releaseInfo");
+        openUrl("/gdc/releaseInfo");
         JSONObject json = loadJSON();
         JSONArray components = json.getJSONObject("release").getJSONArray("components");
         for (int i = 0; i < components.length(); i++) {

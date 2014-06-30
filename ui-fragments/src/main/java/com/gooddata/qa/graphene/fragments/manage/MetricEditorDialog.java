@@ -12,6 +12,8 @@ import com.gooddata.qa.graphene.enums.metrics.LogicalMetricTypes;
 import com.gooddata.qa.graphene.enums.metrics.NumericMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class MetricEditorDialog extends AbstractFragment {
 
     @FindBy(css = "div.shareTemplate")
@@ -118,13 +120,13 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(shareMetric).click();
 	By selectedMetric = By.xpath(selectedMetricLocator.replace(
 		"${metricName}", usedMetric));
-	waitForElementVisible(selectedMetric).click();
+	waitForElementVisible(selectedMetric, browser).click();
 	By selectedAttrFolder = By.xpath(selectedAttrFolderLocator.replace(
 		"${attrFolder}", attrFolder));
-	waitForElementVisible(selectedAttrFolder).click();
+	waitForElementVisible(selectedAttrFolder, browser).click();
 	By selectedAttr = By
 		.xpath(selectedAttrLocator.replace("${attr}", attr));
-	waitForElementVisible(selectedAttr).click();
+	waitForElementVisible(selectedAttr, browser).click();
 	waitForElementVisible(metricNameInput).clear();
 	metricNameInput.sendKeys(metricName);
 	waitForElementVisible(addButton).click();
@@ -147,16 +149,16 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(differenceMetric).click();
 	By selectedMetric = By.xpath(selectedMetricLocator.replace(
 		"${metricName}", usedMetric));
-	waitForElementVisible(selectedMetric).click();
+	waitForElementVisible(selectedMetric, browser).click();
 	By selectedAttrFolder = By.xpath(selectedAttrFolderLocator.replace(
 		"${attrFolder}", attrFolder));
-	waitForElementVisible(selectedAttrFolder).click();
+	waitForElementVisible(selectedAttrFolder, browser).click();
 	By selectedAttr = By
 		.xpath(selectedAttrLocator.replace("${attr}", attr));
-	waitForElementVisible(selectedAttr).click();
+	waitForElementVisible(selectedAttr, browser).click();
 	By selectedAttrValue = By.xpath(selectedAttrValueLocator.replace(
 		"${attrValue}", attrValue));
-	waitForElementVisible(selectedAttrValue).click();
+	waitForElementVisible(selectedAttrValue, browser).click();
 	waitForElementVisible(metricNameInput).clear();
 	metricNameInput.sendKeys(metricName);
 	waitForElementVisible(addButton).click();
@@ -179,10 +181,10 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(ratioMetric).click();
 	By selectedMetric1 = By.xpath(selectedMetricLocator.replace(
 		"${metricName}", usedMetric1));
-	waitForElementVisible(selectedMetric1).click();
+	waitForElementVisible(selectedMetric1, browser).click();
 	By selectedMetric2 = By.xpath(selectedMetricLocator.replace(
 		"${metricName}", usedMetric2));
-	waitForElementVisible(selectedMetric2).click();
+	waitForElementVisible(selectedMetric2, browser).click();
 	waitForElementVisible(metricNameInput).clear();
 	metricNameInput.sendKeys(metricName);
 	waitForElementVisible(addButton).click();
@@ -206,7 +208,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(aggregationTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
-	waitForElementVisible(metricLink).click();
+	waitForElementVisible(metricLink, browser).click();
 	switch (metricType) {
 	case AVG:
 	case RUNAVG:
@@ -257,7 +259,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(numericTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
-	waitForElementVisible(metricLink).click();
+	waitForElementVisible(metricLink, browser).click();
 	selectMetrics(data, 1);
 	waitForElementVisible(customMetricNameInput).sendKeys(metricName);
 	waitForElementVisible(customAddButton).click();
@@ -278,7 +280,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(GranularityTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
-	waitForElementVisible(metricLink).click();
+	waitForElementVisible(metricLink, browser).click();
 	switch (metricType) {
 	case BY:
 	case BY_ALL_ATTRIBUTE:
@@ -323,7 +325,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(LogicalTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
-	waitForElementVisible(metricLink).click();
+	waitForElementVisible(metricLink, browser).click();
 	switch (metricType) {
 	case AND:
 	case OR:
@@ -364,7 +366,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(FiltersTab).click();
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
-	waitForElementVisible(metricLink).click();
+	waitForElementVisible(metricLink, browser).click();
 	switch (metricType) {
 	case EQUAL:
 	    selectMetrics(data, 1);
@@ -409,10 +411,10 @@ public class MetricEditorDialog extends AbstractFragment {
 	    waitForElementVisible(placeHolderAttr).click();
 	    By selectedAttrFolder = By.xpath(selectedAttrFolderLocator.replace(
 		    "${attrFolder}", attrFolder));
-	    waitForElementVisible(selectedAttrFolder).click();
+	    waitForElementVisible(selectedAttrFolder, browser).click();
 	    By selectedAttr = By.xpath(selectedAttrLocator.replace("${attr}",
 		    attr));
-	    waitForElementVisible(selectedAttr).click();
+	    waitForElementVisible(selectedAttr, browser).click();
 	    waitForElementVisible(addSelectedButton).click();
 	    waitForElementNotPresent(selectedAttr);
 	    waitForElementVisible(customCategoryList);
@@ -427,13 +429,13 @@ public class MetricEditorDialog extends AbstractFragment {
 	    waitForElementVisible(placeHolderAttrElements).click();
 	    By selectedAttrFolder = By.xpath(selectedAttrFolderLocator.replace(
 		    "${attrFolder}", attrFolder));
-	    waitForElementVisible(selectedAttrFolder).click();
+	    waitForElementVisible(selectedAttrFolder, browser).click();
 	    By selectedAttr = By.xpath(selectedAttrLocator.replace("${attr}",
 		    attr));
-	    waitForElementVisible(selectedAttr).click();
+	    waitForElementVisible(selectedAttr, browser).click();
 	    By selectedAttrEl = By.xpath(selectedAttrValueLocator.replace(
 		    "${attrValue}", attrValue));
-	    waitForElementVisible(selectedAttrEl).click();
+	    waitForElementVisible(selectedAttrEl, browser).click();
 	    waitForElementVisible(addSelectedButton).click();
 	    waitForElementNotPresent(selectedAttrEl);
 	    waitForElementVisible(customCategoryList);
@@ -446,7 +448,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	    waitForElementVisible(placeHolderFact).click();
 	    By selectedFact = By.xpath(selectedFactLocator.replace("${fact}",
 		    fact));
-	    waitForElementVisible(selectedFact).click();
+	    waitForElementVisible(selectedFact, browser).click();
 	    waitForElementVisible(addSelectedButton).click();
 	    waitForElementNotPresent(selectedFact);
 	    waitForElementVisible(customCategoryList);
@@ -459,7 +461,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	    waitForElementVisible(placeHolderMetric).click();
 	    By selectedMetric = By.xpath(selectedMetricLocator.replace(
 		    "${metricName}", metric));
-	    waitForElementVisible(selectedMetric).click();
+	    waitForElementVisible(selectedMetric, browser).click();
 	    waitForElementVisible(addSelectedButton).click();
 	    waitForElementNotPresent(selectedMetric);
 	    waitForElementVisible(customCategoryList);
@@ -469,9 +471,9 @@ public class MetricEditorDialog extends AbstractFragment {
     public void verifyMetric(String metricName, String expectedMaql,
 	    String expectedFormat) {
 	waitForElementVisible(metricsTable.getRoot());
-	waitForDataPageLoaded();
+	waitForDataPageLoaded(browser);
 	metricsTable.selectObject(metricName);
-	waitForObjectPageLoaded();
+	waitForObjectPageLoaded(browser);
 	metricDetailPage.checkCreatedMetric(metricName, expectedMaql,
 		expectedFormat);
     }

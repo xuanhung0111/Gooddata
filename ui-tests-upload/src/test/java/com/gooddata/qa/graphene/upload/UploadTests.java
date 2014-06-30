@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ReportTypes;
@@ -15,11 +14,12 @@ import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups= { "uploadTests" }, description = "Overall tests for upload.html page in GD platform")
 public class UploadTests extends AbstractUploadTest {
 
-	@Test(dependsOnMethods = { "createProject" }, groups = {
+    @Test(dependsOnMethods = { "createProject" }, groups = {
 			"upload-delimiter", "valid-delimiter" })
 	public void uploadDelimiterColon() throws InterruptedException {
 		uploadFileAndClean("delimiter-colon");
@@ -62,10 +62,9 @@ public class UploadTests extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"upload-definition-check-special-character-column-name",
 					this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			waitForDashboardPageLoaded();
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+			waitForDashboardPageLoaded(browser);
 			Screenshots.takeScreenshot(browser,
 					"check-special-character-column-name" + "-dashboard",
 					this.getClass());
@@ -94,11 +93,10 @@ public class UploadTests extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"upload-definition-payroll-negative-number",
 					this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			waitForDashboardPageLoaded();
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+			waitForDashboardPageLoaded(browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser,
 					"payroll-negative-number-csv-upload" + "-dashboard",
@@ -140,11 +138,10 @@ public class UploadTests extends AbstractUploadTest {
 					UploadColumns.OptionDataType.NUMBER.getOptionLabel());
 			Screenshots.takeScreenshot(browser,
 					"upload-definition-payroll-null-number", this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			waitForDashboardPageLoaded();
-			this.verifyProjectDashboardsAndTabs(true,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+			waitForDashboardPageLoaded(browser);
+            verifyProjectDashboardsAndTabs(true,
 					expectedDashboardsAndTabs, false);
 			Screenshots.takeScreenshot(browser,
 					"payroll-null-number-csv-upload" + "-dashboard",
@@ -179,7 +176,7 @@ public class UploadTests extends AbstractUploadTest {
 			columnIndexAndType.put(2, OptionDataType.TEXT);
 			columnIndexAndType.put(3, OptionDataType.TEXT);
 			columnIndexAndType.put(4, OptionDataType.NUMBER);
-			uploadCSV(csvFilePath + "change-column-type.csv", columnIndexAndType, "change-column-type");
+            uploadCSV(csvFilePath + "change-column-type.csv", columnIndexAndType, "change-column-type");
 
 			// Check non-number value in report
 			List<String> what = new ArrayList<String>();
@@ -260,10 +257,9 @@ public class UploadTests extends AbstractUploadTest {
 			uploadColumns.assertColumnsName(columnIndexes, columnNames);
 			Screenshots.takeScreenshot(browser,
 					"upload-definition-payroll-no-header", this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser, "payroll-no-header-csv-upload"
 					+ "-dashboard", this.getClass());
@@ -287,10 +283,9 @@ public class UploadTests extends AbstractUploadTest {
 			List<String> dataTypes = Arrays.asList("TEXT", "TEXT", "TEXT",
 					"TEXT", "TEXT", "TEXT", "TEXT");
 			uploadColumns.assertColumnsType(columnIndexes, dataTypes);
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser,
 					"payroll-without-fact-csv-upload" + "-dashboard",
@@ -313,10 +308,9 @@ public class UploadTests extends AbstractUploadTest {
 			assertEquals(uploadColumns.getColumnName(0), "Amount");
 			assertEquals(uploadColumns.getColumnType(0),
 					UploadColumns.OptionDataType.NUMBER.getOptionLabel());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser,
 					"payroll-without-attribute-csv-upload" + "-dashboard",
@@ -338,10 +332,9 @@ public class UploadTests extends AbstractUploadTest {
 			assertEquals(uploadColumns.getColumnName(7), "Paydate");
 			assertEquals(uploadColumns.getColumnType(7),
 					UploadColumns.OptionDataType.DATE.getOptionLabel());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser, "payroll-Date-EU-csv-upload"
 					+ "-dashboard", this.getClass());
@@ -363,10 +356,9 @@ public class UploadTests extends AbstractUploadTest {
 			assertEquals(uploadColumns.getColumnName(7), "Paydate");
 			assertEquals(uploadColumns.getColumnType(7),
 					UploadColumns.OptionDataType.DATE.getOptionLabel());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser, "payroll-Date-US-csv-upload"
 					+ "-dashboard", this.getClass());
@@ -390,10 +382,9 @@ public class UploadTests extends AbstractUploadTest {
 			List<String> dataTypes = Arrays.asList("TEXT", "TEXT", "TEXT",
 					"NUMBER");
 			uploadColumns.assertColumnsType(columnIndexes, dataTypes);
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser, "without-Date-csv-upload"
 					+ "-dashboard", this.getClass());
@@ -471,10 +462,9 @@ public class UploadTests extends AbstractUploadTest {
 					UploadColumns.OptionDataType.TEXT.getOptionLabel());
 			Screenshots.takeScreenshot(browser,
 					"upload-definition-auto-guessed-ID", this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser, "auto-guessed-ID-csv-upload"
 					+ "-dashboard", this.getClass());
@@ -517,10 +507,9 @@ public class UploadTests extends AbstractUploadTest {
 					UploadColumns.OptionDataType.NUMBER.getOptionLabel());
 			Screenshots.takeScreenshot(browser,
 					"upload-definition-auto-guessed-many-ID", this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser,
 					"auto-guessed-many-ID-csv-upload" + "-dashboard",
@@ -581,10 +570,9 @@ public class UploadTests extends AbstractUploadTest {
 					.takeScreenshot(browser,
 							"upload-definition-data-with-crazy-footer",
 							this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 			Screenshots.takeScreenshot(browser,
 					"data-with-crazy-footer-csv-upload" + "-dashboard",
@@ -612,10 +600,9 @@ public class UploadTests extends AbstractUploadTest {
 					UploadColumns.OptionDataType.TEXT.getOptionLabel());
 			Screenshots.takeScreenshot(browser,
 					"upload-definition-delimiter-invalid", this.getClass());
-			upload.confirmloadCsv();
-			waitForElementVisible(By
-					.xpath("//iframe[contains(@src,'Auto-Tab')]"));
-			verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
+            upload.confirmloadCsv();
+			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+            verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
 		} finally {
 			List<String> datasets = Arrays.asList("delimiter-invalid");

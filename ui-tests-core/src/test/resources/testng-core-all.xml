@@ -30,7 +30,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.project.GoodSalesDashboardTest"/>
+            <class name="com.gooddata.qa.graphene.dashboards.GoodSalesDashboardTest"/>
         </classes>
     </test>
 
@@ -41,7 +41,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.project.GoodSalesReportsTest"/>
+            <class name="com.gooddata.qa.graphene.reports.GoodSalesReportsTest"/>
         </classes>
     </test>
 
@@ -52,7 +52,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.project.GoodSalesEmailSchedulesTest"/>
+            <class name="com.gooddata.qa.graphene.schedules.GoodSalesEmailSchedulesTest"/>
         </classes>
     </test>
 

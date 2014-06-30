@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardsPage extends AbstractFragment {
 
@@ -107,7 +107,7 @@ public class DashboardsPage extends AbstractFragment {
                 if (elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title").equals(dashboardName)) {
                     elem.findElement(BY_LINK).click();
                     Thread.sleep(3000);
-                    waitForDashboardPageLoaded();
+                    waitForDashboardPageLoaded(browser);
                     return true;
                 }
             }
@@ -124,7 +124,7 @@ public class DashboardsPage extends AbstractFragment {
                 if (Integer.valueOf(elem.getAttribute("gdc:index")) == dashboardIndex) {
                     elem.findElement(BY_LINK).click();
                     Thread.sleep(3000);
-                    waitForDashboardPageLoaded();
+                    waitForDashboardPageLoaded(browser);
                     return true;
                 }
             }
@@ -146,7 +146,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public void editDashboard() {
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         waitForElementVisible(editExportEmbedButton).click();
         waitForElementVisible(editButton).click();
         waitForElementPresent(editDashboardBar.getRoot());
@@ -154,11 +154,11 @@ public class DashboardsPage extends AbstractFragment {
 
     public String exportDashboardTab(int tabIndex) throws InterruptedException {
         tabs.openTab(tabIndex);
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         String tabName = tabs.getTabLabel(0);
         waitForElementVisible(editExportEmbedButton).click();
         waitForElementVisible(exportPdfButton).click();
-        waitForElementVisible(BY_EXPORTING_PANEL);
+        waitForElementVisible(BY_EXPORTING_PANEL, browser);
         Thread.sleep(3000);
         waitForElementNotPresent(BY_EXPORTING_PANEL);
         Thread.sleep(3000);
@@ -168,9 +168,9 @@ public class DashboardsPage extends AbstractFragment {
 
     public String printDashboardTab(int tabIndex) throws InterruptedException {
         tabs.openTab(tabIndex);
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         String tabName = tabs.getTabLabel(0);
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         waitForElementVisible(printPdfButton).click();
         Thread.sleep(3000);
         waitForElementNotPresent(BY_PRINTING_PANEL);
@@ -189,13 +189,13 @@ public class DashboardsPage extends AbstractFragment {
         tabs.openTab(tabIndex);
         editDashboard();
         tabs.selectDropDownMenu(tabIndex);
-        waitForElementVisible(BY_TAB_DROPDOWN_MENU).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
+        waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
         waitForElementVisible(dashboardTabDeleteDialog);
         waitForElementVisible(dashboardTabDeleteConfirmButton).click();
         waitForElementNotVisible(dashboardTabDeleteDialog);
         editDashboardBar.saveDashboard();
         waitForElementNotPresent(editDashboardBar.getRoot());
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
     }
 
     public void addNewDashboard(String dashbordName) throws InterruptedException {

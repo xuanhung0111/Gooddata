@@ -11,6 +11,8 @@ import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.support.ui.Select;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ReportVisualizer extends AbstractFragment {
 
     private static final By BY_WHAT_AREA_METRICS_HEADER = By.xpath("//div[contains(@class, 'sndPanel1')]//div[@title='All Metrics']");
@@ -66,37 +68,37 @@ public class ReportVisualizer extends AbstractFragment {
 
     public void selectWhatArea(List<String> what) throws InterruptedException {
         waitForElementVisible(whatButton).click();
-        waitForElementVisible(BY_WHAT_AREA_METRICS_HEADER);
+        waitForElementVisible(BY_WHAT_AREA_METRICS_HEADER, browser);
         for (String metric : what) {
             waitForElementVisible(metricFilterInput).clear();
             metricFilterInput.sendKeys(metric);
             By metricCheckbox = By.xpath(XPATH_METRIC_CHECKBOX.replace("${metric}", metric));
-            waitForElementVisible(metricCheckbox);
+            waitForElementVisible(metricCheckbox, browser);
             Thread.sleep(2000);
             root.findElement(metricCheckbox).click();
-            waitForElementVisible(By.xpath(XPATH_METRIC_CHECKBOX_CHECKED.replace("${metric}", metric)));
+            waitForElementVisible(By.xpath(XPATH_METRIC_CHECKBOX_CHECKED.replace("${metric}", metric)), browser);
         }
     }
 
     public void selectHowArea(List<String> how) throws InterruptedException {
         waitForElementVisible(howButton).click();
-        waitForElementVisible(BY_HOW_AREA_ATTRIBUTES_HEADER);
+        waitForElementVisible(BY_HOW_AREA_ATTRIBUTES_HEADER, browser);
         if (how != null) {
             for (String attribute : how) {
                 waitForElementVisible(attributeFilterInput).clear();
                 attributeFilterInput.sendKeys(attribute);
                 By attributeCheckbox = By.xpath(XPATH_ATTRIBUTE_CHECKBOX.replace("${attribute}", attribute));
-                waitForElementVisible(attributeCheckbox);
+                waitForElementVisible(attributeCheckbox, browser);
                 Thread.sleep(2000);
                 root.findElement(attributeCheckbox).click();
-                waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_CHECKBOX_CHECKED.replace("${attribute}", attribute)));
+                waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_CHECKBOX_CHECKED.replace("${attribute}", attribute)), browser);
             }
         }
     }
 
     public void addSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal) {
         waitForElementVisible(whatButton).click();
-        waitForElementVisible(BY_WHAT_AREA_METRICS_HEADER);
+        waitForElementVisible(BY_WHAT_AREA_METRICS_HEADER, browser);
 
         waitForElementVisible(createMetricButton).click();
         waitForElementVisible(metricOperationSelect).selectByVisibleText(metricOperation.name());
@@ -112,7 +114,7 @@ public class ReportVisualizer extends AbstractFragment {
 
     public void selectFilterArea() {
         waitForElementVisible(filterButton).click();
-        waitForElementVisible(BY_FILTER_TAB);
+        waitForElementVisible(BY_FILTER_TAB, browser);
     }
 
     public void finishReportChanges() {
@@ -122,9 +124,9 @@ public class ReportVisualizer extends AbstractFragment {
 
     public void selectReportVisualisation(ReportTypes reportVisualizationType) {
         By icon = By.xpath(XPATH_REPORT_VISUALIZATION_TYPE.replace("${type}", reportVisualizationType.getName()));
-        waitForElementVisible(icon);
+        waitForElementVisible(icon, browser);
         reportVisualizationContainer.findElement(icon).click();
-        waitForElementVisible(By.id(reportVisualizationType.getContainerTabId()));
+        waitForElementVisible(By.id(reportVisualizationType.getContainerTabId()), browser);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.performance.dashboards;
 
-import com.gooddata.qa.graphene.AbstractTest;
+import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ClearCaches;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = {"projectDashboardPerf"}, description = "Tests for performance of rendering dashboards of given project")
-public class ProjectPerfWalkthrough extends AbstractTest {
+public class ProjectPerfWalkthrough extends AbstractUITest {
 
     private int startDashboardIndex = 1;
     private boolean singleDashboardComputation = false;
@@ -32,22 +34,22 @@ public class ProjectPerfWalkthrough extends AbstractTest {
     public void initStartPage() {
         startPage = "gdc";
 
-        projectId = loadProperty("projectId");
-        startDashboardIndex = Integer.valueOf(loadProperty("startDashboardIndex"));
-        clearCaches = Boolean.valueOf(loadProperty("clearCaches"));
-        singleDashboardComputation = Boolean.valueOf(loadProperty("singleDashboardComputation"));
+        testParams.setProjectId(testParams.loadProperty("projectId"));
+        startDashboardIndex = Integer.valueOf(testParams.loadProperty("startDashboardIndex"));
+        clearCaches = Boolean.valueOf(testParams.loadProperty("clearCaches"));
+        singleDashboardComputation = Boolean.valueOf(testParams.loadProperty("singleDashboardComputation"));
     }
 
     @Test(groups = {"perfInit"})
     public void init() throws JSONException {
-        signInAtGreyPages(user, password);
+        signInAtGreyPages(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {"perfInit"})
     public void clearCaches() throws JSONException {
         if (clearCaches) {
-            System.out.println("Going to clear caches in project: " + projectId);
-            openUrl(PAGE_GDC_PROJECTS + "/" + projectId + "/clearCaches");
+            System.out.println("Going to clear caches in project: " + testParams.getProjectId());
+            openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/clearCaches");
             ClearCaches clearCaches = Graphene.createPageFragment(ClearCaches.class, browser.findElement(BY_GP_FORM));
             clearCaches.clearCaches(0);
         } else {
@@ -57,12 +59,12 @@ public class ProjectPerfWalkthrough extends AbstractTest {
 
     @Test(dependsOnGroups = {"perfInit"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
-        openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + projectId + "|projectDashboardPage");
+        openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
         verifyProjectDashboardsAndTabs(startDashboardIndex);
     }
 
     protected void verifyProjectDashboardsAndTabs(int dashboardStartIndex) throws InterruptedException, JSONException {
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         Thread.sleep(5000);
         waitForElementVisible(dashboardsPage.getRoot());
         int dashboardsCount = dashboardsPage.getDashboardsCount();
@@ -87,10 +89,10 @@ public class ProjectPerfWalkthrough extends AbstractTest {
         for (int i = 0; i < tabLabels.size(); i++) {
             tabs.openTab(i);
             System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
-            waitForDashboardPageLoaded();
+            waitForDashboardPageLoaded(browser);
             Screenshots.takeScreenshot(browser, dashboardName + "-tab-" + i + "-" + tabLabels.get(i), this.getClass());
             Assert.assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
-            checkRedBar();
+            checkRedBar(browser);
         }
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output, dashboardIndex, dashboardName);

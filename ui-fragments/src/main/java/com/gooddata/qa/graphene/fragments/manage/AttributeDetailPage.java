@@ -7,6 +7,8 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class AttributeDetailPage extends AbstractFragment {
 
     @FindBy(css = "div.objectHeader table tbody tr td h2")
@@ -27,7 +29,7 @@ public class AttributeDetailPage extends AbstractFragment {
     @FindBy(css = "button.s-labelSaveButton")
     private WebElement labelSaveButton;
 
-    private By externalPageLink = By.cssSelector("button.s-btn-external_page");
+    private static final By BY_EXTERNAL_PAGE_LINK = By.cssSelector("button.s-btn-external_page");
 
     @FindBy(css = "button.s-btn-clear")
     private WebElement clearExternalPageButton;
@@ -41,11 +43,11 @@ public class AttributeDetailPage extends AbstractFragment {
     }
 
     public boolean isHyperLink() {
-	return browser.findElements(externalPageLink).size() > 0;
+	return browser.findElements(BY_EXTERNAL_PAGE_LINK).size() > 0;
     }
 
     public void setDrillToExternalPage() {
-	waitForElementVisible(externalPageLink).click();
+	waitForElementVisible(BY_EXTERNAL_PAGE_LINK, browser).click();
 	waitForElementVisible(clearExternalPageButton);
     }
 

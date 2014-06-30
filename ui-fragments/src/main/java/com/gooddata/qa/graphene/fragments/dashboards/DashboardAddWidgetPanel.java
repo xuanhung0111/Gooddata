@@ -9,6 +9,8 @@ import org.testng.Assert;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class DashboardAddWidgetPanel extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class, 'yui3-c-dashboardwidgetconfigpanel')]")
@@ -33,14 +35,14 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
 	    throws InterruptedException {
 	By widgetType = By.xpath(widgetLocator.replace("${widgetLabel}",
 		type.getLabel()));
-	waitForElementVisible(widgetType).click();
+	waitForElementVisible(widgetType, browser).click();
 	// TODO fragments for widget config panel + metric selection can be used
 	// - but better IDs and UI organization is required
 	waitForElementVisible(widgetConfigPanel);
 	waitForElementVisible(widgetConfigMetricButton).click();
 	By metricInWidget = By.xpath(widgetMetricLocator.replace(
 		"${metricLabel}", metricLabel));
-	waitForElementVisible(metricInWidget).click();
+	waitForElementVisible(metricInWidget, browser).click();
 	Thread.sleep(3000);
     }
 

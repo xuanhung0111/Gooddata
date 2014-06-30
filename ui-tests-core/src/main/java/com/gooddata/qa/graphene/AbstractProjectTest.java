@@ -7,8 +7,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-public abstract class AbstractProjectTest extends AbstractTest {
+public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected String projectTitle = "simple-project";
     protected String projectTemplate = "";
@@ -22,7 +23,7 @@ public abstract class AbstractProjectTest extends AbstractTest {
     @Test(groups = {"projectInit"})
     public void init() throws JSONException {
         // sign in with demo user
-        signInAtUI(user, password);
+        signInAtUI(testParams.getUser(), testParams.getPassword());
     }
 
     @Test(dependsOnGroups = {"projectInit"}, groups = {"tests"})
@@ -30,19 +31,19 @@ public abstract class AbstractProjectTest extends AbstractTest {
         openUrl(PAGE_GDC_PROJECTS);
         waitForElementVisible(gpProject.getRoot());
 
-        projectTitle+="-" + dwhDriver.name();
-        if (projectTemplate.isEmpty()){
-            projectId = gpProject.createProject(projectTitle, projectTitle, null, authorizationToken, dwhDriver, projectCreateCheckIterations);
+        projectTitle += "-" + testParams.getDwhDriver().name();
+        if (projectTemplate.isEmpty()) {
+            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken(), testParams.getDwhDriver(), projectCreateCheckIterations));
         } else {
-            projectId = gpProject.createProject(projectTitle, projectTitle, projectTemplate, authorizationToken, DWHDriver.PG, projectCreateCheckIterations);
+            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG, projectCreateCheckIterations));
 
-            if (dwhDriver.equals(DWHDriver.VERTICA)) {
+            if (testParams.getDwhDriver().equals(DWHDriver.VERTICA)) {
                 String exportToken = exportProject(true, true, projectCreateCheckIterations * 5);
-                deleteProject(projectId);
+                deleteProject(testParams.getProjectId());
 
                 openUrl(PAGE_GDC_PROJECTS);
                 waitForElementVisible(gpProject.getRoot());
-                projectId = gpProject.createProject(projectTitle, projectTitle, null, authorizationToken2, dwhDriver, projectCreateCheckIterations);
+                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken2(), testParams.getDwhDriver(), projectCreateCheckIterations));
                 importProject(exportToken, projectCreateCheckIterations * 5);
             }
         }

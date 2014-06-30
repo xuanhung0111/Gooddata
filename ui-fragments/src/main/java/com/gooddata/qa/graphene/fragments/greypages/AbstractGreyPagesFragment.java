@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractGreyPagesFragment extends AbstractFragment {
 
@@ -16,7 +17,7 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
     protected static final By BY_GP_BUTTON_SUBMIT = By.xpath("//div[@class='submit']/input");
 
     protected JSONObject loadJSON() throws JSONException {
-        return new JSONObject(waitForElementPresent(BY_GP_PRE_JSON).getText());
+        return new JSONObject(waitForElementPresent(BY_GP_PRE_JSON, browser).getText());
     }
 
     protected boolean waitForPollState(String expectedValidState, int maxIterations) throws JSONException, InterruptedException {

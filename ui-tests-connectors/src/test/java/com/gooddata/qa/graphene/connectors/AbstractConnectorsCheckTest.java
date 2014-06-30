@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.connectors;
 
+import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,11 +13,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.Connectors;
-import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
 
 import java.util.Map;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 
@@ -101,8 +102,8 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         if (integrationActivated) {
             openUrl(getIntegrationUri());
             waitForElementVisible(connector.getRoot());
-            System.out.println("Delete mode is set to " + deleteMode.toString());
-            switch (deleteMode) {
+            System.out.println("Delete mode is set to " + testParams.getDeleteMode().toString());
+            switch (testParams.getDeleteMode()) {
                 case DELETE_ALWAYS:
                     System.out.println("Integration will be deleted...");
                     connector.deleteIntegration();
@@ -130,16 +131,16 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 
     public void initIntegration() throws JSONException, InterruptedException {
         openUrl(getConnectorUri());
-        waitForElementPresent(BY_GP_PRE_JSON);
+        waitForElementPresent(BY_GP_PRE_JSON, browser);
         waitForElementPresent(connector.getRoot());
         connector.createIntegration(projectTemplate);
         integrationActivated = true;
     }
 
     public String gotoIntegrationSettings() {
-        Graphene.guardHttp(waitForElementVisible(BY_GP_CONFIG_LINK)).click();
-        Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK)).click();
-        waitForElementVisible(BY_GP_FORM);
+        Graphene.guardHttp(waitForElementVisible(BY_GP_CONFIG_LINK, browser)).click();
+        Graphene.guardHttp(waitForElementVisible(BY_GP_SETTINGS_LINK, browser)).click();
+        waitForElementVisible(BY_GP_FORM, browser);
         return browser.getCurrentUrl();
     }
 
@@ -149,7 +150,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         JSONObject json = loadJSON();
         assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == expectedProcessesCount,
                 "There are no processes for new project yet");
-        Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT)).click();
+        Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
 
         waitForIntegrationProcessSynchronized(browser, checkIterations);
     }
@@ -178,7 +179,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     protected String getConnectorUri() {
-        return PAGE_GDC_CONNECTORS.replace("${projectId}", projectId) + "/" + connectorType.getConnectorId();
+        return PAGE_GDC_CONNECTORS.replace("${projectId}", testParams.getProjectId()) + "/" + connectorType.getConnectorId();
     }
 
     protected String getIntegrationUri() {

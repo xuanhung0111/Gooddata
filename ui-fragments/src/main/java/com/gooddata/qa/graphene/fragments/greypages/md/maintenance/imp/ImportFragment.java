@@ -6,6 +6,8 @@ import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ImportFragment extends AbstractGreyPagesFragment {
 
     @FindBy
@@ -18,7 +20,7 @@ public class ImportFragment extends AbstractGreyPagesFragment {
         System.out.println("Using exportToken \""+exportToken+"\" to import project");
         waitForElementVisible(token).sendKeys(exportToken);
         Graphene.guardHttp(submit).click();
-        waitForElementVisible(BY_GP_LINK);
+        waitForElementVisible(BY_GP_LINK, browser);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         return waitForPollState("OK", checkIterations);
     }

@@ -1,15 +1,17 @@
 package com.gooddata.qa.graphene.common;
 
+import com.gooddata.qa.graphene.AbstractUITest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 
 @Test(groups = {"login"}, description = "Tests for basic login functionality in GD platform")
-public class LoginPageTest extends AbstractTest {
+public class LoginPageTest extends AbstractUITest {
 
     @BeforeClass
     public void initStartPage() {
@@ -25,8 +27,8 @@ public class LoginPageTest extends AbstractTest {
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_002_SignInAndSignOut() throws InterruptedException {
         waitForElementVisible(loginFragment.getRoot());
-        loginFragment.login(user, password, true);
-        waitForElementVisible(BY_LOGGED_USER_BUTTON);
+        loginFragment.login(testParams.getUser(), testParams.getPassword(), true);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
         logout();
         Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
@@ -35,14 +37,14 @@ public class LoginPageTest extends AbstractTest {
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_003_SignInWithEmptyPassword() {
         waitForElementVisible(loginFragment.getRoot());
-        loginFragment.login(user, "", false);
+        loginFragment.login(testParams.getUser(), "", false);
         loginFragment.checkPasswordInvalid();
     }
 
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_004_SignInWithInvalidPassword() {
         waitForElementVisible(loginFragment.getRoot());
-        loginFragment.login(user, "abcdefgh", false);
+        loginFragment.login(testParams.getUser(), "abcdefgh", false);
         loginFragment.checkInvalidLogin();
     }
 

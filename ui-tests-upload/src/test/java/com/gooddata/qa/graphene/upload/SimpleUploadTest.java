@@ -1,18 +1,20 @@
 package com.gooddata.qa.graphene.upload;
 
+import com.gooddata.qa.graphene.AbstractUITest;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractTest;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 @Test(groups = { "uploadTests", "brokenTest" }, description = "Simple upload test (using upload.html page) - deprecated, replaced with UploadTests")
-public class SimpleUploadTest extends AbstractTest {
+public class SimpleUploadTest extends AbstractUITest {
 
     private String csvFilePath;
 
@@ -23,7 +25,7 @@ public class SimpleUploadTest extends AbstractTest {
     public void initStartPage() {
         startPage = PAGE_UPLOAD;
 
-        csvFilePath = loadProperty("upload.file.simple.csv");
+        csvFilePath = testParams.loadProperty("upload.file.simple.csv");
     }
 
     @Test(groups = {"SimpleUploadInit"})
@@ -49,8 +51,8 @@ public class SimpleUploadTest extends AbstractTest {
         //confirm CSV load
         upload.confirmloadCsv();
         //verify redirect to dashboard
-        waitForElementVisible(By.cssSelector(".s-we_made_some_kpis_for_you"));
-        waitForDashboardPageLoaded();
+        waitForElementVisible(By.cssSelector(".s-we_made_some_kpis_for_you"), browser);
+        waitForDashboardPageLoaded(browser);
         Screenshots.takeScreenshot(browser, "3-upload-dashboard", this.getClass());
     }
 }

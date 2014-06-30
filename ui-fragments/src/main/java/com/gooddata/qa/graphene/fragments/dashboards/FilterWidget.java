@@ -8,6 +8,8 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class FilterWidget extends AbstractFragment {
 
     public static class FilterPanel extends AbstractFragment {
@@ -69,7 +71,7 @@ public class FilterWidget extends AbstractFragment {
         }
 
         public void waitForValuesToLoad() {
-            this.waitForElementPresent(By.cssSelector(".yui3-c-simpleColumn-window.loaded"));
+            waitForElementPresent(By.cssSelector(".yui3-c-simpleColumn-window.loaded"), browser);
         }
 
         public WebElement getSelectAll() {

@@ -8,6 +8,8 @@ import java.util.List;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class TableReport extends AbstractReport {
 
     @FindBy(xpath = "//div[@class='containerBody']/div[4]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'element')]")

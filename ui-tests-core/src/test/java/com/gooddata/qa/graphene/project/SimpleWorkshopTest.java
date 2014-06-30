@@ -13,6 +13,7 @@ import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"projectSimpleWS"}, description = "Tests for simple workshop test in GD platform")
 public class SimpleWorkshopTest extends AbstractProjectTest {
@@ -21,7 +22,7 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
 
     @BeforeClass
     public void initProperties() {
-        csvFilePath = loadProperty("csvFilePath");
+        csvFilePath = testParams.loadProperty("csvFilePath");
         projectTitle = "simple-project-ws";
     }
 
@@ -39,7 +40,7 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
     public void createBasicReport() throws InterruptedException {
         initReportsPage();
         reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded();
+        waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
         List<String> what = new ArrayList<String>();
         what.add("Sum of Amount");
@@ -51,11 +52,11 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
     public void addReportOnDashboardTab() throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.getTabs().openTab(1);
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         dashboardsPage.editDashboard();
         dashboardsPage.getDashboardEditBar().addReportToDashboard("Headline test");
         dashboardsPage.getDashboardEditBar().saveDashboard();
-        waitForDashboardPageLoaded();
+        waitForDashboardPageLoaded(browser);
         Screenshots.takeScreenshot(browser, "simple-ws-headline-report-dashboard", this.getClass());
     }
 

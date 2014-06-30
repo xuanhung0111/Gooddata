@@ -8,6 +8,8 @@ import static org.testng.Assert.*;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class ReportWithImage extends AbstractReport {
 
     @FindBy(xpath = "//div[@id='gridContainerTab']//div[contains(@class,'image')]//img")
