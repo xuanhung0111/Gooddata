@@ -21,11 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 

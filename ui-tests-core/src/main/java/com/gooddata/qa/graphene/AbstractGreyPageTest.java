@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.assertTrue;
 
 public class AbstractGreyPageTest extends AbstractTest {

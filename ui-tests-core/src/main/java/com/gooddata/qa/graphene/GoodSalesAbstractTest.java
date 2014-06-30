@@ -2,8 +2,6 @@ package com.gooddata.qa.graphene;
 
 import org.testng.annotations.BeforeClass;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-
 import java.util.HashMap;
 import java.util.Map;
 
