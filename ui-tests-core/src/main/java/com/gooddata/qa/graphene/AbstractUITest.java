@@ -26,7 +26,7 @@ import static org.testng.Assert.*;
 public class AbstractUITest extends AbstractGreyPageTest {
 
     protected By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu");
-    protected static final By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
+    protected By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
     protected static final By BY_PANEL_ROOT = By.id("root");
     protected static final By BY_IFRAME = By.tagName("iframe");
 
@@ -123,6 +123,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void signInAtUI(String username, String password) {
+        // this is a temporary workaround for usage of old navigation header in GoodData platform
+        String navigationProperty = System.getProperty("ui.navigation");
+        if (navigationProperty != null && !Boolean.valueOf(navigationProperty)) {
+            BY_LOGGED_USER_BUTTON = By.xpath("//div[@id='subnavigation']//button[2]");
+            BY_LOGOUT_LINK = By.cssSelector("li.s-logout");
+        }
         openUrl(PAGE_LOGIN);
         waitForElementVisible(loginFragment.getRoot());
         loginFragment.login(username, password, true);
