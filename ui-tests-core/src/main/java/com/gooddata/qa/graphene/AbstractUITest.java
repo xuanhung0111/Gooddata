@@ -5,6 +5,10 @@ import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
+import com.gooddata.qa.graphene.fragments.disc.DISCNavigation;
+import com.gooddata.qa.graphene.fragments.disc.DISCProjectsList;
+import com.gooddata.qa.graphene.fragments.disc.DeployForm;
+import com.gooddata.qa.graphene.fragments.disc.ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
@@ -107,6 +111,21 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectDetailPage;
+
+    /**
+     * ----- DISC fragments -----
+     */
+    @FindBy(css = ".nav-global")
+    protected DISCNavigation discNavigation;
+
+    @FindBy(css = ".project-list")
+    protected DISCProjectsList discProjectsList;
+
+    @FindBy(xpath = "//div[@class='row page-header']/..")
+    protected ProjectDetailPage projectDetailPage;
+
+    @FindBy(css = ".l-page .overlay")
+    protected DeployForm deployForm;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
