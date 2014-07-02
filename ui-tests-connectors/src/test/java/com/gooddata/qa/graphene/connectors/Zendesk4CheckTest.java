@@ -56,9 +56,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
         connectorType = Connectors.ZENDESK4;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
-        expectedDashboardsAndTabs.put("Insights Dashboard - View Only", new String[]{
-                "Operational", "Yearly", "Time Metrics", "Backlog", "Agents", "Groups", "Leaderboard",
-                "Users & Orgs", "Satisfaction", "Problems", "Tags"
+        expectedDashboardsAndTabs.put("Insights - View Only", new String[]{
+                "Overview", "Tickets", "Satisfaction", "Efficiency", "Agent Activity", "Learn More"
         });
         zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
@@ -97,8 +96,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         }
         return goodDataClient;
     }
-    **/
-
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createOrganizationMetric() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
@@ -112,6 +109,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         data.put("attrValue2", "false");
         metricEditorPage.createFilterMetric(FilterMetricTypes.NOT_IN, "# Non-deleted organizations", data);
     }
+    **/
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createZendeskTicketsReport() throws InterruptedException {
@@ -123,9 +121,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         createBasicReport("# Users", USERS_REPORT_NAME);
     }
 
-    @Test(dependsOnMethods = {"createOrganizationMetric"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
     public void createZendeskOrganizationsReport() throws InterruptedException {
-        createBasicReport("# Non-deleted organizations", ORGANIZATIONS_REPORT_NAME);
+        createBasicReport("# Organizations", ORGANIZATIONS_REPORT_NAME);
     }
 
     @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
