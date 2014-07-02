@@ -27,7 +27,7 @@ public class ReportWithImage extends AbstractReport {
 	ArrayList<String> urls = getImagesLinks();
 	for (int i = 0; i < urls.size(); i++) {
 	    browser.get(urls.get(i));
-	    assertFalse(browser.getCurrentUrl().endsWith("not+found."),
+	    assertFalse((browser.getCurrentUrl().endsWith("not+found.") || browser.getCurrentUrl().contains("errorCode")),
 		    "SFDC image is NOT rendered in report!");
 	}
     }
