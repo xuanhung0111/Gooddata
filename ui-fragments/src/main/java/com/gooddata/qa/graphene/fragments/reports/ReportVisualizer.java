@@ -26,6 +26,7 @@ public class ReportVisualizer extends AbstractFragment {
 
     private static final String XPATH_ATTRIBUTE_CHECKBOX = "//div[contains(@class, 's-snd-AttributesContainer')]//div[contains(@class, 'element') and contains(@title, '${attribute}')]//input[@type='checkbox']";
     private static final String XPATH_ATTRIBUTE_CHECKBOX_CHECKED = "//div[contains(@class, 'AttributesContainer')]//div[contains(@class, 'element') and contains(@title, '${attribute}')]//input[@type='checkbox' and @checked='checked']";
+    private static final String XPATH_SND_FOLDER = "//div[@title='${SnDFolderName}']";
 
     @FindBy(xpath = "//div[contains(@class, 'reportEditorWhatArea')]/button")
     private WebElement whatButton;
@@ -65,6 +66,14 @@ public class ReportVisualizer extends AbstractFragment {
 
     @FindBy(xpath = "//button[contains(@class,'s-sme-addButton')]")
     private WebElement addMetricButton;
+
+    @FindBy(xpath="//input[contains(@class,'newFolder')]") 
+    private WebElement snDFolderNameInput;
+
+    @FindBy(xpath="//select[contains(@class,'s-sme-folder')]") 
+    private Select folderOption;
+
+    private String selectedFactLocator ="//select[contains(@class,'s-sme-objSelect')]/option[text()='${factName}']";
 
     public void selectWhatArea(List<String> what) throws InterruptedException {
         waitForElementVisible(whatButton).click();
@@ -128,5 +137,23 @@ public class ReportVisualizer extends AbstractFragment {
         reportVisualizationContainer.findElement(icon).click();
         waitForElementVisible(By.id(reportVisualizationType.getContainerTabId()), browser);
     }
-
+    
+    public void createSnDFolder(String metricOnFact, String folderName)
+            throws InterruptedException {
+        waitForElementVisible(whatButton).click();
+        waitForElementVisible(createMetricButton).click();
+        By selectedFactOption = By.xpath(selectedFactLocator.replace(
+                "${factName}", metricOnFact));
+        waitForElementVisible(selectedFactOption, browser);
+        waitForElementVisible(performOperationSelect).selectByVisibleText(
+                metricOnFact);
+        waitForElementVisible(addToGlobalInput).click();
+        waitForElementVisible(folderOption).selectByVisibleText(
+                "Create New Folder");
+        waitForElementVisible(snDFolderNameInput).sendKeys(folderName);
+        waitForElementVisible(addMetricButton).click();
+        By snDFolder = By.xpath(XPATH_SND_FOLDER.replace("${SnDFolderName}",
+                folderName));
+        waitForElementVisible(snDFolder, browser);
+    }
 }
