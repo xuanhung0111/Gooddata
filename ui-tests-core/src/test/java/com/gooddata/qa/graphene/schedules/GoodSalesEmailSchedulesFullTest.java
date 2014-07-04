@@ -158,7 +158,7 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
 
         Part xlsxPart = findPartByContentType(reportAttachmentParts,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        assertTrue(xlsxPart.getSize() > 7700, "XLSX is greater than 7.7kB");
+        assertTrue(xlsxPart.getSize() > 7500, "XLSX is greater than 7.5kB");
 
         Part csvPart = findPartByContentType(reportAttachmentParts, "text/csv");
         assertTrue(csvPart.getSize() > 120, "CSV is greater than 120B");

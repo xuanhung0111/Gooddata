@@ -34,7 +34,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     private static final long expectedBarChartReportExportCSVSize = 300L;
     private static final long expectedTabularReportExportPDFSize = 28000L;
     private static final long expectedTabularReportExportXLSSize = 11000L;
-    private static final long expectedTabularReportExportXLSXSize = 7000L;
+    private static final long expectedTabularReportExportXLSXSize = 6600L;
     private static final long expectedTabularReportExportCSVSize = 1650L;
 
     private String regionLocator = "//div[@*[local-name() = 'gdc:region']='0,0,0,0']/span";
