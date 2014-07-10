@@ -13,11 +13,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
-import com.gooddata.qa.graphene.fragments.disc.SchedulesTable;
-
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-public class SchedulesTests extends AbstractDeployProcesses {
+public class SchedulesTests extends AbstractSchedulesTests {
 
 	@BeforeClass
 	public void initProperties() {
@@ -109,58 +107,7 @@ public class SchedulesTests extends AbstractDeployProcesses {
 				null);
 		assertNewSchedule("Schedule with cron expression", "DWHS1.grf", cronTime, null);
 	}
-
-	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void checkScheduleAutoRun() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
-				"Check Auto Run Schedule",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-				true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-		createScheduleForProcess(projectTitle, "Check Auto Run Schedule",
-				"/graph/successfulGraph.grf", cronTime, null);
-		assertNewSchedule("Check Auto Run Schedule", "successfulGraph.grf", cronTime, null);
-		scheduleDetail.waitForAutoRunSchedule(15);
-		scheduleDetail.assertLastExecutionDetails(true, false, false, null, null, 5);
-	}
-
-	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void checkErrorExecution() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
-				"Check Error Execution of Schedule",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-				true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-		createScheduleForProcess(projectTitle, "Check Error Execution of Schedule",
-				"/graph/errorGraph.grf", cronTime, null);
-		assertNewSchedule("Check Error Execution of Schedule", "errorGraph.grf", cronTime, null);
-		scheduleDetail.waitForAutoRunSchedule(15);
-		scheduleDetail.assertLastExecutionDetails(false, false, false,
-				"Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
-	}
-
-	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void checkRetryExecution() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
-				"Check Retry Schedule",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-				true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_EXPRESSION.getCronTime(), Arrays.asList("*/20 * * * *"));
-		createScheduleForProcess(projectTitle, "Check Retry Schedule", "/graph/errorGraph.grf",
-				cronTime, null);
-		assertNewSchedule("Check Retry Schedule", "errorGraph.grf", cronTime, null);
-		scheduleDetail.addRetryDelay(15);
-		scheduleDetail.waitForAutoRunSchedule(20);
-		scheduleDetail.assertLastExecutionDetails(false, false, false,
-				"Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
-		scheduleDetail.waitForAutoRunSchedule(15);
-		scheduleDetail.assertLastExecutionDetails(false, false, false,
-				"Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
-	}
-
+	
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkManualExecution() throws JSONException, InterruptedException {
 		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
@@ -192,77 +139,6 @@ public class SchedulesTests extends AbstractDeployProcesses {
 		scheduleDetail.manualStop();
 		scheduleDetail.assertLastExecutionDetails(false, true, true,
 				"Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
-	}
-
-	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void checkStopAutoExecution() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
-				"Check Stop Auto Execution",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-				true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-		createScheduleForProcess(projectTitle, "Check Stop Auto Execution",
-				"/graph/longTimeRunningGraph.grf", cronTime, null);
-		assertNewSchedule("Check Stop Auto Execution", "longTimeRunningGraph.grf", cronTime, null);
-		scheduleDetail.waitForAutoRunSchedule(15);
-		scheduleDetail.manualStop();
-		scheduleDetail.assertLastExecutionDetails(false, false, true,
-				"Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
-	}
-
-	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void checkLongTimeExecution() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
-				"Check Long Time Execution",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-				true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-		createScheduleForProcess(projectTitle, "Check Long Time Execution",
-				"/graph/longTimeRunningGraph.grf", cronTime, null);
-		assertNewSchedule("Check Long Time Execution", "longTimeRunningGraph.grf", cronTime, null);
-		scheduleDetail.manualRun();
-		scheduleDetail.assertLastExecutionDetails(true, true, false,
-				"Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
-	}
-
-	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void checkLongTimeAutoExecution() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
-				"Check Long Time Auto Execution",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-				true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-		createScheduleForProcess(projectTitle, "Check Long Time Auto Execution",
-				"/graph/longTimeRunningGraph.grf", cronTime, null);
-		assertNewSchedule("Check Long Time Auto Execution", "longTimeRunningGraph.grf", cronTime,
-				null);
-		scheduleDetail.waitForAutoRunSchedule(15);
-		scheduleDetail.assertLastExecutionDetails(true, false, false,
-				"Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
-	}
-
-	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void disableSchedule() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, "Basic", DISCProcessTypes.GRAPH,
-				"Disable Schedule",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-				true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-		createScheduleForProcess(projectTitle, "Disable Schedule", "/graph/successfulGraph.grf",
-				cronTime, null);
-		assertNewSchedule("Disable Schedule", "successfulGraph.grf", cronTime, null);
-		scheduleDetail.disableSchedule();
-		Assert.assertTrue(scheduleDetail.assertDisableSchedule(15));
-		scheduleDetail.manualRun();
-		scheduleDetail.assertLastExecutionDetails(true, true, false,
-				"Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
-		scheduleDetail.enableSchedule();
-		scheduleDetail.waitForAutoRunSchedule(15);
-		assertNewSchedule("Disable Schedule", "successfulGraph.grf", cronTime, null);
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
@@ -363,7 +239,7 @@ public class SchedulesTests extends AbstractDeployProcesses {
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void createScheduleWithErrorCron() throws JSONException, InterruptedException {
+	public void createScheduleWithIncorrectCron() throws JSONException, InterruptedException {
 		deployInProjectDetailPage(projectTitle, "cloudconnect", DISCProcessTypes.GRAPH,
 				"Create Schedule With Error Cron", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 		Pair<String, List<String>> incorrectCronTime = Pair.of(
@@ -425,63 +301,5 @@ public class SchedulesTests extends AbstractDeployProcesses {
 	@Test(dependsOnGroups = { "schedule" }, groups = { "tests" })
 	public void test() throws JSONException {
 		successfulTest = true;
-	}
-
-	protected void openProjectDetailPage(String projectName) {
-		openUrl(DISC_PROJECTS_PAGE_URL);
-		waitForElementVisible(discProjectsList.getRoot());
-		discProjectsList.selectProject(projectName);
-	}
-
-	protected void createScheduleForProcess(String projectName, String processName,
-			String executable, Pair<String, List<String>> cronTime,
-			Map<String, List<String>> parameters) throws InterruptedException {
-		openProjectDetailPage(projectName);
-		waitForElementVisible(projectDetailPage.getRoot());
-		projectDetailPage.clickOnNewScheduleButton();
-		waitForElementVisible(scheduleForm.getRoot());
-		scheduleForm.createNewSchedule(processName, executable, cronTime, parameters);
-		waitForElementPresent(scheduleDetail.getRoot());
-		scheduleDetail.clickOnCloseScheduleButton();
-		waitForElementVisible(projectDetailPage.getRoot());
-	}
-
-	protected void assertNewSchedule(String processName, String executableName,
-			Pair<String, List<String>> cronTime, Map<String, List<String>> parameters)
-			throws InterruptedException {
-		assertSchedule(schedulesTable, processName, executableName, cronTime, parameters);
-	}
-
-	protected void assertBrokenSchedule(String processName, String executableName,
-			Pair<String, List<String>> cronTime, Map<String, List<String>> parameters)
-			throws InterruptedException {
-		assertSchedule(brokenSchedulesTable, processName, executableName, cronTime, parameters);
-	}
-
-	protected void assertSchedule(SchedulesTable schedulesTable, String processName,
-			String executableName, Pair<String, List<String>> cronTime,
-			Map<String, List<String>> parameters) throws InterruptedException {
-		waitForElementVisible(schedulesTable.getRoot());
-		Assert.assertEquals(executableName, schedulesTable.getScheduleTitle(executableName)
-				.getText());
-		String cronFormat = "";
-		if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYWEEK.getCronTime()))
-			cronFormat = ScheduleCronTimes.CRON_EVERYWEEK.getCronFormat()
-					.replace("${day}", cronTime.getValue().get(2))
-					.replace("${hour}", cronTime.getValue().get(1))
-					.replace("${minute}", cronTime.getValue().get(0));
-		if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYDAY.getCronTime()))
-			cronFormat = ScheduleCronTimes.CRON_EVERYDAY.getCronFormat()
-					.replace("${hour}", cronTime.getValue().get(1))
-					.replace("${minute}", cronTime.getValue().get(0));
-		if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime())
-				|| cronTime.getKey().equals(ScheduleCronTimes.CRON_15_MINUTES.getCronTime())
-				|| cronTime.getKey().equals(ScheduleCronTimes.CRON_30_MINUTES.getCronTime()))
-			cronFormat = cronTime.getKey();
-		if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime()))
-			cronFormat = cronTime.getValue().get(0) + " UTC";
-		Assert.assertEquals(cronFormat, schedulesTable.getScheduleCron(executableName).getText());
-		schedulesTable.getScheduleTitle(executableName).click();
-		scheduleDetail.assertScheduleParameters(parameters);
 	}
 }

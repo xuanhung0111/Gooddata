@@ -11,7 +11,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-public class AbstractDeployProcesses extends AbstractProjectTest {
+public abstract class AbstractDeployProcesses extends AbstractProjectTest {
 
 	private static final String FAILED_REDEPLOY_MESSAGE = "Failed to re-deploy the %s.zip process as %s. Reason: Process contains no executables.";
 	private static final String SUCCESSFUL_REDEPLOY_MESSAGE = "Re-deploy %s process" + "\n"
