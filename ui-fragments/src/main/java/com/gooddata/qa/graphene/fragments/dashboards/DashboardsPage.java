@@ -192,7 +192,7 @@ public class DashboardsPage extends AbstractFragment {
         waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
         waitForElementVisible(dashboardTabDeleteDialog);
         waitForElementVisible(dashboardTabDeleteConfirmButton).click();
-        waitForElementNotVisible(dashboardTabDeleteDialog);
+        waitForElementNotPresent(dashboardTabDeleteDialog);
         editDashboardBar.saveDashboard();
         waitForElementNotPresent(editDashboardBar.getRoot());
         waitForDashboardPageLoaded(browser);
