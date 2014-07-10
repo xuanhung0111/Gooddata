@@ -9,6 +9,9 @@ import com.gooddata.qa.graphene.fragments.disc.DISCNavigation;
 import com.gooddata.qa.graphene.fragments.disc.DISCProjectsList;
 import com.gooddata.qa.graphene.fragments.disc.DeployForm;
 import com.gooddata.qa.graphene.fragments.disc.ProjectDetailPage;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleForm;
+import com.gooddata.qa.graphene.fragments.disc.SchedulesTable;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
@@ -126,6 +129,18 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = ".l-page .overlay")
     protected DeployForm deployForm;
+    
+    @FindBy(css = ".ait-new-schedule-fragment")
+    protected ScheduleForm scheduleForm;
+    
+    @FindBy(css = ".ait-schedule-detail-fragment")
+    protected ScheduleDetail scheduleDetail;
+    
+    @FindBy(css = ".active .ait-process-schedule-list")
+    protected SchedulesTable schedulesTable;
+    
+    @FindBy(css = ".active .broken-schedules-section .selectable-domain-table")
+    protected SchedulesTable brokenSchedulesTable;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
