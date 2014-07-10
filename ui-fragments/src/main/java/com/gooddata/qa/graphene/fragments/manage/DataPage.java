@@ -103,6 +103,13 @@ public class DataPage extends AbstractFragment {
 	@FindBy(xpath = "//button[text()='Deselect all']")
 	private WebElement deselectAllTagsButton;
 	
+    @FindBy(id = "p-dataPage")
+    private ObjectFolder objectFolder;
+
+    public ObjectFolder getObjectFolder() {
+        return objectFolder;
+    }
+
 	public WebElement getMenuItem(ObjectTypes objectType) {
 		return objectTypesList.findElement(By.xpath(objectType.getMenuItemXpath()));
 	}
