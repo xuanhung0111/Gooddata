@@ -44,7 +44,7 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(xpath = "//button[@title='Add a new tab']")
     private WebElement addNewTabButton;
 
-    @FindBy(xpath = "//div[contains(@class,'editTitleDialogView')]//div[contains(@class,'modal-dialog')]")
+    @FindBy(xpath = "//div[contains(@class,'editTitleDialogView')]")
     private TabDialog newTabDialog;
 
     @FindBy(xpath = "//div[contains(@class,'s-dashboard-edit-bar')]")
