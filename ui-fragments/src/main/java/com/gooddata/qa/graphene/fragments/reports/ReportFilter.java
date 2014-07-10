@@ -32,6 +32,12 @@ public class ReportFilter extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'c-AttributeFilterPicker afp-list')]")
     private List<WebElement> simpleColumnList;
 
+    @FindBy(xpath = "//div[contains(@class,'attributes')]//input[contains(@class,'gdc-input')]")
+    private WebElement searchAttributeInput;
+
+    @FindBy(xpath = "//input[contains(@class,'gdc-input')]")
+    private WebElement searchValueInput;
+
     @FindBy(xpath = "//button[(text()='Select') and not (contains(@class,'yui3-c-button-disabled'))]")
     private WebElement selectElementButtonDialog;
 
@@ -86,7 +92,9 @@ public class ReportFilter extends AbstractFragment {
         System.out.println("Adding attribute filter ......");
         String attribute = data.get("attribute");
         String attributeElements = data.get("attributeElements");
+        List<String> attributeHearderInGrid = report.getAttributesHeader();
         List<String> lsAttributeElements = Arrays.asList(attributeElements.split(", "));
+        Boolean attributeInHow = attributeHearderInGrid.contains(attribute);
         Collections.sort(lsAttributeElements);
         if (browser.findElements(addFilterButton).size() > 0) {
             waitForElementVisible(addFilterButton, browser).click();
@@ -94,24 +102,36 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(filterPicker);
         waitForElementVisible(attributeFilterLink).click();
         By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}",
-                attribute.trim().toLowerCase().replaceAll(" ", "_")));
-        waitForElementVisible(listOfAttribute, browser);
-        selectElement(attribute);
+                attribute.trim().toLowerCase().replaceAll("\\W", "_")));
+        if (attributeInHow) {
+            waitForElementVisible(listOfAttribute, browser);
+            selectElement(attribute);
+        } else {
+            waitForElementVisible(searchAttributeInput).sendKeys(attribute);
+            waitForElementVisible(listOfAttribute, browser);
+            selectElementNotInHow(attribute);
+        }
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(listOfElementWithCheckbox);
         for (int i = 0; i < lsAttributeElements.size(); i++) {
+            if (!attributeInHow) {
+                waitForElementVisible(searchValueInput).clear();
+                searchValueInput.sendKeys(lsAttributeElements.get(i));
+            }
             By attributeElement = By.xpath(attributeElementLocator.replace("${element}",
-                    lsAttributeElements.get(i).trim().toLowerCase().replaceAll(" ", "_")));
+                    lsAttributeElements.get(i).trim().toLowerCase().replaceAll("\\W", "_")));
             waitForElementVisible(attributeElement, browser).click();
         }
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
         waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
-        waitForElementVisible(report.getRoot());
-        List<String> attributeElementsInGrid = report.getAttributeElements();
-        Collections.sort(attributeElementsInGrid);
-        Assert.assertEquals(attributeElementsInGrid, lsAttributeElements, "Report isn't applied filter correctly");
+        waitForElementVisible(report.getRoot());        
+        if (attributeInHow) {
+            List<String> attributeElementsInGrid = report.getAttributeElements();
+            Collections.sort(attributeElementsInGrid);
+            Assert.assertEquals(attributeElementsInGrid, lsAttributeElements, "Report isn't applied filter correctly");
+        }
     }
 
     private void selectElement(String elementName) {
@@ -119,6 +139,22 @@ public class ReportFilter extends AbstractFragment {
             for (WebElement elem : simpleColumnList) {
                 if (elem.findElement(By.tagName("span")).getText()
                         .equals(elementName)) {
+                    elem.findElement(By.tagName("span")).click();
+                    break;
+                }
+            }
+            //
+        } else {
+            Assert.fail("No attribute are available");
+        }
+    }
+
+    private void selectElementNotInHow(String elementName) {
+        By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}", elementName.trim().toLowerCase().replaceAll("\\W", "_")));
+        if (listOfAttribute != null) {
+            for (WebElement elem : root.findElements(listOfAttribute)) {
+                String ele = elem.findElement(By.tagName("span")).getText();
+                if (ele.equals(elementName)) {
                     elem.findElement(By.tagName("span")).click();
                     break;
                 }

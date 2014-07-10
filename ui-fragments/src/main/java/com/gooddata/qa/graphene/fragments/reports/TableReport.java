@@ -21,6 +21,19 @@ public class TableReport extends AbstractReport {
     @FindBy(xpath = "//div[@id='gridContainerTab']//div[contains(@class,'drillable')]")
     private List<WebElement> drillableElements;
 
+    @FindBy(xpath = "//div[@id='analysisAttributesContainer']//span[contains(@class,'captionWrapper')]")
+    private List<WebElement> attributesHeader;
+
+    public List<String> getAttributesHeader() {
+        int length = attributesHeader.size();
+        List<String> attributes = new ArrayList<String>();
+        for (int i = 0; i < length; i++) {
+            String tmp = attributesHeader.get(i).getText();
+            attributes.add(tmp);
+        }
+        return attributes;
+    }
+
     public List<String> getAttributeElements() {
 	int length = attributeElementInGrid.size();
 	List<String> attributeElements = new ArrayList<String>();

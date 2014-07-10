@@ -85,6 +85,13 @@ public class ReportPage extends AbstractFragment {
     @FindBy(xpath = "//div[@id='filtersContainer']")
     private ReportFilter reportFilter;
 
+    @FindBy(id = "p-analysisPage")
+    private TableReport tableReport;
+
+    public TableReport getTableReport() {
+        return tableReport;
+    }
+
     public ReportVisualizer getVisualiser() {
         return visualiser;
     }
