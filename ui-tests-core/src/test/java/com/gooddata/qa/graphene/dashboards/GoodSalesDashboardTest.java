@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -34,8 +36,17 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
-    public void addNewTab() throws InterruptedException {
-        addNewTabOnDashboard("Pipeline Analysis", "test", "GoodSales-new-tab");
+    public void addNewEmptyTab() throws InterruptedException {
+        addNewTabOnDashboard("Pipeline Analysis", "empty-tab", "GoodSales-new-empty-tab");
+    }
+    
+    @Test(dependsOnMethods = {"addNewEmptyTab"}, groups = {"dashboards-verification"})
+    public void addNewNonEmptyTab() throws InterruptedException {
+	DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+        addNewTabOnDashboard("Pipeline Analysis", "non-empty-tab", "GoodSales-new-non-empty-tab");
+        dashboardsPage.editDashboard();
+        dashboardEditBar.addLineToDashboard();
+        dashboardEditBar.saveDashboard();
     }
 
     /**
@@ -58,16 +69,14 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
      * }
      */
 
-    @Test(dependsOnMethods = {"addNewTab"}, groups = {"dashboards-verification"})
-    public void deleteNewTab() throws InterruptedException {
-        initDashboardsPage();
-        assertTrue(dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
-        waitForDashboardPageLoaded(browser);
-        Thread.sleep(5000);
-        int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
-        dashboardsPage.deleteDashboardTab(tabsCount - 1);
-        Thread.sleep(5000);
-        assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
+    @Test(dependsOnMethods = {"addNewEmptyTab"}, groups = {"dashboards-verification"})
+    public void deleteEmptyTab() throws InterruptedException {
+        deleteTab(2);
+    }
+    
+    @Test(dependsOnMethods = {"addNewNonEmptyTab"}, groups = {"dashboards-verification"})
+    public void deleteNonEmptyTab() throws InterruptedException {
+	deleteTab(1);
     }
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification", "new-dashboard"})
@@ -107,5 +116,16 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"dashboards-verification"}, groups = {"tests"})
     public void verifyDashboardTabsAfter() throws InterruptedException {
         verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
+    }
+    
+    private void deleteTab(int offset) throws InterruptedException {
+        initDashboardsPage();
+        assertTrue(dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
+        waitForDashboardPageLoaded(browser);
+        Thread.sleep(5000);
+        int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();
+        dashboardsPage.deleteDashboardTab(tabsCount - offset);
+        Thread.sleep(5000);
+        assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), tabsCount - 1, "Tab is still present");
     }
 }

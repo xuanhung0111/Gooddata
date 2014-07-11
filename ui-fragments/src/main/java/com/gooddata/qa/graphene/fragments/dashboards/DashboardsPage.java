@@ -64,6 +64,8 @@ public class DashboardsPage extends AbstractFragment {
 
     @FindBy(className = "yui3-c-projectdashboard-content")
     private DashboardContent content;
+    
+    private By emptyTabPlaceholder = By.xpath("//div[contains(@class, 'yui3-c-projectdashboard-placeholder-visible')]");
 
     private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
     private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
@@ -188,11 +190,14 @@ public class DashboardsPage extends AbstractFragment {
     public void deleteDashboardTab(int tabIndex) throws InterruptedException {
         tabs.openTab(tabIndex);
         editDashboard();
+        boolean nonEmptyTab = browser.findElements(emptyTabPlaceholder).size() == 0;
         tabs.selectDropDownMenu(tabIndex);
         waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
-        waitForElementVisible(dashboardTabDeleteDialog);
-        waitForElementVisible(dashboardTabDeleteConfirmButton).click();
-        waitForElementNotPresent(dashboardTabDeleteDialog);
+        if(nonEmptyTab){
+            waitForElementVisible(dashboardTabDeleteDialog);
+            waitForElementVisible(dashboardTabDeleteConfirmButton).click();
+            waitForElementNotPresent(dashboardTabDeleteDialog);
+        }
         editDashboardBar.saveDashboard();
         waitForElementNotPresent(editDashboardBar.getRoot());
         waitForDashboardPageLoaded(browser);
