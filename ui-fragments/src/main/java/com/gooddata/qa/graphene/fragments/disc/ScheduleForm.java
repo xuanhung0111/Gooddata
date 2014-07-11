@@ -189,6 +189,7 @@ public class ScheduleForm extends AbstractFragment {
 		if (incorrectCronTime != null)
 			selectCron(incorrectCronTime);
 		waitForElementVisible(confirmButton).click();
+		waitForElementVisible(cronExpressionErrorBubble);
 		System.out.println("cron exepression: " + cronExpression.getAttribute("class"));
 		System.out.println("cron bubble: " + cronExpressionErrorBubble.getText());
 		Assert.assertTrue(cronExpression.getAttribute("class").contains("has-error"));
