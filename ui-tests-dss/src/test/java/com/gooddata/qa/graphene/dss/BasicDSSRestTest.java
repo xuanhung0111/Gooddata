@@ -281,14 +281,14 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnMethods = {"verifyStorageEnabled"})
     public void addUserWithEmptyProfileAndLogin() throws JSONException, InterruptedException {
-        invalidUserAssignment(null, null, NEW_USER_ROLE, "One (and only one) of \"profile\" or \"login\" must be " +
+        invalidUserAssignment(null, null, NEW_USER_ROLE, "One (and only one) of 'profile' or 'login' must be " +
                 "provided.");
     }
 
     @Test(dependsOnMethods = {"verifyStorageEnabled"})
     public void addUserWithBothProfileAndLogin() throws JSONException, InterruptedException {
         invalidUserAssignment(getTestUserProfileUri(), testUserLogin, NEW_USER_ROLE,
-                "One (and only one) of \"profile\" or \"login\" must be provided.");
+                "One (and only one) of 'profile' or 'login' must be provided.");
     }
 
     @Test(dependsOnMethods = {"verifyStorageEnabled"})
@@ -321,7 +321,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     @Test(dependsOnMethods = {"verifyStorageEnabled"})
     public void addExistingUserToStorage() throws JSONException, InterruptedException {
         invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE,
-                "User '" + userCreatedById + "' already exists in storage '");
+                "User '" + userCreatedById + "' already exists in DSS instance '");
     }
 
     /**
