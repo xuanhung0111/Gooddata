@@ -146,10 +146,11 @@ public class ScheduleDetail extends ScheduleForm {
 				if (scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText()
 						.equals("SCHEDULED")) {
 					System.out.println("Schedule is in SCHEDULED state...");
-					Thread.sleep(1000);
-				} else if (scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION)
-						.getText().equals("RUNNING")) {
-					System.out.println("Schedule is in RUNNING state...");
+					Thread.sleep(10000);
+				} else {
+					if (scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION)
+							.getText().equals("RUNNING"))
+						System.out.println("Schedule is in RUNNING state...");
 					Calendar startTime = Calendar.getInstance();
 					SimpleDateFormat sdf = new SimpleDateFormat("mm");
 					int startMinute = Integer.valueOf(sdf.format(startTime.getTime()));
@@ -158,7 +159,7 @@ public class ScheduleDetail extends ScheduleForm {
 					if (delayTime >= 0 && delayTime < 4)
 						System.out.println("Start time in minute: " + startMinute);
 					else {
-						System.out.println("Schedule execution is too early, started at: "
+						System.out.println("If this is not re-schedule, schedule execution started too early, started at: "
 								+ startMinute);
 					}
 					break;

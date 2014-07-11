@@ -114,6 +114,7 @@ public class DeployForm extends AbstractFragment {
 		setDeployProcessInput(zipFilePath, processType, processName);
 		getDeployConfirmButton().click();
 		if (zipFilePath.isEmpty()) {
+			waitForElementVisible(getFileInputErrorBubble());
 			Assert.assertTrue(inputFileHasError());
 			Assert.assertEquals(getFileInputErrorBubble().getText(),
 					"A zip file is required. The file must be smaller than 1MB.");
@@ -121,6 +122,7 @@ public class DeployForm extends AbstractFragment {
 		if (processName.isEmpty()) {
 			Assert.assertTrue(inputProcessNameHasError());
 			getProcessName().click();
+			waitForElementVisible(getProcessNameErrorBubble());
 			Assert.assertEquals(getProcessNameErrorBubble().getText(), "A process name is required");
 		}
 	}
