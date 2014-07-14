@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -15,6 +16,8 @@ public class ObjectFolder extends AbstractFragment {
     private static final String XPATH_FOLDER_LINK = "//a[@title='${folderName}']";
 
     private static final String XPATH_ADD_FOLDER_BUTTON = "//div[@id='${list}']//button[contains(@class,'s-btn-add_folder')]";
+
+    private static final String XPATH_FOLDERS_LIST = "//div[@id='${list}']//ul[@class='listList']";
 
     @FindBy(xpath = "//input[contains(@class,'s-newFolderTitle')]")
     private WebElement folderNameInput;
@@ -67,18 +70,27 @@ public class ObjectFolder extends AbstractFragment {
         return addFolderButton;
     }
 
+    private List<WebElement> getFoldersList(String page) {
+        By folders;
+        if (page.equalsIgnoreCase("attributes")) {
+            folders = By.xpath(XPATH_FOLDERS_LIST.replace("${list}", "dimensionList"));
+        } else {
+            folders = By.xpath(XPATH_FOLDERS_LIST.replace("${list}", "foldersList"));
+        }
+        waitForElementVisible(root.findElement(folders));
+        return root.findElement(folders).findElements(By.tagName("li"));
+    }
+
     public void checkFolderVisible(String folderName) {
         By folder = By.xpath(XPATH_FOLDER_LINK.replace("${folderName}",
                 folderName));
         waitForElementVisible(folder, browser);
     }
 
-    public void verifyFolderList(List<String> folders) {
-        List<WebElement> folderListElems = foldersList.findElements(By
-                .tagName("li"));
-        if (foldersList != null && folderListElems.size() > 0) {
+    public void verifyFolderList(String page, List<String> folders) {
+        if (folders != null && folders.size() > 0) {
             int i = 0;
-            for (WebElement elem : folderListElems) {
+            for (WebElement elem : getFoldersList(page)) {
                 Assert.assertEquals(
                         elem.findElement(By.tagName("a")).getText(),
                         folders.get(i));
@@ -126,5 +138,22 @@ public class ObjectFolder extends AbstractFragment {
         waitForElementVisible(deleteFolderButton).click();
         waitForElementVisible(confirmDeleteFolder).click();
         waitForElementNotPresent(folder);
+    }
+
+    public void checkEditorViewFolderList(String page, List<String> folders) {
+        if (folders != null && folders.size() > 0) {
+            List<String> folderList = new ArrayList<String>();
+            for (WebElement elem : getFoldersList(page)) {
+                folderList.add(elem.findElement(By.tagName("a")).getText());
+            }
+            for (String folder : folders) {
+                Assert.assertEquals(folderList.contains(folder), true);
+            }
+        }
+        if (page.equalsIgnoreCase("metrics")) {
+            waitForElementVisible(getAddFolderButton(page));
+        } else {
+            waitForElementNotVisible(getAddFolderButton(page));
+        }
     }
 }
