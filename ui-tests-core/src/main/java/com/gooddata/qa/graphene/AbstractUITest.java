@@ -124,7 +124,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".project-list")
     protected DISCProjectsList discProjectsList;
 
-    @FindBy(xpath = "//div[@class='row page-header']/..")
+    @FindBy(css = ".ait-project-detail-fragment")
     protected ProjectDetailPage projectDetailPage;
 
     @FindBy(css = ".l-page .overlay")

@@ -13,6 +13,25 @@
                 <testng.suite.xml>testng-disc.xml</testng.suite.xml>
                 <propertiesPath>${modulePropertiesPath}</propertiesPath>
             </properties>
+            <build>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>**/firefox-prefs.js</include>
+                        </includes>
+                    </testResource>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>false</filtering>
+                        <includes>
+                            <include>**/*.xml</include>
+                            <include>**/*.properties</include>
+                        </includes>
+                    </testResource>
+                </testResources>
+            </build>
         </profile>
     </profiles>
   <dependencies>
