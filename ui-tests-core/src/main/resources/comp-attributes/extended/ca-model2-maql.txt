@@ -1,0 +1,23 @@
+create dataset {dtst.comp} visual ( title "Computed set" );
+
+create attribute {attr.comp1} visual ( title "CompAttr1" ) as {tab_comp1.id} primary with labels {lbl.comp1} visual ( title "CompAttr1" ) as {tab_comp1.color};
+create attribute {attr.comp2} visual ( title "CompAttr2" ) as {tab_comp2.id} primary with labels {lbl.comp2} visual ( title "CompAttr2" ) as {tab_comp2.color};
+create attribute {attr.comp3} visual ( title "CompAttr3" ) as {tab_comp3.id} primary with labels {lbl.comp3} visual ( title "CompAttr3" ) as {tab_comp3.color};
+create attribute {attr.comp4} visual ( title "CompAttr4" ) as {tab_comp4.id} primary with labels {lbl.comp4} visual ( title "CompAttr4" ) as {tab_comp4.color};
+create attribute {attr.comp5} visual ( title "CompAttr5" ) as {tab_comp5.id} primary with labels {lbl.comp5} visual ( title "CompAttr5" ) as {tab_comp5.color};
+create attribute {attr.comp6} visual ( title "CompAttr6" ) as {tab_comp6.id} primary with labels {lbl.comp6} visual ( title "CompAttr6" ) as {tab_comp6.color};
+create attribute {attr.comp7} visual ( title "CompAttr7" ) as {tab_comp7.id} primary with labels {lbl.comp7} visual ( title "CompAttr7" ) as {tab_comp7.color};
+create attribute {attr.comp8} visual ( title "CompAttr8" ) as {tab_comp8.id} primary with labels {lbl.comp8} visual ( title "CompAttr8" ) as {tab_comp8.color};
+create attribute {attr.comp9} visual ( title "CompAttr9" ) as {tab_comp9.id} primary with labels {lbl.comp9} visual ( title "CompAttr9" ) as {tab_comp9.color};
+
+alter dataset {dtst.comp} add {attr.comp1};
+alter dataset {dtst.comp} add {attr.comp2};
+alter dataset {dtst.comp} add {attr.comp3};
+alter dataset {dtst.comp} add {attr.comp4};
+alter dataset {dtst.comp} add {attr.comp5};
+alter dataset {dtst.comp} add {attr.comp6};
+alter dataset {dtst.comp} add {attr.comp7};
+alter dataset {dtst.comp} add {attr.comp8};
+alter dataset {dtst.comp} add {attr.comp9};
+
+synchronize {dtst.comp};

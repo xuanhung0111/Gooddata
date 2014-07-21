@@ -8,10 +8,14 @@ import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragme
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.singleloadinterface.SingleLoadInterfaceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp.ExportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.imp.ImportFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectElementsFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAttributesFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
@@ -22,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.assertTrue;
@@ -66,6 +71,15 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     @FindBy(tagName = "form")
     protected PullFragment pullFragment;
+
+    @FindBy(tagName = "pre")
+    protected QueryAttributesFragment queryAttributesFragment;
+
+    @FindBy(tagName = "pre")
+    protected ObjectFragment objectFragment;
+
+    @FindBy(tagName = "form")
+    protected ObjectElementsFragment objectElementsFragment;
 
     @FindBy(tagName = "form")
     protected SingleLoadInterfaceFragment singleLoadInterfaceFragment;
@@ -142,6 +156,23 @@ public class AbstractGreyPageTest extends AbstractTest {
         return singleLoadInterfaceFragment.postDataset(dataset);
     }
 
+    public int getAttributeID(String attributeTitle) throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/query/attributes");
+        waitForElementPresent(queryAttributesFragment.getRoot());
+        return queryAttributesFragment.getAttributeIDByTitle(attributeTitle);
+    }
+
+    public JSONObject getObjectByID(int objectID) throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/"+objectID);
+        waitForElementPresent(objectFragment.getRoot());
+        return objectFragment.getObject();
+    }
+
+    public ArrayList<Pair<String, Integer>> getObjectElementsByID(int objectID) throws JSONException, InterruptedException {
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/" + objectID + "/elements");
+        waitForElementPresent(objectElementsFragment.getRoot());
+        return objectElementsFragment.getObjectElements();
+    }
     public String validateProjectPartial(Validation... validationOptions) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
         waitForElementPresent(validateFragment.getRoot());

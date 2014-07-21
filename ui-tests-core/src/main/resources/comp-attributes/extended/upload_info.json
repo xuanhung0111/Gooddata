@@ -1,0 +1,80 @@
+{
+   "dataSetSLIManifest" : {
+      "parts" : [
+         {
+            "columnName" : "tab_comp1.color",
+            "populates" : [
+               "lbl.comp1"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "tab_comp2.color",
+            "populates" : [
+               "lbl.comp2"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "tab_comp3.color",
+            "populates" : [
+               "lbl.comp3"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "tab_comp4.color",
+            "populates" : [
+               "lbl.comp4"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "tab_comp5.color",
+            "populates" : [
+               "lbl.comp5"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "tab_comp6.color",
+            "populates" : [
+               "lbl.comp6"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "tab_comp7.color",
+            "populates" : [
+               "lbl.comp7"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+           {
+            "columnName" : "tab_comp8.color",
+            "populates" : [
+               "lbl.comp8"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "tab_comp9.color",
+            "populates" : [
+               "lbl.comp9"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         }
+      ],
+      "file" : "dtst.comp.csv",
+      "dataSet" : "dtst.comp"
+   }
+}
