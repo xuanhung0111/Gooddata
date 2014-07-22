@@ -59,6 +59,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         expectedDashboardsAndTabs.put("Insights - View Only", new String[]{
                 "Overview", "Tickets", "Satisfaction", "Efficiency", "Agent Activity", "Learn More"
         });
+        expectedDashboardsAndTabs.put("My dashboard", new String[]{"First Tab"});
         zendeskAPIUser = testParams.loadProperty("connectors.zendesk.apiUser");
         zendeskAPIPassword = testParams.loadProperty("connectors.zendesk.apiUserPassword");
         useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
