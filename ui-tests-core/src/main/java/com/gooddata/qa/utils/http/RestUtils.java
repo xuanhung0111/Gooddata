@@ -1,17 +1,14 @@
 package com.gooddata.qa.utils.http;
 
 import java.io.IOException;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.gooddata.qa.graphene.enums.UserRoles;
 import static org.testng.Assert.*;
-
 
 public class RestUtils {
     
