@@ -92,9 +92,8 @@ public class ReportFilter extends AbstractFragment {
         System.out.println("Adding attribute filter ......");
         String attribute = data.get("attribute");
         String attributeElements = data.get("attributeElements");
-        List<String> attributeHearderInGrid = report.getAttributesHeader();
         List<String> lsAttributeElements = Arrays.asList(attributeElements.split(", "));
-        Boolean attributeInHow = attributeHearderInGrid.contains(attribute);
+        boolean attributeInHow = report.getAttributesHeader().contains(attribute);
         Collections.sort(lsAttributeElements);
         if (browser.findElements(addFilterButton).size() > 0) {
             waitForElementVisible(addFilterButton, browser).click();
@@ -130,7 +129,7 @@ public class ReportFilter extends AbstractFragment {
         if (attributeInHow) {
             List<String> attributeElementsInGrid = report.getAttributeElements();
             Collections.sort(attributeElementsInGrid);
-            Assert.assertEquals(attributeElementsInGrid, lsAttributeElements, "Report isn't applied filter correctly");
+            Assert.assertEquals(attributeElementsInGrid, lsAttributeElements, "Filter in report isn't applied correctly");
         }
     }
 
@@ -152,10 +151,10 @@ public class ReportFilter extends AbstractFragment {
     private void selectElementNotInHow(String elementName) {
         By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}", elementName.trim().toLowerCase().replaceAll("\\W", "_")));
         if (listOfAttribute != null) {
-            for (WebElement elem : root.findElements(listOfAttribute)) {
-                String ele = elem.findElement(By.tagName("span")).getText();
-                if (ele.equals(elementName)) {
-                    elem.findElement(By.tagName("span")).click();
+            for (WebElement attribute : root.findElements(listOfAttribute)) {
+                WebElement element = attribute.findElement(By.tagName("span"));
+                if (element.getText().equals(elementName)) {
+                    element.click();
                     break;
                 }
             }

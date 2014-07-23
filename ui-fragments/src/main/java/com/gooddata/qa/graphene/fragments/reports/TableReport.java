@@ -25,9 +25,8 @@ public class TableReport extends AbstractReport {
     private List<WebElement> attributesHeader;
 
     public List<String> getAttributesHeader() {
-        int length = attributesHeader.size();
         List<String> attributes = new ArrayList<String>();
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < attributesHeader.size(); i++) {
             String tmp = attributesHeader.get(i).getText();
             attributes.add(tmp);
         }
@@ -35,9 +34,8 @@ public class TableReport extends AbstractReport {
     }
 
     public List<String> getAttributeElements() {
-	int length = attributeElementInGrid.size();
 	List<String> attributeElements = new ArrayList<String>();
-	for (int i = 0; i < length; i++) {
+	for (int i = 0; i < attributeElementInGrid.size(); i++) {
 	    String tmp = attributeElementInGrid.get(i).getAttribute("title");
 	    attributeElements.add(tmp);
 	}
@@ -45,9 +43,8 @@ public class TableReport extends AbstractReport {
     }
 
     public List<Float> getMetricElements() {
-	int length = metricValuesInGrid.size();
 	List<Float> metricValues = new ArrayList<Float>();
-	for (int i = 0; i < length; i++) {
+	for (int i = 0; i < metricValuesInGrid.size(); i++) {
 	    float tmp = ReportPage.getNumber(metricValuesInGrid.get(i)
 		    .getAttribute("title"));
 	    metricValues.add(tmp);

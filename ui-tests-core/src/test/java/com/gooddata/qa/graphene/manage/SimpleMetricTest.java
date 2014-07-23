@@ -22,8 +22,9 @@ import com.gooddata.qa.graphene.enums.metrics.GranularityMetricTypes;
 import com.gooddata.qa.graphene.enums.metrics.LogicalMetricTypes;
 import com.gooddata.qa.graphene.enums.metrics.NumericMetricTypes;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
-@Test(groups = { "GoodSalesMetrics" }, description = "Tests for GoodSales project (metric creation functionality) in GD platform")
+@Test(groups = {"GoodSalesMetrics"}, description = "Tests for GoodSales project (metric creation functionality) in GD platform")
 public class SimpleMetricTest extends GoodSalesAbstractTest {
 
     private String attrFolder;
@@ -40,16 +41,16 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     List<String> stageNameValues;
 
     private static final String DATE_FORMAT_PATTERN = "yyyy/MM/dd HH:mm:ss";
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-            DATE_FORMAT_PATTERN);
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_PATTERN);
 
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "Simple-metric-test";
     }
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void initialize() throws InterruptedException, JSONException {
+
         attrFolder = "Date dimension (Snapshot)";
         attr = "Year (Snapshot)";
         attrValue = "2010";
@@ -66,49 +67,42 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 "Closed Lost");
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createShareMetric() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metricName = "Share % " + getCurrentDateString();
         String metric = "Amount";
-        metricEditorPage
-                .createShareMetric(metricName, metric, attrFolder, attr);
+        metricEditorPage.createShareMetric(metricName, metric, attrFolder, attr);
         List<Float> metricValues = Arrays.asList(0.23f, 0.2f, 0.33f, 0.07f,
                 0.08f, 0.09f);
         checkMetricValuesInReport(metricName, productAttr, metricValues,
                 productValues);
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createDifferentMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metric = "Amount";
         String metricName = "Difference " + getCurrentDateString();
-        metricEditorPage.createDifferentMetric(metricName, metric, attrFolder,
-                attr, attrValue);
+        metricEditorPage.createDifferentMetric(metricName, metric, attrFolder, attr, attrValue);
         List<Float> metricValues = Arrays.asList(20171686.25f, 16271278.69f,
                 32627524.67f, 6273858.91f, 7532925.39f, 6825820.63f);
         checkMetricValuesInReport(metricName, productAttr, metricValues,
                 productValues);
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createRatioMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metricName = "Ratio " + getCurrentDateString();
-        metricEditorPage.createRatioMetric(metricName, ratioMetric1,
-                ratioMetric2);
+        metricEditorPage.createRatioMetric(metricName, ratioMetric1, ratioMetric2);
         List<Float> metricValues = Arrays.asList(3.61f);
         checkMetricValuesInReport(metricName, null, metricValues, null);
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createAggreationMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String fact0 = "Probability";
         String fact1 = "Amount";
         String attrFolder0 = "Stage";
@@ -129,8 +123,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         ArrayList<String> expectedMaql = new ArrayList<String>();
         String expectedFormat = "#,##0.00";
         String expectedMaqlAvg = "SELECT AVG(" + fact0 + ")";
-        String expectedMaqlCorrel = "SELECT CORREL(" + fact0 + "," + fact1
-                + ")";
+        String expectedMaqlCorrel = "SELECT CORREL(" + fact0 + "," + fact1 + ")";
         String expectedMaqlCount = "SELECT COUNT(" + attr0 + "," + attr1 + ")";
         expectedMaql.add(expectedMaqlAvg);
         expectedMaql.add(expectedMaqlCount);
@@ -147,8 +140,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                     "Creating %s metric, name: %s, data: %s", type, metricName,
                     data.toString()));
             metricEditorPage.createAggregationMetric(type, metricName, data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i),
-                    expectedFormat);
+            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             switch (type) {
             case AVG:
                 checkMetricValuesInReport(metricName, stageNameAttr,
@@ -166,17 +158,16 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 break;
             }
             i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                    + "|dataPage|metrics");
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createNumericMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metric = "Best Case";
         data = new HashMap<String, String>();
+        data.put("metric0", metric);
         ArrayList<NumericMetricTypes> metricTypes = new ArrayList<NumericMetricTypes>();
         metricTypes.add(NumericMetricTypes.ABS);
         metricTypes.add(NumericMetricTypes.EXP);
@@ -190,8 +181,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         List<Float> FLOORMetricValues = Arrays.asList(5319697f, 4363972f,
                 20255220f, 1670164f, 1198603f, 3036473f);
         for (NumericMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " "
-                    + getCurrentDateString();
+            String metricName = metricType.getLabel() + " " + getCurrentDateString();
             if (metricType.equals(NumericMetricTypes.EXP))
                 metric = "Win Rate";
             else
@@ -202,8 +192,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                     metricName, data.toString()));
             metricEditorPage.createNumericMetric(metricType, metricName, data);
             expectedMaql = "SELECT " + metricType + "(" + metric + ")";
-            metricEditorPage.verifyMetric(metricName, expectedMaql,
-                    expectedFormat);
+            metricEditorPage.verifyMetric(metricName, expectedMaql, expectedFormat);
             switch (metricType) {
             case ABS:
                 checkMetricValuesInReport(metricName, productAttr,
@@ -220,15 +209,14 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
             default:
                 break;
             }
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                    + "|dataPage|metrics");
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+
         }
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createGranularityMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String fact0 = "Probability";
         String attrFolder0 = "Date dimension (Snapshot)";
         String attr0 = "Year (Snapshot)";
@@ -249,12 +237,10 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         String expectedFormat = "#,##0.00";
         String expectedMaqlByAllAttr = "SELECT " + metric0 + " / (SELECT "
                 + metric1 + " BY ALL " + attr0 + ")";
-        String expectedMaqlForNext = "SELECT " + metric0 + " FOR Next(" + attr0
-                + ")";
+        String expectedMaqlForNext = "SELECT " + metric0 + " FOR Next(" + attr0 + ")";
         String expectedMaqlByAll = "SELECT " + metric0 + " / (SELECT "
                 + metric1 + " BY ALL IN ALL OTHER DIMENSIONS)";
-        String expectedMaqlWithin = "SELECT RANK(" + metric0 + ") WITHIN ("
-                + fact0 + ")";
+        String expectedMaqlWithin = "SELECT RANK(" + metric0 + ") WITHIN (" + fact0 + ")";
         expectedMaql.add(expectedMaqlByAllAttr);
         expectedMaql.add(expectedMaqlForNext);
         expectedMaql.add(expectedMaqlByAll);
@@ -268,15 +254,12 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 11656.96f, 2428.88f, 2877.03f, 3108.3f);
         int i = 0;
         for (GranularityMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " "
-                    + getCurrentDateString();
+            String metricName = metricType.getLabel() + " " + getCurrentDateString();
             System.out.println(String.format(
                     "Creating %s metric, name: %s, data: %s", metricType,
                     metricName, data.toString()));
-            metricEditorPage.createGranularityMetric(metricType, metricName,
-                    data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i),
-                    expectedFormat);
+            metricEditorPage.createGranularityMetric(metricType, metricName, data);
+            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             switch (metricType) {
             case BY_ALL_ATTRIBUTE:
                 checkMetricValuesInReport(metricName, productAttr,
@@ -294,15 +277,13 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 break;
             }
             i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                    + "|dataPage|metrics");
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createLogicalMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String attrFolder0 = "Date dimension (Snapshot)";
         String attr0 = "Year (Snapshot)";
         String attrValue0 = "2011";
@@ -351,8 +332,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 383107534.50f, 4247057.12f);
         int i = 0;
         for (LogicalMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " "
-                    + getCurrentDateString();
+            String metricName = metricType.getLabel() + " " + getCurrentDateString();
             if (metricType.equals(LogicalMetricTypes.CASE)) {
                 data.put("metric0", metric2);
                 data.put("metric1", metric3);
@@ -369,8 +349,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                     "Creating %s metric, name: %s, data: %s", metricType,
                     metricName, data.toString()));
             metricEditorPage.createLogicalMetric(metricType, metricName, data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i),
-                    expectedFormat);
+            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             switch (metricType) {
             case AND:
                 checkMetricValuesInReport(metricName, productAttr,
@@ -395,15 +374,13 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 break;
             }
             i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                    + "|dataPage|metrics");
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "metric-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createFilterMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|metrics");
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String attrFolder = "Date dimension (Snapshot)";
         String attr = "Year (Snapshot)";
         String attrValue0 = "2010";
@@ -450,14 +427,12 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         List<String> withoutPfAttributeValues = Arrays.asList("Q2/2012");
         int i = 0;
         for (FilterMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " "
-                    + getCurrentDateString();
+            String metricName = metricType.getLabel() + " " + getCurrentDateString();
             System.out.println(String.format(
                     "Creating %s metric, name: %s, data: %s", metricType,
                     metricName, data.toString()));
             metricEditorPage.createFilterMetric(metricType, metricName, data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i),
-                    expectedFormat);
+            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
             switch (metricType) {
             case EQUAL:
                 checkMetricValuesInReport(metricName, quarterYearAttr,
@@ -475,8 +450,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 break;
             }
             i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                    + "|dataPage|metrics");
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
@@ -499,6 +473,8 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         }
         List<Float> metricValuesinGrid = reportPage.getTableReport()
                 .getMetricElements();
+        Screenshots.takeScreenshot(browser, "check-metric" + "-" + metricName,
+                this.getClass());
         Assert.assertEquals(metricValuesinGrid, metricValues,
                 "Metric values list is incorrrect");
         if (attributeValues != null) {
@@ -518,7 +494,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         return DATE_FORMAT.format(new Date()).replaceAll("\\W", "-");
     }
 
-    @Test(dependsOnGroups = { "metric-tests" }, groups = { "tests" })
+    @Test(dependsOnGroups = {"metric-tests"}, groups = {"tests"})
     public void finalTest() {
         successfulTest = true;
     }
