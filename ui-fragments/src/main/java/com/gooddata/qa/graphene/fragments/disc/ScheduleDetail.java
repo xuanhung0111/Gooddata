@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 
@@ -27,20 +28,13 @@ public class ScheduleDetail extends ScheduleForm {
 	private static final String BROKEN_SCHEDULE_MESSAGE = "The graph %s doesn't exist because it has been changed (renamed or deleted). "
 			+ "It isn't possible to execute this schedule because there is no graph to execute.";
 
-	private static final String XPATH_EXECUTABLE_SELECTION = "//select[contains(@class, 'ait-schedule-executable-select-btn')]/option[text()='${option}']";
-	private static final String XPATH_EXECUTION_ITEM = "//div[@class='ember-view execution-history-list']/div[${index}]";
-
-	private static final By BY_EXECUTION_STATUS = By.xpath("//div[@class='execution-status']");
+	private static final By BY_EXECUTION_STATUS = By.cssSelector(".execution-status");
 	private static final By BY_EXECUTION_DESCRIPTION = By
-			.xpath("//div[contains(@class, 'execution-history-item-description')]");
-	private static final By BY_EXECUTION_LOG = By
-			.xpath("//div[@class='list-item-cell execution-log']");
-	private static final By BY_EXECUTION_RUNTIME = By
-			.xpath("//div[@class='list-item-cell execution-runtime']");
-	private static final By BY_EXECUTION_DATE = By
-			.xpath("//div[@class='list-item-cell execution-date']");
-	private static final By BY_EXECUTION_TIMES = By
-			.xpath("//div[@class='list-item-cell execution-times']");
+			.cssSelector(".ait-execution-history-item-description");
+	private static final By BY_EXECUTION_LOG = By.cssSelector(".ait-execution-history-item-log");
+	private static final By BY_EXECUTION_RUNTIME = By.cssSelector(".execution-runtime");
+	private static final By BY_EXECUTION_DATE = By.cssSelector(".execution-date");
+	private static final By BY_EXECUTION_TIMES = By.cssSelector(".execution-times");
 	private static final By BY_OK_STATUS_ICON = By.cssSelector(".status-icon-ok");
 	private static final By BY_ERROR_STATUS_ICON = By.cssSelector(".status-icon-error");
 	private static final By BY_MANUAL_ICON = By.cssSelector(".icon-manual");
@@ -48,7 +42,7 @@ public class ScheduleDetail extends ScheduleForm {
 	private static final By BY_RUN_STOP_BUTTON = By
 			.xpath("//div[@class='large-12 columns ait-schedule-executable-section']/div[@class='l-next']/button[1]");
 
-	@FindBy(xpath = "//a[contains(@class, 'close-button')]")
+	@FindBy(css = ".ait-schedule-close-btn .icon-delete")
 	protected WebElement closeButton;
 
 	@FindBy(css = ".ait-execution-history-item")
@@ -60,14 +54,17 @@ public class ScheduleDetail extends ScheduleForm {
 	@FindBy(css = ".reschedule-form")
 	protected WebElement rescheduleForm;
 
-	@FindBy(xpath = "//div[contains(@class, 'ait-schedule-reschedule-value')]//input")
+	@FindBy(css = ".ait-schedule-reschedule-value input")
 	protected WebElement retryDelayInput;
 
-	@FindBy(css = ".ait-schedule-reschedule-edit-buttons .ember-view .button-positive")
+	@FindBy(css = ".ait-schedule-reschedule-edit-buttons .button-positive")
 	protected WebElement saveRetryDelayButton;
 
 	@FindBy(css = ".ait-schedule-reschedule-edit-buttons .button-secondary")
 	protected WebElement cancelAddRetryDelayButton;
+
+	@FindBy(css = ".ait-schedule-reschedule-value .bubble-overlay")
+	protected WebElement errorRetryDelayBubble;
 
 	@FindBy(css = ".ait-schedule-run-btn")
 	protected WebElement manualRunButton;
@@ -93,8 +90,11 @@ public class ScheduleDetail extends ScheduleForm {
 	@FindBy(css = ".ait-schedule-enable-btn")
 	protected WebElement enableScheduleButton;
 
-	@FindBy(css = ".ait-schedule-executable-edit-buttons .l-inline .button-positive")
+	@FindBy(css = ".ait-schedule-executable-edit-buttons .button-positive")
 	protected WebElement saveChangedExecutable;
+
+	@FindBy(css = ".ait-schedule-executable-edit-buttons .button-secondary")
+	protected WebElement cancelChangedExecutable;
 
 	@FindBy(css = ".ait-schedule-delete-btn")
 	protected WebElement deleteScheduleButton;
@@ -105,14 +105,26 @@ public class ScheduleDetail extends ScheduleForm {
 	@FindBy(css = ".ait-schedule-delete-confirm-btn")
 	protected WebElement confirmDeleteScheduleButton;
 
+	@FindBy(css = ".ait-schedule-delete-cancel-btn")
+	protected WebElement cancelDeleteScheduleButton;
+
 	@FindBy(css = ".ait-schedule-cron-edit-buttons .button-positive")
 	protected WebElement saveChangedCronTimeButton;
 
-	@FindBy(xpath = "//div[contains(@class, 'parameters-save-buttons')]/div/button[text()='Save']")
+	@FindBy(css = ".ait-schedule-cron-edit-buttons .button-secondary")
+	protected WebElement cancelChangedCronTimeButton;
+
+	@FindBy(css = ".parameters-save-buttons .button-positive")
 	protected WebElement saveChangedParameterButton;
 
-	@FindBy(css = "p.broken-schedule-info")
+	@FindBy(css = ".parameters-save-buttons .button-secondary")
+	protected WebElement cancelChangedParameterButton;
+
+	@FindBy(css = ".broken-schedule-info")
 	protected WebElement brokenScheduleMessage;
+
+	@FindBy(css = ".broken-schedule-info .schedule-title-select")
+	protected WebElement brokenScheduleExecutable;
 
 	@FindBy(css = ".broken-schedule-title-save .button-positive")
 	protected WebElement brokenScheduleSaveChangeButton;
@@ -126,6 +138,9 @@ public class ScheduleDetail extends ScheduleForm {
 	@FindBy(css = ".ait-schedule-disabled .message p:nth-child(2)")
 	protected WebElement autoDisableScheduleMoreInfo;
 
+	@FindBy(css = ".ait-schedule-executable-select-btn")
+	protected WebElement selectExecutable;
+
 	public void clickOnCloseScheduleButton() {
 		waitForElementVisible(closeButton).click();
 	}
@@ -136,7 +151,11 @@ public class ScheduleDetail extends ScheduleForm {
 
 	public void waitForAutoRunSchedule(int waitingTimeInMinutes) throws InterruptedException {
 		int executionNumber = scheduleExecutionItem.size();
-		for (int i = 0; i < waitingTimeInMinutes + 3; i++) {
+		Calendar existingTime = Calendar.getInstance();
+		SimpleDateFormat existingSdf = new SimpleDateFormat("mm");
+		int existingMinute = Integer.valueOf(existingSdf.format(existingTime.getTime()));
+		int waitingTimeFromNow = waitingTimeInMinutes - (existingMinute % waitingTimeInMinutes);
+		for (int i = 0; i < waitingTimeFromNow + 3; i++) {
 			System.out.println("Number of executions: " + scheduleExecutionItem.size());
 			if (scheduleExecutionItem.size() == executionNumber) {
 				System.out.println("Waiting for auto execution...");
@@ -158,7 +177,7 @@ public class ScheduleDetail extends ScheduleForm {
 					if (delayTime >= 0 && delayTime < 4)
 						System.out.println("Start time in minute: " + startMinute);
 					else {
-						System.out.println("If this is not re-schedule, schedule execution started too early, started at: "
+						System.out.println("Schedule execution started too early, started at: "
 								+ startMinute);
 					}
 					break;
@@ -177,10 +196,8 @@ public class ScheduleDetail extends ScheduleForm {
 			} else if (getRoot().findElement(BY_RUN_STOP_BUTTON).getText().equals("Run"))
 				break;
 		}
-		waitForElementVisible(getRoot().findElement(
-				By.xpath(XPATH_EXECUTION_ITEM.replace("${index}", "1"))));
-		assertTrue(getRoot().findElement(By.xpath(XPATH_EXECUTION_ITEM.replace("${index}", "1")))
-				.isDisplayed());
+		waitForElementVisible(scheduleExecutionItem.get(0));
+		assertTrue(scheduleExecutionItem.get(0).isDisplayed());
 		if (isSuccessful) {
 			assertTrue(scheduleExecutionItem.get(0).findElement(BY_EXECUTION_STATUS)
 					.findElement(BY_OK_STATUS_ICON).isDisplayed());
@@ -218,12 +235,13 @@ public class ScheduleDetail extends ScheduleForm {
 				+ scheduleExecutionItem.get(0).findElement(BY_EXECUTION_TIMES).getText());
 	}
 
-	public void addRetryDelay(int retryDelay) throws InterruptedException {
+	public void addRetryDelay(String retryDelay, boolean isSaved, boolean isValidDelayValue)
+			throws InterruptedException {
 		if (cronExpression.isDisplayed() && cronExpression.getAttribute("value").isEmpty())
 			Thread.sleep(2000);
 		waitForElementVisible(addRetryDelay).click();
 		waitForElementVisible(rescheduleForm);
-		System.out.println("reschedule form info: " + rescheduleForm.getText());
+		System.out.println("Reschedule form info: " + rescheduleForm.getText());
 		assertEquals(RESCHEDULE_FORM_MESSAGE, rescheduleForm.getText());
 		waitForElementVisible(retryDelayInput);
 		if (retryDelayInput.getAttribute("value").isEmpty())
@@ -235,8 +253,20 @@ public class ScheduleDetail extends ScheduleForm {
 		if (!retryDelayInput.getText().isEmpty())
 			Thread.sleep(1000);
 		retryDelayInput.sendKeys(String.valueOf(retryDelay));
-		waitForElementVisible(saveRetryDelayButton).click();
-		assertEquals(String.valueOf(retryDelay), retryDelayInput.getAttribute("value"));
+		if (isSaved) {
+			waitForElementVisible(saveRetryDelayButton).click();
+			if (isValidDelayValue) {
+				waitForElementNotPresent(saveRetryDelayButton);
+				assertEquals(String.valueOf(retryDelay), retryDelayInput.getAttribute("value"));
+			} else {
+				assertTrue(retryDelayInput.getAttribute("class").contains("has-error"));
+				System.out.println("error retry delay: " + errorRetryDelayBubble.getText());
+			}
+		} else {
+			waitForElementVisible(cancelAddRetryDelayButton).click();
+			waitForElementNotPresent(retryDelayInput);
+			waitForElementVisible(addRetryDelay);
+		}
 	}
 
 	public void manualRun() throws InterruptedException {
@@ -244,6 +274,7 @@ public class ScheduleDetail extends ScheduleForm {
 		waitForElementVisible(manualRunDialog);
 		waitForElementVisible(confirmRunButton).click();
 		waitForElementVisible(manualStopButton);
+		System.out.println("Schedule is executed manually!");
 	}
 
 	public void manualStop() throws InterruptedException {
@@ -253,111 +284,133 @@ public class ScheduleDetail extends ScheduleForm {
 		waitForElementVisible(manualStopDialog);
 		waitForElementVisible(manualStopDialog.findElement(BY_CONFIRM_STOP_EXECUTION)).click();
 		waitForElementVisible(manualRunButton);
+		System.out.println("Schedule is stopped manually!");
 	}
 
 	public void disableSchedule() {
 		waitForElementVisible(disableScheduleButton).click();
 		waitForElementVisible(enableScheduleButton);
+		System.out.println("Schedule is disabled!");
 	}
 
 	public void enableSchedule() {
 		waitForElementVisible(enableScheduleButton).click();
 		waitForElementVisible(disableScheduleButton);
+		System.out.println("Schedule is enabled!");
 	}
 
-	public boolean assertDisableSchedule(int waitingTimeInMinutes) throws InterruptedException {
+	public boolean assertDisableSchedule(int waitingTimeInMinutes, int executionNumberBeforeDisable)
+			throws InterruptedException {
 		assertTrue(enableScheduleButton.isDisplayed());
 		assertTrue(disabledScheduleIcon.isDisplayed());
-		for (int i = 0; i < waitingTimeInMinutes + 3; i++) {
-			if (getRoot().findElement(BY_RUN_STOP_BUTTON).getText().equals("Run")) {
-				System.out.println("Checking disable schedule...");
-				Thread.sleep(60000);
-			} else
-				return false;
-		}
+		waitForAutoRunSchedule(waitingTimeInMinutes);
+		if (scheduleExecutionItem.size() > executionNumberBeforeDisable)
+			return false;
+		System.out.println("Schedule is disabled successfully!");
 		return true;
 	}
 
-	public void changeExecutable(String newExecutable) {
-		getRoot().findElement(
-				By.xpath(ScheduleDetail.XPATH_EXECUTABLE_SELECTION.replace("${option}",
-						newExecutable))).click();
-		waitForElementVisible(saveChangedExecutable).click();
-		waitForElementNotPresent(saveChangedExecutable);
+	public void changeExecutable(String newExecutable, boolean isSaved) throws InterruptedException {
+		waitForElementVisible(selectExecutable);
+		Select select = new Select(selectExecutable);
+		waitForElementVisible(select);
+		if (cronExpression.isDisplayed() && cronExpression.getAttribute("value").isEmpty())
+			Thread.sleep(2000);
+		select.selectByVisibleText(newExecutable);
+		if (isSaved) {
+			waitForElementVisible(saveChangedExecutable).click();
+			waitForElementNotPresent(saveChangedExecutable);
+		} else {
+			waitForElementVisible(cancelChangedExecutable).click();
+		}
 		clickOnCloseScheduleButton();
 	}
 
-	public void deleteSchedule() {
+	public void deleteSchedule(boolean isConfirmed) {
 		waitForElementVisible(getRoot());
 		waitForElementVisible(deleteScheduleButton).click();
 		waitForElementVisible(deleteScheduleDialog);
-		waitForElementVisible(confirmDeleteScheduleButton).click();
+		if (isConfirmed)
+			waitForElementVisible(confirmDeleteScheduleButton).click();
+		else
+			waitForElementVisible(cancelDeleteScheduleButton).click();
 		waitForElementNotPresent(deleteScheduleDialog);
 	}
 
-	public void changeCronTime(Pair<String, List<String>> newCronTime) throws InterruptedException {
+	public void changeCronTime(Pair<String, List<String>> newCronTime, boolean isSaved)
+			throws InterruptedException {
 		waitForElementVisible(getRoot());
 		selectCron(newCronTime);
-		waitForElementVisible(saveChangedCronTimeButton).click();
+		if (isSaved)
+			waitForElementVisible(saveChangedCronTimeButton).click();
+		else
+			waitForElementVisible(cancelChangedCronTimeButton).click();
 		clickOnCloseScheduleButton();
 	}
 
 	public void editScheduleParameters(Map<String, List<String>> changedParameters,
-			boolean newParameters) {
-		int index = 1;
+			boolean newParameters, boolean isSaved) {
+		int index = 0;
 		if (!newParameters) {
 			for (Entry<String, List<String>> changedParameter : changedParameters.entrySet()) {
-				By byParameterName = By.xpath(XPATH_PARAMETER_NAME.replace("${index}",
-						String.valueOf(index)));
-				By byParameterValue = By.xpath(XPATH_PARAMETER_VALUE.replace("${index}",
-						String.valueOf(index)));
-				getRoot().findElement(byParameterName).clear();
-				getRoot().findElement(byParameterName).sendKeys(changedParameter.getKey());
-				getRoot().findElement(byParameterValue).clear();
-				getRoot().findElement(byParameterValue)
-						.sendKeys(changedParameter.getValue().get(1));
-				index++;
+				if (changedParameter.getValue() == null) {
+					parameters.get(index).findElement(BY_PARAMETER_REMOVE_ACTION).click();
+					waitForElementVisible(saveChangedParameterButton);
+				} else {
+					WebElement parameterName = parameters.get(index).findElement(BY_PARAMETER_NAME);
+					WebElement parameterValue = parameters.get(index).findElement(
+							BY_PARAMETER_VALUE);
+					parameterName.clear();
+					parameterName.sendKeys(changedParameter.getKey());
+					parameterValue.clear();
+					parameterValue.sendKeys(changedParameter.getValue().get(1));
+					index++;
+				}
 			}
 		} else {
 			addParameters(changedParameters);
 		}
-		waitForElementVisible(saveChangedParameterButton).click();
+		if (isSaved)
+			waitForElementVisible(saveChangedParameterButton).click();
+		else
+			waitForElementVisible(cancelChangedParameterButton).click();
 		clickOnCloseScheduleButton();
 	}
 
-	public void assertScheduleParameters(Map<String, List<String>> parameters)
+	public void assertScheduleParameters(Map<String, List<String>> expectedParameters)
 			throws InterruptedException {
 		waitForElementVisible(getRoot());
-		int i = 1;
-		if (parameters != null) {
+		int i = 0;
+		if (expectedParameters != null) {
 			Thread.sleep(1000);
-			for (Entry<String, List<String>> parameter : parameters.entrySet()) {
-				assertEquals(parameter.getKey(), getRoot().findElement(
-					By.xpath(XPATH_PARAMETER_NAME.replace("${index}", String.valueOf(i)))).getAttribute("value"));
+			for (Entry<String, List<String>> parameter : expectedParameters.entrySet()) {
+				assertEquals(parameter.getKey(), parameters.get(i).findElement(BY_PARAMETER_NAME)
+						.getAttribute("value"));
 				if (parameter.getValue().get(0).equals("secure")) {
-					assertEquals("password", getRoot().findElement(
-						By.xpath(XPATH_PARAMETER_VALUE.replace("${index}", String.valueOf(i)))).getAttribute("type"));
-					assertEquals("Secure parameter value", getRoot().findElement(
-						By.xpath(XPATH_PARAMETER_VALUE.replace("${index}", String.valueOf(i)))).getAttribute("placeholder"));
+					assertEquals("password", parameters.get(i).findElement(BY_PARAMETER_VALUE)
+							.getAttribute("type"));
+					assertEquals(
+							"Secure parameter value",
+							parameters.get(i).findElement(BY_PARAMETER_VALUE)
+									.getAttribute("placeholder"));
 				} else {
 					assertEquals(parameter.getValue().get(1),
-						getRoot().findElement(By.xpath(XPATH_PARAMETER_VALUE.replace("${index}",
-								String.valueOf(i)))).getAttribute("value"));
+							parameters.get(i).findElement(BY_PARAMETER_VALUE).getAttribute("value"));
 				}
 				i++;
 			}
 		}
 	}
 
-	public void checkBrokenSchedule(String oldExecutable, String newExecutable) {
+	public void checkBrokenSchedule(String oldExecutable, String newExecutable)
+			throws InterruptedException {
 		waitForElementVisible(getRoot());
 		waitForElementVisible(brokenScheduleMessage);
 		System.out.println("Check broken schedule detail page...");
 		assertEquals(String.format(BROKEN_SCHEDULE_MESSAGE, oldExecutable),
 				brokenScheduleMessage.getText());
-		getRoot().findElement(
-				By.xpath(XPATH_EXECUTABLE_SELECTION_IN_BROKEN_SCHEDULE.replace("${option}",
-						newExecutable))).click();
+		Select select = new Select(brokenScheduleExecutable);
+		select.selectByVisibleText(newExecutable);
 		waitForElementVisible(brokenScheduleSaveChangeButton).click();
 		waitForElementNotPresent(brokenScheduleSaveChangeButton);
 		clickOnCloseScheduleButton();
@@ -385,7 +438,7 @@ public class ScheduleDetail extends ScheduleForm {
 		assertEquals(String.format(AUTO_DISABLED_SCHEDULE_MESSAGE, scheduleExecutionItem.size()),
 				autoDisableScheduleMessage.getText());
 		assertEquals(AUTO_DISABLED_SCHEDULE_MORE_INFO, autoDisableScheduleMoreInfo.getText());
-		assertDisableSchedule(15);
+		assertDisableSchedule(15, scheduleExecutionItem.size());
 		clickOnCloseScheduleButton();
 	}
 }

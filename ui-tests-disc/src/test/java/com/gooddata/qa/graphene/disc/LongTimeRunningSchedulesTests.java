@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.disc;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.testng.Assert;
@@ -67,8 +68,8 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Retry Schedule",
 					"/graph/errorGraph.grf", cronTime, null);
 			assertNewSchedule("Check Retry Schedule", "errorGraph.grf", cronTime, null);
-			scheduleDetail.addRetryDelay(15);
-			scheduleDetail.waitForAutoRunSchedule(20);
+			scheduleDetail.addRetryDelay("15", true, true);
+			scheduleDetail.waitForAutoRunSchedule(30);
 			scheduleDetail.assertLastExecutionDetails(false, false, false,
 					"Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
 			scheduleDetail.waitForAutoRunSchedule(15);
@@ -152,7 +153,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 					"Disable Schedule", "/graph/successfulGraph.grf", cronTime, null);
 			assertNewSchedule("Disable Schedule", "successfulGraph.grf", cronTime, null);
 			scheduleDetail.disableSchedule();
-			Assert.assertTrue(scheduleDetail.assertDisableSchedule(15));
+			Assert.assertTrue(scheduleDetail.assertDisableSchedule(15, 0));
 			scheduleDetail.manualRun();
 			scheduleDetail.assertLastExecutionDetails(true, true, false,
 					"Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -162,6 +163,19 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 		} finally {
 			scheduleDetail.disableSchedule();
 		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkScheduleFailForManyTimes() throws JSONException, InterruptedException {
+		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
+				"Check Failed Schedule",
+				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
+				true);
+		Pair<String, List<String>> cronTime = Pair.of(
+				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+		createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Failed Schedule", null, cronTime, null);
+		assertNewSchedule("Check Failed Schedule", "errorGraph.grf", cronTime, null);
+		scheduleDetail.checkFailedSchedule("Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH);
 	}
 
 	@Test(dependsOnGroups = { "long-time-schedule" }, groups = { "tests" })

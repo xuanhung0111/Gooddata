@@ -19,19 +19,18 @@ import static org.testng.Assert.*;
 
 public class ScheduleForm extends AbstractFragment {
 
-	protected static String XPATH_SELECT_OPTION = "//span/select/option[text()='${option}']";
-	protected static String XPATH_CRON_OPTION = "//option[text()='${option}']";
-	protected static String XPATH_CRON_HOUR_OPTION = "//span[@class='option-content everyDay everyWeek cron-editor-line']//option[text()='${option}']";
-	protected static String XPATH_CRON_MINUTE_OPTION = "//span[@class='option-content everyHour everyDay everyWeek cron-editor-line']//option[text()='${option}']";
-	protected static String XPATH_PARAMETER_VALUE = "//div[@class='ember-view schedule-params']/div[${index}]//div[@class='param-value']//input";
-	protected static String XPATH_PARAMETER_NAME = "//div[@class='ember-view schedule-params']/div[${index}]//div[@class='param-name']/input";
-	protected static String XPATH_EXECUTABLE_SELECTION_IN_BROKEN_SCHEDULE = "//div[@class='broken-schedule-title']//select/option[text()='${option}']";
+	protected static By BY_PARAMETER_VALUE = By.cssSelector(".param-value input");
+	protected static By BY_PARAMETER_NAME = By.cssSelector(".param-name input");
+	protected static By BY_PARAMETER_SHOW_SECURE_VALUE = By
+			.cssSelector(".param-show-secure-value input");
+	protected static By BY_PARAMETER_REMOVE_ACTION = By
+			.cssSelector(".param-action a[title='Remove this parameter.']");
 
-	@FindBy(xpath = "//div[@class='form-field']/label[text()='Process']/..")
-	protected WebElement selectProcess;
+	@FindBy(css = ".ait-new-schedule-process-select-btn")
+	protected WebElement selectProcessForNewSchedule;
 
-	@FindBy(xpath = "//div[@class='form-field']/label[text()='Executable']/..")
-	protected WebElement selectExecutable;
+	@FindBy(css = ".ait-new-schedule-executable-select-btn")
+	protected WebElement selectExecutableForNewSchedule;
 
 	@FindBy(css = ".ait-schedule-cron-select-btn")
 	protected WebElement cronPicker;
@@ -57,58 +56,62 @@ public class ScheduleForm extends AbstractFragment {
 	@FindBy(xpath = "//div[@class='schedule-params-actions']//a[text()='Add secure parameter']")
 	protected WebElement addSecureParameterLink;
 
-	@FindBy(xpath = "//div[contains(@class, 'schedule-form')]/button[text()='Schedule']")
+	@FindBy(xpath = "//button[contains(@class, 'ait-new-schedule-confirm-btn') and text()='Schedule']")
 	protected WebElement confirmScheduleButton;
+
+	@FindBy(xpath = "//a[contains(@class, 'ait-new-schedule-cancel-btn') and text()='Cancel']")
+	protected WebElement cancelScheduleButton;
 
 	@FindBy(css = ".schedule-param")
 	protected List<WebElement> parameters;
 
 	public void selectProcess(String processName) {
-		selectProcess.findElement(By.xpath(XPATH_SELECT_OPTION.replace("${option}", processName)))
-				.click();
+		waitForElementVisible(selectProcessForNewSchedule);
+		Select select = new Select(selectProcessForNewSchedule);
+		select.selectByVisibleText(processName);
 	}
 
 	public void selectExecutable(String executableName) {
-		selectExecutable.findElement(
-				By.xpath(XPATH_SELECT_OPTION.replace("${option}", executableName))).click();
+		waitForElementVisible(selectExecutableForNewSchedule);
+		Select select = new Select(selectExecutableForNewSchedule);
+		select.selectByVisibleText(executableName);
 	}
 
 	public void selectHourInDay(Pair<String, List<String>> cronTime) {
-		if (cronTime.getValue().get(1) != null)
-			selectHourInDay.findElement(
-					By.xpath(XPATH_CRON_HOUR_OPTION
-							.replace("${option}", cronTime.getValue().get(1)))).click();
+		waitForElementVisible(selectHourInDay);
+		Select select = new Select(selectHourInDay);
+		select.selectByVisibleText(cronTime.getValue().get(1));
 	}
 
 	public void selectMinuteInHour(Pair<String, List<String>> cronTime) {
-		if (cronTime.getValue().get(0) != null)
-			selectMinuteInHour.findElement(
-					By.xpath(XPATH_CRON_MINUTE_OPTION.replace("${option}",
-							cronTime.getValue().get(0)))).click();
+		waitForElementVisible(selectMinuteInHour);
+		Select select = new Select(selectMinuteInHour);
+		select.selectByVisibleText(cronTime.getValue().get(0));
 	}
 
 	public void selectCron(Pair<String, List<String>> cronTime) throws InterruptedException {
-		Select select = new Select(cronPicker);
+		Select selectCron = new Select(cronPicker);
 		try {
-			waitForElementVisible(select);
-			if (select.getFirstSelectedOption().equals(
+			waitForElementVisible(selectCron);
+			if (selectCron.getFirstSelectedOption().equals(
 					ScheduleCronTimes.CRON_EXPRESSION.getCronTime()))
 				Thread.sleep(1000);
 		} catch (NoSuchElementException e) {
 			System.out.println("Wait for selected element...");
 			Thread.sleep(1000);
 		} finally {
-			System.out.println("Selected cron time: " + select.getFirstSelectedOption().getText());
+			System.out.println("Selected cron time: "
+					+ selectCron.getFirstSelectedOption().getText());
 		}
-		select.selectByVisibleText(cronTime.getKey());
+		selectCron.selectByVisibleText(cronTime.getKey());
 		System.out.println("Selected cron time after change: "
-				+ select.getFirstSelectedOption().getText());
+				+ selectCron.getFirstSelectedOption().getText());
 		if (cronTime.getValue() != null) {
 			if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYWEEK.getCronTime())) {
-				if (cronTime.getValue().get(2) != null)
-					selectDayInWeek.findElement(
-							By.xpath(XPATH_CRON_OPTION.replace("${option}", cronTime.getValue()
-									.get(2)))).click();
+				if (cronTime.getValue().get(2) != null) {
+					Select selectWeek = new Select(selectDayInWeek);
+					selectWeek.selectByVisibleText(cronTime.getValue().get(2));
+				}
 				selectHourInDay(cronTime);
 				selectMinuteInHour(cronTime);
 			}
@@ -145,7 +148,7 @@ public class ScheduleForm extends AbstractFragment {
 	}
 
 	public void addParameters(Map<String, List<String>> newParameters) {
-		int index = parameters.size() + 1;
+		int index = parameters.size();
 		for (Entry<String, List<String>> newParameter : newParameters.entrySet()) {
 			if (newParameter.getValue().get(0).equals("secure")) {
 				System.out.println("Add new secure parameter: " + newParameter.getKey());
@@ -154,20 +157,25 @@ public class ScheduleForm extends AbstractFragment {
 				System.out.println("Add new parameter: " + newParameter.getKey());
 				addParameterLink.click();
 			}
-			waitForElementVisible(getRoot().findElement(
-					By.xpath(XPATH_PARAMETER_NAME.replace("${index}",
-							String.valueOf(index))))).sendKeys(newParameter.getKey());
-			waitForElementVisible(getRoot().findElement(
-					By.xpath(XPATH_PARAMETER_VALUE.replace("${index}",
-							String.valueOf(index))))).sendKeys(
-					newParameter.getValue().get(1));
+			waitForElementVisible(parameters.get(index));
+			parameters.get(index).findElement(BY_PARAMETER_NAME).sendKeys(newParameter.getKey());
+			parameters.get(index).findElement(BY_PARAMETER_VALUE)
+					.sendKeys(newParameter.getValue().get(1));
+			if (newParameter.getValue().get(0).equals("secure")) {
+				parameters.get(index).findElement(BY_PARAMETER_SHOW_SECURE_VALUE).click();
+				Assert.assertEquals("text", parameters.get(index).findElement(BY_PARAMETER_VALUE)
+						.getAttribute("type"));
+				Assert.assertEquals(newParameter.getValue().get(1), parameters.get(index)
+						.findElement(BY_PARAMETER_VALUE).getAttribute("value"));
+			}
 			index++;
 		}
 	}
 
 	public void createNewSchedule(String processName, String executableName,
-			Pair<String, List<String>> cronTime, Map<String, List<String>> parameters)
-			throws InterruptedException {
+			Pair<String, List<String>> cronTime, Map<String, List<String>> parameters,
+			boolean isConfirmed) throws InterruptedException {
+		waitForElementVisible(getRoot());
 		if (processName != null)
 			selectProcess(processName);
 		if (executableName != null)
@@ -176,7 +184,10 @@ public class ScheduleForm extends AbstractFragment {
 			selectCron(cronTime);
 		if (parameters != null)
 			addParameters(parameters);
-		confirmScheduleButton.click();
+		if (isConfirmed)
+			waitForElementVisible(confirmScheduleButton).click();
+		else
+			waitForElementVisible(cancelScheduleButton).click();
 	}
 
 	public WebElement getConfirmScheduleButton() {

@@ -118,7 +118,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     /**
      * ----- DISC fragments -----
      */
-    @FindBy(css = ".nav-global")
+    @FindBy(css = ".ait-header-fragment")
     protected DISCNavigation discNavigation;
 
     @FindBy(css = ".project-list")
