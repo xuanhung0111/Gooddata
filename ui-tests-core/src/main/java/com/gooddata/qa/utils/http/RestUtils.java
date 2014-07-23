@@ -2,7 +2,6 @@ package com.gooddata.qa.utils.http;
 
 import java.io.IOException;
 
-import com.gooddata.qa.utils.http.RestApiClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -28,8 +27,8 @@ public class RestUtils {
 	String contentBody =  String.format(addUserContentBody, roleUri, inviteeProfile);
 	HttpRequestBase postRequest = restApiClient.newPostMethod(usersUri, contentBody);
 	HttpResponse postResponse = restApiClient.execute(postRequest);
-	JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
 	assertEquals(postResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
+	JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
 	assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"), "User isn't assigned properly into the project");
 	System.out.println(String.format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId, domainUser ));
     }
