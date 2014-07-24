@@ -151,11 +151,10 @@ public class ScheduleDetail extends ScheduleForm {
 
 	public void waitForAutoRunSchedule(int waitingTimeInMinutes) throws InterruptedException {
 		int executionNumber = scheduleExecutionItem.size();
-		Calendar existingTime = Calendar.getInstance();
-		SimpleDateFormat existingSdf = new SimpleDateFormat("mm");
-		int existingMinute = Integer.valueOf(existingSdf.format(existingTime.getTime()));
-		int waitingTimeFromNow = waitingTimeInMinutes - (existingMinute % waitingTimeInMinutes);
-		for (int i = 0; i < waitingTimeFromNow + 3; i++) {
+		Calendar startWaitingTime = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("mm");
+		int startWaitingMinute = Integer.valueOf(sdf.format(startWaitingTime.getTime()));
+		for (int i = 0; i < waitingTimeInMinutes + 3; i++) {
 			System.out.println("Number of executions: " + scheduleExecutionItem.size());
 			if (scheduleExecutionItem.size() == executionNumber) {
 				System.out.println("Waiting for auto execution...");
@@ -164,21 +163,24 @@ public class ScheduleDetail extends ScheduleForm {
 				if (scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText()
 						.equals("SCHEDULED")) {
 					System.out.println("Schedule is in SCHEDULED state...");
-					Thread.sleep(10000);
+					Thread.sleep(60000);
 				} else {
 					if (scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION)
 							.getText().equals("RUNNING"))
 						System.out.println("Schedule is in RUNNING state...");
-					Calendar startTime = Calendar.getInstance();
-					SimpleDateFormat sdf = new SimpleDateFormat("mm");
-					int startMinute = Integer.valueOf(sdf.format(startTime.getTime()));
-					int delayTime = startMinute % waitingTimeInMinutes;
+					Calendar startExecutionTime = Calendar.getInstance();
+					int startExecutionMinute = Integer.valueOf(sdf.format(startExecutionTime
+							.getTime()));
+					startExecutionMinute = startExecutionMinute > startWaitingMinute ? startExecutionMinute
+							: startExecutionMinute + 60;
+					int delayTime = startExecutionMinute - startWaitingMinute
+							- waitingTimeInMinutes;
 					System.out.println("Delay time: " + delayTime);
-					if (delayTime >= 0 && delayTime < 4)
-						System.out.println("Start time in minute: " + startMinute);
+					if (delayTime >= 0)
+						System.out.println("Start time in minute: " + startExecutionMinute);
 					else {
 						System.out.println("Schedule execution started too early, started at: "
-								+ startMinute);
+								+ startExecutionMinute);
 					}
 					break;
 				}
@@ -279,7 +281,7 @@ public class ScheduleDetail extends ScheduleForm {
 
 	public void manualStop() throws InterruptedException {
 		if (scheduleExecutionItem.isEmpty())
-			Thread.sleep(2000);
+			Thread.sleep(60000);
 		waitForElementVisible(manualStopButton).click();
 		waitForElementVisible(manualStopDialog);
 		waitForElementVisible(manualStopDialog.findElement(BY_CONFIRM_STOP_EXECUTION)).click();
@@ -290,6 +292,7 @@ public class ScheduleDetail extends ScheduleForm {
 	public void disableSchedule() {
 		waitForElementVisible(disableScheduleButton).click();
 		waitForElementVisible(enableScheduleButton);
+		waitForElementVisible(disabledScheduleIcon);
 		System.out.println("Schedule is disabled!");
 	}
 
@@ -299,11 +302,13 @@ public class ScheduleDetail extends ScheduleForm {
 		System.out.println("Schedule is enabled!");
 	}
 
-	public boolean assertDisableSchedule(int waitingTimeInMinutes, int executionNumberBeforeDisable)
+	public boolean isDisabledSchedule(int waitingTimeInMinutes, int executionNumberBeforeDisable)
 			throws InterruptedException {
-		assertTrue(enableScheduleButton.isDisplayed());
-		assertTrue(disabledScheduleIcon.isDisplayed());
-		waitForAutoRunSchedule(waitingTimeInMinutes);
+		Calendar startWaitingTime = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("mm");
+		int startWaitingMinute = Integer.valueOf(sdf.format(startWaitingTime.getTime()));
+		int waitingTimeFromNow = waitingTimeInMinutes - startWaitingMinute % waitingTimeInMinutes;
+		waitForAutoRunSchedule(waitingTimeFromNow);
 		if (scheduleExecutionItem.size() > executionNumberBeforeDisable)
 			return false;
 		System.out.println("Schedule is disabled successfully!");
@@ -416,7 +421,7 @@ public class ScheduleDetail extends ScheduleForm {
 		clickOnCloseScheduleButton();
 	}
 
-	public void manualRunSchedule(int executionTimes, String executablePath,
+	public void repeatManualRun(int executionTimes, String executablePath,
 			DISCProcessTypes processType) throws InterruptedException {
 		waitForElementVisible(manualRunButton);
 		for (int i = 0; i < executionTimes; i++) {
@@ -425,20 +430,20 @@ public class ScheduleDetail extends ScheduleForm {
 		}
 	}
 
-	public void checkFailedSchedule(String executablePath, DISCProcessTypes processType)
+	public void checkRepeatedFailureSchedule(String executablePath, DISCProcessTypes processType)
 			throws InterruptedException {
 		waitForElementVisible(cronPicker);
-		manualRunSchedule(5, executablePath, processType);
+		repeatManualRun(5, executablePath, processType);
 		System.out.println("Schedule failed for the 5th time...");
+		waitForElementVisible(failedScheduleInfoSection);
 		assertEquals(
 				String.format(FAILED_SCHEDULE_FOR_5TH_TIME_MESSAGE, scheduleExecutionItem.size()),
 				failedScheduleInfoSection.getText());
-		manualRunSchedule(25, executablePath, processType);
+		repeatManualRun(25, executablePath, processType);
 		System.out.println("Schedule failed for the 30th time...");
+		waitForElementVisible(autoDisableScheduleMessage);
 		assertEquals(String.format(AUTO_DISABLED_SCHEDULE_MESSAGE, scheduleExecutionItem.size()),
 				autoDisableScheduleMessage.getText());
 		assertEquals(AUTO_DISABLED_SCHEDULE_MORE_INFO, autoDisableScheduleMoreInfo.getText());
-		assertDisableSchedule(15, scheduleExecutionItem.size());
-		clickOnCloseScheduleButton();
 	}
 }

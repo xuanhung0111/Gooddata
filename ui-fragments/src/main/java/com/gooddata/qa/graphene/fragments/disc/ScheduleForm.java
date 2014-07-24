@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -78,15 +80,24 @@ public class ScheduleForm extends AbstractFragment {
 	}
 
 	public void selectHourInDay(Pair<String, List<String>> cronTime) {
-		waitForElementVisible(selectHourInDay);
-		Select select = new Select(selectHourInDay);
-		select.selectByVisibleText(cronTime.getValue().get(1));
+		if (cronTime.getValue().get(1) != null) {
+			waitForElementVisible(selectHourInDay);
+			Select select = new Select(selectHourInDay);
+			select.selectByVisibleText(cronTime.getValue().get(1));
+		}
 	}
 
 	public void selectMinuteInHour(Pair<String, List<String>> cronTime) {
-		waitForElementVisible(selectMinuteInHour);
-		Select select = new Select(selectMinuteInHour);
-		select.selectByVisibleText(cronTime.getValue().get(0));
+		if (cronTime.getValue().get(0) != null) {
+			Calendar existingTime = Calendar.getInstance();
+			SimpleDateFormat existingSdf = new SimpleDateFormat("mm");
+			int existingMinute = Integer.valueOf(existingSdf.format(existingTime.getTime())) + 2;
+			existingMinute = existingMinute >= 60 ? 2 : existingMinute;
+			waitForElementVisible(selectMinuteInHour);
+			Select select = new Select(selectMinuteInHour);
+			select.selectByValue(cronTime.getValue().get(0)
+					.replace("${minute}", String.valueOf(existingMinute)));
+		}
 	}
 
 	public void selectCron(Pair<String, List<String>> cronTime) throws InterruptedException {
