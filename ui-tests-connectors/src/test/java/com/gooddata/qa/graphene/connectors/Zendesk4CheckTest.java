@@ -5,7 +5,7 @@ package com.gooddata.qa.graphene.connectors;
 
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.enums.metrics.FilterMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
 import com.gooddata.qa.utils.http.RestApiClient;
 import org.jboss.arquillian.graphene.Graphene;
@@ -108,7 +108,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         data.put("attribute2", "Organization Deleted");
         data.put("attrValue1", "false");
         data.put("attrValue2", "false");
-        metricEditorPage.createFilterMetric(FilterMetricTypes.NOT_IN, "# Non-deleted organizations", data);
+        metricEditorPage.createFilterMetric(MetricTypes.NOT_IN, "# Non-deleted organizations", data);
     }
     **/
 

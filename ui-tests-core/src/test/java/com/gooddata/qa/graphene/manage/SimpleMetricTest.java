@@ -16,17 +16,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.FilterTypes;
 import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.enums.metrics.AggregationMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.FilterMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.GranularityMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.LogicalMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.NumericMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"GoodSalesMetrics"}, description = "Tests for GoodSales project (metric creation functionality) in GD platform")
 public class SimpleMetricTest extends GoodSalesAbstractTest {
-
     private String attrFolder;
     private String attr;
     private String attrValue;
@@ -35,10 +30,16 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     private String productAttr;
     private String stageNameAttr;
     private String quarterYearAttr;
+    private String quarterYearCreatedAttr;
+    private String statusAttr;
+    private String expectedMetricFormat;
     private Map<String, String> data;
     List<String> yearSnapshotValues;
     List<String> productValues;
     List<String> stageNameValues;
+    List<String> quarterYearValues;
+    List<String> quarterYearCreatedValues;
+    List<String> statusValues;
 
     private static final String DATE_FORMAT_PATTERN = "yyyy/MM/dd HH:mm:ss";
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_PATTERN);
@@ -50,7 +51,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void initialize() throws InterruptedException, JSONException {
-
+        expectedMetricFormat = "#,##0.00";
         attrFolder = "Date dimension (Snapshot)";
         attr = "Year (Snapshot)";
         attrValue = "2010";
@@ -59,12 +60,22 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         productAttr = "Product";
         stageNameAttr = "Stage Name";
         quarterYearAttr = "Quarter/Year (Snapshot)";
+        quarterYearCreatedAttr = "Quarter/Year (Created)";
+        statusAttr = "Status";
+        quarterYearValues = Arrays.asList("Q2/2010", "Q3/2010", "Q4/2010",
+                "Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011", "Q1/2012",
+                "Q2/2012");
         yearSnapshotValues = Arrays.asList("2010", "2011", "2012");
         productValues = Arrays.asList("CompuSci", "Educationly", "Explorer",
                 "Grammar Plus", "PhoenixSoft", "WonderKid");
         stageNameValues = Arrays.asList("Interest", "Discovery", "Short List",
                 "Risk Assessment", "Conviction", "Negotiation", "Closed Won",
                 "Closed Lost");
+        quarterYearCreatedValues = Arrays.asList("Q1/2008", "Q2/2008",
+                "Q3/2008", "Q4/2008", "Q1/2009", "Q2/2009", "Q3/2009",
+                "Q4/2009", "Q1/2010", "Q2/2010", "Q3/2010", "Q4/2010",
+                "Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011", "Q1/2012");
+        statusValues = Arrays.asList("Lost", "Open", "Won");
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
@@ -101,10 +112,13 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
-    public void createAggreationMetricTest() throws InterruptedException {
+    public void createAggregationMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
-        String fact0 = "Probability";
-        String fact1 = "Amount";
+        String fact0 = "Amount";
+        String fact1 = "Probability";
+        String fact2 = "Velocity";
+        String fact3 = "Duration";
+        String fact4 = "Days to Close";
         String attrFolder0 = "Stage";
         String attrFolder1 = "Stage History";
         String attr0 = "Stage Name";
@@ -112,105 +126,121 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         data = new HashMap<String, String>();
         data.put("attrFolder0", attrFolder0);
         data.put("attrFolder1", attrFolder1);
-        data.put("fact0", fact0);
-        data.put("fact1", fact1);
         data.put("attribute0", attr0);
         data.put("attribute1", attr1);
-        ArrayList<AggregationMetricTypes> metricType = new ArrayList<AggregationMetricTypes>();
-        metricType.add(AggregationMetricTypes.AVG);
-        metricType.add(AggregationMetricTypes.COUNT);
-        metricType.add(AggregationMetricTypes.CORREL);
-        ArrayList<String> expectedMaql = new ArrayList<String>();
-        String expectedFormat = "#,##0.00";
-        String expectedMaqlAvg = "SELECT AVG(" + fact0 + ")";
-        String expectedMaqlCorrel = "SELECT CORREL(" + fact0 + "," + fact1 + ")";
-        String expectedMaqlCount = "SELECT COUNT(" + attr0 + "," + attr1 + ")";
-        expectedMaql.add(expectedMaqlAvg);
-        expectedMaql.add(expectedMaqlCount);
-        expectedMaql.add(expectedMaqlCorrel);
-        List<Float> avgMetricValues = Arrays.asList(0.1f, 0.2f, 0.3f, 0.5f,
-                0.6f, 0.8f, 1.0f, 0.0f);
-        List<Float> correlMetricValues = Arrays.asList(-0.05f);
-        List<Float> countMetricValues = Arrays.asList(1.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f, 1.0f);
-        int i = 0;
-        for (AggregationMetricTypes type : metricType) {
-            String metricName = type.getLabel() + " " + getCurrentDateString();
-            System.out.println(String.format(
-                    "Creating %s metric, name: %s, data: %s", type, metricName,
-                    data.toString()));
-            metricEditorPage.createAggregationMetric(type, metricName, data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
-            switch (type) {
-            case AVG:
-                checkMetricValuesInReport(metricName, stageNameAttr,
-                        avgMetricValues, stageNameValues);
-                break;
-            case COUNT:
-                checkMetricValuesInReport(metricName, stageNameAttr,
-                        countMetricValues, stageNameValues);
-                break;
-            case CORREL:
-                checkMetricValuesInReport(metricName, null, correlMetricValues,
-                        null);
-                break;
-            default:
-                break;
+        for (MetricList metric : MetricList.values()) {
+            if (metric.getType().equalsIgnoreCase("Aggregation")) {
+                String metricName = metric + " " + getCurrentDateString();
+                switch (metric) {
+                case COVAR:
+                case COVARP:
+                case INTERCEPT:
+                case RSQ:
+                case SLOPE:
+                    data.put("fact0", fact2);
+                    data.put("fact1", fact3);
+                    break;
+                case MAX:
+                case RUNMAX:
+                    data.put("fact0", fact4);
+                    break;
+                case MIN:
+                case RUNMIN:
+                    data.put("fact0", fact3);
+                    break;
+                default:
+                    data.put("fact0", fact0);
+                    data.put("fact1", fact1);
+                    break;
+                }
+                System.out.println(String.format(
+                        "Creating %s metric, name: %s, data: %s", metric, metricName, data.toString()));
+                metricEditorPage.createAggregationMetric(metric.getMetric(), metricName, data);
+                String expectedMaql = metric.getMaql()
+                        .replace("${fact0}", data.get("fact0"))
+                        .replace("${fact1}", data.get("fact1"))
+                        .replace("${attr0}", data.get("attribute0"))
+                        .replace("${attr1}", data.get("attribute1"));
+                metricEditorPage.verifyMetric(metricName, expectedMaql, expectedMetricFormat);
+                switch (metric) {
+                case AVG:
+                case COUNT:
+                case MEDIAN:
+                    checkMetricValuesInReport(metricName, stageNameAttr,
+                            metric.getMetricValues(), stageNameValues);
+                    break;
+                case CORREL:
+                    checkMetricValuesInReport(metricName, null,
+                            metric.getMetricValues(), null);
+                    break;
+                case COVAR:
+                case COVARP:
+                case INTERCEPT:
+                case PERCENTILE:
+                case RSQ:
+                case SLOPE:
+                    checkMetricValuesInReport(metricName, productAttr,
+                            metric.getMetricValues(), productValues);
+                    break;
+                case MIN:
+                case RUNMIN:
+                    checkMetricValuesInReport(metricName,
+                            quarterYearCreatedAttr, metric.getMetricValues(),
+                            quarterYearCreatedValues);
+                    break;
+                default:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            metric.getMetricValues(), quarterYearValues);
+                    break;
+                }
+                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
             }
-            i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
     public void createNumericMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
-        String metric = "Best Case";
+        String metric0 = "Best Case";
+        String metric1 = "Amount";
+        String metric2 = "Win Rate";
+        String metric3 = "Remaining Quota";
         data = new HashMap<String, String>();
-        data.put("metric0", metric);
-        ArrayList<NumericMetricTypes> metricTypes = new ArrayList<NumericMetricTypes>();
-        metricTypes.add(NumericMetricTypes.ABS);
-        metricTypes.add(NumericMetricTypes.EXP);
-        metricTypes.add(NumericMetricTypes.FLOOR);
-        String expectedFormat = "#,##0.00";
-        String expectedMaql;
-        List<Float> ABSMetricValues = Arrays.asList(5319697.32f, 4363972.93f,
-                20255220.38f, 1670164.74f, 1198603.33f, 3036473.23f);
-        List<Float> EXPMetricValues = Arrays.asList(1.76f, 1.74f, 1.7f, 1.77f,
-                1.79f, 1.69f);
-        List<Float> FLOORMetricValues = Arrays.asList(5319697f, 4363972f,
-                20255220f, 1670164f, 1198603f, 3036473f);
-        for (NumericMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " " + getCurrentDateString();
-            if (metricType.equals(NumericMetricTypes.EXP))
-                metric = "Win Rate";
-            else
-                metric = "Best Case";
-            data.put("metric0", metric);
-            System.out.println(String.format(
-                    "Creating %s metric, name: %s, data: %s", metricType,
-                    metricName, data.toString()));
-            metricEditorPage.createNumericMetric(metricType, metricName, data);
-            expectedMaql = "SELECT " + metricType + "(" + metric + ")";
-            metricEditorPage.verifyMetric(metricName, expectedMaql, expectedFormat);
-            switch (metricType) {
-            case ABS:
-                checkMetricValuesInReport(metricName, productAttr,
-                        ABSMetricValues, productValues);
-                break;
-            case EXP:
-                checkMetricValuesInReport(metricName, productAttr,
-                        EXPMetricValues, productValues);
-                break;
-            case FLOOR:
-                checkMetricValuesInReport(metricName, productAttr,
-                        FLOORMetricValues, productValues);
-                break;
-            default:
-                break;
+        data.put("metric1", metric1);
+        for (MetricList metric: MetricList.values() ) {
+            if (metric.getType().equalsIgnoreCase("Numeric")) {
+                String metricName = metric + " " + getCurrentDateString();
+                switch (metric) {
+                case EXP:
+                    data.put("metric0", metric2);
+                    break;
+                case SIGN:
+                    data.put("metric0", metric3);
+                    break;
+                default:
+                    data.put("metric0", metric0);
+                    break;
+                }
+                System.out.println(String.format(
+                        "Creating %s metric, name: %s, data: %s", metric, metricName, data.toString()));
+                metricEditorPage.createNumericMetric(metric.getMetric(), metricName, data);
+                String expectedMaql = metric.getMaql()
+                        .replace("${metric}", data.get("metric0"))
+                        .replace("${metric1}", data.get("metric1"));
+                metricEditorPage.verifyMetric(metricName, expectedMaql, expectedMetricFormat);
+                switch (metric) {
+                case IFNULL:
+                    checkMetricValuesInReport(metricName, statusAttr, metric.getMetricValues(), statusValues);
+                    break;
+                case SIGN:
+                    checkMetricValuesInReport(metricName, quarterYearAttr, metric.getMetricValues(), quarterYearValues);
+                    break;
+                default:
+                    checkMetricValuesInReport(metricName, productAttr, metric.getMetricValues(), productValues);
+                    break;
+                }
+                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
             }
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
-
         }
     }
 
@@ -219,65 +249,64 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String fact0 = "Probability";
         String attrFolder0 = "Date dimension (Snapshot)";
+        String attrFolder1 = "Date dimension (Closed)";
         String attr0 = "Year (Snapshot)";
+        String attr1 = "Year (Closed)";
         String metric0 = "Amount";
         String metric1 = "# of Won Opps.";
+        String metric2 = "# of Open Opps.";
         data = new HashMap<String, String>();
-        data.put("attrFolder0", attrFolder0);
-        data.put("fact0", fact0);
-        data.put("metric0", metric0);
-        data.put("metric1", metric1);
-        data.put("attribute0", attr0);
-        ArrayList<GranularityMetricTypes> metricTypes = new ArrayList<GranularityMetricTypes>();
-        metricTypes.add(GranularityMetricTypes.BY_ALL_ATTRIBUTE);
-        metricTypes.add(GranularityMetricTypes.FOR_NEXT);
-        metricTypes.add(GranularityMetricTypes.BY_ALL);
-        metricTypes.add(GranularityMetricTypes.WITHIN);
-        ArrayList<String> expectedMaql = new ArrayList<String>();
-        String expectedFormat = "#,##0.00";
-        String expectedMaqlByAllAttr = "SELECT " + metric0 + " / (SELECT "
-                + metric1 + " BY ALL " + attr0 + ")";
-        String expectedMaqlForNext = "SELECT " + metric0 + " FOR Next(" + attr0 + ")";
-        String expectedMaqlByAll = "SELECT " + metric0 + " / (SELECT "
-                + metric1 + " BY ALL IN ALL OTHER DIMENSIONS)";
-        String expectedMaqlWithin = "SELECT RANK(" + metric0 + ") WITHIN (" + fact0 + ")";
-        expectedMaql.add(expectedMaqlByAllAttr);
-        expectedMaql.add(expectedMaqlForNext);
-        expectedMaql.add(expectedMaqlByAll);
-        expectedMaql.add(expectedMaqlWithin);
-        List<Float> byAllAttributesMetricValues = Arrays.asList(31728.32f,
-                29046.7f, 49673.35f, 27827.10f, 29310.33f, 37836.68f);
-        List<Float> forNextMetricValues = Arrays.asList(27222899.64f,
-                22946895.47f, 38596194.86f, 8042031.92f, 9525857.91f,
-                10291576.74f);
-        List<Float> byAllMetricValues = Arrays.asList(8221.96f, 6930.5f,
-                11656.96f, 2428.88f, 2877.03f, 3108.3f);
-        int i = 0;
-        for (GranularityMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " " + getCurrentDateString();
-            System.out.println(String.format(
-                    "Creating %s metric, name: %s, data: %s", metricType,
-                    metricName, data.toString()));
-            metricEditorPage.createGranularityMetric(metricType, metricName, data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
-            switch (metricType) {
-            case BY_ALL_ATTRIBUTE:
-                checkMetricValuesInReport(metricName, productAttr,
-                        byAllAttributesMetricValues, productValues);
-                break;
-            case FOR_NEXT:
-                checkMetricValuesInReport(metricName, productAttr,
-                        forNextMetricValues, productValues);
-                break;
-            case BY_ALL:
-                checkMetricValuesInReport(metricName, productAttr,
-                        byAllMetricValues, productValues);
-                break;
-            default:
-                break;
+        List<String> forPreviousAttrValues = Arrays.asList("Q3/2011", "Q4/2011", "Q1/2012", "Q2/2012", "Q3/2012", "Q4/2012", "Q1/2013", "Q2/2013", "Q3/2013", "Q4/2013", "Q1/2014", "Q2/2014", "Q3/2014", "Q4/2014", "Q1/2015", "Q2/2015", "Q4/2015");
+        List<String> forNextPeriodAttrValues = Arrays.asList("Q2/2010", "Q3/2010", "Q4/2010", "Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011", "Q1/2012", "Q2/2012", "Q3/2012", "Q4/2012", "Q1/2013", "Q2/2013", "Q3/2013", "Q4/2013", "Q1/2014", "Q3/2014");
+        List<String> forPreviousPeriodAttrValues = Arrays.asList("Q4/2010", "Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011", "Q1/2012", "Q2/2012", "Q3/2012", "Q4/2012", "Q1/2013", "Q2/2013", "Q3/2013", "Q4/2013", "Q1/2014", "Q2/2014", "Q3/2014", "Q1/2015");
+        for (MetricList metric: MetricList.values() ) {
+            if (metric.getType().equalsIgnoreCase("Granularity")) {
+                String metricName = metric + " " + getCurrentDateString();
+                switch (metric) {
+                case FOR_PREVIOUS:
+                case FOR_NEXT_PERIOD:
+                case FOR_PREVIOUS_PERIOD:
+                    data.put("attrFolder0", attrFolder1);
+                    data.put("metric0", metric2);
+                    data.put("attribute0", attr1);
+                    break;
+                default:
+                    data.put("attrFolder0", attrFolder0);
+                    data.put("fact0", fact0);
+                    data.put("metric0", metric0);
+                    data.put("metric1", metric1);
+                    data.put("attribute0", attr0);
+                    break;
+                }
+                System.out.println(String.format("Creating %s metric, name: %s, data: %s", metric, metricName, data.toString()));
+                metricEditorPage.createGranularityMetric(metric.getMetric(), metricName, data);
+                String expectedMaql = metric.getMaql().replace("${metric0}", data.get("metric0")).replace("${metric1}", data.get("metric1")).replace("${attr0}", data.get("attribute0"));
+                metricEditorPage.verifyMetric(metricName, expectedMaql , expectedMetricFormat);
+                switch (metric) {
+                case BY:
+                case BY_ALL_EXCEPT:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            metric.getMetricValues(), quarterYearValues);
+                    break;
+                case FOR_PREVIOUS:
+                    checkMetricValuesInReport(metricName, "Quarter/Year (Closed)",
+                            metric.getMetricValues(), forPreviousAttrValues);
+                    break;
+                case FOR_NEXT_PERIOD:
+                    checkMetricValuesInReport(metricName, "Quarter/Year (Closed)",
+                            metric.getMetricValues(), forNextPeriodAttrValues);
+                    break;
+                case FOR_PREVIOUS_PERIOD:
+                    checkMetricValuesInReport(metricName, "Quarter/Year (Closed)",
+                            metric.getMetricValues(), forPreviousPeriodAttrValues);
+                    break;
+                default:
+                    checkMetricValuesInReport(metricName, productAttr,
+                            metric.getMetricValues(), productValues);
+                    break;
+                }
+                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
             }
-            i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
@@ -301,80 +330,57 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         data.put("attribute1", attr1);
         data.put("attrValue0", attrValue0);
         data.put("attrValue1", attrValue1);
-        ArrayList<LogicalMetricTypes> metricTypes = new ArrayList<LogicalMetricTypes>();
-        metricTypes.add(LogicalMetricTypes.AND);
-        metricTypes.add(LogicalMetricTypes.NOT);
-        metricTypes.add(LogicalMetricTypes.CASE);
-        metricTypes.add(LogicalMetricTypes.IF);
-        ArrayList<String> expectedMaql = new ArrayList<String>();
-        String expectedFormat = "#,##0.00";
-        String expectedMaqlAnd = "SELECT " + metric0 + " WHERE " + attr0
-                + " = " + attrValue0 + " AND " + attr1 + " = " + attrValue1;
-        String expectedMaqlNot = "SELECT " + metric0 + " WHERE NOT (" + attr0
-                + " = " + attrValue0 + ")";
-        String expectedMaqlCase = "SELECT CASE WHEN " + metric2 + " > "
-                + metric3 + " THEN 1, WHEN " + metric2 + " < " + metric3
-                + " THEN 2 ELSE 3 END";
-        String expectedMaqlIf = "SELECT IF " + metric4 + " > 0.5 THEN "
-                + metric5 + " * 10 ELSE " + metric5 + " / 10 END";
-        expectedMaql.add(expectedMaqlAnd);
-        expectedMaql.add(expectedMaqlNot);
-        expectedMaql.add(expectedMaqlCase);
-        expectedMaql.add(expectedMaqlIf);
-        List<Float> andMetricValues = Arrays.asList(74f, 78f, 69f, 31f, 28f,
-                34f);
-        List<Float> notMetricValues = Arrays.asList(246f, 224f, 214f, 70f, 72f,
-                92f);
-        List<Float> caseMetricValues = Arrays
-                .asList(1f, 1f, 2f, 2f, 1f, 3f, 1f);
-        List<Float> ifMetricValues = Arrays.asList(1844726.61f, 424902.79f,
-                561206.26f, 260629.35f, 30674661.20f, 18620157.30f,
-                383107534.50f, 4247057.12f);
-        int i = 0;
-        for (LogicalMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " " + getCurrentDateString();
-            if (metricType.equals(LogicalMetricTypes.CASE)) {
-                data.put("metric0", metric2);
-                data.put("metric1", metric3);
-                data.put("metric2", metric2);
-                data.put("metric3", metric3);
-            } else if (metricType.equals(LogicalMetricTypes.IF)) {
-                data.put("metric0", metric4);
-                data.put("metric1", metric5);
-                data.put("metric2", metric5);
-            } else {
-                data.put("metric0", metric0);
+        data.put("metric3", metric3);
+        for (MetricList metric: MetricList.values() ) {
+            if (metric.getType().equalsIgnoreCase("Logical")) {
+                String metricName = metric + " " + getCurrentDateString();
+                if (metric.equals(MetricList.CASE)) {
+                    data.put("metric0", metric2);
+                    data.put("metric1", metric3);
+                    data.put("metric2", metric2);
+                } else if (metric.equals(MetricList.IF)) {
+                    data.put("metric0", metric4);
+                    data.put("metric1", metric5);
+                    data.put("metric2", metric5);
+                } else {
+                    data.put("metric0", metric0);
+                    data.put("metric1", metric3);
+                    data.put("metric2", metric2);
+                }
+                System.out.println(String.format(
+                        "Creating %s metric, name: %s, data: %s", metric,
+                        metricName, data.toString()));
+                metricEditorPage.createLogicalMetric(metric.getMetric(), metricName, data);
+                String expectedMaql = metric.getMaql()
+                        .replace("${metric0}", data.get("metric0"))
+                        .replace("${metric1}", data.get("metric1"))
+                        .replace("${metric2}", data.get("metric2"))
+                        .replace("${metric3}", data.get("metric3"))
+                        .replace("${attr0}", data.get("attribute0"))
+                        .replace("${attrValue0}", data.get("attrValue0"))
+                        .replace("${attr1}", data.get("attribute1"))
+                        .replace("${attrValue1}", data.get("attrValue1"));
+                System.out.println("expectedMaql" + expectedMaql);
+                metricEditorPage.verifyMetric(metricName, expectedMaql, expectedMetricFormat);
+                switch (metric) {
+                case CASE:
+                    List<String> attrValues = Arrays.asList("CompuSci",
+                            "Educationly", "Explorer", "Grammar Plus",
+                            "PhoenixSoft", "TouchAll", "WonderKid");
+                    checkMetricValuesInReport(metricName, productAttr,
+                            metric.getMetricValues(), attrValues);
+                    break;
+                case IF:
+                    checkMetricValuesInReport(metricName, stageNameAttr,
+                            metric.getMetricValues(), stageNameValues);
+                    break;
+                default:
+                    checkMetricValuesInReport(metricName, productAttr,
+                            metric.getMetricValues(), productValues);
+                    break;
+                }
+                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
             }
-            System.out.println(String.format(
-                    "Creating %s metric, name: %s, data: %s", metricType,
-                    metricName, data.toString()));
-            metricEditorPage.createLogicalMetric(metricType, metricName, data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
-            switch (metricType) {
-            case AND:
-                checkMetricValuesInReport(metricName, productAttr,
-                        andMetricValues, productValues);
-                break;
-            case NOT:
-                checkMetricValuesInReport(metricName, productAttr,
-                        notMetricValues, productValues);
-                break;
-            case CASE:
-                List<String> productValues = Arrays.asList("CompuSci",
-                        "Educationly", "Explorer", "Grammar Plus",
-                        "PhoenixSoft", "TouchAll", "WonderKid");
-                checkMetricValuesInReport(metricName, productAttr,
-                        caseMetricValues, productValues);
-                break;
-            case IF:
-                checkMetricValuesInReport(metricName, stageNameAttr,
-                        ifMetricValues, stageNameValues);
-                break;
-            default:
-                break;
-            }
-            i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
     }
 
@@ -385,86 +391,102 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         String attr = "Year (Snapshot)";
         String attrValue0 = "2010";
         String attrValue1 = "2011";
+        String attrValue2 = "2012";
         String metric0 = "# of Open Opps.";
         String metric1 = "Amount";
-        String fact = "Amount";
         data = new HashMap<String, String>();
         data.put("attrFolder0", attrFolder);
         data.put("attrFolder1", attrFolder);
-        data.put("fact0", fact);
-        data.put("fact1", fact);
         data.put("metric0", metric0);
         data.put("metric1", metric1);
         data.put("attribute0", attr);
         data.put("attribute1", attr);
-        data.put("attrValue0", attrValue0);
-        data.put("attrValue1", attrValue1);
-        ArrayList<FilterMetricTypes> metricTypes = new ArrayList<FilterMetricTypes>();
-        metricTypes.add(FilterMetricTypes.EQUAL);
-        metricTypes.add(FilterMetricTypes.NOT_IN);
-        metricTypes.add(FilterMetricTypes.BOTTOM);
-        metricTypes.add(FilterMetricTypes.WITHOUT_PF);
-        ArrayList<String> expectedMaql = new ArrayList<String>();
-        String expectedFormat = "#,##0.00";
-        String expectedMaqlEqual = "SELECT " + metric0 + " WHERE " + attr
-                + " = " + attrValue0;
-        String expectedMaqlNotIn = "SELECT " + metric0 + " WHERE " + attr
-                + " NOT IN (" + attrValue0 + ", " + attrValue1 + ")";
-        String expectedMaqlBottom = "SELECT " + fact
-                + " WHERE BOTTOM(25%) IN (SELECT " + fact + " BY " + attr + ")";
-        String expectedMaqlWithoutPf = "SELECT " + metric0 + " - (SELECT "
-                + metric1 + " BY ALL " + attr + " WITHOUT PARENT FILTER)";
-        expectedMaql.add(expectedMaqlEqual);
-        expectedMaql.add(expectedMaqlNotIn);
-        expectedMaql.add(expectedMaqlBottom);
-        expectedMaql.add(expectedMaqlWithoutPf);
-        List<Float> equalMetricValues = Arrays.asList(149f, 210f, 232f);
-        List<Float> notInMetricValues = Arrays.asList(730f, 918f);
-        List<Float> withoutPfMetricValues = Arrays.asList(-116624637.54f);
-        List<String> equalAttributeValues = Arrays.asList("Q2/2010", "Q3/2010",
-                "Q4/2010");
-        List<String> notInAttributeValues = Arrays.asList("Q1/2012", "Q2/2012");
+        List<String> quartersIn2010 = Arrays.asList("Q2/2010", "Q3/2010", "Q4/2010");
+        List<String> quartersIn2012 = Arrays.asList("Q1/2012", "Q2/2012");
         List<String> withoutPfAttributeValues = Arrays.asList("Q2/2012");
-        int i = 0;
-        for (FilterMetricTypes metricType : metricTypes) {
-            String metricName = metricType.getLabel() + " " + getCurrentDateString();
-            System.out.println(String.format(
-                    "Creating %s metric, name: %s, data: %s", metricType,
-                    metricName, data.toString()));
-            metricEditorPage.createFilterMetric(metricType, metricName, data);
-            metricEditorPage.verifyMetric(metricName, expectedMaql.get(i), expectedFormat);
-            switch (metricType) {
-            case EQUAL:
-                checkMetricValuesInReport(metricName, quarterYearAttr,
-                        equalMetricValues, equalAttributeValues);
-                break;
-            case NOT_IN:
-                checkMetricValuesInReport(metricName, quarterYearAttr,
-                        notInMetricValues, notInAttributeValues);
-                break;
-            case WITHOUT_PF:
-                checkMetricValuesInReport(metricName, quarterYearAttr,
-                        withoutPfMetricValues, withoutPfAttributeValues);
-                break;
-            default:
-                break;
+        List<String> quartersIn2011and2012 = Arrays.asList("Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011", "Q1/2012", "Q2/2012");
+        List<String> quartersIn2010and2011 = Arrays.asList("Q2/2010", "Q3/2010", "Q4/2010", "Q1/2011", "Q2/2011", "Q3/2011", "Q4/2011");
+        for (MetricList metric : MetricList.values()) {
+            if (metric.getType().equalsIgnoreCase("Filter")) {
+                String metricName = metric + " " + getCurrentDateString();
+                switch (metric) {
+                case LESS:
+                case LESS_OR_EQUAL:
+                    data.put("attrValue0", attrValue1);
+                    break;
+                case BETWEEN:
+                    data.put("attrValue0", attrValue0);
+                    data.put("attrValue1", attrValue2);
+                    break;
+                default:
+                    data.put("attrValue0", attrValue0);
+                    data.put("attrValue1", attrValue1);
+                    break;
+                }
+                System.out.println(String.format(
+                        "Creating %s metric, name: %s, data: %s", metric, metricName, data.toString()));
+                metricEditorPage.createFilterMetric(metric.getMetric(), metricName, data);
+                String expectedMaql = metric.maql.replace("${metric0}", data.get("metric0"))
+                        .replace("${metric1}", data.get("metric1"))
+                        .replace("${attr}", data.get("attribute0"))
+                        .replace("${attrValue0}", data.get("attrValue0"))
+                        .replace("${attrValue1}", data.get("attrValue1"));
+                metricEditorPage.verifyMetric(metricName, expectedMaql, expectedMetricFormat);
+                switch (metric) {
+                case EQUAL:
+                case LESS:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            MetricList.EQUAL.getMetricValues(), quartersIn2010);
+                    break;
+                case DOES_NOT_EQUAL:
+                case GREATER:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            MetricList.GREATER.getMetricValues(), quartersIn2011and2012);
+                    break;
+                case GREATER_OR_EQUAL:
+                case BETWEEN:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            MetricList.BETWEEN.getMetricValues(), quarterYearValues);
+                    break;
+                case LESS_OR_EQUAL:
+                case IN:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            MetricList.IN.getMetricValues(), quartersIn2010and2011);
+                    break;
+                case WITHOUT_PF:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            MetricList.WITHOUT_PF.getMetricValues(), withoutPfAttributeValues);
+                    break;
+                default:
+                    checkMetricValuesInReport(metricName, quarterYearAttr,
+                            MetricList.NOT_IN.getMetricValues(), quartersIn2012);
+                    break;
+                }
+                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
             }
-            i++;
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         }
+    }
+
+    @Test(dependsOnGroups = {"metric-tests"}, groups = {"tests"})
+    public void finalTest() {
+        successfulTest = true;
     }
 
     private void checkMetricValuesInReport(String metricName,
             String attributeName, List<Float> metricValues,
             List<String> attributeValues) throws InterruptedException {
+        System.out.println("Verifying metric values of " + metricName +" in report");
         List<String> what = Arrays.asList(metricName);
+        if (metricName.contains("IFNULL")) {
+            what = Arrays.asList(metricName,"Amount");
+        }
         List<String> how = null;
         if (attributeName != null) {
             how = Arrays.asList(attributeName);
         }
         createReport("report_" + metricName, ReportTypes.TABLE, what, how,
                 "screenshot");
-        if (metricName.contains("WITHOUT PARENT FILTER")) {
+        if (metricName.contains("WITHOUT_PF")) {
             data = new HashMap<String, String>();
             data.put("attribute", "Month/Year (Snapshot)");
             data.put("attributeElements", "Apr 2012");
@@ -477,15 +499,11 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
                 this.getClass());
         Assert.assertEquals(metricValuesinGrid, metricValues,
                 "Metric values list is incorrrect");
+        System.out.println(metricValuesinGrid + "--" + metricValues);
         if (attributeValues != null) {
             List<String> attributeValuesinGrid = reportPage.getTableReport()
                     .getAttributeElements();
-            int i = 0;
-            for (String attributeValue : attributeValues) {
-                Assert.assertEquals(attributeValuesinGrid.get(i),
-                        attributeValue);
-                i++;
-            }
+            Assert.assertEquals(attributeValuesinGrid, attributeValues);
         }
         reportPage.saveReport();
     }
@@ -494,8 +512,108 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
         return DATE_FORMAT.format(new Date()).replaceAll("\\W", "-");
     }
 
-    @Test(dependsOnGroups = {"metric-tests"}, groups = {"tests"})
-    public void finalTest() {
-        successfulTest = true;
+    public enum MetricList {
+        // Numeric
+        ABS("ABS", "SELECT ABS(${metric})", "5319697.32f, 4363972.93f, 20255220.38f, 1670164.74f, 1198603.33f, 3036473.23f", "Numeric"),
+        EXP("EXP", "SELECT EXP(${metric})", "1.76f, 1.74f, 1.7f, 1.77f, 1.79f, 1.69f", "Numeric"),
+        IFNULL("IFNULL", "SELECT IFNULL(${metric},0)", "0f, 35844131.93f, 0f, 42470571.16f, 35844131.93f, 38310753.45f", "Numeric"),
+        LOG("LOG", "SELECT LOG(${metric})", "6.73f, 6.64f, 7.31f, 6.22f, 6.08f, 6.48f", "Numeric"),
+        LN("LN", "SELECT LN(${metric})", "15.49f, 15.29f, 16.82f, 14.33f, 14f, 14.93f", "Numeric"),
+        POWER("POWER", "SELECT POWER(${metric},1)", "5319697.32f, 4363972.93f, 20255220.38f, 1670164.74f, 1198603.33f, 3036473.23f", "Numeric"),
+        RANK("RANK", "SELECT RANK(${metric})", "5f, 4f, 6f, 2f, 1f, 3f", "Numeric"),
+        ROUND("ROUND", "SELECT ROUND(${metric})", "5319697f, 4363973f, 20255220f, 1670165f, 1198603f, 3036473f", "Numeric"),
+        FLOOR("FLOOR", "SELECT FLOOR(${metric})", "5319697f, 4363972f, 20255220f, 1670164f, 1198603f, 3036473f", "Numeric"),
+        CEILING("CEILING", "SELECT CEILING(${metric})", "5319698f, 4363973f, 20255221f, 1670165f, 1198604f, 3036474f", "Numeric"),
+        TRUNC("TRUNC", "SELECT TRUNC(${metric})", "5319697f, 4363972f, 20255220f, 1670164f, 1198603f, 3036473f", "Numeric"),
+        SIGN("SIGN", "SELECT SIGN(${metric})", "1f, -1f, -1f, -1f, -1f, -1f, -1f, -1f, -1f", "Numeric"),
+        SQRT("SQRT", "SELECT SQRT(${metric})", "2306.45f, 2089.01f, 4500.58f, 1292.35f, 1094.81f, 1742.55f", "Numeric"),
+        SUBTRACTION("+, -, *, /", "SELECT ${metric} - ${metric1}", "-21903202.32f, -18582922.54f, -18340974.48f, -6371867.18f, -8327254.58f, -7255103.51f", "Numeric"),
+        // Aggregation
+        AVG("AVG", "SELECT AVG(${fact0})", "91950.44f, 24518.32f, 30384.53f, 59651.14f, 37137.94f, 28180f, 11747.9f, 24006.22f", "Aggregation"),
+        RUNAVG("RUNAVG", "SELECT RUNAVG(${fact0})", "28781.53f, 22976.64f, 20236.14f, 18799.05f, 18254.70f, 18797.26f, 19476.70f, 19760.85f, 19923.45f", "Aggregation"),
+        MAX("MAX", "SELECT MAX(${fact0})", "679f, 710f, 1460f, 1446f, 1355f, 1264f, 1173f, 1844f, 1795f", "Aggregation"),
+        RUNMAX("RUNMAX", "SELECT RUNMAX(${fact0})", "679f, 710f, 1460f, 1460f, 1460f, 1460f, 1460f, 1844f, 1844f", "Aggregation"),
+        MIN("MIN", "SELECT MIN(${fact0})", "0f, 9f, 2f, 6f, 7f, 5f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 3f", "Aggregation"),
+        RUNMIN("RUNMIN", "SELECT RUNMIN(${fact0})", "0f, 9f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f", "Aggregation"),
+        SUM("SUM", "SELECT SUM(${fact0})", "26680476.45f, 173032507.14f, 286622094.62f, 403085507.4f, 549068386.54f, 784155771.33f, 1026730772.12f, 1245801949.39f, 1122736243.73f", "Aggregation"),
+        RUNSUM("RUNSUM", "SELECT RUNSUM(${fact0})", "26680476.45f, 199712983.59f, 486335078.21f, 889420585.61f, 1438488972.15f, 2222644743.48f, 3249375515.6f, 4495177464.99f, 5617913708.72f", "Aggregation"),
+        MEDIAN("MEDIAN", "SELECT MEDIAN(${fact0})", "5240.16f, 6362.40f, 12000f, 12000f, 16998.12f, 13187.33f, 2980.46f, 4800f", "Aggregation"),
+        CORREL("CORREL", "SELECT CORREL(${fact0},${fact1})", "-0.05f", "Aggregation"),
+        COUNT("COUNT", "SELECT COUNT(${attr0},${attr1})", "1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f", "Aggregation"),
+        COVAR("COVAR", "SELECT COVAR(${fact0},${fact1})", "2.26f, 8.17f, 38.61f, 59.28f, 14.13f, 52.22f", "Aggregation"),
+        COVARP("COVARP", "SELECT COVARP(${fact0},${fact1})", "2.26f, 8.15f, 38.5f, 58.74f, 14.02f, 51.8f", "Aggregation"),
+        INTERCEPT("INTERCEPT", "SELECT INTERCEPT(${fact0},${fact1})", "41.11f, 39.99f, 36.74f, 30.09f, 38.14f, 35.12f", "Aggregation"),
+        PERCENTILE("PERCENTILE", "SELECT PERCENTILE(${fact0},0.25)", "832.80f, 769.52f, 940.80f, 1348.12f, 1036.80f, 900f", "Aggregation"),
+        RSQ("RSQ", "SELECT RSQ(${fact0},${fact1})", "0f, 0f, 0.02f, 0.05f, 0f, 0.03f", "Aggregation"),
+        SLOPE("SLOPE", "SELECT SLOPE(${fact0},${fact1})", "0.03f, 0.1f, 0.51f, 0.83f, 0.22f, 0.57f", "Aggregation"),
+        STDEV("STDEV", "SELECT STDEV(${fact0})", "74188.03f, 66021.22f, 52967.24f, 48908.74f, 47954.34f, 169291.7f, 220273.73f, 204454.97f, 192490.02f", "Aggregation"),
+        RUNSTDEV("RUNSTDEV", "SELECT RUNSTDEV(${fact0})", "74188.03f, 66965.11f, 58453.34f, 53987.64f, 51665.31f, 106485.98f, 148893.7f, 165539.55f, 171079.39f", "Aggregation"),
+        VAR("VAR", "SELECT VAR(${fact0})", "5503864027f, 4358800996.88f, 2805528940.9f, 2392065115.96f, 2299618561.68f, 28659680430.94f, 48520516045.51f, 41801835719.68f, 37052408241.94f", "Aggregation"),
+        RUNVAR("RUNVAR", "SELECT RUNVAR(${fact0})", "5503864027f, 4484325735.48f, 3416792441.66f, 2914665138.04f, 2669304494.43f, 11339263468.53f, 22169333880.03f, 27403342437.44f, 29268158189.74f", "Aggregation"),
+        // Granularity
+        BY("BY", "SELECT ${metric0} / (SELECT ${metric1} BY ${attr0})", "10780.66f, 23031.85f, 34560.16f, 14490.03f, 19202.08f, 29123.39f, 34651.63f, 31400.59f, 35223.64f", "Granularity"),
+        BY_ALL_ATTRIBUTE("BY ALL attributes", "SELECT ${metric0} / (SELECT ${metric1} BY ALL ${attr0})", "31728.32f, 29046.7f, 49673.35f, 27827.10f, 29310.33f, 37836.68f", "Granularity"),
+        BY_ALL("BY ALL IN ALL OTHER DIMENSIONS", "SELECT ${metric0} / (SELECT ${metric1} BY ALL IN ALL OTHER DIMENSIONS)", "8221.96f, 6930.5f, 11656.96f, 2428.88f, 2877.03f, 3108.3f", "Granularity"),
+        BY_ATTR_ALL_OTHER("BY Attr, ALL OTHER", "SELECT ${metric0} / (SELECT ${metric1} BY ${attr0}, ALL IN ALL OTHER DIMENSIONS)", "8221.96f, 6930.5f, 11656.96f, 2428.88f, 2877.03f, 3108.3f", "Granularity"),
+        FOR_NEXT("FOR Next", "SELECT ${metric0} FOR Next(${attr0})", "27222899.64f, 22946895.47f, 38596194.86f, 8042031.92f, 9525857.91f, 10291576.74f", "Granularity"),
+        FOR_PREVIOUS("FOR Previous", "SELECT ${metric0} FOR Previous(${attr0})", "13f, 17f, 16f, 24f, 20f, 14f, 17f, 122f, 452f, 144f, 38f, 30f, 5f, 1f, 1f, 2f, 1f", "Granularity"),
+        FOR_NEXT_PERIOD("FOR NextPeriod", "SELECT ${metric0} FOR NextPeriod(${attr0})", "13f, 17f, 16f, 24f, 20f, 14f, 17f, 122f, 452f, 144f, 38f, 30f, 5f, 1f, 1f, 2f, 1f", "Granularity"),
+        FOR_PREVIOUS_PERIOD("FOR PreviousPeriod", "SELECT ${metric0} FOR PreviousPeriod(${attr0})", "13f, 17f, 16f, 24f, 20f, 14f, 17f, 122f, 452f, 144f, 38f, 30f, 5f, 1f, 1f, 2f, 1f", "Granularity"),
+        BY_ALL_EXCEPT("BY ALL IN ALL OTHER DIMENSIONS EXCEPT (FOR)", "SELECT ${metric0} BY ALL IN ALL OTHER DIMENSIONS EXCEPT ${attr0}", "8398134.81f, 17941808.52f, 26922362f, 36036707.95f, 47755578.7f, 72429870.62f, 86178611.71f, 103967358.32f, 116625456.54f", "Granularity"),
+        // Logical
+        AND("AND", "SELECT ${metric0} WHERE ${attr0} = ${attrValue0} AND ${attr1} = ${attrValue1}", "74f, 78f, 69f, 31f, 28f, 34f", "Logical"),
+        OR("OR", "SELECT ${metric0} WHERE ${attr0} = ${attrValue0} OR ${attr1} = ${attrValue1}", "119f, 137f, 128f, 39f, 48f, 63f", "Logical"),
+        CASE("CASE", "SELECT CASE WHEN ${metric0} > ${metric1} THEN 1, WHEN ${metric2} < ${metric3} THEN 2 ELSE 3 END", "1f, 1f, 2f, 2f, 1f, 3f, 1f", "Logical"),
+        IF("IF", "SELECT IF ${metric0} > 0.5 THEN ${metric1} * 10 ELSE ${metric2} / 10 END", "1844726.61f, 424902.79f, 561206.26f, 260629.35f, 30674661.20f, 18620157.30f, 383107534.50f, 4247057.12f", "Logical"),
+        NOT("NOT", "SELECT ${metric0} WHERE NOT (${attr0} = ${attrValue0})", "246f, 224f, 214f, 70f, 72f, 92f", "Logical"),
+        // Filter   
+        EQUAL("= (equals)", "SELECT ${metric0} WHERE ${attr} = ${attrValue0}", "149f, 210f, 232f", "Filter"),
+        DOES_NOT_EQUAL("<> (does not equal)", "SELECT ${metric0} WHERE ${attr} <> ${attrValue0}", "272f, 338f, 437f, 534f, 730f, 918f", "Filter"),
+        GREATER("> (greater)", "SELECT ${metric0} WHERE ${attr} > ${attrValue0}", "272f, 338f, 437f, 534f, 730f, 918f", "Filter"),
+        LESS("< (less)", "SELECT ${metric0} WHERE ${attr} < ${attrValue0}", "149f, 210f, 232f", "Filter"),
+        GREATER_OR_EQUAL(">= (greater or equal)", "SELECT ${metric0} WHERE ${attr} >= ${attrValue0}", "149f, 210f, 232f, 272f, 338f, 437f, 534f, 730f, 918f", "Filter"),
+        LESS_OR_EQUAL("<= (less or equal)", "SELECT ${metric0} WHERE ${attr} <= ${attrValue1}", "149f, 210f, 232f, 272f, 338f, 437f, 534f", "Filter"),
+        BETWEEN ("BETWEEN", "SELECT ${metric0} WHERE ${attr} BETWEEN ${attrValue0} AND ${attrValue1}", "149f, 210f, 232f, 272f, 338f, 437f, 534f, 730f, 918f", "Filter"),
+        NOT_BETWEEN("NOT BETWEEN", "SELECT ${metric0} WHERE ${attr} NOT BETWEEN ${attrValue0} AND ${attrValue1}", "730f, 918f", "Filter"),
+        IN("IN", "SELECT ${metric0} WHERE ${attr} IN (${attrValue0}, ${attrValue1})", "149f, 210f, 232f, 272f, 338f, 437f, 534f", "Filter"),
+        NOT_IN("NOT IN", "SELECT ${metric0} WHERE ${attr} NOT IN (${attrValue0}, ${attrValue1})", "730f, 918f", "Filter"),
+        WITHOUT_PF("WITHOUT PARENT FILTER", "SELECT ${metric0} - (SELECT ${metric1} BY ALL ${attr} WITHOUT PARENT FILTER)", "-116624637.54f", "Filter");
+
+        private final String name;
+        private final String maql;
+        private final String values;
+        private final String type;
+
+        private MetricList(String name, String maql, String values, String type) {
+            this.name = name;
+            this.maql = maql;
+            this.values = values;
+            this.type = type;
+        }
+
+        private String getMaql() {
+            return maql;
+        }
+
+        private String getType() {
+            return type;
+        }
+
+        private MetricTypes getMetric() {
+            MetricTypes numericMetric = null;
+            for (MetricTypes metric: MetricTypes.values()) {
+                if (metric.getLabel().equals(this.name))
+                    numericMetric = metric;
+            }
+            return numericMetric;
+        }
+
+        private List<Float> getMetricValues() {
+            List<Float> metricValues = new ArrayList<Float>();
+            for (String el: Arrays.asList(values.split(", "))){
+                metricValues.add(Float.valueOf(el));
+            }
+            return metricValues;
+        }
     }
 }

@@ -5,11 +5,7 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import com.gooddata.qa.graphene.enums.metrics.AggregationMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.FilterMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.GranularityMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.LogicalMetricTypes;
-import com.gooddata.qa.graphene.enums.metrics.NumericMetricTypes;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
@@ -197,7 +193,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	verifyMetric(metricName, expectedMaql, expectedFormat);
     }
 
-    public void createAggregationMetric(AggregationMetricTypes metricType,
+    public void createAggregationMetric(MetricTypes metricType,
 	    String metricName, Map<String, String> data)
 	    throws InterruptedException {
 	waitForElementVisible(createMetricButton).click();
@@ -220,8 +216,10 @@ public class MetricEditorDialog extends AbstractFragment {
 	case RUNSUM:
 	case MEDIAN:
 	case VAR:
-	case VARP:
+	case RUNVAR:
 	case PERCENTILE:
+    case STDEV:
+    case RUNSTDEV:
 	    selectFacts(data, 1);
 	    break;
 	case COUNT:
@@ -233,8 +231,6 @@ public class MetricEditorDialog extends AbstractFragment {
 	case INTERCEPT:
 	case RSQ:
 	case SLOPE:
-	case STDEV:
-	case STDEVP:
 	    selectFacts(data, 2);
 	    break;
 	default:
@@ -248,7 +244,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(dataLink).click();
     }
 
-    public void createNumericMetric(NumericMetricTypes metricType,
+    public void createNumericMetric(MetricTypes metricType,
 	    String metricName, Map<String, String> data)
 	    throws InterruptedException {
 	waitForElementVisible(createMetricButton).click();
@@ -260,7 +256,14 @@ public class MetricEditorDialog extends AbstractFragment {
 	By metricLink = By.linkText(metricLinkLocator.replace("${metricType}",
 		metricType.getLabel()));
 	waitForElementVisible(metricLink, browser).click();
-	selectMetrics(data, 1);
+	switch(metricType) {
+	case SUBTRACTION:
+	    selectMetrics(data, 2);
+	    break;
+	default:
+	    selectMetrics(data, 1);
+	    break;
+	}
 	waitForElementVisible(customMetricNameInput).sendKeys(metricName);
 	waitForElementVisible(customAddButton).click();
 	Thread.sleep(3000);
@@ -269,7 +272,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(dataLink).click();
     }
 
-    public void createGranularityMetric(GranularityMetricTypes metricType,
+    public void createGranularityMetric(MetricTypes metricType,
 	    String metricName, Map<String, String> data)
 	    throws InterruptedException {
 	waitForElementVisible(createMetricButton).click();
@@ -299,10 +302,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	case BY_ALL:
 	    selectMetrics(data, 2);
 	    break;
-	case WITHIN:
-	    selectMetrics(data, 1);
-	    selectFacts(data, 1);
-	    break;
+	// TODO: case WITHIN:
 	default:
 	    break;
 	}
@@ -314,7 +314,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(dataLink).click();
     }
 
-    public void createLogicalMetric(LogicalMetricTypes metricType,
+    public void createLogicalMetric(MetricTypes metricType,
 	    String metricName, Map<String, String> data)
 	    throws InterruptedException {
 	waitForElementVisible(createMetricButton).click();
@@ -355,7 +355,7 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(dataLink).click();
     }
 
-    public void createFilterMetric(FilterMetricTypes metricType,
+    public void createFilterMetric(MetricTypes metricType,
 	    String metricName, Map<String, String> data)
 	    throws InterruptedException {
 	waitForElementVisible(createMetricButton).click();
@@ -369,6 +369,11 @@ public class MetricEditorDialog extends AbstractFragment {
 	waitForElementVisible(metricLink, browser).click();
 	switch (metricType) {
 	case EQUAL:
+	case DOES_NOT_EQUAL:
+	case GREATER:
+	case GREATER_OR_EQUAL:
+	case LESS:
+	case LESS_OR_EQUAL:
 	    selectMetrics(data, 1);
 	    selectAttributes(data, 1);
 	    selectAttrElements(data, 1);
@@ -381,14 +386,14 @@ public class MetricEditorDialog extends AbstractFragment {
 	    selectAttributes(data, 1);
 	    selectAttrElements(data, 2);
 	    break;
-	case TOP:
+	/* TODO: case TOP:
 	    selectFacts(data, 2);
 	    selectMetrics(data, 1);
 	    break;
 	case BOTTOM:
 	    selectFacts(data, 2);
 	    selectAttributes(data, 1);
-	    break;
+	    break; */
 	case WITHOUT_PF:
 	    selectMetrics(data, 2);
 	    selectAttributes(data, 1);
