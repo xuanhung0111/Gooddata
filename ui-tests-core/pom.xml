@@ -21,7 +21,7 @@
             <id>selenium</id>
             <properties>
                 <testng.suite.xml>testng-core-simple.xml</testng.suite.xml>
-                <propertiesPath>${basedir}/src/test/resources/variables-env-test.properties</propertiesPath>
+                <propertiesPath>${modulePropertiesPath}</propertiesPath>
                 <csvFilePath>${basedir}/src/test/resources/geochart-csv</csvFilePath>
             </properties>
             <build>

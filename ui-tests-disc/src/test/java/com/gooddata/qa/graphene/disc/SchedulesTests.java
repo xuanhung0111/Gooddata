@@ -19,7 +19,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
 	@BeforeClass
 	public void initProperties() {
-		zipFilePath = testParams.loadProperty("zipFilePath");
+		zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
 		projectTitle = "disc-schedule-test";
 	}
 

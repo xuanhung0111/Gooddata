@@ -14,7 +14,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath");
+        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         projectTitle = "disc-deploy-process-test";
     }
 

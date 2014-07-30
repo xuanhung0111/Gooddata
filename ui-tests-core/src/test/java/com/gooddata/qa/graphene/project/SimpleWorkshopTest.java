@@ -22,13 +22,13 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
 
     @BeforeClass
     public void initProperties() {
-        csvFilePath = testParams.loadProperty("csvFilePath");
+        csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
         projectTitle = "simple-project-ws";
     }
 
     @Test(dependsOnMethods = {"createSimpleProject"}, groups = {"tests"})
     public void uploadData() throws InterruptedException {
-        uploadCSV(csvFilePath + "/payroll.csv", null, "simple-ws");
+        uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadData"}, groups = {"tests"})
