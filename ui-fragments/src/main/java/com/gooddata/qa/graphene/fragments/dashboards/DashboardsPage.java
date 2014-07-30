@@ -32,6 +32,9 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(css = ".s-export_to_pdf")
     private WebElement exportPdfButton;
 
+    @FindBy(css = ".s-permissions")
+    private WebElement permissionsButton;
+
     @FindBy(xpath = "//button[@title='Download PDF']")
     private WebElement printPdfButton;
 
@@ -64,7 +67,16 @@ public class DashboardsPage extends AbstractFragment {
 
     @FindBy(className = "yui3-c-projectdashboard-content")
     private DashboardContent content;
-    
+
+    @FindBy(xpath = "//div[contains(@class,'s-permissionSettingsDialog')]")
+    private PermissionsDialog permissionsDialog;
+
+    @FindBy(css = ".s-unlistedIcon")
+    private WebElement unlistedIcon;
+
+    @FindBy(css = ".s-lockIcon")
+    private WebElement lockIcon;
+
     private By emptyTabPlaceholder = By.xpath("//div[contains(@class, 'yui3-c-projectdashboard-placeholder-visible')]");
 
     private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
@@ -87,6 +99,10 @@ public class DashboardsPage extends AbstractFragment {
 
     public DashboardEditBar getDashboardEditBar() {
         return editDashboardBar;
+    }
+
+    public PermissionsDialog getPermissionsDialog() {
+        return permissionsDialog;
     }
 
     public String getDashboardName() {
@@ -193,7 +209,7 @@ public class DashboardsPage extends AbstractFragment {
         boolean nonEmptyTab = browser.findElements(emptyTabPlaceholder).size() == 0;
         tabs.selectDropDownMenu(tabIndex);
         waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DELETE_BUTTON).click();
-        if(nonEmptyTab){
+        if (nonEmptyTab) {
             waitForElementVisible(dashboardTabDeleteDialog);
             waitForElementVisible(dashboardTabDeleteConfirmButton).click();
             waitForElementNotPresent(dashboardTabDeleteDialog);
@@ -215,5 +231,44 @@ public class DashboardsPage extends AbstractFragment {
     public void deleteDashboard() throws InterruptedException {
         editDashboard();
         editDashboardBar.deleteDashboard();
+    }
+
+    public void openPermissionsDialog() {
+        waitForDashboardPageLoaded(browser);
+        waitForElementVisible(editExportEmbedButton).click();
+        waitForElementVisible(permissionsButton).click();
+        waitForElementVisible(permissionsDialog.getRoot());
+    }
+
+    public void publishDashboard(boolean listed) {
+        openPermissionsDialog();
+        permissionsDialog.publish(listed);
+        permissionsDialog.submit();
+    }
+
+    public void lockDashboard(boolean locked) {
+        openPermissionsDialog();
+        if (locked) {
+            permissionsDialog.lock();
+        } else {
+            permissionsDialog.unlock();
+        }
+        permissionsDialog.submit();
+    }
+
+    public void lockIconClick() {
+        waitForElementVisible(lockIcon).click();
+    }
+
+    public void unlistedIconClick() {
+        waitForElementVisible(unlistedIcon).click();
+    }
+
+    public boolean isLocked() {
+        return lockIcon.isDisplayed();
+    }
+
+    public boolean isUnlisted() {
+        return unlistedIcon.isDisplayed();
     }
 }
