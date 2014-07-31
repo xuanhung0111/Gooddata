@@ -156,4 +156,10 @@ public class ObjectFolder extends AbstractFragment {
             waitForElementNotVisible(getAddFolderButton(page));
         }
     }
+
+    public void checkEditorCannotEditFolder(String folder) {
+        By folderLink = By.xpath(XPATH_FOLDER_LINK.replace("${folderName}", folder));
+        waitForElementVisible(folderLink, browser).click();
+        waitForElementNotPresent(settingButton);
+    }
 }

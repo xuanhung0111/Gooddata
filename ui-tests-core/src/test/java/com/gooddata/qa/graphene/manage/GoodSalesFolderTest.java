@@ -152,6 +152,19 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         createSnDFolder("Editor slide-n-dice folder");
     }
 
+    @Test(dependsOnMethods = { "editorVerifyFolderListTest" }, groups = { "editor-tests" })
+    public void editorCannotEditAttributeAndFactFolderTest() throws InterruptedException {
+        for (String page : Arrays.asList("attributes", "facts")) {
+            initDataPage(page);
+            String folder;
+            if (page.equalsIgnoreCase("attributes"))
+                folder = "Opportunity";
+            else
+                folder = "Opp. Snapshot";
+            dataPage.getObjectFolder().checkEditorCannotEditFolder(folder);
+        }
+    }
+
     @Test(dependsOnGroups = { "editor-tests" }, groups = { "tests" })
     public void finalTest() {
         successfulTest = true;
