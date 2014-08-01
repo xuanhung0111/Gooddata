@@ -27,8 +27,8 @@
 
         <browser>firefox</browser>
         <timeout>90</timeout><!-- (seconds) -->
-        <folderSeparator>/</folderSeparator>
-        <browserDownloadFolder>${project.build.directory}${folderSeparator}downloads</browserDownloadFolder>
+        <file.separator>/</file.separator>
+        <browserDownloadFolder>${project.build.directory}${file.separator}downloads</browserDownloadFolder>
         <video.recording>false</video.recording>
 
         <!-- Possible values are: delete_always, delete_if_successful, delete_never -->
@@ -36,9 +36,9 @@
 
         <testng.suite.xml>testng-basic.xml</testng.suite.xml>
 
-        <corePropertiesPath>ui-tests-core${folderSeparator}src${folderSeparator}test${folderSeparator}resources${folderSeparator}variables-env-test.properties</corePropertiesPath>
-        <propertiesPath>${basedir}${folderSeparator}${corePropertiesPath}</propertiesPath>
-        <modulePropertiesPath>${basedir}${folderSeparator}..${folderSeparator}${corePropertiesPath}</modulePropertiesPath>
+        <corePropertiesPath>ui-tests-core${file.separator}src${file.separator}test${file.separator}resources${file.separator}variables-env-test.properties</corePropertiesPath>
+        <propertiesPath>${basedir}${file.separator}${corePropertiesPath}</propertiesPath>
+        <modulePropertiesPath>${basedir}${file.separator}..${file.separator}${corePropertiesPath}</modulePropertiesPath>
 
         <skipTests>false</skipTests>
 
@@ -221,8 +221,8 @@
                                                 <value>${project.build.directory}</value>
                                             </property>
                                             <property>
-                                                <name>folderSeparator</name>
-                                                <value>${folderSeparator}</value>
+                                                <name>file.separator</name>
+                                                <value>${file.separator}</value>
                                             </property>
                                         </systemProperties>
                                     </configuration>
@@ -256,7 +256,7 @@
                 <os><family>Windows</family></os>
             </activation>
             <properties>
-                <folderSeparator>\\</folderSeparator>
+                <file.separator>\\</file.separator>
             </properties>
         </profile>
     </profiles>

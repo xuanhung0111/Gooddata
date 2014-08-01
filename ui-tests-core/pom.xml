@@ -22,7 +22,7 @@
             <properties>
                 <testng.suite.xml>testng-core-simple.xml</testng.suite.xml>
                 <propertiesPath>${modulePropertiesPath}</propertiesPath>
-                <csvFilePath>${basedir}/src/test/resources/geochart-csv</csvFilePath>
+                <csvFilePath>${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}geochart-csv</csvFilePath>
             </properties>
             <build>
                 <testResources>

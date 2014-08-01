@@ -42,7 +42,7 @@ public class TestParameters {
         if (testIdentification == null) {
             testIdentification = UUID.randomUUID().toString();
         }
-        folderSeparator = loadProperty("folderSeparator");
+        folderSeparator = loadProperty("file.separator");
 
     }
 
