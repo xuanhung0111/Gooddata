@@ -311,16 +311,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyDashboardExport(String dashboardName, long minimalSize) {
-        File pdfExport = new File(testParams.getDownloadFolder() + "/" + dashboardName + ".pdf");
+        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
-        System.out.println(testParams.getDownloadFolder() + "/" + dashboardName + ".pdf");
+        System.out.println(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         long fileSize = pdfExport.length();
         System.out.println("File size: " + fileSize);
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
     }
 
     public void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
-        String fileURL = testParams.getDownloadFolder() + "/" + reportName + "." + format.getName();
+        String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "." + format.getName();
         File export = new File(fileURL);
         long fileSize = export.length();
         System.out.println("File size: " + fileSize);

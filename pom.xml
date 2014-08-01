@@ -27,8 +27,8 @@
 
         <browser>firefox</browser>
         <timeout>90</timeout><!-- (seconds) -->
-        <browserDownloadFolder>${project.build.directory}/downloads</browserDownloadFolder>
-        <csvFilePath>${basedir}/src/test/resources</csvFilePath>
+        <folderSeparator>/</folderSeparator>
+        <browserDownloadFolder>${project.build.directory}${folderSeparator}downloads</browserDownloadFolder>
         <video.recording>false</video.recording>
 
         <!-- Possible values are: delete_always, delete_if_successful, delete_never -->
@@ -36,7 +36,9 @@
 
         <testng.suite.xml>testng-basic.xml</testng.suite.xml>
 
-        <propertiesPath>${basedir}/ui-tests-core/src/test/resources/variables-env-test.properties</propertiesPath>
+        <corePropertiesPath>ui-tests-core${folderSeparator}src${folderSeparator}test${folderSeparator}resources${folderSeparator}variables-env-test.properties</corePropertiesPath>
+        <propertiesPath>${basedir}${folderSeparator}${corePropertiesPath}</propertiesPath>
+        <modulePropertiesPath>${basedir}${folderSeparator}..${folderSeparator}${corePropertiesPath}</modulePropertiesPath>
 
         <skipTests>false</skipTests>
 
@@ -215,12 +217,12 @@
                                                 <value>${browserDownloadFolder}</value>
                                             </property>
                                             <property>
-                                                <name>csvFilePath</name>
-                                                <value>${csvFilePath}</value>
-                                            </property>
-                                            <property>
                                                 <name>user.home</name>
                                                 <value>${project.build.directory}</value>
+                                            </property>
+                                            <property>
+                                                <name>folderSeparator</name>
+                                                <value>${folderSeparator}</value>
                                             </property>
                                         </systemProperties>
                                     </configuration>
@@ -247,6 +249,15 @@
                     <version>${version.org.jboss.arquillian.ext.screenrecorder}</version>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os><family>Windows</family></os>
+            </activation>
+            <properties>
+                <folderSeparator>\\</folderSeparator>
+            </properties>
         </profile>
     </profiles>
     <distributionManagement>

@@ -20,8 +20,7 @@
             <id>selenium</id>
             <properties>
                 <testng.suite.xml>testng-upload.xml</testng.suite.xml>
-                <propertiesPath>${basedir}/../ui-tests-core/src/test/resources/variables-env-test.properties
-                </propertiesPath>
+                <propertiesPath>${modulePropertiesPath}</propertiesPath>
             </properties>
         </profile>
     </profiles>

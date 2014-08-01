@@ -23,6 +23,7 @@ public class TestParameters {
     private DeleteMode deleteMode = DeleteMode.DELETE_IF_SUCCESSFUL;
     private String testIdentification;
     private String downloadFolder;
+    private String folderSeparator;
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
@@ -41,6 +42,8 @@ public class TestParameters {
         if (testIdentification == null) {
             testIdentification = UUID.randomUUID().toString();
         }
+        folderSeparator = loadProperty("folderSeparator");
+
     }
 
     /**
@@ -121,5 +124,9 @@ public class TestParameters {
 
     public String getDownloadFolder() {
         return downloadFolder;
+    }
+
+    public String getFolderSeparator() {
+        return folderSeparator;
     }
 }
