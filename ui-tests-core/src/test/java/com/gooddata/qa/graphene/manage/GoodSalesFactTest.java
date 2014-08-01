@@ -8,13 +8,13 @@ import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"GoodSalesFacts"}, description = "Tests for GoodSales project (view and edit fact functionality) in GD platform")
-public class SimpleFactTest extends ObjectAbstractTest {
+public class GoodSalesFactTest extends ObjectAbstractTest {
 
     private String factFolder;
 
     @BeforeClass
     public void setProjectTitle() {
-        projectTitle = "Simple-fact-test";
+        projectTitle = "GoodSales-test-fact";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests", "object-tests"})

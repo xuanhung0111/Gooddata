@@ -16,7 +16,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"GoodSalesReportFilters"}, description = "Tests for GoodSales project (report filters functionality) in GD platform")
-public class FilterReportTest extends GoodSalesAbstractTest {
+public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     private String reportName;
     private String variableName;
@@ -25,7 +25,7 @@ public class FilterReportTest extends GoodSalesAbstractTest {
 
     @BeforeClass
     public void setProjectTitle() {
-        projectTitle = "GoodSales-filter-test";
+        projectTitle = "GoodSales-test-filter";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})

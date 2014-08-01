@@ -29,7 +29,7 @@ public class DeleteTestProjects extends AbstractUITest {
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
     public void deleteAllConnectorCheckProjects() throws InterruptedException {
-        deleteProjects("CheckConnector");
+        deleteProjects("Connector-test");
     }
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
@@ -39,17 +39,12 @@ public class DeleteTestProjects extends AbstractUITest {
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
     public void deleteAllSimpleProjects() throws InterruptedException {
-        deleteProjects("simple-project");
+        deleteProjects("SimpleProject-test");
     }
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllSimpleGeoProjects() throws InterruptedException {
-        deleteProjects("simple-project-geo");
-    }
-
-    @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllGoodSalesPerfCheckProjects() throws InterruptedException {
-        deleteProjects("GoodSales-perf-test");
+    public void deleteAllDiscProjects() throws InterruptedException {
+        deleteProjects("Disc-test");
     }
 
     private void deleteProjects(String projectSubstring) throws InterruptedException {

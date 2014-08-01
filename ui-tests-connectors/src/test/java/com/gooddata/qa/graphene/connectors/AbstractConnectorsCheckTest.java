@@ -43,7 +43,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     @BeforeClass(dependsOnMethods = {"loadRequiredProperties"})
     public void initStartPage() {
         startPage = "gdc";
-        projectTitle = connectorType.getName() + "CheckConnector";
+        projectTitle = connectorType.getName() + "Connector-test";
         String projectTemplateOverride = System.getProperty("projectTemplate");
         if (projectTemplateOverride != null && !projectTemplateOverride.isEmpty()) {
             projectTemplate = projectTemplateOverride;

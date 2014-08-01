@@ -23,7 +23,7 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
     @BeforeClass
     public void initProperties() {
         csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
-        projectTitle = "simple-project-ws";
+        projectTitle = "SimpleProject-test-ws";
     }
 
     @Test(dependsOnMethods = {"createSimpleProject"}, groups = {"tests"})

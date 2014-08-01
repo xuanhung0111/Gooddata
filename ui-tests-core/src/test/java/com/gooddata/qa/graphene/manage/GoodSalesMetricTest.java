@@ -21,7 +21,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"GoodSalesMetrics"}, description = "Tests for GoodSales project (metric creation functionality) in GD platform")
-public class SimpleMetricTest extends GoodSalesAbstractTest {
+public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private String attrFolder;
     private String attr;
     private String attrValue;
@@ -46,7 +46,7 @@ public class SimpleMetricTest extends GoodSalesAbstractTest {
 
     @BeforeClass
     public void setProjectTitle() {
-        projectTitle = "Simple-metric-test";
+        projectTitle = "GoodSales-test-metric";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})

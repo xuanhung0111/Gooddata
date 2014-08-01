@@ -51,7 +51,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	@BeforeClass
 	public void initProperties() {
 		csvFilePath = testParams.loadProperty("csvFilePath");
-		projectTitle = "simple-project-upload";
+		projectTitle = "SimpleProject-test-upload";
 
 		expectedDashboardsAndTabs = new HashMap<String, String[]>();
 		expectedDashboardsAndTabs.put("Default dashboard",
