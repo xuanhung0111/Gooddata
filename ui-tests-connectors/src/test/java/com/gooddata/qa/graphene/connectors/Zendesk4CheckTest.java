@@ -260,7 +260,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         waitForElementVisible(reportPage.getRoot());
         OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class, browser.findElement(
                 BY_ONE_NUMBER_REPORT));
-        return Integer.valueOf(report.getValue().replace(".00", ""));
+        return Integer.valueOf(report.getValue().replace(".00", "").replace(",", ""));
     }
 
     private void compareObjectsCount(int actual, int expected, ZendeskHelper.ZendeskObject objectName) {
