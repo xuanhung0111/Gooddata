@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.Assert;
+
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.disc.SchedulesTable;
 
@@ -12,16 +13,10 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
 
-	protected void openProjectDetailPage(String projectName) {
-		openUrl(DISC_PROJECTS_PAGE_URL);
-		waitForElementVisible(discProjectsList.getRoot());
-		discProjectsList.selectProject(projectName);
-	}
-
-	protected void createScheduleForProcess(String projectName, String processName,
-			String executable, Pair<String, List<String>> cronTime,
-			Map<String, List<String>> parameters) throws InterruptedException {
-		openProjectDetailPage(projectName);
+	protected void createScheduleForProcess(String projectName, String projectId,
+			String processName, String executable,
+			Pair<String, List<String>> cronTime, Map<String, List<String>> parameters) throws InterruptedException {
+		openProjectDetailPage(projectName, projectId);
 		waitForElementVisible(projectDetailPage.getRoot());
 		projectDetailPage.clickOnNewScheduleButton();
 		waitForElementVisible(scheduleForm.getRoot());
