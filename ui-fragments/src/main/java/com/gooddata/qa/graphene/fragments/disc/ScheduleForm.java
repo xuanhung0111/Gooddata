@@ -174,9 +174,9 @@ public class ScheduleForm extends AbstractFragment {
 					.sendKeys(newParameter.getValue().get(1));
 			if (newParameter.getValue().get(0).equals("secure")) {
 				parameters.get(index).findElement(BY_PARAMETER_SHOW_SECURE_VALUE).click();
-				Assert.assertEquals("text", parameters.get(index).findElement(BY_PARAMETER_VALUE)
+				assertEquals("text", parameters.get(index).findElement(BY_PARAMETER_VALUE)
 						.getAttribute("type"));
-				Assert.assertEquals(newParameter.getValue().get(1), parameters.get(index)
+				assertEquals(newParameter.getValue().get(1), parameters.get(index)
 						.findElement(BY_PARAMETER_VALUE).getAttribute("value"));
 			}
 			index++;

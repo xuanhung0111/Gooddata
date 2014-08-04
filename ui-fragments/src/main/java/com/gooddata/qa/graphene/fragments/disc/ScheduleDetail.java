@@ -239,18 +239,18 @@ public class ScheduleDetail extends ScheduleForm {
 
 	public void addRetryDelay(String retryDelay, boolean isSaved, boolean isValidDelayValue)
 			throws InterruptedException {
-		if (cronExpression.isDisplayed() && cronExpression.getAttribute("value").isEmpty())
+		waitForElementVisible(selectExecutable);
+		Select select = new Select(selectExecutable);
+		if (select.getFirstSelectedOption().equals(select.getOptions().get(0)))
 			Thread.sleep(2000);
 		waitForElementVisible(addRetryDelay).click();
 		waitForElementVisible(rescheduleForm);
 		System.out.println("Reschedule form info: " + rescheduleForm.getText());
 		assertEquals(RESCHEDULE_FORM_MESSAGE, rescheduleForm.getText());
 		waitForElementVisible(retryDelayInput);
-		if (retryDelayInput.getAttribute("value").isEmpty())
-			Thread.sleep(2000);
-		assertEquals(DEFAULT_RETRY_DELAY_VALUE, retryDelayInput.getAttribute("value").toString());
-		waitForElementVisible(cancelAddRetryDelayButton).click();
-		waitForElementVisible(addRetryDelay).click();
+		if (retryDelayInput.getAttribute("value").toString().isEmpty())
+			Thread.sleep(5000);
+		assertEquals(DEFAULT_RETRY_DELAY_VALUE, retryDelayInput.getAttribute("value"));
 		waitForElementVisible(retryDelayInput).clear();
 		if (!retryDelayInput.getText().isEmpty())
 			Thread.sleep(1000);
@@ -318,8 +318,7 @@ public class ScheduleDetail extends ScheduleForm {
 	public void changeExecutable(String newExecutable, boolean isSaved) throws InterruptedException {
 		waitForElementVisible(selectExecutable);
 		Select select = new Select(selectExecutable);
-		waitForElementVisible(select);
-		if (cronExpression.isDisplayed() && cronExpression.getAttribute("value").isEmpty())
+		if (select.getFirstSelectedOption().equals(select.getOptions().get(0)))
 			Thread.sleep(2000);
 		select.selectByVisibleText(newExecutable);
 		if (isSaved) {
