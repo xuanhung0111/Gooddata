@@ -23,7 +23,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	public void initProperties() {
 		zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
 		downloadFolder = testParams.loadProperty("browserDownloadFolder") + testParams.getFolderSeparator();
-		projectTitle = "disc-project-detail-test";
+		projectTitle = "Disc-test-project-detail";
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })

@@ -12,11 +12,11 @@ import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 
 @Test(groups = {"ManageObjects"}, description = "Tests for list, filter and sort objects in GD platform")
-public class ManageObjectsTest extends ManageObjectsAbstractTest {
+public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
 
     @BeforeClass
     public void setProjectTitle() {
-        projectTitle = "GoodSales-manage-objects-tests";
+        projectTitle = "GoodSales-test-manage-objects";
     }
 
     @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"viewObjetcs", "fact"})

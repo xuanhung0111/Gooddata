@@ -18,7 +18,7 @@ public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
     @BeforeClass
     public void initProperties() {
         csvFilePath = testParams.loadProperty("csvFilePath");
-        projectTitle = "simple-project-geo";
+        projectTitle = "SimpleProject-test-geo-charts";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"geo-charts"})

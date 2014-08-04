@@ -33,7 +33,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
 
     @BeforeClass
     public void setProjectTitle() {
-        projectTitle = "GoodSales-folder-test";
+        projectTitle = "GoodSales-test-folder";
         testParams.setUser(testParams.getDomainUser());
         testParams.setPassword(testParams.getDomainPassword());
     }

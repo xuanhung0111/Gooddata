@@ -38,7 +38,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     @BeforeClass
     public void setProjectTitle() {
         csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
-        projectTitle = "Attribute-labels-test";
+        projectTitle = "SimpleProject-test-attribute-labels";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})

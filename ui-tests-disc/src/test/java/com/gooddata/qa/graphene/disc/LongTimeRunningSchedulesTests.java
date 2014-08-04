@@ -16,7 +16,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 	@BeforeClass
 	public void initProperties() {
 		zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
-		projectTitle = "disc-long-time-running-schedule";
+		projectTitle = "Disc-test-long-time-running-schedule";
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "long-time-schedule" })

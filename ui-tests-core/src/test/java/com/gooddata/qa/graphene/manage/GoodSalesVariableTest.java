@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.VariableTypes;
 
 @Test(groups = {"GoodSalesVariables"}, description = "Tests for GoodSales project (create/view and edit variable functionality) in GD platform")
-public class SimpleVariableTest extends ObjectAbstractTest {
+public class GoodSalesVariableTest extends ObjectAbstractTest {
 
     private String attrName;
     private String defaultNumber;
@@ -22,7 +22,7 @@ public class SimpleVariableTest extends ObjectAbstractTest {
 
     @BeforeClass
     public void setProjectTitle() {
-        projectTitle = "Simple-variable-test";
+        projectTitle = "GoodSales-test-variable";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})

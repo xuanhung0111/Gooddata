@@ -23,7 +23,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @BeforeClass
     public void initStartPage() {
-        projectTitle = "simple-dashboard-objects-test";
+        projectTitle = "SimpleProject-test-dashboard-objects";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
