@@ -1,9 +1,11 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.testng.Assert;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -102,6 +104,42 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
     
+    public void addScatterWidgetToDashboard(Map<String, String> data, boolean isInvalidConfiguration)
+    		throws InterruptedException {
+    	int widgetCountBefore = listDashboardWidgets.size();
+    	waitForElementVisible(widgetMenuButton).click();
+    	waitForElementVisible(dashboardAddWidgetPanel.getRoot());
+    	dashboardAddWidgetPanel.addScatterWidget(data, isInvalidConfiguration);
+    	int widgetCountAfter = listDashboardWidgets.size();
+    	Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
+    			"Widget wasn't added");
+    }
+    
+    public void addScatterWidgetToDashboard(Map<String, String> data)
+    		throws InterruptedException {
+    	addScatterWidgetToDashboard(data, false);
+    }
+    
+    public void addColorToScatterWidget(Map<String, String> data)
+    		throws InterruptedException {
+    	dashboardAddWidgetPanel.addColorToScatterWidget(data);
+    }
+    
+    public void disableColorInScatterWidget()
+    		throws InterruptedException {
+    	dashboardAddWidgetPanel.disableColorToScatterWidget();
+    }
+    
+    public void addColumnsToScatterWidget(Map<String, ArrayList<HashMap <String,String>>> data)
+    		throws InterruptedException {
+    	dashboardAddWidgetPanel.addColumnsToScatterWidget(data);
+    }
+    
+    public void removeColumnsFromScatterWidget()
+    		throws InterruptedException {
+    	dashboardAddWidgetPanel.removeColumnsFromScatterWidget();
+    }
+    
     public void verifyGeoLayersList(String metricLabel, List<String> layersList) throws InterruptedException{
 	waitForElementVisible(widgetMenuButton).click();
         waitForElementVisible(dashboardAddWidgetPanel.getRoot());
@@ -175,6 +213,12 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(saveButton);
         Graphene.guardAjax(saveButton).click();
         waitForElementNotVisible(this.getRoot());
+    }
+    
+    public void cancelDashboard() {
+    	waitForElementVisible(cancelButton);
+    	Graphene.guardAjax(cancelButton).click();
+    	waitForElementNotVisible(this.getRoot());
     }
 
     public void deleteDashboard() throws InterruptedException {

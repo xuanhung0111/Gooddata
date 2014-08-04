@@ -82,6 +82,9 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(css = ".s-lockIcon")
     private WebElement lockIcon;
 
+	@FindBy (xpath = "//div[@class='yui3-d-embeddialog-content']")
+	private DashboardEmbedDialog dashboardEmbedDialog;
+    
     private By emptyTabPlaceholder = By.xpath("//div[contains(@class, 'yui3-c-projectdashboard-placeholder-visible')]");
 
     private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
@@ -216,11 +219,20 @@ public class DashboardsPage extends AbstractFragment {
         String tabName = tabs.getTabLabel(0);
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(printPdfButton).click();
+        waitForElementVisible(BY_PRINTING_PANEL,browser);
         Thread.sleep(3000);
         waitForElementNotPresent(BY_PRINTING_PANEL);
         Thread.sleep(3000);
         System.out.println("Dashboard " + tabName + " printed to Pdf");
         return tabName;
+    }
+    
+    public DashboardEmbedDialog embedDashboard() throws InterruptedException {
+    	waitForDashboardPageLoaded(browser);
+    	waitForElementVisible(editExportEmbedButton).click();
+    	waitForElementVisible(embedButton).click();
+    	waitForElementVisible(dashboardEmbedDialog.getRoot());
+    	return dashboardEmbedDialog;
     }
 
     public void addNewTab(String tabName) {
