@@ -116,7 +116,7 @@ public class ZendeskHelper {
             String result = EntityUtils.toString(getResponse.getEntity());
             JSONObject json = new JSONObject(result);
             int count = json.getInt("count");
-            System.out.println(count + " " + objectType.getPluralName() + "returned from " + url);
+            System.out.println(count + " " + objectType.getPluralName() + " returned from " + url);
             int deletedObjects = 0;
             JSONArray array = json.getJSONArray(objectType.getPluralName());
             for (int i = 0; i < array.length(); i++) {
@@ -133,8 +133,13 @@ public class ZendeskHelper {
                         break;
                 }
             }
+            System.out.println("Found " + deletedObjects + " deleted " + objectType.getPluralName());
             int nonDeletedObjectsCount = count - deletedObjects;
-            System.out.println("Found " + deletedObjects + " deleted " + objectType.getPluralName() + ", returning " + nonDeletedObjectsCount + " " + objectType.getPluralName());
+            if (count == 1000 && json.getString("next_page") != null) {
+                System.out.println("Next page found...");
+                nonDeletedObjectsCount = nonDeletedObjectsCount + getZendeskEntityCount(json.getString("next_page"), objectType);
+            }
+            System.out.println("Returning " + nonDeletedObjectsCount + " " + objectType.getPluralName());
             return nonDeletedObjectsCount;
         } finally {
             getRequest.releaseConnection();
@@ -157,13 +162,12 @@ public class ZendeskHelper {
     public static void main(String[] args) throws IOException, JSONException, InterruptedException {
         ZendeskHelper helper = new ZendeskHelper(new RestApiClient("gooddataqa3.zendesk-staging.com",
                 "qa@gooddata.com", "12345", false, false));
-        //System.out.println(helper.getNumberOfTickets());
+        System.out.println(helper.getNumberOfTickets());
         System.out.println(helper.getNumberOfOrganizations());
-        //System.out.println(helper.getNumberOfUsers());
-/**
-        final String JSON_TICKET_CREATE = "{\"ticket\":{\"subject\":\"GD test ticket\", " +
-                "\"comment\": { \"body\": \"Description of automatically created ticket\" }}}";
-
+        System.out.println(helper.getNumberOfUsers());
+        /**
+        final String JSON_TICKET_CREATE = "{\"ticket\":{\"subject\":\"GD test ticket - %s\", " +
+                "\"comment\": { \"body\": \"Description of automatically created ticket\" }, \"requester_id\":20037877,\"submitter_id\":20037877,\"assignee_id\":20012506}}";
         final String JSON_USER_CREATE = "{\"user\": {\"name\": \"GD test user\", \"email\": " +
                 "\"qa+zendesk-test%s@gooddata.com\"}}";
 
