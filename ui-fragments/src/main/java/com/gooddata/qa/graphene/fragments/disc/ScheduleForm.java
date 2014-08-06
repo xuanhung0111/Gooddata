@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import junit.framework.Assert;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -17,6 +15,7 @@ import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 public class ScheduleForm extends AbstractFragment {
 
@@ -132,7 +131,7 @@ public class ScheduleForm extends AbstractFragment {
 					System.out.println("Cron expression value after clearing: "
 							+ cronExpression.getAttribute("value"));
 					cronExpression.sendKeys(cronTime.getValue().get(0));
-					Assert.assertEquals(cronTime.getValue().get(0),
+					assertEquals(cronTime.getValue().get(0),
 							cronExpression.getAttribute("value"));
 					System.out.println("Cron expression is set to... "
 							+ cronExpression.getAttribute("value"));
@@ -192,8 +191,8 @@ public class ScheduleForm extends AbstractFragment {
 		waitForElementVisible(cronExpressionErrorBubble);
 		System.out.println("cron exepression: " + cronExpression.getAttribute("class"));
 		System.out.println("cron bubble: " + cronExpressionErrorBubble.getText());
-		Assert.assertTrue(cronExpression.getAttribute("class").contains("has-error"));
-		Assert.assertTrue(cronExpressionErrorBubble.getText().equals(
+		assertTrue(cronExpression.getAttribute("class").contains("has-error"));
+		assertTrue(cronExpressionErrorBubble.getText().equals(
 				"Inserted cron format is invalid. Please verify and try again."));
 	}
 }

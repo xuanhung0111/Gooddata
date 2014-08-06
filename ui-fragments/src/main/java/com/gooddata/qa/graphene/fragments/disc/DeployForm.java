@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -9,6 +8,7 @@ import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 public class DeployForm extends AbstractFragment {
 
@@ -115,15 +115,15 @@ public class DeployForm extends AbstractFragment {
 		getDeployConfirmButton().click();
 		if (zipFilePath.isEmpty()) {
 			waitForElementVisible(getFileInputErrorBubble());
-			Assert.assertTrue(inputFileHasError());
-			Assert.assertEquals(getFileInputErrorBubble().getText(),
+			assertTrue(inputFileHasError());
+			assertEquals(getFileInputErrorBubble().getText(),
 					"A zip file is required. The file must be smaller than 1MB.");
 		}
 		if (processName.isEmpty()) {
-			Assert.assertTrue(inputProcessNameHasError());
+			assertTrue(inputProcessNameHasError());
 			getProcessName().click();
 			waitForElementVisible(getProcessNameErrorBubble());
-			Assert.assertEquals(getProcessNameErrorBubble().getText(), "A process name is required");
+			assertEquals(getProcessNameErrorBubble().getText(), "A process name is required");
 		}
 	}
 }

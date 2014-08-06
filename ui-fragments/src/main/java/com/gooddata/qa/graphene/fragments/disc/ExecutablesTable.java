@@ -2,12 +2,12 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
+
+import static org.testng.Assert.*;
 
 public class ExecutablesTable extends AbstractTable {
 
@@ -19,8 +19,8 @@ public class ExecutablesTable extends AbstractTable {
 	public void assertExecutablesList(DISCProcessTypes processType, List<String> executables) {
 		String executablePath = String.format("/%s/", processType.getProcessTypeExecutable());
 		for (int i = 0; i < this.getNumberOfRows(); i++) {
-			Assert.assertEquals(getRow(i).findElement(BY_EXECUTABLE_PATH).getText(), executablePath);
-			Assert.assertEquals(executables.get(i), getRow(i).findElement(BY_EXECUTABLE).getText());
+			assertEquals(getRow(i).findElement(BY_EXECUTABLE_PATH).getText(), executablePath);
+			assertEquals(executables.get(i), getRow(i).findElement(BY_EXECUTABLE).getText());
 		}
 	}
 	

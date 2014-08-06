@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import static org.junit.Assert.*;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -17,6 +15,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 public class ScheduleDetail extends ScheduleForm {
 
