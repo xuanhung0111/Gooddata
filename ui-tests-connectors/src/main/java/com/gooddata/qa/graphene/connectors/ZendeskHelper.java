@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 
@@ -100,6 +102,10 @@ public class ZendeskHelper {
     }
 
     private int getZendeskEntityCount(String url, ZendeskObject objectType) throws JSONException, IOException, InterruptedException {
+        return getSetOfActiveZendeskEntities(url, objectType, 1).size();
+    }
+
+    private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber) throws JSONException, IOException, InterruptedException {
         HttpRequestBase getRequest = apiClient.newGetMethod(url);
         try {
             HttpResponse getResponse = apiClient.execute(getRequest);
@@ -115,6 +121,7 @@ public class ZendeskHelper {
             checkStatusCode(getResponse, 200);
             String result = EntityUtils.toString(getResponse.getEntity());
             JSONObject json = new JSONObject(result);
+            Set<Integer> nonDeletedObjects = new HashSet<Integer>();
             int count = json.getInt("count");
             System.out.println(count + " " + objectType.getPluralName() + " returned from " + url);
             int deletedObjects = 0;
@@ -123,24 +130,35 @@ public class ZendeskHelper {
                 JSONObject object = array.getJSONObject(i);
                 switch (objectType) {
                     case TICKET:
-                        if (object.getString("status").equals("deleted")) deletedObjects++;
+                        if (object.getString("status").equals("deleted")) {
+                            deletedObjects++;
+                        } else {
+                            nonDeletedObjects.add(object.getInt("id"));
+                        }
                         break;
                     case USER:
-                        if (object.getBoolean("active") == false) deletedObjects++;
+                        if (object.getBoolean("active") == false) {
+                            deletedObjects++;
+                        } else {
+                            nonDeletedObjects.add(object.getInt("id"));
+                        }
                         break;
                     case ORGANIZATION:
-                        if (!object.getString("deleted_at").isEmpty() && !object.getString("deleted_at").equals("null")) deletedObjects++;
+                        if (!object.getString("deleted_at").isEmpty() && !object.getString("deleted_at").equals("null")) {
+                            deletedObjects++;
+                        } else {
+                            nonDeletedObjects.add(object.getInt("id"));
+                        }
                         break;
                 }
             }
             System.out.println("Found " + deletedObjects + " deleted " + objectType.getPluralName());
-            int nonDeletedObjectsCount = count - deletedObjects;
             if (count == 1000 && json.getString("next_page") != null) {
                 System.out.println("Next page found...");
-                nonDeletedObjectsCount = nonDeletedObjectsCount + getZendeskEntityCount(json.getString("next_page"), objectType);
+                nonDeletedObjects.addAll(getSetOfActiveZendeskEntities(json.getString("next_page"), objectType, pageNumber + 1));
             }
-            System.out.println("Returning " + nonDeletedObjectsCount + " " + objectType.getPluralName());
-            return nonDeletedObjectsCount;
+            System.out.println("Returning " + nonDeletedObjects.size() + " " + objectType.getPluralName() + " after iteration on page " + pageNumber);
+            return nonDeletedObjects;
         } finally {
             getRequest.releaseConnection();
         }
