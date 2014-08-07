@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.connectors;
 
+import com.gooddata.qa.graphene.enums.UserRoles;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +60,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
             dependsOnMethods = {"testPardotIntegrationConfiguration"})
     public void testPardotIntegration() throws InterruptedException, JSONException {
         // sign in back with demo user
-        validSignInWithDemoUser(true);
+        signIn(true, UserRoles.ADMIN);
         // process schedule
         scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
     }

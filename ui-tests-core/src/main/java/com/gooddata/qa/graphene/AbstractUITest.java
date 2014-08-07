@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -146,13 +147,30 @@ public class AbstractUITest extends AbstractGreyPageTest {
      * Help method which provides verification if login page is present a sign in a demo user if needed
      *
      * @param greyPages - indicator for login at greyPages/UI
+     * @param userRole - user role (based on this enum, parameter with user credentials is used)
      * @throws org.json.JSONException
      */
-    protected void validSignInWithDemoUser(boolean greyPages) throws JSONException {
+    protected void signIn(boolean greyPages, UserRoles userRole) throws JSONException {
+        String user = null;
+        String password = null;
+        switch (userRole) {
+            case ADMIN:
+                user = testParams.getUser();
+                password = testParams.getPassword();
+                break;
+            case EDITOR:
+                user = testParams.getEditorUser();
+                password = testParams.getEditorPassword();
+                break;
+            case VIEWER:
+                user = testParams.getViewerUser();
+                password = testParams.getViewerPassword();
+                break;
+        }
         if (greyPages) {
-            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            signInAtGreyPages(user, password);
         } else {
-            signInAtUI(testParams.getUser(), testParams.getPassword());
+            signInAtUI(user, password);
         }
     }
 

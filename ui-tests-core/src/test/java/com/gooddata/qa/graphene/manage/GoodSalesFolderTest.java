@@ -34,8 +34,6 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-folder";
-        testParams.setUser(testParams.getDomainUser());
-        testParams.setPassword(testParams.getDomainPassword());
     }
 
     @Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
@@ -166,10 +164,10 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = { "editor-tests" }, groups = { "tests" })
-    public void finalTest() {
+    public void finalTest() throws JSONException {
         successfulTest = true;
         logout();
-        signInAtUI(testParams.getDomainUser(), testParams.getDomainPassword());
+        signIn(false, UserRoles.ADMIN);
     }
 
     private void initVariables(String page) {
@@ -200,13 +198,13 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     private void addEditorUserToProject() throws ParseException, IOException, JSONException {
         String projectId = testParams.getProjectId();
         RestUtils.addUserToProject(testParams.getHost(),
-                testParams.getProjectId(), testParams.getDomainUser(),
-                testParams.getDomainPassword(), testParams.getProfileUri(),
+                testParams.getProjectId(), testParams.getUser(),
+                testParams.getPassword(), testParams.getProfileUri(),
                 UserRoles.EDITOR);
         logout();
         loadProperties();
         testParams.setProjectId(projectId);
-        signInAtUI(testParams.getUser(), testParams.getPassword());
+        signIn(false, UserRoles.EDITOR);
     }
 
     private void createSnDFolder(String folderName) throws InterruptedException {

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -28,7 +29,7 @@ public class LoginPageTest extends AbstractUITest {
     @Test(dependsOnGroups = {"loginInit"})
     public void gd_Login_002_SignInAndSignOut() throws InterruptedException, JSONException {
         waitForElementVisible(loginFragment.getRoot());
-        validSignInWithDemoUser(false);
+        signIn(false, UserRoles.ADMIN);
         logout();
         Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
     }

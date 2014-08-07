@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.filters;
 import java.util.List;
 
 import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -68,7 +69,7 @@ public class SimpleFiltersTest extends AbstractUITest {
             JSONException {
         // TODO - redirect
         Thread.sleep(5000);
-        validSignInWithDemoUser(false);
+        signIn(false, UserRoles.ADMIN);
         waitForDashboardPageLoaded(browser);
         dashboards = Graphene.createPageFragment(DashboardsPage.class,
                 browser.findElement(BY_PANEL_ROOT));

@@ -15,8 +15,10 @@ public class TestParameters {
     private String user;
     private String password;
     private String profileUri;
-    private String domainUser;
-    private String domainPassword;
+    private String editorUser;
+    private String editorPassword;
+    private String viewerUser;
+    private String viewerPassword;
     private String authorizationToken;
     private String authorizationToken2;
     private DWHDriver dwhDriver = DWHDriver.PG;
@@ -31,8 +33,10 @@ public class TestParameters {
         user = loadProperty("user");
         password = loadProperty("password");
         profileUri = loadProperty("profileUri");
-        domainUser = loadProperty("domainUser");
-        domainPassword = loadProperty("domainPassword");
+        editorUser = loadProperty("editorUser");
+        editorPassword = loadProperty("editorPassword");
+        viewerUser = loadProperty("viewerUser");
+        viewerPassword = loadProperty("viewerPassword");
         dwhDriver = DWHDriver.getDriverByName(loadProperty("project.dwhDriver"));
         authorizationToken = loadProperty("project.authorizationToken");
         authorizationToken2 = loadProperty("project.authorizationToken2");
@@ -94,12 +98,20 @@ public class TestParameters {
         return profileUri;
     }
 
-    public String getDomainUser() {
-        return domainUser;
+    public String getEditorUser() {
+        return editorUser;
     }
 
-    public String getDomainPassword() {
-        return domainPassword;
+    public String getEditorPassword() {
+        return editorPassword;
+    }
+
+    public String getViewerUser() {
+        return viewerUser;
+    }
+
+    public String getViewerPassword() {
+        return viewerPassword;
     }
 
     public String getAuthorizationToken() {
