@@ -64,7 +64,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             dashboardsPage.publishDashboard(listed);
         }
         waitForElementVisible(dashboardsPage.getRoot());
-
+        Screenshots.takeScreenshot(browser, "dashboard-" + (locked != null ? "locked" : "unlocked") + "-" +
+                (listed != null ? "listed" : "unlisted"), this.getClass());
         if (listed != null) {
             Assert.assertEquals((boolean) listed, !dashboardsPage.isUnlisted());
         }
