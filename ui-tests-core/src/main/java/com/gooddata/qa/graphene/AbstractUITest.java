@@ -8,6 +8,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.DISCNavigation;
 import com.gooddata.qa.graphene.fragments.disc.DISCProjectsList;
+import com.gooddata.qa.graphene.fragments.disc.DISCProjectsPage;
 import com.gooddata.qa.graphene.fragments.disc.DeployForm;
 import com.gooddata.qa.graphene.fragments.disc.ProjectDetailPage;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
@@ -142,6 +143,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = ".active .broken-schedules-section .selectable-domain-table")
     protected SchedulesTable brokenSchedulesTable;
+    
+    @FindBy(css = ".ait-projects-fragment")
+    protected DISCProjectsPage discProjectsPage;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
