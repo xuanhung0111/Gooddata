@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
+import com.gooddata.qa.graphene.enums.UserRoles;
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -40,10 +42,10 @@ public class SimpleProjectGeoChartsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"addNewTabs"}, groups = {"geo-charts", "tests"})
-    public void addGeoWidgetsOnTab() throws InterruptedException {
+    public void addGeoWidgetsOnTab() throws InterruptedException, JSONException {
         addGeoWidgetOnTab(2, "Sum of amount");
         logout();
-        signInAtUI(testParams.getUser(), testParams.getPassword());
+        signIn(false, UserRoles.ADMIN);
         addGeoWidgetOnTab(3, "Avg of hodnota");
         successfulTest = true;
     }

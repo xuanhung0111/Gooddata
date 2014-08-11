@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.enums.DWHDriver;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -22,8 +23,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(groups = {"projectInit"})
     public void init() throws JSONException {
-        // sign in with demo user
-        signInAtUI(testParams.getUser(), testParams.getPassword());
+        // sign in with admin user
+        signIn(false, UserRoles.ADMIN);
     }
 
     @Test(dependsOnGroups = {"projectInit"}, groups = {"tests"})

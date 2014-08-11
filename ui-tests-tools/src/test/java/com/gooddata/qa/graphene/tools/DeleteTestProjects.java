@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.tools;
 import java.util.List;
 
 import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -24,7 +25,7 @@ public class DeleteTestProjects extends AbstractUITest {
 
     @Test(groups = "deleteProjectsInit")
     public void initTest() throws JSONException {
-        validSignInWithDemoUser(false);
+        signIn(false, UserRoles.ADMIN);
     }
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
