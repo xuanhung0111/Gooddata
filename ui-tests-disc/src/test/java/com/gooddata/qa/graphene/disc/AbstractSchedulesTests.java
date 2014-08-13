@@ -20,7 +20,7 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
 		waitForElementVisible(projectDetailPage.getRoot());
 		projectDetailPage.clickOnNewScheduleButton();
 		waitForElementVisible(scheduleForm.getRoot());
-		scheduleForm.createNewSchedule(processName, executable, cronTime, parameters);
+		scheduleForm.createNewSchedule(processName, executable, cronTime, parameters, true);
 		waitForElementPresent(scheduleDetail.getRoot());
 		scheduleDetail.clickOnCloseScheduleButton();
 		waitForElementVisible(projectDetailPage.getRoot());

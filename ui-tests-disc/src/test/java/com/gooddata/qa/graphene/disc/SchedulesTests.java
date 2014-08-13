@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
+
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class SchedulesTests extends AbstractSchedulesTests {
@@ -57,7 +58,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 					"Create Schedule for Specific Executable").click();
 			waitForElementVisible(projectDetailPage.getExecutableScheduleLink("DWHS2.grf")).click();
 			waitForElementVisible(scheduleForm.getRoot());
-			scheduleForm.createNewSchedule(null, null, null, null);
+			scheduleForm.createNewSchedule(null, null, null, null, true);
 			waitForElementPresent(scheduleDetail.getRoot());
 			scheduleDetail.clickOnCloseScheduleButton();
 			waitForElementVisible(schedulesTable.getRoot());
@@ -81,7 +82,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 			projectDetailPage.getNewScheduleLinkInSchedulesList(
 					"Create Schedule from Schedule List").click();
 			waitForElementVisible(scheduleForm.getRoot());
-			scheduleForm.createNewSchedule(null, null, null, null);
+			scheduleForm.createNewSchedule(null, null, null, null, true);
 			waitForElementPresent(scheduleDetail.getRoot());
 			scheduleDetail.clickOnCloseScheduleButton();
 			waitForElementNotPresent(scheduleDetail.getRoot());
@@ -169,6 +170,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 			assertNewSchedule("Check Stop Manual Execution", "longTimeRunningGraph.grf", cronTime,
 					null);
 			scheduleDetail.manualRun();
+			Thread.sleep(5000);
 			scheduleDetail.manualStop();
 			scheduleDetail.assertLastExecutionDetails(false, true, true,
 					"Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -189,7 +191,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 					"Change Executable of Schedule", "/graph/successfulGraph.grf", cronTime, null);
 			assertNewSchedule("Change Executable of Schedule", "successfulGraph.grf", cronTime,
 					null);
-			scheduleDetail.changeExecutable("/graph/errorGraph.grf");
+			scheduleDetail.changeExecutable("/graph/errorGraph.grf", true);
 			assertNewSchedule("Change Executable of Schedule", "errorGraph.grf", cronTime, null);
 		} finally {
 			scheduleDetail.disableSchedule();
@@ -206,7 +208,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 		createScheduleForProcess(projectTitle, testParams.getProjectId(), "Delete Schedule",
 				"/graph/successfulGraph.grf", cronTime, null);
 		assertNewSchedule("Delete Schedule", "successfulGraph.grf", cronTime, null);
-		scheduleDetail.deleteSchedule();
+		scheduleDetail.deleteSchedule(true);
 		waitForElementVisible(projectDetailPage.getRoot());
 		waitForElementVisible(projectDetailPage.getScheduleTabByProcessName("Delete Schedule"))
 				.click();
@@ -228,7 +230,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 			assertNewSchedule("Change Cron Time of Schedule", "successfulGraph.grf", cronTime, null);
 			Pair<String, List<String>> newCronTime = Pair.of(
 					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-			scheduleDetail.changeCronTime(newCronTime);
+			scheduleDetail.changeCronTime(newCronTime, true);
 			assertNewSchedule("Change Cron Time of Schedule", "successfulGraph.grf", newCronTime,
 					null);
 		} finally {
@@ -255,7 +257,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 			changedParameters.put("param 2 new name", Arrays.asList("", "value 2 new"));
 			changedParameters.put("secure param new name",
 					Arrays.asList("secure", "secure value new"));
-			scheduleDetail.editScheduleParameters(changedParameters, false);
+			scheduleDetail.editScheduleParameters(changedParameters, false, true);
 			assertNewSchedule("Edit schedule parameters", "DWHS2.grf", cronTime, changedParameters);
 		} finally {
 			scheduleDetail.disableSchedule();
@@ -284,7 +286,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 			changedParameters.put("param 2", Arrays.asList("", "value 2"));
 			changedParameters.put("secure param", Arrays.asList("secure", "secure value"));
 			changedParameters.put("secure param 2", Arrays.asList("secure", "secure value 2"));
-			scheduleDetail.editScheduleParameters(newParameters, true);
+			scheduleDetail.editScheduleParameters(newParameters, true, true);
 			assertNewSchedule("Add New Parameters for Schedule", "DWHS2.grf", cronTime,
 					changedParameters);
 		} finally {
@@ -347,16 +349,196 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
-	public void checkScheduleFailForManyTimes() throws JSONException, InterruptedException {
-		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-				DISCProcessTypes.GRAPH,
-				"Check Failed Schedule",
-				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-		createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Failed Schedule", null, cronTime, null);
-		assertNewSchedule("Check Failed Schedule", "errorGraph.grf", cronTime, null);
-		scheduleDetail.checkFailedSchedule("Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH);
+	public void checkDeleteScheduleParams() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
+					"Delete Schedule Parameter", Arrays.asList("DWHS1.grf", "DWHS2.grf"),
+					true);
+			Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
+			parameters.put("param 1", Arrays.asList("", "value 1"));
+			parameters.put("param 2", Arrays.asList("", "value 2"));
+			parameters.put("secure param", Arrays.asList("secure", "secure value"));
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Delete Schedule Parameter",
+					"/graph/DWHS2.grf", cronTime, parameters);
+			assertNewSchedule("Delete Schedule Parameter", "DWHS2.grf", cronTime,
+					parameters);
+			Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
+			changedParameters.put("param 1 new name", null);
+			changedParameters.put("param 2 new name", Arrays.asList("", "value 2 new"));
+			changedParameters.put("secure param new name",
+					Arrays.asList("secure", "secure value new"));
+			scheduleDetail.editScheduleParameters(changedParameters, false, true);
+			changedParameters.remove("param 1 new name");
+			assertNewSchedule("Delete Schedule Parameter", "DWHS2.grf", cronTime,
+					changedParameters);
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkCancelDeleteScheduleParams() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
+					"Cancel Delete Schedule Parameter", Arrays.asList("DWHS1.grf", "DWHS2.grf"),
+					true);
+			Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
+			parameters.put("param 1", Arrays.asList("", "value 1"));
+			parameters.put("param 2", Arrays.asList("", "value 2"));
+			parameters.put("secure param", Arrays.asList("secure", "secure value"));
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Cancel Delete Schedule Parameter",
+					"/graph/DWHS2.grf", cronTime, parameters);
+			assertNewSchedule("Cancel Delete Schedule Parameter", "DWHS2.grf", cronTime,
+					parameters);
+			Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
+			changedParameters.put("param 1", null);
+			changedParameters.put("param 2", Arrays.asList("", "value 2"));
+			changedParameters.put("secure param",
+					Arrays.asList("secure", "secure value"));
+			scheduleDetail.editScheduleParameters(changedParameters, false, false);
+			assertNewSchedule("Cancel Delete Schedule Parameter", "DWHS2.grf", cronTime,
+					parameters);
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkIncorrectRetryDelay() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
+					"Check Incorrect Retry Schedule", Arrays.asList("errorGraph.grf",
+							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_30_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Incorrect Retry Schedule", "/graph/errorGraph.grf",
+					cronTime, null);
+			assertNewSchedule("Check Incorrect Retry Schedule", "errorGraph.grf", cronTime, null);
+			scheduleDetail.addRetryDelay("5", true, false);
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkCancelCreateSchedule() throws JSONException, InterruptedException {
+		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
+				"Cancel Create Schedule from Schedule List",
+				Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
+		projectDetailPage.clickOnNewScheduleButton();
+		waitForElementVisible(scheduleForm.getRoot());
+		scheduleForm.createNewSchedule(null, null, null, null, false);
+		waitForElementNotPresent(scheduleForm.getRoot());
+		waitForElementVisible(projectDetailPage.getRoot());
+		projectDetailPage.assertProcessInList("Cancel Create Schedule from Schedule List",
+				DISCProcessTypes.GRAPH, Arrays.asList("DWHS1.grf", "DWHS2.grf"));
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkCancelChangeScheduleExecutable() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
+					"Cancel Change Executable", Arrays.asList("errorGraph.grf",
+							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Cancel Change Executable",
+					"/graph/successfulGraph.grf", cronTime, null);
+			assertNewSchedule("Cancel Change Executable", "successfulGraph.grf",
+					cronTime, null);
+			scheduleDetail.changeExecutable("/graph/errorGraph.grf", false);
+			assertNewSchedule("Cancel Change Executable", "successfulGraph.grf",
+					cronTime, null);
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkCancelChangeScheduleCronTime() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
+					"Cancel Change Cron Time of Schedule", Arrays.asList("errorGraph.grf",
+							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_30_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Cancel Change Cron Time of Schedule",
+					"/graph/successfulGraph.grf", cronTime, null);
+			assertNewSchedule("Cancel Change Cron Time of Schedule", "successfulGraph.grf",
+					cronTime, null);
+			Pair<String, List<String>> newCronTime = Pair.of(
+					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			scheduleDetail.changeCronTime(newCronTime, false);
+			assertNewSchedule("Cancel Change Cron Time of Schedule", "successfulGraph.grf",
+					cronTime, null);
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkCancelAddRetryDelay() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
+					"Check Retry Schedule", Arrays.asList("errorGraph.grf",
+							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_30_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Retry Schedule", "/graph/errorGraph.grf",
+					cronTime, null);
+			assertNewSchedule("Check Retry Schedule", "errorGraph.grf", cronTime, null);
+			scheduleDetail.addRetryDelay("15", false, true);
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkCancelEditScheduleParams() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
+					"Cancel Edit schedule parameters", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
+			Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
+			parameters.put("param 1", Arrays.asList("", "value 1"));
+			parameters.put("param 2", Arrays.asList("", "value 2"));
+			parameters.put("secure param", Arrays.asList("secure", "secure value"));
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Cancel Edit schedule parameters", "/graph/DWHS2.grf",
+					cronTime, parameters);
+			assertNewSchedule("Cancel Edit schedule parameters", "DWHS2.grf", cronTime, parameters);
+			Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
+			changedParameters.put("param 1 new name", Arrays.asList("", "value 1 new"));
+			changedParameters.put("param 2 new name", Arrays.asList("", "value 2 new"));
+			changedParameters.put("secure param new name",
+					Arrays.asList("secure", "secure value new"));
+			scheduleDetail.editScheduleParameters(changedParameters, false, false);
+			assertNewSchedule("Cancel Edit schedule parameters", "DWHS2.grf", cronTime, parameters);
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
+	public void checkCancelDeleteSchedule() throws JSONException, InterruptedException {
+		try {
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
+					"Cancel Delete Schedule", Arrays.asList("errorGraph.grf",
+							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+			Pair<String, List<String>> cronTime = Pair.of(
+					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			createScheduleForProcess(projectTitle, testParams.getProjectId(), "Cancel Delete Schedule",
+					"/graph/successfulGraph.grf", cronTime, null);
+			assertNewSchedule("Cancel Delete Schedule", "successfulGraph.grf", cronTime, null);
+			scheduleDetail.deleteSchedule(false);
+			waitForElementVisible(scheduleDetail.getRoot());
+		} finally {
+			scheduleDetail.disableSchedule();
+		}
 	}
 
 	@Test(dependsOnGroups = { "schedule" }, groups = { "tests" })
