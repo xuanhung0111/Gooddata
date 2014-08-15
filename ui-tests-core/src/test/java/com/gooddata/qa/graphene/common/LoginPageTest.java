@@ -31,6 +31,7 @@ public class LoginPageTest extends AbstractUITest {
         waitForElementVisible(loginFragment.getRoot());
         signIn(false, UserRoles.ADMIN);
         logout();
+        waitForElementVisible(loginFragment.getRoot());
         Screenshots.takeScreenshot(browser, "logout-ui", this.getClass());
     }
 
