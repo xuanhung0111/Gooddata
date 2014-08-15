@@ -12,9 +12,11 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractProjectTest extends AbstractUITest {
 
+    protected static final int DEFAULT_PROJECT_CHECK_LIMIT = 60; // 5 minutes
+
     protected String projectTitle = "simple-project";
     protected String projectTemplate = "";
-    protected int projectCreateCheckIterations = 12; // (12*5s = 1 minute)
+    protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
 
     @BeforeClass
     public void initStartPage() {

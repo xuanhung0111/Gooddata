@@ -25,10 +25,12 @@ public class LoginFragment extends AbstractFragment {
         waitForElementVisible(this.password).clear();
         this.email.sendKeys(username);
         this.password.sendKeys(password);
-        signInButton.click();
         if (validLogin) {
+            Graphene.guardAjax(signInButton).click();
             waitForElementNotVisible(this.getRoot());
             waitForElementNotVisible(email);
+        } else {
+            signInButton.click();
         }
     }
 

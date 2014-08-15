@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
@@ -47,7 +48,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
      * ----- UI fragmnets -----
      */
 
-    @FindBy(css = ".s-loginPage")
+    @FindBy(css = ".s-loginPage.s-ready")
     protected LoginFragment loginFragment;
 
     @FindBy(id = "root")
@@ -191,7 +192,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void logout() {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
-        waitForElementVisible(BY_LOGOUT_LINK, browser).click();
+        Graphene.guardAjax(waitForElementVisible(BY_LOGOUT_LINK, browser)).click();
         waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
     }
 
