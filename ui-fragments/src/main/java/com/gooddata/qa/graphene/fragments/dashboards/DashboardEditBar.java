@@ -1,23 +1,23 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.testng.Assert;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.testng.Assert;
 
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -41,6 +41,9 @@ public class DashboardEditBar extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
     private DashboardAddWidgetPanel dashboardAddWidgetPanel;
+    
+    @FindBy(xpath = "//iframe[contains(@src,'iaa/scatter')]")
+    private DashboardScatterExplorer dashboardScatterExplorer; 
 
     @FindBy(xpath = "//span[text()='Web Content']")
     private WebElement addwebContent;
@@ -87,9 +90,8 @@ public class DashboardEditBar extends AbstractFragment {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(reportMenuButton).click();
         waitForElementVisible(dashboardAddReportPanel.getRoot());
-        dashboardAddReportPanel.addReport(reportName);
-        int widgetCountAfter = listDashboardWidgets.size();
-        Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
+        dashboardAddReportPanel.addReport(reportName); 
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }
 
@@ -99,20 +101,19 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(widgetMenuButton).click();
         waitForElementVisible(dashboardAddWidgetPanel.getRoot());
         dashboardAddWidgetPanel.addWidget(widgetType, metricLabel);
-        int widgetCountAfter = listDashboardWidgets.size();
-        Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }
     
-    public void addScatterWidgetToDashboard(Map<String, String> data, boolean isInvalidConfiguration)
+    public void addScatterWidgetToDashboard(Map<String, String> data, boolean invalidConfiguration)
     		throws InterruptedException {
     	int widgetCountBefore = listDashboardWidgets.size();
     	waitForElementVisible(widgetMenuButton).click();
     	waitForElementVisible(dashboardAddWidgetPanel.getRoot());
-    	dashboardAddWidgetPanel.addScatterWidget(data, isInvalidConfiguration);
-    	int widgetCountAfter = listDashboardWidgets.size();
-    	Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
-    			"Widget wasn't added");
+    	dashboardAddWidgetPanel.initWidget(WidgetTypes.SCATTER_EXPLORER);
+    	waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
+    	dashboardScatterExplorer.addScatterWidget(data, invalidConfiguration);
+    	Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1, "Widget wasn't added");
     }
     
     public void addScatterWidgetToDashboard(Map<String, String> data)
@@ -122,22 +123,26 @@ public class DashboardEditBar extends AbstractFragment {
     
     public void addColorToScatterWidget(Map<String, String> data)
     		throws InterruptedException {
-    	dashboardAddWidgetPanel.addColorToScatterWidget(data);
+    	waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
+    	dashboardScatterExplorer.addColorToScatterWidget(data);
     }
     
     public void disableColorInScatterWidget()
     		throws InterruptedException {
-    	dashboardAddWidgetPanel.disableColorToScatterWidget();
+    	waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
+    	dashboardScatterExplorer.disableColorToScatterWidget();
     }
     
     public void addColumnsToScatterWidget(Map<String, ArrayList<HashMap <String,String>>> data)
     		throws InterruptedException {
-    	dashboardAddWidgetPanel.addColumnsToScatterWidget(data);
+    	waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
+    	dashboardScatterExplorer.addColumnsToScatterWidget(data);
     }
     
     public void removeColumnsFromScatterWidget()
     		throws InterruptedException {
-    	dashboardAddWidgetPanel.removeColumnsFromScatterWidget();
+    	waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
+    	dashboardScatterExplorer.removeColumnsFromScatterWidget();
     }
     
     public void verifyGeoLayersList(String metricLabel, List<String> layersList) throws InterruptedException{
@@ -151,8 +156,7 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(addwebContent).click();
         waitForElementVisible(dashboardWebContent.getRoot());
         dashboardWebContent.addWebContent();
-        int widgetCountAfter = listDashboardWidgets.size();
-        Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
 
     }
@@ -164,8 +168,7 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(attributeFilter).click();
         waitForElementVisible(dashboardFilter.getRoot());
         dashboardFilter.addListFilter(type, name);
-        int widgetCountAfter = listDashboardWidgets.size();
-        Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }
 
@@ -177,8 +180,7 @@ public class DashboardEditBar extends AbstractFragment {
         Thread.sleep(2000);
         waitForElementVisible(dashboardFilter.getRoot());
         dashboardFilter.addTimeFilter(dateDimensionIndex, dateRange);
-        int widgetCountAfter = listDashboardWidgets.size();
-        Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }
 
@@ -191,8 +193,7 @@ public class DashboardEditBar extends AbstractFragment {
 	waitForElementVisible(textLabel, browser).click();
         waitForElementVisible(dashboardTextObject.getRoot());
         dashboardTextObject.addText(textObject, text, link);
-        int widgetCountAfter = listDashboardWidgets.size();
-        Assert.assertEquals(widgetCountAfter, widgetCountBefore + 1,
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }
 
@@ -204,8 +205,7 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(addLine).click();
         waitForElementVisible(dashboardLineObject.getRoot());
         dashboardLineObject.addLineVerticalToDashboard();
-        int widgetCountAfter = listDashboardWidgets.size();
-        Assert.assertEquals(widgetCountAfter, widgetCountBefore + 2,
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 2,
                 "Widget wasn't added");
     }
 

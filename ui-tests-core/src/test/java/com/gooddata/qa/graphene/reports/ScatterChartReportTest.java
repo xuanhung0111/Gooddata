@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +23,43 @@ import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget.FilterPanel;
 
 public class ScatterChartReportTest extends GoodSalesAbstractTest {
 
-	private static final By by_iframe = By.xpath("//iframe[contains(@src,'scatter')]");
+	private static final By BY_IFRAME_SCATTER = By.xpath("//iframe[contains(@src,'iaa/scatter')]");
 	private static final long expectedDashboardExportSize = 42000;
+
+	private static final By dataPoints = By
+			.xpath("//*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-series-group']//*[name() = 'path']");
+	private static final By nameTooltip = By
+			.xpath("//div[@class='highcharts-tooltip']//div[@class='tt-name']");
+	private static final By contentTooltip = By
+			.xpath("//div[@class='highcharts-tooltip']//table[@class='tt-values']//tr/td[@class='title']");
+	private static final By tableStatus = By
+			.xpath("//div[contains(@class,'ember-table-footer-container')]//div[contains(@class,'text-align-left')][1]/span");
+	private static final By legendSeries = By
+			.xpath("//*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-legend']//*[name()='g' and @class='highcharts-legend-item']");
+	private static final By tableHeaderColumns = By
+			.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-header-row')]/div//span");
+	private static final By scatterTitleInEditMode = By
+			.xpath("//div[@class='title']//label[contains(@class,'editable-label')]");
+	private static final By scatterSubtitleInEditMode = By
+			.xpath("//div[@class='subtitle']//label[contains(@class,'editable-label')]");
+	private static final By scatterTitleInput = By
+			.xpath("//div[@class='title']//input");
+	private static final By scatterSubtitleInput = By
+			.xpath("//div[@class='subtitle']//input");
+	private static final By scatterTitleInViewMode = By
+			.xpath("//div[@class='title']");
+	private static final By scatterSubTitleInViewMode = By
+			.xpath("//div[@class='subtitle']");
+	private static final By alertMessage = By
+			.xpath("//div[contains(@class,'scatter-component')]//div[@class='alert-title']");
+	private static final By invalidConfigurationAlert = By
+			.xpath("//div[contains(@class,'gd-dashboard')]//div[@class='explorer-message-title']");
+	private static final By timeFilterButton = By
+			.xpath("//div[contains(@class,'yui3-c-tabfilteritem')]//span[text()='Date dimension (Closed)']/../../../button");
+	private static final By timeLineLocator = By.xpath("//div[text()='2014']");
+	private static final By applyButton = By
+			.xpath("//div[contains(@class,'bottomButtons')]//button[text()='Apply']");
+	private static final By noDataMessage = By.xpath("//div[@class='alert-title']");
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "addAndEditScatterWidgetTest" })
 	public void addScatterWidgetTest() throws InterruptedException {
@@ -49,38 +83,24 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 	private void testScatterWidgetDisplaying() throws InterruptedException {
 		Thread.sleep(2000);
 		// hover on data point
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
-		By dataPoint = By
-				.xpath("//div[@class='highcharts-container']/*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-series-group']//*[name() = 'path' and position() = 8]");
-		WebElement selectedDataPointElement = waitForElementVisible(dataPoint, browser);
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+		waitForElementVisible(dataPoints, browser);
+		List<WebElement> dataPointElements = browser.findElements(dataPoints);
+		WebElement selectedDataPointElement = dataPointElements.get(7);
 		Actions builder = new Actions(browser);
 		Actions hoverOverDataPoint = builder.moveToElement(selectedDataPointElement);
 		hoverOverDataPoint.perform();
-		By nameTooltip = By
-				.xpath("//div[@class='highcharts-container']/div[@class='highcharts-tooltip']//div[@class='content']/div[@class='tt-name']");
-		By contentTooltip1 = By
-				.xpath("//div[@class='highcharts-container']/div[@class='highcharts-tooltip']//div[@class='content']/table[@class='tt-values']//tr[1]/td[@class='title']");
-		By contentTooltip2 = By
-				.xpath("//div[@class='highcharts-container']/div[@class='highcharts-tooltip']//div[@class='content']/table[@class='tt-values']//tr[2]/td[@class='title']");
 		Assert.assertTrue(waitForElementVisible(nameTooltip, browser).isDisplayed(),
 				"Attribute name is not displayed");
 		Assert.assertEquals(waitForElementVisible(nameTooltip, browser).getText(), "STAGE NAME");
-		Assert.assertTrue(waitForElementVisible(contentTooltip1, browser).isDisplayed(),
-				"X Axis metric name is not displayed");
-		Assert.assertEquals(waitForElementVisible(contentTooltip1, browser).getText(), "Amount");
-		Assert.assertTrue(waitForElementVisible(contentTooltip2, browser).isDisplayed(),
-				"Y Axis metric is not displayed");
-		Assert.assertEquals(waitForElementVisible(contentTooltip2, browser).getText(),
-				"Avg. Amount");
+		Assert.assertTrue(waitForElementVisible(contentTooltip, browser).isDisplayed(),
+				"Axis metric name is not displayed");
+		Assert.assertEquals(browser.findElements(contentTooltip).get(0).getText(), "Amount");
+		Assert.assertEquals(browser.findElements(contentTooltip).get(1).getText(), "Avg. Amount");
 		// click on one data point to make other data points become gray and
 		// explorer table is selected correspondingly
-		By tableStatus = By
-				.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-fixed-table-container') and contains(@class,'ember-table-footer-container')]//div[contains(@class,'ember-table-right-table-block')]//div[contains(@class,'text-align-left')]/span");
 		WebElement tableStatusElement = browser.findElement(tableStatus);
-		By dataPoints = By
-				.xpath("//div[@class='highcharts-container']/*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-series-group']//*[name() = 'path']");
-		List<WebElement> dataPointElements = browser.findElements(dataPoints);
 		for (WebElement dataPointElement : dataPointElements) {
 			Assert.assertEquals(dataPointElement.getAttribute("fill"), "rgb(77,133,255)");
 			System.out.println(dataPointElement.getLocation() + " is blue");
@@ -117,58 +137,38 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
 		dashboardEditBar.addColorToScatterWidget(data);
 		String parentWindowHandle = browser.getWindowHandle();
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		// check whether color legend is added to scatter widget
-		By legendSeries = By
-				.xpath("//div[@class='highcharts-container']/*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-legend']//*[name()='g' and @class='highcharts-legend-item']");
 		List<WebElement> series = browser.findElements(legendSeries);
 		Assert.assertEquals(series.size(), 3, "Color legend is not added to Scatter chart");
 		// check the second column header is STATUS
-		By tableHeaderColumn2 = By
-				.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-header-row')]/div/div[2]//span");
-		Assert.assertEquals(browser.findElement(tableHeaderColumn2).getText(), "STATUS",
+		List<WebElement> tableHeaderColumnElements = browser.findElements(tableHeaderColumns);
+		Assert.assertEquals(tableHeaderColumnElements.get(1).getText(), "STATUS",
 				"STATUS column is not added to table");
 		browser.switchTo().window(parentWindowHandle);
 		dashboardEditBar.saveDashboard();
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
 		// hover on data point
-		By dataPoint = By
-				.xpath("//div[@class='highcharts-container']/*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-series-group']//*[name() = 'path' and position() = 6]");
-		WebElement selectedDataPointElement = waitForElementVisible(dataPoint, browser);
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+		waitForElementVisible(dataPoints, browser); // to ensure that dataPoints
+													// has been rendered
+		List<WebElement> dataPointElements = browser.findElements(dataPoints);
+		WebElement selectedDataPointElement = dataPointElements.get(5);
 		Actions builder = new Actions(browser);
 		Actions hoverOverDataPoint = builder.moveToElement(selectedDataPointElement);
 		hoverOverDataPoint.perform();
-		By nameTooltip = By
-				.xpath("//div[@class='highcharts-container']/div[@class='highcharts-tooltip']//div[@class='content']/div[@class='tt-name']");
-		By contentTooltip1 = By
-				.xpath("//div[@class='highcharts-container']/div[@class='highcharts-tooltip']//div[@class='content']/table[@class='tt-values']//tr[1]/td[@class='title']");
-		By contentTooltip2 = By
-				.xpath("//div[@class='highcharts-container']/div[@class='highcharts-tooltip']//div[@class='content']/table[@class='tt-values']//tr[2]/td[@class='title']");
-		By contentTooltip3 = By
-				.xpath("//div[@class='highcharts-container']/div[@class='highcharts-tooltip']//div[@class='content']/table[@class='tt-values']//tr[3]/td[@class='title']");
 		Assert.assertTrue(waitForElementVisible(nameTooltip, browser).isDisplayed(),
 				"Attribute name is not displayed");
 		Assert.assertEquals(waitForElementVisible(nameTooltip, browser).getText(), "STAGE NAME");
-		Assert.assertTrue(waitForElementVisible(contentTooltip1, browser).isDisplayed(),
-				"Color legend name is not displayed");
-		Assert.assertEquals(waitForElementVisible(contentTooltip1, browser).getText(), "Status");
-		Assert.assertTrue(waitForElementVisible(contentTooltip2, browser).isDisplayed(),
-				"X Axis metric name is not displayed");
-		Assert.assertEquals(waitForElementVisible(contentTooltip2, browser).getText(), "Amount");
-		Assert.assertTrue(waitForElementVisible(contentTooltip3, browser).isDisplayed(),
-				"Y Axis metric is not displayed");
-		Assert.assertEquals(waitForElementVisible(contentTooltip3, browser).getText(),
-				"Avg. Amount");
+		Assert.assertTrue(waitForElementVisible(contentTooltip, browser).isDisplayed(),
+				"Tooltip name is not displayed");
+		Assert.assertEquals(browser.findElements(contentTooltip).get(0).getText(), "Status");
+		Assert.assertEquals(browser.findElements(contentTooltip).get(1).getText(), "Amount");
+		Assert.assertEquals(browser.findElements(contentTooltip).get(2).getText(), "Avg. Amount");
 		// click on one data point to make other data points become gray and
 		// explorer table is selected correspondingly
-		By tableStatus = By
-				.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-fixed-table-container') and contains(@class,'ember-table-footer-container')]//div[contains(@class,'ember-table-right-table-block')]//div[contains(@class,'text-align-left')][1]/span");
 		WebElement tableStatusElement = browser.findElement(tableStatus);
-		By dataPoints = By
-				.xpath("//div[@class='highcharts-container']/*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-series-group']//*[name() = 'path']");
-		List<WebElement> dataPointElements = browser.findElements(dataPoints);
 		selectedDataPointElement.click();
 		Assert.assertEquals(selectedDataPointElement.getAttribute("fill"), "rgb(77,133,255)");
 		for (Iterator<WebElement> iterator = dataPointElements.iterator(); iterator.hasNext();) {
@@ -184,14 +184,14 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		// disable color
 		dashboardsPage.editDashboard();
 		dashboardEditBar.disableColorInScatterWidget();
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		// check whether color legend is removed from scatter widget
 		series = browser.findElements(legendSeries);
 		Assert.assertEquals(series.size(), 1, "Color legend is not removed from Scatter chart");
 		// check the second column header is no longer STATUS
-		By.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-header-row')]/div/div[2]//span");
-		Assert.assertNotEquals(browser.findElement(tableHeaderColumn2).getText(), "STATUS",
+		tableHeaderColumnElements = browser.findElements(tableHeaderColumns);
+		Assert.assertNotEquals(tableHeaderColumnElements.get(1).getText(), "STATUS",
 				"STATUS column header is not removed from table");
 		browser.switchTo().window(parentWindowHandle);
 		dashboardEditBar.saveDashboard();
@@ -219,26 +219,21 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		dashboardEditBar.saveDashboard();
 		Thread.sleep(3000);
 		String parentWindowHandle = browser.getWindowHandle();
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
-		By tableHeaderColumn4 = By
-				.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-header-row')]/div/div[4]//span");
-		By tableHeaderColumn5 = By
-				.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-header-row')]/div/div[5]//span");
-		Assert.assertEquals(browser.findElement(tableHeaderColumn4).getText(), "PRODUCT NAME",
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+		List<WebElement> tableHeaderColumnElements = browser.findElements(tableHeaderColumns);
+		Assert.assertEquals(tableHeaderColumnElements.get(3).getText(), "PRODUCT NAME",
 				"PRODUCT NAME column is not added to table");
-		Assert.assertEquals(browser.findElement(tableHeaderColumn5).getText(), "EXPECTED",
+		Assert.assertEquals(tableHeaderColumnElements.get(4).getText(), "EXPECTED",
 				"EXPECTED column is not added to table");
 		// remove additional columns
 		browser.switchTo().window(parentWindowHandle);
 		dashboardsPage.editDashboard();
 		dashboardEditBar.removeColumnsFromScatterWidget();
 		// check whether Product and Expected removed from table or not
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
-		By tableHeaders = By
-				.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-header-row')]/div/div//span");
-		Assert.assertEquals(browser.findElements(tableHeaders).size(), 3);
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+		Assert.assertEquals(browser.findElements(tableHeaderColumns).size(), 3);
 		browser.switchTo().window(parentWindowHandle);
 		dashboardEditBar.saveDashboard();
 	}
@@ -254,15 +249,11 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		checkRedBar(browser);
 		Thread.sleep(3000);
 		String parentWindowHandle = browser.getWindowHandle();
-		waitForElementVisible(by_iframe, browser).click(); // click on the
-															// scatter widget in
-															// EDIT mode to make
-															// it enable (it's a
-															// kind of error).
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser).click(); // click on the scatter widget in
+																// EDIT mode to make it enable 
+																// (it's a kind of error).
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		// hover on scatter title
-		By scatterTitleInEditMode = By
-				.xpath("//div[contains(@class,'dda-editable-text-view')]/div[@class='title']//label[contains(@class,'editable-label')]");
 		WebElement scatterTitleInEditModeElement = waitForElementVisible(scatterTitleInEditMode,
 				browser);
 		Actions builder = new Actions(browser);
@@ -271,8 +262,6 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		Assert.assertEquals(scatterTitleInEditModeElement.getCssValue("background-color"),
 				"rgba(255, 253, 198, 1)", "Scatter title is not highlighted when being hovered on");
 		// hover on scatter subtitle
-		By scatterSubtitleInEditMode = By
-				.xpath("//div[contains(@class,'dda-editable-text-view')]/div[@class='subtitle']//label[contains(@class,'editable-label')]");
 		WebElement scatterSubtitleInEditModeElement = waitForElementVisible(
 				scatterSubtitleInEditMode, browser);
 		hoverAction = builder.moveToElement(scatterSubtitleInEditModeElement);
@@ -281,25 +270,18 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 				"rgba(255, 253, 198, 1)",
 				"Scatter subtitle is not highlighted when being hovered on");
 		scatterTitleInEditModeElement.click();
-		WebElement scatterTitleInput = waitForElementVisible(
-				By.xpath("//div[contains(@class,'dda-editable-text-view')]/div[@class='title']//input"),
-				browser);
-		scatterTitleInput.clear();
-		scatterTitleInput.sendKeys(scatterTitleText);
+		WebElement scatterTitleInputElement = waitForElementVisible(scatterTitleInput, browser);
+		scatterTitleInputElement.clear();
+		scatterTitleInputElement.sendKeys(scatterTitleText);
 		scatterSubtitleInEditModeElement.click();
-		WebElement scatterSubtitleInput = waitForElementVisible(
-				By.xpath("//div[contains(@class,'dda-editable-text-view')]/div[@class='subtitle']//input"),
+		WebElement scatterSubtitleInputElement = waitForElementVisible(scatterSubtitleInput,
 				browser);
-		scatterSubtitleInput.clear();
-		scatterSubtitleInput.sendKeys(scatterSubtitleText);
+		scatterSubtitleInputElement.clear();
+		scatterSubtitleInputElement.sendKeys(scatterSubtitleText);
 		browser.switchTo().window(parentWindowHandle);
 		dashboardsPage.getDashboardEditBar().saveDashboard();
 		Thread.sleep(3000);
-		browser.switchTo().frame(browser.findElement(by_iframe));
-		By scatterTitleInViewMode = By
-				.xpath("//div[contains(@class,'dda-editable-text-view')]//div[@class='title']");
-		By scatterSubTitleInViewMode = By
-				.xpath("//div[contains(@class,'dda-editable-text-view')]//div[@class='subtitle']");
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		WebElement scatterTitleInViewModeElement = waitForElementVisible(scatterTitleInViewMode,
 				browser);
 		WebElement scatterSubtitleInViewModeElement = waitForElementVisible(
@@ -311,29 +293,23 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		browser.switchTo().window(parentWindowHandle);
 		// check editing scatter title/subtitle then cancel
 		dashboardsPage.editDashboard();
-		waitForElementVisible(by_iframe, browser).click(); // click on the
-															// scatter widget in
-															// EDIT mode to make
-															// it enable (it's a
-															// kind of error).
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser).click(); // click on the scatter widget in
+																// EDIT mode to make it enable 
+																// (it's a kind of error).
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		scatterTitleInEditModeElement = waitForElementVisible(scatterTitleInEditMode, browser);
 		scatterSubtitleInEditModeElement = waitForElementVisible(scatterSubtitleInEditMode, browser);
 		scatterTitleInEditModeElement.click();
-		scatterTitleInput = waitForElementVisible(
-				By.xpath("//div[contains(@class,'dda-editable-text-view')]//div[@class='title']//input"),
-				browser);
-		scatterTitleInput.clear();
-		scatterTitleInput.sendKeys(fakeScatterTitleText);
+		scatterTitleInputElement = waitForElementVisible(scatterTitleInput, browser);
+		scatterTitleInputElement.clear();
+		scatterTitleInputElement.sendKeys(fakeScatterTitleText);
 		scatterSubtitleInEditModeElement.click();
-		scatterSubtitleInput = waitForElementVisible(
-				By.xpath("//div[contains(@class,'dda-editable-text-view')]//div[@class='subtitle']//input"),
-				browser);
-		scatterSubtitleInput.clear();
-		scatterSubtitleInput.sendKeys(fakeScatterSubtitleText);
+		scatterSubtitleInputElement = waitForElementVisible(scatterSubtitleInput, browser);
+		scatterSubtitleInputElement.clear();
+		scatterSubtitleInputElement.sendKeys(fakeScatterSubtitleText);
 		browser.switchTo().window(parentWindowHandle);
 		dashboardsPage.getDashboardEditBar().cancelDashboard();
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		scatterTitleInViewModeElement = waitForElementVisible(scatterTitleInViewMode, browser);
 		scatterSubtitleInViewModeElement = waitForElementVisible(scatterSubTitleInViewMode, browser);
 		Assert.assertEquals(scatterTitleInViewModeElement.getText(), scatterTitleText,
@@ -380,17 +356,15 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		dashboardsPage.editDashboard();
 		dashboardEditBar.addScatterWidgetToDashboard(data);
 		// check "too many data points" message
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
-		By alertMessage = By
-				.xpath("//div[contains(@class,'scatter-component')]//div[@class='alert']//div[@class='alert-title']");
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		WebElement alertMessageElement = waitForElementVisible(alertMessage, browser);
 		Assert.assertEquals(alertMessageElement.getText().trim(), "Too many data points");
 		browser.switchTo().window(parentWindowHandle);
 		dashboardEditBar.saveDashboard();
 		// check this alert message still show after saving dashboard
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		alertMessageElement = waitForElementVisible(alertMessage, browser);
 		Assert.assertEquals(alertMessageElement.getText().trim(), "Too many data points");
 		browser.switchTo().window(parentWindowHandle);
@@ -419,10 +393,8 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		dashboardsPage.editDashboard();
 		dashboardEditBar.addScatterWidgetToDashboard(data, true);
 		// check "invalid configuration" message
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
-		By invalidConfigurationAlert = By
-				.xpath("//div[contains(@class,'gd-dashboard')]/div[contains(@class,'explorer-message')]/div[@class='explorer-message-title']");
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		WebElement invalidConfigurationAlertElement = waitForElementVisible(
 				invalidConfigurationAlert, browser);
 		Assert.assertEquals(invalidConfigurationAlertElement.getText().trim(),
@@ -430,8 +402,8 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		browser.switchTo().window(parentWindowHandle);
 		dashboardEditBar.saveDashboard();
 		// check this alert message still show after saving dashboard
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		invalidConfigurationAlertElement = waitForElementVisible(invalidConfigurationAlert, browser);
 		Assert.assertEquals(invalidConfigurationAlertElement.getText().trim(),
 				"Invalid configuration");
@@ -467,17 +439,14 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Sales Rep");
 		// check scatter widget is rendered well
 		checkRedBar(browser);
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		// check whether color legend is added to scatter widget
-		By legendSeries = By
-				.xpath("//div[@class='highcharts-container']/*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-legend']//*[name()='g' and @class='highcharts-legend-item']");
 		List<WebElement> series = browser.findElements(legendSeries);
 		Assert.assertEquals(series.size(), 19, "Color legend is not added to Scatter chart");
 		// check the second column header is OWNER NAME
-		By tableHeaderColumn2 = By
-				.xpath("//div[contains(@class,'dda-table-view')]//div[contains(@class,'ember-table-header-row')]/div/div[2]//span");
-		Assert.assertEquals(browser.findElement(tableHeaderColumn2).getText(), "OWNER NAME",
+		List<WebElement> tableHeaderColumnElements = browser.findElements(tableHeaderColumns);
+		Assert.assertEquals(tableHeaderColumnElements.get(1).getText(), "OWNER NAME",
 				"OWNER NAME column is not added to table");
 		browser.switchTo().window(parentWindowHandle);
 		dashboardEditBar.saveDashboard();
@@ -504,25 +473,19 @@ public class ScatterChartReportTest extends GoodSalesAbstractTest {
 		rows.get(0).getSelectOnly().click();
 		waitForElementVisible(panel.getApply()).click();
 		Thread.sleep(4000);
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		series = browser.findElements(legendSeries);
 		Assert.assertEquals(series.size(), 1, "Attribute filter is not applied to scatter");
 		browser.switchTo().window(parentWindowHandle);
 		// check filtering out all values on scatter widget
-		By timeFilterButton = By
-				.xpath("//div[contains(@class,'yui3-c-tabfilteritem')]//span[text()='Date dimension (Closed)']/../../../button");
-		By timeLineLocator = By.xpath("//div[text()='2014']");
-		By applyButton = By
-				.xpath("//div[contains(@class,'bottomButtons')]//button[text()='Apply']");
 		waitForElementVisible(timeFilterButton, browser).click();
 		waitForElementVisible(timeLineLocator, browser).click();
 		waitForElementVisible(applyButton, browser).click();
 		Thread.sleep(3000);
 		checkRedBar(browser);
-		waitForElementVisible(by_iframe, browser);
-		browser.switchTo().frame(browser.findElement(by_iframe));
-		By noDataMessage = By.xpath("//div[@class='alert-title']");
+		waitForElementVisible(BY_IFRAME_SCATTER, browser);
+		browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
 		WebElement noDataMessageElement = waitForElementVisible(noDataMessage, browser);
 		Assert.assertEquals(noDataMessageElement.getText().trim(), "No data",
 				"Scatter widget is not filtered out values");

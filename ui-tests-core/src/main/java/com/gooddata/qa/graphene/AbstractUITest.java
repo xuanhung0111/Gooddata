@@ -336,7 +336,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyDashboardExport(String dashboardName, long minimalSize) {
-    	File pdfExport = new File(testParams.getDownloadFolder() + "/" + dashboardName.replaceAll(" ", "_") + ".pdf");
+    	File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName.replaceAll(" ", "_") + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
         System.out.println(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         long fileSize = pdfExport.length();
