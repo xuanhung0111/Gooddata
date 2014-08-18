@@ -192,7 +192,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void logout() {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
-        Graphene.guardAjax(waitForElementVisible(BY_LOGOUT_LINK, browser)).click();
+        waitForElementVisible(BY_LOGOUT_LINK, browser).click();
         waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
     }
 
