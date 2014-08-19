@@ -1,14 +1,12 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
 import java.text.SimpleDateFormat;
-
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.Pair;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -203,8 +201,8 @@ public class ScheduleDetail extends ScheduleForm {
 		if (isSuccessful) {
 			assertTrue(scheduleExecutionItem.get(0).findElement(BY_EXECUTION_STATUS)
 					.findElement(BY_OK_STATUS_ICON).isDisplayed());
-			assertEquals(scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION)
-					.getText(), "OK");
+			assertTrue(scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION)
+					.getText().contains("OK"));
 		} else {
 			assertTrue(scheduleExecutionItem.get(0).findElement(BY_EXECUTION_STATUS)
 					.findElement(BY_ERROR_STATUS_ICON).isDisplayed());
@@ -446,7 +444,7 @@ public class ScheduleDetail extends ScheduleForm {
 		assertEquals(AUTO_DISABLED_SCHEDULE_MORE_INFO, autoDisableScheduleMoreInfo.getText());
 	}
 
-	public boolean isExecutionInRunningState() throws InterruptedException {
+	public boolean isInRunningState() throws InterruptedException {
 		int executionNumber = scheduleExecutionItem.size();
 		for (int i = 0; executionNumber == scheduleExecutionItem.size() && i < 10; i++)
 			Thread.sleep(3000);
@@ -466,5 +464,27 @@ public class ScheduleDetail extends ScheduleForm {
 
 	public String getLastExecutionTime() {
 		return scheduleExecutionItem.get(0).findElement(BY_EXECUTION_TIMES).getText();
+	}
+	
+	public String getExecutionRuntime() {
+		return scheduleExecutionItem.get(0).findElement(BY_EXECUTION_RUNTIME).getText();
+	}
+	
+	public String getExecutionError() {
+		return scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText();
+	}
+	
+	public boolean isStarted() {
+		return waitForElementVisible(manualStopButton).isDisplayed();
+	}
+	
+	public int getExecutionItemsNumber() throws InterruptedException {
+		for (int i = 0; i < 10 && scheduleExecutionItem.isEmpty(); i++)
+			Thread.sleep(1000);
+		return scheduleExecutionItem.size();
+	}
+	
+	public WebElement getEnableButton () {
+		return waitForElementVisible(enableScheduleButton);
 	}
 }

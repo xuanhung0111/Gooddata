@@ -7,6 +7,8 @@ import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.DISCNavigation;
+import com.gooddata.qa.graphene.fragments.disc.DISCOverview;
+import com.gooddata.qa.graphene.fragments.disc.DISCOverviewProjects;
 import com.gooddata.qa.graphene.fragments.disc.DISCProjectsList;
 import com.gooddata.qa.graphene.fragments.disc.DISCProjectsPage;
 import com.gooddata.qa.graphene.fragments.disc.DeployForm;
@@ -149,6 +151,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
     
     @FindBy(css = ".ait-projects-fragment")
     protected DISCProjectsPage discProjectsPage;
+
+    @FindBy(css = ".ait-overview-fragment")
+    protected DISCOverview discOverview;
+    
+    @FindBy(css = ".ait-overview-projects-fragment")
+    protected DISCOverviewProjects discOverviewProjects;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
