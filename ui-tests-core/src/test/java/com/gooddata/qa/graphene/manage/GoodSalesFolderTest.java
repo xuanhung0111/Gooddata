@@ -12,11 +12,10 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.utils.http.RestUtils;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-@Test(groups = { "GoodSalesFolder" }, description = "Tests for view and edit folder on GoodSales project in GD platform")
+@Test(groups = {"GoodSalesFolder"}, description = "Tests for view and edit folder on GoodSales project in GD platform")
 public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     private String newName;
     private String oldEditName;
@@ -36,7 +35,12 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-folder";
     }
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "tests" })
+    @BeforeClass
+    public void addUsers() {
+        addUsersWithOtherRoles = true;
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void initialize() throws InterruptedException, JSONException {
         newName = "New Folder";
         unicodeName = "ພາສາລາວ résumé اللغة";
@@ -56,7 +60,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
                 "Sales Cycles", "Sales Figures", "Sales Rep", "_System"));
     }
 
-    @Test(dependsOnMethods = { "initialize" }, groups = { "admin-tests" })
+    @Test(dependsOnMethods = {"initialize"}, groups = {"admin-tests"})
     public void verifyFolderListTest() throws InterruptedException {
         for (String page : pages) {
             initDataPage(page);
@@ -64,7 +68,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = { "verifyFolderListTest" }, groups = { "admin-tests" })
+    @Test(dependsOnMethods = {"verifyFolderListTest"}, groups = {"admin-tests"})
     public void addFolderTest() throws InterruptedException {
         for (String page : pages) {
             initDataPage(page);
@@ -73,7 +77,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = { "addFolderTest" }, groups = { "admin-tests" })
+    @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void checkUnicodeNameTest() throws InterruptedException {
         for (String page : pages) {
             initDataPage(page);
@@ -82,7 +86,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = { "addFolderTest" }, groups = { "admin-tests" })
+    @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void checkUniqueNameTest() throws InterruptedException {
         for (String page : pages) {
             initDataPage(page);
@@ -92,7 +96,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = { "addFolderTest" }, groups = { "admin-tests" })
+    @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
     public void editFolderTest() throws InterruptedException {
         for (String page : pages) {
             initDataPage(page);
@@ -102,7 +106,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = { "editFolderTest" }, groups = { "admin-tests" })
+    @Test(dependsOnMethods = {"editFolderTest"}, groups = {"admin-tests"})
     public void deleteFolderTest() throws InterruptedException {
         for (String page : pages) {
             initDataPage(page);
@@ -112,45 +116,46 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = { "verifyFolderListTest" }, groups = { "admin-tests" })
+    @Test(dependsOnMethods = {"verifyFolderListTest"}, groups = {"admin-tests"})
     public void createSnDFolderTest() throws InterruptedException {
         createSnDFolder(sndFolder);
     }
 
-    @Test(dependsOnGroups = { "admin-tests" }, groups = { "editor-tests" })
-    public void editorVerifyFolderListTest() throws ParseException, IOException, JSONException  {
-        addEditorUserToProject();
+    @Test(dependsOnGroups = {"admin-tests"}, groups = {"editor-tests"})
+    public void editorVerifyFolderListTest() throws ParseException, IOException, JSONException {
+        logout();
+        signIn(false, UserRoles.EDITOR);
         for (String page : pages) {
             initDataPage(page);
             dataPage.getObjectFolder().checkEditorViewFolderList(page, getFolderList(page));
         }
     }
 
-    @Test(dependsOnMethods = { "editorVerifyFolderListTest" }, groups = { "editor-tests" })
+    @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorCreateMetricFolderTest() throws InterruptedException {
         initDataPage("metrics");
         dataPage.getObjectFolder().addFolder("metrics", "New Folder 1", null);
     }
 
-    @Test(dependsOnMethods = { "editorVerifyFolderListTest" }, groups = { "editor-tests" })
+    @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorEditMetricFolderTest() throws InterruptedException {
         initDataPage("metrics");
         dataPage.getObjectFolder().editFolder("Sales Figures",
                 "Sales Figures Renamed", "This is a description of folder");
     }
 
-    @Test(dependsOnMethods = { "editorVerifyFolderListTest" }, groups = { "editor-tests" })
+    @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorDeleteMetricFolderTest() throws InterruptedException {
         initDataPage("metrics");
         dataPage.getObjectFolder().deleteFolder("Sales Rep");
     }
 
-    @Test(dependsOnMethods = { "editorVerifyFolderListTest" }, groups = { "editor-tests" })
+    @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorCreateSnDFolderTest() throws InterruptedException {
         createSnDFolder("Editor slide-n-dice folder");
     }
 
-    @Test(dependsOnMethods = { "editorVerifyFolderListTest" }, groups = { "editor-tests" })
+    @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
     public void editorCannotEditAttributeAndFactFolderTest() throws InterruptedException {
         for (String page : Arrays.asList("attributes", "facts")) {
             initDataPage(page);
@@ -163,7 +168,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = { "editor-tests" }, groups = { "tests" })
+    @Test(dependsOnGroups = {"editor-tests"}, groups = {"tests"})
     public void finalTest() throws JSONException {
         successfulTest = true;
         logout();
@@ -193,18 +198,6 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
                 + "|dataPage|" + page);
         waitForDataPageLoaded(browser);
-    }
-
-    private void addEditorUserToProject() throws ParseException, IOException, JSONException {
-        String projectId = testParams.getProjectId();
-        RestUtils.addUserToProject(testParams.getHost(),
-                testParams.getProjectId(), testParams.getUser(),
-                testParams.getPassword(), testParams.getProfileUri(),
-                UserRoles.EDITOR);
-        logout();
-        loadProperties();
-        testParams.setProjectId(projectId);
-        signIn(false, UserRoles.EDITOR);
     }
 
     private void createSnDFolder(String folderName) throws InterruptedException {

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
@@ -14,8 +15,10 @@ import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAtt
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
@@ -163,7 +166,7 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     public JSONObject getObjectByID(int objectID) throws JSONException, InterruptedException {
-        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/"+objectID);
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/" + objectID);
         waitForElementPresent(objectFragment.getRoot());
         return objectFragment.getObject();
     }
@@ -173,11 +176,24 @@ public class AbstractGreyPageTest extends AbstractTest {
         waitForElementPresent(objectElementsFragment.getRoot());
         return objectElementsFragment.getObjectElements();
     }
+
     public String validateProjectPartial(Validation... validationOptions) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
         waitForElementPresent(validateFragment.getRoot());
         String statusReturning = validateFragment.validateOnly(validationOptions);
         Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation-partial", this.getClass());
         return statusReturning;
+    }
+
+    protected void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
+        addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
+        addUserToProject(testParams.getViewerProfileUri(), UserRoles.VIEWER);
+    }
+
+    private void addUserToProject(String profileUri, UserRoles userRole) throws ParseException, IOException, JSONException {
+        RestUtils.addUserToProject(testParams.getHost(),
+                testParams.getProjectId(), testParams.getUser(),
+                testParams.getPassword(), profileUri,
+                userRole);
     }
 }

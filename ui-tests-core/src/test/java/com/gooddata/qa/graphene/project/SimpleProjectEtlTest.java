@@ -101,7 +101,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"loadProject"}, groups = {"tests"})
-    public void exportImportProject() throws JSONException, InterruptedException {
+    public void exportImportProject() throws JSONException, InterruptedException, IOException {
         String exportToken = exportProject(exportUsers, exportData, statusPollingCheckIterations);
         String parentProjectId = testParams.getProjectId();
 

@@ -20,7 +20,6 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
@@ -131,16 +130,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = ".l-page .overlay")
     protected DeployForm deployForm;
-    
+
     @FindBy(css = ".ait-new-schedule-fragment")
     protected ScheduleForm scheduleForm;
-    
+
     @FindBy(css = ".ait-schedule-detail-fragment")
     protected ScheduleDetail scheduleDetail;
-    
+
     @FindBy(css = ".active .ait-process-schedule-list")
     protected SchedulesTable schedulesTable;
-    
+
     @FindBy(css = ".active .broken-schedules-section .selectable-domain-table")
     protected SchedulesTable brokenSchedulesTable;
 
@@ -148,7 +147,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
      * Help method which provides verification if login page is present a sign in a demo user if needed
      *
      * @param greyPages - indicator for login at greyPages/UI
-     * @param userRole - user role (based on this enum, parameter with user credentials is used)
+     * @param userRole  - user role (based on this enum, parameter with user credentials is used)
      * @throws org.json.JSONException
      */
     protected void signIn(boolean greyPages, UserRoles userRole) throws JSONException {

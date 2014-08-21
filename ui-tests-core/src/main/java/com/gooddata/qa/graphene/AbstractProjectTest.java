@@ -7,6 +7,8 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
@@ -17,6 +19,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected String projectTitle = "simple-project";
     protected String projectTemplate = "";
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
+
+    protected boolean addUsersWithOtherRoles = false;
 
     @BeforeClass
     public void initStartPage() {
@@ -30,7 +34,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @Test(dependsOnGroups = {"projectInit"}, groups = {"tests"})
-    public void createProject() throws JSONException, InterruptedException {
+    public void createProject() throws JSONException, InterruptedException, IOException {
         openUrl(PAGE_GDC_PROJECTS);
         waitForElementVisible(gpProject.getRoot());
 
@@ -51,6 +55,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         }
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
+
+        if (addUsersWithOtherRoles) addUsersWithOtherRolesToProject();
     }
 
     @Test(dependsOnGroups = {"tests"})
