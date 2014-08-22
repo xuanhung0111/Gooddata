@@ -29,15 +29,15 @@ public class ObjectsTable extends AbstractTable {
 	private static final By BY_ROW_TITLE = By
 			.cssSelector("td.title");
 	private static final By BY_TABLE_HEADER_TITLE = By
-	.cssSelector("th.column-title");
+	.cssSelector("th.col-title");
 	
-	@FindBy(css = "th.column-title")
+	@FindBy(css = "th.col-title")
     private WebElement tableHeaderTitle;
 	
-	@FindBy(css = "th.column-time")
+	@FindBy(css = "th.col-time")
     private WebElement tableHeaderTime;
 	
-	@FindBy(css = "th.column-author")
+	@FindBy(css = "th.col-author")
     private WebElement tableHeaderAuthor;
 	
     public boolean selectObject(String objectName) {
