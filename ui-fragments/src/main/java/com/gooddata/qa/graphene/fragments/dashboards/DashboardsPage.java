@@ -2,9 +2,11 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
@@ -19,6 +21,9 @@ public class DashboardsPage extends AbstractFragment {
 
     @FindBy(css = ".menuArrow")
     private WebElement dashboardSwitcherArrowMenu;
+
+    @FindBy(css = ".s-dashboards-menu")
+    private WebElement dashboardsMenu;
 
     @FindBy(css = ".s-dashboards-menu-item")
     private List<WebElement> dashboardSelectors;
@@ -101,6 +106,10 @@ public class DashboardsPage extends AbstractFragment {
         return editDashboardBar;
     }
 
+    public WebElement getEditExportEmbedButton() {
+        return editExportEmbedButton;
+    }
+
     public PermissionsDialog getPermissionsDialog() {
         return permissionsDialog;
     }
@@ -149,6 +158,23 @@ public class DashboardsPage extends AbstractFragment {
         }
         System.out.println("Dashboard not selected because it's not present!!!!");
         return false;
+    }
+
+    public List<String> getDashboardsNames() throws InterruptedException {
+        List<String> dashboardsNames = new ArrayList<String>();
+        if (dashboardSwitcherArrowMenu.isDisplayed()) {
+            dashboardSwitcherArrowMenu.click();
+            waitForElementVisible(dashboardsMenu);
+            if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
+                for (WebElement elem : dashboardSelectors) {
+                    dashboardsNames.add(elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title"));
+                }
+            }
+            dashboardSwitcherArrowMenu.click();
+        } else if (dashboardSwitcherButton.isDisplayed()) {
+            dashboardsNames.add(getDashboardName());
+        }
+        return dashboardsNames;
     }
 
     public int getDashboardsCount() {
@@ -223,8 +249,8 @@ public class DashboardsPage extends AbstractFragment {
         waitForElementVisible(editExportEmbedButton).click();
         waitForElementVisible(addDashboardButton).click();
         waitForElementVisible(newDashboardNameInput).clear();
+        newDashboardNameInput.click(); //sleep wasn't necessary, getting focus on the input field helps
         newDashboardNameInput.sendKeys(dashbordName);
-        Thread.sleep(5000); // name is empty if the save button is used immediately
         editDashboardBar.saveDashboard();
     }
 
@@ -270,5 +296,13 @@ public class DashboardsPage extends AbstractFragment {
 
     public boolean isUnlisted() {
         return unlistedIcon.isDisplayed();
+    }
+
+    public boolean isEditButtonPresent() {
+        try {
+            return editButton.isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 }
