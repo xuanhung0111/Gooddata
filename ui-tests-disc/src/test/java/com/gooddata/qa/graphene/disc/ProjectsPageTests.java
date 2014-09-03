@@ -279,20 +279,13 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "projects-page" })
 	public void checkProjectsNotAdmin() throws ParseException, IOException, JSONException {
 		try {
-			RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
-					testParams.getUser(), testParams.getPassword(), testParams.getProfileUri(),
-					UserRoles.VIEWER);
+			addUsersWithOtherRolesToProject();
 			logout();
 			signIn(false, UserRoles.VIEWER);
 			openUrl(DISC_PROJECTS_PAGE_URL);
 			waitForElementVisible(discProjectsPage.getRoot());
 			discProjectsList.assertProjectNotAdmin(projectTitle, testParams.getProjectId());
 			openUrl(PAGE_PROJECTS);
-			logout();
-			signIn(false, UserRoles.ADMIN);
-			RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
-					testParams.getUser(), testParams.getPassword(), testParams.getProfileUri(),
-					UserRoles.EDITOR);
 			logout();
 			signIn(false, UserRoles.EDITOR);
 			openUrl(DISC_PROJECTS_PAGE_URL);
