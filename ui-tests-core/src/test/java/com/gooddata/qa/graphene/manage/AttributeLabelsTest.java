@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.manage;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.greypages.sfdccredentials.ConfigureSFDCCredentials;
 import com.gooddata.qa.graphene.fragments.reports.ReportWithImage;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
@@ -28,7 +26,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 public class AttributeLabelsTest extends AbstractProjectTest {
 
     private String csvFilePath;
-    private List<String> attributesList;
     private String hyperlinkAttr;
     private String hyperlinkReport;
 
@@ -45,17 +42,11 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     public void initialize() throws InterruptedException, JSONException {
         hyperlinkAttr = "Hyperlink";
         hyperlinkReport = "Hyperlink Report";
-        attributesList = Arrays.asList("Geo_pushpin", "AUS_State_Name",
-                "AUS_State_ISO", "StateName", "StateID", "StateCode",
-                "CountyID", "CountryName", "Country_ISO2", "Country_ISO3",
-                "CZ_District_Name", "CZ_District_NO_Diacritics",
-                "CZ_District_NUTS4", "CZ_District_KNOK");
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void initDataTest() throws InterruptedException {
         Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
-        columnIndexAndType.put(12, OptionDataType.TEXT);
         uploadCSV(csvFilePath + "attribute_labels.csv", columnIndexAndType, "attribute-labels");
     }
 
@@ -126,24 +117,6 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         report.verifyAttributeIsHyperlinkInReport();
     }
 
-    @Test(dependsOnMethods = {"initDataTest"}, groups = {"tests"})
-    public void changeAttributeToGeoStateTest() throws InterruptedException {
-        int i = 0;
-        for (AttributeLabelTypes type : getGeoLabels()) {
-            changeAttributeLabel(attributesList.get(i), type);
-            i++;
-        }
-    }
-
-    @Test(dependsOnMethods = {"changeAttributeToGeoStateTest"}, groups = {"tests"})
-    public void verifyGeoLayersTest() throws InterruptedException {
-        initDashboardsPage();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.addNewDashboard("Test");
-        dashboardsPage.editDashboard();
-        dashboardEditBar.verifyGeoLayersList("Sum of Amount", attributesList);
-    }
-
     @Test(dependsOnGroups = {"tests"})
     public void finalTest() {
         successfulTest = true;
@@ -162,13 +135,4 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         attributePage.configureAttributeLabel(attribute, label);
     }
 
-    public List<AttributeLabelTypes> getGeoLabels() {
-        List<AttributeLabelTypes> list = new ArrayList<AttributeLabelTypes>();
-        for (AttributeLabelTypes label : AttributeLabelTypes.values()) {
-            if (label.isGeoLabel()) {
-                list.add(label);
-            }
-        }
-        return list;
-    }
 }

@@ -1,10 +1,10 @@
-Image;Image_SFDC;Hyperlink;StateName;StateID;StateCode;CountyID;CountryName;Country_ISO2;Country_ISO3;CZ_District_Name;CZ_District_NUTS4;CZ_District_KNOK;CZ_District_NO_Diacritics;Geo_pushpin;AUS_State_ISO;AUS_State_Name;Amount
-https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US53;WA;0400000US37;Czech Republic;CZ;CZE;Beroun;CZ0212;0202;Beroun;"33.335554;-86.994991";VIC;Victoria;102300
-https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US54;WA;0500000US22001;Germany;DE;DEU;Kladno;CZ0213;0203;Kladno;"33.607361;-86.630355";QLD;Queensland;102301
-https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US55;WA;0500000US51001;Indonesia;ID;IDN;Nymburk;CZ0218;0208;Nymburk;"33.507590;-86.798513";WA;Western;102302
-https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US56;WA;0500000US16001;United States of America;US;USA;Strakonice;CZ0316;0306;Strakonice;"33.179071;-87.447521";TAS;Tasmania;102303
-https://dl.dropbox.com/u/18409595/reobr/petr.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US57;WA;0500000US19001;Venezuela;VE;VEN;Klatovy;CZ0322;0402;Klatovy;"31.190020;-85.399150";ACT;Australian;10230
-https://dl.dropbox.com/u/18409595/reobr/pavel.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US58;WA;0500000US21001;Vietnam;VN;VNM;Rokycany;CZ0326;0406;Rokycany;"34.743001;-86.601108";NSW;New;10230
-https://dl.dropbox.com/u/18409595/reobr/denis.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US59;WA;0500000US29001;Turkey;TR;TUR;Tachov;CZ0327;0407;Tachov;"33.334175;-86.784966";SA;South;10230
-https://dl.dropbox.com/u/18409595/reobr/bryan.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US60;WA;0500000US40001;Poland;PL;POL;Cheb;CZ0411;0501;Cheb;"34.616719;-92.498309";NT;Northern;10230
-https://dl.dropbox.com/u/18409595/reobr/hubert.jpg;source=sfdc&userId=005U0000000cgeyIAA;http://www.gooddata.com/;Washington;0400000US61;WA;0500000US08001;Paraguay;PY;PRY;Karlovy;CZ0412;0502;Vary;"35.091612;-92.427588";QLD;Queensland;10230
+Image;Image_SFDC;Hyperlink;Amount
+https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;102300
+https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;102301
+https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=v00590000000wz7OAAQ;http://www.gooddata.com/;102302
+https://dl.dropbox.com/u/18409595/reobr/ja.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;102303
+https://dl.dropbox.com/u/18409595/reobr/petr.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;10230
+https://dl.dropbox.com/u/18409595/reobr/pavel.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;10236
+https://dl.dropbox.com/u/18409595/reobr/denis.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;10237
+https://dl.dropbox.com/u/18409595/reobr/bryan.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;10239
+https://dl.dropbox.com/u/18409595/reobr/hubert.jpg;source=sfdc&userId=00590000000wz7OAAQ;http://www.gooddata.com/;10225
