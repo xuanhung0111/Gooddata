@@ -14,3 +14,4 @@ user_pref("browser.download.defaultFolder", "${browserDownloadFolder}");
 user_pref("browser.helperApps.alwaysAsk.force", false);
 user_pref("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream");
 user_pref("pdfjs.disabled", true);
+user_pref("focusmanager.testmode", true);

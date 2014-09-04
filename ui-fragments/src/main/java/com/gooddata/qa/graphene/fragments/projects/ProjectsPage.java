@@ -13,11 +13,18 @@ public class ProjectsPage extends AbstractFragment {
 
     @FindBy(xpath = "//ul[@id='myProjects']/li")
     private List<WebElement> projects;
+    
+    @FindBy(xpath = "//ul[@id='demoProjects']/li")
+    private List<WebElement> demoProjects;
 
     private static final By BY_SPAN_PROJECT_TITLE = By.xpath("span[@class='projectTitle']");
 
     public List<WebElement> getProjectsElements() {
         return projects;
+    }
+    
+    public List<WebElement> getDemoProjectsElements() {
+    	return demoProjects;
     }
 
     public List<String> getProjectsIds() {

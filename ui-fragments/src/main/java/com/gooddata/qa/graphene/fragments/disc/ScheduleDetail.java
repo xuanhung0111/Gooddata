@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
 import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -444,5 +445,27 @@ public class ScheduleDetail extends ScheduleForm {
 		assertEquals(String.format(AUTO_DISABLED_SCHEDULE_MESSAGE, scheduleExecutionItem.size()),
 				autoDisableScheduleMessage.getText());
 		assertEquals(AUTO_DISABLED_SCHEDULE_MORE_INFO, autoDisableScheduleMoreInfo.getText());
+	}
+
+	public boolean isExecutionInRunningState() throws InterruptedException {
+		int executionNumber = scheduleExecutionItem.size();
+		for (int i = 0; executionNumber == scheduleExecutionItem.size() && i < 10; i++)
+			Thread.sleep(3000);
+		for (int i = 0; i < 10; i++) {
+			if (scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText()
+					.equals("RUNNING")) {
+				return true;
+			} else
+				Thread.sleep(3000);
+		}
+		return false;
+	}
+
+	public String getLastExecutionDate() {
+		return scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DATE).getText();
+	}
+
+	public String getLastExecutionTime() {
+		return scheduleExecutionItem.get(0).findElement(BY_EXECUTION_TIMES).getText();
 	}
 }
