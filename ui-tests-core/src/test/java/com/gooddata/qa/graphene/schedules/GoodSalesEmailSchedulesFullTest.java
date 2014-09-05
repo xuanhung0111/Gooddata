@@ -142,6 +142,12 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
             loops++;
         }
 
+        System.out.println("Saving dashboard message ...");
+        ImapClient.saveMessageAttachments(dashboardMessages[0], attachmentsDirectory);
+
+        System.out.println("Saving report messages ...");
+        ImapClient.saveMessageAttachments(reportMessages[0], attachmentsDirectory);
+
         System.out.println("Email checks ...");
         assertEquals(reportMessages.length, 1, "Expected one report message");
         assertEquals(dashboardMessages.length, 1, "Expected one dashboard message");
@@ -163,8 +169,6 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         Part csvPart = findPartByContentType(reportAttachmentParts, "text/csv");
         assertTrue(csvPart.getSize() > 120, "CSV is greater than 120B");
 
-        System.out.println("Saving report messages ...");
-        ImapClient.saveMessageAttachments(reportMessages[0], attachmentsDirectory);
 
 
         // DASHBOARD EXPORT
@@ -174,8 +178,6 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
                 "Dashboard attachment has PDF content type");
         assertTrue(dashboardAttachmentParts.get(0).getSize() > 67000, "PDF is greater than 67kB");
 
-        System.out.println("Saving dashboard message ...");
-        ImapClient.saveMessageAttachments(dashboardMessages[0], attachmentsDirectory);
     }
 
     private Part findPartByContentType(List<Part> parts, String contentType) throws MessagingException {
