@@ -157,18 +157,17 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         assertEquals(reportAttachmentParts.size(), 4, "Expected 4 attachments for report");
 
         Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
-        assertTrue(pdfPart.getSize() > 32000, "PDF is greater than 32kB");
+        verifyAttachment(pdfPart, "PDF", 3200);
 
         Part xlsPart = findPartByContentType(reportAttachmentParts, "application/vnd.ms-excel");
-        assertTrue(xlsPart.getSize() > 7700, "XLS is greater than 7.7kB");
+        verifyAttachment(xlsPart, "XLS", 7700);
 
         Part xlsxPart = findPartByContentType(reportAttachmentParts,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        assertTrue(xlsxPart.getSize() > 7500, "XLSX is greater than 7.5kB");
+        verifyAttachment(xlsxPart, "XLSX", 7500);
 
         Part csvPart = findPartByContentType(reportAttachmentParts, "text/csv");
-        assertTrue(csvPart.getSize() > 120, "CSV is greater than 120B");
-
+        verifyAttachment(csvPart, "CSV", 120);
 
 
         // DASHBOARD EXPORT
@@ -176,8 +175,7 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         assertEquals(dashboardAttachmentParts.size(), 1, "Expected 1 attachment for dashboard");
         assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
                 "Dashboard attachment has PDF content type");
-        assertTrue(dashboardAttachmentParts.get(0).getSize() > 67000, "PDF is greater than 67kB");
-
+        verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 67000);
     }
 
     private Part findPartByContentType(List<Part> parts, String contentType) throws MessagingException {
@@ -232,5 +230,10 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         System.out.println(" - set recurrency to: " + when.get("recurrency"));
 
         return mapper.writeValueAsString(rootNode);
+    }
+
+    private void verifyAttachment(Part attachment, String type, long minimalSize) throws Exception {
+        assertTrue(attachment.getSize() > minimalSize,
+                   "Expected " + minimalSize + "B , but " + attachment.getSize() + "B found for " + type);
     }
 }
