@@ -117,6 +117,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectDetailPage;
 
+    @FindBy(id = "p-objectPage")
+    protected CreateAttributePage createAttributePage;
+
     /**
      * ----- DISC fragments -----
      */
@@ -381,5 +384,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"), browser);
         waitForDashboardPageLoaded(browser);
         Screenshots.takeScreenshot(browser, screenshotName + "-dashboard", this.getClass());
+    }
+
+    public void initAttributePage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        waitForDataPageLoaded(browser);
     }
 }

@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static org.testng.Assert.*;
 
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -16,6 +17,12 @@ public class AttributePage extends AbstractFragment {
 
     @FindBy(xpath = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]")
     protected AttributeDetailPage attributeDetailPage;
+
+    @FindBy(xpath = "//div[@id='p-objectPage' and contains(@class,'s-displayed')]")
+    protected CreateAttributePage createAttributePage;
+
+    @FindBy(css = ".s-attributesAddButton")
+    protected WebElement createAttributeButton;
 
     public void configureAttributeLabel(String attributeName,
         AttributeLabelTypes attributeLabel) throws InterruptedException {
@@ -49,4 +56,11 @@ public class AttributePage extends AbstractFragment {
         waitForElementVisible(attributeDetailPage.getRoot());
     }
 
+    public void createAttribute() {
+        waitForElementVisible(createAttributeButton).click();
+        waitForObjectPageLoaded(browser);
+        String computedAttributeWindowHandle = browser.getWindowHandle();
+        browser.switchTo().window(computedAttributeWindowHandle);
+        waitForElementVisible(createAttributePage.getRoot());
+    }
 }
