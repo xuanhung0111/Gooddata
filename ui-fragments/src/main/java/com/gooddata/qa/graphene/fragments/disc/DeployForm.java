@@ -66,23 +66,23 @@ public class DeployForm extends AbstractFragment {
 	}
 
 	public WebElement getProcessName() {
-		return processNameInput;
+		return waitForElementVisible(processNameInput);
 	}
 
 	public WebElement getDeployConfirmButton() {
-		return deployConfirmButton;
+		return waitForElementVisible(deployConfirmButton);
 	}
 
 	public WebElement getDeployCancelButton() {
-		return deployCancelButton;
+		return waitForElementVisible(deployCancelButton);
 	}
 
 	public WebElement getDeployProcessDialog() {
-		return deployProcessDialog;
+		return waitForElementVisible(deployProcessDialog);
 	}
 
 	public WebElement getDeployProcessDialogButton() {
-		return deployProcessDialogButton;
+		return waitForElementVisible(deployProcessDialogButton);
 	}
 
 	public void setDeployProcessInput(String zipFilePath, DISCProcessTypes processType,
@@ -93,20 +93,20 @@ public class DeployForm extends AbstractFragment {
 	}
 
 	public boolean inputFileHasError() {
-		return deployProcessDialog.findElement(BY_FILE_INPUT_ERROR).getAttribute("class")
-				.contains("has-error");
+		return waitForElementVisible(deployProcessDialog).findElement(BY_FILE_INPUT_ERROR)
+				.getAttribute("class").contains("has-error");
 	}
 
 	public boolean inputProcessNameHasError() {
-		return processNameInput.getAttribute("class").contains("has-error");
+		return waitForElementVisible(processNameInput).getAttribute("class").contains("has-error");
 	}
 
 	public WebElement getFileInputErrorBubble() {
-		return deployProcessDialog.findElement(BY_INPUT_ERROR_BUBBLE);
+		return waitForElementVisible(deployProcessDialog).findElement(BY_INPUT_ERROR_BUBBLE);
 	}
 
 	public WebElement getProcessNameErrorBubble() {
-		return processNameErrorBubble;
+		return waitForElementVisible(processNameErrorBubble);
 	}
 
 	public void assertErrorOnDeployForm(String zipFilePath, DISCProcessTypes processType,
@@ -122,7 +122,6 @@ public class DeployForm extends AbstractFragment {
 		if (processName.isEmpty()) {
 			assertTrue(inputProcessNameHasError());
 			getProcessName().click();
-			waitForElementVisible(getProcessNameErrorBubble());
 			assertEquals(getProcessNameErrorBubble().getText(), "A process name is required");
 		}
 	}

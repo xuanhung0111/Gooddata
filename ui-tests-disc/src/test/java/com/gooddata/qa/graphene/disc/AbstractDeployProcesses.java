@@ -64,12 +64,12 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
 		Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
 		deployForm.getDeployConfirmButton().click();
 		for (int i = 0; deployForm.getDeployProcessDialogButton().getText().contains("Cancel")
-				&& i < 10; i++)
-			Thread.sleep(1000);
+				&& i < 50; i++)
+			Thread.sleep(100);
 		assertEquals(deployForm.getDeployProcessDialog().getText(), progressDialogMessage);
 		if (deployResultMessage != null) {
-			while (deployForm.getDeployProcessDialogButton().getText().equals("Deploying")
-					|| deployForm.getDeployProcessDialogButton().getText().equals("Re-deploying"))
+			for (int i = 0; i < 100 && (deployForm.getDeployProcessDialogButton().getText().equals("Deploying") ||
+					deployForm.getDeployProcessDialogButton().getText().equals("Re-deploying")); i++)
 				Thread.sleep(100);
 			assertEquals(deployForm.getDeployProcessDialog().getText(), deployResultMessage);
 			waitForElementNotPresent(deployForm.getRoot());

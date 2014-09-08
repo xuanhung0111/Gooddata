@@ -280,6 +280,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 	public void checkProjectsNotAdmin() throws ParseException, IOException, JSONException {
 		try {
 			addUsersWithOtherRolesToProject();
+			openUrl(PAGE_PROJECTS);
 			logout();
 			signIn(false, UserRoles.VIEWER);
 			openUrl(DISC_PROJECTS_PAGE_URL);

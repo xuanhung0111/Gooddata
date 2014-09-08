@@ -70,7 +70,7 @@ public class DISCProjectsPage extends AbstractFragment {
 			DISCProjectsList projectsList) {
 		for (Entry<String, String> filteredProject : filteredProjects.entrySet()) {
 			assertNotNull(projectsList.selectProject(filteredProject.getKey(),
-					filteredProject.getValue()));
+					filteredProject.getValue(), true));
 			System.out.println("Project " + filteredProject.getKey() + "(id = "
 					+ filteredProject.getValue() + ") is in filtered list.");
 		}
@@ -80,7 +80,7 @@ public class DISCProjectsPage extends AbstractFragment {
 			DISCProjectsList projectsList) {
 		for (Entry<String, String> filteredOutProject : filteredOutProjects.entrySet()) {
 			assertNull(projectsList.selectProject(filteredOutProject.getKey(),
-					filteredOutProject.getValue()));
+					filteredOutProject.getValue(), true));
 			System.out.println("Project " + filteredOutProject.getKey() + "(id = "
 					+ filteredOutProject.getValue() + ") is filtered out.");
 		}
@@ -111,6 +111,7 @@ public class DISCProjectsPage extends AbstractFragment {
 				DISCProjectFilters.UNSCHEDULED.getOption());
 		System.out.println("Check filter option:" + filterOption);
 		selectFilterOption(filterOption);
+		Thread.sleep(2000);
 		waitForElementVisible(discProjectsList.getRoot());
 		checkFilteredProjects(projectsMap, discProjectsList);
 		if (filterOption == DISCProjectFilters.DISABLED.getOption()) {
@@ -121,6 +122,7 @@ public class DISCProjectsPage extends AbstractFragment {
 				if (filterOutOption != filterOption
 						&& filterOutOption != DISCProjectFilters.UNSCHEDULED.getOption()) {
 					selectFilterOption(filterOutOption);
+					Thread.sleep(2000);
 					waitForElementVisible(discProjectsList.getRoot());
 					checkFilteredOutProjects(projectsMap, discProjectsList);
 				}
@@ -129,6 +131,7 @@ public class DISCProjectsPage extends AbstractFragment {
 			for (String filterOutOption : filterOutOptions) {
 				if (filterOutOption != filterOption) {
 					selectFilterOption(filterOutOption);
+					Thread.sleep(2000);
 					waitForElementVisible(discProjectsList.getRoot());
 					checkFilteredOutProjects(projectsMap, discProjectsList);
 				}
@@ -166,7 +169,7 @@ public class DISCProjectsPage extends AbstractFragment {
 		assertFalse(projectPageNumber.get(1).getAttribute("class").contains("active-cell"));
 		assertTrue(projectPageNumber.get(0).getAttribute("class").contains("active-cell"));
 		assertTrue(prevPageButton.getAttribute("class").contains("disabled"));
-		for (int i = 1; i < projectPageNumber.size(); i++) {
+		for (int i = 1; i < projectPageNumber.size() && i < 4; i++) {
 			System.out.println("Click on page " + i);
 			projectPageNumber.get(i).click();
 			waitForElementVisible(discProjectsList.getRoot());
