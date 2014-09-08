@@ -189,8 +189,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     public void createStorageWithNonDssAuthToken() throws JSONException {
         // use non-dss-enabled authorization token to create new dss
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, testParams.getAuthorizationToken(),
-                "Project group with name '" + testParams.getAuthorizationToken() + "' does not have valid " +
-                        "DSS connection information (DSS cluster is missing)");
+                "DSS project group source is missing");
     }
 
     @Test(dependsOnMethods = {"createStorage"})
