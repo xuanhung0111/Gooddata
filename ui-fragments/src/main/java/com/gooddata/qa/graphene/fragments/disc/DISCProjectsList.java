@@ -43,29 +43,34 @@ public class DISCProjectsList extends AbstractTable {
 
 	public void checkOnProjects(Map<String, String> projects) {
 		for (Entry<String, String> project : projects.entrySet()) {
-			selectProject(project.getKey(), project.getValue()).findElement(BY_PROJECT_CHECKBOX)
+			selectProject(project.getKey(), project.getValue(), true).findElement(BY_PROJECT_CHECKBOX)
 					.click();
 		}
 	}
 
 	public void clickOnProjectTitle(String projectName, String projectId) {
-		selectProject(projectName, projectId).findElement(BY_DISC_PROJECT_NAME).click();
+		selectProject(projectName, projectId, true).findElement(BY_DISC_PROJECT_NAME).click();
 	}
 
-	public WebElement selectProject(String projectName, String projectId) {
+	public WebElement selectProject(String projectName, String projectId, boolean isAdmin) {
 		int pageIndex = 0;
 		do {
 			for (int i = 0; i < getNumberOfRows(); i++) {
-				if (getRow(i).findElement(BY_PROJECT_CHECKBOX).isEnabled()) {
-					if (getRow(i).findElement(BY_DISC_PROJECT_NAME).getText().equals(projectName)) {
-						if (getRow(i).findElement(BY_DISC_PROJECT_NAME).getAttribute("href")
-								.contains(projectId))
-							return getRow(i);
+				if (isAdmin) {
+					if (getRow(i).findElement(BY_PROJECT_CHECKBOX).isEnabled()) {
+						if (getRow(i).findElement(BY_DISC_PROJECT_NAME).getText().equals(projectName)) {
+							if (getRow(i).findElement(BY_DISC_PROJECT_NAME).getAttribute("href")
+									.contains(projectId))
+								return getRow(i);
+						}
 					}
-				} else {
-					if (getRow(i).findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText()
-							.equals(projectName)) {
-						return getRow(i);
+				}
+				else {
+					if (!getRow(i).findElement(BY_PROJECT_CHECKBOX).isEnabled()) {
+						if (getRow(i).findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText()
+								.equals(projectName)) {
+							return getRow(i);
+						}
 					}
 				}
 			}
@@ -85,7 +90,7 @@ public class DISCProjectsList extends AbstractTable {
 		for (Entry<String, String> project : projectsMap.entrySet()) {
 			assertEquals(
 					expectedDataLoadingProcess,
-					selectProject(project.getKey(), project.getValue()).findElement(
+					selectProject(project.getKey(), project.getValue(), true).findElement(
 							BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText());
 		}
 	}
@@ -95,14 +100,14 @@ public class DISCProjectsList extends AbstractTable {
 		String expectedLastLoaded = executionDate + " " + executionTime;
 		System.out.println("expectedLastLoaded " + expectedLastLoaded);
 		for (Entry<String, String> project : projectsMap.entrySet()) {
-			assertEquals(expectedLastLoaded, selectProject(project.getKey(), project.getValue())
+			assertEquals(expectedLastLoaded, selectProject(project.getKey(), project.getValue(), true)
 					.findElement(BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION).getText());
 		}
 	}
 
 	public void assertProjectNotAdmin(String projectName, String projectId) {
 		waitForElementVisible(getRoot());
-		WebElement projectCell = selectProject(projectName, projectId);
+		WebElement projectCell = selectProject(projectName, projectId, false);
 		assertNotNull(projectCell.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN));
 	}
 }
