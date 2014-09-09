@@ -17,8 +17,6 @@ import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.enums.DISCProjectFilters;
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.utils.http.RestUtils;
-
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -59,7 +57,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			discProjectsPage.checkProjectFilter(DISCProjectFilters.FAILED.getOption(),
 					getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
 
 		}
@@ -86,7 +84,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			discProjectsPage.checkProjectFilter(DISCProjectFilters.SUCCESSFUL.getOption(),
 					getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
 
 		}
@@ -112,7 +110,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			discProjectsPage.checkProjectFilter(DISCProjectFilters.RUNNING.getOption(),
 					getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
 
 		}
@@ -120,29 +118,30 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "projects-page" })
 	public void checkScheduledProjectsFilterOptions() throws JSONException, InterruptedException {
+		Pair<String, List<String>> cronTime = Pair.of(
+				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+		Map<String, String> addtionalProjects = createMultipleProjects("Disc-test-scheduled-filter-option", 1);
 		try {
-			Pair<String, List<String>> cronTime = Pair.of(
-					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-			createMultipleProjects("Disc-test-scheduled-filter-option", 1);
-			for (Entry<String, String> project : getProjectsMap().entrySet()) {
-				if (project.getValue() == testParams.getProjectId()) {
-					deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-							DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option",
-							Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
-									"successfulGraph.grf"), true);
-				} else {
-					for (int i = 1; i <= 6; i++) {
-						deployInProjectDetailPage(project.getKey(), project.getValue(), "Basic",
-								DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option "
-										+ i, Arrays.asList("errorGraph.grf",
-										"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-						createScheduleForProcess(project.getKey(), project.getValue(),
-								"Check Scheduled Projects Filter Option " + i,
-								"/graph/longTimeRunningGraph.grf", cronTime, null);
-						assertNewSchedule("Check Scheduled Projects Filter Option " + i,
-								"longTimeRunningGraph.grf", cronTime, null);
-						scheduleDetail.manualRun();
-					}
+			for (Entry<String, String> project : addtionalProjects.entrySet()) {
+				for (int i = 1; i < 10; i++) {
+					deployInProjectDetailPage(project.getKey(), project.getValue(), "Basic",
+							DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option "
+									+ i, Arrays.asList("errorGraph.grf",
+									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+				}
+			}
+			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+					DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option",
+					Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
+							"successfulGraph.grf"), true);
+			for (Entry<String, String> project : addtionalProjects.entrySet()) {
+				for (int i = 1; i < 10; i++) {
+					createScheduleForProcess(project.getKey(), project.getValue(),
+							"Check Scheduled Projects Filter Option " + i,
+							"/graph/longTimeRunningGraph.grf", cronTime, null);
+					assertNewSchedule("Check Scheduled Projects Filter Option " + i,
+							"longTimeRunningGraph.grf", cronTime, null);
+					scheduleDetail.manualRun();
 				}
 			}
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
@@ -153,17 +152,12 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			scheduleDetail.manualRun();
 			openUrl(DISC_PROJECTS_PAGE_URL);
 			waitForElementVisible(discProjectsPage.getRoot());
-			Map<String, String> filteredProjects = new HashMap<String, String>();
-			filteredProjects.put(projectTitle, testParams.getProjectId());
 			discProjectsPage.checkProjectFilter(DISCProjectFilters.SCHEDULED.getOption(),
-					filteredProjects);
+					getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
-			Map<String, String> projectsToDelete = new HashMap<String, String>();
-			projectsToDelete.putAll(getProjectsMap());
-			projectsToDelete.remove(projectTitle);
-			deleteProjects(projectsToDelete);
+			deleteProjects(addtionalProjects);
 		}
 	}
 
@@ -178,7 +172,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			discProjectsPage.checkProjectFilter(DISCProjectFilters.UNSCHEDULED.getOption(),
 					getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
 		}
 	}
@@ -202,7 +196,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			discProjectsPage.checkProjectFilter(DISCProjectFilters.DISABLED.getOption(),
 					getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
 
 		}
@@ -234,7 +228,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			waitForElementVisible(discProjectsList.getRoot());
 			discProjectsList.assertDataLoadingProcesses(2, 3, getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
 
 		}
@@ -270,7 +264,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			discProjectsList.assertLastLoaded(lastSuccessfulExecutionDate,
 					lastSuccessfulExecutionTime.substring(14), getProjectsMap());
 		} finally {
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
+			openProjectDetailByUrl(testParams.getProjectId());
 			projectDetailPage.deleteAllProcesses();
 
 		}
@@ -329,17 +323,19 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 		successfulTest = true;
 	}
 
-	protected void createMultipleProjects(String projectNamePrefix, int projectNumber)
+	protected Map<String, String> createMultipleProjects(String projectNamePrefix, int projectNumber)
 			throws JSONException, InterruptedException {
+		Map<String, String> additionalProjects = new HashMap<String, String>(1);
 		for (int i = 0; i < projectNumber; i++) {
 			openUrl(PAGE_GDC_PROJECTS);
 			waitForElementVisible(gpProject.getRoot());
-			getProjectsMap().put(
+			additionalProjects.put(
 					projectNamePrefix + String.valueOf(i),
 					gpProject.createProject(projectNamePrefix + i, projectNamePrefix + i, null,
 							testParams.getAuthorizationToken(), testParams.getDwhDriver(),
 							projectCreateCheckIterations));
 		}
+		return additionalProjects;
 	}
 
 	protected void deleteProjects(Map<String, String> projectsToDelete) throws InterruptedException {
