@@ -21,7 +21,8 @@ public class ZendeskHelper {
     public static enum ZendeskObject {
         TICKET,
         USER,
-        ORGANIZATION;
+        ORGANIZATION,
+        TICKET_EVENT;
 
         public String getName() {
             return this.toString().toLowerCase();
@@ -37,6 +38,7 @@ public class ZendeskHelper {
     private static final String TICKETS_INC_URL = "/api/v2/incremental/tickets.json?start_time=0";
     private static final String USERS_INC_URL = "/api/v2/incremental/users.json?start_time=0";
     private static final String ORGANIZATIONS_INC_URL = "/api/v2/incremental/organizations.json?start_time=0";
+    private static final String TICKET_EVENTS_INC_URL = "/api/v2/incremental/ticket_events.json?start_time=0";
 
     private static final String TICKETS_URL = "/api/v2/tickets";
     private static final String USERS_URL = "/api/v2/users";
@@ -59,6 +61,10 @@ public class ZendeskHelper {
 
     public int getNumberOfOrganizations() throws IOException, JSONException, InterruptedException {
         return getZendeskEntityCount(ORGANIZATIONS_INC_URL, ZendeskObject.ORGANIZATION);
+    }
+
+    public int getNumberOfTicketEvents() throws IOException, JSONException, InterruptedException {
+        return getZendeskEntityCount(TICKET_EVENTS_INC_URL, ZendeskObject.TICKET_EVENT);
     }
 
     public int createNewTicket(String jsonTicket) throws IOException, JSONException {
@@ -150,6 +156,10 @@ public class ZendeskHelper {
                             nonDeletedObjects.add(object.getInt("id"));
                         }
                         break;
+                    case TICKET_EVENT:
+                        //TODO - more events are sent at single event
+                        nonDeletedObjects.add(object.getInt("id"));
+                        break;
                 }
             }
             System.out.println("Found " + deletedObjects + " deleted " + objectType.getPluralName());
@@ -180,9 +190,10 @@ public class ZendeskHelper {
     public static void main(String[] args) throws IOException, JSONException, InterruptedException {
         ZendeskHelper helper = new ZendeskHelper(new RestApiClient("gooddataqa3.zendesk-staging.com",
                 "qa@gooddata.com", "12345", false, false));
-        System.out.println(helper.getNumberOfTickets());
-        System.out.println(helper.getNumberOfOrganizations());
-        System.out.println(helper.getNumberOfUsers());
+        //System.out.println(helper.getNumberOfTickets());
+        //System.out.println(helper.getNumberOfTicketEvents());
+        //System.out.println(helper.getNumberOfOrganizations());
+        //System.out.println(helper.getNumberOfUsers());
         /**
         final String JSON_TICKET_CREATE = "{\"ticket\":{\"subject\":\"GD test ticket - %s\", " +
                 "\"comment\": { \"body\": \"Description of automatically created ticket\" }, \"requester_id\":20037877,\"submitter_id\":20037877,\"assignee_id\":20012506}}";
