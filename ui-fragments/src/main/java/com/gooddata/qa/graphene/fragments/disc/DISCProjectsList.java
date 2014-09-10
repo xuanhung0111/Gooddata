@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -18,7 +19,7 @@ public class DISCProjectsList extends AbstractTable {
 	private static final By BY_DISC_PROJECT_NAME = By.cssSelector("td.project-name-cell a");
 	private static final By BY_PROJECT_CHECKBOX = By.cssSelector("td.project-checkbox-cell input");
 	private static final By BY_DISC_PROJECT_NAME_NOT_ADMIN = By
-			.cssSelector(".project-name-user-not-admin-cell");
+			.cssSelector(".project-name-user-not-admin-cell .ait-project-list-item-title");
 	private static final By BY_DISC_PROJECT_DATA_LOADING_PROCESSES = By
 			.cssSelector(".ait-project-list-item-processes-label");
 	private static final By BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION = By
@@ -32,6 +33,9 @@ public class DISCProjectsList extends AbstractTable {
 
 	@FindBy(css = ".page-cell")
 	private List<WebElement> projectPages;
+	
+	@FindBy(css = ".ait-project-detail-fragment")
+	private WebElement projectDetail;
 
 	public WebElement getDeployProcessButton() {
 		return deployProcessButton;
@@ -109,5 +113,13 @@ public class DISCProjectsList extends AbstractTable {
 		waitForElementVisible(getRoot());
 		WebElement projectCell = selectProject(projectName, projectId, false);
 		assertNotNull(projectCell.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN));
+		try {
+			projectCell.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).click();
+			waitForElementVisible(projectDetail);
+		}
+		catch (NoSuchElementException ex) {
+			System.out.println("Non-admin user cannot access project detail page!");
+		}
+		waitForElementVisible(getRoot());
 	}
 }

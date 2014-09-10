@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.json.JSONException;
+import org.openqa.selenium.NoSuchElementException;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
@@ -55,6 +56,11 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
 		waitForElementVisible(projectDetailPage.getRoot());
 	}
 
+	protected void openProjectDetailByUrl(String projectId) {
+		openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
+		waitForElementVisible(projectDetailPage.getRoot());
+	}
+
 	protected void deployProcess(String zipFile, DISCProcessTypes processType, String processName,
 			String progressDialogMessage, String deployResultMessage) throws InterruptedException {
 		waitForElementVisible(deployForm.getRoot());
@@ -63,16 +69,41 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
 		assertFalse(deployForm.inputProcessNameHasError());
 		Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
 		deployForm.getDeployConfirmButton().click();
-		for (int i = 0; deployForm.getDeployProcessDialogButton().getText().contains("Cancel")
-				&& i < 50; i++)
-			Thread.sleep(100);
-		assertEquals(deployForm.getDeployProcessDialog().getText(), progressDialogMessage);
-		if (deployResultMessage != null) {
-			for (int i = 0; i < 100 && (deployForm.getDeployProcessDialogButton().getText().equals("Deploying") ||
-					deployForm.getDeployProcessDialogButton().getText().equals("Re-deploying")); i++)
+		int checkProgressMessage = 0;
+		int checkResultMessage = 0;
+		try {
+			for (int i = 0; deployForm.getDeployProcessDialogButton().getText().contains("Cancel")
+					&& i < 50; i++)
 				Thread.sleep(100);
-			assertEquals(deployForm.getDeployProcessDialog().getText(), deployResultMessage);
-			waitForElementNotPresent(deployForm.getRoot());
+			if (deployForm.getDeployProcessDialogButton().getText().toLowerCase()
+					.contains("deploying")) {
+				if (deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage))
+					checkProgressMessage = 1;
+				else
+					checkProgressMessage = 2;
+			}
+			if (deployResultMessage != null) {
+				for (int i = 0; i < 100
+						&& deployForm.getDeployProcessDialogButton().getText().toLowerCase()
+								.contains("deploying"); i++)
+					Thread.sleep(100);
+				if (deployForm.getDeployProcessDialog().getText().equals(deployResultMessage))
+					checkResultMessage = 1;
+				else
+					checkResultMessage = 2;
+			}
+		} catch (NoSuchElementException ex) {
+			/* The deploy dialog message may be not checked by this test! */
+		}
+		if (checkProgressMessage != 0)
+			assertEquals(checkProgressMessage, 1);
+		else
+			System.out.println("Deploy progress message is not checked!");
+		if (deployResultMessage != null) {
+			if (checkResultMessage != 0)
+				assertEquals(checkResultMessage, 1);
+			else
+				System.out.println("Deploy result message is not checked!");
 		}
 	}
 
