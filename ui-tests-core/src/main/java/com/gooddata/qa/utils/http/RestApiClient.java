@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -116,26 +117,23 @@ public class RestApiClient {
     }
 
     protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password, boolean useSST, boolean useApiProxy) {
+        final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        httpClientBuilder.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         if (useSST) {
-            SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(new DefaultHttpClient(), hostGoodData, user, password);
-            return new GoodDataHttpClient(new DefaultHttpClient(), sstStrategy);
+            HttpClient httpClient = httpClientBuilder.build();
+            SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(httpClient, hostGoodData, user, password);
+            return new GoodDataHttpClient(httpClient, sstStrategy);
         } else {
             final CredentialsProvider provider = new BasicCredentialsProvider();
             final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(user, password);
             provider.setCredentials(AuthScope.ANY, credentials);
+            httpClientBuilder.setDefaultCredentialsProvider(provider);
             if (useApiProxy) {
                 System.out.println("Creating a client with basic authentication and proxy to " + API_PROXY_HOST);
                 final HttpHost proxyHost = new HttpHost(API_PROXY_HOST, 80);
-                final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
                 httpClientBuilder.setProxy(proxyHost);
-                httpClientBuilder.setDefaultCredentialsProvider(provider);
-                return httpClientBuilder.build();
-            } else {
-                System.out.println("Creating a client with basic authentication...");
-                final DefaultHttpClient client = new DefaultHttpClient();
-                client.setCredentialsProvider(provider);
-                return client;
             }
+            return httpClientBuilder.build();
         }
     }
 }
