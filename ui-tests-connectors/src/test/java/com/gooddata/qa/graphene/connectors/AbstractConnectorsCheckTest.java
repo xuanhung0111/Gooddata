@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.connectors;
 
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.util.EntityUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +17,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.Connectors;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.testng.Assert.*;
@@ -27,6 +31,8 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     protected static final By BY_GP_SETTINGS_LINK = By.partialLinkText("settings");
 
     private static final int DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT = 180; // 15 minutes
+
+    private static final String PROCESS_FULL_LOAD_JSON = "{\"process\":{\"incremental\":false}}";
 
     protected int integrationProcessCheckLimit = DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT;
 
@@ -236,5 +242,15 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         assertTrue(process.getJSONObject("status").has("code"), "status code is missing");
         assertTrue(process.getJSONObject("links").getString("self").startsWith("/" + getProcessesUri()),
                 "self link is incorrect");
+    }
+
+    protected void runConnectorProjectFullLoad() throws JSONException, InterruptedException, IOException {
+        getRestApiClient();
+        HttpRequestBase postRequest = restApiClient.newPostMethod("/" + getProcessesUri(), PROCESS_FULL_LOAD_JSON);
+        HttpResponse postResponse = restApiClient.execute(postRequest);
+        assertEquals(postResponse.getStatusLine().getStatusCode(), 201, "Invalid return code when running connector full load");
+        JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+        browser.get(getBasicRootUrl() + json.getString("uri"));
+        waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
     }
 }
