@@ -10,7 +10,7 @@
         <property name="browser">${browser:firefox}</property>
         <property name="remoteReusable">false</property>
         <property name="remoteAddress">http://localhost:4444/wd/hub</property>
-        <property name="chromeDriverBinary"></property>
+        <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
         <property name="firefoxUserPreferences">target/test-classes/firefox-prefs.js</property>
     </extension>
 

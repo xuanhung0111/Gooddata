@@ -26,6 +26,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <browser>firefox</browser>
+        <chromeDriverBinaryPath>/usr/bin/chromium-browser</chromeDriverBinaryPath>
         <timeout>90</timeout><!-- (seconds) -->
         <file.separator>/</file.separator>
         <browserDownloadFolder>${project.build.directory}${file.separator}downloads</browserDownloadFolder>
@@ -156,6 +157,14 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${version.org.apache.maven.surefire-plugin}</version>
                     <configuration>
@@ -203,6 +212,10 @@
                                             <property>
                                                 <name>browser</name>
                                                 <value>${browser}</value>
+                                            </property>
+                                            <property>
+                                                <name>chromeDriverBinaryPath</name>
+                                                <value>${chromeDriverBinaryPath}</value>
                                             </property>
                                             <property>
                                                 <name>timeout</name>
