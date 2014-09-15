@@ -67,7 +67,7 @@ public class DISCProjectsPage extends AbstractFragment {
 	}
 
 	public void checkFilteredProjects(Map<String, String> filteredProjects,
-			DISCProjectsList projectsList) {
+			DISCProjectsList projectsList) throws InterruptedException {
 		for (Entry<String, String> filteredProject : filteredProjects.entrySet()) {
 			assertNotNull(projectsList.selectProject(filteredProject.getKey(),
 					filteredProject.getValue(), true));
@@ -77,7 +77,7 @@ public class DISCProjectsPage extends AbstractFragment {
 	}
 
 	public void checkFilteredOutProjects(Map<String, String> filteredOutProjects,
-			DISCProjectsList projectsList) {
+			DISCProjectsList projectsList) throws InterruptedException {
 		for (Entry<String, String> filteredOutProject : filteredOutProjects.entrySet()) {
 			assertNull(projectsList.selectProject(filteredOutProject.getKey(),
 					filteredOutProject.getValue(), true));

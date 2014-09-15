@@ -23,6 +23,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "long-time-schedule" })
 	public void checkScheduleAutoRun() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Auto Run Schedule", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -41,6 +42,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "long-time-schedule" })
 	public void checkErrorExecution() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Error Execution of Schedule", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -60,6 +62,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "long-time-schedule" })
 	public void checkRetryExecution() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Retry Schedule", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -83,6 +86,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "long-time-schedule" })
 	public void checkStopAutoExecution() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Stop Auto Execution", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -104,6 +108,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "long-time-schedule" })
 	public void checkLongTimeExecution() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Long Time Execution", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -125,6 +130,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 
 	public void disableSchedule() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Disable Schedule", Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 									"successfulGraph.grf"), true);
@@ -149,6 +155,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "long-time-schedule" })
 	public void checkScheduleFailForManyTimes() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 				"Check Failed Schedule",
 				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),

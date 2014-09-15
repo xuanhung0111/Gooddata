@@ -40,8 +40,7 @@ public class ScheduleDetail extends ScheduleForm {
 	private static final By BY_ERROR_STATUS_ICON = By.cssSelector(".status-icon-error");
 	private static final By BY_MANUAL_ICON = By.cssSelector(".icon-manual");
 	private static final By BY_CONFIRM_STOP_EXECUTION = By.cssSelector(".button-negative");
-	private static final By BY_RUN_STOP_BUTTON = By
-			.xpath("//div[@class='large-12 columns ait-schedule-executable-section']/div[@class='l-next']/button[1]");
+	private static final By BY_RUN_STOP_BUTTON = By.xpath("//div[contains(@class, 'ait-schedule-title-section')]//button[1]");
 
 	@FindBy(css = ".ait-schedule-close-btn .icon-delete")
 	protected WebElement closeButton;
@@ -109,10 +108,10 @@ public class ScheduleDetail extends ScheduleForm {
 	@FindBy(css = ".ait-schedule-delete-cancel-btn")
 	protected WebElement cancelDeleteScheduleButton;
 
-	@FindBy(css = ".ait-schedule-cron-edit-buttons .button-positive")
+	@FindBy(css = ".ait-schedule-executable-edit-buttons .button-positive")
 	protected WebElement saveChangedCronTimeButton;
 
-	@FindBy(css = ".ait-schedule-cron-edit-buttons .button-secondary")
+	@FindBy(css = ".ait-schedule-executable-edit-buttons .button-secondary")
 	protected WebElement cancelChangedCronTimeButton;
 
 	@FindBy(css = ".parameters-save-buttons .button-positive")
@@ -127,7 +126,7 @@ public class ScheduleDetail extends ScheduleForm {
 	@FindBy(css = ".broken-schedule-info .schedule-title-select")
 	protected WebElement brokenScheduleExecutable;
 
-	@FindBy(css = ".broken-schedule-title-save .button-positive")
+	@FindBy(css = ".ait-schedule-executable-edit-buttons .button-positive")
 	protected WebElement brokenScheduleSaveChangeButton;
 
 	@FindBy(css = ".info-section")

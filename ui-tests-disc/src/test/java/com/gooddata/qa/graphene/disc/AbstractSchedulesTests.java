@@ -16,8 +16,6 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
 	protected void createScheduleForProcess(String projectName, String projectId,
 			String processName, String executable,
 			Pair<String, List<String>> cronTime, Map<String, List<String>> parameters) throws InterruptedException {
-		openProjectDetailPage(projectName, projectId);
-		waitForElementVisible(projectDetailPage.getRoot());
 		projectDetailPage.clickOnNewScheduleButton();
 		waitForElementVisible(scheduleForm.getRoot());
 		scheduleForm.createNewSchedule(processName, executable, cronTime, parameters, true);
@@ -42,6 +40,8 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
 			String executableName, Pair<String, List<String>> cronTime,
 			Map<String, List<String>> parameters) throws InterruptedException {
 		waitForElementVisible(schedulesTable.getRoot());
+		for(int i = 0; i < 10 && schedulesTable.getScheduleTitle(executableName) == null; i++)
+			Thread.sleep(1000);
 		Assert.assertEquals(executableName, schedulesTable.getScheduleTitle(executableName)
 				.getText());
 		String cronFormat = "";
