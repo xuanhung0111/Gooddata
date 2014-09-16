@@ -32,6 +32,8 @@ public class DashboardFilter extends AbstractFragment {
     private String attributeToAddLocator = "//div[contains(@class,'es_body')]/span[text()='${variableName}']";
     
     private String selectedPromptLocator = "//div[contains(@class, 'filter_prompts sliding')]//div[contains(@class,'${promptName}')]";
+    
+    private String addButton = "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']";
 
     @FindBy(xpath = "//div[contains(@class,'yui3-c-collectionwidget-content')]/div[contains(@class,'c-label')]/span")
     private List<WebElement> dateFilterList;
@@ -71,7 +73,7 @@ public class DashboardFilter extends AbstractFragment {
 
     public void addTimeFilter(int dateDimensionIndex, String dataRange)
 	    throws InterruptedException {
-    if (browser.findElements(By.xpath("//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']")).size() > 0 && addTimeButton.isDisplayed()) {
+    if (browser.findElements(By.xpath(addButton)).size() > 0 && addTimeButton.isDisplayed()) {
 	    waitForElementVisible(yearOption).click();
 	    WebElement selectYear = browser.findElement(By
 		    .xpath(timeLineLocator.replace("${time}", dataRange)));
