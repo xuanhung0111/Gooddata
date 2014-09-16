@@ -27,6 +27,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void createScheduleWithCustomInput() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Create Schedule with Custom Input",
 					Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
@@ -47,13 +48,12 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void createScheduleForSpecificExecutable() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH,
 					"Create Schedule for Specific Executable", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
-			waitForElementVisible(projectDetailPage.getRoot());
 			projectDetailPage.getExecutableTabByProcessName(
 					"Create Schedule for Specific Executable").click();
 			waitForElementVisible(projectDetailPage.getExecutableScheduleLink("DWHS2.grf")).click();
@@ -72,13 +72,12 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void createScheduleFromSchedulesList() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Create Schedule from Schedule List",
 					Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-			openProjectDetailPage(projectTitle, testParams.getProjectId());
-			waitForElementVisible(projectDetailPage.getRoot());
 			projectDetailPage.getNewScheduleLinkInSchedulesList(
 					"Create Schedule from Schedule List").click();
 			waitForElementVisible(scheduleForm.getRoot());
@@ -95,6 +94,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void createScheduleWithEveryWeekCronTime() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Edit Cron Time of Schedule", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
@@ -112,6 +112,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void createScheduleWithEveryDayCronTime() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Schedule every day", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
@@ -126,6 +127,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void createScheduleWithCronExpression() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Schedule with cron expression", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
@@ -141,6 +143,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkManualExecution() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Manual Execution", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -160,6 +163,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkStopManualExecution() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Stop Manual Execution", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -182,6 +186,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void changeExecutableOfSchedule() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Change Executable of Schedule", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -200,6 +205,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void deleteSchedule() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 				"Delete Schedule",
 				Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -220,6 +226,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void changeScheduleCronTime() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Change Cron Time of Schedule", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -241,6 +248,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void editScheduleParameters() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Edit schedule parameters", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
@@ -267,6 +275,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void addNewParametersForSchedule() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Add New Parameters for Schedule",
 					Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
@@ -296,12 +305,11 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void createScheduleWithIncorrectCron() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 				DISCProcessTypes.GRAPH, "Create Schedule With Error Cron", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 		Pair<String, List<String>> incorrectCronTime = Pair.of(
 				ScheduleCronTimes.CRON_EXPRESSION.getCronTime(), Arrays.asList("* * *"));
-		openProjectDetailPage(projectTitle, testParams.getProjectId());
-		waitForElementVisible(projectDetailPage.getRoot());
 		projectDetailPage.clickOnNewScheduleButton();
 		waitForElementVisible(scheduleForm.getRoot());
 		scheduleForm.checkScheduleWithIncorrectCron(incorrectCronTime,
@@ -311,6 +319,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void editScheduleWithIncorrectCron() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Edit Schedule With Error Cron", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
@@ -330,6 +339,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkBrokenSchedule() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 					DISCProcessTypes.GRAPH, "Check Broken Schedule", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
@@ -351,6 +361,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkDeleteScheduleParams() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
 					"Delete Schedule Parameter", Arrays.asList("DWHS1.grf", "DWHS2.grf"),
 					true);
@@ -381,6 +392,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkCancelDeleteScheduleParams() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
 					"Cancel Delete Schedule Parameter", Arrays.asList("DWHS1.grf", "DWHS2.grf"),
 					true);
@@ -410,6 +422,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkIncorrectRetryDelay() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Check Incorrect Retry Schedule", Arrays.asList("errorGraph.grf",
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -426,6 +439,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkCancelCreateSchedule() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
 				"Cancel Create Schedule from Schedule List",
 				Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
@@ -441,6 +455,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkCancelChangeScheduleExecutable() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Cancel Change Executable", Arrays.asList("errorGraph.grf",
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -461,6 +476,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkCancelChangeScheduleCronTime() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Cancel Change Cron Time of Schedule", Arrays.asList("errorGraph.grf",
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -483,6 +499,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkCancelAddRetryDelay() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Check Retry Schedule", Arrays.asList("errorGraph.grf",
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -500,6 +517,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkCancelEditScheduleParams() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect", DISCProcessTypes.GRAPH,
 					"Cancel Edit schedule parameters", Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
 			Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
@@ -526,6 +544,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "schedule" })
 	public void checkCancelDeleteSchedule() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Cancel Delete Schedule", Arrays.asList("errorGraph.grf",
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);

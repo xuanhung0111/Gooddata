@@ -27,14 +27,14 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
-	public void checkProjectTitle() {
+	public void checkProjectTitle() throws InterruptedException {
 		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		waitForElementVisible(projectDetailPage.getRoot());
 		assertEquals(projectTitle, projectDetailPage.getDisplayedProjectTitle());
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
-	public void checkGoToDashboardsLink() {
+	public void checkGoToDashboardsLink() throws InterruptedException {
 		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		waitForElementVisible(projectDetailPage.getRoot());
 		projectDetailPage.goToDashboards();
@@ -42,7 +42,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
-	public void checkEmptyProjectState() {
+	public void checkEmptyProjectState() throws InterruptedException {
 		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		waitForElementVisible(projectDetailPage.getRoot());
 		assertEquals(PROJECT_EMPTY_STATE_TITLE,
@@ -54,6 +54,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
 	public void downloadProcess() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Download Process Test", Arrays.asList("errorGraph.grf",
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
@@ -68,6 +69,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
 	public void checkSortedProcesses() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Process-A", Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 									"successfulGraph.grf"), true);
@@ -90,6 +92,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
 	public void checkSortedProcessesAfterRedeploy() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Process-A", Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 									"successfulGraph.grf"), true);
@@ -114,6 +117,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
 	public void checkDeleteProcess() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Process-A", Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 									"successfulGraph.grf"), true);
@@ -139,6 +143,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
 	public void checkProcessDeleteDialog() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Process-A", Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 									"successfulGraph.grf"), true);
@@ -151,6 +156,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
 	public void checkCancelProcessDeleteDialog() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Process-A", Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 									"successfulGraph.grf"), true);
@@ -163,6 +169,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-detail" })
 	public void checkExecutableScheduleNumber() throws JSONException, InterruptedException {
 		try {
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic", DISCProcessTypes.GRAPH,
 					"Process-A", Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 									"successfulGraph.grf"), true);

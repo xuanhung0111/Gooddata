@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +37,9 @@ public class DISCProjectsList extends AbstractTable {
 	
 	@FindBy(css = ".ait-project-detail-fragment")
 	private WebElement projectDetail;
+	
+	@FindBy(css = ".ait-projects-empty-state")
+	private WebElement projectsEmptyState;
 
 	public WebElement getDeployProcessButton() {
 		return deployProcessButton;
@@ -45,20 +49,22 @@ public class DISCProjectsList extends AbstractTable {
 		return errorBar;
 	}
 
-	public void checkOnProjects(Map<String, String> projects) {
+	public void checkOnProjects(Map<String, String> projects) throws InterruptedException {
 		for (Entry<String, String> project : projects.entrySet()) {
 			selectProject(project.getKey(), project.getValue(), true).findElement(BY_PROJECT_CHECKBOX)
 					.click();
 		}
 	}
 
-	public void clickOnProjectTitle(String projectName, String projectId) {
+	public void clickOnProjectTitle(String projectName, String projectId) throws InterruptedException {
 		selectProject(projectName, projectId, true).findElement(BY_DISC_PROJECT_NAME).click();
 	}
 
-	public WebElement selectProject(String projectName, String projectId, boolean isAdmin) {
+	public WebElement selectProject(String projectName, String projectId, boolean isAdmin) throws InterruptedException {
 		int pageIndex = 0;
 		do {
+			for(int i = 0; i < 10 && projectsEmptyState != null && getNumberOfRows() == 0; i++)
+				Thread.sleep(1000);
 			for (int i = 0; i < getNumberOfRows(); i++) {
 				if (isAdmin) {
 					if (getRow(i).findElement(BY_PROJECT_CHECKBOX).isEnabled()) {
@@ -87,7 +93,7 @@ public class DISCProjectsList extends AbstractTable {
 	}
 
 	public void assertDataLoadingProcesses(int processNumber, int scheduleNumber,
-			Map<String, String> projectsMap) {
+			Map<String, String> projectsMap) throws InterruptedException {
 		String expectedDataLoadingProcess = String.format("%d processes, %d schedules",
 				processNumber, scheduleNumber);
 		System.out.println("expectedDataLoadingProcess " + expectedDataLoadingProcess);
@@ -100,7 +106,7 @@ public class DISCProjectsList extends AbstractTable {
 	}
 
 	public void assertLastLoaded(String executionDate, String executionTime,
-			Map<String, String> projectsMap) {
+			Map<String, String> projectsMap) throws InterruptedException {
 		String expectedLastLoaded = executionDate + " " + executionTime;
 		System.out.println("expectedLastLoaded " + expectedLastLoaded);
 		for (Entry<String, String> project : projectsMap.entrySet()) {
@@ -109,7 +115,7 @@ public class DISCProjectsList extends AbstractTable {
 		}
 	}
 
-	public void assertProjectNotAdmin(String projectName, String projectId) {
+	public void assertProjectNotAdmin(String projectName, String projectId) throws InterruptedException {
 		waitForElementVisible(getRoot());
 		WebElement projectCell = selectProject(projectName, projectId, false);
 		assertNotNull(projectCell.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN));

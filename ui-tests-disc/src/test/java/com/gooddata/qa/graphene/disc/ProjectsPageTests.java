@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.enums.DISCProjectFilters;
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.UserRoles;
+
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -45,6 +46,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Failed Projects Filter Option", "/graph/errorGraph.grf", cronTime, null);
 			assertNewSchedule("Check Failed Projects Filter Option", "errorGraph.grf", cronTime,
@@ -71,6 +73,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Successful Projects Filter Option", "/graph/successfulGraph.grf",
 					cronTime, null);
@@ -98,6 +101,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Running Projects Filter Option", "/graph/longTimeRunningGraph.grf",
 					cronTime, null);
@@ -121,8 +125,10 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 		Pair<String, List<String>> cronTime = Pair.of(
 				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
 		Map<String, String> addtionalProjects = createMultipleProjects("Disc-test-scheduled-filter-option", 1);
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		try {
 			for (Entry<String, String> project : addtionalProjects.entrySet()) {
+				openProjectDetailPage(project.getKey(), project.getValue());
 				for (int i = 1; i < 10; i++) {
 					deployInProjectDetailPage(project.getKey(), project.getValue(), "Basic",
 							DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option "
@@ -130,11 +136,13 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 									"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
 				}
 			}
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option",
 					Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
 							"successfulGraph.grf"), true);
 			for (Entry<String, String> project : addtionalProjects.entrySet()) {
+				openProjectDetailPage(project.getKey(), project.getValue());
 				for (int i = 1; i < 10; i++) {
 					createScheduleForProcess(project.getKey(), project.getValue(),
 							"Check Scheduled Projects Filter Option " + i,
@@ -144,6 +152,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 					scheduleDetail.manualRun();
 				}
 			}
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Scheduled Projects Filter Option", "/graph/longTimeRunningGraph.grf",
 					cronTime, null);
@@ -185,6 +194,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Disabled Projects Filter Option", "/graph/longTimeRunningGraph.grf",
 					cronTime, null);
@@ -213,6 +223,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Data Loading Processes 1", "/graph/longTimeRunningGraph.grf", cronTime,
 					null);
@@ -223,6 +234,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			assertNewSchedule("Check Data Loading Processes 1", "errorGraph.grf", cronTime, null);
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Data Loading Processes 2", "/graph/errorGraph.grf", cronTime, null);
+			Thread.sleep(2000);
 			assertNewSchedule("Check Data Loading Processes 2", "errorGraph.grf", cronTime, null);
 			openUrl(DISC_PROJECTS_PAGE_URL);
 			waitForElementVisible(discProjectsList.getRoot());
@@ -242,6 +254,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
 			Pair<String, List<String>> cronTime = Pair.of(
 					ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
 					"Check Last Successful Execution", "/graph/successfulGraph.grf", cronTime, null);
 			assertNewSchedule("Check Last Successful Execution", "successfulGraph.grf", cronTime,
@@ -271,7 +284,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "projects-page" })
-	public void checkProjectsNotAdmin() throws ParseException, IOException, JSONException {
+	public void checkProjectsNotAdmin() throws ParseException, IOException, JSONException, InterruptedException {
 		try {
 			addUsersWithOtherRolesToProject();
 			openUrl(PAGE_PROJECTS);

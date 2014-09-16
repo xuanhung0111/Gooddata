@@ -34,6 +34,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void deployCloudConnectInProjectDetailPage() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 				DISCProcessTypes.GRAPH, "CloudConnect - Project Detail Page",
 				Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
@@ -41,6 +42,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void deployRubyInProjectDetailPage() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "ruby",
 				DISCProcessTypes.RUBY, "Ruby - Project Detail Page",
 				Arrays.asList("ruby1.rb", "ruby2.rb"), true);
@@ -50,6 +52,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 	public void redeployProcessWithDifferentPackage() throws JSONException, InterruptedException {
 		List<String> executablesList = Arrays.asList("01 - REST_GET_1.grf", "02 - REST_POST.grf",
 				"03 - REST_PUT.grf", "04 - REST_DELETE.grf");
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 				DISCProcessTypes.GRAPH, "Process to redeploy with different package",
 				Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
@@ -63,6 +66,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 			InterruptedException {
 		List<String> executablesList = Arrays.asList("01 - REST_GET_1.grf", "02 - REST_POST.grf",
 				"03 - REST_PUT.grf", "04 - REST_DELETE.grf");
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "executables",
 				DISCProcessTypes.GRAPH, "Process to redeploy with different process type",
 				executablesList, true);
@@ -76,6 +80,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 	public void redeployProcessWithSamePackage() throws JSONException, InterruptedException {
 		List<String> executablesList = Arrays.asList("01 - REST_GET_1.grf", "02 - REST_POST.grf",
 				"03 - REST_PUT.grf", "04 - REST_DELETE.grf");
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "executables",
 				DISCProcessTypes.GRAPH, "Process to redeploy with the same package",
 				executablesList, true);
@@ -85,15 +90,17 @@ public class DeployProcesses extends AbstractDeployProcesses {
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
-	public void emptyInputErrorDeployment() {
+	public void emptyInputErrorDeployment() throws InterruptedException {
 		Map<String, String> projects = new LinkedHashMap<String, String>();
 		projects.put(projectTitle, testParams.getProjectId());
+		openUrl(DISC_PROJECTS_PAGE_URL);
 		selectProjectsToDeployInProjectsPage(projects);
 		deployForm.assertErrorOnDeployForm("", DISCProcessTypes.DEFAULT, "");
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void notZipFileErrorDeployment() throws InterruptedException {
+		openUrl(DISC_PROJECTS_PAGE_URL);
 		selectProjectsToDeployInProjectsPage(getProjectsMap());
 		deployForm.assertErrorOnDeployForm(zipFilePath + "not-zip-file.7z",
 				DISCProcessTypes.DEFAULT, "Not zip file");
@@ -101,6 +108,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void tooLargeZipFileErrorDeployment() throws InterruptedException {
+		openUrl(DISC_PROJECTS_PAGE_URL);
 		selectProjectsToDeployInProjectsPage(getProjectsMap());
 		deployForm.assertErrorOnDeployForm(zipFilePath + "too-large-file.zip",
 				DISCProcessTypes.DEFAULT, "Too large file");
@@ -129,6 +137,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void deployWithoutExecutablesInProjectDetailPage() throws JSONException,
 			InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "not-executables",
 				DISCProcessTypes.GRAPH, "Not Executables", null, false);
 	}
@@ -136,6 +145,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void deployCloudConnectWithRubyTypeInProjectDetailPage() throws JSONException,
 			InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 				DISCProcessTypes.RUBY, "CloudConnect with Ruby type", null, false);
 	}
@@ -143,12 +153,14 @@ public class DeployProcesses extends AbstractDeployProcesses {
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void deployRubyWithCloudConnectTypeInProjectDetailPage() throws JSONException,
 			InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "ruby",
 				DISCProcessTypes.GRAPH, "Ruby with CloudConnect type", null, false);
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void redeployWithoutExecutables() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 				DISCProcessTypes.GRAPH, "Process to redeploy without executables",
 				Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
@@ -159,6 +171,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void redeployCloudConnectWithRubyType() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
 				DISCProcessTypes.GRAPH, "CloudConnect process to redeploy with Ruby type",
 				Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
@@ -169,12 +182,32 @@ public class DeployProcesses extends AbstractDeployProcesses {
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
 	public void redeployRubyWithCloudConnectType() throws JSONException, InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
 		deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "ruby",
 				DISCProcessTypes.RUBY, "Ruby process to redeploy with CloudConnect type",
 				Arrays.asList("ruby1.rb", "ruby2.rb"), true);
 		redeployProcess(projectTitle, testParams.getProjectId(),
 				"Ruby process to redeploy with CloudConnect type", "ruby",
 				"Redeploy with different process type", DISCProcessTypes.GRAPH, null, false);
+	}
+	
+	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
+	public void checkDeployDialogMessageInProjectDetail() throws InterruptedException {
+		openProjectDetailPage(projectTitle, testParams.getProjectId());
+		checkDeployDialogMessageInProjectDetail(projectTitle, testParams.getProjectId(), "Basic",
+				DISCProcessTypes.GRAPH, "Check deploy dialog message in project detail", true);
+	}
+	
+	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
+	public void checkDeployDialogMessageInProjectsPage() throws InterruptedException {
+		checkDeployDialogMessageInProjectsPage(getProjectsMap(), "Basic",
+				DISCProcessTypes.GRAPH, "Check deploy dialog message in projects page", true);
+	}
+	
+	@Test(dependsOnMethods = { "createProject" }, groups = { "deploy" })
+	public void checkFailedDeployMessageInProjectsPage() throws InterruptedException {
+		checkDeployDialogMessageInProjectsPage(getProjectsMap(), "Basic",
+				DISCProcessTypes.RUBY, "Check failed deploy dialog message in projects page", false);
 	}
 
 	@Test(dependsOnGroups = { "deploy" }, groups = { "tests" })
