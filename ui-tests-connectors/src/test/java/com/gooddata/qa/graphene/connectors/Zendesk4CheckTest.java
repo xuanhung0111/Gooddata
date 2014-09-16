@@ -294,7 +294,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
-            "connectorWalkthrough"})
+            "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testTicketsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         int gdTicketsCount = getNumberFromGDReport(TICKETS_REPORT_NAME, "inc_after_delete");
         compareObjectsCount(gdTicketsCount, zendeskHelper.getNumberOfTickets(),
@@ -304,7 +304,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
-            "connectorWalkthrough"})
+            "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testUsersCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         int gdUsersCount = getNumberFromGDReport(USERS_REPORT_NAME, "inc_after_delete");
         compareObjectsCount(gdUsersCount, zendeskHelper.getNumberOfUsers(),
@@ -314,7 +314,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
-            "connectorWalkthrough"})
+            "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testOrganizationsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME, "inc_after_delete");
         compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations(),
@@ -326,7 +326,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     /**
      * TODO
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
-            "connectorWalkthrough"})
+    "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testTicketEventsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         compareObjectsCount(getNumberFromGDReport(TICKET_EVENTS_REPORT_NAME), zendeskHelper.getNumberOfTicketEvents(),
                 ZendeskHelper.ZendeskObject.TICKET_EVENT);
@@ -334,19 +334,19 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     */
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
-            "connectorWalkthrough"})
+            "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testReportMetricsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         assertEquals(getNumberFromGDReport(BACKLOG_TICKETS_REPORT_NAME, "inc_after_delete"),
                 reportMetricsResults.get(BACKLOG_TICKETS_REPORT_NAME).intValue(),
                 "Backlog tickets count doesn't match after ticket deleted");
     }
 
-    @Test(dependsOnGroups = {"zendeskApiTests"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnGroups = {"zendeskAfterDeletionTests"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testFullLoad() throws IOException, JSONException, InterruptedException {
         runConnectorProjectFullLoad();
     }
 
-    @Test(dependsOnMethods = {"testFullLoad"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testFullLoad"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testReportMetricsCountAfterFullLoad() throws IOException, JSONException, InterruptedException {
         assertEquals(getNumberFromGDReport(TICKETS_REPORT_NAME, "full_final"),
                 reportMetricsResults.get(TICKETS_REPORT_NAME).intValue(),
