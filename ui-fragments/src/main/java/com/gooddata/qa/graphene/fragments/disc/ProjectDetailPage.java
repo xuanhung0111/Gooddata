@@ -34,6 +34,7 @@ public class ProjectDetailPage extends AbstractFragment {
 	private final static By BY_PROCESS_METADATA_KEY = By.cssSelector(".ait-process-metadata-key");
 	private final static By BY_PROCESS_METADATA_VALUE = By
 			.cssSelector(".ait-process-metadata-value");
+	private final static By BY_PROCESS_NOTIFICATION_RULE_BUTTON = By.cssSelector(".ait-process-notification-rules-btn");
 
 	private static final String DELETE_PROCESS_DIALOG_MESSAGE = "Are you sure you want to delete process %s?";
 	private static final String DELETE_PROCESS_DIALOG_TITLE = "Delete process %s";
@@ -420,5 +421,9 @@ public class ProjectDetailPage extends AbstractFragment {
 			assertNotNull(schedule.findElement(DISCScheduleStatus.UNSCHEDULED.getIconByCss()));
 			break;
 		}
+	}
+	
+	public WebElement getNotificationButton(String processName) {
+		return waitForElementVisible(getElementFromSpecificProcess(processName, BY_PROCESS_NOTIFICATION_RULE_BUTTON));
 	}
 }
