@@ -445,10 +445,9 @@ public class ScheduleDetail extends ScheduleForm {
 	}
 
 	public boolean isInRunningState() throws InterruptedException {
-		int executionNumber = scheduleExecutionItem.size();
-		for (int i = 0; executionNumber == scheduleExecutionItem.size() && i < 10; i++)
-			Thread.sleep(3000);
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 10 && scheduleExecutionItem.isEmpty(); i++)
+			Thread.sleep(1000);
+		for (int i = 0; i < 50; i++) {
 			if (scheduleExecutionItem.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText()
 					.equals("RUNNING")) {
 				return true;

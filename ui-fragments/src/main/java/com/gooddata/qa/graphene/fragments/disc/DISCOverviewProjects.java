@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -84,8 +83,150 @@ public class DISCOverviewProjects extends AbstractFragment {
 			.cssSelector(".overview-schedule-list .overview-schedule-item");
 	private By BY_OVERVIEW_PROCESS_TITLE = By.cssSelector(".process-title");
 
-	public String getOverviewEmptyStateMessage() {
+	private String getOverviewEmptyStateMessage() {
 		return waitForElementVisible(overviewEmptyState).getText();
+	}
+
+	private void assertProjectInfoWithoutAdminRole(String projectState, String projectName,
+			String projectId, Map<String, String> processes,
+			Map<List<String>, List<String>> expectedSchedules) throws InterruptedException {
+		WebElement overviewProjectDetail = getOverviewProjectDetail(projectName, projectId, false);
+		assertTrue(overviewProjectDetail != null);
+		try {
+			waitForElementVisible(overviewProjectDetail
+					.findElement(BY_OVERVIEW_PROJECT_EXPAND_BUTTON));
+		} catch (NoSuchElementException ex) {
+			System.out.println("Project expand icon is not displayed!");
+		}
+		if (expectedSchedules.size() == 1) {
+			if (!projectState.equals(DISCOverviewProjectStates.SCHEDULED.getOption())
+					&& !projectState.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
+				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_LOG).isEnabled());
+				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME)
+						.getText().isEmpty());
+				System.out.println("Project schedule runtime: "
+						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText());
+				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_DATE).getText()
+						.isEmpty());
+				System.out.println("Project schedule date: "
+						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_DATE).getText());
+			}
+			if (projectState.equals(DISCOverviewProjectStates.FAILED.getOption())
+					|| projectState.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
+				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+						.getText().isEmpty());
+				System.out.println("Overview project error message: "
+						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+								.getText());
+			}
+			if (projectState.equals(DISCOverviewProjectStates.SUCCESSFUL.getOption())) {
+				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO)
+						.getText().isEmpty());
+				System.out.println("Overview project ok info: "
+						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText());
+			}
+		} else if (expectedSchedules.size() > 1) {
+			if (!projectState.equals(DISCOverviewProjectStates.SCHEDULED.getOption())) {
+				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText()
+						.isEmpty());
+				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_DATE).getText()
+						.isEmpty());
+			}
+			if (projectState.equals(DISCOverviewProjectStates.FAILED.getOption())) {
+				String errorMessage = String.format("%d schedules", expectedSchedules.size());
+				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+						.getText().isEmpty());
+				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+						.getText().equals(errorMessage));
+				System.out.println("Overview project error message: "
+						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+								.getText());
+			}
+			if (projectState.equals(DISCOverviewProjectStates.SUCCESSFUL.getOption())) {
+				String okInfo = String.format("%d schedules", expectedSchedules.size());
+				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO)
+						.getText().isEmpty());
+				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText()
+						.equals(okInfo));
+				System.out.println("Overview project ok info: "
+						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText());
+			}
+		}
+	}
+
+	private void assertOverviewSchedules(String state, String projectId, String processName,
+			List<WebElement> overviewSchedules, Map<List<String>, List<String>> expectedSchedules) {
+		for (WebElement overviewSchedule : overviewSchedules) {
+			By scheduleLink = BY_OVERVIEW_PROJECT_SCHEDULE_LINK;
+			assertTrue(expectedSchedules.containsKey(Arrays.asList(processName, overviewSchedule
+					.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText())));
+			List<String> expectedScheduleDetails = expectedSchedules.get(Arrays.asList(processName,
+					overviewSchedule.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText()));
+			if (!state.equals(DISCOverviewProjectStates.SCHEDULED.getOption())
+					&& !state.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
+				assertTrue(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_LOG).isEnabled());
+				assertFalse(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText()
+						.isEmpty());
+				System.out.println("Project schedule runtime: "
+						+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText());
+				assertFalse(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_DATE).getText()
+						.isEmpty());
+				System.out.println("Project schedule date: "
+						+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_DATE).getText());
+			}
+			if (state.equals(DISCOverviewProjectStates.FAILED.getOption())
+					|| state.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
+				scheduleLink = BY_OVERVIEW_PROJECT_ERROR_SCHEDULE_LINK;
+				assertFalse(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+						.getText().isEmpty());
+				System.out
+						.println("Overview schedule error message: "
+								+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+										.getText());
+				assertEquals(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+						.getText(), expectedScheduleDetails.get(4));
+				if (expectedScheduleDetails.get(1) != null)
+					assertEquals(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME)
+							.getText(), expectedScheduleDetails.get(1));
+			}
+			if (state.equals(DISCOverviewProjectStates.SUCCESSFUL.getOption())) {
+				assertTrue(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText()
+						.isEmpty());
+				System.out.println("Overview schedule ok info: "
+						+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText());
+				assertTrue(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText()
+						.equals(expectedScheduleDetails.get(1)));
+			}
+			assertEquals(overviewSchedule.findElement(scheduleLink).getAttribute("href"),
+					expectedScheduleDetails.get(0));
+		}
+	}
+
+	private void runNowProject() {
+		waitForElementVisible(runNowButton);
+		assertTrue(runNowButton.isEnabled());
+		runNowButton.click();
+		waitForElementVisible(runNowDialog);
+		waitForElementVisible(positiveButton).click();
+		waitForElementNotPresent(runNowDialog);
+	}
+
+	private void disableProject() {
+		waitForElementVisible(disableButton);
+		assertTrue(disableButton.isEnabled());
+		disableButton.click();
+		waitForElementVisible(disableDialog);
+		waitForElementVisible(negativeButton).click();
+		waitForElementNotPresent(disableDialog);
+	}
+
+	private void stopProject() {
+		waitForElementVisible(stopButton);
+		assertTrue(stopButton.isEnabled());
+		stopButton.click();
+		waitForElementVisible(stopDialog);
+		waitForElementVisible(negativeButton).click();
+		waitForElementNotPresent(stopDialog);
 	}
 
 	public WebElement getOverviewProjectDetail(String projectName, String projectId, boolean isAdmin)
@@ -118,7 +259,7 @@ public class DISCOverviewProjects extends AbstractFragment {
 		assertEquals(getOverviewEmptyStateMessage(), state.getOverviewEmptyState());
 	}
 
-	public void assertOverviewProcesses(String projectState, String projectName, String projectId,
+	public void assertOverviewProject(String projectState, String projectName, String projectId,
 			Map<String, String> processes, Map<List<String>, List<String>> expectedSchedules)
 			throws InterruptedException {
 		WebElement overviewProjectDetail = getOverviewProjectDetail(projectName, projectId, true);
@@ -202,148 +343,6 @@ public class DISCOverviewProjects extends AbstractFragment {
 		}
 	}
 
-	public void assertProjectInfoWithoutAdminRole(String projectState, String projectName,
-			String projectId, Map<String, String> processes,
-			Map<List<String>, List<String>> expectedSchedules) throws InterruptedException {
-		WebElement overviewProjectDetail = getOverviewProjectDetail(projectName, projectId, false);
-		assertTrue(overviewProjectDetail != null);
-		try {
-			waitForElementVisible(overviewProjectDetail
-					.findElement(BY_OVERVIEW_PROJECT_EXPAND_BUTTON));
-		} catch (NoSuchElementException ex) {
-			System.out.println("Project expand icon is not displayed!");
-		}
-		if (expectedSchedules.size() == 1) {
-			if (!projectState.equals(DISCOverviewProjectStates.SCHEDULED.getOption())
-					&& !projectState.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
-				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_LOG).isEnabled());
-				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME)
-						.getText().isEmpty());
-				System.out.println("Project schedule runtime: "
-						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText());
-				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_DATE).getText()
-						.isEmpty());
-				System.out.println("Project schedule date: "
-						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_DATE).getText());
-			}
-			if (projectState.equals(DISCOverviewProjectStates.FAILED.getOption())
-					|| projectState.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
-				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-						.getText().isEmpty());
-				System.out.println("Overview project error message: "
-						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-								.getText());
-			}
-			if (projectState.equals(DISCOverviewProjectStates.SUCCESSFUL.getOption())) {
-				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO)
-						.getText().isEmpty());
-				System.out.println("Overview project ok info: "
-						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText());
-			}
-		} else if (expectedSchedules.size() > 1) {
-			if (!projectState.equals(DISCOverviewProjectStates.SCHEDULED.getOption())) {
-				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText()
-						.isEmpty());
-				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_DATE).getText()
-						.isEmpty());
-			}
-			if (projectState.equals(DISCOverviewProjectStates.FAILED.getOption())) {
-				String errorMessage = String.format("%d schedules", expectedSchedules.size());
-				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-						.getText().isEmpty());
-				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-						.getText().equals(errorMessage));
-				System.out.println("Overview project error message: "
-						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-								.getText());
-			}
-			if (projectState.equals(DISCOverviewProjectStates.SUCCESSFUL.getOption())) {
-				String okInfo = String.format("%d schedules", expectedSchedules.size());
-				assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO)
-						.getText().isEmpty());
-				assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText()
-						.equals(okInfo));
-				System.out.println("Overview project ok info: "
-						+ overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText());
-			}
-		}
-	}
-
-	public void assertOverviewSchedules(String state, String projectId, String processName,
-			List<WebElement> overviewSchedules, Map<List<String>, List<String>> expectedSchedules) {
-		for (WebElement overviewSchedule : overviewSchedules) {
-			By scheduleLink = BY_OVERVIEW_PROJECT_SCHEDULE_LINK;
-			assertTrue(expectedSchedules.containsKey(Arrays.asList(processName, overviewSchedule
-					.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText())));
-			List<String> expectedScheduleDetails = expectedSchedules.get(Arrays.asList(processName,
-					overviewSchedule.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText()));
-			if (!state.equals(DISCOverviewProjectStates.SCHEDULED.getOption())
-					&& !state.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
-				assertTrue(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_LOG).isEnabled());
-				assertFalse(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText()
-						.isEmpty());
-				System.out.println("Project schedule runtime: "
-						+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText());
-				assertFalse(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_DATE).getText()
-						.isEmpty());
-				System.out.println("Project schedule date: "
-						+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_DATE).getText());
-			}
-			if (state.equals(DISCOverviewProjectStates.FAILED.getOption())
-					|| state.equals(DISCOverviewProjectStates.STOPPED.getOption())) {
-				scheduleLink = BY_OVERVIEW_PROJECT_ERROR_SCHEDULE_LINK;
-				assertFalse(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-						.getText().isEmpty());
-				System.out
-						.println("Overview schedule error message: "
-								+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-										.getText());
-				assertEquals(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
-						.getText(), expectedScheduleDetails.get(4));
-				if (expectedScheduleDetails.get(1) != null)
-					assertEquals(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME)
-							.getText(), expectedScheduleDetails.get(1));
-			}
-			if (state.equals(DISCOverviewProjectStates.SUCCESSFUL.getOption())) {
-				assertTrue(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText()
-						.isEmpty());
-				System.out.println("Overview schedule ok info: "
-						+ overviewSchedule.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText());
-				assertTrue(overviewSchedule.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText()
-						.equals(expectedScheduleDetails.get(1)));
-			}
-			assertEquals(overviewSchedule.findElement(scheduleLink).getAttribute("href"),
-					expectedScheduleDetails.get(0));
-		}
-	}
-
-	public void runNowProject() {
-		waitForElementVisible(runNowButton);
-		assertTrue(runNowButton.isEnabled());
-		runNowButton.click();
-		waitForElementVisible(runNowDialog);
-		waitForElementVisible(positiveButton).click();
-		waitForElementNotPresent(runNowDialog);
-	}
-
-	public void disableProject() {
-		waitForElementVisible(disableButton);
-		assertTrue(disableButton.isEnabled());
-		disableButton.click();
-		waitForElementVisible(disableDialog);
-		waitForElementVisible(negativeButton).click();
-		waitForElementNotPresent(disableDialog);
-	}
-
-	public void stopProject() {
-		waitForElementVisible(stopButton);
-		assertTrue(stopButton.isEnabled());
-		stopButton.click();
-		waitForElementVisible(stopDialog);
-		waitForElementVisible(negativeButton).click();
-		waitForElementNotPresent(stopDialog);
-	}
-
 	public void checkAllProjects() throws InterruptedException {
 		waitForElementVisible(checkAllProjects).click();
 		for (int i = 0; i < 5 && !disableButton.isEnabled(); i++) {
@@ -394,28 +393,28 @@ public class DISCOverviewProjects extends AbstractFragment {
 		}
 	}
 
-	public void bulkAction(DISCOverviewProjectStates state, boolean isDisable) {
+	public void bulkAction(DISCOverviewProjectStates state, boolean disable) {
 		switch (state) {
 		case FAILED:
-			if (isDisable)
+			if (disable)
 				disableProject();
 			else
 				runNowProject();
 			break;
 		case RUNNING:
-			if (isDisable)
+			if (disable)
 				disableProject();
 			else
 				stopProject();
 			break;
 		case SCHEDULED:
-			if (isDisable)
+			if (disable)
 				disableProject();
 			else
 				stopProject();
 			break;
 		case SUCCESSFUL:
-			if (isDisable)
+			if (disable)
 				disableProject();
 			else
 				runNowProject();

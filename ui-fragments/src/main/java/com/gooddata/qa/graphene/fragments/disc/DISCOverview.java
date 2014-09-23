@@ -4,6 +4,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.DISCOverviewProjectStates;
+
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -65,63 +66,46 @@ public class DISCOverview extends DISCOverviewProjects {
 			break;
 		}
 	}
-
-	public String getFailedState() {
-		return waitForElementVisible(failedState).getText();
+	
+	public String getState(DISCOverviewProjectStates state) {
+		switch (state) {
+		case FAILED:
+			return waitForElementVisible(failedState).getText();
+		case RUNNING:
+			return waitForElementVisible(runningState).getText();
+		case SCHEDULED:
+			return waitForElementVisible(scheduledState).getText();
+		case SUCCESSFUL:
+			return waitForElementVisible(successfulState).getText();
+		}
+		return null;
 	}
-
-	public String getFailedStateNumber() throws InterruptedException {
-		waitForElementVisible(failedStateNumber);
-		waitForStateNumber(failedStateNumber);
-		return failedStateNumber.getText();
-	}
-
-	public String getRunningState() {
-		return waitForElementVisible(runningState).getText();
-	}
-
-	public String getRunningStateNumber() throws InterruptedException {
-		waitForElementVisible(runningStateNumber);
-		waitForStateNumber(runningStateNumber);
-		return runningStateNumber.getText();
-	}
-
-	public String getScheduledState() {
-		return waitForElementVisible(scheduledState).getText();
-	}
-
-	public String getScheduledStateNumber() throws InterruptedException {
-		waitForElementVisible(scheduledStateNumber);
-		waitForStateNumber(scheduledStateNumber);
-		return scheduledStateNumber.getText();
-	}
-
-	public String getSuccessfulState() {
-		return waitForElementVisible(successfulState).getText();
-	}
-
-	public String getSuccessfulStateNumber() throws InterruptedException {
-		waitForElementVisible(successfulStateNumber);
-		waitForStateNumber(successfulStateNumber);
-		return successfulStateNumber.getText();
+	
+	public String getStateNumber(DISCOverviewProjectStates state) throws InterruptedException {
+		switch (state) {
+		case FAILED:
+			waitForElementVisible(failedStateNumber);
+			waitForStateNumber(failedStateNumber);
+			return failedStateNumber.getText();
+		case RUNNING:
+			waitForElementVisible(runningStateNumber);
+			waitForStateNumber(runningStateNumber);
+			return runningStateNumber.getText();
+		case SCHEDULED:
+			waitForElementVisible(scheduledStateNumber);
+			waitForStateNumber(scheduledStateNumber);
+			return scheduledStateNumber.getText();
+		case SUCCESSFUL:
+			waitForElementVisible(successfulStateNumber);
+			waitForStateNumber(successfulStateNumber);
+			return successfulStateNumber.getText();
+		}
+		return null;
 	}
 
 	public boolean assertOverviewStateNumber(DISCOverviewProjectStates state, int number)
 			throws InterruptedException {
-		switch (state) {
-		case FAILED:
-			assertTrue(state.getOption().equalsIgnoreCase(getFailedState()));
-			return getFailedStateNumber().equals(String.valueOf(number));
-		case RUNNING:
-			assertTrue(state.getOption().equalsIgnoreCase(getRunningState()));
-			return getRunningStateNumber().equals(String.valueOf(number));
-		case SCHEDULED:
-			assertTrue(state.getOption().equalsIgnoreCase(getScheduledState()));
-			return getScheduledStateNumber().equals(String.valueOf(number));
-		case SUCCESSFUL:
-			assertTrue(state.getOption().equalsIgnoreCase(getSuccessfulState()));
-			return getSuccessfulStateNumber().equals(String.valueOf(number));
-		}
-		return false;
+		assertTrue(state.getOption().equalsIgnoreCase(getState(state)));
+		return getStateNumber(state).equals(String.valueOf(number));
 	}
 }
