@@ -29,9 +29,13 @@ public class DashboardFilter extends AbstractFragment {
 
     private String selectedAttributeLocator = "//div[contains(@class, 'attributes sliding')]//div[contains(@class,'${attributeName}')]";
 
+    private String attributeToAddLocator = "//div[contains(@class,'es_body')]/span[text()='${variableName}']";
+    
     private String selectedPromptLocator = "//div[contains(@class, 'filter_prompts sliding')]//div[contains(@class,'${promptName}')]";
+    
+    private String addButton = "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']";
 
-    @FindBy(xpath = "//div[contains(@class,'yui3-c-collectionwidget-content')]/div[contains(@class,'c-label')]")
+    @FindBy(xpath = "//div[contains(@class,'yui3-c-collectionwidget-content')]/div[contains(@class,'c-label')]/span")
     private List<WebElement> dateFilterList;
 
     @FindBy(xpath = "//button[text()='next']")
@@ -51,15 +55,17 @@ public class DashboardFilter extends AbstractFragment {
 	    waitForElementVisible(promptFilter).click();
 	    waitForElementVisible(lisPrompt);
 	    By selectedPrompt = By.xpath(selectedPromptLocator.replace(
-		    "${promptName}", name.toLowerCase()));
+	    	"${promptName}", name.trim().toLowerCase().replaceAll(" ", "_")));
 	    waitForElementVisible(promptSearchInput).sendKeys(name);
 	    waitForElementVisible(selectedPrompt, browser).click();
 
 	} else {
-	    By selectedAttribute = By.xpath(selectedAttributeLocator.replace(
-		    "${attributeName}", "s-item-" + name.toLowerCase()));
+		By listOfAttribute = By.xpath(selectedAttributeLocator.replace(
+			"${attributeName}", "s-item-" + name.trim().toLowerCase().replaceAll(" ", "_")));
 	    waitForElementVisible(attributeSearchInput).sendKeys(name);
-	    waitForElementVisible(selectedAttribute, browser).click();
+	    waitForElementVisible(listOfAttribute, browser);
+	    By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", name));
+	    waitForElementVisible(attributeToAdd, browser).click();
 	}
 	waitForElementVisible(addFilterButton).click();
 	Thread.sleep(2000);
@@ -67,14 +73,14 @@ public class DashboardFilter extends AbstractFragment {
 
     public void addTimeFilter(int dateDimensionIndex, String dataRange)
 	    throws InterruptedException {
-	if (addTimeButton.isDisplayed()) {
+    if (browser.findElements(By.xpath(addButton)).size() > 0 && addTimeButton.isDisplayed()) {
 	    waitForElementVisible(yearOption).click();
 	    WebElement selectYear = browser.findElement(By
 		    .xpath(timeLineLocator.replace("${time}", dataRange)));
 	    waitForElementVisible(selectYear).click();
 	    waitForElementVisible(addTimeButton).click();
 	} else {
-	    dateFilterList.get(dateDimensionIndex).click();
+		waitForElementVisible(dateFilterList.get(dateDimensionIndex)).click();
 	    waitForElementVisible(nextButton).click();
 	    waitForElementVisible(yearOption).click();
 	    WebElement selectYear = browser.findElement(By

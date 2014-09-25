@@ -336,7 +336,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyDashboardExport(String dashboardName, long minimalSize) {
-        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
+    	File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName.replaceAll(" ", "_") + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
         System.out.println(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         long fileSize = pdfExport.length();
@@ -365,9 +365,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType, String screenshotName) throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-        Thread.sleep(3000);
-        openUrl(PAGE_UPLOAD);
+    	openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
+    	waitForDashboardPageLoaded(browser);
+    	openUrl(PAGE_UPLOAD);
         waitForElementVisible(upload.getRoot());
         upload.uploadFile(filePath);
         Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());

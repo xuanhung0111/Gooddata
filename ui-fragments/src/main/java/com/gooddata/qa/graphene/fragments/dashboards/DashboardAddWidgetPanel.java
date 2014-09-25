@@ -1,15 +1,17 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
+
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardAddWidgetPanel extends AbstractFragment {
 
@@ -27,15 +29,19 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class, 'c-geoConfiguration')]//span[@class='attr-inside']")
     private List<WebElement> listGeoLayer;
+    
 
-    private static final String widgetLocator = "//div[contains(@class,'yui3-c-adddashboardwidgetpickerpanel')]//div[contains(@class,'add-dashboard-item')]/div[contains(text(), '${widgetLabel}')]/../button";
+    private static final String widgetLocator = "//div[contains(@class,'yui3-c-adddashboardwidgetpickerpanel')]//div[contains(@class,'add-dashboard-item')]/div[text()='${widgetLabel}']/../button";
     private static final String widgetMetricLocator = "//div[contains(@class,'yui3-widget-stacked shelterPlugin-plugged')]//div[contains(@class,'yui3-c-picker-content')]//div[contains(@class,'yui3-c-simplecolumn')]//div[contains(@class,'c-label') and contains(@class,'s-enabled')]/span[text()='${metricLabel}']";
-
+    
+    public void initWidget(WidgetTypes type) throws InterruptedException {
+    	By widgetType = By.xpath(widgetLocator.replace("${widgetLabel}", type.getLabel()));
+    	waitForElementVisible(widgetType, browser).click();
+    }
+    
     public void initWidget(WidgetTypes type, String metricLabel)
 	    throws InterruptedException {
-	By widgetType = By.xpath(widgetLocator.replace("${widgetLabel}",
-		type.getLabel()));
-	waitForElementVisible(widgetType, browser).click();
+    	initWidget (type);
 	// TODO fragments for widget config panel + metric selection can be used
 	// - but better IDs and UI organization is required
 	waitForElementVisible(widgetConfigPanel);
@@ -52,7 +58,7 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
 	waitForElementVisible(widgetConfigApplyButton).click();
 	waitForElementNotVisible(widgetConfigPanel);
     }
-
+    
     public List<String> getGeoLayersList() {
 	List<String> layersList = new ArrayList<String>();
 	for (WebElement element : listGeoLayer) {

@@ -58,6 +58,9 @@ public class FilterWidget extends AbstractFragment {
 
         @FindBy(css = ".s-btn-cancel")
         private WebElement cancel;
+        
+        @FindBy(css = ".s-btn-apply")
+        private WebElement apply;
 
         @FindBy(css = ".s-afp-input")
         private WebElement search;
@@ -84,6 +87,10 @@ public class FilterWidget extends AbstractFragment {
 
         public WebElement getCancel() {
             return cancel;
+        }
+        
+        public WebElement getApply() {
+        	return apply;
         }
 
         public WebElement getSearch() {
