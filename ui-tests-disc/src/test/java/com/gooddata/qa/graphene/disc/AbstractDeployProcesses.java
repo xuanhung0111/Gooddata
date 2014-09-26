@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -250,6 +251,27 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
 			String failedDeployMessage = String.format(FAILED_DEPLOY_MESSAGE_IN_PROJECTS_PAGE,
 					zipFileName);
 			assertTrue(deployForm.getDeployProcessDialog().getText().equals(failedDeployMessage));
+		}
+	}
+
+	protected Map<String, String> createMultipleProjects(String projectNamePrefix, int projectNumber)
+			throws JSONException, InterruptedException {
+		Map<String, String> additionalProjects = new HashMap<String, String>(1);
+		for (int i = 0; i < projectNumber; i++) {
+			openUrl(PAGE_GDC_PROJECTS);
+			waitForElementVisible(gpProject.getRoot());
+			additionalProjects.put(
+					projectNamePrefix + String.valueOf(i),
+					gpProject.createProject(projectNamePrefix + i, projectNamePrefix + i, null,
+							testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+							projectCreateCheckIterations));
+		}
+		return additionalProjects;
+	}
+
+	protected void deleteProjects(Map<String, String> projectsToDelete) throws InterruptedException {
+		for (Entry<String, String> projectToDelete : projectsToDelete.entrySet()) {
+			deleteProject(projectToDelete.getValue());
 		}
 	}
 }

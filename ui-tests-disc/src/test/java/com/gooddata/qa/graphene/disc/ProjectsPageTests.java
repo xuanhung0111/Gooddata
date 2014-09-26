@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.disc;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -108,7 +107,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 			assertNewSchedule("Check Running Projects Filter Option", "longTimeRunningGraph.grf",
 					cronTime, null);
 			scheduleDetail.manualRun();
-			assertTrue(scheduleDetail.isExecutionInRunningState());
+			assertTrue(scheduleDetail.isInRunningState());
 			openUrl(DISC_PROJECTS_PAGE_URL);
 			waitForElementVisible(discProjectsPage.getRoot());
 			discProjectsPage.checkProjectFilter(DISCProjectFilters.RUNNING.getOption(),
@@ -334,29 +333,5 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 	@Test(dependsOnGroups = { "projects-page" }, groups = { "tests" })
 	public void test() throws JSONException {
 		successfulTest = true;
-	}
-
-	protected Map<String, String> createMultipleProjects(String projectNamePrefix, int projectNumber)
-			throws JSONException, InterruptedException {
-		Map<String, String> additionalProjects = new HashMap<String, String>(1);
-		for (int i = 0; i < projectNumber; i++) {
-			openUrl(PAGE_GDC_PROJECTS);
-			waitForElementVisible(gpProject.getRoot());
-			additionalProjects.put(
-					projectNamePrefix + String.valueOf(i),
-					gpProject.createProject(projectNamePrefix + i, projectNamePrefix + i, null,
-							testParams.getAuthorizationToken(), testParams.getDwhDriver(),
-							projectCreateCheckIterations));
-		}
-		return additionalProjects;
-	}
-
-	protected void deleteProjects(Map<String, String> projectsToDelete) throws InterruptedException {
-		for (Entry<String, String> projectToDelete : projectsToDelete.entrySet()) {
-			if (projectToDelete.getValue() != testParams.getProjectId()) {
-				deleteProject(projectToDelete.getValue());
-				getProjectsMap().remove(projectToDelete.getKey());
-			}
-		}
 	}
 }
