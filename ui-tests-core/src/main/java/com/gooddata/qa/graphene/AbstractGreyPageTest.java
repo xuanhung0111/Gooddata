@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.graphene.enums.Validation;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.etl.pull.PullFragment;
@@ -182,16 +181,10 @@ public class AbstractGreyPageTest extends AbstractTest {
         return objectElementsFragment.getObjectElements();
     }
 
-    public String validateProjectPartial(Validation... validationOptions) throws JSONException {
-        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
-        waitForElementPresent(validateFragment.getRoot());
-        String statusReturning = validateFragment.validateOnly(validationOptions);
-        Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation-partial", this.getClass());
-        return statusReturning;
-    }
-    
     public void verifyLDMModelProject(long minimalSize) throws ParseException, IOException, JSONException {
-        File imageFileName = new File(testParams.getDownloadFolder() + getLDMImageFile());
+        //download folder is not created automatically
+        new File(testParams.getDownloadFolder()).mkdir();
+        File imageFileName = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + getLDMImageFile());
         System.out.println("imageFileName = " + imageFileName);
         long fileSize = imageFileName.length();
         System.out.println("File size: " + fileSize);
@@ -211,22 +204,23 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
     
     private String getLDMImageFile() throws ParseException, IOException, JSONException {
-    	String imageURI = RestUtils.getLDMImageURI(testParams.getHost(), testParams.getProjectId(), testParams.getUser(), testParams.getPassword());
+        String imageURI = RestUtils.getLDMImageURI(testParams.getHost(), testParams.getProjectId(), testParams.getUser(), testParams.getPassword());
         int indexPNG = imageURI.indexOf(".png");
         String imageFileName = imageURI.substring(0, indexPNG+4);
         imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/")+1);
-        downloadImageFile(imageURI, imageFileName);
+        downloadFile(imageURI, imageFileName);
         return imageFileName;
     }
     
-    private void downloadImageFile(String href, String filename) throws IOException {
-    	URL url = new URL(href);
-    	InputStream in = new BufferedInputStream(url.openStream());
-    	OutputStream out = new BufferedOutputStream(new FileOutputStream(testParams.getDownloadFolder() + filename));
-    	for ( int i; (i = in.read()) != -1; ) {
-    	    out.write(i);
-    	}
-    	out.close();
-    	in.close();
+    private void downloadFile(String href, String filename) throws IOException {
+        URL url = new URL(href);
+        InputStream in = new BufferedInputStream(url.openStream());
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(testParams.getDownloadFolder() +
+                testParams.getFolderSeparator() + filename));
+        for ( int i; (i = in.read()) != -1; ) {
+            out.write(i);
+        }
+        out.close();
+        in.close();
     }
 }
