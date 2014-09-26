@@ -43,64 +43,69 @@ public class DISCOverview extends DISCOverviewProjects {
 	}
 
 	public void selectOverviewState(DISCOverviewProjectStates state) throws InterruptedException {
+		WebElement stateTitle = null;
+		WebElement stateNumber = null;
 		switch (state) {
 		case FAILED:
-			waitForElementVisible(failedState).click();
-			Thread.sleep(1000);
-			waitForStateNumber(failedStateNumber);
+			stateTitle = failedState;
+			stateNumber = failedStateNumber;
 			break;
 		case RUNNING:
-			waitForElementVisible(runningState).click();
-			Thread.sleep(1000);
-			waitForStateNumber(runningStateNumber);
+			stateTitle = runningState;
+			stateNumber = runningStateNumber;
 			break;
 		case SCHEDULED:
-			waitForElementVisible(scheduledState).click();
-			Thread.sleep(1000);
-			waitForStateNumber(scheduledStateNumber);
+			stateTitle = scheduledState;
+			stateNumber = scheduledStateNumber;
 			break;
 		case SUCCESSFUL:
-			waitForElementVisible(successfulState).click();
-			Thread.sleep(1000);
-			waitForStateNumber(successfulStateNumber);
+			stateTitle = successfulState;
+			stateNumber = successfulStateNumber;
 			break;
 		}
+		waitForElementVisible(stateTitle).click();
+		Thread.sleep(1000);
+		waitForStateNumber(stateNumber);
 	}
 	
 	public String getState(DISCOverviewProjectStates state) {
+		WebElement stateTitle = null;
 		switch (state) {
 		case FAILED:
-			return waitForElementVisible(failedState).getText();
+			stateTitle = failedState;
+			break;
 		case RUNNING:
-			return waitForElementVisible(runningState).getText();
+			stateTitle = runningState;
+			break;
 		case SCHEDULED:
-			return waitForElementVisible(scheduledState).getText();
+			stateTitle = scheduledState;
+			break;
 		case SUCCESSFUL:
-			return waitForElementVisible(successfulState).getText();
+			stateTitle = successfulState;
+			break;
 		}
-		return null;
+		return waitForElementVisible(stateTitle).getText();
 	}
 	
 	public String getStateNumber(DISCOverviewProjectStates state) throws InterruptedException {
+		WebElement stateNumber = null;
 		switch (state) {
 		case FAILED:
-			waitForElementVisible(failedStateNumber);
-			waitForStateNumber(failedStateNumber);
-			return failedStateNumber.getText();
+			stateNumber = failedStateNumber;
+			break;
 		case RUNNING:
-			waitForElementVisible(runningStateNumber);
-			waitForStateNumber(runningStateNumber);
-			return runningStateNumber.getText();
+			stateNumber = runningStateNumber;
+			break;
 		case SCHEDULED:
-			waitForElementVisible(scheduledStateNumber);
-			waitForStateNumber(scheduledStateNumber);
-			return scheduledStateNumber.getText();
+			stateNumber = scheduledStateNumber;
+			break;
 		case SUCCESSFUL:
-			waitForElementVisible(successfulStateNumber);
-			waitForStateNumber(successfulStateNumber);
-			return successfulStateNumber.getText();
+			stateNumber = successfulStateNumber;
+			break;
 		}
-		return null;
+		waitForElementVisible(stateNumber);
+		waitForStateNumber(stateNumber);
+		return stateNumber.getText();
 	}
 
 	public boolean assertOverviewStateNumber(DISCOverviewProjectStates state, int number)

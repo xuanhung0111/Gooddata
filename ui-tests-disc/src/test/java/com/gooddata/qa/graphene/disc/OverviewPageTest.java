@@ -79,7 +79,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 				testParams.getProjectId(), "Check Successful State Number", "successfulGraph");
 	}
 
-	@Test(enabled = true, dependsOnMethods = { "createProject" }, groups = { "project-overview" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "project-overview" })
 	public void checkScheduledStateNumber() throws JSONException, InterruptedException {
 		Map<String, String> additionalProjects = createMultipleProjects(
 				"Disc-test-scheduled-state", 1);
