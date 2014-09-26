@@ -16,7 +16,7 @@ public class DropDown extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'gd-dropdown-search')]/input")
     private WebElement searchInput;
 
-    private static final String itemLocator = ".gd-list-view-item.s-%s";
+    private static final String itemLocator = ".gd-list-view-item .s-%s";
 
     public void selectItem(String name) {
         String itemCssSelector = String.format(itemLocator, simplifyText(name));

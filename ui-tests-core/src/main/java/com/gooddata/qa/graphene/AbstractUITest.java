@@ -398,4 +398,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         waitForDataPageLoaded(browser);
     }
+    
+    public void initModelPage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|ldmModel");
+        waitForDataPageLoaded(browser);
+    }
 }
