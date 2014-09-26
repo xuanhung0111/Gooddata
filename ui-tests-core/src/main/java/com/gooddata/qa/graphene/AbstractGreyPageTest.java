@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -24,9 +25,13 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -184,6 +189,14 @@ public class AbstractGreyPageTest extends AbstractTest {
         Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation-partial", this.getClass());
         return statusReturning;
     }
+    
+    public void verifyLDMModelProject(long minimalSize) throws ParseException, IOException, JSONException {
+        File imageFileName = new File(testParams.getDownloadFolder() + getLDMImageFile());
+        System.out.println("imageFileName = " + imageFileName);
+        long fileSize = imageFileName.length();
+        System.out.println("File size: " + fileSize);
+        assertTrue(fileSize >= minimalSize, "LDM is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+    }
 
     protected void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
         addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
@@ -195,5 +208,25 @@ public class AbstractGreyPageTest extends AbstractTest {
                 testParams.getProjectId(), testParams.getUser(),
                 testParams.getPassword(), profileUri,
                 userRole);
+    }
+    
+    private String getLDMImageFile() throws ParseException, IOException, JSONException {
+    	String imageURI = RestUtils.getLDMImageURI(testParams.getHost(), testParams.getProjectId(), testParams.getUser(), testParams.getPassword());
+        int indexPNG = imageURI.indexOf(".png");
+        String imageFileName = imageURI.substring(0, indexPNG+4);
+        imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/")+1);
+        downloadImageFile(imageURI, imageFileName);
+        return imageFileName;
+    }
+    
+    private void downloadImageFile(String href, String filename) throws IOException {
+    	URL url = new URL(href);
+    	InputStream in = new BufferedInputStream(url.openStream());
+    	OutputStream out = new BufferedOutputStream(new FileOutputStream(testParams.getDownloadFolder() + filename));
+    	for ( int i; (i = in.read()) != -1; ) {
+    	    out.write(i);
+    	}
+    	out.close();
+    	in.close();
     }
 }

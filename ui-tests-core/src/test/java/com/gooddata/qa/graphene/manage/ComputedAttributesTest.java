@@ -3,17 +3,12 @@ package com.gooddata.qa.graphene.manage;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.Test;
@@ -36,14 +31,11 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     @FindBy(css = ".s-attributeBucketName")
     private WebElement attributeBucketName;
     
-    @FindBy (css = ".param strong a")
-    private WebElement modelHref;	
-    
     @FindBy (css = ".modelThumbContentImage")
     private WebElement modelImage;
 
     @Test(dependsOnMethods = { "createProject" }, groups = { "computedAttributeTest" })
-    public void createComputedAttribute() throws InterruptedException {
+    public void createComputedAttribute() {
         initAttributePage();
         attributePage.createAttribute();
 
@@ -65,6 +57,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         createAttributePage.setBucket(2, "Great", "250");
         createAttributePage.setBucket(3, "Best");
         createAttributePage.setComputedAttributeName("Sales Rep Ranking");
+        Screenshots.takeScreenshot(browser, "computed-attribute-creation-page", this.getClass());
         createAttributePage.submit();
 
         waitForElementVisible(attributeBucketName);
@@ -73,8 +66,11 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         List<String> expectedBucketNames = Arrays.asList("Poor", "Good", "Great", "Best");
         List<String> expectedBucketRanges = Arrays.asList("# of Won Opps. <= 120", "120 < # of Won Opps. <= 200", "200 < # of Won Opps. <= 250", "250 < # of Won Opps.");
         createAttributePage.checkCreatedComputedAttribute("Sales Rep Ranking", expectedBucketNames, expectedBucketRanges);
-        
-        initAttributePage();
+    }
+    
+    @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
+    public void checkOthersPageAfterComputedAttributeCreated() throws InterruptedException, ParseException, IOException, JSONException {
+    	initAttributePage();
         Screenshots.takeScreenshot(browser, "attribute-list", this.getClass());
         
         initModelPage();
@@ -87,18 +83,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         Thread.sleep(4000);
         Screenshots.takeScreenshot(browser, "project-model", this.getClass());
         
-        openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() +  "/ldm");
-        String href = modelHref.getAttribute("href");
-        int indexPNG = href.indexOf(".png");
-        String imageFileName = href.substring(0, indexPNG+4);
-        imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/")+1);
-        try{
-        	downloadImageFile(href, imageFileName);
-        }catch (IOException e) {
-        	System.out.println(e);
-        }
-        verifyLDMModelProject(imageFileName, 185494);
+    	verifyLDMModelProject(185494);
     }
+    	
 
     @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
     public void createReportWithComputedAttribute() throws InterruptedException {
@@ -124,25 +111,4 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     private boolean isCreatedButtonEnabled() {
         return ! btnCreateComputedAttribute.getAttribute("class").contains("disabled");
     }   
-    
-    private void verifyLDMModelProject(String fileName, long minimalSize) {
-        File imageExport = new File(testParams.getDownloadFolder() + fileName);
-        System.out.println("imageExport = " + imageExport);
-        long fileSize = imageExport.length();
-        System.out.println("File size: " + fileSize);
-        assertTrue(fileSize >= minimalSize, "Export is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
-    }
-    
-    private void downloadImageFile(String href, String filename) throws IOException {
-    	URL url = new URL(href);
-    	InputStream in = new BufferedInputStream(url.openStream());
-    	OutputStream out = new BufferedOutputStream(new FileOutputStream(testParams.getDownloadFolder() + filename));
-
-    	for ( int i; (i = in.read()) != -1; ) {
-    	    out.write(i);
-    	}
-    	
-    	out.close();
-    	in.close();
-    }
 }
