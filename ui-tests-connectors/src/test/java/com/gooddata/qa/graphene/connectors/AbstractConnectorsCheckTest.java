@@ -68,8 +68,10 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         // verify that connector resource exist
         openUrl(getConnectorUri());
         verifyConnectorResourceJSON();
-        // create integration
-        initIntegration();
+        if (!testParams.isReuseProject()) {
+            // create integration
+            initIntegration();
+        }
     }
 
     @Test(groups = {"connectorBasicREST"}, dependsOnGroups = {"connectorInit"})
@@ -153,8 +155,10 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
             throws JSONException, InterruptedException {
         openUrl(getProcessesUri());
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == expectedProcessesCount,
-                "There are no processes for new project yet");
+        if (!testParams.isReuseProject()) {
+            assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == expectedProcessesCount,
+                    "There are no processes for new project yet");
+        }
         Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
 
         waitForIntegrationProcessSynchronized(browser, checkIterations);
@@ -165,20 +169,20 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         String processUrl = browser.getCurrentUrl();
         System.out.println("Waiting for process synchronized: " + processUrl);
         int i = 0;
-        String status = getProcessStatus(browser);
+        String status = getProcessStatus();
         while (!"SYNCHRONIZED".equals(status) && i < checkIterations) {
             System.out.println("Current process status is: " + status);
             assertNotEquals(status, "ERROR", "Error status appeared");
             Thread.sleep(5000);
             browser.get(processUrl);
-            status = getProcessStatus(browser);
+            status = getProcessStatus();
             i++;
         }
         assertEquals(status, "SYNCHRONIZED", "Process is synchronized");
         System.out.println("Integration was synchronized at +- " + (i * 5) + "seconds");
     }
 
-    private String getProcessStatus(WebDriver browser) throws JSONException {
+    private String getProcessStatus() throws JSONException {
         JSONObject json = loadJSON();
         return json.getJSONObject("process").getJSONObject("status").getString("code");
     }

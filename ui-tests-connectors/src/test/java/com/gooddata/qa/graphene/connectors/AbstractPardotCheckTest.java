@@ -49,8 +49,10 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
         // pardot specific configuration of API Url (with specific upload user)
         signInAtGreyPages(pardotUploadUser, pardotUploadUserPassword);
         browser.get(settingsUrl);
-        waitForElementVisible(BY_INPUT_PARDOT_ACCOUNT_ID, browser).sendKeys(pardotAccountId);
-        Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
+        if (!testParams.isReuseProject()) {
+            waitForElementVisible(BY_INPUT_PARDOT_ACCOUNT_ID, browser).sendKeys(pardotAccountId);
+            Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
+        }
         JSONObject json = loadJSON();
         assertEquals(json.getJSONObject("settings").getString("accountId"), pardotAccountId,
                 "Pardot accountId was not set to expected value");
