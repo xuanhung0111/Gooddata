@@ -1,17 +1,18 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import java.util.List;
-
+import com.gooddata.qa.graphene.entity.HowItem;
+import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.support.ui.Select;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 public class ReportVisualizer extends AbstractFragment {
 
@@ -26,6 +27,8 @@ public class ReportVisualizer extends AbstractFragment {
 
     private static final String XPATH_ATTRIBUTE_CHECKBOX = "//div[contains(@class, 's-snd-AttributesContainer')]//div[contains(@class, 'element') and contains(@title, '${attribute}')]//input[@type='checkbox']";
     private static final String XPATH_ATTRIBUTE_CHECKBOX_CHECKED = "//div[contains(@class, 'AttributesContainer')]//div[contains(@class, 'element') and contains(@title, '${attribute}')]//input[@type='checkbox' and @checked='checked']";
+    private static final String XPATH_ATTRIBUTE_POSITION = "//div[contains(@class, 's-snd-AttributesContainer')]//div[contains(@class, 'element') and contains(@title, '${attribute}')]//div[contains(@title, 'Toggle attribute')]";
+    private static final String XPATH_ATTRIBUTE_POSITION_TOGGLED = "//div[contains(@class, 's-snd-AttributesContainer')]//div[contains(@class, 'element') and contains(@title, '${attribute}')]//div[contains(@title, 'Toggle attribute') and contains(@class, '${position}')]";
     private static final String XPATH_SND_FOLDER = "//div[@title='${SnDFolderName}']";
 
     @FindBy(xpath = "//div[contains(@class, 'reportEditorWhatArea')]/button")
@@ -94,15 +97,47 @@ public class ReportVisualizer extends AbstractFragment {
         waitForElementVisible(BY_HOW_AREA_ATTRIBUTES_HEADER, browser);
         if (how != null) {
             for (String attribute : how) {
-                waitForElementVisible(attributeFilterInput).clear();
-                attributeFilterInput.sendKeys(attribute);
-                By attributeCheckbox = By.xpath(XPATH_ATTRIBUTE_CHECKBOX.replace("${attribute}", attribute));
-                waitForElementVisible(attributeCheckbox, browser);
-                Thread.sleep(2000);
-                root.findElement(attributeCheckbox).click();
-                waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_CHECKBOX_CHECKED.replace("${attribute}", attribute)), browser);
+                selectAttribute(attribute);
             }
         }
+    }
+
+    public void selectHowAreaWithPosition(List<HowItem> how) throws InterruptedException {
+        //TODO: avoid duplication
+        waitForElementVisible(howButton).click();
+        waitForElementVisible(BY_HOW_AREA_ATTRIBUTES_HEADER, browser);
+        if (how != null) {
+            for (HowItem howItem : how) {
+                By attributePosition = selectAttribute(howItem.getAttribute().getName());
+                WebElement attributePositionElement = root.findElement(attributePosition);
+                String attributeClass =  attributePositionElement.getAttribute("class");
+                String attrLeftClass = "sndAttributePosition_rows";
+                String attrTopClass = "sndAttributePosition_columns";
+
+                if (howItem.getPosition() == HowItem.Position.LEFT && !attributeClass.contains(attrLeftClass)) {
+                    attributePositionElement.click();
+                    waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_POSITION_TOGGLED.replace("${attribute}",
+                            howItem.getAttribute().getName()).replace("${position}", attrLeftClass)), browser);
+                } else if (howItem.getPosition() == HowItem.Position.TOP && !attributeClass.contains(attrTopClass)) {
+                    attributePositionElement.click();
+                    waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_POSITION_TOGGLED.replace("${attribute}",
+                            howItem.getAttribute().getName()).replace("${position}", attrTopClass)), browser);
+                }
+            }
+        }
+    }
+
+    private By selectAttribute(String attribute) throws InterruptedException {
+        waitForElementVisible(attributeFilterInput).clear();
+        attributeFilterInput.sendKeys(attribute);
+        By attributeCheckbox = By.xpath(XPATH_ATTRIBUTE_CHECKBOX.replace("${attribute}", attribute));
+        By attributePosition = By.xpath(XPATH_ATTRIBUTE_POSITION.replace("${attribute}", attribute));
+        waitForElementVisible(attributeCheckbox, browser);
+        Thread.sleep(2000);
+        root.findElement(attributeCheckbox).click();
+        waitForElementVisible(By.xpath(XPATH_ATTRIBUTE_CHECKBOX_CHECKED.replace("${attribute}", attribute)), browser);
+        
+        return attributePosition;
     }
 
     public void addSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal) {

@@ -1,24 +1,20 @@
 package com.gooddata.qa.graphene.upload;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.HowItem;
+import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
-import com.gooddata.qa.graphene.fragments.upload.*;
-import com.gooddata.qa.utils.graphene.Screenshots;
+import java.util.*;
 
-import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 public abstract class AbstractUploadTest extends AbstractProjectTest {
 
@@ -68,7 +64,11 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 		waitForAnalysisPageLoaded(browser);
 		waitForElementVisible(reportPage.getRoot());
 		assertNotNull(reportPage, "Report page not initialized!");
-        reportPage.createReport(reportName, reportType, what, how);
+        List<HowItem> howWithPosition = new ArrayList<HowItem>();
+        for (String attributeName : how) {
+            howWithPosition.add(new HowItem(attributeName));
+        }
+        reportPage.createReport(reportName, reportType, what, howWithPosition);
 	}
 
 	protected void deleteDataset(String datasetName)

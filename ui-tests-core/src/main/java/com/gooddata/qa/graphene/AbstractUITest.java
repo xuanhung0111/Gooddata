@@ -1,21 +1,13 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
-import com.gooddata.qa.graphene.fragments.disc.DISCNavigation;
-import com.gooddata.qa.graphene.fragments.disc.DISCOverview;
-import com.gooddata.qa.graphene.fragments.disc.DISCOverviewProjects;
-import com.gooddata.qa.graphene.fragments.disc.DISCProjectsList;
-import com.gooddata.qa.graphene.fragments.disc.DISCProjectsPage;
-import com.gooddata.qa.graphene.fragments.disc.DeployForm;
-import com.gooddata.qa.graphene.fragments.disc.ProjectDetailPage;
-import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.ScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.SchedulesTable;
+import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
@@ -28,6 +20,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -335,7 +328,34 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementVisible(reportsPage.getRoot());
     }
 
-    public void createReport(String reportName, ReportTypes reportType, List<String> what, List<String> how, String screenshotName) throws InterruptedException {
+    /** Backwards compatibility */
+    public void createReport(String reportName, ReportTypes reportType, List<String> what,
+                             List<String> how, String screenshotName) throws InterruptedException {
+        List<HowItem> howWithPosition = new ArrayList<HowItem>();
+        for (String attributeName : how) {
+            howWithPosition.add(new HowItem(attributeName));
+        }
+        createReportTmp(reportName, reportType, what, howWithPosition, screenshotName);
+    }
+
+    /**
+     * This is just temporary implementation of report creation at the moment.
+     * Future implementation of the method could process objects like this:
+     *
+     *  ReportDefinition reportDefinition = new ReportDefinition();
+     *  reportDefinition.setName(TICKET_EVENTS_REPORT_NAME);
+     *  reportDefinition.setType(ReportTypes.TABLE);
+     *  reportDefinition.addHow("Ticket Updates", HowItem.Position.LEFT);
+     *  reportDefinition.addHow(...);
+     *  reportDefinition.addWhat(what);
+     *  reportDefinition.addFilter(filter); // this could be filter of different types
+     *
+     *  ReportHelper reportHelper = new ReportHelper(browser); // could be implemented on REST or whatever
+     *  reportHelper.create(reportDefinition);
+     */
+    public void createReportTmp(String reportName, ReportTypes reportType, List<String> what,
+                             List<HowItem> how, String screenshotName) throws InterruptedException {
+        // TODO: add filter functionality
         initReportsPage();
         selectReportsDomainFolder("My Reports");
         reportsPage.startCreateReport();

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
+import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.FilterTypes;
 import com.gooddata.qa.graphene.enums.ReportTypes;
@@ -111,19 +112,12 @@ public class ReportPage extends AbstractFragment {
     }
 
     public void createReport(String reportName, ReportTypes reportType,
-                             List<String> what, List<String> how) throws InterruptedException {
+                             List<String> what, List<HowItem> how) throws InterruptedException {
         setReportName(reportName);
-        // select what - metrics
-        visualiser.selectWhatArea(what);
-
-        // select how - attributes
-        visualiser.selectHowArea(how);
-
+        visualiser.selectWhatArea(what); //metrics
+        visualiser.selectHowAreaWithPosition(how); //attributes
+        //TODO: addFilter(FilterTypes.ATTRIBUTE, filter); //filters
         visualiser.finishReportChanges();
-
-        // visualiser.selectFilterArea();
-        // TODO
-
         visualiser.selectReportVisualisation(reportType);
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(createReportButton);
