@@ -35,6 +35,14 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(dependsOnGroups = {"projectInit"}, groups = {"tests"})
     public void createProject() throws JSONException, InterruptedException, IOException {
+        if (testParams.isReuseProject()) {
+            if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
+                System.out.println("Project will be re-used, id: " + testParams.getProjectId());
+                return;
+            } else {
+                System.out.println("Project reuse is expected, but projectId is missing, new project will be created...");
+            }
+        }
         openUrl(PAGE_GDC_PROJECTS);
         waitForElementVisible(gpProject.getRoot());
 
@@ -72,6 +80,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"validateProjectAfterTests"}, alwaysRun = true)
     public void deleteProject() {
-        deleteProjectByDeleteMode(successfulTest);
+        deleteProjectByDeleteModeAndReuse(successfulTest);
     }
 }
