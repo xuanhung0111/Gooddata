@@ -24,13 +24,13 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = {"projectSimpleCompAttributes"}, description = "Tests for basic Computed Attributes functionality in GD platform")
 public class SimpleCompAttributesTest extends AbstractProjectTest {
 
-    protected int statusPollingCheckIterations = 60; // (60*5s)
+    private static final int statusPollingCheckIterations = 60; // (60*5s)
     Map<String, Integer> attributeMapping = new HashMap<String, Integer>();
     Map<String, Pair<String, Integer>> attributesElementsMapping = new HashMap<String, Pair<String, Integer>>();
 
     @DataProvider(name = "defaultRelations")
     public static Object[][] compAttrsData() {
-        return new Object[][] {
+        return new Object[][]{
                 {"CompAttr1", "attr.comp1", "to {attr.invoice}", " as {attr.comp1?40}"},
                 {"CompAttr2", "attr.comp2", "to {attr.comp1}", " as {attr.comp2?32}"},
                 {"CompAttr3", "attr.comp3", "to {attr.comp2}", " as {attr.comp3?42}"},
@@ -78,14 +78,14 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"loadProject"}, dataProvider = "defaultRelations")
     public void createRel(String attributeTitle, String attrIdentifier, String relation, String relationAs) throws JSONException, InterruptedException {
         String createMAQL = "alter attribute {" + attrIdentifier + "} add relations " + relation + relationAs + ";";
-        postMAQL(createMAQL,statusPollingCheckIterations);
+        postMAQL(createMAQL, statusPollingCheckIterations);
         int attributeID = getAttributeID(attributeTitle);
         attributeMapping.put(attrIdentifier, attributeID);
 
         JSONObject attribute = getObjectByID(attributeID);
         JSONArray attributeRelations = attribute.getJSONObject("attribute").getJSONObject("content").getJSONArray("rel");
         String attrRel = (String) attributeRelations.get(0);
-        assertEquals(attrRel,relation+relationAs);
+        assertEquals(attrRel, relation + relationAs);
     }
 
     @Test(dependsOnMethods = {"createRel"}, dataProvider = "defaultRelations")
@@ -108,15 +108,19 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
 
         // drop old relation
         String dropMAQL = "alter attribute {" + attrIdentifier + "} drop relations " + relation + ";";
-        postMAQL(dropMAQL,statusPollingCheckIterations);
+        postMAQL(dropMAQL, statusPollingCheckIterations);
         assertTrue(getObjectByID(attributeID).getJSONObject("attribute").getJSONObject("content").isNull("rel"));
 
         // re-create new one
         String createMAQL = "alter attribute {" + attrIdentifier + "} add relations " + relation + relationAs.replaceAll("\\?.*}", "?" + attributeElement.getValue()) + "};";
         System.out.println("createMAQL = " + createMAQL);
-        postMAQL(createMAQL,statusPollingCheckIterations);
+        postMAQL(createMAQL, statusPollingCheckIterations);
     }
 
+    @Test(dependsOnMethods = {"alterAndCompute"}, groups = {"tests"})
+    public void endOfTests() {
+        successfulTest = true;
+    }
 
     private String parseIntegrationEntry(String url) {
         return url.substring(url.lastIndexOf("/") + 1, url.length());
