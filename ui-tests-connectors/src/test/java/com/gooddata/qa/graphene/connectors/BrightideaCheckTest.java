@@ -54,6 +54,7 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testBrightideaIntegrationConfiguration() throws InterruptedException, JSONException {
+        if (testParams.isReuseProject()) return;
         // Brightidea specific configuration of integration (tfue page)
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
         waitForElementVisible(BY_IFRAME, browser);
@@ -75,7 +76,7 @@ public class BrightideaCheckTest extends AbstractConnectorsCheckTest {
         // process is scheduled automatically - check status
         openUrl(getProcessesUri());
         JSONObject json = loadJSON();
-        assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
+        if (!testParams.isReuseProject()) assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == 1,
                 "Integration process wasn't started...");
         waitForElementVisible(BY_GP_LINK, browser);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();

@@ -52,6 +52,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
+        if (testParams.isReuseProject()) return;
         // verify empty Coupa dashboard
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
         waitForElementVisible(BY_IFRAME, browser);

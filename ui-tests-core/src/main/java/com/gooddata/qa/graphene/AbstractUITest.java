@@ -260,7 +260,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
     }
 
-    public void deleteProjectByDeleteMode(boolean successfulTest) {
+    public void deleteProjectByDeleteModeAndReuse(boolean successfulTest) {
+        if (testParams.isReuseProject()) {
+            System.out.println("Project is being re-used and won't be deleted.");
+            return;
+        }
         System.out.println("Delete mode is set to " + testParams.getDeleteMode().toString());
         String projectId = testParams.getProjectId();
         if (projectId != null && projectId.length() > 0) {

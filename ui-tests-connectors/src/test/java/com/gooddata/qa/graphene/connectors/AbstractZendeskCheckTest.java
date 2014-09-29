@@ -28,14 +28,16 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
         // go to page with integration settings (differs for Zendesk3/4)
         String settingsUrl = openZendeskSettingsUrl();
         JSONObject json = loadJSON();
-        assertEquals(json.getJSONObject("settings").getString("apiUrl"), "null",
+        if (!testParams.isReuseProject()) assertEquals(json.getJSONObject("settings").getString("apiUrl"), "null",
                 String.format("%s API URL was not set to expected value", connectorType.getName()));
 
         // zendesk specific configuration of API Url (with specific upload user)
         signInAtGreyPages(zendeskUploadUser, zendeskUploadUserPassword);
         browser.get(settingsUrl);
-        waitForElementPresent(BY_INPUT_API_URL, browser).sendKeys(zendeskApiUrl);
-        Graphene.guardHttp(waitForElementPresent(BY_GP_BUTTON_SUBMIT, browser)).click();
+        if (!testParams.isReuseProject()) {
+            waitForElementPresent(BY_INPUT_API_URL, browser).sendKeys(zendeskApiUrl);
+            Graphene.guardHttp(waitForElementPresent(BY_GP_BUTTON_SUBMIT, browser)).click();
+        }
         json = loadJSON();
         assertEquals(json.getJSONObject("settings").getString("apiUrl"), zendeskApiUrl,
                 String.format("%s API URL was not set to expected value", connectorType.getName()));

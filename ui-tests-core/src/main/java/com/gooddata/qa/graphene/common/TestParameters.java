@@ -23,10 +23,11 @@ public class TestParameters {
     private String authorizationToken;
     private String authorizationToken2;
     private DWHDriver dwhDriver = DWHDriver.PG;
-    private DeleteMode deleteMode = DeleteMode.DELETE_IF_SUCCESSFUL;
+    private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
     private String testIdentification;
     private String downloadFolder;
     private String folderSeparator;
+    private boolean reuseProject = false;
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
@@ -49,7 +50,8 @@ public class TestParameters {
             testIdentification = UUID.randomUUID().toString();
         }
         folderSeparator = loadProperty("file.separator");
-
+        reuseProject = Boolean.valueOf(loadProperty("project.reuse"));
+        if (reuseProject) projectId = loadProperty("projectId");
     }
 
     /**
@@ -146,5 +148,13 @@ public class TestParameters {
 
     public String getFolderSeparator() {
         return folderSeparator;
+    }
+
+    public boolean isReuseProject() {
+        return reuseProject;
+    }
+
+    public void setReuseProject(boolean reuseProject) {
+        this.reuseProject = reuseProject;
     }
 }
