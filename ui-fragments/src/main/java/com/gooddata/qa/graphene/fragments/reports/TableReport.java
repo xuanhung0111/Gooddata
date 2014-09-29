@@ -12,7 +12,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class TableReport extends AbstractReport {
 
-    @FindBy(xpath = "//div[@class='containerBody']/div[4]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'element')]")
+    @FindBy(xpath = "//div[@class='containerBody']/div[4]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'element')]/span")
     private List<WebElement> attributeElementInGrid;
 
     @FindBy(xpath = "//div[@class='containerBody']/div[5]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'data')]")
@@ -36,7 +36,7 @@ public class TableReport extends AbstractReport {
     public List<String> getAttributeElements() {
 	List<String> attributeElements = new ArrayList<String>();
 	for (int i = 0; i < attributeElementInGrid.size(); i++) {
-	    String tmp = attributeElementInGrid.get(i).getAttribute("title");
+	    String tmp = attributeElementInGrid.get(i).getText();
 	    attributeElements.add(tmp);
 	}
 	return attributeElements;
