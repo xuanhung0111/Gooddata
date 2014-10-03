@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.FilterTypes;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.entity.HowItem;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -116,7 +116,6 @@ public class ReportPage extends AbstractFragment {
         setReportName(reportName);
         visualiser.selectWhatArea(what); //metrics
         visualiser.selectHowAreaWithPosition(how); //attributes
-        //TODO: addFilter(FilterTypes.ATTRIBUTE, filter); //filters
         visualiser.finishReportChanges();
         visualiser.selectReportVisualisation(reportType);
         waitForAnalysisPageLoaded(browser);

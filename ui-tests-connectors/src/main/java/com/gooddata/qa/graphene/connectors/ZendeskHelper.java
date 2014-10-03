@@ -40,7 +40,7 @@ public class ZendeskHelper {
     private static final String TICKETS_INC_URL = "/api/v2/incremental/tickets.json?start_time=0";
     private static final String USERS_INC_URL = "/api/v2/incremental/users.json?start_time=0";
     private static final String ORGANIZATIONS_INC_URL = "/api/v2/incremental/organizations.json?start_time=0";
-    private static final String TICKET_EVENTS_INC_URL = "/api/v2/incremental/ticket_events.json?start_time=0";
+    private static final String TICKET_EVENTS_INC_URL = "/api/v2/incremental/ticket_events.json";
 
     private static final String TICKETS_URL = "/api/v2/tickets";
     private static final String USERS_URL = "/api/v2/users";
@@ -121,7 +121,7 @@ public class ZendeskHelper {
         JSONObject ticketsEventsPageJson;
         JSONArray ticketEventsJson;
         long startTimestampInUTC = startDateTime.toDateTime(DateTimeZone.UTC).getMillis() / 1000L;
-        String jsonUrl = "/api/v2/incremental/ticket_events.json?start_time=" + startTimestampInUTC;
+        String jsonUrl = TICKET_EVENTS_INC_URL + "?start_time=" + startTimestampInUTC;
         int lastTicketEventId = 0;
 
         do {
@@ -143,30 +143,6 @@ public class ZendeskHelper {
     }
 
     private JSONObject retrieveEntitiesJsonFromUrl(String url) throws InterruptedException, IOException, JSONException {
-        JSONObject json = new JSONObject();
-        HttpRequestBase getRequest = apiClient.newGetMethod(url);
-        try {
-            HttpResponse getResponse = apiClient.execute(getRequest);
-            int retryCounter = 0;
-            while (getResponse.getStatusLine().getStatusCode() == 429 && retryCounter < 5) {
-                System.out.println("API limits reached, retrying ... ");
-                Thread.sleep(30000);
-                getRequest.releaseConnection();
-                getRequest = apiClient.newGetMethod(url);
-                getResponse = apiClient.execute(getRequest);
-                retryCounter++;
-            }
-            checkStatusCode(getResponse, 200);
-            String result = EntityUtils.toString(getResponse.getEntity());
-            json = new JSONObject(result);
-            System.out.println("Total " + json.getInt("count") + " entities returned from " + url);
-        } finally {
-            getRequest.releaseConnection();
-        }
-        return json;
-    }
-
-    private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber) throws JSONException, IOException, InterruptedException {
         HttpRequestBase getRequest = apiClient.newGetMethod(url);
         try {
             HttpResponse getResponse = apiClient.execute(getRequest);
@@ -182,6 +158,15 @@ public class ZendeskHelper {
             checkStatusCode(getResponse, 200);
             String result = EntityUtils.toString(getResponse.getEntity());
             JSONObject json = new JSONObject(result);
+            System.out.println("Total " + json.getInt("count") + " entities returned from " + url);
+            return json;
+        } finally {
+            getRequest.releaseConnection();
+        }
+    }
+
+    private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber) throws JSONException, IOException, InterruptedException {
+            JSONObject json = retrieveEntitiesJsonFromUrl(url);
             Set<Integer> nonDeletedObjects = new HashSet<Integer>();
             int count = json.getInt("count");
             System.out.println(count + " " + objectType.getPluralName() + " returned from " + url);
@@ -198,7 +183,7 @@ public class ZendeskHelper {
                         }
                         break;
                     case USER:
-                        if (object.getBoolean("active") == false) {
+                        if (!object.getBoolean("active")) {
                             deletedObjects++;
                         } else {
                             nonDeletedObjects.add(object.getInt("id"));
@@ -226,10 +211,8 @@ public class ZendeskHelper {
                 nonDeletedObjects.addAll(getSetOfActiveZendeskEntities(json.getString("next_page"), objectType, pageNumber + 1));
             }
             System.out.println("Returning " + nonDeletedObjects.size() + " " + objectType.getPluralName() + " after iteration on page " + pageNumber);
+
             return nonDeletedObjects;
-        } finally {
-            getRequest.releaseConnection();
-        }
     }
 
     private void deleteZendeskEntity(String url, int id) throws IOException {

@@ -83,8 +83,8 @@ public class ReportFilter extends AbstractFragment {
     @FindBy(xpath = "//div[@id='gridContainerTab']")
     private TableReport report;
 
-    private String listOfElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label} lastCell')]";
-
+    private String listOfElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
+    private String lastFromlistElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label} lastCell')]";
     private String attributeElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'s-item-${element}')]/input";
 
     public void addFilterSelectList(Map<String, String> data)
@@ -93,30 +93,32 @@ public class ReportFilter extends AbstractFragment {
         String attribute = data.get("attribute");
         String attributeElements = data.get("attributeElements");
         List<String> lsAttributeElements = Arrays.asList(attributeElements.split(", "));
-        //boolean attributeInHow = report.getAttributesHeader().contains(attribute);
+        // report could be too large to display before filtering => there is no header/report visible
+        boolean attributeInHow = report.getAttributesHeader().contains(attribute);
+
         Collections.sort(lsAttributeElements);
         if (browser.findElements(addFilterButton).size() > 0) {
             waitForElementVisible(addFilterButton, browser).click();
-        }// displayed if at least one filter added.
+        } //displayed if at least one filter added.
         waitForElementVisible(filterPicker);
         waitForElementVisible(attributeFilterLink).click();
-        By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}",
-                attribute.trim().toLowerCase().replaceAll("\\W", "_")));
-        /*if (attributeInHow) {
+        if (attributeInHow) {
+            By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}",
+                    attribute.trim().toLowerCase().replaceAll("\\W", "_")));
             waitForElementVisible(listOfAttribute, browser);
             selectElement(attribute);
-        } else {*/
+        } else {
+            By listOfAttribute = By.xpath(lastFromlistElementLocator.replace("${label}",
+                    attribute.trim().toLowerCase().replaceAll("\\W", "_")));
             waitForElementVisible(searchAttributeInput).sendKeys(attribute);
             waitForElementVisible(listOfAttribute, browser);
             selectElementNotInHow(attribute);
-        //}
+        }
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(listOfElementWithCheckbox);
         for (int i = 0; i < lsAttributeElements.size(); i++) {
-            //if (!attributeInHow) {
-                waitForElementVisible(searchValueInput).clear();
-                searchValueInput.sendKeys(lsAttributeElements.get(i));
-            //}
+            waitForElementVisible(searchValueInput).clear();
+            searchValueInput.sendKeys(lsAttributeElements.get(i));
             By attributeElement = By.xpath(attributeElementLocator.replace("${element}",
                     lsAttributeElements.get(i).trim().toLowerCase().replaceAll("\\W", "_")));
             waitForElementVisible(attributeElement, browser).click();
@@ -125,12 +127,7 @@ public class ReportFilter extends AbstractFragment {
         waitForElementNotVisible(confirmApplyButton);
         waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
-        waitForElementVisible(report.getRoot());        
-        /*if (attributeInHow) {
-            List<String> attributeElementsInGrid = report.getAttributeElements();
-            Collections.sort(attributeElementsInGrid);
-            Assert.assertEquals(attributeElementsInGrid, lsAttributeElements, "Filter in report isn't applied correctly");
-        }*/
+        waitForElementVisible(report.getRoot());
     }
 
     private void selectElement(String elementName) {

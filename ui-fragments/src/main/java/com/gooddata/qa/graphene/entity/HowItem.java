@@ -15,12 +15,10 @@ public class HowItem {
         this.position = Position.LEFT;
     }
 
-    //TODO: move to definition
     public HowItem(String attributeName) {
         this(new Attribute(attributeName));
     }
 
-    //TODO: move to definition
     public HowItem(String attributeName, Position position) {
         this(new Attribute(attributeName), position);
     }
