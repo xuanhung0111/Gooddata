@@ -437,4 +437,11 @@ public class DISCOverviewProjects extends AbstractFragment {
 		assertProjectInfoWithoutAdminRole(projectState, projectName, projectId, processes,
 				expectedSchedules);
 	}
+	
+	public int getOverviewProjectNumber() throws InterruptedException {
+	    for (int i = 0; i < 10 && overviewProjects.size() == 0; i++) {
+	        Thread.sleep(1000);
+	    }
+	    return overviewProjects.size();
+	}
 }

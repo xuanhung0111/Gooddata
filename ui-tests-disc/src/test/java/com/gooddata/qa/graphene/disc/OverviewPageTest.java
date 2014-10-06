@@ -31,6 +31,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 	public void initProperties() throws InterruptedException {
 		zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
 		projectTitle = "Disc-test-overview-page";
+		startPage = DISC_OVERVIEW_PAGE;
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-overview" })
@@ -87,9 +88,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			prepareDataForScheduledStateTests(projectTitle, testParams.getProjectId(),
 					additionalProjects, null, null, "Check Scheduled State Number");
 			openOverviewPage();
-			checkStateNumber(DISCOverviewProjectStates.SCHEDULED, 1);
-			checkOtherStateNumbers(DISCOverviewProjectStates.SCHEDULED, projectTitle,
-					testParams.getProjectId());
+			discOverview.selectOverviewState(DISCOverviewProjectStates.SCHEDULED);
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
 		} finally {
 			cleanupProcessesAndProjects(true, additionalProjects);
 		}
@@ -99,19 +99,22 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 	public void checkCombinedStatesNumber() throws JSONException, InterruptedException {
 		try {
 			Pair<String, List<String>> cronTime = Pair.of(
-					ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+					ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
 			prepareDataForCheckingProjectState(DISCOverviewProjectStates.FAILED, projectTitle,
 					testParams.getProjectId(), "Check Combined States Number", "errorGraph", null,
 					null);
+			openProjectDetailPage(projectTitle, testParams.getProjectId());
 			createScheduleForProcess(projectTitle, testParams.getProjectId(),
-					"Check Combined States Number", "/graph/successfulGraph.grf", null, null);
+					"Check Combined States Number", "/graph/successfulGraph.grf", cronTime, null);
 			assertNewSchedule("Check Combined States Number", "successfulGraph.grf", cronTime, null);
 			scheduleDetail.manualRun();
 			scheduleDetail.assertLastExecutionDetails(true, true, false,
 					"Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
 			openOverviewPage();
-			checkStateNumber(DISCOverviewProjectStates.FAILED, 1);
-			checkStateNumber(DISCOverviewProjectStates.SUCCESSFUL, 1);
+			discOverview.selectOverviewState(DISCOverviewProjectStates.FAILED);
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.FAILED, discOverviewProjects.getOverviewProjectNumber());
+			discOverview.selectOverviewState(DISCOverviewProjectStates.SUCCESSFUL);
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SUCCESSFUL, discOverviewProjects.getOverviewProjectNumber());
 			checkFilteredOutProject(DISCOverviewProjectStates.RUNNING, projectTitle,
 					testParams.getProjectId());
 			checkFilteredOutProject(DISCOverviewProjectStates.SCHEDULED, projectTitle,
@@ -134,6 +137,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.FAILED.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
+			checkOtherStates(DISCOverviewProjectStates.FAILED, projectTitle, testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -154,6 +158,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.SUCCESSFUL.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
+			checkOtherStates(DISCOverviewProjectStates.SUCCESSFUL, projectTitle, testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -176,6 +181,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.SCHEDULED.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
+			checkOtherStates(DISCOverviewProjectStates.SCHEDULED, projectTitle, testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(true, additionalProjects);
 		}
@@ -196,6 +202,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.RUNNING.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
+			checkOtherStates(DISCOverviewProjectStates.RUNNING, projectTitle, testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -434,7 +441,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			waitForElementVisible(discOverview.getRoot());
 			checkBulkActionForSelectedProjects(DISCOverviewProjectStates.RUNNING, false,
 					getProjectsMap());
-			checkOtherStateNumbers(DISCOverviewProjectStates.FAILED, projectTitle,
+			checkOtherStates(DISCOverviewProjectStates.FAILED, projectTitle,
 					testParams.getProjectId());
 			browser.get(scheduleDetailUrl);
 			waitForElementVisible(scheduleDetail.getRoot());
@@ -565,9 +572,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			prepareDataForScheduledStateTests(projectTitle, testParams.getProjectId(),
 					additionalProjects, null, null, "Disable Scheduled Projects");
 			openOverviewPage();
-			checkStateNumber(DISCOverviewProjectStates.SCHEDULED, 1);
+			discOverview.selectOverviewState(DISCOverviewProjectStates.SCHEDULED);
+            discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
 			checkBulkAction(DISCOverviewProjectStates.SCHEDULED, true);
-			checkOtherStateNumbers(DISCOverviewProjectStates.ALL, projectTitle,
+			checkOtherStates(DISCOverviewProjectStates.ALL, projectTitle,
 					testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(true, additionalProjects);
@@ -585,9 +593,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					additionalProjects, processesMap, expectedSchedules, "Stop Scheduled Projects");
 			String scheduleDetailUrl = browser.getCurrentUrl();
 			openOverviewPage();
-			checkStateNumber(DISCOverviewProjectStates.SCHEDULED, 1);
+			discOverview.selectOverviewState(DISCOverviewProjectStates.SCHEDULED);
+            discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
 			checkBulkAction(DISCOverviewProjectStates.SCHEDULED, false);
-			checkOtherStateNumbers(DISCOverviewProjectStates.FAILED, projectTitle,
+			checkOtherStates(DISCOverviewProjectStates.FAILED, projectTitle,
 					testParams.getProjectId());
 			browser.get(scheduleDetailUrl);
 			waitForElementVisible(scheduleDetail.getRoot());
@@ -640,18 +649,13 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			String projectId) throws InterruptedException {
 		discOverview.selectOverviewState(state);
 		waitForElementVisible(discOverviewProjects.getRoot());
-		if (discOverview.assertOverviewStateNumber(state, 0))
+		if (discOverview.getStateNumber(state).equals("0"))
 			discOverviewProjects.assertOverviewEmptyState(state);
 		else
 			assertNull(discOverviewProjects.getOverviewProjectDetail(projectName, projectId, true));
 	}
 
-	private void checkStateNumber(DISCOverviewProjectStates state, int number)
-			throws InterruptedException {
-		assertTrue(discOverview.assertOverviewStateNumber(state, number));
-	}
-
-	private void checkOtherStateNumbers(DISCOverviewProjectStates state, String projectName,
+	private void checkOtherStates(DISCOverviewProjectStates state, String projectName,
 			String projectId) throws InterruptedException {
 		List<DISCOverviewProjectStates> projectStateToCheck = Arrays.asList(
 				DISCOverviewProjectStates.FAILED, DISCOverviewProjectStates.RUNNING,
@@ -706,7 +710,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			Map<List<String>, List<String>> expectedSchedules, String processNameFormat)
 			throws JSONException, InterruptedException {
 		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+				ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
 		openProjectDetailPage(projectName, projectId);
 		deployInProjectDetailPage(projectName, projectId, "Basic", DISCProcessTypes.GRAPH,
 				processNameFormat,
@@ -729,6 +733,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 						cronTime, null);
 				scheduleDetail.manualRun();
 				scheduleDetail.isInRunningState();
+				scheduleDetail.clickOnCloseScheduleButton();
 			}
 		}
 		openProjectDetailPage(projectName, projectId);
@@ -748,8 +753,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			prepareDataForCheckingProjectState(state, projectName, projectId, processName,
 					graphName, null, null);
 			openOverviewPage();
-			checkStateNumber(state, 1);
-			checkOtherStateNumbers(state, projectName, projectId);
+			discOverview.selectOverviewState(state);
+			discOverview.assertOverviewStateNumber(state, discOverviewProjects.getOverviewProjectNumber());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -767,9 +772,9 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 		if (processesMap != null)
 			processesMap.put(processName, browser.getCurrentUrl());
 		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+				ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
 		createScheduleForProcess(projectName, projectId, processName, "/graph/" + graphName
-				+ ".grf", null, null);
+				+ ".grf", cronTime, null);
 		assertNewSchedule(processName, graphName + ".grf", cronTime, null);
 		scheduleDetail.manualRun();
 		if (state == DISCOverviewProjectStates.RUNNING) {
@@ -806,9 +811,9 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 				true);
 		processesMap.put(processName + " 2", browser.getCurrentUrl());
 		Pair<String, List<String>> cronTime = Pair.of(
-				ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+				ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
 		createScheduleForProcess(projectName, projectId, processName + " 1", "/graph/" + graphName
-				+ ".grf", null, null);
+				+ ".grf", cronTime, null);
 		assertNewSchedule(processName + " 1", graphName + ".grf", cronTime, null);
 		scheduleDetail.manualRun();
 		if (state == DISCOverviewProjectStates.RUNNING) {
@@ -827,8 +832,9 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 								scheduleDetail.getLastExecutionTime(),
 								scheduleDetail.getExecutionError()));
 		}
+		scheduleDetail.clickOnCloseScheduleButton();
 		createScheduleForProcess(projectName, projectId, processName + " 2", "/graph/" + graphName
-				+ ".grf", null, null);
+				+ ".grf", cronTime, null);
 		assertNewSchedule(processName + " 2", graphName + ".grf", cronTime, null);
 		scheduleDetail.manualRun();
 		if (state == DISCOverviewProjectStates.RUNNING) {
@@ -861,9 +867,9 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			Map<String, String> processesMap = new HashMap<String, String>();
 			processesMap.put(processName, browser.getCurrentUrl());
 			Pair<String, List<String>> cronTime = Pair.of(
-					ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+					ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
 			createScheduleForProcess(projectName, projectId, processName, "/graph/" + graphName
-					+ ".grf", null, null);
+					+ ".grf", cronTime, null);
 			assertNewSchedule(processName, graphName + ".grf", cronTime, null);
 			scheduleDetail.manualRun();
 			if (state == DISCOverviewProjectStates.RUNNING)
@@ -909,7 +915,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 		openOverviewPage();
 		waitForElementVisible(discOverview.getRoot());
 		checkBulkActionForSelectedProjects(state, true, getProjectsMap());
-		checkOtherStateNumbers(DISCOverviewProjectStates.ALL, projectName, projectId);
+		checkOtherStates(DISCOverviewProjectStates.ALL, projectName, projectId);
 		browser.get(expectedSchedules.get(Arrays.asList(processName, graphName + ".grf")).get(0));
 		waitForElementVisible(scheduleDetail.getRoot());
 		assertTrue(scheduleDetail.getEnableButton().isDisplayed());
