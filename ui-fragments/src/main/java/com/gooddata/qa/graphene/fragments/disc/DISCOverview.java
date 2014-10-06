@@ -4,11 +4,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.DISCOverviewProjectStates;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public class DISCOverview extends DISCOverviewProjects {
+public class DISCOverview extends AbstractFragment {
 
 	@FindBy(css = ".ait-overview-field-failed .ait-overview-state")
 	private WebElement failedState;
@@ -108,9 +109,9 @@ public class DISCOverview extends DISCOverviewProjects {
 		return stateNumber.getText();
 	}
 
-	public boolean assertOverviewStateNumber(DISCOverviewProjectStates state, int number)
+	public void assertOverviewStateNumber(DISCOverviewProjectStates state, int number)
 			throws InterruptedException {
 		assertTrue(state.getOption().equalsIgnoreCase(getState(state)));
-		return getStateNumber(state).equals(String.valueOf(number));
+		assertEquals(getStateNumber(state), String.valueOf(number));
 	}
 }
