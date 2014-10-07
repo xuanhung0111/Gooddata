@@ -84,7 +84,7 @@ public class MetricEditorDialog extends AbstractFragment {
     @FindBy(xpath = "//a[@class='interpolateProject']")
     private WebElement dataLink;
 
-    @FindBy(tagName = "iframe")
+    @FindBy(xpath = "//iframe[@class='metricEditorFrame']")
     private WebElement metricEditorPopup;
 
     @FindBy(id = "metricsTable")
