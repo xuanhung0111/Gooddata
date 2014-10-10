@@ -3,42 +3,25 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Part;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
 
 import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"GoodSalesSchedules"}, description = "Tests for GoodSales project (email schedules functionality) in GD platform")
-public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
+public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private static final String FROM = "noreply@gooddata.com";
-    private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 
     private String reportTitle = "UI-Graphene-core-Report";
     private String dashboardTitle = "UI-Graphene-core-Dashboard";
@@ -116,13 +99,6 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void initEmailSchedulesPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
-        waitForSchedulesPageLoaded(browser);
-        waitForElementNotVisible(BY_SCHEDULES_LOADING);
-        waitForElementVisible(emailSchedulesPage.getRoot());
-    }
-
     private void checkMailbox(ImapClient imapClient) throws Exception {
         Message[] reportMessages = new Message[0];
         Message[] dashboardMessages = new Message[0];
@@ -178,58 +154,8 @@ public class GoodSalesEmailSchedulesFullTest extends GoodSalesAbstractTest {
         verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 67000);
     }
 
-    private Part findPartByContentType(List<Part> parts, String contentType) throws MessagingException {
-        for (Part part : parts) {
-            if (part.getContentType().contains(contentType.toUpperCase())) {
-                return part;
-            }
-        }
-        return null;
-    }
-
     private boolean bothEmailsArrived(Message[] reportMessages, Message[] dashboardMessages) {
         return reportMessages.length > 0 && dashboardMessages.length > 0;
-    }
-
-    private void updateRecurrencyString(String scheduleUri) throws IOException {
-        RestApiClient restApiClient = getRestApiClient();
-
-        // get scheduledMail
-        System.out.println("Get scheduledMail: " + scheduleUri);
-        HttpRequestBase getRequest = restApiClient.newGetMethod(scheduleUri);
-        HttpResponse getResponse = restApiClient.execute(getRequest);
-        System.out.println(" - status: " + getResponse.getStatusLine().getStatusCode());
-        InputStream scheduleStream = getResponse.getEntity().getContent();
-
-        // change recurrency to current
-        String schedule = resetRecurrencyToNow(scheduleStream);
-
-        // update scheduledMail
-        System.out.println("Update scheduledMail: " + scheduleUri);
-        HttpRequestBase postRequest = restApiClient.newPostMethod(scheduleUri, schedule);
-        HttpResponse postResponse = restApiClient.execute(postRequest);
-        System.out.println(" - status: " + postResponse.getStatusLine().getStatusCode());
-        EntityUtils.consumeQuietly(postResponse.getEntity());
-    }
-
-    private String resetRecurrencyToNow(InputStream stream) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-
-        Map rootNode = mapper.readValue(stream, Map.class);
-        Map scheduledMail = (Map) rootNode.get("scheduledMail");
-        Map content = (Map) scheduledMail.get("content");
-        Map when = (Map) content.get("when");
-
-        String timeZone = (String) when.get("timeZone");
-        content.remove("lastSuccessfull");
-
-        DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZone)));
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("*Y:M:0:d:H:m:s");
-        // plusSeconds(1) - to be meta.updated <= recurrency (cannot be older)
-        when.put("recurrency", fmt.print(dateTime.plusSeconds(1)));
-        System.out.println(" - set recurrency to: " + when.get("recurrency"));
-
-        return mapper.writeValueAsString(rootNode);
     }
 
     private void verifyAttachment(Part attachment, String type, long minimalSize) throws Exception {

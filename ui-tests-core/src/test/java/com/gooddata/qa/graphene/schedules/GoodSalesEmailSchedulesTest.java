@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.schedules;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.ExportFormat;
@@ -11,9 +9,7 @@ import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"GoodSalesSchedulesFull"}, description = "Tests for GoodSales project (email schedules functionality, incl. imap verification) in GD platform")
-public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
-
-    private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
+public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedulesTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
     public void verifyEmptySchedules() {
@@ -46,13 +42,6 @@ public class GoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
         successfulTest = true;
-    }
-
-    private void initEmailSchedulesPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
-        waitForSchedulesPageLoaded(browser);
-        waitForElementNotVisible(BY_SCHEDULES_LOADING);
-        waitForElementVisible(emailSchedulesPage.getRoot());
     }
 
 }
