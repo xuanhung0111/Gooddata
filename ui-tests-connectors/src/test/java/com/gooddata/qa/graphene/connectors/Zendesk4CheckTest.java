@@ -67,18 +67,18 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private int totalEventsBaseCount;
 
     static {
-        AFTER_TICKET_CREATE_EVENTS.put("type", new FieldChange("question", EMPTY_VALUE));
-        AFTER_TICKET_CREATE_EVENTS.put("priority", new FieldChange("high", EMPTY_VALUE));
-        AFTER_TICKET_CREATE_EVENTS.put("tags", new FieldChange("first, second, to-be-deleted", "N/A", false));
-        AFTER_TICKET_CREATE_EVENTS.put("status", new FieldChange("new", EMPTY_VALUE));
+        AFTER_TICKET_CREATE_EVENTS.put("type", new FieldChange("Ticket Type", "question", EMPTY_VALUE));
+        AFTER_TICKET_CREATE_EVENTS.put("priority", new FieldChange("Priority", "high", EMPTY_VALUE));
+        AFTER_TICKET_CREATE_EVENTS.put("tags", new FieldChange("Tags", "first, second, to-be-deleted", "N/A", false));
+        AFTER_TICKET_CREATE_EVENTS.put("status", new FieldChange("Status", "new", EMPTY_VALUE));
 
-        AFTER_TICKET_UPDATE_EVENTS.put("type", new FieldChange("incident", "question"));
-        AFTER_TICKET_UPDATE_EVENTS.put("tags", new FieldChange("first, second", "first, second, to-be-deleted", false));
-        AFTER_TICKET_UPDATE_EVENTS.put("status", new FieldChange("open", "new"));
+        AFTER_TICKET_UPDATE_EVENTS.put("type", new FieldChange("Ticket Type", "incident", "question"));
+        AFTER_TICKET_UPDATE_EVENTS.put("tags", new FieldChange("Tags", "first, second", "first, second, to-be-deleted", false));
+        AFTER_TICKET_UPDATE_EVENTS.put("status", new FieldChange("Status", "open", "new"));
 
-        AFTER_TICKET_DELETE_EVENTS.put("status", new FieldChange("deleted", "open"));
+        AFTER_TICKET_DELETE_EVENTS.put("status", new FieldChange("Status", "deleted", "open"));
 
-        TAGS_AFTER_FULL_LOAD = new FieldChange("first, second", "N/A", false);
+        TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false);
     }
 
     @BeforeClass
@@ -291,8 +291,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     @Test(dependsOnMethods = {"testIncrementalSynchronization"}, groups = {"zendeskApiTests",
             "zendeskAfterCreateTests", "connectorWalkthrough"})
     public void testTicketEventsCountAfterIncrementalSync() throws IOException, JSONException, InterruptedException {
-        createTicketEventsReport(createdZendeskTicketId);
         createTicketTagsReport(createdZendeskTicketId);
+        createTicketEventsReport(createdZendeskTicketId);
 
         afterTicketCreateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId, DateTime.now().minusMinutes(10));
         checkTicketEventsReport(createdZendeskTicketId, afterTicketCreateEventId, AFTER_TICKET_CREATE_EVENTS);
@@ -303,7 +303,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     private void createTicketEventsReport(int ticketId) throws InterruptedException {
         List<HowItem> how = new ArrayList<HowItem>();
-        how.add(new HowItem("Ticket Text Field Change"));
+        how.add(new HowItem("Text Field"));
         how.add(new HowItem("[Text Field] New Value"));
         how.add(new HowItem("[Text Field] Previous Value"));
         how.add(new HowItem("Ticket Updates"));
@@ -541,14 +541,14 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private void checkTicketEventsReport(int ticketId, int ticketEventId, Map<String, FieldChange> expectedValues) {
         Map<String, FieldChange> reportValues = parseTicketEventFromReport(String.valueOf(ticketId), String.valueOf(ticketEventId));
 
-        for (String fieldName : expectedValues.keySet()) {
-            FieldChange expectedField = expectedValues.get(fieldName);
+        for (String zendeskFieldName : expectedValues.keySet()) {
+            FieldChange expectedReportField = expectedValues.get(zendeskFieldName);
 
-            if (expectedField.toBeChecked) {
-                FieldChange reportField = reportValues.get(fieldName);
-                assertNotNull(reportField, "Report does not contain changed field \"" + fieldName + "\"");
-                assertEquals(reportField.newValue, expectedField.newValue, "Report has incorrect NEW value for field \"" + fieldName + "\"");
-                assertEquals(reportField.oldValue, expectedField.oldValue, "Report has incorrect OLD value for field \"" + fieldName + "\"");
+            if (expectedReportField.toBeChecked) {
+                FieldChange reportField = reportValues.get(expectedReportField.fieldAlias);
+                assertNotNull(reportField, "Report does not contain changed field \"" + zendeskFieldName + "\"");
+                assertEquals(reportField.newValue, expectedReportField.newValue, "Report has incorrect NEW value for field \"" + zendeskFieldName + "\"");
+                assertEquals(reportField.oldValue, expectedReportField.oldValue, "Report has incorrect OLD value for field \"" + zendeskFieldName + "\"");
             }
         }
     }
@@ -565,14 +565,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         Map<String, FieldChange> actualValues = new HashMap<String, FieldChange>();
         String reportTicketEventId;
         String reportTicketId;
-        String fieldName;
+        String fieldNameAlias;
         String newValue;
         String oldValue;
 
         try {
-            while (i < cellValues.size()) { // format of report: "28779297:status", "[Status] open", "[Status] new", "reportTicketEventId", "reportTicketId"
-                fieldName = cellValues.get(i);
-                fieldName = fieldName.substring(fieldName.indexOf(":") + 1); // format: 28779297:status
+            while (i < cellValues.size()) { // format of report: "Status", "[Status] open", "[Status] new", "reportTicketEventId", "reportTicketId"
+                fieldNameAlias = cellValues.get(i); // not same as Zendesk field name!
                 i++;
                 newValue = cellValues.get(i);
                 newValue = newValue.substring(newValue.indexOf("]") + 2); // format: [Status] open
@@ -588,7 +587,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 i++;
 
                 if (reportTicketId.equals(ticketIdString) && reportTicketEventId.equals(ticketEventIdString)) {
-                    actualValues.put(fieldName, new FieldChange(newValue, oldValue));
+                    actualValues.put(fieldNameAlias, new FieldChange(fieldNameAlias, newValue, oldValue));
                 }
             }
         } catch (IndexOutOfBoundsException exception) {
@@ -645,17 +644,19 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private static class FieldChange {
+        private final String fieldAlias;
         private final String newValue;
         private final String oldValue;
         private boolean toBeChecked = true;
 
-        public FieldChange(String newValue, String oldValue) {
+        public FieldChange(String fieldAlias, String newValue, String oldValue) {
+            this.fieldAlias = fieldAlias;
             this.newValue = newValue;
             this.oldValue = oldValue;
         }
 
-        public FieldChange(String newValue, String oldValue, boolean toBeChecked) {
-            this(newValue, oldValue);
+        public FieldChange(String fieldAlias, String newValue, String oldValue, boolean toBeChecked) {
+            this(fieldAlias, newValue, oldValue);
             this.toBeChecked = toBeChecked;
         }
     }

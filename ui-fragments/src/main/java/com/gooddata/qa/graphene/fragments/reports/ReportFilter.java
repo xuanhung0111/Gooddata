@@ -18,6 +18,9 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class ReportFilter extends AbstractFragment {
 
+    private static final String ATTRIBUTE_IN_HOW_FROM_LIST = "//div[contains(@class,'s-item-${label}') and contains(@class,'s-enabled')]//span";
+    private static final String ATTRIBUTE_NOT_IN_HOW_FROM_LIST = "//div[contains(@class,'s-item-ticket_id') and contains(@class,'s-enabled') and contains(@class,'lastCell')]//span";
+
     private By addFilterButton = By.cssSelector(".s-btn-add_filter");
 
     @FindBy(xpath = "//div[contains(@class,'newFilterPicker')]")
@@ -82,9 +85,7 @@ public class ReportFilter extends AbstractFragment {
 
     @FindBy(xpath = "//div[@id='gridContainerTab']")
     private TableReport report;
-
     private String listOfElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
-    private String lastFromlistElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label} lastCell')]";
     private String attributeElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'s-item-${element}')]/input";
 
     public void addFilterSelectList(Map<String, String> data)
@@ -103,15 +104,8 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(filterPicker);
         waitForElementVisible(attributeFilterLink).click();
         if (attributeInHow) {
-            By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}",
-                    attribute.trim().toLowerCase().replaceAll("\\W", "_")));
-            waitForElementVisible(listOfAttribute, browser);
             selectElement(attribute);
         } else {
-            By listOfAttribute = By.xpath(lastFromlistElementLocator.replace("${label}",
-                    attribute.trim().toLowerCase().replaceAll("\\W", "_")));
-            waitForElementVisible(searchAttributeInput).sendKeys(attribute);
-            waitForElementVisible(listOfAttribute, browser);
             selectElementNotInHow(attribute);
         }
         waitForElementVisible(selectElementButtonDialog).click();
@@ -119,9 +113,9 @@ public class ReportFilter extends AbstractFragment {
         for (int i = 0; i < lsAttributeElements.size(); i++) {
             waitForElementVisible(searchValueInput).clear();
             searchValueInput.sendKeys(lsAttributeElements.get(i));
-            By attributeElement = By.xpath(attributeElementLocator.replace("${element}",
-                    lsAttributeElements.get(i).trim().toLowerCase().replaceAll("\\W", "_")));
-            waitForElementVisible(attributeElement, browser).click();
+            waitForElementVisible(
+                    By.xpath(createAttributeXPath(attributeElementLocator, "${element}", lsAttributeElements.get(i))),
+                    browser).click();
         }
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
@@ -130,35 +124,19 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(report.getRoot());
     }
 
+    private String createAttributeXPath(String locator, String placeHolder, String attributeName) {
+        return locator.replace(placeHolder, attributeName.trim().toLowerCase().replaceAll("\\W", "_"));
+    }
+
     private void selectElement(String elementName) {
-        if (simpleColumnList != null && simpleColumnList.size() > 0) {
-            for (WebElement elem : simpleColumnList) {
-                if (elem.findElement(By.tagName("span")).getText()
-                        .equals(elementName)) {
-                    elem.findElement(By.tagName("span")).click();
-                    break;
-                }
-            }
-            //
-        } else {
-            Assert.fail("No attribute are available");
-        }
+        waitForElementVisible(By.xpath(createAttributeXPath(listOfElementLocator, "${label}", elementName)), browser);
+        waitForElementVisible(By.xpath(createAttributeXPath(ATTRIBUTE_IN_HOW_FROM_LIST, "${label}", elementName)), browser).click();
     }
 
     private void selectElementNotInHow(String elementName) {
-        By listOfAttribute = By.xpath(listOfElementLocator.replace("${label}", elementName.trim().toLowerCase().replaceAll("\\W", "_")));
-        if (listOfAttribute != null) {
-            for (WebElement attribute : root.findElements(listOfAttribute)) {
-                WebElement element = attribute.findElement(By.tagName("span"));
-                if (element.getText().equals(elementName)) {
-                    element.click();
-                    break;
-                }
-            }
-            //
-        } else {
-            Assert.fail("No attribute are available");
-        }
+        waitForElementVisible(By.xpath(createAttributeXPath(listOfElementLocator, "${label}", elementName)), browser);
+        waitForElementVisible(searchAttributeInput).sendKeys(elementName);
+        waitForElementVisible(By.xpath(createAttributeXPath(ATTRIBUTE_NOT_IN_HOW_FROM_LIST, "${label}", elementName)), browser).click();
     }
 
     public void addRankFilter(Map<String, String> data)

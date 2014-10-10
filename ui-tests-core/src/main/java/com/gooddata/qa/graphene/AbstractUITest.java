@@ -332,9 +332,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void createReport(String reportName, ReportTypes reportType, List<String> what,
                              List<String> how, String screenshotName) throws InterruptedException {
         List<HowItem> howWithPosition = new ArrayList<HowItem>();
-        for (String attributeName : how) {
-            howWithPosition.add(new HowItem(attributeName));
+
+        if (how != null) {
+            for (String attributeName : how) {
+                howWithPosition.add(new HowItem(attributeName));
+            }
         }
+
         createReportTmp(reportName, reportType, what, howWithPosition, screenshotName);
     }
 
