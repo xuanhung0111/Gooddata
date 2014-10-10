@@ -188,7 +188,7 @@ public class ZendeskHelper {
     }
 
     public static void main(String[] args) throws IOException, JSONException, InterruptedException {
-        ZendeskHelper helper = new ZendeskHelper(new RestApiClient("gooddataqa3.zendesk-staging.com",
+        ZendeskHelper helper = new ZendeskHelper(new RestApiClient("gooddataqa3.zd-staging.com",
                 "qa@gooddata.com", "12345", false, false));
         //System.out.println(helper.getNumberOfTickets());
         //System.out.println(helper.getNumberOfTicketEvents());
