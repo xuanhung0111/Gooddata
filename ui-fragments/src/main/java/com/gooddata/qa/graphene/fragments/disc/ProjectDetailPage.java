@@ -2,19 +2,20 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.io.File;
 import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.disc.SchedulesTable.ScheduleStatus;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
 public class ProjectDetailPage extends AbstractFragment {
 
+	private static final String PROCESS_METADATA_ID = "Process ID";
 	private static final By BY_PROCESS_TITLE = By.cssSelector(".ait-process-title");
 	private final static By BY_PROCESS_DELETE_BUTTON = By.cssSelector(".ait-process-delete-btn");
 	private final static By BY_PROCESS_DOWNLOAD_BUTTON = By
@@ -28,6 +29,20 @@ public class ProjectDetailPage extends AbstractFragment {
 	private final static By BY_PROCESS_METADATA_TAB = By.cssSelector(".ait-process-metadata-btn");
 	private final static By BY_BROKEN_SCHEDULE_MESSAGE = By
 			.cssSelector(".broken-schedules-section .message");
+	private final static By BY_PROJECT_METADATA_KEY = By.cssSelector(".ait-metadata-key");
+	private final static By BY_PROJECT_METADATA_VALUE = By.cssSelector(".ait-metadata-value");
+	private final static By BY_PROCESS_METADATA_KEY = By.cssSelector(".ait-process-metadata-key");
+	private final static By BY_PROCESS_METADATA_VALUE = By
+			.cssSelector(".ait-process-metadata-value");
+	private final static By BY_ERROR_STATUS_ICON = By.cssSelector(".status-icon-error");
+	private final static By BY_OK_STATUS_ICON = By.cssSelector(".status-icon-ok.icon-check");
+	private final static By BY_DISABLED_STATUS_ICON = By
+			.cssSelector(".status-icon-disabled.icon-pause");
+	private final static By BY_UNSCHEDULED_STATUS_ICON = By.cssSelector(".ico-unscheduled");
+	private final static By BY_SCHEDULED_STATUS_ICON = By
+			.cssSelector(".status-icon-scheduled.icon-sync");
+	private final static By BY_RUNNING_STATUS_ICON = By
+			.cssSelector(".status-icon-running.icon-sync");
 
 	private static final String DELETE_PROCESS_DIALOG_MESSAGE = "Are you sure you want to delete process %s?";
 	private static final String DELETE_PROCESS_DIALOG_TITLE = "Delete process %s";
@@ -38,6 +53,12 @@ public class ProjectDetailPage extends AbstractFragment {
 
 	@FindBy(css = ".ait-project-title")
 	protected WebElement displayedProjectTitle;
+
+	@FindBy(css = ".ait-project-metadata-list-item")
+	protected List<WebElement> projectMetadataItems;
+
+	@FindBy(css = ".ait-process-metadata-list-item")
+	protected List<WebElement> processMetadataItems;
 
 	@FindBy(xpath = "//a/span[text()='Go to Dashboards']")
 	protected WebElement goToDashboardsLink;
@@ -97,6 +118,29 @@ public class ProjectDetailPage extends AbstractFragment {
 		return waitForElementVisible(displayedProjectTitle).getText();
 	}
 
+	public String getProjectMetadata(String metadataKey) throws InterruptedException {
+		for (int i = 0; i < 10 && projectMetadataItems.size() == 0; i++) {
+			Thread.sleep(1000);
+		}
+		for (int i = 0; i < projectMetadataItems.size(); i++) {
+			if (projectMetadataItems.get(i).findElement(BY_PROJECT_METADATA_KEY).getText()
+					.equals(metadataKey))
+				return projectMetadataItems.get(i).findElement(BY_PROJECT_METADATA_VALUE).getText();
+		}
+		return null;
+	}
+
+	public String getProcessMetadata(String metadataKey) throws InterruptedException {
+		for (int i = 0; i < 10 && processMetadataItems.size() == 0; i++) {
+			Thread.sleep(1000);
+		}
+		for (WebElement metadataItem : processMetadataItems) {
+			if (metadataItem.findElement(BY_PROCESS_METADATA_KEY).getText().equals(metadataKey))
+				return metadataItem.findElement(BY_PROCESS_METADATA_VALUE).getText();
+		}
+		return null;
+	}
+
 	public void goToDashboards() {
 		waitForElementVisible(goToDashboardsLink).click();
 	}
@@ -154,7 +198,7 @@ public class ProjectDetailPage extends AbstractFragment {
 				BY_PROCESS_METADATA_TAB));
 	}
 
-	protected void assertExecutablesList(DISCProcessTypes processType, List<String> executables) {
+	public void assertExecutablesList(DISCProcessTypes processType, List<String> executables) {
 		executablesTable.assertExecutablesList(processType, executables);
 	}
 
@@ -215,6 +259,10 @@ public class ProjectDetailPage extends AbstractFragment {
 		return getElementFromSpecificProcess(processName, BY_PROCESS_SCHEDULE_TAB);
 	}
 
+	public WebElement getMetadataTabByProcessName(String processName) {
+		return getElementFromSpecificProcess(processName, BY_PROCESS_METADATA_TAB);
+	}
+
 	public WebElement getExecutableScheduleLink(String executableName) {
 		return executablesTable.getExecutableScheduleLink(executableName);
 	}
@@ -230,10 +278,10 @@ public class ProjectDetailPage extends AbstractFragment {
 				getElementFromSpecificProcess(processName, BY_BROKEN_SCHEDULE_MESSAGE).getText());
 	}
 
-	public String getProcessID(String processName) {
+	public String getProcessID(String processName) throws InterruptedException {
 		waitForElementVisible(getElementFromSpecificProcess(processName, BY_PROCESS_METADATA_TAB))
 				.click();
-		return waitForElementVisible(processMetadataValue).getText();
+		return getProcessMetadata(PROCESS_METADATA_ID);
 	}
 
 	public String getProcessTitle(WebElement process) {
@@ -244,8 +292,7 @@ public class ProjectDetailPage extends AbstractFragment {
 			long minimumDownloadedFileSize) throws InterruptedException {
 		String processID = getProcessID(processName);
 		clickOnDownloadProcessButton(processName);
-		File zipDownload = new File(downloadFolder + projectID + "_" + processID
-				+ "-decrypted.zip");
+		File zipDownload = new File(downloadFolder + projectID + "_" + processID + "-decrypted.zip");
 		for (int i = 0; zipDownload.length() < minimumDownloadedFileSize && i < 10; i++) {
 			Thread.sleep(1000);
 		}
@@ -330,5 +377,66 @@ public class ProjectDetailPage extends AbstractFragment {
 		} else
 			assertEquals(EXECUTABLE_NO_SCHEDULES,
 					executablesTable.getExecutableScheduleNumber(executableName));
+	}
+
+	public void activeScheduleTab(String processName) {
+		getScheduleTabByProcessName(processName).click();
+		assertTrue(getScheduleTabByProcessName(processName).getAttribute("class")
+				.contains("active"));
+		assertFalse(getExecutableTabByProcessName(processName).getAttribute("class").contains(
+				"active"));
+		assertFalse(getMetadataTabByProcessName(processName).getAttribute("class").contains(
+				"active"));
+	}
+
+	public void activeExecutableTab(String processName) {
+		getExecutableTabByProcessName(processName).click();
+		assertTrue(getExecutableTabByProcessName(processName).getAttribute("class").contains(
+				"active"));
+		assertFalse(getScheduleTabByProcessName(processName).getAttribute("class").contains(
+				"active"));
+		assertFalse(getMetadataTabByProcessName(processName).getAttribute("class").contains(
+				"active"));
+	}
+
+	public void activeMetadataTab(String processName) {
+		getMetadataTabByProcessName(processName).click();
+		assertTrue(getMetadataTabByProcessName(processName).getAttribute("class")
+				.contains("active"));
+		assertFalse(getScheduleTabByProcessName(processName).getAttribute("class").contains(
+				"active"));
+		assertFalse(getExecutableTabByProcessName(processName).getAttribute("class").contains(
+				"active"));
+	}
+
+	public void assertScheduleStatus(String processName, String scheduleName,
+			ScheduleStatus scheduleStatus, boolean lastErrorExecution, SchedulesTable scheduleTable) {
+		WebElement schedule = scheduleTable.getSchedule(scheduleName);
+		assertNotNull(schedule);
+		if (lastErrorExecution)
+			assertTrue(schedule.getAttribute("class").contains("is-error"));
+		else
+			assertFalse(schedule.getAttribute("class").contains("is-error"));
+		switch (scheduleStatus) {
+		case OK:
+			assertNotNull(schedule.findElement(BY_OK_STATUS_ICON));
+			break;
+		case SCHEDULED:
+			assertNotNull(schedule.findElement(BY_SCHEDULED_STATUS_ICON));
+			break;
+		case ERROR:
+			assertNotNull(schedule.findElement(BY_ERROR_STATUS_ICON));
+			break;
+		case DISABLED:
+			assertNotNull(schedule.findElement(BY_DISABLED_STATUS_ICON));
+			break;
+		case RUNNING:
+			assertNotNull(schedule.findElement(BY_RUNNING_STATUS_ICON));
+			break;
+		case UNSCHEDULED:
+			assertFalse(schedule.getAttribute("class").contains("is-error"));
+			assertNotNull(schedule.findElement(BY_UNSCHEDULED_STATUS_ICON));
+			break;
+		}
 	}
 }
