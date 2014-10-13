@@ -542,92 +542,80 @@ public class ScheduleDetail extends ScheduleForm {
 		scheduleExecutionItems.get(0).findElement(BY_OK_GROUP_EXPAND_BUTTON).click();
 	}
 
-	public void checkOkExecutionGroup(int okExecutionNumber, int okGroupIndex)
-			throws InterruptedException {
-		int scheduleExecutionNumber = scheduleExecutionItems.size();
-		String groupDescription = String.format(OK_GROUP_DESCRIPTION_FORMAT, okExecutionNumber);
-		assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_STATUS_ICON)
-				.isDisplayed());
-		System.out.println("Execution description of ok execution group: "
-				+ scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DESCRIPTION)
-						.getText());
-		assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DESCRIPTION)
-				.getText().contains(groupDescription));
-		assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_LAST_RUN)
-				.isDisplayed());
-		System.out.println("Execution description of ok execution group: "
-				+ scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_RUNTIME)
-						.getText());
-		assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_RUNTIME)
-				.isDisplayed());
-		System.out
-				.println("Execution description of ok execution group: "
-						+ scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DATE)
-								.getText());
-		assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DATE)
-				.isDisplayed());
-		System.out.println("Execution description of ok execution group: "
-				+ scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_TIMES)
-						.getText());
-		assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_TIMES)
-				.isDisplayed());
-		assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_LOG)
-				.isDisplayed());
-		waitForElementVisible(scheduleExecutionItems.get(okGroupIndex).findElement(
-				BY_OK_GROUP_EXPAND_BUTTON));
-		scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_GROUP_EXPAND_BUTTON).click();
-		for (int i = 0; i < 10 && scheduleExecutionItems.size() == scheduleExecutionNumber; i++) {
-			Thread.sleep(1000);
-		}
-		assertEquals(scheduleExecutionNumber + okExecutionNumber, scheduleExecutionItems.size());
-		for (int i = okGroupIndex; i < okGroupIndex + okExecutionNumber + 1; i++) {
-			if (i == okGroupIndex) {
-				assertTrue(scheduleExecutionItems.get(i).findElement(BY_OK_STATUS_ICON)
-						.isDisplayed());
-				System.out.println("Execution description at "
-						+ i
-						+ " index: "
-						+ scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-								.getText());
-				assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-						.getText().contains(groupDescription));
-				assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME)
-						.isDisplayed());
-				assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE)
-						.isDisplayed());
-				assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES)
-						.isDisplayed());
-				assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_LOG)
-						.isDisplayed());
-			} else {
-				assertFalse(scheduleExecutionItems.get(i).findElement(BY_OK_STATUS_ICON)
-						.isDisplayed());
-				System.out.println("Execution description at "
-						+ i
-						+ " index: "
-						+ scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-								.getText());
-				assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-						.isDisplayed());
-				System.out
-						.println("Execution description at "
-								+ i
-								+ " index: "
-								+ scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME)
-										.getText());
-				assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME)
-						.isDisplayed());
-				System.out.println("Execution description at " + i + " index: "
-						+ scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE).getText());
-				assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE)
-						.isDisplayed());
-				System.out.println("Execution description at " + i + " index: "
-						+ scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES).getText());
-				assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES)
-						.isDisplayed());
-				assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_LOG)
-						.isDisplayed());
-			}
-		}
-	}
+    public void checkOkExecutionGroup(int okExecutionNumber, int okGroupIndex)
+            throws InterruptedException {
+        int scheduleExecutionNumber = scheduleExecutionItems.size();
+        String groupDescription = String.format(OK_GROUP_DESCRIPTION_FORMAT, okExecutionNumber);
+        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_STATUS_ICON)
+                .isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DESCRIPTION)
+                        .getText());
+        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DESCRIPTION)
+                .getText().contains(groupDescription));
+        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_LAST_RUN)
+                .isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_RUNTIME).getText());
+        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_RUNTIME)
+                .isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DATE).getText());
+        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DATE)
+                .isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_TIMES).getText());
+        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_TIMES)
+                .isDisplayed());
+        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_LOG)
+                .isDisplayed());
+        waitForElementVisible(scheduleExecutionItems.get(okGroupIndex).findElement(
+                BY_OK_GROUP_EXPAND_BUTTON));
+        scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_GROUP_EXPAND_BUTTON).click();
+        for (int i = 0; i < 10 && scheduleExecutionItems.size() == scheduleExecutionNumber; i++) {
+            Thread.sleep(1000);
+        }
+        assertEquals(scheduleExecutionNumber + okExecutionNumber, scheduleExecutionItems.size());
+        for (int i = okGroupIndex; i < okGroupIndex + okExecutionNumber + 1; i++) {
+            if (i == okGroupIndex) {
+                assertTrue(scheduleExecutionItems.get(i).findElement(BY_OK_STATUS_ICON)
+                        .isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
+                                .getText());
+                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
+                        .getText().contains(groupDescription));
+                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME)
+                        .isDisplayed());
+                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE)
+                        .isDisplayed());
+                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES)
+                        .isDisplayed());
+                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_LOG)
+                        .isDisplayed());
+            } else {
+                assertFalse(scheduleExecutionItems.get(i).findElement(BY_OK_STATUS_ICON)
+                        .isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
+                                .getText());
+                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
+                        .isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME) .getText());
+                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME)
+                        .isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE).getText());
+                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE)
+                        .isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES).getText());
+                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES)
+                        .isDisplayed());
+                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_LOG)
+                        .isDisplayed());
+            }
+        }
+    }
 }

@@ -375,8 +375,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					Arrays.asList("successfulGraph.grf"));
 			Map<List<String>, List<String>> checkedSchedules = new HashMap<List<String>, List<String>>();
 			checkedSchedules.put(Arrays.asList("Run Successful Schedule 2", "successfulGraph.grf"),
-					expectedSchedules.get(Arrays.asList("Run Successful Schedule 2",
-							"successfulGraph.grf")));
+					expectedSchedules.get(Arrays.asList("Run Successful Schedule 2", "successfulGraph.grf")));
 			Map<String, String> checkedProcesses = new HashMap<String, String>();
 			checkedProcesses.put("Run Successful Schedule 2",
 					processesMap.get("Run Successful Schedule 2"));

@@ -2,14 +2,14 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.io.File;
 import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.graphene.enums.DISCScheduleStatus;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.disc.SchedulesTable.ScheduleStatus;
-
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -34,15 +34,6 @@ public class ProjectDetailPage extends AbstractFragment {
 	private final static By BY_PROCESS_METADATA_KEY = By.cssSelector(".ait-process-metadata-key");
 	private final static By BY_PROCESS_METADATA_VALUE = By
 			.cssSelector(".ait-process-metadata-value");
-	private final static By BY_ERROR_STATUS_ICON = By.cssSelector(".status-icon-error");
-	private final static By BY_OK_STATUS_ICON = By.cssSelector(".status-icon-ok.icon-check");
-	private final static By BY_DISABLED_STATUS_ICON = By
-			.cssSelector(".status-icon-disabled.icon-pause");
-	private final static By BY_UNSCHEDULED_STATUS_ICON = By.cssSelector(".ico-unscheduled");
-	private final static By BY_SCHEDULED_STATUS_ICON = By
-			.cssSelector(".status-icon-scheduled.icon-sync");
-	private final static By BY_RUNNING_STATUS_ICON = By
-			.cssSelector(".status-icon-running.icon-sync");
 
 	private static final String DELETE_PROCESS_DIALOG_MESSAGE = "Are you sure you want to delete process %s?";
 	private static final String DELETE_PROCESS_DIALOG_TITLE = "Delete process %s";
@@ -71,9 +62,6 @@ public class ProjectDetailPage extends AbstractFragment {
 
 	@FindBy(css = ".ait-project-deploy-process-btn")
 	protected WebElement deployProcessButton;
-
-	@FindBy(css = ".ait-process-list-item.active .ait-process-metadata-value")
-	protected WebElement processMetadataValue;
 
 	@FindBy(css = ".ait-process-list-item")
 	protected List<WebElement> processes;
@@ -379,38 +367,32 @@ public class ProjectDetailPage extends AbstractFragment {
 					executablesTable.getExecutableScheduleNumber(executableName));
 	}
 
-	public void activeScheduleTab(String processName) {
+	public void selectScheduleTab(String processName) {
 		getScheduleTabByProcessName(processName).click();
-		assertTrue(getScheduleTabByProcessName(processName).getAttribute("class")
-				.contains("active"));
-		assertFalse(getExecutableTabByProcessName(processName).getAttribute("class").contains(
-				"active"));
-		assertFalse(getMetadataTabByProcessName(processName).getAttribute("class").contains(
-				"active"));
+		assertActiveProcessTabs(processName, true, false, false);
 	}
 
-	public void activeExecutableTab(String processName) {
+	public void selectExecutableTab(String processName) {
 		getExecutableTabByProcessName(processName).click();
-		assertTrue(getExecutableTabByProcessName(processName).getAttribute("class").contains(
-				"active"));
-		assertFalse(getScheduleTabByProcessName(processName).getAttribute("class").contains(
-				"active"));
-		assertFalse(getMetadataTabByProcessName(processName).getAttribute("class").contains(
-				"active"));
+		assertActiveProcessTabs(processName, false, true, false);
 	}
 
-	public void activeMetadataTab(String processName) {
+	public void selectMetadataTab(String processName) {
 		getMetadataTabByProcessName(processName).click();
-		assertTrue(getMetadataTabByProcessName(processName).getAttribute("class")
-				.contains("active"));
-		assertFalse(getScheduleTabByProcessName(processName).getAttribute("class").contains(
-				"active"));
-		assertFalse(getExecutableTabByProcessName(processName).getAttribute("class").contains(
-				"active"));
+		assertActiveProcessTabs(processName, false, false, true);
+	}
+	
+	public void assertActiveProcessTabs(String processName, boolean activeScheduleTab, boolean activeExecutableTab, boolean activeMetadataTab) {
+	    assertEquals(getScheduleTabByProcessName(processName).getAttribute("class").contains(
+                "active"), activeScheduleTab);
+	    assertEquals(getExecutableTabByProcessName(processName).getAttribute("class").contains(
+                "active"), activeExecutableTab);
+	    assertEquals(getMetadataTabByProcessName(processName).getAttribute("class").contains(
+                "active"), activeMetadataTab);
 	}
 
 	public void assertScheduleStatus(String processName, String scheduleName,
-			ScheduleStatus scheduleStatus, boolean lastErrorExecution, SchedulesTable scheduleTable) {
+			DISCScheduleStatus scheduleStatus, boolean lastErrorExecution, SchedulesTable scheduleTable) {
 		WebElement schedule = scheduleTable.getSchedule(scheduleName);
 		assertNotNull(schedule);
 		if (lastErrorExecution)
@@ -419,23 +401,23 @@ public class ProjectDetailPage extends AbstractFragment {
 			assertFalse(schedule.getAttribute("class").contains("is-error"));
 		switch (scheduleStatus) {
 		case OK:
-			assertNotNull(schedule.findElement(BY_OK_STATUS_ICON));
+			assertNotNull(schedule.findElement(DISCScheduleStatus.OK.getIconByCss()));
 			break;
 		case SCHEDULED:
-			assertNotNull(schedule.findElement(BY_SCHEDULED_STATUS_ICON));
+			assertNotNull(schedule.findElement(DISCScheduleStatus.SCHEDULED.getIconByCss()));
 			break;
 		case ERROR:
-			assertNotNull(schedule.findElement(BY_ERROR_STATUS_ICON));
+			assertNotNull(schedule.findElement(DISCScheduleStatus.ERROR.getIconByCss()));
 			break;
 		case DISABLED:
-			assertNotNull(schedule.findElement(BY_DISABLED_STATUS_ICON));
+			assertNotNull(schedule.findElement(DISCScheduleStatus.DISABLED.getIconByCss()));
 			break;
 		case RUNNING:
-			assertNotNull(schedule.findElement(BY_RUNNING_STATUS_ICON));
+			assertNotNull(schedule.findElement(DISCScheduleStatus.RUNNING.getIconByCss()));
 			break;
 		case UNSCHEDULED:
 			assertFalse(schedule.getAttribute("class").contains("is-error"));
-			assertNotNull(schedule.findElement(BY_UNSCHEDULED_STATUS_ICON));
+			assertNotNull(schedule.findElement(DISCScheduleStatus.UNSCHEDULED.getIconByCss()));
 			break;
 		}
 	}

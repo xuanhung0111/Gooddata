@@ -2,14 +2,15 @@ package com.gooddata.qa.graphene.disc;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.DISCScheduleStatus;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
-import com.gooddata.qa.graphene.fragments.disc.SchedulesTable.ScheduleStatus;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -59,12 +60,12 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 			deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
 					DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
 							"longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-			projectDetailPage.activeScheduleTab(processName);
+			projectDetailPage.selectScheduleTab(processName);
 			waitForElementVisible(projectDetailPage.checkEmptySchedulesList(processName));
-			projectDetailPage.activeExecutableTab(processName);
+			projectDetailPage.selectExecutableTab(processName);
 			projectDetailPage.assertExecutablesList(DISCProcessTypes.GRAPH, Arrays.asList(
 					"errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"));
-			projectDetailPage.activeMetadataTab(processName);
+			projectDetailPage.selectMetadataTab(processName);
 			String processID = browser
 					.getCurrentUrl()
 					.substring(browser.getCurrentUrl().indexOf("processes/"),
@@ -240,18 +241,18 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 					"/graph/successfulGraph.grf", cronTime, null);
 			assertNewSchedule(processName, "successfulGraph.grf", cronTime, null);
 			projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-					ScheduleStatus.UNSCHEDULED, false, schedulesTable);
+					DISCScheduleStatus.UNSCHEDULED, false, schedulesTable);
 			scheduleDetail.manualRun();
 			scheduleDetail.isInScheduledState();
 			projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-					ScheduleStatus.SCHEDULED, false, schedulesTable);
+					DISCScheduleStatus.SCHEDULED, false, schedulesTable);
 			scheduleDetail.isInRunningState();
 			projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-					ScheduleStatus.RUNNING, false, schedulesTable);
+					DISCScheduleStatus.RUNNING, false, schedulesTable);
 			scheduleDetail.assertLastExecutionDetails(true, true, false,
 					"Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
 			projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-					ScheduleStatus.OK, false, schedulesTable);
+					DISCScheduleStatus.OK, false, schedulesTable);
 			createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
 					"/graph/errorGraph.grf", cronTime, null);
 			assertNewSchedule(processName, "errorGraph.grf", cronTime, null);
@@ -259,10 +260,10 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 			scheduleDetail.assertLastExecutionDetails(false, true, false,
 					"Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
 			projectDetailPage.assertScheduleStatus(processName, "errorGraph.grf",
-					ScheduleStatus.ERROR, true, schedulesTable);
+					DISCScheduleStatus.ERROR, true, schedulesTable);
 			scheduleDetail.disableSchedule();
 			projectDetailPage.assertScheduleStatus(processName, "errorGraph.grf",
-					ScheduleStatus.DISABLED, true, schedulesTable);
+			        DISCScheduleStatus.DISABLED, true, schedulesTable);
 		} finally {
 			projectDetailPage.deleteAllProcesses();
 		}
