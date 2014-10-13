@@ -9,10 +9,10 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DISCNavigation extends AbstractFragment {
 
-	@FindBy(xpath = "//a[text()='Projects']")
-	protected WebElement projectsButton;
-	
-	public void clickOnProjectsButton() {
-		waitForElementPresent(projectsButton).click();
-	}
+    @FindBy(xpath = "//a[text()='Projects']")
+    protected WebElement projectsButton;
+
+    public void clickOnProjectsButton() {
+        waitForElementPresent(projectsButton).click();
+    }
 }
