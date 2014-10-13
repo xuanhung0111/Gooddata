@@ -618,4 +618,12 @@ public class ScheduleDetail extends ScheduleForm {
             }
         }
     }
+    
+	public String getLastExecutionLogLink () {
+		return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_LOG).getAttribute("href");
+	}
+	
+	public String getLastExecutionDescription() {
+		return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText();
+	}
 }

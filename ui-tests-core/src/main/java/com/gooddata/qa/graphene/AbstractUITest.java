@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
@@ -144,6 +145,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     
     @FindBy(css = ".ait-projects-fragment")
     protected DISCProjectsPage discProjectsPage;
+    
+    @FindBy(css = ".ait-notification-rules-fragment")
+    protected NotificationRulesDialog discNotificationRules;
 
     @FindBy(css = ".ait-overview-fragment")
     protected DISCOverview discOverview;
