@@ -257,12 +257,14 @@ public class DashboardsPage extends AbstractFragment {
         waitForDashboardPageLoaded(browser);
     }
 
-    public void addNewDashboard(String dashbordName) throws InterruptedException {
+    public void addNewDashboard(String dashboardName) throws InterruptedException {
         waitForElementVisible(editExportEmbedButton).click();
         waitForElementVisible(addDashboardButton).click();
         waitForElementVisible(newDashboardNameInput).clear();
         newDashboardNameInput.click(); //sleep wasn't necessary, getting focus on the input field helps
-        newDashboardNameInput.sendKeys(dashbordName);
+        newDashboardNameInput.sendKeys(dashboardName);
+        System.out.println(newDashboardNameInput.getText());
+        Thread.sleep(2000);
         editDashboardBar.saveDashboard();
     }
 
