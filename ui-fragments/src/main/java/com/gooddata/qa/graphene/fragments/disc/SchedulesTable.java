@@ -24,4 +24,12 @@ public class SchedulesTable extends AbstractTable {
 		}
 		return null;
 	}
+
+	public WebElement getSchedule(String executableName) {
+		for (int i = 0; i < this.getNumberOfRows(); i++) {
+			if (getRow(i).findElement(BY_SCHEDULE_TITLE).getText().equals(executableName))
+				return getRow(i);
+		}
+		return null;
+	}
 }

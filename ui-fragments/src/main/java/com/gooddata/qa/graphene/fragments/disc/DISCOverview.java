@@ -11,11 +11,17 @@ import static org.testng.Assert.*;
 
 public class DISCOverview extends AbstractFragment {
 
+	@FindBy(css = ".ait-overview-field-failed")
+	private WebElement failedField;
+
 	@FindBy(css = ".ait-overview-field-failed .ait-overview-state")
 	private WebElement failedState;
 
 	@FindBy(css = ".ait-overview-field-failed .ait-overview-state-count")
 	private WebElement failedStateNumber;
+
+	@FindBy(css = ".ait-overview-field-running")
+	private WebElement runningField;
 
 	@FindBy(css = ".ait-overview-field-running .ait-overview-state")
 	private WebElement runningState;
@@ -23,11 +29,17 @@ public class DISCOverview extends AbstractFragment {
 	@FindBy(css = ".ait-overview-field-running .ait-overview-state-count")
 	private WebElement runningStateNumber;
 
+	@FindBy(css = ".ait-overview-field-scheduled")
+	private WebElement scheduledField;
+
 	@FindBy(css = ".ait-overview-field-scheduled .ait-overview-state")
 	private WebElement scheduledState;
 
 	@FindBy(css = ".ait-overview-field-scheduled .ait-overview-state-count")
 	private WebElement scheduledStateNumber;
+
+	@FindBy(css = ".ait-overview-field-successful")
+	private WebElement successfulField;
 
 	@FindBy(css = ".ait-overview-field-successful .ait-overview-state")
 	private WebElement successfulState;
@@ -68,7 +80,7 @@ public class DISCOverview extends AbstractFragment {
 		Thread.sleep(1000);
 		waitForStateNumber(stateNumber);
 	}
-	
+
 	public String getState(DISCOverviewProjectStates state) {
 		WebElement stateTitle = null;
 		switch (state) {
@@ -87,7 +99,7 @@ public class DISCOverview extends AbstractFragment {
 		}
 		return waitForElementVisible(stateTitle).getText();
 	}
-	
+
 	public String getStateNumber(DISCOverviewProjectStates state) throws InterruptedException {
 		WebElement stateNumber = null;
 		switch (state) {
@@ -113,5 +125,25 @@ public class DISCOverview extends AbstractFragment {
 			throws InterruptedException {
 		assertTrue(state.getOption().equalsIgnoreCase(getState(state)));
 		assertEquals(getStateNumber(state), String.valueOf(number));
+	}
+
+	public boolean isActive(DISCOverviewProjectStates state) {
+		WebElement overviewField = null;
+		switch (state) {
+		case FAILED:
+			overviewField = failedField;
+			break;
+		case RUNNING:
+			overviewField = runningField;
+			break;
+		case SCHEDULED:
+			overviewField = scheduledField;
+			break;
+		case SUCCESSFUL:
+			overviewField = successfulField;
+			break;
+		}
+		waitForElementVisible(overviewField);
+		return overviewField.getAttribute("class").contains("active");
 	}
 }

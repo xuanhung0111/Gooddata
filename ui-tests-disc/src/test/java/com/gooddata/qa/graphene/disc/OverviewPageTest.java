@@ -26,12 +26,21 @@ import static org.testng.Assert.*;
 public class OverviewPageTest extends AbstractSchedulesTests {
 
 	private static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
-	
+
 	@BeforeClass
 	public void initProperties() throws InterruptedException {
 		zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
 		projectTitle = "Disc-test-overview-page";
 		startPage = DISC_OVERVIEW_PAGE;
+	}
+
+	@Test(dependsOnMethods = { "createProject" }, groups = { "project-overview" })
+	public void checkDefaultOverviewState() throws InterruptedException {
+		openOverviewPage();
+		assertTrue(discOverview.isActive(DISCOverviewProjectStates.FAILED));
+		assertFalse(discOverview.isActive(DISCOverviewProjectStates.RUNNING));
+		assertFalse(discOverview.isActive(DISCOverviewProjectStates.SCHEDULED));
+		assertFalse(discOverview.isActive(DISCOverviewProjectStates.SUCCESSFUL));
 	}
 
 	@Test(dependsOnMethods = { "createProject" }, groups = { "project-overview" })
@@ -89,7 +98,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					additionalProjects, null, null, "Check Scheduled State Number");
 			openOverviewPage();
 			discOverview.selectOverviewState(DISCOverviewProjectStates.SCHEDULED);
-			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED,
+					discOverviewProjects.getOverviewProjectNumber());
 		} finally {
 			cleanupProcessesAndProjects(true, additionalProjects);
 		}
@@ -112,9 +122,11 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					"Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
 			openOverviewPage();
 			discOverview.selectOverviewState(DISCOverviewProjectStates.FAILED);
-			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.FAILED, discOverviewProjects.getOverviewProjectNumber());
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.FAILED,
+					discOverviewProjects.getOverviewProjectNumber());
 			discOverview.selectOverviewState(DISCOverviewProjectStates.SUCCESSFUL);
-			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SUCCESSFUL, discOverviewProjects.getOverviewProjectNumber());
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SUCCESSFUL,
+					discOverviewProjects.getOverviewProjectNumber());
 			checkFilteredOutProject(DISCOverviewProjectStates.RUNNING, projectTitle,
 					testParams.getProjectId());
 			checkFilteredOutProject(DISCOverviewProjectStates.SCHEDULED, projectTitle,
@@ -137,7 +149,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.FAILED.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
-			checkOtherStates(DISCOverviewProjectStates.FAILED, projectTitle, testParams.getProjectId());
+			checkOtherStates(DISCOverviewProjectStates.FAILED, projectTitle,
+					testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -158,7 +171,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.SUCCESSFUL.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
-			checkOtherStates(DISCOverviewProjectStates.SUCCESSFUL, projectTitle, testParams.getProjectId());
+			checkOtherStates(DISCOverviewProjectStates.SUCCESSFUL, projectTitle,
+					testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -181,7 +195,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.SCHEDULED.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
-			checkOtherStates(DISCOverviewProjectStates.SCHEDULED, projectTitle, testParams.getProjectId());
+			checkOtherStates(DISCOverviewProjectStates.SCHEDULED, projectTitle,
+					testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(true, additionalProjects);
 		}
@@ -202,7 +217,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			discOverviewProjects.assertOverviewProject(
 					DISCOverviewProjectStates.RUNNING.getOption(), projectTitle,
 					testParams.getProjectId(), processesMap, expectedSchedules);
-			checkOtherStates(DISCOverviewProjectStates.RUNNING, projectTitle, testParams.getProjectId());
+			checkOtherStates(DISCOverviewProjectStates.RUNNING, projectTitle,
+					testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -358,9 +374,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			selectedSchedules.put(("Run Successful Schedule 1").toUpperCase(),
 					Arrays.asList("successfulGraph.grf"));
 			Map<List<String>, List<String>> checkedSchedules = new HashMap<List<String>, List<String>>();
-			checkedSchedules.put(Arrays.asList("Run Successful Schedule 2",
-					"successfulGraph.grf"), expectedSchedules.get(Arrays.asList(
-					"Run Successful Schedule 2", "successfulGraph.grf")));
+			checkedSchedules.put(Arrays.asList("Run Successful Schedule 2", "successfulGraph.grf"),
+					expectedSchedules.get(Arrays.asList("Run Successful Schedule 2", "successfulGraph.grf")));
 			Map<String, String> checkedProcesses = new HashMap<String, String>();
 			checkedProcesses.put("Run Successful Schedule 2",
 					processesMap.get("Run Successful Schedule 2"));
@@ -450,7 +465,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					.asList("Stop Running Projects", "longTimeRunningGraph.grf"), Arrays.asList(
 					browser.getCurrentUrl(), scheduleDetail.getExecutionRuntime(),
 					scheduleDetail.getLastExecutionDate(), scheduleDetail.getLastExecutionTime(),
-					scheduleDetail.getExecutionError()));
+					scheduleDetail.getExecutionDescription()));
 			openOverviewPage();
 			waitForElementVisible(discOverview.getRoot());
 			discOverview.selectOverviewState(DISCOverviewProjectStates.FAILED);
@@ -502,9 +517,11 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			Thread.sleep(1000);
 			Map<List<String>, List<String>> checkedSchedules2 = new HashMap<List<String>, List<String>>();
 			checkedSchedules2.put(Arrays.asList("Stop Running Schedule 2",
-					"longTimeRunningGraph.grf"), Arrays.asList(browser.getCurrentUrl(),
-					scheduleDetail.getExecutionRuntime(), scheduleDetail.getLastExecutionDate(),
-					scheduleDetail.getLastExecutionTime(), scheduleDetail.getExecutionError()));
+					"longTimeRunningGraph.grf"),
+					Arrays.asList(browser.getCurrentUrl(), scheduleDetail.getExecutionRuntime(),
+							scheduleDetail.getLastExecutionDate(),
+							scheduleDetail.getLastExecutionTime(),
+							scheduleDetail.getExecutionDescription()));
 			openOverviewPage();
 			discOverview.selectOverviewState(DISCOverviewProjectStates.FAILED);
 			waitForElementVisible(discOverviewProjects.getRoot());
@@ -573,10 +590,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					additionalProjects, null, null, "Disable Scheduled Projects");
 			openOverviewPage();
 			discOverview.selectOverviewState(DISCOverviewProjectStates.SCHEDULED);
-            discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED,
+					discOverviewProjects.getOverviewProjectNumber());
 			checkBulkAction(DISCOverviewProjectStates.SCHEDULED, true);
-			checkOtherStates(DISCOverviewProjectStates.ALL, projectTitle,
-					testParams.getProjectId());
+			checkOtherStates(DISCOverviewProjectStates.ALL, projectTitle, testParams.getProjectId());
 		} finally {
 			cleanupProcessesAndProjects(true, additionalProjects);
 		}
@@ -594,7 +611,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 			String scheduleDetailUrl = browser.getCurrentUrl();
 			openOverviewPage();
 			discOverview.selectOverviewState(DISCOverviewProjectStates.SCHEDULED);
-            discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
+			discOverview.assertOverviewStateNumber(DISCOverviewProjectStates.SCHEDULED,
+					discOverviewProjects.getOverviewProjectNumber());
 			checkBulkAction(DISCOverviewProjectStates.SCHEDULED, false);
 			checkOtherStates(DISCOverviewProjectStates.FAILED, projectTitle,
 					testParams.getProjectId());
@@ -606,7 +624,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					Arrays.asList(browser.getCurrentUrl(), null,
 							scheduleDetail.getLastExecutionDate(),
 							scheduleDetail.getLastExecutionTime(),
-							scheduleDetail.getExecutionError()));
+							scheduleDetail.getExecutionDescription()));
 			openOverviewPage();
 			waitForElementVisible(discOverview.getRoot());
 			discOverview.selectOverviewState(DISCOverviewProjectStates.FAILED);
@@ -674,7 +692,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 
 	private void openOverviewPage() throws InterruptedException {
 		openUrl(DISC_OVERVIEW_PAGE);
-		for (int i = 0; i < 5 && discOverview.getStateNumber(DISCOverviewProjectStates.FAILED).isEmpty(); i++)
+		for (int i = 0; i < 5
+				&& discOverview.getStateNumber(DISCOverviewProjectStates.FAILED).isEmpty(); i++)
 			Thread.sleep(1000);
 		waitForElementVisible(discOverviewProjects.getRoot());
 	}
@@ -754,7 +773,8 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 					graphName, null, null);
 			openOverviewPage();
 			discOverview.selectOverviewState(state);
-			discOverview.assertOverviewStateNumber(state, discOverviewProjects.getOverviewProjectNumber());
+			discOverview.assertOverviewStateNumber(state,
+					discOverviewProjects.getOverviewProjectNumber());
 		} finally {
 			cleanupProcessesAndProjects(false, null);
 		}
@@ -791,7 +811,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 						.asList(browser.getCurrentUrl(), scheduleDetail.getExecutionRuntime(),
 								scheduleDetail.getLastExecutionDate(),
 								scheduleDetail.getLastExecutionTime(),
-								scheduleDetail.getExecutionError()));
+								scheduleDetail.getExecutionDescription()));
 		}
 	}
 
@@ -830,7 +850,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 						.asList(browser.getCurrentUrl(), scheduleDetail.getExecutionRuntime(),
 								scheduleDetail.getLastExecutionDate(),
 								scheduleDetail.getLastExecutionTime(),
-								scheduleDetail.getExecutionError()));
+								scheduleDetail.getExecutionDescription()));
 		}
 		scheduleDetail.clickOnCloseScheduleButton();
 		createScheduleForProcess(projectName, projectId, processName + " 2", "/graph/" + graphName
@@ -851,7 +871,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 						.asList(browser.getCurrentUrl(), scheduleDetail.getExecutionRuntime(),
 								scheduleDetail.getLastExecutionDate(),
 								scheduleDetail.getLastExecutionTime(),
-								scheduleDetail.getExecutionError()));
+								scheduleDetail.getExecutionDescription()));
 		}
 	}
 
@@ -906,9 +926,9 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 		}
 	}
 
-	private void disableProjectsOnOverviewPage(DISCOverviewProjectStates state,
-			String projectName, String projectId, String processName, String graphName)
-			throws JSONException, InterruptedException {
+	private void disableProjectsOnOverviewPage(DISCOverviewProjectStates state, String projectName,
+			String projectId, String processName, String graphName) throws JSONException,
+			InterruptedException {
 		Map<List<String>, List<String>> expectedSchedules = new HashMap<List<String>, List<String>>();
 		prepareDataForCheckingProjectState(state, projectName, projectId, processName, graphName,
 				null, expectedSchedules);
@@ -920,10 +940,12 @@ public class OverviewPageTest extends AbstractSchedulesTests {
 		waitForElementVisible(scheduleDetail.getRoot());
 		assertTrue(scheduleDetail.getEnableButton().isDisplayed());
 	}
-	
-	private void cleanupProcessesAndProjects(boolean deleteProjects, Map<String, String> additionalProjects) throws InterruptedException {
-	    openProjectDetailByUrl(testParams.getProjectId());
-	    projectDetailPage.deleteAllProcesses();
-	    if (deleteProjects) deleteProjects(additionalProjects);
+
+	private void cleanupProcessesAndProjects(boolean deleteProjects,
+			Map<String, String> additionalProjects) throws InterruptedException {
+		openProjectDetailByUrl(testParams.getProjectId());
+		projectDetailPage.deleteAllProcesses();
+		if (deleteProjects)
+			deleteProjects(additionalProjects);
 	}
 }
