@@ -398,32 +398,25 @@ public class DISCOverviewProjects extends AbstractFragment {
     }
 
     public void bulkAction(DISCOverviewProjectStates state, boolean disable) {
-        switch (state) {
-            case FAILED:
-                if (disable)
-                    disableProject();
-                else
+        if (disable)
+            disableProject();
+        else {
+            switch (state) {
+                case FAILED:
                     runNowProject();
-                break;
-            case RUNNING:
-                if (disable)
-                    disableProject();
-                else
+                    break;
+                case RUNNING:
                     stopProject();
-                break;
-            case SCHEDULED:
-                if (disable)
-                    disableProject();
-                else
+                    break;
+                case SCHEDULED:
                     stopProject();
-                break;
-            case SUCCESSFUL:
-                if (disable)
-                    disableProject();
-                else
+                    break;
+                case SUCCESSFUL:
                     runNowProject();
-                break;
+                    break;
+            }
         }
+
     }
 
     public void checkProjectNotAdmin(String projectState, String projectName, String projectId,
