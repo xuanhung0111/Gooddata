@@ -518,7 +518,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
         assertNewSchedule(processName, "errorGraph.grf", cronTime, null);
         String scheduleUrl = browser.getCurrentUrl();
 
-        scheduleDetail.repeatManualRun(5, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, false);
+        scheduleDetail.repeatManualRun(5, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH,
+                false);
         String repeatedFailuresNotificationSubject =
                 String.format(REPEATED_FAILURES_NOTIFICATION_SUBJECT, processName);
         String repeatedFailuresNotificationMessagePart1 =
@@ -535,7 +536,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
         waitForNotification(repeatedFailuresNotificationSubject,
                 Arrays.asList(NOTIFICATION_SUPPORT_MESSAGE));
 
-        scheduleDetail.repeatManualRun(25, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, false);
+        scheduleDetail.repeatManualRun(25, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH,
+                false);
         String scheduleDisabledNotificationSubject =
                 String.format(SCHEDULE_DISABLED_NOTIFICATION_SUBJECT, processName);
         String scheduleDisabledNotificationMessagePart1 =
@@ -608,7 +610,7 @@ public class NotificationsTest extends AbstractSchedulesTests {
         if (notificationIndex >= 0) {
             assertTrue(discNotificationRules.isNotExpanded(notificationIndex));
             discNotificationRules.expandNotificationRule(notificationIndex);
-            discNotificationRules.assertNotificationFileds(processName, notificationIndex, email,
+            discNotificationRules.assertNotificationFields(processName, notificationIndex, email,
                     subject, message, event, customEventName);
         }
     }
@@ -667,7 +669,10 @@ public class NotificationsTest extends AbstractSchedulesTests {
                         notificationContent.substring(notificationContent.indexOf("*") + 1);
         }
         for (int i = 0; expectedParamValues != null && i < expectedParamValues.size(); i++) {
-            assertTrue(paramValues.get(i).contains(expectedParamValues.get(i)));
+            assertTrue(paramValues.get(i).contains(expectedParamValues.get(i)),
+                    "The expected param value is: " + expectedParamValues.get(i)
+                            + ",but the displayed param value in message is: "
+                            + paramValues.get(i));
             System.out.println("Param value is displayed well in notification: "
                     + paramValues.get(i));
         }
@@ -768,7 +773,7 @@ public class NotificationsTest extends AbstractSchedulesTests {
         List<String> expectedParamValues = new ArrayList<String>();
         expectedParamValues.add(testParams.getProjectId());
         expectedParamValues.add(userProfileId);
-        expectedParamValues.add(imapUser);
+        expectedParamValues.add(testParams.getUser());
         expectedParamValues.add(processUri);
         expectedParamValues.add(processUri.substring(processUri.lastIndexOf("/") + 1));
         if (processName != null)
