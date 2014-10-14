@@ -205,7 +205,7 @@ public class NotificationRulesDialog extends AbstractFragment {
         waitForElementNotPresent(getRoot());
     }
 
-    public void assertNotificationFileds(String processName, int notificationIndex, String email,
+    public void assertNotificationFields(String processName, int notificationIndex, String email,
             String subject, String message, DISCNotificationEvents event, String customEventName) {
         assertEquals(email, getNotificationEmail(notificationIndex));
         assertEquals(subject, getNotificationSubject(notificationIndex));
