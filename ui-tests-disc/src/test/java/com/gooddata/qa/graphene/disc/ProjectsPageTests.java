@@ -322,15 +322,11 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         int projectsNumber =
                 projectsPage.getProjectsElements().size()
                         + projectsPage.getDemoProjectsElements().size();
-        if (projectsPage.getProjectsElements().size() <= 20) {
+        if (projectsPage.getProjectsElements().size() <= 20)
             createMultipleProjects("Disc-test-paging-projects-page-", 20 - projectsNumber + 1);
-            projectsNumber = projectsNumber + 2;
-        }
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
-        if (projectsNumber > 20)
-            discProjectsPage.checkPagingProjectsPage("20", projectsNumber);
-        deleteProjects(getProjectsMap());
+        discProjectsPage.checkPagingProjectsPage("20");
     }
 
     @Test(dependsOnGroups = {"projects-page"}, groups = {"tests"})

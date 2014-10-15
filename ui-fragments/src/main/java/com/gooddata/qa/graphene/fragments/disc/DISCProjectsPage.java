@@ -144,7 +144,7 @@ public class DISCProjectsPage extends AbstractFragment {
         checkFilteredProjects(projectsMap, discProjectsList);
     }
 
-    public void checkPagingProjectsPage(String selectedProjectsPerPageOption, int projectsNumber) {
+    public void checkPagingProjectsPage(String selectedProjectsPerPageOption) {
         waitForElementVisible(projectsPerPageOptions);
         Select select = new Select(projectsPerPageOptions);
         select.selectByVisibleText(selectedProjectsPerPageOption);
@@ -152,10 +152,10 @@ public class DISCProjectsPage extends AbstractFragment {
         waitForElementVisible(discProjectsList.getRoot());
         int projectsPerPageNumber = Integer.parseInt(selectedProjectsPerPageOption);
         assertEquals(projectsPerPageNumber, discProjectsList.getNumberOfRows());
-        String pagingBarLabelSubString =
-                String.format("Showing 1-%d of %d projects", projectsPerPageNumber, projectsNumber);
+        String pagingBarLabelSubString = String.format("Showing 1-%d", projectsPerPageNumber);
         System.out.println("Paging bar label: " + pagingBarLabelSubString);
-        assertTrue(pagingBarLabel.getText().contains(pagingBarLabelSubString));
+        assertTrue(pagingBarLabel.getText().contains(pagingBarLabelSubString), "Paging bar label:"
+                + pagingBarLabel.getText());
         assertTrue(prevPageButton.getAttribute("class").contains("disabled"));
         assertFalse(nextPageButton.getAttribute("class").contains("disabled"));
         assertTrue(projectPageNumber.get(0).getAttribute("class").contains("active-cell"));
@@ -179,8 +179,10 @@ public class DISCProjectsPage extends AbstractFragment {
             if (i != projectPageNumber.size() - 1)
                 assertEquals(projectsPerPageNumber, discProjectsList.getNumberOfRows());
             else
-                assertEquals(projectsNumber - projectsPerPageNumber * (i),
-                        discProjectsList.getNumberOfRows());
+                assertFalse(
+                        discProjectsList.getNumberOfRows() > projectsPerPageNumber,
+                        "The project number in the last page: "
+                                + discProjectsList.getNumberOfRows());
         }
     }
 }
