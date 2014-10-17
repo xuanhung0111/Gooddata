@@ -211,8 +211,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                SUCCESS_NOTIFICATION_TEST_PROCESS, "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule(SUCCESS_NOTIFICATION_TEST_PROCESS, "successfulGraph.grf", cronTime, null);
+                SUCCESS_NOTIFICATION_TEST_PROCESS, null, "/graph/successfulGraph.grf", cronTime, null);
+        assertNewSchedule(SUCCESS_NOTIFICATION_TEST_PROCESS, "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -235,8 +235,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                FAILURE_NOTIFICATION_TEST_PROCESS, "/graph/errorGraph.grf", cronTime, null);
-        assertNewSchedule(FAILURE_NOTIFICATION_TEST_PROCESS, "errorGraph.grf", cronTime, null);
+                FAILURE_NOTIFICATION_TEST_PROCESS, null, "/graph/errorGraph.grf", cronTime, null);
+        assertNewSchedule(FAILURE_NOTIFICATION_TEST_PROCESS, "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(false, true, false, "Basic/graph/errorGraph.grf",
                 DISCProcessTypes.GRAPH, 5);
@@ -260,8 +260,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                CUSTOM_NOTIFICATION_TEST_PROCESS, "/graph/CTL_Function.grf", cronTime, null);
-        assertNewSchedule(CUSTOM_NOTIFICATION_TEST_PROCESS, "CTL_Function.grf", cronTime, null);
+                CUSTOM_NOTIFICATION_TEST_PROCESS, null, "/graph/CTL_Function.grf", cronTime, null);
+        assertNewSchedule(CUSTOM_NOTIFICATION_TEST_PROCESS, "CTL_Function.grf", "/graph/CTL_Function.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "CTL_event/graph/CTL_Function.grf", DISCProcessTypes.GRAPH, 5);
@@ -452,8 +452,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                "Check Edit Notification", "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule("Check Edit Notification", "successfulGraph.grf", cronTime, null);
+                "Check Edit Notification", null, "/graph/successfulGraph.grf", cronTime, null);
+        assertNewSchedule("Check Edit Notification", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -487,8 +487,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                "Check Cancel Edit Notification", "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule("Check Cancel Edit Notification", "successfulGraph.grf", cronTime, null);
+                "Check Cancel Edit Notification", null, "/graph/successfulGraph.grf", cronTime, null);
+        assertNewSchedule("Check Cancel Edit Notification", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -513,9 +513,9 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 DISCProcessTypes.GRAPH, processName, BASIC_GRAPH_LIST, true);
         Pair<String, List<String>> cronTime =
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
+        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null, null,
                 cronTime, null);
-        assertNewSchedule(processName, "errorGraph.grf", cronTime, null);
+        assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
         String scheduleUrl = browser.getCurrentUrl();
 
         scheduleDetail.repeatManualRun(5, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH,

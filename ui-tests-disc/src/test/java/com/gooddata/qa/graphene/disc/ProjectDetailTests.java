@@ -219,7 +219,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
                     DISCProcessTypes.GRAPH, "Process-A", Arrays.asList("errorGraph.grf",
                             "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), "Process-A",
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), "Process-A", null,
                     "/graph/successfulGraph.grf", null, null);
             projectDetailPage.checkExecutableScheduleNumber("Process-A", "errorGraph.grf", 0);
             projectDetailPage.checkExecutableScheduleNumber("Process-A",
@@ -240,9 +240,10 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
                             "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
             Pair<String, List<String>> cronTime =
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
                     "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
             projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
                     DISCScheduleStatus.UNSCHEDULED, false, schedulesTable);
             scheduleDetail.manualRun();
@@ -256,9 +257,10 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
                     "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
             projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
                     DISCScheduleStatus.OK, false, schedulesTable);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
                     "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "errorGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf", cronTime,
+                    null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(false, true, false,
                     "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);

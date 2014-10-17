@@ -3,13 +3,16 @@ package com.gooddata.qa.graphene.fragments.disc;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.DISCScheduleStatus;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
+import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -436,5 +439,37 @@ public class ProjectDetailPage extends AbstractFragment {
     public WebElement getNotificationButton(String processName) {
         return waitForElementVisible(getElementFromSpecificProcess(processName,
                 BY_PROCESS_NOTIFICATION_RULE_BUTTON));
+    }
+
+    public void assertScheduleInList(SchedulesTable schedulesTable, String scheduleName,
+            String executablePath, Pair<String, List<String>> cronTime) throws InterruptedException {
+        for (int i = 0; i < 10 && schedulesTable.getScheduleTitle(scheduleName) == null; i++)
+            Thread.sleep(1000);
+        assertEquals(scheduleName, schedulesTable.getScheduleTitle(scheduleName).getText());
+        String cronFormat = "";
+        String hourInDay = "";
+        if (cronTime.getValue() != null && cronTime.getValue().size() > 1)
+            hourInDay =
+                    cronTime.getValue().get(1).startsWith("0") ? cronTime.getValue().get(1)
+                            .substring(1) : cronTime.getValue().get(1);
+        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYWEEK.getCronTime()))
+            cronFormat =
+                    ScheduleCronTimes.CRON_EVERYWEEK
+                            .getCronFormat()
+                            .replace("${day}", cronTime.getValue().get(2))
+                            .replace("${hour}", hourInDay)
+                            .replace("${minute}", cronTime.getValue().get(0));
+        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYDAY.getCronTime()))
+            cronFormat =
+                    ScheduleCronTimes.CRON_EVERYDAY.getCronFormat()
+                            .replace("${hour}", hourInDay)
+                            .replace("${minute}", cronTime.getValue().get(0));
+        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime())
+                || cronTime.getKey().equals(ScheduleCronTimes.CRON_15_MINUTES.getCronTime())
+                || cronTime.getKey().equals(ScheduleCronTimes.CRON_30_MINUTES.getCronTime()))
+            cronFormat = cronTime.getKey();
+        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime()))
+            cronFormat = cronTime.getValue().get(0) + " UTC";
+        assertEquals(cronFormat, schedulesTable.getScheduleCron(scheduleName).getText());
     }
 }

@@ -32,8 +32,8 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
                             Arrays.asList("${minute}"));
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Auto Run Schedule", "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Check Auto Run Schedule", "successfulGraph.grf", cronTime, null);
+                    "Check Auto Run Schedule", null, "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule("Check Auto Run Schedule", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
             scheduleDetail.waitForAutoRunSchedule(2);
             scheduleDetail.assertLastExecutionDetails(true, false, false, null, null, 5);
         } finally {
@@ -53,8 +53,8 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
                             Arrays.asList("${minute}"));
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Error Execution of Schedule", "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Error Execution of Schedule", "errorGraph.grf", cronTime, null);
+                    "Check Error Execution of Schedule", null, "/graph/errorGraph.grf", cronTime, null);
+            assertNewSchedule("Check Error Execution of Schedule", "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
             scheduleDetail.waitForAutoRunSchedule(2);
             scheduleDetail.assertLastExecutionDetails(false, false, false,
                     "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -74,8 +74,8 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
                             Arrays.asList("${minute}"));
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Retry Schedule", "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Retry Schedule", "errorGraph.grf", cronTime, null);
+                    "Check Retry Schedule", null, "/graph/errorGraph.grf", cronTime, null);
+            assertNewSchedule("Check Retry Schedule", "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
             scheduleDetail.addRetryDelay("15", true, true);
             scheduleDetail.waitForAutoRunSchedule(2);
             scheduleDetail.assertLastExecutionDetails(false, false, false,
@@ -100,8 +100,8 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
                             Arrays.asList("${minute}"));
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Stop Auto Execution", "/graph/longTimeRunningGraph.grf", cronTime, null);
-            assertNewSchedule("Check Stop Auto Execution", "longTimeRunningGraph.grf", cronTime,
+                    "Check Stop Auto Execution", null, "/graph/longTimeRunningGraph.grf", cronTime, null);
+            assertNewSchedule("Check Stop Auto Execution", "longTimeRunningGraph.grf", "/graph/longTimeRunningGraph.grf", cronTime,
                     null);
             scheduleDetail.waitForAutoRunSchedule(2);
             scheduleDetail.manualStop();
@@ -123,8 +123,8 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
             Pair<String, List<String>> cronTime =
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Long Time Execution", "/graph/longTimeRunningGraph.grf", cronTime, null);
-            assertNewSchedule("Check Long Time Execution", "longTimeRunningGraph.grf", cronTime,
+                    "Check Long Time Execution", null, "/graph/longTimeRunningGraph.grf", cronTime, null);
+            assertNewSchedule("Check Long Time Execution", "longTimeRunningGraph.grf", "/graph/longTimeRunningGraph.grf", cronTime,
                     null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(true, true, false,
@@ -144,8 +144,8 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
             Pair<String, List<String>> cronTime =
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(), "Disable Schedule",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Disable Schedule", "successfulGraph.grf", cronTime, null);
+                     null, "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule("Disable Schedule", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
             scheduleDetail.disableSchedule();
             Assert.assertTrue(scheduleDetail.isDisabledSchedule(15, 0));
             scheduleDetail.manualRun();
@@ -169,9 +169,9 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
                 true);
         Pair<String, List<String>> cronTime =
                 Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Failed Schedule",
+        createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Failed Schedule", null,
                 null, cronTime, null);
-        assertNewSchedule("Check Failed Schedule", "errorGraph.grf", cronTime, null);
+        assertNewSchedule("Check Failed Schedule", "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
         scheduleDetail.checkRepeatedFailureSchedule("Basic/graph/errorGraph.grf",
                 DISCProcessTypes.GRAPH);
         Assert.assertTrue(scheduleDetail.isDisabledSchedule(15, 30));
