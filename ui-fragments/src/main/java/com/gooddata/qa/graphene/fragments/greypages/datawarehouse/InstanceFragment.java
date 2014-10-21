@@ -1,6 +1,5 @@
-package com.gooddata.qa.graphene.fragments.greypages.dss;
+package com.gooddata.qa.graphene.fragments.greypages.datawarehouse;
 
-import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.AbstractDatawarehouseFragment;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -8,9 +7,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
-public class StorageFragment extends AbstractDatawarehouseFragment {
+public class InstanceFragment extends AbstractDatawarehouseFragment {
 
     @FindBy
     private WebElement title;
@@ -83,7 +84,7 @@ public class StorageFragment extends AbstractDatawarehouseFragment {
     public void deleteStorageSuccess() {
         deleteStorage();
         waitForElementVisible(BY_BUTTON_CREATE, browser);
-        Assert.assertTrue(browser.getCurrentUrl().endsWith("/dss/instances"), "Browser wasn't redirected to storages page");
+        Assert.assertTrue(browser.getCurrentUrl().endsWith("/datawarehouse/instances"), "Browser wasn't redirected to instances page");
     }
 
     public void deleteStorage() {
@@ -91,7 +92,7 @@ public class StorageFragment extends AbstractDatawarehouseFragment {
     }
 
     private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
-        return waitTaskSucceed(checkIterations, "dssInstance");
+        return waitTaskSucceed(checkIterations, "instance");
     }
 
 }
