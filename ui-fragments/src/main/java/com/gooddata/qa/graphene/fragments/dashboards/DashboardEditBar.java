@@ -151,6 +151,12 @@ public class DashboardEditBar extends AbstractFragment {
         dashboardAddWidgetPanel.verifyLayersList(metricLabel, layersList);
     }
 
+    public void addGeoChart(String metricLabel, String attributeLayer) throws InterruptedException{
+        waitForElementVisible(widgetMenuButton).click();
+        waitForElementVisible(dashboardAddWidgetPanel.getRoot());
+        dashboardAddWidgetPanel.addGeoChart(metricLabel, attributeLayer);
+    }
+
     public void addWebContentToDashboard() throws InterruptedException {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addwebContent).click();

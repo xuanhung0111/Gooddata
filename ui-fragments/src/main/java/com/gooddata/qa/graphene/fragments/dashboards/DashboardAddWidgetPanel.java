@@ -30,8 +30,10 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class, 'c-geoConfiguration')]//span[@class='attr-inside']")
     private List<WebElement> listGeoLayer;
     
+    @FindBy(xpath = "//div[contains(@class, 'c-geoConfiguration')]//input[@type='checkbox']")
+    private List<WebElement> listGeoLayerCheckbox;
 
-    private static final String widgetLocator = "//div[contains(@class,'yui3-c-adddashboardwidgetpickerpanel')]//div[contains(@class,'add-dashboard-item')]/div[text()='${widgetLabel}']/../button";
+    private static final String widgetLocator = "//div[contains(@class,'yui3-c-adddashboardwidgetpickerpanel')]//div[contains(@class,'add-dashboard-item')]/div[contains(text(), '${widgetLabel}')]/../button";
     private static final String widgetMetricLocator = "//div[contains(@class,'yui3-widget-stacked shelterPlugin-plugged')]//div[contains(@class,'yui3-c-picker-content')]//div[contains(@class,'yui3-c-simplecolumn')]//div[contains(@class,'c-label') and contains(@class,'s-enabled')]/span[text()='${metricLabel}']";
     
     public void initWidget(WidgetTypes type) throws InterruptedException {
@@ -84,4 +86,20 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
 	}
     }
 
+    public void addGeoChart(String metricLabel, String attributeLayer) throws InterruptedException {
+        initWidget(WidgetTypes.GEO_CHART, metricLabel);
+        waitForElementVisible(layers);
+        int i = 0;
+        listGeoLayerCheckbox.get(0).click();
+        Thread.sleep(3000);
+        for (WebElement element : listGeoLayerCheckbox) {
+            if (listGeoLayer.get(i).getText().equalsIgnoreCase(attributeLayer)) {
+                element.click();
+                break;
+            }
+            i++;
+        }
+        waitForElementVisible(widgetConfigApplyButton).click();
+        waitForElementNotVisible(widgetConfigPanel);
+    }
 }

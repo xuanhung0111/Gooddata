@@ -11,6 +11,9 @@ public class DashboardContent extends AbstractFragment {
     @FindBy(css = ".c-projectdashboard-items .yui3-c-reportdashboardwidget")
     private List<AbstractReport> reports;
 
+    @FindBy(css = ".geo-content-wrapper")
+    private List<DashboardGeoChart> geoCharts;
+
     public List<AbstractReport> getReports() {
         return reports;
     }
@@ -23,4 +26,11 @@ public class DashboardContent extends AbstractFragment {
         return getReports().get(reportIndex);
     }
 
+    public List<DashboardGeoChart> getGeoCharts() {
+        return geoCharts;
+    }
+
+    public DashboardGeoChart getGeoChart(int geoChartIndex) {
+        return getGeoCharts().get(geoChartIndex);
+    }
 }
