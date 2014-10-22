@@ -116,8 +116,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
                     null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Combined States Number", "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Check Combined States Number", "successfulGraph.grf", cronTime, null);
+                    "Check Combined States Number", null, "/graph/successfulGraph.grf", cronTime,
+                    null);
+            assertNewSchedule("Check Combined States Number", "successfulGraph.grf",
+                    "/graph/successfulGraph.grf", cronTime, null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(true, true, false,
                     "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -478,10 +480,11 @@ public class OverviewPageTest extends AbstractSchedulesTests {
             browser.get(scheduleDetailUrl);
             waitForElementVisible(scheduleDetail.getRoot());
             Thread.sleep(3000);
-            expectedSchedules.put(Arrays.asList("Stop Running Projects", "longTimeRunningGraph.grf"), 
-                    Arrays.asList(browser.getCurrentUrl(), scheduleDetail.getExecutionRuntime(),
-                            scheduleDetail.getLastExecutionDate(), scheduleDetail.getLastExecutionTime(),
-                            scheduleDetail.getExecutionDescription()));
+            expectedSchedules.put(Arrays
+                    .asList("Stop Running Projects", "longTimeRunningGraph.grf"), Arrays.asList(
+                    browser.getCurrentUrl(), scheduleDetail.getExecutionRuntime(),
+                    scheduleDetail.getLastExecutionDate(), scheduleDetail.getLastExecutionTime(),
+                    scheduleDetail.getExecutionDescription()));
             openOverviewPage();
             waitForElementVisible(discOverview.getRoot());
             discOverview.selectOverviewState(DISCOverviewProjectStates.FAILED);
@@ -769,18 +772,19 @@ public class OverviewPageTest extends AbstractSchedulesTests {
             }
             for (int i = 1; i < 6; i++) {
                 createScheduleForProcess(project.getKey(), project.getValue(), processNameFormat
-                        + " " + i, "/graph/longTimeRunningGraph.grf", cronTime, null);
+                        + " " + i, null, "/graph/longTimeRunningGraph.grf", cronTime, null);
                 assertNewSchedule(processNameFormat + " " + i, "longTimeRunningGraph.grf",
-                        cronTime, null);
+                        "/graph/longTimeRunningGraph.grf", cronTime, null);
                 scheduleDetail.manualRun();
                 scheduleDetail.isInRunningState();
                 scheduleDetail.clickOnCloseScheduleButton();
             }
         }
         openProjectDetailPage(projectName, projectId);
-        createScheduleForProcess(projectName, projectId, processNameFormat,
+        createScheduleForProcess(projectName, projectId, processNameFormat, null,
                 "/graph/longTimeRunningGraph.grf", cronTime, null);
-        assertNewSchedule(processNameFormat, "longTimeRunningGraph.grf", cronTime, null);
+        assertNewSchedule(processNameFormat, "longTimeRunningGraph.grf",
+                "/graph/longTimeRunningGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         if (expectedSchedules != null)
             expectedSchedules.put(Arrays.asList(processNameFormat, "longTimeRunningGraph.grf"),
@@ -815,9 +819,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
             processesMap.put(processName, browser.getCurrentUrl());
         Pair<String, List<String>> cronTime =
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        createScheduleForProcess(projectName, projectId, processName, "/graph/" + graphName
+        createScheduleForProcess(projectName, projectId, processName, null, "/graph/" + graphName
                 + ".grf", cronTime, null);
-        assertNewSchedule(processName, graphName + ".grf", cronTime, null);
+        assertNewSchedule(processName, graphName + ".grf", "/graph/" + graphName + ".grf",
+                cronTime, null);
         scheduleDetail.manualRun();
         if (state == DISCOverviewProjectStates.RUNNING) {
             assertTrue(scheduleDetail.isInRunningState());
@@ -854,9 +859,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         processesMap.put(processName + " 2", browser.getCurrentUrl());
         Pair<String, List<String>> cronTime =
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        createScheduleForProcess(projectName, projectId, processName + " 1", "/graph/" + graphName
-                + ".grf", cronTime, null);
-        assertNewSchedule(processName + " 1", graphName + ".grf", cronTime, null);
+        createScheduleForProcess(projectName, projectId, processName + " 1", null, "/graph/"
+                + graphName + ".grf", cronTime, null);
+        assertNewSchedule(processName + " 1", graphName + ".grf", "/graph/" + graphName + ".grf",
+                cronTime, null);
         scheduleDetail.manualRun();
         if (state == DISCOverviewProjectStates.RUNNING) {
             assertTrue(scheduleDetail.isInRunningState());
@@ -875,9 +881,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
                                 scheduleDetail.getExecutionDescription()));
         }
         scheduleDetail.clickOnCloseScheduleButton();
-        createScheduleForProcess(projectName, projectId, processName + " 2", "/graph/" + graphName
-                + ".grf", cronTime, null);
-        assertNewSchedule(processName + " 2", graphName + ".grf", cronTime, null);
+        createScheduleForProcess(projectName, projectId, processName + " 2", null, "/graph/"
+                + graphName + ".grf", cronTime, null);
+        assertNewSchedule(processName + " 2", graphName + ".grf", "/graph/" + graphName + ".grf",
+                cronTime, null);
         scheduleDetail.manualRun();
         if (state == DISCOverviewProjectStates.RUNNING) {
             assertTrue(scheduleDetail.isInRunningState());
@@ -912,9 +919,10 @@ public class OverviewPageTest extends AbstractSchedulesTests {
             Pair<String, List<String>> cronTime =
                     Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(),
                             Arrays.asList("59", "23"));
-            createScheduleForProcess(projectName, projectId, processName, "/graph/" + graphName
-                    + ".grf", cronTime, null);
-            assertNewSchedule(processName, graphName + ".grf", cronTime, null);
+            createScheduleForProcess(projectName, projectId, processName, null, "/graph/"
+                    + graphName + ".grf", cronTime, null);
+            assertNewSchedule(processName, graphName + ".grf", "/graph/" + graphName + ".grf",
+                    cronTime, null);
             scheduleDetail.manualRun();
             if (state == DISCOverviewProjectStates.RUNNING)
                 assertTrue(scheduleDetail.isInRunningState());

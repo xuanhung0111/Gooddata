@@ -13,6 +13,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
+import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -49,6 +50,9 @@ public class ScheduleDetail extends ScheduleForm {
             .xpath("//div[contains(@class, 'ait-schedule-title-section')]//button[1]");
     private static final By BY_OK_GROUP_EXPAND_BUTTON = By.cssSelector(".icon-navigatedown");
 
+    @FindBy(css = ".ait-schedule-title-section-heading")
+    protected WebElement scheduleTitle;
+    
     @FindBy(css = ".ait-schedule-close-btn .icon-delete")
     protected WebElement closeButton;
 
@@ -633,4 +637,52 @@ public class ScheduleDetail extends ScheduleForm {
 	public String getLastExecutionDescription() {
 		return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText();
 	}
+    
+    public void assertCronTime (Pair<String, List<String>> cronTime) throws InterruptedException {
+        Select selectCron = new Select(cronPicker);
+        assertEquals(selectCron.getFirstSelectedOption().getText(), cronTime.getKey());
+        if (cronTime.getValue() != null) {
+            if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime())) {
+                if (cronTime.getValue().get(0) != null) {
+                    if (cronExpression.getAttribute("value").isEmpty())
+                        Thread.sleep(1000);
+                    assertEquals(cronTime.getValue().get(0),
+                            cronExpression.getAttribute("value"));
+                    System.out.println("Cron expression is set to... "
+                            + cronExpression.getAttribute("value"));
+                }
+            }
+            else {
+                if (cronTime.getValue().size() > 2 && cronTime.getValue().get(2) != null) {
+                    waitForElementVisible(selectDayInWeek);
+                    Select selectWeek = new Select(selectDayInWeek);
+                    assertEquals(cronTime.getValue().get(2), selectWeek.getFirstSelectedOption().getText());
+                }
+                else if (cronTime.getValue().size() > 1 && cronTime.getValue().get(1) != null) {
+                    waitForElementVisible(selectHourInDay);
+                    Select selectHour = new Select(selectHourInDay);
+                    assertEquals(cronTime.getValue().get(1), selectHour.getFirstSelectedOption().getText());
+                }
+                else if (cronTime.getValue().size() > 0 && cronTime.getValue().get(0) != null) {
+                    waitForElementVisible(selectMinuteInHour);
+                    Select selectMinute = new Select(selectMinuteInHour);
+                    assertEquals(cronTime.getValue().get(0), selectMinute.getFirstSelectedOption().getText());
+                }
+            }
+        }
+    }
+
+    public void assertScheduleDetail(String scheduleName, String executable,
+            Pair<String, List<String>> cronTime, Map<String, List<String>> parameters)
+            throws InterruptedException {
+        waitForElementVisible(scheduleTitle);
+        assertEquals(scheduleName, scheduleTitle.getText());
+        waitForElementVisible(selectExecutable);
+        Select select = new Select(selectExecutable);
+        if (!select.getFirstSelectedOption().equals(executable))
+            Thread.sleep(2000);
+        assertEquals(select.getFirstSelectedOption().getText(), executable);
+        assertCronTime(cronTime);
+        assertScheduleParameters(parameters);
+    }
 }

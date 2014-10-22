@@ -210,15 +210,25 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
         assertFalse(deployForm.inputFileHasError());
         assertFalse(deployForm.inputProcessNameHasError());
         Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
+        boolean correctProgressMessage = false;
+        int index = 0;
         deployForm.getDeployConfirmButton().click();
-        for (int i = 0; deployForm.getDeployProcessDialogButton().getText().contains("Cancel")
-                && i < 50; i++)
-            Thread.sleep(100);
-        assertTrue(deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage));
-        for (int i = 0; i < 100
+        do {
+            if (deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage)) {
+                correctProgressMessage = true;
+                break;
+            }
+            else {
+                Thread.sleep(100);
+                index++;
+            }
+        }
+        while (index < 10);
+        assertTrue(correctProgressMessage, "Displayed progess message: " + deployForm.getDeployProcessDialog().getText());
+        for (int i = 0; i < 10
                 && deployForm.getDeployProcessDialogButton().getText().toLowerCase()
                         .contains("deploying"); i++)
-            Thread.sleep(100);
+            Thread.sleep(1000);
         if (isSuccessful) {
             String successfulDeployMessage =
                     String.format(SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE, processName);
@@ -240,15 +250,21 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
         assertFalse(deployForm.inputFileHasError());
         assertFalse(deployForm.inputProcessNameHasError());
         Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
+        boolean correctProgressMessage = false;
         deployForm.getDeployConfirmButton().click();
-        for (int i = 0; deployForm.getDeployProcessDialogButton().getText().contains("Cancel")
-                && i < 50; i++)
-            Thread.sleep(100);
-        assertTrue(deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage));
-        for (int i = 0; i < 100
+        for (int i = 0; i < 10 ; i++) {
+            if (deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage)) {
+                correctProgressMessage = true;
+                break;
+            }
+            else
+                Thread.sleep(100);
+        }
+        assertTrue(correctProgressMessage, "Displayed progess message: " + deployForm.getDeployProcessDialog().getText());
+        for (int i = 0; i < 10
                 && deployForm.getDeployProcessDialogButton().getText().toLowerCase()
                         .contains("deploying"); i++)
-            Thread.sleep(100);
+            Thread.sleep(1000);
         if (isSuccessful) {
             String successfulDeployMessage =
                     String.format(SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECTS_PAGE, zipFileName);

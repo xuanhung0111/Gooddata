@@ -68,6 +68,9 @@ public class ScheduleForm extends AbstractFragment {
 
     @FindBy(css = ".schedule-param")
     protected List<WebElement> parameters;
+    
+    @FindBy(css = ".ait-new-schedule-fragment-name input")
+    protected WebElement scheduleNameInput;
 
     public void selectProcess(String processName) {
         waitForElementVisible(selectProcessForNewSchedule);
@@ -97,8 +100,9 @@ public class ScheduleForm extends AbstractFragment {
             existingMinute = existingMinute >= 60 ? 2 : existingMinute;
             waitForElementVisible(selectMinuteInHour);
             Select select = new Select(selectMinuteInHour);
-            select.selectByValue(cronTime.getValue().get(0)
-                    .replace("${minute}", String.valueOf(existingMinute)));
+            cronTime.getValue().set(0, cronTime.getValue().get(0)
+                    .replace("${minute}", (existingMinute < 10 ? "0" : "") + String.valueOf(existingMinute))); 
+            select.selectByVisibleText(cronTime.getValue().get(0));
         }
     }
 
@@ -186,7 +190,7 @@ public class ScheduleForm extends AbstractFragment {
 
     public void createNewSchedule(String processName, String executableName,
             Pair<String, List<String>> cronTime, Map<String, List<String>> parameters,
-            boolean isConfirmed) throws InterruptedException {
+            String scheduleName, boolean isConfirmed) throws InterruptedException {
         waitForElementVisible(getRoot());
         if (processName != null)
             selectProcess(processName);
@@ -196,6 +200,12 @@ public class ScheduleForm extends AbstractFragment {
             selectCron(cronTime);
         if (parameters != null)
             addParameters(parameters);
+        if (scheduleName != null) {
+            waitForElementVisible(scheduleNameInput).clear();
+            if(scheduleNameInput.getText() != "")
+                Thread.sleep(2000);
+            scheduleNameInput.sendKeys(scheduleName);
+        }
         if (isConfirmed)
             waitForElementVisible(confirmScheduleButton).click();
         else

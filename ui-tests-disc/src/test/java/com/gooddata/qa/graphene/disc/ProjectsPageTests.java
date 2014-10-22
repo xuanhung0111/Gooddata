@@ -47,9 +47,10 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Failed Projects Filter Option", "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Failed Projects Filter Option", "errorGraph.grf", cronTime,
+                    "Check Failed Projects Filter Option", null, "/graph/errorGraph.grf", cronTime,
                     null);
+            assertNewSchedule("Check Failed Projects Filter Option", "errorGraph.grf",
+                    "/graph/errorGraph.grf", cronTime, null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(false, true, false,
                     "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -74,10 +75,10 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Successful Projects Filter Option", "/graph/successfulGraph.grf",
+                    "Check Successful Projects Filter Option", null, "/graph/successfulGraph.grf",
                     cronTime, null);
             assertNewSchedule("Check Successful Projects Filter Option", "successfulGraph.grf",
-                    cronTime, null);
+                    "/graph/successfulGraph.grf", cronTime, null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(true, true, false,
                     "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -102,10 +103,10 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Running Projects Filter Option", "/graph/longTimeRunningGraph.grf",
-                    cronTime, null);
+                    "Check Running Projects Filter Option", null,
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
             assertNewSchedule("Check Running Projects Filter Option", "longTimeRunningGraph.grf",
-                    cronTime, null);
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
             scheduleDetail.manualRun();
             assertTrue(scheduleDetail.isInRunningState());
             openUrl(DISC_PROJECTS_PAGE_URL);
@@ -145,19 +146,20 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                 openProjectDetailPage(project.getKey(), project.getValue());
                 for (int i = 1; i < 10; i++) {
                     createScheduleForProcess(project.getKey(), project.getValue(),
-                            "Check Scheduled Projects Filter Option " + i,
+                            "Check Scheduled Projects Filter Option " + i, null,
                             "/graph/longTimeRunningGraph.grf", cronTime, null);
                     assertNewSchedule("Check Scheduled Projects Filter Option " + i,
-                            "longTimeRunningGraph.grf", cronTime, null);
+                            "longTimeRunningGraph.grf", "/graph/longTimeRunningGraph.grf",
+                            cronTime, null);
                     scheduleDetail.manualRun();
                 }
             }
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Scheduled Projects Filter Option", "/graph/longTimeRunningGraph.grf",
-                    cronTime, null);
+                    "Check Scheduled Projects Filter Option", null,
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
             assertNewSchedule("Check Scheduled Projects Filter Option", "longTimeRunningGraph.grf",
-                    cronTime, null);
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
             scheduleDetail.manualRun();
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
@@ -196,10 +198,10 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Disabled Projects Filter Option", "/graph/longTimeRunningGraph.grf",
-                    cronTime, null);
+                    "Check Disabled Projects Filter Option", null,
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
             assertNewSchedule("Check Disabled Projects Filter Option", "longTimeRunningGraph.grf",
-                    cronTime, null);
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
             scheduleDetail.disableSchedule();
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
@@ -225,17 +227,19 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Data Loading Processes 1", "/graph/longTimeRunningGraph.grf", cronTime,
-                    null);
-            assertNewSchedule("Check Data Loading Processes 1", "longTimeRunningGraph.grf",
+                    "Check Data Loading Processes 1", null, "/graph/longTimeRunningGraph.grf",
                     cronTime, null);
+            assertNewSchedule("Check Data Loading Processes 1", "longTimeRunningGraph.grf",
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Data Loading Processes 1", "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Data Loading Processes 1", "errorGraph.grf", cronTime, null);
+                    "Check Data Loading Processes 1", null, "/graph/errorGraph.grf", cronTime, null);
+            assertNewSchedule("Check Data Loading Processes 1", "errorGraph.grf",
+                    "/graph/errorGraph.grf", cronTime, null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Data Loading Processes 2", "/graph/errorGraph.grf", cronTime, null);
+                    "Check Data Loading Processes 2", null, "/graph/errorGraph.grf", cronTime, null);
             Thread.sleep(2000);
-            assertNewSchedule("Check Data Loading Processes 2", "errorGraph.grf", cronTime, null);
+            assertNewSchedule("Check Data Loading Processes 2", "errorGraph.grf",
+                    "/graph/errorGraph.grf", cronTime, null);
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsList.getRoot());
             discProjectsList.assertDataLoadingProcesses(2, 3, getProjectsMap());
@@ -256,18 +260,20 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Last Successful Execution", "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Check Last Successful Execution", "successfulGraph.grf", cronTime,
-                    null);
+                    "Check Last Successful Execution", null, "/graph/successfulGraph.grf",
+                    cronTime, null);
+            assertNewSchedule("Check Last Successful Execution", "successfulGraph.grf",
+                    "/graph/successfulGraph.grf", cronTime, null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(true, true, false,
                     "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
             String lastSuccessfulExecutionDate = scheduleDetail.getLastExecutionDate();
             String lastSuccessfulExecutionTime = scheduleDetail.getLastExecutionTime();
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Last Successful Execution", "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Failed Projects Filter Option", "errorGraph.grf", cronTime,
+                    "Check Last Successful Execution", null, "/graph/errorGraph.grf", cronTime,
                     null);
+            assertNewSchedule("Check Failed Projects Filter Option", "errorGraph.grf",
+                    "/graph/errorGraph.grf", cronTime, null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(false, true, false,
                     "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -279,7 +285,6 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         } finally {
             openProjectDetailByUrl(testParams.getProjectId());
             projectDetailPage.deleteAllProcesses();
-
         }
     }
 
