@@ -30,10 +30,15 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     // mailbox polling interval in miliseconds
     private static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 10000;
 
+    private static final String unsubscribePattern = ".*If you no longer want to receive it, <a href=\"([^\"]*)\">click here</a>.*";
+
     private String reportTitle = "UI-Graphene-core-Report";
 
     @FindBy(css = ".standalone-message.unsubscribed .title")
     private WebElement unsubscribedTitle;
+
+    @FindBy(css = ".logoArea-big img")
+    private WebElement unsubscribedLogo;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -93,7 +98,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
             for (Message message: emailMessages) {
                 assertEquals(message.getAllRecipients().length, 1, "Expected one recipient.");
                 String messageBody = ImapClient.getEmailBody(message);
-                String unsubscribeLink = getUnsubscribeLink(messageBody);
+                String unsubscribeLink = getUnsubscribeLink(messageBody, unsubscribePattern);
                 visitUnsubscribeLink(unsubscribeLink);
                 Screenshots.takeScreenshot(
                     browser,
@@ -119,8 +124,8 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     }
 
     // check email source for unsubscribe link and return this link
-    private String getUnsubscribeLink(String emailSource) {
-        Pattern pattern = Pattern.compile(".*If you no longer want to receive it, <a href=\"([^\"]*)\">click here</a>.*", Pattern.DOTALL);
+    private String getUnsubscribeLink(String emailSource, String unsubscribePattern) {
+        Pattern pattern = Pattern.compile(unsubscribePattern, Pattern.DOTALL);
         Matcher matcher = pattern.matcher(emailSource);
         assertTrue(matcher.matches(), "There is no link to unsubscribe from scheduled e-mail.");
         return matcher.group(1);
@@ -131,6 +136,8 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         browser.get(unsubscribeLink);
         waitForElementPresent(unsubscribedTitle);
         assertEquals(unsubscribedTitle.getText(), "You have been unsubscribed", "Unsubscribed message does not match.");
+        waitForElementPresent(unsubscribedLogo);
+        assertEquals(unsubscribedLogo.getAttribute("alt"), "GoodData", "Attribute 'alt' in the logo does not match");
     }
 
     private Message[] getMessagesFromInbox(ImapClient imapClient, String from, String subject, int expectedMessagesCount)
