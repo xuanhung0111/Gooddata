@@ -80,7 +80,11 @@ public class NotificationRulesDialog extends AbstractFragment {
                 .sendKeys(email);
     }
 
-    public String getNotificationEmail(int notificationIndex) {
+    public String getNotificationEmail(int notificationIndex) throws InterruptedException {
+        for (int i = 0; i < 5
+                && notificationRuleItems.get(notificationIndex)
+                        .findElement(BY_NOTIFICATION_RULE_EMAIL).getAttribute("value").isEmpty(); i++)
+            Thread.sleep(1000);
         return notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_RULE_EMAIL)
                 .getAttribute("value");
     }
@@ -206,7 +210,8 @@ public class NotificationRulesDialog extends AbstractFragment {
     }
 
     public void assertNotificationFields(String processName, int notificationIndex, String email,
-            String subject, String message, DISCNotificationEvents event, String customEventName) {
+            String subject, String message, DISCNotificationEvents event, String customEventName)
+            throws InterruptedException {
         assertEquals(email, getNotificationEmail(notificationIndex));
         assertEquals(subject, getNotificationSubject(notificationIndex));
         assertEquals(message, getNotificationMessage(notificationIndex));
