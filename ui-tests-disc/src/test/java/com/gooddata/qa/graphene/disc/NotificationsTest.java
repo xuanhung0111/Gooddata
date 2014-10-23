@@ -6,19 +6,27 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.DISCNotificationEvents;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
+import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.utils.mail.ImapClient;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
@@ -34,24 +42,32 @@ public class NotificationsTest extends AbstractSchedulesTests {
     private static final String CUSTOM_NOTIFICATION_TEST_PROCESS = "Custom Event Notification Test";
     private static final String REPEATED_FAILURES_NOTIFICATION_SUBJECT =
             "Repeated data loading failure: \"%s\" process";
+    private static final String REPEATED_FAILURES_NOTIFICATION_BODY =
+            "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project (id: %s) has failed for the 5th time."
+                    + " We highly recommend disabling failing schedules until the issues are addressed: Go to"
+                    + " the schedule page Click \"Disable\" button If you require assistance with troubleshooting"
+                    + " data uploading, please visit the GoodData Support Portal. At your service, The GoodData Team";
     private static final String REPEATED_FAILURES_NOTIFICATION_MESSAGE_1 =
-            "<p>the <a href=\"%s\">%s schedule</a> within the \"%s\" process of your\"%s\" GoodData project (id: %s) has failed for the 5th time.</p>";
+            "<p>the <a href=\"%s\">%s schedule</a> within the &quot;%s&quot; process of your &quot;%s&quot;"
+                    + " GoodData project (id: %s) has failed for the 5th time.</p>";
     private static final String REPEATED_FAILURES_NOTIFICATION_MESSAGE_2 =
-            "<p>We highly recommend disabling failing schedules until the issues are addressed:</p>"
-                    + System.lineSeparator()
-                    + "<ol> <li>Go to the <a href=\"%s\">schedule page</a></li> <li>Click \"Disable\" button</li>";
+            "<li>Go to the <a href=\"%s\">schedule page</a></li>";
     private static final String SCHEDULE_DISABLED_NOTIFICATION_SUBJECT =
             "Schedule disabled: \"%s\" process";
+    private static final String SCHEDULE_DISABLED_NOTIFICATION_BODY =
+            "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project "
+                    + "(id: %s) has been automatically disabled following its 30th consecutive failure. "
+                    + "To resume scheduled uploads from this process: Go to the schedule page Click "
+                    + "\"Enable\" If you require assistance with troubleshooting data uploading, "
+                    + "please visit the GoodData Support Portal. At your service, The GoodData Team";
     private static final String SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1 =
-            "<p>the <a href=\"%s\">%s schedule</a> within the \"%s\" process of your\"%s\" GoodData project (id: %s) "
-                    + "has been <strong>automatically disabled</strong> following its30th consecutive failure.</p>";
+            "<p>the <a href=\"%s\">%s schedule</a> within the &quot;%s&quot; process of your &quot;%s&quot;"
+                    + " GoodData project (id: %s) has been <strong>automatically disabled</strong> following its "
+                    + "30th consecutive failure.</p>";
     private static final String SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2 =
-            "<p>To resume scheduled uploads from this process:</p>"
-                    + System.lineSeparator()
-                    + "<ol> <li>Go to the <a href=\"%s\">schedule page</a></li> <li>Click \"Enable\"</li>";
+            "<li>Go to the <a href=\"%s\">schedule page</a></li>";
     private static final String NOTIFICATION_SUPPORT_MESSAGE =
-            "<p>If you require assistance with troubleshooting data uploading, please visit the"
-                    + System.lineSeparator()
+            "<p>If you require assistance with troubleshooting data uploading, please visit the "
                     + "<a href=\"http://support.gooddata.com/entries/23541617-Automatic-Disabling-of-Failed-Schedules\">GoodData Support Portal</a>.</p>";
     private static final String NOTIFICATION_RULES_EMPTY_STATE_MESSAGE =
             "No event (eg. schedule start, finish, fail, etc.) will trigger a notification email.";
@@ -104,10 +120,10 @@ public class NotificationsTest extends AbstractSchedulesTests {
     private String failedStartTime;
     private String failedEndTime;
     private String errorMessage;
-    private final SimpleDateFormat dateFormat1 = new SimpleDateFormat("MMM dd, yyyy");
-    private final SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
-    private final SimpleDateFormat timeFormat1 = new SimpleDateFormat("hh:mm:ss aaa");
-    private final SimpleDateFormat timeFormat2 = new SimpleDateFormat("HH:mm:ss");
+    private String processStartTime;
+
+    @FindBy(tagName = "pre")
+    private ObjectFragment objectFragment;
 
     @BeforeClass
     public void initProperties() {
@@ -206,13 +222,15 @@ public class NotificationsTest extends AbstractSchedulesTests {
     }
 
     @Test(dependsOnMethods = {"createNotificationForSuccessEvent"}, groups = {"notification"})
-    public void successEventTrigger() throws InterruptedException, ParseException {
+    public void successEventTrigger() throws InterruptedException, ParseException, JSONException {
         Pair<String, List<String>> cronTime =
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                SUCCESS_NOTIFICATION_TEST_PROCESS, null, "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule(SUCCESS_NOTIFICATION_TEST_PROCESS, "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
+                SUCCESS_NOTIFICATION_TEST_PROCESS, null, "/graph/successfulGraph.grf", cronTime,
+                null);
+        assertNewSchedule(SUCCESS_NOTIFICATION_TEST_PROCESS, "successfulGraph.grf",
+                "/graph/successfulGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -221,22 +239,22 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 browser.getCurrentUrl().substring(browser.getCurrentUrl().lastIndexOf("/") + 1);
         lastSuccessfulExecutionLogLink =
                 scheduleDetail.getLastExecutionLogLink().replace("ea.", "");
-        List<String> formattedDateTime =
-                formatExecutionDateTime(successfulStartTime, successfulEndTime,
-                        scheduleDetail.getLastExecutionDate(),
-                        scheduleDetail.getLastExecutionTime());
-        successfulStartTime = formattedDateTime.get(0);
-        successfulEndTime = formattedDateTime.get(1);
+        String gpExecutionDetailUrl = lastSuccessfulExecutionLogLink.replace("/log", "/detail");
+        Map<String, String> executionDetails = getExecutionInfoFromGreyPage(gpExecutionDetailUrl);
+        successfulStartTime = executionDetails.get("scheduledTime");
+        successfulEndTime = executionDetails.get("endTime");
+        processStartTime = executionDetails.get("startedTime");
     }
 
     @Test(dependsOnMethods = {"createNotificationForFailureEvent"}, groups = {"notification"})
-    public void failureEventTrigger() throws InterruptedException, ParseException {
+    public void failureEventTrigger() throws InterruptedException, ParseException, JSONException {
         Pair<String, List<String>> cronTime =
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
                 FAILURE_NOTIFICATION_TEST_PROCESS, null, "/graph/errorGraph.grf", cronTime, null);
-        assertNewSchedule(FAILURE_NOTIFICATION_TEST_PROCESS, "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
+        assertNewSchedule(FAILURE_NOTIFICATION_TEST_PROCESS, "errorGraph.grf",
+                "/graph/errorGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(false, true, false, "Basic/graph/errorGraph.grf",
                 DISCProcessTypes.GRAPH, 5);
@@ -245,13 +263,11 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 browser.getCurrentUrl().substring(browser.getCurrentUrl().lastIndexOf("/") + 1);
         lastFailedExecutionLogLink =
                 scheduleDetail.getLastExecutionLogLink().replace("https://ea.", "https://");
-        List<String> formattedDateTime =
-                formatExecutionDateTime(failedStartTime, failedEndTime,
-                        scheduleDetail.getLastExecutionDate(),
-                        scheduleDetail.getLastExecutionTime());
-        failedStartTime = formattedDateTime.get(0);
-        failedEndTime = formattedDateTime.get(1);
-        errorMessage = scheduleDetail.getLastExecutionDescription();
+        String gpExecutionDetailUrl = lastFailedExecutionLogLink.replace("/log", "/detail");
+        Map<String, String> executionDetails = getExecutionInfoFromGreyPage(gpExecutionDetailUrl);
+        failedStartTime = executionDetails.get("scheduledTime");
+        failedEndTime = executionDetails.get("endTime");
+        errorMessage = executionDetails.get("errorMessage").replace("\n", "").replace("    ", "");
     }
 
     @Test(dependsOnMethods = {"createNotificationForCustomEvent"}, groups = {"notification"})
@@ -261,7 +277,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
                 CUSTOM_NOTIFICATION_TEST_PROCESS, null, "/graph/CTL_Function.grf", cronTime, null);
-        assertNewSchedule(CUSTOM_NOTIFICATION_TEST_PROCESS, "CTL_Function.grf", "/graph/CTL_Function.grf", cronTime, null);
+        assertNewSchedule(CUSTOM_NOTIFICATION_TEST_PROCESS, "CTL_Function.grf",
+                "/graph/CTL_Function.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "CTL_event/graph/CTL_Function.grf", DISCProcessTypes.GRAPH, 5);
@@ -284,7 +301,7 @@ public class NotificationsTest extends AbstractSchedulesTests {
         List<String> expectedParamValues =
                 getBasicEventParamValues(successProcessUri, SUCCESS_NOTIFICATION_TEST_PROCESS,
                         "Basic/graph/successfulGraph.grf", "successfulGraph.grf",
-                        successfulScheduleId, lastSuccessfulExecutionLogLink, successfulStartTime,
+                        successfulScheduleId, lastSuccessfulExecutionLogLink, processStartTime,
                         null, null);
         checkNotification(DISCNotificationEvents.PROCESS_STARTED, expectedParamValues);
     }
@@ -453,7 +470,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
                 "Check Edit Notification", null, "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule("Check Edit Notification", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
+        assertNewSchedule("Check Edit Notification", "successfulGraph.grf",
+                "/graph/successfulGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
@@ -487,15 +505,18 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                "Check Cancel Edit Notification", null, "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule("Check Cancel Edit Notification", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
+                "Check Cancel Edit Notification", null, "/graph/successfulGraph.grf", cronTime,
+                null);
+        assertNewSchedule("Check Cancel Edit Notification", "successfulGraph.grf",
+                "/graph/successfulGraph.grf", cronTime, null);
         scheduleDetail.manualRun();
         scheduleDetail.assertLastExecutionDetails(true, true, false,
                 "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
-        successfulEndTime =
-                formatExecutionDateTime(successfulStartTime, successfulEndTime,
-                        scheduleDetail.getLastExecutionDate(),
-                        scheduleDetail.getLastExecutionTime()).get(1);
+        lastSuccessfulExecutionLogLink =
+                scheduleDetail.getLastExecutionLogLink().replace("ea.", "");
+        String gpExecutionDetailUrl = lastSuccessfulExecutionLogLink.replace("/log", "/detail");
+        Map<String, String> executionDetails = getExecutionInfoFromGreyPage(gpExecutionDetailUrl);
+        successfulEndTime = executionDetails.get("endTime");
 
         List<String> expectedParamValues = new ArrayList<String>();
         expectedParamValues.add(testParams.getProjectId());
@@ -520,39 +541,10 @@ public class NotificationsTest extends AbstractSchedulesTests {
 
         scheduleDetail.repeatManualRun(5, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH,
                 false);
-        String repeatedFailuresNotificationSubject =
-                String.format(REPEATED_FAILURES_NOTIFICATION_SUBJECT, processName);
-        String repeatedFailuresNotificationMessagePart1 =
-                String.format(REPEATED_FAILURES_NOTIFICATION_MESSAGE_1, scheduleUrl,
-                        "errorGraph.grf", processName, projectTitle, testParams.getProjectId());
-        String repeatedFailuresNotificationMessagePart2 =
-                String.format(REPEATED_FAILURES_NOTIFICATION_MESSAGE_2, scheduleUrl);
-        System.out.println("Repeated Data Loading Failures Message: "
-                + repeatedFailuresNotificationMessagePart1);
-        waitForNotification(repeatedFailuresNotificationSubject,
-                Arrays.asList(repeatedFailuresNotificationMessagePart1));
-        waitForNotification(repeatedFailuresNotificationSubject,
-                Arrays.asList(repeatedFailuresNotificationMessagePart2));
-        waitForNotification(repeatedFailuresNotificationSubject,
-                Arrays.asList(NOTIFICATION_SUPPORT_MESSAGE));
-
+        waitForRepeatedFailuresEmail(processName, "errorGraph.grf", scheduleUrl, false);
         scheduleDetail.repeatManualRun(25, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH,
                 false);
-        String scheduleDisabledNotificationSubject =
-                String.format(SCHEDULE_DISABLED_NOTIFICATION_SUBJECT, processName);
-        String scheduleDisabledNotificationMessagePart1 =
-                String.format(SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1, scheduleUrl,
-                        "errorGraph.grf", processName, projectTitle, testParams.getProjectId());
-        String scheduleDisabledNotificationMessagePart2 =
-                String.format(SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2, scheduleUrl);
-        System.out.println("message: " + scheduleDisabledNotificationMessagePart1);
-        System.out.println("message: " + scheduleDisabledNotificationMessagePart2);
-        waitForNotification(scheduleDisabledNotificationSubject,
-                Arrays.asList(scheduleDisabledNotificationMessagePart1));
-        waitForNotification(scheduleDisabledNotificationSubject,
-                Arrays.asList(scheduleDisabledNotificationMessagePart2));
-        waitForNotification(scheduleDisabledNotificationSubject,
-                Arrays.asList(NOTIFICATION_SUPPORT_MESSAGE));
+        waitForRepeatedFailuresEmail(processName, "errorGraph.grf", scheduleUrl, true);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
@@ -636,31 +628,34 @@ public class NotificationsTest extends AbstractSchedulesTests {
             discNotificationRules.cancelSaveNotification(notificationIndex);
     }
 
-    private void checkMailbox(ImapClient imapClient, String subject,
-            List<String> expectedParamValues) throws InterruptedException, MessagingException,
-            IOException {
-        Message[] notification = new Message[0];
-        for (int i = 0; i < 100 && notification.length <= 0; i++) {
+    private Message getNotification(ImapClient imapClient, String subject)
+            throws InterruptedException, MessagingException, IOException {
+        Message[] notifications = new Message[0];
+        for (int i = 0; i < 100 && notifications.length <= 0; i++) {
             System.out.println("Wait for notification: " + subject);
-            notification = imapClient.getMessagesFromInbox(FROM, subject);
+            notifications = imapClient.getMessagesFromInbox(FROM, subject);
             Thread.sleep(2000);
         }
-        assertTrue(notification.length > 0, "Notification is not sent!");
-        assertTrue(notification.length == 1, "More than 1 notification!");
-        System.out.println("Notification message: " + notification.length);
-        System.out.println("Notification subject: " + notification[0].getSubject());
-        System.out.println("Notification content: " + notification[0].getContent().toString());
+        assertTrue(notifications.length > 0, "Notification is not sent!");
+        assertTrue(notifications.length == 1, "More than 1 notification!");
+        System.out.println("Notification subject: " + notifications[0].getSubject());
+        System.out.println("Notification content: " + notifications[0].getContent().toString());
+        return notifications[0];
+    }
+
+    private void checkScheduleEventNotification(ImapClient imapClient, String subject,
+            List<String> expectedParamValues) throws InterruptedException, MessagingException,
+            IOException {
+        Message notification = getNotification(imapClient, subject);
         ArrayList<String> paramValues = new ArrayList<String>();
-        String notificationContent = notification[0].getContent().toString() + "*";
+        String notificationContent = String.format(notification.getContent().toString()) + "*";
         while (!notificationContent.isEmpty()) {
             if (notificationContent.substring(0, notificationContent.indexOf("*")).contains(
                     "https://ea."))
                 paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*"))
-                        .replace("https://ea.", "https://")
-                        .replace(System.lineSeparator() + "   ", ""));
+                        .replace("https://ea.", "https://"));
             else
-                paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*"))
-                        .replace(System.lineSeparator() + "   ", ""));
+                paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*")));
             System.out.println("Param value: " + paramValues.get(paramValues.size() - 1));
             if (notificationContent.substring(notificationContent.indexOf("*")).equals("*"))
                 notificationContent = "";
@@ -668,11 +663,23 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 notificationContent =
                         notificationContent.substring(notificationContent.indexOf("*") + 1);
         }
-        for (int i = 0; expectedParamValues != null && i < expectedParamValues.size(); i++) {
-            assertTrue(paramValues.get(i).contains(expectedParamValues.get(i)),
-                    "The expected param value is: " + expectedParamValues.get(i)
-                            + ",but the displayed param value in message is: "
-                            + paramValues.get(i));
+        if (expectedParamValues == null)
+            throw new RuntimeException("");
+        String paramValue = "";
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0, n = expectedParamValues.size(); i < n; i++) {
+            if (paramValues.get(i).contains(SystemUtils.LINE_SEPARATOR)) {
+                builder.setLength(0);
+                for (String s : paramValues.get(i).split(SystemUtils.LINE_SEPARATOR)) {
+                    builder.append(s.trim());
+                }
+                paramValue = builder.toString();
+            } else {
+                paramValue = paramValues.get(i);
+            }
+            assertEquals(paramValue, expectedParamValues.get(i), "The expected param value is: "
+                    + expectedParamValues.get(i)
+                    + ", but the displayed param value in message is: " + paramValue);
             System.out.println("Param value is displayed well in notification: "
                     + paramValues.get(i));
         }
@@ -683,8 +690,19 @@ public class NotificationsTest extends AbstractSchedulesTests {
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
         try {
             System.out.println("Waiting for notification...");
-            checkMailbox(imapClient, subject, expectedParamValues);
-            successfulTest = true;
+            checkScheduleEventNotification(imapClient, subject, expectedParamValues);
+        } finally {
+            imapClient.close();
+        }
+    }
+
+    private void waitForRepeatedFailuresEmail(String processName, String scheduleName,
+            String scheduleUrl, boolean isDisabled) throws InterruptedException,
+            MessagingException, IOException {
+        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
+        try {
+            System.out.println("Waiting for notification...");
+            checkRepeatFailureEmail(imapClient, processName, scheduleName, scheduleUrl, isDisabled);
         } finally {
             imapClient.close();
         }
@@ -743,28 +761,8 @@ public class NotificationsTest extends AbstractSchedulesTests {
     private String getProcessUri(String url) {
         String processUri =
                 "/gdc/projects/" + testParams.getProjectId() + "/dataload/"
-                        + url.substring(url.indexOf("processes"), url.lastIndexOf("schedules") - 2);
+                        + url.substring(url.indexOf("processes"), url.lastIndexOf("schedules") - 1);
         return processUri;
-    }
-
-    private List<String> formatExecutionDateTime(String startTime, String endTime,
-            String executionDate, String executionTime) throws ParseException {
-        List<String> formattedDateTime = new ArrayList<String>();
-        startTime =
-                dateFormat2.format(dateFormat1.parse(executionDate))
-                        + "T"
-                        + timeFormat2.format(timeFormat1.parse(executionTime.substring(0,
-                                executionTime.indexOf("-") - 1)));
-        formattedDateTime.add(startTime);
-        endTime =
-                dateFormat2.format(dateFormat1.parse(executionDate))
-                        + "T"
-                        + timeFormat2.format(timeFormat1.parse(executionTime
-                                .substring(executionTime.indexOf("-") + 1)));
-        formattedDateTime.add(endTime);
-        System.out.println("Start time: " + startTime);
-        System.out.println("End time: " + endTime);
-        return formattedDateTime;
     }
 
     private List<String> getBasicEventParamValues(String processUri, String processName,
@@ -783,11 +781,66 @@ public class NotificationsTest extends AbstractSchedulesTests {
         expectedParamValues.add(scheduleName);
         if (logLink != null)
             expectedParamValues.add(logLink);
-        expectedParamValues.add(startTime.substring(0, startTime.lastIndexOf(":") - 1));
+        expectedParamValues.add(startTime);
         if (endTime != null)
             expectedParamValues.add(endTime);
         if (errorMessage != null)
             expectedParamValues.add(errorMessage);
         return expectedParamValues;
+    }
+
+    private void checkRepeatFailureEmail(ImapClient imapClient, String processName,
+            String scheduleName, String scheduleUrl, boolean isDisabled)
+            throws InterruptedException, MessagingException, IOException {
+        String subjectFormat =
+                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_SUBJECT
+                        : REPEATED_FAILURES_NOTIFICATION_SUBJECT;
+        String notificationSubject = String.format(subjectFormat, processName);
+        Message notification = getNotification(imapClient, notificationSubject);
+        String notificationMessage1 =
+                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1
+                        : REPEATED_FAILURES_NOTIFICATION_MESSAGE_1;
+        String notificationMessage2 =
+                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2
+                        : REPEATED_FAILURES_NOTIFICATION_MESSAGE_2;
+        String notificationBody =
+                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_BODY
+                        : REPEATED_FAILURES_NOTIFICATION_BODY;
+        Document message = Jsoup.parse(notification.getContent().toString());
+        System.out.println("Notification message: " + message.getElementsByTag("body").text());
+        assertEquals(
+                message.getElementsByTag("body").text(),
+                String.format(notificationBody, scheduleName, processName, projectTitle,
+                        testParams.getProjectId()));
+        assertEquals(
+                message.getElementsByTag("p").get(1).toString().replace("https://ea.", "https://"),
+                String.format(notificationMessage1, scheduleUrl, scheduleName, processName,
+                        projectTitle, testParams.getProjectId()));
+        assertEquals(
+                message.getElementsByTag("li").get(0).toString().replace("https://ea.", "https://"),
+                String.format(notificationMessage2, scheduleUrl));
+        assertEquals(message.getElementsByTag("p").get(3).toString(), NOTIFICATION_SUPPORT_MESSAGE);
+    }
+
+    private String timeFormat(String dateTime) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        return format2.format(format.parse(dateTime));
+    }
+
+    private Map<String, String> getExecutionInfoFromGreyPage(String gpExecutionDetailUrl)
+            throws JSONException, ParseException {
+        Map<String, String> executionDetails = new HashMap<String, String>();
+        browser.get(gpExecutionDetailUrl);
+        waitForElementVisible(objectFragment.getRoot());
+        JSONObject jsonObject = objectFragment.getObject();
+        JSONObject executionDetail = jsonObject.getJSONObject("executionDetail");
+        if (executionDetail.optJSONObject("error") != null)
+            executionDetails.put("errorMessage",
+                    executionDetail.getJSONObject("error").getString("message"));
+        executionDetails.put("scheduledTime", timeFormat(executionDetail.getString("created")));
+        executionDetails.put("startedTime", timeFormat(executionDetail.getString("started")));
+        executionDetails.put("endTime", timeFormat(executionDetail.getString("finished")));
+        return executionDetails;
     }
 }
