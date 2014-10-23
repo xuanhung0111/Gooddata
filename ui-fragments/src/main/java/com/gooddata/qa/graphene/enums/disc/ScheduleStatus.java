@@ -1,8 +1,8 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.disc;
 
 import org.openqa.selenium.By;
 
-public enum DISCScheduleStatus {
+public enum ScheduleStatus {
 
     OK(".status-icon-ok.icon-check"),
     ERROR(".status-icon-error"),
@@ -13,7 +13,7 @@ public enum DISCScheduleStatus {
 
     private String iconCss;
 
-    private DISCScheduleStatus(String iconCss) {
+    private ScheduleStatus(String iconCss) {
         this.iconCss = iconCss;
     }
 

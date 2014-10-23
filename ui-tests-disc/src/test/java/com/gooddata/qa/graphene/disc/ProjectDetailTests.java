@@ -1,16 +1,12 @@
 package com.gooddata.qa.graphene.disc;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.DISCScheduleStatus;
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
-import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages;
+import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -34,39 +30,38 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkProjectInfo() throws InterruptedException, JSONException {
+    public void checkProjectInfo() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
             String processName = "Check Project Info";
             int processNumber = projectDetailPage.getNumberOfProcesses();
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
             assertEquals(processNumber + 1, projectDetailPage.getNumberOfProcesses(),
                     "The number of processes is incorrect!");
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
             waitForElementVisible(projectDetailPage.getRoot());
             assertEquals(projectTitle, projectDetailPage.getDisplayedProjectTitle());
             assertEquals(testParams.getProjectId(),
                     projectDetailPage.getProjectMetadata("Project ID"));
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkProcessInfo() throws JSONException, InterruptedException {
+    public void checkProcessInfo() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
             String processName = "Check Process Info";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
             projectDetailPage.selectScheduleTab(processName);
             waitForElementVisible(projectDetailPage.checkEmptySchedulesList(processName));
+
             projectDetailPage.selectExecutableTab(processName);
-            projectDetailPage.assertExecutablesList(DISCProcessTypes.GRAPH, Arrays.asList(
-                    "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"));
+            projectDetailPage.assertExecutableList(DeployPackages.BASIC.getExecutables());
+
             projectDetailPage.selectMetadataTab(processName);
             String processID =
                     browser.getCurrentUrl()
@@ -76,206 +71,189 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
             System.out.println("processID: " + processID);
             assertEquals(processID, projectDetailPage.getProcessMetadata("Process ID"));
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkGoToDashboardsLink() throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+    public void checkGoToDashboardsLink() {
+        openProjectDetailPage(getWorkingProject());
         waitForElementVisible(projectDetailPage.getRoot());
         projectDetailPage.goToDashboards();
         waitForDashboardPageLoaded(browser);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkEmptyProjectState() throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+    public void checkEmptyProjectState() {
+        openProjectDetailPage(getWorkingProject());
         waitForElementVisible(projectDetailPage.getRoot());
         assertEquals(PROJECT_EMPTY_STATE_TITLE, projectDetailPage.getProjectEmptyStateTitle());
         assertEquals(PROJECT_EMPTY_STATE_MESSAGE, projectDetailPage.getProjectEmptyStateMessage());
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void downloadProcess() throws JSONException, InterruptedException {
+    public void downloadProcess() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Download Process Test", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
+            openProjectDetailPage(getWorkingProject());
+            String processName = "Download Process Test";
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
             System.out.println("Download folder: " + downloadFolder);
-            projectDetailPage.checkDownloadProcess("Download Process Test", downloadFolder,
+            projectDetailPage.checkDownloadProcess(processName, downloadFolder,
                     testParams.getProjectId(), expectedDownloadedProcessSize);
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkSortedProcesses() throws JSONException, InterruptedException {
+    public void checkSortedProcesses() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-A", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-Z", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-B", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-P", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
+
+            openProjectDetailPage(getWorkingProject());
             projectDetailPage.checkSortedProcesses();
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkSortedProcessesAfterRedeploy() throws JSONException, InterruptedException {
+    public void checkSortedProcessesAfterRedeploy() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-A", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-Z", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-B", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-P", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            redeployProcess(projectTitle, testParams.getProjectId(), "Process-B", "Basic",
-                    "Process-R", DISCProcessTypes.GRAPH, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            openProjectDetailPage(getWorkingProject());
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-R");
+
+            openProjectDetailPage(getWorkingProject());
+            redeployProcess("Process-R", DeployPackages.BASIC, "Process-B");
+
+            openProjectDetailPage(getWorkingProject());
             projectDetailPage.checkSortedProcesses();
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkDeleteProcess() throws JSONException, InterruptedException {
+    public void checkDeleteProcess() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-A", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-Z", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-B", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-P", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            projectDetailPage.deleteProcess("Process-B");
-            assertFalse(projectDetailPage.assertIsExistingProcess("Process-B"));
+            openProjectDetailPage(getWorkingProject());
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
+
+            openProjectDetailPage(getWorkingProject());
+            projectDetailPage.deleteProcess("Process-P");
+            assertFalse(projectDetailPage.assertIsExistingProcess("Process-P"));
             projectDetailPage.checkSortedProcesses();
         } finally {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkProcessDeleteDialog() throws JSONException, InterruptedException {
+    public void checkProcessDeleteDialog() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-A", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            projectDetailPage.checkDeleteProcessDialog("Process-A");
+            openProjectDetailPage(getWorkingProject());
+            deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
+            String processName = "Process-A";
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+            openProjectDetailPage(getWorkingProject());
+            projectDetailPage.checkDeleteProcessDialog(processName);
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkCancelProcessDeleteDialog() throws JSONException, InterruptedException {
+    public void checkCancelProcessDeleteDialog() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-A", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            projectDetailPage.checkCancelDeleteProcess("Process-A");
+            openProjectDetailPage(getWorkingProject());
+            String processName = "Process-A";
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+            projectDetailPage.checkCancelDeleteProcess(processName);
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkExecutableScheduleNumber() throws JSONException, InterruptedException {
+    public void checkExecutableScheduleNumber() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Process-A", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), "Process-A", null,
-                    "/graph/successfulGraph.grf", null, null);
-            projectDetailPage.checkExecutableScheduleNumber("Process-A", "errorGraph.grf", 0);
-            projectDetailPage.checkExecutableScheduleNumber("Process-A",
-                    "longTimeRunningGraph.grf", 0);
-            projectDetailPage.checkExecutableScheduleNumber("Process-A", "successfulGraph.grf", 1);
+            openProjectDetailPage(getWorkingProject());
+            String processName = "Process-A";
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+            createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(
+                    Executables.SUCCESSFUL_GRAPH));
+            scheduleDetail.clickOnCloseScheduleButton();
+
+            projectDetailPage.checkExecutableScheduleNumber(processName,
+                    Executables.FAILED_GRAPH.getExecutableName(), 0);
+            projectDetailPage.checkExecutableScheduleNumber(processName,
+                    Executables.LONG_TIME_RUNNING_GRAPH.getExecutableName(), 0);
+            projectDetailPage.checkExecutableScheduleNumber(processName,
+                    Executables.SUCCESSFUL_GRAPH.getExecutableName(), 1);
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkProcessScheduleList() throws JSONException, InterruptedException {
+    public void checkProcessScheduleList() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
             String processName = "Check Process Schedule List";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
-            projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-                    DISCScheduleStatus.UNSCHEDULED, false, schedulesTable);
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+            ScheduleBuilder successfulScheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
+            createAndAssertSchedule(successfulScheduleBuilder);
+
+            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                    ScheduleStatus.UNSCHEDULED);
+
             scheduleDetail.manualRun();
             scheduleDetail.isInScheduledState();
-            projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-                    DISCScheduleStatus.SCHEDULED, false, schedulesTable);
+            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                    ScheduleStatus.SCHEDULED);
+
             scheduleDetail.isInRunningState();
-            projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-                    DISCScheduleStatus.RUNNING, false, schedulesTable);
-            scheduleDetail.assertLastExecutionDetails(true, true, false,
-                    "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
-            projectDetailPage.assertScheduleStatus(processName, "successfulGraph.grf",
-                    DISCScheduleStatus.OK, false, schedulesTable);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf", cronTime,
-                    null);
+            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                    ScheduleStatus.RUNNING);
+
+            scheduleDetail.assertSuccessfulExecution();
+            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                    ScheduleStatus.OK);
+
+            ScheduleBuilder failedScheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.FAILED_GRAPH);
+            createAndAssertSchedule(failedScheduleBuilder);
+
             scheduleDetail.manualRun();
-            scheduleDetail.assertLastExecutionDetails(false, true, false,
-                    "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
-            projectDetailPage.assertScheduleStatus(processName, "errorGraph.grf",
-                    DISCScheduleStatus.ERROR, true, schedulesTable);
+            scheduleDetail.assertFailedExecution(failedScheduleBuilder.getExecutable());
+            projectDetailPage.assertScheduleStatus(failedScheduleBuilder.getScheduleName(),
+                    ScheduleStatus.ERROR);
+
             scheduleDetail.disableSchedule();
-            projectDetailPage.assertScheduleStatus(processName, "errorGraph.grf",
-                    DISCScheduleStatus.DISABLED, true, schedulesTable);
+            projectDetailPage.assertScheduleStatus(failedScheduleBuilder.getScheduleName(),
+                    ScheduleStatus.DISABLED);
         } finally {
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnGroups = {"project-detail"}, groups = {"tests"})
-    public void test() throws JSONException {
+    public void test() {
         successfulTest = true;
     }
 }

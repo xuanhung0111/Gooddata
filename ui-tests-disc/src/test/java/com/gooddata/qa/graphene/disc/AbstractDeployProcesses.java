@@ -1,17 +1,19 @@
 package com.gooddata.qa.graphene.disc;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
+import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages;
+import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -19,43 +21,49 @@ import static org.testng.Assert.*;
 public abstract class AbstractDeployProcesses extends AbstractProjectTest {
 
     private static final String FAILED_REDEPLOY_MESSAGE =
-            "Failed to re-deploy the %s.zip process as %s. Reason: Process contains no executables.";
+            "Failed to re-deploy the %s process as %s. Reason: Process contains no executables.";
     private static final String FAILED_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE =
-            "Failed to deploy the %s.zip process as %s. Reason: Process contains no executables.";
+            "Failed to deploy the %s process as %s. Reason: Process contains no executables.";
     private static final String SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE =
             "Deploy process to project" + "\n" + "%s process has been deployed successfully.";
     private static final String DEPLOY_PROGRESS_MESSAGE_IN_PROJECT_DETAIL_PAGE =
             "Deploy process to project" + "\n" + "Deploying \"%s\" process as %s.";
     private static final String SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECTS_PAGE =
             "Deploy process to selected projects" + "\n"
-                    + "The \"%s.zip\" has been deployed successfully to all selected projects.";
-    private static final String FAILED_DEPLOY_MESSAGE_IN_PROJECTS_PAGE =
+                    + "The \"%s\" has been deployed successfully to all selected projects.";
+    private static final String FAILED_DEPLOY_DIALOG_MESSAGE_IN_PROJECTS_PAGE =
             "Deploy process to selected projects"
                     + "\n"
-                    + "Deployment of the \"%s.zip\" has finished."
+                    + "Deployment of the \"%s\" has finished."
                     + " The process has not been deployed successfully into some projects. See the error message";
     private static final String DEPLOY_PROGRESS_MESSAGE_IN_PROJECTS_PAGE =
-            "Deploy process to selected projects" + "\n" + "Deploying %s.zip as %s.";
+            "Deploy process to selected projects" + "\n" + "Deploying %s as %s.";
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
-    private static final String FAILED_DEPLOY_ERROR_IN_PROJECTS_PAGE =
-            "Failed to deploy the %s.zip process as %s to the projects below. Reasons: Process contains no executables.";
+    private static final String FAILED_DEPLOY_ERROR_BAR_IN_PROJECTS_PAGE =
+            "Failed to deploy the %s process as %s to the projects below. Reasons: Process contains no executables.";
     protected String zipFilePath;
 
-    protected Map<String, String> projects;
+    private List<ProjectInfo> projects;
+    private ProjectInfo workingProject;
 
-    protected Map<String, String> getProjectsMap() {
-        if (projects == null) {
-            projects = new LinkedHashMap<String, String>();
-            projects.put(projectTitle, testParams.getProjectId());
-        }
+    protected List<ProjectInfo> getProjects() {
+        if (projects == null)
+            projects = Arrays.asList(getWorkingProject());
         return projects;
     }
 
-    protected void openProjectDetailPage(String projectName, String projectId)
-            throws InterruptedException {
+    protected ProjectInfo getWorkingProject() {
+        if (workingProject == null)
+            workingProject =
+                    new ProjectInfo().setProjectName(projectTitle).setProjectId(
+                            testParams.getProjectId());
+        return workingProject;
+    }
+
+    protected void openProjectDetailPage(ProjectInfo project) {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsList.getRoot());
-        discProjectsList.clickOnProjectTitle(projectName, projectId);
+        discProjectsList.clickOnProjectTitle(project);
         waitForElementVisible(projectDetailPage.getRoot());
     }
 
@@ -64,246 +72,243 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
         waitForElementVisible(projectDetailPage.getRoot());
     }
 
-    protected void deployProcess(String zipFile, DISCProcessTypes processType, String processName,
-            boolean isSuccessful) throws InterruptedException {
+    protected void deployInProjectsPage(List<ProjectInfo> projects, DeployPackages deployPackage,
+            String processName) {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        selectProjectsToDeployInProjectsPage(projects);
+        deployForm.deployProcess(zipFilePath + deployPackage.getPackageName(),
+                deployPackage.getPackageType(), processName);
+        assertDeployedProcessInProjects(processName, projects, deployPackage);
+    }
+
+    protected void failedDeployInProjectsPage(List<ProjectInfo> projects,
+            DeployPackages deployPackage, ProcessTypes processType, String processName) {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        selectProjectsToDeployInProjectsPage(projects);
+        deployForm.tryToDeployProcess(zipFilePath + deployPackage.getPackageName(), processType,
+                processName);
+        String failedDeployError =
+                String.format(FAILED_DEPLOY_ERROR_BAR_IN_PROJECTS_PAGE,
+                        deployPackage.getPackageName(), processName);
+        waitForElementNotPresent(deployForm.getRoot());
+        waitForElementVisible(discProjectsList.getRoot());
+        System.out.println("Error bar in projects page: "
+                + discProjectsList.getErrorBar().getText());
+        assertEquals(failedDeployError, discProjectsList.getErrorBar().getText());
+    }
+
+    protected String deployInProjectDetailPage(DeployPackages deployPackage, String processName) {
+        String processUrl = null;
+        waitForElementVisible(projectDetailPage.getRoot());
+        projectDetailPage.clickOnDeployProcessButton();
+        deployForm.deployProcess(zipFilePath + deployPackage.getPackageName(),
+                deployPackage.getPackageType(), processName);
+        waitForElementNotPresent(deployForm.getRoot());
+        processUrl = browser.getCurrentUrl();
+        projectDetailPage.checkFocusedProcess(processName);
+        projectDetailPage.assertActiveProcessInList(processName, deployPackage);
+        Screenshots.takeScreenshot(browser, "assert-successful-deployed-process-" + processName,
+                getClass());
+        return processUrl;
+    }
+
+    protected void failedDeployInProjectDetailPage(DeployPackages deployPackage,
+            ProcessTypes processType, String processName) {
+        waitForElementVisible(projectDetailPage.getRoot());
+        projectDetailPage.clickOnDeployProcessButton();
+        String failedDeployMessage =
+                String.format(FAILED_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE,
+                        deployPackage.getPackageName(), processName);
+        deployForm.tryToDeployProcess(zipFilePath + deployPackage.getPackageName(), processType,
+                processName);
+        waitForElementVisible(projectDetailPage.getDeployErrorDialog());
+        System.out.println("Error deploy dialog message: "
+                + projectDetailPage.getDeployErrorDialog().getText());
+        assertEquals(failedDeployMessage, projectDetailPage.getDeployErrorDialog().getText());
+        Screenshots.takeScreenshot(browser, "assert-failed-deployed-process-" + processName,
+                getClass());
+        projectDetailPage.closeDeployErrorDialogButton();
+    }
+
+    protected void redeployProcess(String processName, DeployPackages redeployPackage,
+            String redeployProcessName, ScheduleBuilder... schedules) {
+        waitForElementVisible(projectDetailPage.getRoot());
+        projectDetailPage.clickOnRedeployButton(processName);
+        deployForm.redeployProcess(zipFilePath + redeployPackage.getPackageName(),
+                redeployPackage.getPackageType(), redeployProcessName);
+        waitForElementNotPresent(deployForm.getRoot());
+        projectDetailPage.checkFocusedProcess(redeployProcessName);
+        projectDetailPage
+                .assertActiveProcessInList(redeployProcessName, redeployPackage, schedules);
+        Screenshots.takeScreenshot(browser, "assert-successful-deployed-process-"
+                + redeployProcessName, getClass());
+    }
+
+    protected void failedRedeployProcess(String processName, DeployPackages redeployPackage,
+            ProcessTypes redeployProcessType, String redeployProcessName) {
+        waitForElementVisible(projectDetailPage.getRoot());
+        projectDetailPage.clickOnRedeployButton(processName);
+        String failedDeployMessage =
+                String.format(FAILED_REDEPLOY_MESSAGE, redeployPackage.getPackageName(),
+                        redeployProcessName);
+        deployForm.tryToDeployProcess(zipFilePath + redeployPackage.getPackageName(),
+                redeployProcessType, redeployProcessName);
+        waitForElementPresent(projectDetailPage.getDeployErrorDialog());
+        assertEquals(failedDeployMessage, projectDetailPage.getDeployErrorDialog().getText());
+        Screenshots.takeScreenshot(browser, "assert-failed-redeployed-process-"
+                + redeployProcessName, getClass());
+        projectDetailPage.closeDeployErrorDialogButton();
+    }
+
+    protected void selectProjectsToDeployInProjectsPage(List<ProjectInfo> projects) {
+        waitForElementVisible(discProjectsList.getRoot());
+        discProjectsList.checkOnProjects(projects);
+        assertTrue(discProjectsList.getDeployProcessButton().isEnabled());
+        discProjectsList.clickOnDeployProcessButton();
         waitForElementVisible(deployForm.getRoot());
-        deployForm.setDeployProcessInput(zipFile, processType, processName);
-        assertFalse(deployForm.inputFileHasError());
-        assertFalse(deployForm.inputProcessNameHasError());
-        Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
-        deployForm.getDeployConfirmButton().click();
-        try {
-            for (int i = 0; deployForm.getDeployProcessDialogButton().getText().contains("Cancel")
-                    && i < 20; i++)
-                Thread.sleep(500);
-            for (int i = 0; i < 20
-                    && deployForm.getDeployProcessDialogButton().getText().toLowerCase()
-                            .contains("deploying"); i++) {
-                System.out.println("Process is deploying!");
-                Thread.sleep(500);
-            }
-            if (isSuccessful) {
-                assertTrue(deployForm.getDeployProcessDialogButton().getText().toLowerCase()
-                        .contains("deployed"));
-                System.out.println("Deploy progress is finished!");
-                for (int i = 0; i < 30 && deployForm.getRoot().isDisplayed(); i++)
-                    Thread.sleep(1000);
-            }
-        } catch (NoSuchElementException ex) {
-            /* The deploy dialog may be not checked by this test! */
+    }
+
+    protected void checkSuccessfulDeployDialogMessageInProjectDetail(DeployPackages deployPackage,
+            ProcessTypes processType) {
+        checkDeployDialogMessageInProjectDetail(deployPackage, processType, true);
+    }
+
+    protected void checkSuccessfulDeployDialogMessageInProjectsPage(List<ProjectInfo> projects,
+            DeployPackages deployPackage, ProcessTypes processType) {
+        checkDeployDialogMessageInProjectsPage(projects, deployPackage, processType, true);
+    }
+
+    protected void checkFailedDeployDialogMessageInProjectsPage(List<ProjectInfo> projects,
+            DeployPackages deployPackage, ProcessTypes processType) {
+        checkDeployDialogMessageInProjectsPage(projects, deployPackage, processType, false);
+    }
+
+    protected List<ProjectInfo> createMultipleProjects(String projectNamePrefix, int projectNumber)
+            throws JSONException, InterruptedException {
+        List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
+        for (int i = 0; i < projectNumber; i++) {
+            openUrl(PAGE_GDC_PROJECTS);
+            waitForElementVisible(gpProject.getRoot());
+            additionalProjects.add(new ProjectInfo().setProjectName(
+                    projectNamePrefix + String.valueOf(i)).setProjectId(
+                    gpProject.createProject(projectNamePrefix + i, projectNamePrefix + i, null,
+                            testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                            projectCreateCheckIterations)));
+        }
+        return additionalProjects;
+    }
+
+    protected void deleteProjects(List<ProjectInfo> projectsToDelete) {
+        for (ProjectInfo projectToDelete : projectsToDelete) {
+            deleteProject(projectToDelete.getProjectId());
         }
     }
 
-    protected void assertDeployedProcessInProjects(String processName,
-            Map<String, String> projects, DISCProcessTypes processType, List<String> executables)
-            throws InterruptedException {
-        for (Entry<String, String> project : projects.entrySet()) {
+    protected void cleanProcessesInProjectDetail(String projectId) {
+        openProjectDetailByUrl(projectId);
+        browser.navigate().refresh();
+        waitForElementVisible(projectDetailPage.getRoot());
+        projectDetailPage.deleteAllProcesses();
+    }
+
+    private void assertDeployedProcessInProjects(String processName, List<ProjectInfo> projects,
+            DeployPackages deployPackage) {
+        for (ProjectInfo project : projects) {
             waitForElementVisible(discProjectsList.getRoot());
-            discProjectsList.clickOnProjectTitle(project.getKey(), project.getValue());
+            discProjectsList.clickOnProjectTitle(project);
             waitForElementVisible(projectDetailPage.getRoot());
-            projectDetailPage.assertProcessInList(processName, processType, executables);
+            projectDetailPage.assertNewDeployedProcessInList(processName, deployPackage);
             Screenshots.takeScreenshot(browser, "assert-deployed-process-" + processName,
                     getClass());
             discNavigation.clickOnProjectsButton();
         }
     }
 
-    protected void deployInProjectsPage(Map<String, String> projects, String zipFileName,
-            DISCProcessTypes processType, String processName, List<String> executables,
-            boolean isSuccessful) throws JSONException, InterruptedException {
+    private void checkDeployDialogMessageInProjectsPage(List<ProjectInfo> projects,
+            DeployPackages deployPackage, ProcessTypes processType, boolean isSuccessful) {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(projects);
-        if (isSuccessful) {
-            deployProcess(zipFilePath + zipFileName + ".zip", processType, processName, true);
-            assertDeployedProcessInProjects(processName, projects, processType, executables);
-        } else {
-            String failedDeployError =
-                    String.format(FAILED_DEPLOY_ERROR_IN_PROJECTS_PAGE, zipFileName, processName);
-            deployProcess(zipFilePath + zipFileName + ".zip", processType, processName, false);
-            try {
-                for (int i = 0; i < 30 && deployForm.getRoot().isDisplayed(); i++)
-                    Thread.sleep(1000);
-            } catch (NoSuchElementException ex) {
-                System.out.println("Deploy progress is finished!");
-            }
-            waitForElementVisible(discProjectsList.getRoot());
-            System.out.println("Error bar in projects page: "
-                    + discProjectsList.getErrorBar().getText());
-            assertEquals(failedDeployError, discProjectsList.getErrorBar().getText());
-        }
-    }
-
-    protected void deployInProjectDetailPage(String projectName, String projectId,
-            String zipFileName, DISCProcessTypes processType, String processName,
-            List<String> executables, boolean isSuccessful) throws JSONException,
-            InterruptedException {
-        waitForElementVisible(projectDetailPage.getRoot());
-        projectDetailPage.clickOnDeployProcessButton();
-        if (isSuccessful) {
-            deployProcess(zipFilePath + zipFileName + ".zip", processType, processName, true);
-            waitForElementVisible(projectDetailPage.getRoot());
-            Thread.sleep(2000);
-            projectDetailPage.checkFocusedProcess(processName);
-            projectDetailPage.assertProcessInList(processName, processType, executables);
-            Screenshots.takeScreenshot(browser,
-                    "assert-successful-deployed-process-" + processName, getClass());
-        } else {
-            String failedDeployMessage =
-                    String.format(FAILED_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE, zipFileName,
-                            processName);
-            deployProcess(zipFilePath + zipFileName + ".zip", processType, processName, false);
-            waitForElementVisible(projectDetailPage.getDeployErrorDialog());
-            System.out.println("Error deploy dialog message: "
-                    + projectDetailPage.getDeployErrorDialog().getText());
-            assertEquals(failedDeployMessage, projectDetailPage.getDeployErrorDialog().getText());
-            Screenshots.takeScreenshot(browser, "assert-failed-deployed-process-" + processName,
-                    getClass());
-        }
-    }
-
-    protected void redeployProcess(String projectName, String projectId, String processName,
-            String newZipFileName, String newProcessName, DISCProcessTypes newProcessType,
-            List<String> newExecutables, boolean isSuccessful) throws JSONException,
-            InterruptedException {
-        waitForElementVisible(projectDetailPage.getRoot());
-        projectDetailPage.getRedeployButton(processName).click();
-        if (isSuccessful) {
-            deployProcess(zipFilePath + newZipFileName + ".zip", newProcessType, newProcessName,
-                    true);
-            waitForElementVisible(projectDetailPage.getRoot());
-            Thread.sleep(2000);
-            projectDetailPage.checkFocusedProcess(newProcessName);
-            projectDetailPage.assertProcessInList(processName, newProcessType, newExecutables);
-            Screenshots.takeScreenshot(browser, "assert-successful-redeployed-process-"
-                    + newProcessName, getClass());
-        } else {
-            String failedDeployMessage =
-                    String.format(FAILED_REDEPLOY_MESSAGE, newZipFileName, newProcessName);
-            deployProcess(zipFilePath + newZipFileName + ".zip", newProcessType, newProcessName,
-                    false);
-            waitForElementPresent(projectDetailPage.getDeployErrorDialog());
-            assertEquals(failedDeployMessage, projectDetailPage.getDeployErrorDialog().getText());
-            Screenshots.takeScreenshot(browser, "assert-failed-redeployed-process-"
-                    + newProcessName, getClass());
-        }
-    }
-
-    protected void selectProjectsToDeployInProjectsPage(Map<String, String> projects)
-            throws InterruptedException {
-        waitForElementVisible(discProjectsList.getRoot());
-        discProjectsList.checkOnProjects(projects);
-        assertTrue(discProjectsList.getDeployProcessButton().isEnabled());
-        discProjectsList.getDeployProcessButton().click();
-        waitForElementVisible(deployForm.getRoot());
-    }
-
-    protected void checkDeployDialogMessageInProjectDetail(String projectName, String projectId,
-            String zipFileName, DISCProcessTypes processType, String processName,
-            boolean isSuccessful) throws InterruptedException {
-        projectDetailPage.clickOnDeployProcessButton();
-        String progressDialogMessage =
-                String.format(DEPLOY_PROGRESS_MESSAGE_IN_PROJECT_DETAIL_PAGE, zipFileName + ".zip",
-                        processName);
-        waitForElementVisible(deployForm.getRoot());
-        deployForm.setDeployProcessInput(zipFilePath + zipFileName + ".zip", processType,
-                processName);
-        assertFalse(deployForm.inputFileHasError());
-        assertFalse(deployForm.inputProcessNameHasError());
-        Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
-        boolean correctProgressMessage = false;
-        int index = 0;
-        deployForm.getDeployConfirmButton().click();
-        do {
-            if (deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage)) {
-                correctProgressMessage = true;
-                break;
-            } else {
-                Thread.sleep(100);
-                index++;
-            }
-        } while (index < 10);
-        assertTrue(correctProgressMessage, "Displayed progess message: "
-                + deployForm.getDeployProcessDialog().getText());
-        for (int i = 0; i < 10
-                && deployForm.getDeployProcessDialogButton().getText().toLowerCase()
-                        .contains("deploying"); i++)
-            Thread.sleep(1000);
-        if (isSuccessful) {
-            String successfulDeployMessage =
-                    String.format(SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE, processName);
-            assertTrue(deployForm.getDeployProcessDialog().getText()
-                    .equals(successfulDeployMessage));
-        }
-    }
-
-    protected void checkDeployDialogMessageInProjectsPage(Map<String, String> projects,
-            String zipFileName, DISCProcessTypes processType, String processName,
-            boolean isSuccessful) throws InterruptedException {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        selectProjectsToDeployInProjectsPage(projects);
-        String progressDialogMessage =
+        String processName = "Check Deploy Dialog Message";
+        String zipFileName = deployPackage.getPackageName();
+        final String progressDialogMessage =
                 String.format(DEPLOY_PROGRESS_MESSAGE_IN_PROJECTS_PAGE, zipFileName, processName);
         waitForElementVisible(deployForm.getRoot());
-        deployForm.setDeployProcessInput(zipFilePath + zipFileName + ".zip", processType,
-                processName);
+        deployForm.setDeployProcessInput(zipFilePath + zipFileName, processType, processName);
         assertFalse(deployForm.inputFileHasError());
         assertFalse(deployForm.inputProcessNameHasError());
         Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
-        boolean correctProgressMessage = false;
-        int index = 0;
         deployForm.getDeployConfirmButton().click();
-        correctProgressMessage =
-                deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage);
-        do {
-            if (correctProgressMessage) {
-                break;
-            } else {
-                Thread.sleep(100);
-                correctProgressMessage =
-                        deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage);
-                index++;
+
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return progressDialogMessage.equals(deployForm.getDeployProcessDialog().getText());
             }
-        } while (index < 10);
-        assertTrue(correctProgressMessage, "Displayed progess message: "
-                + deployForm.getDeployProcessDialog().getText());
-        for (int i = 0; i < 10
-                && deployForm.getDeployProcessDialogButton().getText().toLowerCase()
-                        .contains("deploying"); i++)
-            Thread.sleep(1000);
+        });
+
         if (isSuccessful) {
-            String successfulDeployMessage =
+            final String successfulDeployMessage =
                     String.format(SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECTS_PAGE, zipFileName);
-            assertTrue(deployForm.getDeployProcessDialog().getText()
-                    .equals(successfulDeployMessage));
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return successfulDeployMessage.equals(deployForm.getDeployProcessDialog()
+                            .getText());
+                }
+            });
+            waitForElementNotPresent(deployForm.getRoot());
         } else {
-            String failedDeployMessage =
-                    String.format(FAILED_DEPLOY_MESSAGE_IN_PROJECTS_PAGE, zipFileName);
-            assertTrue(deployForm.getDeployProcessDialog().getText().equals(failedDeployMessage));
+            final String failedDeployMessage =
+                    String.format(FAILED_DEPLOY_DIALOG_MESSAGE_IN_PROJECTS_PAGE, zipFileName);
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return failedDeployMessage
+                            .equals(deployForm.getDeployProcessDialog().getText());
+                }
+            });
         }
     }
 
-    protected Map<String, String> createMultipleProjects(String projectNamePrefix, int projectNumber)
-            throws JSONException, InterruptedException {
-        Map<String, String> additionalProjects = new HashMap<String, String>(1);
-        for (int i = 0; i < projectNumber; i++) {
-            openUrl(PAGE_GDC_PROJECTS);
-            waitForElementVisible(gpProject.getRoot());
-            additionalProjects.put(projectNamePrefix + String.valueOf(i), gpProject.createProject(
-                    projectNamePrefix + i, projectNamePrefix + i, null,
-                    testParams.getAuthorizationToken(), testParams.getDwhDriver(),
-                    projectCreateCheckIterations));
-        }
-        return additionalProjects;
-    }
+    private void checkDeployDialogMessageInProjectDetail(DeployPackages deployPackage,
+            ProcessTypes processType, boolean isSuccessful) {
+        projectDetailPage.clickOnDeployProcessButton();
+        String processName = "Check Deploy Dialog Message";
+        String zipFileName = deployPackage.getPackageName();
+        final String expectedProgressDialogMessage =
+                String.format(DEPLOY_PROGRESS_MESSAGE_IN_PROJECT_DETAIL_PAGE, zipFileName,
+                        processName);
+        waitForElementVisible(deployForm.getRoot());
+        deployForm.setDeployProcessInput(zipFilePath + zipFileName, processType, processName);
+        assertFalse(deployForm.inputFileHasError());
+        assertFalse(deployForm.inputProcessNameHasError());
+        deployForm.getDeployConfirmButton().click();
 
-    protected void deleteProjects(Map<String, String> projectsToDelete) throws InterruptedException {
-        for (Entry<String, String> projectToDelete : projectsToDelete.entrySet()) {
-            deleteProject(projectToDelete.getValue());
-        }
-    }
-    
-    protected void cleanProcessesInProjectDetail(String projectId) throws InterruptedException {
-        openProjectDetailByUrl(projectId);
-        projectDetailPage.deleteAllProcesses();
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return expectedProgressDialogMessage.equals(deployForm.getDeployProcessDialog()
+                        .getText());
+            }
+        });
+
+        if (!isSuccessful)
+            return;
+
+        final String successfulDeployMessage =
+                String.format(SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE, processName);
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return successfulDeployMessage
+                        .equals(deployForm.getDeployProcessDialog().getText());
+            }
+        });
+        waitForElementNotPresent(deployForm.getRoot());
     }
 }

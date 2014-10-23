@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
+
+import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 
 import static org.testng.Assert.*;
@@ -18,11 +19,11 @@ public class ExecutablesTable extends AbstractTable {
     private final static By BY_EXECUTABLE_NEW_SCHEDULE_LINK = By
             .cssSelector(".ait-process-executable-list-item-new-schedule-btn");
 
-    public void assertExecutablesList(DISCProcessTypes processType, List<String> executables) {
-        String executablePath = String.format("/%s/", processType.getProcessTypeExecutable());
+    public void assertExecutableList(List<Executables> executables) {
         for (int i = 0; i < this.getNumberOfRows(); i++) {
-            assertEquals(getRow(i).findElement(BY_EXECUTABLE_PATH).getText(), executablePath);
-            assertEquals(executables.get(i), getRow(i).findElement(BY_EXECUTABLE).getText());
+            assertEquals(getRow(i).findElement(BY_EXECUTABLE_PATH).getText()
+                    + getRow(i).findElement(BY_EXECUTABLE).getText(), executables.get(i)
+                    .getExecutablePath());
         }
     }
 

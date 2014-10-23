@@ -1,6 +1,6 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.disc;
 
-public enum DISCNotificationEvents {
+public enum NotificationEvents {
 
     SUCCESS("success"),
     FAILURE("failure"),
@@ -10,7 +10,7 @@ public enum DISCNotificationEvents {
 
     private String eventOption;
 
-    private DISCNotificationEvents(String eventOption) {
+    private NotificationEvents(String eventOption) {
         this.eventOption = eventOption;
     }
 

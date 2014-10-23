@@ -118,10 +118,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
      * ----- DISC fragments -----
      */
     @FindBy(css = ".ait-header-fragment")
-    protected DISCNavigation discNavigation;
+    protected NavigationBar discNavigation;
 
     @FindBy(css = ".project-list")
-    protected DISCProjectsList discProjectsList;
+    protected ProjectsList discProjectsList;
 
     @FindBy(css = ".ait-project-detail-fragment")
     protected ProjectDetailPage projectDetailPage;
@@ -148,10 +148,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected NotificationRulesDialog discNotificationRules;
 
     @FindBy(css = ".ait-overview-fragment")
-    protected DISCOverview discOverview;
+    protected OverviewStates discOverview;
     
     @FindBy(css = ".ait-overview-projects-fragment")
-    protected DISCOverviewProjects discOverviewProjects;
+    protected OverviewProjects discOverviewProjects;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed

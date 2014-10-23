@@ -1,20 +1,22 @@
 package com.gooddata.qa.graphene.disc;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.DISCOverviewProjectStates;
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
-import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.CronTimeBuilder;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -25,8 +27,6 @@ public class SchedulesTests extends AbstractSchedulesTests {
     private final static String EXECUTION_HISTORY_EMPTY_STATE_MESSAGE =
             "No history available. This schedule has not been run yet.";
     private static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
-    private Pair<String, List<String>> defaultCronTime = Pair.of(
-            ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);;
 
     @BeforeClass
     public void initProperties() {
@@ -37,20 +37,22 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleWithCustomInput() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Create Schedule with Custom Input",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-            parameters.put("param", Arrays.asList("", "value"));
-            parameters.put("secure param", Arrays.asList("secure", "secure value"));
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Create Schedule with Custom Input", null, "/graph/DWHS2.grf", cronTime,
-                    parameters);
-            assertNewSchedule("Create Schedule with Custom Input", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Create Schedule with Custom Input";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            List<Parameter> paramList =
+                    Arrays.asList(
+                            new Parameter().setParamName("param").setParamValue("value"),
+                            new Parameter().setParamName("secure param")
+                                    .setParamValue("secure value").setSecureParam());
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.DWHS2)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                            .setParameters(paramList).isConfirm();
+            createAndAssertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -59,20 +61,20 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleForSpecificExecutable() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Create Schedule for Specific Executable",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            projectDetailPage.getExecutableTabByProcessName(
-                    "Create Schedule for Specific Executable").click();
-            waitForElementVisible(projectDetailPage.getExecutableScheduleLink("DWHS2.grf")).click();
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Create Schedule for Specific Executable";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            projectDetailPage.getExecutableTabByProcessName(processName).click();
+            waitForElementVisible(
+                    projectDetailPage.getExecutableScheduleLink(Executables.DWHS2
+                            .getExecutableName())).click();
             waitForElementVisible(scheduleForm.getRoot());
-            scheduleForm.createNewSchedule(null, null, null, null, null, true);
-            waitForElementPresent(scheduleDetail.getRoot());
-            scheduleDetail.clickOnCloseScheduleButton();
-            waitForElementVisible(schedulesTable.getRoot());
-            assertNewSchedule("Create Schedule for Specific Executable", "DWHS2.grf",
-                    "/graph/DWHS2.grf", defaultCronTime, null);
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().isConfirm();
+            scheduleForm.createNewSchedule(scheduleBuilder);
+            assertSchedule(scheduleBuilder.setProcessName(processName).setExecutable(
+                    Executables.DWHS2));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -81,19 +83,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleFromSchedulesList() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Create Schedule from Schedule List",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            projectDetailPage.getNewScheduleLinkInSchedulesList(
-                    "Create Schedule from Schedule List").click();
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Create Schedule from Schedule List";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            projectDetailPage.getNewScheduleLinkInSchedulesList(processName).click();
             waitForElementVisible(scheduleForm.getRoot());
-            scheduleForm.createNewSchedule(null, null, null, null, null, true);
-            waitForElementPresent(scheduleDetail.getRoot());
-            scheduleDetail.clickOnCloseScheduleButton();
-            waitForElementNotPresent(scheduleDetail.getRoot());
-            assertNewSchedule("Create Schedule from Schedule List", "DWHS1.grf",
-                    "/graph/DWHS1.grf", defaultCronTime, null);
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().isConfirm();
+            scheduleForm.createNewSchedule(scheduleBuilder);
+            assertSchedule(scheduleBuilder.setProcessName(processName).setExecutable(
+                    Executables.DWHS1));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -102,17 +102,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleWithEveryWeekCronTime() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Edit Cron Time of Schedule",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYWEEK.getCronTime(), Arrays.asList("00",
-                            "00", ScheduleCronTimes.CRON_EVERYWEEK.getDaysInWeek().get(1)));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Edit Cron Time of Schedule", null, null, cronTime, null);
-            assertNewSchedule("Edit Cron Time of Schedule", "DWHS1.grf", "/graph/DWHS1.grf",
-                    cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Edit Cron Time of Schedule";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYWEEK).setDayInWeek("Monday")
+                            .setHourInDay("14").setMinuteInHour("30");
+            createSchedule(scheduleBuilder);
+            assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -121,16 +121,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleWithEveryDayCronTime() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Schedule every day",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(),
-                            Arrays.asList("30", "10"));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), "Schedule every day",
-                    null, null, cronTime, null);
-            assertNewSchedule("Schedule every day", "DWHS1.grf", "/graph/DWHS1.grf", cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Schedule every day";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("10")
+                            .setMinuteInHour("30");
+            createSchedule(scheduleBuilder);
+            assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -139,17 +140,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleWithCronExpression() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Schedule with cron expression",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EXPRESSION.getCronTime(),
-                            Arrays.asList("*/20 * * * *"));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Schedule with cron expression", null, null, cronTime, null);
-            assertNewSchedule("Schedule with cron expression", "DWHS1.grf", "/graph/DWHS1.grf",
-                    cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Schedule with cron expression";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setCronTime(ScheduleCronTimes.CRON_EXPRESSION)
+                            .setCronTimeExpression("*/20 * * * *");
+            createSchedule(scheduleBuilder);
+            assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -158,20 +159,18 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkManualExecution() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Manual Execution", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Manual Execution", null, "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Check Manual Execution", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Manual Execution";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
             scheduleDetail.manualRun();
-            scheduleDetail.assertLastExecutionDetails(true, true, false,
-                    "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
+            scheduleDetail.assertSuccessfulExecution();
+            scheduleDetail.assertManualRunExecution();
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -180,23 +179,19 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkStopManualExecution() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Stop Manual Execution", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Stop Manual Execution", null, "/graph/longTimeRunningGraph.grf",
-                    cronTime, null);
-            assertNewSchedule("Check Stop Manual Execution", "longTimeRunningGraph.grf",
-                    "/graph/longTimeRunningGraph.grf", cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Stop Manual Execution";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
             scheduleDetail.manualRun();
-            Thread.sleep(5000);
+            assertTrue(scheduleDetail.isInRunningState());
             scheduleDetail.manualStop();
-            scheduleDetail.assertLastExecutionDetails(false, true, true,
-                    "Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
+            scheduleDetail.assertManualStoppedExecution();
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -205,21 +200,18 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void changeExecutableOfSchedule() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Change Executable of Schedule", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Change Executable of Schedule", null, "/graph/successfulGraph.grf", cronTime,
-                    null);
-            assertNewSchedule("Change Executable of Schedule", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            scheduleDetail.changeExecutable("/graph/errorGraph.grf", true);
-            assertNewSchedule("Change Executable of Schedule", "errorGraph.grf",
-                    "/graph/errorGraph.grf", cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Change Executable of Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.changeExecutable(Executables.FAILED_GRAPH, Confirmation.SAVE_CHANGES);
+            assertSchedule(scheduleBuilder.setExecutable(Executables.FAILED_GRAPH).setScheduleName(
+                    Executables.FAILED_GRAPH.getExecutableName()));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -227,46 +219,43 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void deleteSchedule() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, "Delete Schedule",
-                Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                true);
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), "Delete Schedule", null,
-                "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule("Delete Schedule", "successfulGraph.grf", "/graph/successfulGraph.grf",
-                cronTime, null);
-        scheduleDetail.deleteSchedule(true);
-        waitForElementVisible(projectDetailPage.getRoot());
-        waitForElementVisible(projectDetailPage.getScheduleTabByProcessName("Delete Schedule"))
-                .click();
-        waitForElementVisible(projectDetailPage.checkEmptySchedulesList("Delete Schedule"));
-        Assert.assertTrue(projectDetailPage.checkEmptySchedulesList("Delete Schedule")
-                .isDisplayed());
+        try {
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Delete Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.deleteSchedule(ScheduleDetail.Confirmation.SAVE_CHANGES);
+            waitForElementVisible(projectDetailPage.getRoot());
+            waitForElementVisible(projectDetailPage.getScheduleTabByProcessName(processName))
+                    .click();
+            waitForElementVisible(projectDetailPage.checkEmptySchedulesList(processName));
+            Assert.assertTrue(projectDetailPage.checkEmptySchedulesList(processName).isDisplayed());
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void changeScheduleCronTime() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Change Cron Time of Schedule", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_30_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Change Cron Time of Schedule", null, "/graph/successfulGraph.grf", cronTime,
-                    null);
-            assertNewSchedule("Change Cron Time of Schedule", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            Pair<String, List<String>> newCronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            scheduleDetail.changeCronTime(newCronTime, true);
-            assertNewSchedule("Change Cron Time of Schedule", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", newCronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Change Cron Time of Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_30_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleBuilder.setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            scheduleDetail.changeCronTime(scheduleBuilder.getCronTimeBuilder(),
+                    Confirmation.SAVE_CHANGES);
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -275,28 +264,33 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void editScheduleParameters() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Edit schedule parameters",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-            parameters.put("param 1", Arrays.asList("", "value 1"));
-            parameters.put("param 2", Arrays.asList("", "value 2"));
-            parameters.put("secure param", Arrays.asList("secure", "secure value"));
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Edit schedule parameters", null, "/graph/DWHS2.grf", cronTime, parameters);
-            assertNewSchedule("Edit schedule parameters", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
-            Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
-            changedParameters.put("param 1 new name", Arrays.asList("", "value 1 new"));
-            changedParameters.put("param 2 new name", Arrays.asList("", "value 2 new"));
-            changedParameters.put("secure param new name",
-                    Arrays.asList("secure", "secure value new"));
-            scheduleDetail.editScheduleParameters(changedParameters, false, true);
-            assertNewSchedule("Edit schedule parameters", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, changedParameters);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Edit schedule parameters";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            Parameter param1 = new Parameter().setParamName("param").setParamValue("value");
+            Parameter param2 =
+                    new Parameter().setParamName("secure param").setParamValue("secure value")
+                            .setSecureParam();
+            List<Parameter> paramList = Arrays.asList(param1, param2);
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.DWHS2)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                            .setParameters(paramList);
+            createAndAssertSchedule(scheduleBuilder);
+
+            Parameter editedParam1 =
+                    new Parameter().setParamName("param new name").setParamValue("value new");
+            Parameter editedParam2 =
+                    new Parameter().setParamName("secure param new").setParamValue(
+                            "secure value new");
+            scheduleDetail.editParameter(param1, editedParam1);
+            scheduleDetail.editParameter(param2, editedParam2);
+            scheduleDetail.confirmParamsChange(Confirmation.SAVE_CHANGES);
+            assertSchedule(scheduleBuilder.editParam(param1, editedParam1).editParam(param2,
+                    editedParam2));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -305,31 +299,30 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void addNewParametersForSchedule() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Add New Parameters for Schedule",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-            parameters.put("param 1", Arrays.asList("", "value 1"));
-            parameters.put("secure param", Arrays.asList("secure", "secure value"));
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Add New Parameters for Schedule", null, "/graph/DWHS2.grf", cronTime,
-                    parameters);
-            assertNewSchedule("Add New Parameters for Schedule", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
-            Map<String, List<String>> newParameters = new LinkedHashMap<String, List<String>>();
-            newParameters.put("param 2", Arrays.asList("", "value 2"));
-            newParameters.put("secure param 2", Arrays.asList("secure", "secure value 2"));
-            Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
-            changedParameters.put("param 1", Arrays.asList("", "value 1"));
-            changedParameters.put("param 2", Arrays.asList("", "value 2"));
-            changedParameters.put("secure param", Arrays.asList("secure", "secure value"));
-            changedParameters.put("secure param 2", Arrays.asList("secure", "secure value 2"));
-            scheduleDetail.editScheduleParameters(newParameters, true, true);
-            assertNewSchedule("Add New Parameters for Schedule", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, changedParameters);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Add New Parameters for Schedule";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            List<Parameter> paramList =
+                    Arrays.asList(
+                            new Parameter().setParamName("param 1").setParamValue("value 1"),
+                            new Parameter().setParamName("secure param")
+                                    .setParamValue("secure value").setSecureParam());
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.DWHS2)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                            .setParameters(paramList).isConfirm();
+            createAndAssertSchedule(scheduleBuilder);
+
+            List<Parameter> newParams =
+                    Arrays.asList(
+                            new Parameter().setParamName("param 2").setParamValue("value 2"),
+                            new Parameter().setParamName("secure param 2")
+                                    .setParamValue("secure value 2").setSecureParam());
+            scheduleDetail.addNewParams(newParams, Confirmation.SAVE_CHANGES);
+            assertSchedule(scheduleBuilder.setParameters(newParams));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -337,35 +330,36 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleWithIncorrectCron() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                DISCProcessTypes.GRAPH, "Create Schedule With Error Cron",
-                Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-        Pair<String, List<String>> incorrectCronTime =
-                Pair.of(ScheduleCronTimes.CRON_EXPRESSION.getCronTime(), Arrays.asList("* * *"));
+        openProjectDetailPage(getWorkingProject());
+
+        deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, "Create Schedule With Error Cron");
+
+        CronTimeBuilder cronTimeBuilder =
+                new CronTimeBuilder().setCronTime(ScheduleCronTimes.CRON_EXPRESSION)
+                        .setCronTimeExpression("* * *");
         projectDetailPage.clickOnNewScheduleButton();
         waitForElementVisible(scheduleForm.getRoot());
-        scheduleForm.checkScheduleWithIncorrectCron(incorrectCronTime,
-                scheduleForm.getConfirmScheduleButton());
+        scheduleForm.checkScheduleWithIncorrectCron(cronTimeBuilder);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void editScheduleWithIncorrectCron() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Edit Schedule With Error Cron",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Edit Schedule With Error Cron", null, "/graph/DWHS2.grf", cronTime, null);
-            assertNewSchedule("Edit Schedule With Error Cron", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, null);
-            Pair<String, List<String>> incorrectCronTime =
-                    Pair.of("cron expression", Arrays.asList("* * *"));
-            scheduleDetail.checkScheduleWithIncorrectCron(incorrectCronTime,
-                    scheduleDetail.getSaveChangedCronTimeButton());
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Edit Schedule With Error Cron";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.DWHS2)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+            createAndAssertSchedule(scheduleBuilder);
+
+            CronTimeBuilder cronTimeBuilder =
+                    new CronTimeBuilder().setCronTime(ScheduleCronTimes.CRON_EXPRESSION)
+                            .setCronTimeExpression("* * *");
+            scheduleDetail.checkScheduleWithIncorrectCron(cronTimeBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -374,25 +368,33 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkBrokenSchedule() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Check Broken Schedule",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Broken Schedule", null, null, null, null);
-            assertNewSchedule("Check Broken Schedule", "DWHS1.grf", "/graph/DWHS1.grf",
-                    defaultCronTime, null);
-            redeployProcess(projectTitle, testParams.getProjectId(), "Check Broken Schedule",
-                    "Basic", "Redeployed Process", DISCProcessTypes.GRAPH, Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            projectDetailPage.checkBrokenScheduleSection("Redeployed Process");
-            assertBrokenSchedule("DWHS1.grf", "/graph/DWHS1.grf", defaultCronTime);
-            brokenSchedulesTable.getScheduleTitle("DWHS1.grf").click();
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Broken Schedule";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName).isConfirm();
+            createSchedule(scheduleBuilder);
+            assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
+            scheduleDetail.clickOnCloseScheduleButton();
+
+            String redeployedProcessName = "Redeployed Process";
+            redeployProcess(processName, DeployPackages.BASIC, redeployedProcessName,
+                    scheduleBuilder);
+
+            projectDetailPage.checkBrokenScheduleSection(redeployedProcessName);
+            assertBrokenSchedule(scheduleBuilder);
+
+            brokenSchedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()).click();
             waitForElementVisible(scheduleDetail.getRoot());
-            scheduleDetail.checkBrokenSchedule("DWHS1.grf", "/graph/errorGraph.grf");
-            assertNewSchedule("Redeployed Process", "errorGraph.grf", "/graph/errorGraph.grf",
-                    defaultCronTime, null);
+            Executables newExecutable = Executables.FAILED_GRAPH;
+            scheduleDetail.checkMessageInBrokenScheduleDetail(scheduleBuilder.getScheduleName());
+
+            scheduleDetail.fixBrokenSchedule(newExecutable);
+            assertSchedule(scheduleBuilder.setProcessName(redeployedProcessName)
+                    .setScheduleName(Executables.FAILED_GRAPH.getExecutableName())
+                    .setExecutable(newExecutable));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -401,29 +403,26 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkDeleteScheduleParams() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Delete Schedule Parameter",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-            parameters.put("param 1", Arrays.asList("", "value 1"));
-            parameters.put("param 2", Arrays.asList("", "value 2"));
-            parameters.put("secure param", Arrays.asList("secure", "secure value"));
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Delete Schedule Parameter", null, "/graph/DWHS2.grf", cronTime, parameters);
-            assertNewSchedule("Delete Schedule Parameter", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
-            Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
-            changedParameters.put("param 1 new name", null);
-            changedParameters.put("param 2 new name", Arrays.asList("", "value 2 new"));
-            changedParameters.put("secure param new name",
-                    Arrays.asList("secure", "secure value new"));
-            scheduleDetail.editScheduleParameters(changedParameters, false, true);
-            changedParameters.remove("param 1 new name");
-            assertNewSchedule("Delete Schedule Parameter", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, changedParameters);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Delete Schedule Parameter";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            Parameter param1 =
+                    new Parameter().setParamName("param name").setParamValue("param value");
+            Parameter param2 =
+                    new Parameter().setParamName("secure param").setParamValue("secure value")
+                            .setSecureParam();
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.DWHS2)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                            .setParameters(Arrays.asList(param1, param2));
+            createAndAssertSchedule(scheduleBuilder);
+
+            scheduleDetail
+                    .removeParameter(Arrays.asList(param1, param2), Confirmation.SAVE_CHANGES);
+            assertSchedule(scheduleBuilder.removeParam(param1).removeParam(param2));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -432,28 +431,26 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCancelDeleteScheduleParams() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Cancel Delete Schedule Parameter",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-            parameters.put("param 1", Arrays.asList("", "value 1"));
-            parameters.put("param 2", Arrays.asList("", "value 2"));
-            parameters.put("secure param", Arrays.asList("secure", "secure value"));
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Cancel Delete Schedule Parameter", "DWHS2.grf", "/graph/DWHS2.grf", cronTime,
-                    parameters);
-            assertNewSchedule("Cancel Delete Schedule Parameter", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
-            Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
-            changedParameters.put("param 1", null);
-            changedParameters.put("param 2", Arrays.asList("", "value 2"));
-            changedParameters.put("secure param", Arrays.asList("secure", "secure value"));
-            scheduleDetail.editScheduleParameters(changedParameters, false, false);
-            assertNewSchedule("Cancel Delete Schedule Parameter", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Cancel Delete Schedule Parameter";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            Parameter param1 =
+                    new Parameter().setParamName("param name").setParamValue("param value");
+            Parameter param2 =
+                    new Parameter().setParamName("secure param").setParamValue("secure value")
+                            .setSecureParam();
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.DWHS2)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                            .setParameters(Arrays.asList(param1, param2));
+            createAndAssertSchedule(scheduleBuilder);
+
+            scheduleDetail.removeParameter(Arrays.asList(param1, param2),
+                    Confirmation.CANCEL_CHANGES);
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -462,18 +459,15 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkIncorrectRetryDelay() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Incorrect Retry Schedule", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_30_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Incorrect Retry Schedule", null, "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Incorrect Retry Schedule", "errorGraph.grf",
-                    "/graph/errorGraph.grf", cronTime, null);
-            scheduleDetail.addRetryDelay("5", true, false);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Incorrect Retry Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+            scheduleDetail.addInvalidRetry("5");
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -481,36 +475,38 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCancelCreateSchedule() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                DISCProcessTypes.GRAPH, "Cancel Create Schedule from Schedule List",
-                Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-        projectDetailPage.clickOnNewScheduleButton();
-        waitForElementVisible(scheduleForm.getRoot());
-        scheduleForm.createNewSchedule(null, null, null, null, null, false);
-        waitForElementNotPresent(scheduleForm.getRoot());
-        waitForElementVisible(projectDetailPage.getRoot());
-        projectDetailPage.assertProcessInList("Cancel Create Schedule from Schedule List",
-                DISCProcessTypes.GRAPH, Arrays.asList("DWHS1.grf", "DWHS2.grf"));
+        try {
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Cancel Create Schedule";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().isCancel();
+            createSchedule(scheduleBuilder);
+            waitForElementNotPresent(scheduleForm.getRoot());
+
+            waitForElementVisible(projectDetailPage.getRoot());
+            projectDetailPage.assertActiveProcessInList(processName, DeployPackages.CLOUDCONNECT);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCancelChangeScheduleExecutable() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Cancel Change Executable", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Cancel Change Executable", null, "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Cancel Change Executable", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            scheduleDetail.changeExecutable("/graph/errorGraph.grf", false);
-            assertNewSchedule("Cancel Change Executable", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Cancel Change Executable";
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.changeExecutable(Executables.FAILED_GRAPH, Confirmation.CANCEL_CHANGES);
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -519,23 +515,19 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCancelChangeScheduleCronTime() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Cancel Change Cron Time of Schedule", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_30_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Cancel Change Cron Time of Schedule", null, "/graph/successfulGraph.grf",
-                    cronTime, null);
-            assertNewSchedule("Cancel Change Cron Time of Schedule", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            Pair<String, List<String>> newCronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            scheduleDetail.changeCronTime(newCronTime, false);
-            assertNewSchedule("Cancel Change Cron Time of Schedule", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Cancel Change Cron Time of Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_30_MINUTES).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.changeCronTime(
+                    new CronTimeBuilder().setCronTime(ScheduleCronTimes.CRON_15_MINUTES),
+                    Confirmation.CANCEL_CHANGES);
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -544,17 +536,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCancelAddRetryDelay() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Retry Schedule", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_30_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Retry Schedule", null, "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Retry Schedule", "errorGraph.grf", "/graph/errorGraph.grf",
-                    cronTime, null);
-            scheduleDetail.addRetryDelay("15", false, true);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Retry Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_30_MINUTES).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.checkRescheduleMessageAndDefault();
+            scheduleDetail.addValidRetry("15", Confirmation.CANCEL_CHANGES);;
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -563,29 +555,27 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCancelEditScheduleParams() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
-                    DISCProcessTypes.GRAPH, "Cancel Edit schedule parameters",
-                    Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-            parameters.put("param 1", Arrays.asList("", "value 1"));
-            parameters.put("param 2", Arrays.asList("", "value 2"));
-            parameters.put("secure param", Arrays.asList("secure", "secure value"));
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Cancel Edit schedule parameters", null, "/graph/DWHS2.grf", cronTime,
-                    parameters);
-            assertNewSchedule("Cancel Edit schedule parameters", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
-            Map<String, List<String>> changedParameters = new LinkedHashMap<String, List<String>>();
-            changedParameters.put("param 1 new name", Arrays.asList("", "value 1 new"));
-            changedParameters.put("param 2 new name", Arrays.asList("", "value 2 new"));
-            changedParameters.put("secure param new name",
-                    Arrays.asList("secure", "secure value new"));
-            scheduleDetail.editScheduleParameters(changedParameters, false, false);
-            assertNewSchedule("Cancel Edit schedule parameters", "DWHS2.grf", "/graph/DWHS2.grf",
-                    cronTime, parameters);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Cancel Edit schedule parameters";
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
+
+            Parameter param1 =
+                    new Parameter().setParamName("param name").setParamValue("param value");
+            Parameter param2 =
+                    new Parameter().setParamName("secure param").setParamValue("secure value")
+                            .setSecureParam();
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.DWHS2)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                            .setParameters(Arrays.asList(param1, param2));
+            createAndAssertSchedule(scheduleBuilder);
+
+            scheduleDetail.editParameter(param1, new Parameter().setParamName("edited param name")
+                    .setParamValue("edited param value"));
+            scheduleDetail.confirmParamsChange(Confirmation.CANCEL_CHANGES);
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -594,18 +584,16 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCancelDeleteSchedule() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Cancel Delete Schedule", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Cancel Delete Schedule", null, "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Cancel Delete Schedule", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            scheduleDetail.deleteSchedule(false);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Cancel Delete Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.deleteSchedule(Confirmation.CANCEL_CHANGES);
             waitForElementVisible(scheduleDetail.getRoot());
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
@@ -615,17 +603,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkRemoveRetry() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Retry Schedule", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Retry Schedule", null, "/graph/errorGraph.grf", defaultCronTime, null);
-            assertNewSchedule("Check Retry Schedule", "errorGraph.grf", "/graph/errorGraph.grf",
-                    defaultCronTime, null);
-            scheduleDetail.addRetryDelay("15", true, true);
-            scheduleDetail.removeRetryDelay(false);
-            scheduleDetail.removeRetryDelay(true);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Retry Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.addValidRetry("15", Confirmation.SAVE_CHANGES);
+            scheduleDetail.removeRetryDelay(Confirmation.CANCEL_CHANGES);
+            scheduleDetail.removeRetryDelay(Confirmation.SAVE_CHANGES);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -634,16 +622,14 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkExecutionHistoryEmptyState() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Execution History Empty State", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Execution History Empty State", null, "/graph/errorGraph.grf",
-                    defaultCronTime, null);
-            assertNewSchedule("Check Execution History Empty State", "errorGraph.grf",
-                    "/graph/errorGraph.grf", defaultCronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Execution History Empty State";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
             assertNotNull(scheduleDetail.getExecutionHistoryEmptyState());
             assertEquals(EXECUTION_HISTORY_EMPTY_STATE_MESSAGE, scheduleDetail
                     .getExecutionHistoryEmptyState().getText());
@@ -655,29 +641,30 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkScheduleExecutionState() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
+
             String processName = "Check Schedule Execution State";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/errorGraph.grf", defaultCronTime, null);
-            assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf",
-                    defaultCronTime, null);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
             scheduleDetail.manualRun();
             assertTrue(scheduleDetail.isInScheduledState());
             assertTrue(scheduleDetail.isInRunningState());
-            scheduleDetail.assertLastExecutionDetails(false, true, false,
-                    "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", defaultCronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
+            scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
+
+            ScheduleBuilder scheduleBuilder2 =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            openProjectDetailPage(getWorkingProject());
+            createAndAssertSchedule(scheduleBuilder2);
+
             scheduleDetail.manualRun();
             assertTrue(scheduleDetail.isInScheduledState());
             assertTrue(scheduleDetail.isInRunningState());
-            scheduleDetail.assertLastExecutionDetails(true, true, false,
-                    "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
+            scheduleDetail.assertSuccessfulExecution();
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -686,38 +673,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkSuccessfulExecutionGroup() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
+
             String processName = "Check Schedule Execution State";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", defaultCronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
-            scheduleDetail.repeatManualRun(3, "/graph/successfulGraph.grf", DISCProcessTypes.GRAPH,
-                    true);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.repeatManualRunSuccessfulSchedule(3);
             scheduleDetail.checkOkExecutionGroup(3, 0);
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
-    public void checkProjectWithOneSchedule() throws InterruptedException, JSONException {
-        cleanProcessesInProjectDetail(testParams.getProjectId());
-
-        try {
-            String processName = "Check Schedule Trigger With 1 Schedule In Project";
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(), null);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            projectDetailPage.clickOnNewScheduleButton();
-            waitForElementVisible(scheduleForm.getRoot());
-            scheduleForm.checkScheduleTriggerOptions(cronTime, true, null);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -726,11 +692,12 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleWithCustomName() throws InterruptedException, JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            String processName = "Create Schedule With Custom Name";
-            String scheduleName = "Custom Schedule Name";
-            String executableName = "successfulGraph.grf";
-            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+            openProjectDetailPage(getWorkingProject());
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName("Create Schedule With Custom Name")
+                            .setScheduleName("Custom Schedule Name")
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -739,17 +706,19 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void editScheduleWithCustomName() throws InterruptedException, JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
+
             String processName = "Edit Schedule With Custom Name";
-            String scheduleName = null;
-            String executableName = "successfulGraph.grf";
-            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
 
             String newScheduleName = "Custom Schedule Name";
-            scheduleDetail.changeScheduleTitle(newScheduleName, true, true);
+            scheduleDetail.changeValidScheduleName(newScheduleName, Confirmation.SAVE_CHANGES);
             scheduleDetail.clickOnCloseScheduleButton();
-            assertNewSchedule(processName, newScheduleName, "/graph/" + executableName,
-                    defaultCronTime, null);
+
+            assertSchedule(scheduleBuilder.setScheduleName(newScheduleName));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -758,17 +727,20 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleWithEmptyCustomName() throws InterruptedException, JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
+
             String processName = "Create Schedule With Empty Custom Name";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
             projectDetailPage.clickOnNewScheduleButton();
             waitForElementVisible(scheduleForm.getRoot());
-            scheduleForm.createScheduleWithInvalidScheduleName(processName,
-                    "/graph/successfulGraph.grf", "", "Custom Schedule Name");
-            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
+            String validScheduleName = "Custom Schedule Name";
+            ScheduleBuilder scheduleWithEmptyScheduleName =
+                    new ScheduleBuilder().setProcessName(processName).setScheduleName("")
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            scheduleForm.createScheduleWithInvalidScheduleName(scheduleWithEmptyScheduleName,
+                    validScheduleName);
+            assertSchedule(scheduleWithEmptyScheduleName.setScheduleName(validScheduleName));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -777,16 +749,16 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void editScheduleWithEmptyCustomName() throws InterruptedException, JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            String processName = "Edit Schedule With Empty Custom Name";
-            String scheduleName = null;
-            String executableName = "successfulGraph.grf";
-            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+            openProjectDetailPage(getWorkingProject());
 
-            scheduleDetail.changeScheduleTitle("", true, false);
-            scheduleDetail.clickOnCloseScheduleButton();
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
+            String processName = "Edit Schedule With Empty Custom Name";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.changeInvalidScheduleName("");
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -795,18 +767,22 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void createScheduleNotUniqueName() throws InterruptedException, JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            String processName = "Create Schedule With Not Unique Name";
-            String scheduleName = null;
-            String executableName = "successfulGraph.grf";
-            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+            openProjectDetailPage(getWorkingProject());
 
+            String processName = "Create Schedule With Not Unique Name";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            ScheduleBuilder scheduleBuilder2 =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
             projectDetailPage.clickOnNewScheduleButton();
             waitForElementVisible(scheduleForm.getRoot());
-            scheduleForm.createScheduleWithInvalidScheduleName(processName,
-                    "/graph/successfulGraph.grf", "successfulGraph.grf", "Custom Schedule Name");
-            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
+            String validScheduleName = "Custom Schedule Name";
+            scheduleForm.createScheduleWithInvalidScheduleName(scheduleBuilder2, validScheduleName);
+            assertSchedule(scheduleBuilder2.setScheduleName(validScheduleName));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -815,20 +791,22 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void editScheduleWithNotUniqueName() throws InterruptedException, JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
             String processName = "Create Schedule With Custom Name";
-            String scheduleName = null;
-            String executableName = "successfulGraph.grf";
-            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
 
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                    "Custom Schedule Name", "/graph/successfulGraph.grf", defaultCronTime, null);
-            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
-            scheduleDetail.changeScheduleTitle("successfulGraph.grf", true, false);
-            scheduleDetail.clickOnCloseScheduleButton();
-            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
+            ScheduleBuilder scheduleBuilder2 =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setScheduleName("Custom Schedule Name")
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            createSchedule(scheduleBuilder2);
+            assertSchedule(scheduleBuilder2);
+            scheduleDetail.changeInvalidScheduleName(Executables.SUCCESSFUL_GRAPH
+                    .getExecutableName());
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -837,16 +815,18 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void cancelEditScheduleName() throws InterruptedException, JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            String processName = "Edit Schedule With Custom Name";
-            String scheduleName = null;
-            String executableName = "successfulGraph.grf";
-            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+            openProjectDetailPage(getWorkingProject());
 
-            scheduleDetail.changeScheduleTitle("Custom Schedule Name", false, true);
+            String processName = "Edit Schedule With Custom Name";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.changeValidScheduleName("Custom Schedule Name",
+                    Confirmation.CANCEL_CHANGES);
             scheduleDetail.clickOnCloseScheduleButton();
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    defaultCronTime, null);
+            assertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -856,14 +836,16 @@ public class SchedulesTests extends AbstractSchedulesTests {
     public void createScheduleWithCustomNameForRubyScript() throws InterruptedException,
             JSONException {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            openProjectDetailPage(getWorkingProject());
+
             String processName = "Create Schedule With Custom Name For Ruby Script";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "ruby",
-                    DISCProcessTypes.RUBY, processName, Arrays.asList("ruby1.rb", "ruby2.rb"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                    "Custom Schedule Name", "/script/ruby1.rb", defaultCronTime, null);
-            assertNewSchedule(processName, "Custom Schedule Name", "/script/ruby1.rb",
-                    defaultCronTime, null);
+            deployInProjectDetailPage(DeployPackages.RUBY, processName);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setScheduleName("Schedule of Ruby script")
+                            .setExecutable(Executables.RUBY1).isConfirm();
+            createAndAssertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -872,25 +854,37 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCustomScheduleNameInFailedOverview() throws InterruptedException,
             JSONException {
-        String graphName = "errorGraph.grf";
-        checkScheduleNameInOverviewPage(DISCOverviewProjectStates.FAILED, projectTitle,
-                testParams.getProjectId(), graphName);
+        checkScheduleNameInOverviewPage(OverviewProjectStates.FAILED);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCustomScheduleNameInSuccessfulOverview() throws InterruptedException,
             JSONException {
-        String graphName = "successfulGraph.grf";
-        checkScheduleNameInOverviewPage(DISCOverviewProjectStates.SUCCESSFUL, projectTitle,
-                testParams.getProjectId(), graphName);
+        checkScheduleNameInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkCustomScheduleNameInRunningOverview() throws InterruptedException,
             JSONException {
-        String graphName = "longTimeRunningGraph.grf";
-        checkScheduleNameInOverviewPage(DISCOverviewProjectStates.RUNNING, projectTitle,
-                testParams.getProjectId(), graphName);
+        checkScheduleNameInOverviewPage(OverviewProjectStates.RUNNING);
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkProjectWithOneSchedule() throws InterruptedException, JSONException {
+        cleanProcessesInProjectDetail(testParams.getProjectId());
+
+        try {
+            String processName = "Check Schedule Trigger With 1 Schedule In Project";
+
+            openProjectDetailPage(getWorkingProject());
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+            projectDetailPage.clickOnNewScheduleButton();
+            waitForElementVisible(scheduleForm.getRoot());
+            scheduleForm.checkNoTriggerScheduleOptions();
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
@@ -898,19 +892,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
             JSONException {
         try {
             String processName = "Check Schedule With Trigger Schedule";
-            String triggerScheduleName = "successfulGraph.grf";
-            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
-            String dependentScheduleExecutable = "/graph/errorGraph.grf";
-            String dependentScheduleName = "errorGraph.grf";
-            Map<String, String> scheduleUrls =
-                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
-                            triggerScheduleExecutable, dependentScheduleName,
-                            dependentScheduleExecutable);
 
-            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
-                    "Basic/graph/successfulGraph.grf");
-            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
-                    "Basic/graph/errorGraph.grf", 1, true, false, 1);
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
+                    dependentScheduleBuilder);
+
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            scheduleDetail.assertFailedExecution(dependentScheduleBuilder.getExecutable());
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -920,19 +912,19 @@ public class SchedulesTests extends AbstractSchedulesTests {
     public void checkScheduleTriggerByFailedSchedule() throws InterruptedException, JSONException {
         try {
             String processName = "Check Schedule With Trigger Schedule";
-            String triggerScheduleName = "errorGraph.grf";
-            String triggerScheduleExecutable = "/graph/errorGraph.grf";
-            String dependentScheduleExecutable = "/graph/successfulGraph.grf";
-            String dependentScheduleName = "successfulGraph.grf";
-            Map<String, String> scheduleUrls =
-                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
-                            triggerScheduleExecutable, dependentScheduleName,
-                            dependentScheduleExecutable);
 
-            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), false,
-                    "Basic/graph/errorGraph.grf");
-            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
-                    "Basic/graph/successfulGraph.grf", 1, false, false, 0);
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
+                    dependentScheduleBuilder);
+
+            manualRunTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            scheduleDetail.assertFailedExecution(triggerScheduleBuilder.getExecutable());
+            int dependentScheduleExecutionNumber =
+                    waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            assertEquals(dependentScheduleExecutionNumber, 0);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -944,21 +936,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
         try {
             String processName = "Check Schedule With Trigger Schedule";
-            String triggerScheduleName = "successfulGraph.grf";
-            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
-            String dependentScheduleExecutable = "/graph/errorGraph.grf";
-            String dependentScheduleName = "errorGraph.grf";
-            Map<String, String> scheduleUrls =
-                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
-                            triggerScheduleExecutable, dependentScheduleName,
-                            dependentScheduleExecutable);
 
-            Pair<String, List<String>> dependentScheduleCronTime =
-                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
-                            Arrays.asList(processName, triggerScheduleExecutable));
-            browser.get(scheduleUrls.get("triggerScheduleUrl"));
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
+                    dependentScheduleBuilder);
+
+            browser.get(triggerScheduleBuilder.getScheduleUrl());
             waitForElementVisible(scheduleDetail.getRoot());
-            scheduleDetail.checkScheduleTriggerOptions(dependentScheduleCronTime, true, null);
+            scheduleDetail.checkNoTriggerScheduleOptions();
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -967,29 +955,19 @@ public class SchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
     public void checkScheduleTriggerByItself() throws InterruptedException, JSONException {
         try {
+            openProjectDetailPage(getWorkingProject());
             String processName = "Check Schedule With Trigger Schedule";
-            String triggerScheduleName = "successfulGraph.grf";
-            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
-            Pair<String, List<String>> triggerScheduleCronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    triggerScheduleExecutable, triggerScheduleCronTime, null);
-            assertNewSchedule(processName, triggerScheduleName, triggerScheduleExecutable,
-                    triggerScheduleCronTime, null);
+            String triggerScheduleName = Executables.SUCCESSFUL_GRAPH.getExecutableName();
+            Executables triggerScheduleExecutable = Executables.SUCCESSFUL_GRAPH;
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setScheduleName(triggerScheduleName)
+                            .setExecutable(triggerScheduleExecutable).isConfirm();
+            prepareScheduleWithBasicPackage(scheduleBuilder);
 
-            Pair<String, List<String>> dependentSchduleCronTime =
-                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
-                            Arrays.asList(processName, triggerScheduleExecutable));
-            Map<String, String> expectedScheduleTriggerOptions = new HashMap<String, String>();
-            expectedScheduleTriggerOptions.put(processName, triggerScheduleExecutable);
             projectDetailPage.clickOnNewScheduleButton();
             waitForElementVisible(scheduleForm.getRoot());
-            scheduleForm.checkScheduleTriggerOptions(dependentSchduleCronTime, false,
-                    expectedScheduleTriggerOptions);
+            scheduleForm.checkScheduleTriggerOptions(Arrays.asList(scheduleBuilder));
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -999,25 +977,23 @@ public class SchedulesTests extends AbstractSchedulesTests {
     public void checkDisableDependentSchedule() throws InterruptedException, JSONException {
         try {
             String processName = "Check Schedule With Trigger Schedule";
-            String triggerScheduleName = "successfulGraph.grf";
-            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
-            String dependentScheduleExecutable = "/graph/errorGraph.grf";
-            String dependentScheduleName = "errorGraph.grf";
-            Map<String, String> scheduleUrls =
-                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
-                            triggerScheduleExecutable, dependentScheduleName,
-                            dependentScheduleExecutable);
 
-            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
-                    "Basic/graph/successfulGraph.grf");
-            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
-                    "Basic/graph/errorGraph.grf", 1, true, false, 1);
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
+                    dependentScheduleBuilder);
+
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            scheduleDetail.assertFailedExecution(dependentScheduleBuilder.getExecutable());
             scheduleDetail.disableSchedule();
 
-            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
-                    "Basic/graph/successfulGraph.grf");
-            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
-                    "Basic/graph/errorGraph.grf", 1, false, false, 1);
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            int dependentScheduleExecutionNumber =
+                    waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            assertEquals(dependentScheduleExecutionNumber, 1);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -1027,24 +1003,23 @@ public class SchedulesTests extends AbstractSchedulesTests {
     public void checkMissingScheduleTrigger() throws InterruptedException, JSONException {
         try {
             String processName = "Check Schedule With Trigger Schedule";
-            String triggerScheduleName = "successfulGraph.grf";
-            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
-            String dependentScheduleExecutable = "/graph/errorGraph.grf";
-            String dependentScheduleName = "errorGraph.grf";
-            Map<String, String> scheduleUrls =
-                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
-                            triggerScheduleExecutable, dependentScheduleName,
-                            dependentScheduleExecutable);
 
-            browser.get(scheduleUrls.get("triggerScheduleUrl"));
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
+                    dependentScheduleBuilder);
+
+            browser.get(triggerScheduleBuilder.getScheduleUrl());
             waitForElementVisible(scheduleDetail.getRoot());
-            scheduleDetail.deleteSchedule(true);
+            scheduleDetail.deleteSchedule(Confirmation.SAVE_CHANGES);
 
             openProjectDetailByUrl(testParams.getProjectId());
             projectDetailPage.selectScheduleTab(processName);
-            assertEquals(schedulesTable.getScheduleCron(dependentScheduleName).getText(),
-                    TRIGGER_SCHEDULE_MISSING);
-            browser.get(scheduleUrls.get("dependentScheduleUrl"));
+            assertEquals(schedulesTable.getScheduleCron(dependentScheduleBuilder.getScheduleName())
+                    .getText(), TRIGGER_SCHEDULE_MISSING);
+            browser.get(dependentScheduleBuilder.getScheduleUrl());
             waitForElementVisible(scheduleDetail.getRoot());
             scheduleDetail.checkTriggerScheduleMissing();
         } finally {
@@ -1056,38 +1031,32 @@ public class SchedulesTests extends AbstractSchedulesTests {
     public void checkMultipleScheduleTriggers() throws JSONException, InterruptedException {
         try {
             String processName1 = "Check Schedule With Trigger Schedule 1";
-            String triggerScheduleName1 = "successfulGraph.grf";
-            String triggerScheduleExecutable1 = "/graph/successfulGraph.grf";
-            String dependentScheduleExecutable1 = "/graph/longTimeRunningGraph.grf";
-            String dependentScheduleName1 = "longTimeRunningGraph.grf";
-            Map<String, String> scheduleUrls =
-                    prepareDataForTriggerScheduleTest(processName1, triggerScheduleName1,
-                            triggerScheduleExecutable1, dependentScheduleName1,
-                            dependentScheduleExecutable1);
+
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setScheduleName("Trigger schedule").setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder1 =
+                    new ScheduleBuilder().setScheduleName("Dependent schedule 1").setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
+            prepareDataForTriggerScheduleTest(processName1, triggerScheduleBuilder,
+                    dependentScheduleBuilder1);
 
             String processName2 = "Check Schedule With Trigger Schedule 2";
-            String triggerScheduleExecutable2 = dependentScheduleExecutable1;
-            String dependentScheduleExecutable2 = "/graph/errorGraph.grf";
-            String dependentScheduleName2 = "errorGraph.grf";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName2, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> dependentScheduleCronTime =
-                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
-                            Arrays.asList(processName1, triggerScheduleExecutable2));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName2,
-                    dependentScheduleName2, dependentScheduleExecutable2,
-                    dependentScheduleCronTime, null);
-            assertNewSchedule(processName2, dependentScheduleName2, dependentScheduleExecutable2,
-                    dependentScheduleCronTime, null);
-            String dependentScheduleUrl2 = browser.getCurrentUrl();
+            ScheduleBuilder dependentScheduleBuilder2 =
+                    new ScheduleBuilder()
+                            .setProcessName(processName2)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.AFTER)
+                            .setTriggerScheduleGroup(dependentScheduleBuilder1.getProcessName())
+                            .setTriggerScheduleOption(
+                                    dependentScheduleBuilder1.getExecutable().getExecutablePath());
+            prepareScheduleWithBasicPackage(dependentScheduleBuilder2);
 
-            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
-                    "Basic/graph/successfulGraph.grf");
-            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
-                    "Basic/graph/successfulGraph.grf", 1, true, true, 1);
-            waitForAutoRunDependentSchedule(dependentScheduleUrl2, "Basic/graph/errorGraph.grf", 1,
-                    true, false, 1);
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder1);
+            scheduleDetail.assertSuccessfulExecution();
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder2);
+            scheduleDetail.assertFailedExecution(dependentScheduleBuilder2.getExecutable());
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -1098,104 +1067,97 @@ public class SchedulesTests extends AbstractSchedulesTests {
         successfulTest = true;
     }
 
-    private void checkScheduleNameInOverviewPage(DISCOverviewProjectStates overviewState,
-            String projectName, String projectId, String graphName) throws JSONException,
-            InterruptedException {
+    private void checkScheduleNameInOverviewPage(OverviewProjectStates overviewState)
+            throws JSONException {
         try {
+            openProjectDetailPage(getWorkingProject());
+
             String processName = "Check Custom Schedule Name In Overview Page";
             String scheduleName = "Custom Schedule Name";
-            openProjectDetailPage(projectName, projectId);
-            deployInProjectDetailPage(projectName, projectId, "Basic", DISCProcessTypes.GRAPH,
-                    processName, Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
-                            "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(),
-                            Arrays.asList("59", "23"));
-            createScheduleForProcess(projectName, projectId, processName, scheduleName, "/graph/"
-                    + graphName, cronTime, null);
-            assertNewSchedule(processName, scheduleName, "/graph/" + graphName, cronTime, null);
-            scheduleDetail.manualRun();
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            if (overviewState.equals(DISCOverviewProjectStates.RUNNING))
+            Executables graph = null;
+            switch (overviewState) {
+                case FAILED:
+                    graph = Executables.FAILED_GRAPH;
+                    break;
+                case SUCCESSFUL:
+                    graph = Executables.SUCCESSFUL_GRAPH;
+                    break;
+                case RUNNING:
+                    graph = Executables.LONG_TIME_RUNNING_GRAPH;
+                    break;
+                default:
+                    graph = Executables.SUCCESSFUL_GRAPH;
+                    break;
+            }
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName).setScheduleName(scheduleName)
+                            .setExecutable(graph).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                            .setHourInDay("23").setMinuteInHour("59").isConfirm();
+            createAndAssertSchedule(scheduleBuilder);
+
+            scheduleDetail.manualRun();
+            if (overviewState.equals(OverviewProjectStates.RUNNING))
                 assertTrue(scheduleDetail.isInRunningState());
             else {
-                boolean isSuccessful = !overviewState.equals(DISCOverviewProjectStates.FAILED);
-                scheduleDetail.assertLastExecutionDetails(isSuccessful, true, false, "Basic/graph/"
-                        + graphName, DISCProcessTypes.GRAPH, 5);
+                if (overviewState.equals(OverviewProjectStates.FAILED))
+                    scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
+                else
+                    scheduleDetail.assertSuccessfulExecution();
             }
-            String scheduleUrl = browser.getCurrentUrl();
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
             openUrl(DISC_OVERVIEW_PAGE);
             waitForElementVisible(discOverview.getRoot());
             discOverview.selectOverviewState(overviewState);
             waitForElementVisible(discOverviewProjects.getRoot());
-            discOverviewProjects.assertOverviewScheduleName(overviewState, projectName, projectId,
-                    true, scheduleUrl, scheduleName);
+            discOverviewProjects.assertOverviewScheduleName(overviewState, getWorkingProject(),
+                    scheduleBuilder.getScheduleUrl(), scheduleName);
         } finally {
-            cleanProcessesInProjectDetail(projectId);
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
-    private void prepareScheduleWithCustomName(String processName, String scheduleName,
-            String executableName) throws JSONException, InterruptedException {
-        scheduleName = scheduleName == null ? executableName : scheduleName;
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, processName,
-                Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                true);
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                scheduleName, "/graph/" + executableName, defaultCronTime, null);
-        assertNewSchedule(processName, scheduleName, "/graph/" + executableName, defaultCronTime,
-                null);
+    private void prepareDataForTriggerScheduleTest(String processName,
+            ScheduleBuilder triggerScheduleBuilder, ScheduleBuilder dependentScheduleBuilder)
+            throws JSONException, InterruptedException {
+        openProjectDetailPage(getWorkingProject());
+
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+        triggerScheduleBuilder.setProcessName(processName)
+                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+                .setMinuteInHour("59");
+        createAndAssertSchedule(triggerScheduleBuilder);
+        triggerScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+
+        dependentScheduleBuilder
+                .setProcessName(processName)
+                .setCronTime(ScheduleCronTimes.AFTER)
+                .setTriggerScheduleGroup(processName)
+                .setTriggerScheduleOption(
+                        triggerScheduleBuilder.getExecutable().getExecutablePath());
+        createAndAssertSchedule(dependentScheduleBuilder);
+        dependentScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
     }
 
-    private Map<String, String> prepareDataForTriggerScheduleTest(String processName,
-            String triggerScheduleName, String triggerScheduleExecutable,
-            String dependentSheduleName, String dependentScheduleExecutable) throws JSONException,
-            InterruptedException {
-        Map<String, String> scheduleUrls = new HashMap<String, String>();
-        Pair<String, List<String>> triggerScheduleCronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, processName,
-                Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                true);
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                triggerScheduleName, triggerScheduleExecutable, triggerScheduleCronTime, null);
-        assertNewSchedule(processName, triggerScheduleName, triggerScheduleExecutable,
-                triggerScheduleCronTime, null);
-        scheduleUrls.put("triggerScheduleUrl", browser.getCurrentUrl());
-
-        Pair<String, List<String>> dependentScheduleCronTime =
-                Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
-                        Arrays.asList(processName, triggerScheduleExecutable));
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                dependentSheduleName, dependentScheduleExecutable, dependentScheduleCronTime, null);
-        assertNewSchedule(processName, dependentSheduleName, dependentScheduleExecutable,
-                dependentScheduleCronTime, null);
-        scheduleUrls.put("dependentScheduleUrl", browser.getCurrentUrl());
-        return scheduleUrls;
-    }
-
-    private void manualRunTriggerSchedule(String scheduleUrl, boolean isSuccessful,
-            String executablePath) throws InterruptedException {
+    private void manualRunTriggerSchedule(String scheduleUrl) throws InterruptedException {
         browser.get(scheduleUrl);
         waitForElementVisible(scheduleDetail.getRoot());
         scheduleDetail.manualRun();
-        scheduleDetail.assertLastExecutionDetails(isSuccessful, true, false, executablePath,
-                DISCProcessTypes.GRAPH, 5);
     }
 
-    private void waitForAutoRunDependentSchedule(String scheduleUrl, String executablePath,
-            int waitingTimeInMinutes, boolean isAutoRun, boolean isSuccessful,
-            int expectedExecutionNumber) throws InterruptedException {
-        browser.get(scheduleUrl);
+    private void runSuccessfulTriggerSchedule(String scheduleUrl) throws InterruptedException {
+        manualRunTriggerSchedule(scheduleUrl);
+        scheduleDetail.assertSuccessfulExecution();
+    }
+
+    private int waitForAutoRunDependentSchedule(ScheduleBuilder scheduleBuilder)
+            throws InterruptedException {
+        browser.get(scheduleBuilder.getScheduleUrl());
         waitForElementVisible(scheduleDetail.getRoot());
-        scheduleDetail.waitForAutoRunSchedule(waitingTimeInMinutes);
-        if (isAutoRun)
-            scheduleDetail.assertLastExecutionDetails(isSuccessful, false, false, executablePath,
-                    DISCProcessTypes.GRAPH, 5);
-        assertEquals(scheduleDetail.getExecutionItemsNumber(), expectedExecutionNumber);
+        scheduleDetail.tryToWaitForAutoRun(scheduleBuilder.getCronTimeBuilder());
+        return scheduleDetail.getExecutionItemsNumber();
     }
 }

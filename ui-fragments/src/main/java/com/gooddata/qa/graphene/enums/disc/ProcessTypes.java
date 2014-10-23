@@ -1,6 +1,6 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.disc;
 
-public enum DISCProcessTypes {
+public enum ProcessTypes {
 
     DEFAULT("CloudConnect", "graph"),
     GRAPH("CloudConnect", "graph"),
@@ -9,7 +9,7 @@ public enum DISCProcessTypes {
     private String processTypeOption;
     private String processTypeExecutable;
 
-    private DISCProcessTypes(String processTypeOption, String processTypeExecutable) {
+    private ProcessTypes(String processTypeOption, String processTypeExecutable) {
         this.processTypeOption = processTypeOption;
         this.processTypeExecutable = processTypeExecutable;
     }
