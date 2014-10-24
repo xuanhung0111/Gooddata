@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static java.util.Arrays.asList;
 
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
@@ -43,20 +44,31 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         }
         return null;
     }
-    
+
     protected void updateRecurrencyString(String scheduleUri) throws IOException {
-        RestApiClient restApiClient = getRestApiClient();
+        InputStream scheduleStream = getScheduleInputStream(scheduleUri);
+        String schedule = getResetRecurrencySchedule(scheduleStream);
+        setSchedule(scheduleUri, schedule);
+    }
+
+    protected void setBcc(String scheduleUri, String[] bccEmails) throws IOException {
+        InputStream scheduleStream = getScheduleInputStream(scheduleUri);
+        String schedule = getBccSchedule(scheduleStream, bccEmails);
+        setSchedule(scheduleUri, schedule);
+    }
+
+    private InputStream getScheduleInputStream(String scheduleUri) throws IOException {
+        RestApiClient apiClient = getRestApiClient();
 
         // get scheduledMail
         System.out.println("Get scheduledMail: " + scheduleUri);
-        HttpRequestBase getRequest = restApiClient.newGetMethod(scheduleUri);
-        HttpResponse getResponse = restApiClient.execute(getRequest);
+        HttpRequestBase getRequest = apiClient.newGetMethod(scheduleUri);
+        HttpResponse getResponse = apiClient.execute(getRequest);
         System.out.println(" - status: " + getResponse.getStatusLine().getStatusCode());
-        InputStream scheduleStream = getResponse.getEntity().getContent();
+        return getResponse.getEntity().getContent();
+    }
 
-        // change recurrency to current
-        String schedule = resetRecurrencyToNow(scheduleStream);
-
+    private void setSchedule(String scheduleUri, String schedule) {
         // update scheduledMail
         System.out.println("Update scheduledMail: " + scheduleUri);
         HttpRequestBase postRequest = restApiClient.newPostMethod(scheduleUri, schedule);
@@ -65,7 +77,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         EntityUtils.consumeQuietly(postResponse.getEntity());
     }
 
-    protected String resetRecurrencyToNow(InputStream stream) throws IOException {
+    private String getResetRecurrencySchedule(InputStream stream) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         Map rootNode = mapper.readValue(stream, Map.class);
@@ -75,7 +87,6 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
         String timeZone = (String) when.get("timeZone");
         content.remove("lastSuccessfull");
-
         DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZone)));
         DateTimeFormatter fmt = DateTimeFormat.forPattern("*Y:M:0:d:H:m:s");
         // plusSeconds(1) - to be meta.updated <= recurrency (cannot be older)
@@ -84,4 +95,21 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
         return mapper.writeValueAsString(rootNode);
     }
+
+    private String getBccSchedule(InputStream scheduleStream, String[] bccEmails) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map rootNode = mapper.readValue(scheduleStream, Map.class);
+        Map scheduledMail = (Map) rootNode.get("scheduledMail");
+        Map content = (Map) scheduledMail.get("content");
+
+        List<String> bccEmailsList = asList(bccEmails);
+        if (bccEmails != null) {
+            content.put("bcc", bccEmailsList);
+        }
+
+        System.out.println(" - added bcc to schedule: " + bccEmailsList);
+        return mapper.writeValueAsString(rootNode);
+    }
+
 }
