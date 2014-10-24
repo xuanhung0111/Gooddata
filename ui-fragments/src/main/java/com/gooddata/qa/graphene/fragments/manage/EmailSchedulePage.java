@@ -54,6 +54,12 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".s-btn-save")
     private WebElement saveButton;
 
+    @FindBy(css = "#unsubscribeTooltip span.info")
+    private WebElement unsubscribeTooltip;
+
+    @FindBy(css = "#unsubscribeTooltip div.bubble-primary .bubble-content .content")
+    private WebElement unsubscribedTooltipAddresses;
+
     public int getNumberOfSchedules() {
         waitForElementPresent(schedulesTable);
         int schedulesCount = schedulesTable.findElement(By.tagName("tbody")).findElements(By.tagName("tr")).size();
@@ -62,6 +68,19 @@ public class EmailSchedulePage extends AbstractFragment {
         } else {
             return schedulesCount;
         }
+    }
+
+    public String getSubscribed(String scheduleName) {
+        Graphene.guardAjax(getScheduleLink(scheduleName)).click();
+        waitForElementVisible(emailToInput);
+        return emailToInput.getAttribute("value");
+    }
+
+    public String getUnsubscribed(String scheduleName) {
+        Graphene.guardAjax(getScheduleLink(scheduleName)).click();
+        waitForElementPresent(unsubscribeTooltip);
+        unsubscribeTooltip.click();
+        return unsubscribedTooltipAddresses.getText();
     }
 
     public String getNoSchedulesMessage() {
@@ -168,4 +187,9 @@ public class EmailSchedulePage extends AbstractFragment {
         }
     }
 
+    private WebElement getScheduleLink(String scheduleName) {
+        waitForElementPresent(schedulesTable);
+        String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
+        return schedulesTable.findElement(By.cssSelector(anchorSelector));
+    }
 }

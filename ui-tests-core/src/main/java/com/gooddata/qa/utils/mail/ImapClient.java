@@ -3,6 +3,7 @@
  */
 package com.gooddata.qa.utils.mail;
 
+import com.sun.mail.util.BASE64DecoderStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -130,6 +131,50 @@ public class ImapClient {
         } catch (MessagingException e) {
             throw new RuntimeException("Session issue when checking message attachments", e);
         }
+    }
+
+    public static String getEmailBody(Part message) throws MessagingException, IOException {
+        if (message.isMimeType("text/*")) {
+            Object content = message.getContent();
+            if (content instanceof BASE64DecoderStream) {
+                return null;
+            } else {
+                return (String) message.getContent();
+            }
+        }
+        if (message.isMimeType("multipart/alternative")) {
+            // prefer html text over plain text
+            Multipart mp = (Multipart) message.getContent();
+            String text = null;
+            for (int i = 0; i < mp.getCount(); i++) {
+                Part bp = mp.getBodyPart(i);
+                if (bp.isMimeType("text/plain")) {
+                    if (text == null) {
+                        text = getEmailBody(bp);
+                    }
+                } else if (bp.isMimeType("text/html")) {
+                    String s = getEmailBody(bp);
+                    if (s != null) {
+                        return s;
+                    }
+                } else {
+                    String s = getEmailBody(bp);
+                    if (s != null) {
+                        return s;
+                    }
+                }
+            }
+            return text;
+        } else if (message.isMimeType("multipart/*")) {
+            Multipart mp = (Multipart)message.getContent();
+            for (int i = 0; i < mp.getCount(); i++) {
+                String s = getEmailBody(mp.getBodyPart(i));
+                if (s != null) {
+                    return s;
+                }
+            }
+        }
+        return null;
     }
 
     public static void saveMessageAttachments(Message message, File outputDirectory) {
