@@ -11,6 +11,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.DISCOverviewProjectStates;
 import com.gooddata.qa.graphene.enums.DISCProcessTypes;
 import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
 
@@ -21,6 +22,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
     private final static String EXECUTION_HISTORY_EMPTY_STATE_MESSAGE =
             "No history available. This schedule has not been run yet.";
+    private static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
 
     @BeforeClass
     public void initProperties() {
@@ -738,8 +740,266 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void createScheduleWithCustomName() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Create Schedule With Custom Name";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+                    "Custom Schedule Name", "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void editScheduleWithCustomName() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Edit Schedule With Custom Name";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
+                    "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
+            scheduleDetail.changeScheduleTitle("Custom Schedule Name", true, true);
+            scheduleDetail.clickOnCloseScheduleButton();
+            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void createScheduleWithEmptyCustomName() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Create Schedule With Empty Custom Name";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            projectDetailPage.clickOnNewScheduleButton();
+            waitForElementVisible(scheduleForm.getRoot());
+            scheduleForm.createScheduleWithInvalidScheduleName(processName,
+                    "/graph/successfulGraph.grf", "", "Custom Schedule Name");
+            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void editScheduleWithEmptyCustomName() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Edit Schedule With Empty Custom Name";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
+                    "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
+            scheduleDetail.changeScheduleTitle("", true, false);
+            scheduleDetail.clickOnCloseScheduleButton();
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void createScheduleNotUniqueName() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Create Schedule With Not Unique Name";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
+                    "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
+            projectDetailPage.clickOnNewScheduleButton();
+            waitForElementVisible(scheduleForm.getRoot());
+            scheduleForm.createScheduleWithInvalidScheduleName(processName,
+                    "/graph/successfulGraph.grf", "successfulGraph.grf", "Custom Schedule Name");
+            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void editScheduleWithNotUniqueName() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Create Schedule With Custom Name";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
+                    "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+                    "Custom Schedule Name", "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
+                    cronTime, null);
+            scheduleDetail.changeScheduleTitle("successfulGraph.grf", true, false);
+            scheduleDetail.clickOnCloseScheduleButton();
+            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void cancelEditScheduleName() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Edit Schedule With Custom Name";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
+                    "/graph/successfulGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
+            scheduleDetail.changeScheduleTitle("Custom Schedule Name", false, true);
+            scheduleDetail.clickOnCloseScheduleButton();
+            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void createScheduleWithCustomNameForRubyScript() throws InterruptedException, JSONException {
+        try {
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            String processName = "Create Schedule With Custom Name For Ruby Script";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "ruby",
+                    DISCProcessTypes.RUBY, processName,
+                    Arrays.asList("ruby1.rb", "ruby2.rb"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+                    "Custom Schedule Name", "/script/ruby1.rb", cronTime, null);
+            assertNewSchedule(processName, "Custom Schedule Name", "/script/ruby1.rb",
+                    cronTime, null);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+    
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void checkCustomScheduleNameInFailedOverview() throws InterruptedException, JSONException {
+        try {
+            String processName = "Check Custom Schedule Name In Overview Page";
+            String scheduleName = "Custom Failed Schedule Name";
+            String graphName = "errorGraph.grf";
+            checkScheduleNameInOverviewPage(DISCOverviewProjectStates.FAILED, projectTitle, testParams.getProjectId(), processName, graphName, scheduleName);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+    
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void checkCustomScheduleNameInSuccessfulOverview() throws InterruptedException, JSONException {
+        try {
+            String processName = "Check Custom Schedule Name In Overview Page";
+            String scheduleName = "Custom Successful Schedule Name";
+            String graphName = "successfulGraph.grf";
+            checkScheduleNameInOverviewPage(DISCOverviewProjectStates.SUCCESSFUL, projectTitle, testParams.getProjectId(), processName, graphName, scheduleName);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+    
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void checkCustomScheduleNameInRunningOverview() throws InterruptedException, JSONException {
+        try {
+            String processName = "Check Custom Schedule Name In Overview Page";
+            String scheduleName = "Custom Running Schedule Name";
+            String graphName = "longTimeRunningGraph.grf";
+            checkScheduleNameInOverviewPage(DISCOverviewProjectStates.RUNNING, projectTitle, testParams.getProjectId(), processName, graphName, scheduleName);
+        } finally {
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.deleteAllProcesses();
+        }
+    }
+
     @Test(dependsOnGroups = {"schedule"}, groups = {"tests"})
     public void test() throws JSONException {
         successfulTest = true;
+    }
+    
+    private void checkScheduleNameInOverviewPage(DISCOverviewProjectStates overviewState, String projectName,
+            String projectId, String processName, String graphName, String scheduleName) throws JSONException,
+            InterruptedException {
+        openProjectDetailPage(projectName, projectId);
+        deployInProjectDetailPage(projectName, projectId, "Basic", DISCProcessTypes.GRAPH,
+                processName,
+                Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
+                true);
+        Pair<String, List<String>> cronTime =
+                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
+        createScheduleForProcess(projectName, projectId, processName, scheduleName, "/graph/" + graphName,
+                cronTime, null);
+        assertNewSchedule(processName, scheduleName, "/graph/" + graphName, cronTime, null);
+        scheduleDetail.manualRun();
+        
+        if (overviewState.equals(DISCOverviewProjectStates.RUNNING))
+            assertTrue(scheduleDetail.isInRunningState());
+        else {
+            boolean isSuccessful = !overviewState.equals(DISCOverviewProjectStates.FAILED);
+            scheduleDetail.assertLastExecutionDetails(isSuccessful, true, false, "Basic/graph/"
+                    + graphName, DISCProcessTypes.GRAPH, 5);
+        }
+        String scheduleUrl = browser.getCurrentUrl();
+        
+        openUrl(DISC_OVERVIEW_PAGE);
+        waitForElementVisible(discOverview.getRoot());
+        discOverview.selectOverviewState(overviewState);
+        waitForElementVisible(discOverviewProjects.getRoot());
+        discOverviewProjects.assertOverviewScheduleName(overviewState, projectName, projectId, true, scheduleUrl, scheduleName);
     }
 }

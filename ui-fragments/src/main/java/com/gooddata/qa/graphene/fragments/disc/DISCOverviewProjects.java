@@ -59,6 +59,9 @@ public class DISCOverviewProjects extends AbstractFragment {
 
     @FindBy(css = ".ait-project-detail-fragment")
     private WebElement projectDetail;
+    
+    private String XPATH_OVERVIEW_ERROR_SCHEDULE_TITLE = "//div[@class='overview-project-error-cell-schedule-name']/a[@href='${scheduleUrl}']";
+    private String XPATH_OVERVIEW_SCHEDULE_TITLE = "//div[@class='overview-project-cell-schedule-name']/a[@href='${scheduleUrl}']";
 
     private By BY_OVERVIEW_PROJECT_CHECKBOX = By
             .cssSelector(".overview-project-cell-checkbox input");
@@ -440,5 +443,18 @@ public class DISCOverviewProjects extends AbstractFragment {
             Thread.sleep(1000);
         }
         return overviewProjects.size();
+    }
+    
+    public WebElement getOverviewScheduleName(DISCOverviewProjectStates overviewState, String projectName, String projectId, boolean isAdmin, String scheduleUrl) throws InterruptedException {
+        WebElement overviewProject = getOverviewProjectDetail(projectName, projectId, isAdmin);
+        overviewProject.findElement(BY_OVERVIEW_PROJECT_EXPAND_BUTTON).click();
+        String xpathScheduleTitle = overviewState.equals(DISCOverviewProjectStates.FAILED) ? XPATH_OVERVIEW_ERROR_SCHEDULE_TITLE : XPATH_OVERVIEW_SCHEDULE_TITLE;
+        return overviewProject.findElement(By.xpath(xpathScheduleTitle.replace("${scheduleUrl}", scheduleUrl)));
+    }
+    
+    public void assertOverviewScheduleName(DISCOverviewProjectStates overviewState, String projectName, String projectId, boolean isAdmin, String scheduleUrl, String scheduleName) throws InterruptedException {
+        String overviewScheduleLink = scheduleUrl.substring(scheduleUrl.indexOf("#"));
+        String overviewScheduleName = getOverviewScheduleName(overviewState, projectName, projectId, isAdmin, overviewScheduleLink).findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText();
+        assertEquals(overviewScheduleName, scheduleName);
     }
 }

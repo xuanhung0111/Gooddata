@@ -6,11 +6,16 @@ import com.gooddata.qa.graphene.fragments.AbstractTable;
 
 public class SchedulesTable extends AbstractTable {
 
-    private final static By BY_SCHEDULE_TITLE = By.cssSelector(".schedule-title-cell");
+    private final static By BY_SCHEDULE_TITLE = By.cssSelector(".ait-process-schedule-list-item-title");
+    private final static By BY_SCHEDULE_EXECUTABLE_PATH = By.cssSelector(".ait-process-schedule-list-item-title-graph");
     private final static By BY_SCHEDULE_CRON = By.cssSelector(".schedule-cron-cell");
 
-    public WebElement getScheduleTitle(String executableName) {
-        return getScheduleElement(executableName, BY_SCHEDULE_TITLE);
+    public WebElement getScheduleTitle(String scheduleName) {
+        return getScheduleElement(scheduleName, BY_SCHEDULE_TITLE);
+    }
+    
+    public WebElement getScheduleExecutablePath(String scheduleName) {
+        return getScheduleElement(scheduleName, BY_SCHEDULE_EXECUTABLE_PATH);
     }
 
     public WebElement getScheduleCron(String executableName) {

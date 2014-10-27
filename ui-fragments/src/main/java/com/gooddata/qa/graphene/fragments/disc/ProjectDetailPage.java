@@ -85,12 +85,6 @@ public class ProjectDetailPage extends AbstractFragment {
     @FindBy(css = ".ait-project-new-schedule-btn")
     protected WebElement newScheduleButton;
 
-    @FindBy(css = ".schedule-title-cell")
-    private WebElement scheduleTitle;
-
-    @FindBy(css = ".schedule-cron-cell")
-    private WebElement scheduleCron;
-
     @FindBy(css = ".ait-process-schedule-list")
     protected List<SchedulesTable> schedulesTablesList;
 
@@ -445,7 +439,9 @@ public class ProjectDetailPage extends AbstractFragment {
             String executablePath, Pair<String, List<String>> cronTime) throws InterruptedException {
         for (int i = 0; i < 10 && schedulesTable.getScheduleTitle(scheduleName) == null; i++)
             Thread.sleep(1000);
-        assertEquals(scheduleName, schedulesTable.getScheduleTitle(scheduleName).getText());
+        assertEquals(schedulesTable.getScheduleTitle(scheduleName).getText(), scheduleName);
+        if(!scheduleName.equals(executablePath.substring(executablePath.lastIndexOf("/") + 1)))
+            assertEquals(schedulesTable.getScheduleExecutablePath(scheduleName).getText(), executablePath);
         String cronFormat = "";
         String hourInDay = "";
         if (cronTime.getValue() != null && cronTime.getValue().size() > 1)

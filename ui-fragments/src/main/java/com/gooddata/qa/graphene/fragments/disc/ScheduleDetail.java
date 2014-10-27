@@ -20,6 +20,8 @@ import static org.testng.Assert.*;
 
 public class ScheduleDetail extends ScheduleForm {
 
+    private static final String INVALID_SCHEDULE_TITLE_ERROR = "\'${scheduleName}\' name already in use within the process. Change the name.";
+    private static final String EMPTY_SCHEDULE_TITLE_ERROR = "can't be blank";
     private static final String DEFAULT_RETRY_DELAY_VALUE = "30";
     private static final String RESCHEDULE_FORM_MESSAGE =
             "Restart every minutes until success (or 30th consecutive failure)";
@@ -52,6 +54,18 @@ public class ScheduleDetail extends ScheduleForm {
 
     @FindBy(css = ".ait-schedule-title-section-heading")
     protected WebElement scheduleTitle;
+    
+    @FindBy(css = ".ait-schedule-title-field input")
+    protected WebElement scheduleTitleInput;
+    
+    @FindBy(css = ".ait-schedule-title-edit-buttons .button-positive")
+    protected WebElement saveScheduleTitleButton;
+    
+    @FindBy(css = ".ait-schedule-title-field .bubble-overlay")
+    protected WebElement scheduleTitleErrorBubble;
+    
+    @FindBy(css = ".ait-schedule-title-edit-buttons .button-secondary")
+    protected WebElement cancelChangeScheduleTitleButton;
     
     @FindBy(css = ".ait-schedule-close-btn .icon-delete")
     protected WebElement closeButton;
@@ -684,5 +698,27 @@ public class ScheduleDetail extends ScheduleForm {
         assertEquals(select.getFirstSelectedOption().getText(), executable);
         assertCronTime(cronTime);
         assertScheduleParameters(parameters);
+    }
+    
+    public void changeScheduleTitle(String newScheduleName, boolean isSaved, boolean isValid)
+            throws InterruptedException {
+        waitForElementVisible(scheduleTitle).click();
+        waitForElementVisible(scheduleTitleInput).clear();
+        if (!scheduleTitleInput.getText().isEmpty())
+            Thread.sleep(2000);
+        scheduleTitleInput.sendKeys(newScheduleName);
+        if (isSaved) {
+            saveScheduleTitleButton.click();
+            if (!isValid) {
+                assertTrue(scheduleTitleInput.getAttribute("class").contains("has-error"));
+                waitForElementVisible(scheduleTitleErrorBubble);
+                if (newScheduleName.isEmpty())
+                    assertEquals(scheduleTitleErrorBubble.getText(), EMPTY_SCHEDULE_TITLE_ERROR);
+                else
+                    assertEquals(scheduleTitleErrorBubble.getText(),
+                            INVALID_SCHEDULE_TITLE_ERROR.replace("${scheduleName}", newScheduleName));
+            }
+        } else
+            cancelChangeScheduleTitleButton.click();
     }
 }

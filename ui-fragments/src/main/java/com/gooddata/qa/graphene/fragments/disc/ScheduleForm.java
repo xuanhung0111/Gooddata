@@ -21,6 +21,8 @@ import static org.testng.Assert.*;
 
 public class ScheduleForm extends AbstractFragment {
 
+    private static final String EMPTY_SCHEDULE_NAME_ERROR = "can't be blank";
+    private static final String INVALID_SCHEDULE_NAME_ERROR = "\'${scheduleName}\' name already in use within the process. Change the name.";
     protected static By BY_PARAMETER_VALUE = By.cssSelector(".param-value input");
     protected static By BY_PARAMETER_NAME = By.cssSelector(".param-name input");
     protected static By BY_PARAMETER_SHOW_SECURE_VALUE = By
@@ -71,6 +73,9 @@ public class ScheduleForm extends AbstractFragment {
     
     @FindBy(css = ".ait-new-schedule-fragment-name input")
     protected WebElement scheduleNameInput;
+    
+    @FindBy(css = ".ait-new-schedule-fragment-name .bubble-overlay")
+    protected WebElement scheduleNameErrorBubble;
 
     public void selectProcess(String processName) {
         waitForElementVisible(selectProcessForNewSchedule);
@@ -78,10 +83,10 @@ public class ScheduleForm extends AbstractFragment {
         select.selectByVisibleText(processName);
     }
 
-    public void selectExecutable(String executableName) {
+    public void selectExecutable(String executable) {
         waitForElementVisible(selectExecutableForNewSchedule);
         Select select = new Select(selectExecutableForNewSchedule);
-        select.selectByVisibleText(executableName);
+        select.selectByVisibleText(executable);
     }
 
     public void selectHourInDay(Pair<String, List<String>> cronTime) {
@@ -187,24 +192,28 @@ public class ScheduleForm extends AbstractFragment {
             index++;
         }
     }
+    
+    public void setScheduleName(String scheduleName) throws InterruptedException {
+        waitForElementVisible(scheduleNameInput).clear();
+        if(scheduleNameInput.getText() != "")
+            Thread.sleep(2000);
+        scheduleNameInput.sendKeys(scheduleName);
+    }
 
-    public void createNewSchedule(String processName, String executableName,
+    public void createNewSchedule(String processName, String executable,
             Pair<String, List<String>> cronTime, Map<String, List<String>> parameters,
             String scheduleName, boolean isConfirmed) throws InterruptedException {
         waitForElementVisible(getRoot());
         if (processName != null)
             selectProcess(processName);
-        if (executableName != null)
-            selectExecutable(executableName);
+        if (executable != null)
+            selectExecutable(executable);
         if (cronTime != null)
             selectCron(cronTime);
         if (parameters != null)
             addParameters(parameters);
         if (scheduleName != null) {
-            waitForElementVisible(scheduleNameInput).clear();
-            if(scheduleNameInput.getText() != "")
-                Thread.sleep(2000);
-            scheduleNameInput.sendKeys(scheduleName);
+            setScheduleName(scheduleName);
         }
         if (isConfirmed)
             waitForElementVisible(confirmScheduleButton).click();
@@ -227,5 +236,22 @@ public class ScheduleForm extends AbstractFragment {
         assertTrue(cronExpression.getAttribute("class").contains("has-error"));
         assertTrue(cronExpressionErrorBubble.getText().equals(
                 "Inserted cron format is invalid. Please verify and try again."));
+    }
+    
+    public void createScheduleWithInvalidScheduleName(String processName, String executable,
+            String invalidScheduleName, String validScheduleName) throws InterruptedException {
+        createNewSchedule(processName, executable, null, null, invalidScheduleName, true);
+        if (invalidScheduleName.isEmpty()) {
+            assertTrue(scheduleNameInput.getAttribute("class").contains("has-error"));
+            waitForElementVisible(scheduleNameErrorBubble);
+            assertEquals(scheduleNameErrorBubble.getText(), EMPTY_SCHEDULE_NAME_ERROR);
+        } else {
+            assertTrue(scheduleNameInput.getAttribute("class").contains("has-error"));
+            waitForElementVisible(scheduleNameErrorBubble);
+            assertEquals(scheduleNameErrorBubble.getText(),
+                    INVALID_SCHEDULE_NAME_ERROR.replace("${scheduleName}", invalidScheduleName));
+        }
+        setScheduleName(validScheduleName);
+        waitForElementVisible(confirmScheduleButton).click();
     }
 }
