@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,7 +16,9 @@ import static org.testng.Assert.*;
 
 public class DISCProjectsList extends AbstractTable {
 
-    private static final By BY_DISC_PROJECT_NAME = By.cssSelector("td.project-name-cell a");
+    private String XPATH_PROJECT_NAME = "//td[contains(@class, 'ait-project-list-item-title')]/a[contains(text(),'${searchKey}')]";
+    
+    private static final By BY_DISC_PROJECT_NAME = By.cssSelector(".ait-project-list-item-title a");
     private static final By BY_PROJECT_CHECKBOX = By.cssSelector("td.project-checkbox-cell input");
     private static final By BY_DISC_PROJECT_NAME_NOT_ADMIN = By
             .cssSelector(".project-name-user-not-admin-cell .ait-project-list-item-title");
@@ -131,5 +132,28 @@ public class DISCProjectsList extends AbstractTable {
             System.out.println("Non-admin user cannot access project detail page!");
         }
         waitForElementVisible(getRoot());
+    }
+
+    public String getEmptyStateMessage() {
+        return waitForElementVisible(projectsEmptyState).getText();
+    }
+
+    public WebElement getEmptyState() {
+        return waitForElementVisible(projectsEmptyState);
+    }
+
+    public void assertSearchProjectsByName(String searchKey) {
+        for (WebElement project : getRows()) {
+            assertTrue(project.findElement(BY_DISC_PROJECT_NAME).getText().contains(searchKey),
+                    "Display project with name: "
+                            + project.findElement(BY_DISC_PROJECT_NAME).getText());
+        }
+    }
+    
+    public void assertSearchProjectByUnicodeName(String searchKey) {
+        for (WebElement project : getRows()) {
+            assertNotNull(project.findElement(By.xpath(XPATH_PROJECT_NAME.replace("${searchKey}", searchKey))));
+            System.out.println("Url of project with unicode name: " + project.findElement(BY_DISC_PROJECT_NAME).getAttribute("href"));
+        }
     }
 }

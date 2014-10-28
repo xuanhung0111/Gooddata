@@ -40,20 +40,11 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkFailedProjectsFilterOption() throws JSONException, InterruptedException {
         try {
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Failed Projects Filter Option", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Failed Projects Filter Option", null, "/graph/errorGraph.grf", cronTime,
-                    null);
-            assertNewSchedule("Check Failed Projects Filter Option", "errorGraph.grf",
-                    "/graph/errorGraph.grf", cronTime, null);
-            scheduleDetail.manualRun();
-            scheduleDetail.assertLastExecutionDetails(false, true, false,
-                    "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
+            String processName = "Check Failed Projects Filter Option";
+            String graphName = "errorGraph.grf";
+            prepareDataWithBasicPackage(DISCProjectFilters.FAILED, projectTitle,
+                    testParams.getProjectId(), processName, graphName);
+
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(DISCProjectFilters.FAILED.getOption(),
@@ -68,20 +59,11 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkSuccessfulProjectsFilterOptions() throws JSONException, InterruptedException {
         try {
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Successful Projects Filter Option", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Successful Projects Filter Option", null, "/graph/successfulGraph.grf",
-                    cronTime, null);
-            assertNewSchedule("Check Successful Projects Filter Option", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            scheduleDetail.manualRun();
-            scheduleDetail.assertLastExecutionDetails(true, true, false,
-                    "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
+            String processName = "Check Successful Projects Filter Option";
+            String graphName = "successfulGraph.grf";
+            prepareDataWithBasicPackage(DISCProjectFilters.SUCCESSFUL, projectTitle,
+                    testParams.getProjectId(), processName, graphName);
+
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(DISCProjectFilters.SUCCESSFUL.getOption(),
@@ -96,19 +78,11 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkRunningProjectsFilterOptions() throws JSONException, InterruptedException {
         try {
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Running Projects Filter Option", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Running Projects Filter Option", null,
-                    "/graph/longTimeRunningGraph.grf", cronTime, null);
-            assertNewSchedule("Check Running Projects Filter Option", "longTimeRunningGraph.grf",
-                    "/graph/longTimeRunningGraph.grf", cronTime, null);
-            scheduleDetail.manualRun();
-            assertTrue(scheduleDetail.isInRunningState());
+            String processName = "Check Running Projects Filter Option";
+            String graphName = "longTimeRunningGraph.grf";
+            prepareDataWithBasicPackage(DISCProjectFilters.RUNNING, projectTitle,
+                    testParams.getProjectId(), processName, graphName);
+
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(DISCProjectFilters.RUNNING.getOption(),
@@ -124,43 +98,28 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     public void checkScheduledProjectsFilterOptions() throws JSONException, InterruptedException {
         Pair<String, List<String>> cronTime =
                 Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-        Map<String, String> addtionalProjects =
+        Map<String, String> additionalProjects =
                 createMultipleProjects("Disc-test-scheduled-filter-option", 1);
         openProjectDetailPage(projectTitle, testParams.getProjectId());
         try {
-            for (Entry<String, String> project : addtionalProjects.entrySet()) {
+            String processName = "Process for additional projects";
+            String graphName = "longTimeRunningGraph.grf";
+            for (Entry<String, String> project : additionalProjects.entrySet()) {
+                prepareDataWithBasicPackage(DISCProjectFilters.SCHEDULED, project.getKey(),
+                        project.getValue(), processName, graphName);
                 openProjectDetailPage(project.getKey(), project.getValue());
-                for (int i = 1; i < 10; i++) {
-                    deployInProjectDetailPage(project.getKey(), project.getValue(), "Basic",
-                            DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option " + i,
-                            Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
-                                    "successfulGraph.grf"), true);
-                }
-            }
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Scheduled Projects Filter Option",
-                    Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
-                            "successfulGraph.grf"), true);
-            for (Entry<String, String> project : addtionalProjects.entrySet()) {
-                openProjectDetailPage(project.getKey(), project.getValue());
-                for (int i = 1; i < 10; i++) {
-                    createScheduleForProcess(project.getKey(), project.getValue(),
-                            "Check Scheduled Projects Filter Option " + i, null,
-                            "/graph/longTimeRunningGraph.grf", cronTime, null);
-                    assertNewSchedule("Check Scheduled Projects Filter Option " + i,
-                            "longTimeRunningGraph.grf", "/graph/longTimeRunningGraph.grf",
+                for (int i = 1; i < 7; i++) {
+                    createScheduleForProcess(project.getKey(), project.getValue(), processName,
+                            "longTimeRunningGraph.grf" + i, "/graph/longTimeRunningGraph.grf",
                             cronTime, null);
+                    assertNewSchedule(processName, "longTimeRunningGraph.grf" + i,
+                            "/graph/longTimeRunningGraph.grf", cronTime, null);
                     scheduleDetail.manualRun();
                 }
             }
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Scheduled Projects Filter Option", null,
-                    "/graph/longTimeRunningGraph.grf", cronTime, null);
-            assertNewSchedule("Check Scheduled Projects Filter Option", "longTimeRunningGraph.grf",
-                    "/graph/longTimeRunningGraph.grf", cronTime, null);
-            scheduleDetail.manualRun();
+            prepareDataWithBasicPackage(DISCProjectFilters.SCHEDULED, projectTitle,
+                    testParams.getProjectId(), processName, graphName);
+
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(DISCProjectFilters.SCHEDULED.getOption(),
@@ -168,16 +127,18 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         } finally {
             openProjectDetailByUrl(testParams.getProjectId());
             projectDetailPage.deleteAllProcesses();
-            deleteProjects(addtionalProjects);
+            deleteProjects(additionalProjects);
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkUnscheduledProjectsFilterOptions() throws JSONException, InterruptedException {
         try {
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Unscheduled Projects Filter Option", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            String processName = "Check Unscheduled Projects Filter Option";
+            String graphName = null;
+            prepareDataWithBasicPackage(DISCProjectFilters.UNSCHEDULED, projectTitle,
+                    testParams.getProjectId(), processName, graphName);
+
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(DISCProjectFilters.UNSCHEDULED.getOption(),
@@ -191,18 +152,11 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkDisabledProjectsFilterOptions() throws JSONException, InterruptedException {
         try {
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Disabled Projects Filter Option", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Disabled Projects Filter Option", null,
-                    "/graph/longTimeRunningGraph.grf", cronTime, null);
-            assertNewSchedule("Check Disabled Projects Filter Option", "longTimeRunningGraph.grf",
-                    "/graph/longTimeRunningGraph.grf", cronTime, null);
-            scheduleDetail.disableSchedule();
+            String processName = "Check Disabled Projects Filter Option";
+            String graphName = "successfulGraph.grf";
+            prepareDataWithBasicPackage(DISCProjectFilters.DISABLED, projectTitle,
+                    testParams.getProjectId(), processName, graphName);
+
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(DISCProjectFilters.DISABLED.getOption(),
@@ -217,29 +171,30 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkDataLoadingProcess() throws JSONException, InterruptedException {
         try {
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Data Loading Processes 1", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Data Loading Processes 2", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            String processName1 = "Check Data Loading Processes 1";
+            String processName2 = "Check Data Loading Processes 2";
+            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH, processName1,
+                    Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
+                            "successfulGraph.grf"), true);
+            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH, processName2,
+                    Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
+                            "successfulGraph.grf"), true);
             Pair<String, List<String>> cronTime =
                     Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
             openProjectDetailPage(projectTitle, testParams.getProjectId());
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Data Loading Processes 1", null, "/graph/longTimeRunningGraph.grf",
-                    cronTime, null);
-            assertNewSchedule("Check Data Loading Processes 1", "longTimeRunningGraph.grf",
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName1, null,
                     "/graph/longTimeRunningGraph.grf", cronTime, null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Data Loading Processes 1", null, "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Data Loading Processes 1", "errorGraph.grf",
+            assertNewSchedule(processName1, "longTimeRunningGraph.grf",
+                    "/graph/longTimeRunningGraph.grf", cronTime, null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName1, null,
                     "/graph/errorGraph.grf", cronTime, null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Data Loading Processes 2", null, "/graph/errorGraph.grf", cronTime, null);
+            assertNewSchedule(processName1, "errorGraph.grf", "/graph/errorGraph.grf", cronTime,
+                    null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName2, null,
+                    "/graph/errorGraph.grf", cronTime, null);
             Thread.sleep(2000);
-            assertNewSchedule("Check Data Loading Processes 2", "errorGraph.grf",
-                    "/graph/errorGraph.grf", cronTime, null);
+            assertNewSchedule(processName2, "errorGraph.grf", "/graph/errorGraph.grf", cronTime,
+                    null);
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsList.getRoot());
             discProjectsList.assertDataLoadingProcesses(2, 3, getProjectsMap());
@@ -253,30 +208,22 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkLastSuccessfulExecution() throws JSONException, InterruptedException {
         try {
-            deployInProjectsPage(getProjectsMap(), "Basic", DISCProcessTypes.GRAPH,
-                    "Check Last Successful Execution", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Last Successful Execution", null, "/graph/successfulGraph.grf",
-                    cronTime, null);
-            assertNewSchedule("Check Last Successful Execution", "successfulGraph.grf",
-                    "/graph/successfulGraph.grf", cronTime, null);
-            scheduleDetail.manualRun();
-            scheduleDetail.assertLastExecutionDetails(true, true, false,
-                    "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
+            String processName = "Check Last Successful Execution";
+            String graphName = "successfulGraph.grf";
+            prepareDataWithBasicPackage(DISCProjectFilters.SUCCESSFUL, projectTitle,
+                    testParams.getProjectId(), processName, graphName);
             String lastSuccessfulExecutionDate = scheduleDetail.getLastExecutionDate();
             String lastSuccessfulExecutionTime = scheduleDetail.getLastExecutionTime();
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Last Successful Execution", null, "/graph/errorGraph.grf", cronTime,
-                    null);
-            assertNewSchedule("Check Failed Projects Filter Option", "errorGraph.grf",
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
                     "/graph/errorGraph.grf", cronTime, null);
+            assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf", cronTime,
+                    null);
             scheduleDetail.manualRun();
             scheduleDetail.assertLastExecutionDetails(false, true, false,
                     "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
+
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsList.getRoot());
             System.out.println("Successful Execution Date: " + lastSuccessfulExecutionDate);
@@ -334,8 +281,142 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         discProjectsPage.checkPagingProjectsPage("20");
     }
 
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkEmptySearchResult() throws InterruptedException {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.checkEmptySearchResult("no search result");
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchProjectByName() throws InterruptedException {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.searchProjectByName(projectTitle);
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchProjectById() throws InterruptedException {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.searchProjectById(testParams.getProjectId(), projectTitle);
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchProjectInSuccessfulState() throws InterruptedException, JSONException {
+        String processName = "Check Search Project In Successful State";
+        checkSearchProjectInSpecificState(DISCProjectFilters.SUCCESSFUL, projectTitle,
+                testParams.getProjectId(), processName, "successfulGraph.grf");
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchProjectInFailedState() throws JSONException, InterruptedException {
+        String processName = "Check Search Project In Failed State";
+        checkSearchProjectInSpecificState(DISCProjectFilters.FAILED, projectTitle,
+                testParams.getProjectId(), processName, "errorGraph.grf");
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchProjectInRunningState() throws JSONException, InterruptedException {
+        String processName = "Check Search Project In Running State";
+        checkSearchProjectInSpecificState(DISCProjectFilters.RUNNING, projectTitle,
+                testParams.getProjectId(), processName, "longTimeRunningGraph.grf");
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchProjectInDisabledState() throws JSONException, InterruptedException {
+        String processName = "Check Search Project In Failed State";
+        checkSearchProjectInSpecificState(DISCProjectFilters.DISABLED, projectTitle,
+                testParams.getProjectId(), processName, "successfulGraph.grf");
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchProjectInUnscheduledState() throws InterruptedException {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.searchProjectInSpecificState(DISCProjectFilters.UNSCHEDULED, projectTitle,
+                testParams.getProjectId());
+    }
+    
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkSearchUnicodeProjectName() throws JSONException, InterruptedException {
+        String unicodeProjectName = "Tiếng Việt ພາສາລາວ  résumé";
+        Map<String, String> additionalProjects = createMultipleProjects(unicodeProjectName, 1);
+        try {
+            openUrl(DISC_PROJECTS_PAGE_URL);
+            waitForElementVisible(discProjectsPage.getRoot());
+            discProjectsPage.searchProjectByUnicodeName(unicodeProjectName);
+        } finally {
+            deleteProjects(additionalProjects);
+        }
+
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkDefaultSearchBox() {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.checkDefaultSearchBox();
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    public void checkDeleteSearchKey() {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.checkDeleteSearchKey("no search result");
+    }
+
     @Test(dependsOnGroups = {"projects-page"}, groups = {"tests"})
     public void test() throws JSONException {
         successfulTest = true;
+    }
+
+    private void prepareDataWithBasicPackage(DISCProjectFilters projectFilter, String projectName,
+            String projectId, String processName, String graphName) throws JSONException,
+            InterruptedException {
+        openProjectDetailPage(projectName, projectId);
+        deployInProjectDetailPage(projectName, projectId, "Basic", DISCProcessTypes.GRAPH,
+                processName,
+                Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
+                true);
+        if (projectFilter.equals(DISCProjectFilters.UNSCHEDULED))
+            return;
+
+        Pair<String, List<String>> cronTime =
+                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
+        createScheduleForProcess(projectName, projectId, processName, null, "/graph/" + graphName,
+                cronTime, null);
+        assertNewSchedule(processName, graphName, "/graph/" + graphName, cronTime, null);
+        scheduleDetail.manualRun();
+        if (projectFilter.equals(DISCProjectFilters.SCHEDULED))
+            return;
+
+        assertTrue(scheduleDetail.isInRunningState());
+        if (projectFilter.equals(DISCProjectFilters.RUNNING))
+            return;
+
+        boolean isSuccessful = !projectFilter.equals(DISCProjectFilters.FAILED);
+        scheduleDetail.assertLastExecutionDetails(isSuccessful, true, false, "Basic/graph/"
+                + graphName, DISCProcessTypes.GRAPH, 5);
+
+        if (!projectFilter.equals(DISCProjectFilters.DISABLED))
+            return;
+        scheduleDetail.disableSchedule();
+    }
+
+    private void checkSearchProjectInSpecificState(DISCProjectFilters projectFilter,
+            String projectName, String projectId, String processName, String graphName)
+            throws JSONException, InterruptedException {
+        try {
+            prepareDataWithBasicPackage(projectFilter, projectName, projectId, processName,
+                    graphName);
+            openUrl(DISC_PROJECTS_PAGE_URL);
+            waitForElementVisible(discProjectsPage.getRoot());
+            discProjectsPage.searchProjectInSpecificState(projectFilter, projectName, projectId);
+        } finally {
+            openProjectDetailByUrl(projectId);
+            projectDetailPage.deleteAllProcesses();
+
+        }
     }
 }

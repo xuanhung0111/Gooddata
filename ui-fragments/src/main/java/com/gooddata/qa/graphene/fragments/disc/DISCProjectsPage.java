@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -17,6 +19,8 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import static org.testng.Assert.*;
 
 public class DISCProjectsPage extends AbstractFragment {
+
+    private By BY_ALL_PROJECTS_LINK = By.cssSelector(".all-projects-link");
 
     @FindBy(css = ".filter-combo .ember-select")
     private WebElement projectFilter;
@@ -38,6 +42,18 @@ public class DISCProjectsPage extends AbstractFragment {
 
     @FindBy(css = ".paging-bar .label")
     private WebElement pagingBarLabel;
+
+    @FindBy(css = ".search-field input")
+    private WebElement searchBox;
+
+    @FindBy(css = ".search-field .search-button")
+    private WebElement searchButton;
+
+    @FindBy(css = ".search-field .search-delete-button")
+    private WebElement deleteSearchKeyButton;
+
+    @FindBy(css = ".searching-progress")
+    private WebElement searchingProgress;
 
     public void checkProjectFilterOptions() {
         waitForElementVisible(projectFilter);
@@ -184,5 +200,85 @@ public class DISCProjectsPage extends AbstractFragment {
                         "The project number in the last page: "
                                 + discProjectsList.getNumberOfRows());
         }
+    }
+
+    public void searchProjectInSpecificState(DISCProjectFilters projectFilter, String projectTitle,
+            String projectId) throws InterruptedException {
+        selectFilterOption(projectFilter.getOption());
+        searchProjectByName(projectTitle);
+        searchProjectById(projectId, projectTitle);
+    }
+
+    public void searchProjectByName(String searchKey) throws InterruptedException {
+        enterSearchKey(searchKey);
+        waitForElementVisible(discProjectsList.getRoot());
+        discProjectsList.assertSearchProjectsByName(searchKey);
+    }
+    
+    public void searchProjectByUnicodeName(String unicodeSearchKey) {
+        enterSearchKey(unicodeSearchKey);
+        waitForElementVisible(discProjectsList.getRoot());
+        discProjectsList.assertSearchProjectByUnicodeName(unicodeSearchKey);
+    }
+
+    public void searchProjectById(String projectId, String projectTitle)
+            throws InterruptedException {
+        enterSearchKey(projectId);
+        waitForElementVisible(discProjectsList.getRoot());
+        assertEquals(discProjectsList.getNumberOfRows(), 1,
+                "Actual project number in search result: " + discProjectsList.getNumberOfRows());
+        assertNotNull(discProjectsList.selectProject(projectTitle, projectId, true));
+    }
+
+    public void checkEmptySearchResult(String searchKey) throws InterruptedException {
+        for (DISCProjectFilters projectFilter : DISCProjectFilters.values()) {
+            selectFilterOption(projectFilter.getOption());
+            String expectedEmptySearchResultMessage =
+                    projectFilter.getEmptySearchResultMessage().replace("${searchKey}", searchKey);
+            enterSearchKey(searchKey);
+            System.out.println("Empty Search Result Message: "
+                    + discProjectsList.getEmptyStateMessage().trim());
+            String actualEmptySearchResultMessage = discProjectsList.getEmptyStateMessage();
+            if (projectFilter.equals(DISCProjectFilters.ALL))
+                assertEquals(actualEmptySearchResultMessage.trim(),
+                        expectedEmptySearchResultMessage);
+            else {
+                assertTrue(actualEmptySearchResultMessage
+                        .contains(expectedEmptySearchResultMessage));
+                String emtySearchResultMessageInSpecificState = "Search in all projects";
+                assertTrue(actualEmptySearchResultMessage
+                        .contains(emtySearchResultMessageInSpecificState));
+                discProjectsList.getEmptyState().findElement(BY_ALL_PROJECTS_LINK).click();
+                assertEquals(getSelectedFilterOption().getText(),
+                        DISCProjectFilters.ALL.getOption());
+            }
+        }
+    }
+
+    public void enterSearchKey(String searchKey) {
+        waitForElementVisible(searchBox).clear();
+        waitForElementVisible(searchBox).sendKeys(searchKey);
+        System.out.println("Enter search key: " + searchBox.getAttribute("value"));
+        waitForElementVisible(searchButton).click();
+        try {
+            waitForElementVisible(searchingProgress);
+        } catch (NoSuchElementException ex) {
+            System.out
+                    .println("Searching progress doesn't display, please check the search result...");
+        }
+    }
+
+    public void checkDeleteSearchKey(String noResultSearchKey) {
+        enterSearchKey(noResultSearchKey);
+        System.out.println("Empty state message: " + discProjectsList.getEmptyStateMessage());
+        waitForElementVisible(deleteSearchKeyButton).click();
+        assertTrue(searchBox.getAttribute("value").isEmpty());
+        waitForElementVisible(discProjectsList.getRoot());
+    }
+
+    public void checkDefaultSearchBox() {
+        waitForElementVisible(searchBox);
+        assertTrue(searchBox.getAttribute("value").isEmpty());
+        assertEquals(searchBox.getAttribute("placeholder"), "Search in project names and ids ...");
     }
 }
