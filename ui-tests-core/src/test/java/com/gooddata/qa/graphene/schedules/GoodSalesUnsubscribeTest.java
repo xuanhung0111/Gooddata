@@ -32,10 +32,13 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     private static final String unsubscribePattern = ".*If you no longer want to receive it, <a href=\"([^\"]*)\">click here</a>.*";
 
-    private String reportTitle = "UI-Graphene-core-Report";
+    private String reportTitle = "UI Graphene core Report";
 
     @FindBy(css = ".standalone-message.unsubscribed .title")
     private WebElement unsubscribedTitle;
+
+    @FindBy(css = ".standalone-message.unsubscribed .description")
+    private WebElement unsubscribedDescription;
 
     @FindBy(css = ".logoArea-big img")
     private WebElement unsubscribedLogo;
@@ -136,6 +139,8 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         browser.get(unsubscribeLink);
         waitForElementPresent(unsubscribedTitle);
         assertEquals(unsubscribedTitle.getText(), "You have been unsubscribed", "Unsubscribed message does not match.");
+        waitForElementPresent(unsubscribedDescription);
+        assertTrue(unsubscribedDescription.getText().contains("\"" + reportTitle + "\""), "Unsubscribed description does not contain subject in quotes.");
         waitForElementPresent(unsubscribedLogo);
         assertEquals(unsubscribedLogo.getAttribute("alt"), "GoodData", "Attribute 'alt' in the logo does not match");
     }
