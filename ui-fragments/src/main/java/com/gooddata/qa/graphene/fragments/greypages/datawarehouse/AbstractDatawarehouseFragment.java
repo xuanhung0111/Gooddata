@@ -1,11 +1,11 @@
-package com.gooddata.qa.graphene.fragments.greypages.dss;
+package com.gooddata.qa.graphene.fragments.greypages.datawarehouse;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
 
-public class AbstractDSSFragment extends AbstractGreyPagesFragment {
+public class AbstractDatawarehouseFragment extends AbstractGreyPagesFragment {
 
     protected String waitTaskSucceed(int checkIterations, String resultLink) throws JSONException, InterruptedException {
         waitTaskFinished(checkIterations);

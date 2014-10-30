@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests">
 
-    <test name="HDSTest">
+    <test name="DSSTest">
         <groups>
             <run>
                 <exclude name="brokenTest"/>
@@ -9,6 +9,17 @@
         </groups>
         <packages>
             <package name="com.gooddata.qa.graphene.dss.*"/>
+        </packages>
+    </test>
+
+    <test name="DatawarehouseTest">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.gooddata.qa.graphene.datawarehouse.*"/>
         </packages>
     </test>
 
