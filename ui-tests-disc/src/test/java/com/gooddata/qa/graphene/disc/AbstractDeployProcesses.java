@@ -217,14 +217,13 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
             if (deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage)) {
                 correctProgressMessage = true;
                 break;
-            }
-            else {
+            } else {
                 Thread.sleep(100);
                 index++;
             }
-        }
-        while (index < 10);
-        assertTrue(correctProgressMessage, "Displayed progess message: " + deployForm.getDeployProcessDialog().getText());
+        } while (index < 10);
+        assertTrue(correctProgressMessage, "Displayed progess message: "
+                + deployForm.getDeployProcessDialog().getText());
         for (int i = 0; i < 10
                 && deployForm.getDeployProcessDialogButton().getText().toLowerCase()
                         .contains("deploying"); i++)
@@ -251,16 +250,22 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
         assertFalse(deployForm.inputProcessNameHasError());
         Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
         boolean correctProgressMessage = false;
+        int index = 0;
         deployForm.getDeployConfirmButton().click();
-        for (int i = 0; i < 10 ; i++) {
-            if (deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage)) {
-                correctProgressMessage = true;
+        correctProgressMessage =
+                deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage);
+        do {
+            if (correctProgressMessage) {
                 break;
-            }
-            else
+            } else {
                 Thread.sleep(100);
-        }
-        assertTrue(correctProgressMessage, "Displayed progess message: " + deployForm.getDeployProcessDialog().getText());
+                correctProgressMessage =
+                        deployForm.getDeployProcessDialog().getText().equals(progressDialogMessage);
+                index++;
+            }
+        } while (index < 10);
+        assertTrue(correctProgressMessage, "Displayed progess message: "
+                + deployForm.getDeployProcessDialog().getText());
         for (int i = 0; i < 10
                 && deployForm.getDeployProcessDialogButton().getText().toLowerCase()
                         .contains("deploying"); i++)

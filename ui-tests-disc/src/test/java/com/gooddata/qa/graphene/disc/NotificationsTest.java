@@ -454,15 +454,15 @@ public class NotificationsTest extends AbstractSchedulesTests {
         String subject = notificationSubject + Calendar.getInstance().getTime();
         String message = "${params.PROJECT}" + "*" + "${params.FINISH_TIME}";
         int notificationIndex =
-                createNotification("Check Edit Notification", imapUser, subject, message,
+                createNotification("Check Edit Notification", testParams.getUser(), subject, message,
                         DISCNotificationEvents.SUCCESS, null, true);
-        assertNotification("Check Edit Notification", notificationIndex, imapUser, subject,
+        assertNotification("Check Edit Notification", notificationIndex, testParams.getUser(), subject,
                 message, DISCNotificationEvents.SUCCESS, null);
         String editedSubject = notificationSubject + Calendar.getInstance().getTime();
-        editNotification("Check Edit Notification", notificationIndex, testParams.getEditorUser(),
+        editNotification("Check Edit Notification", notificationIndex, imapUser,
                 editedSubject, message, DISCNotificationEvents.PROCESS_STARTED, null, true);
         assertNotification("Check Edit Notification", notificationIndex,
-                testParams.getEditorUser(), editedSubject, message,
+                imapUser, editedSubject, message,
                 DISCNotificationEvents.PROCESS_STARTED, null);
         checkNotificationNumber(notificationIndex + 1, "Check Edit Notification");
         Pair<String, List<String>> cronTime =
@@ -496,7 +496,7 @@ public class NotificationsTest extends AbstractSchedulesTests {
                 message, DISCNotificationEvents.SUCCESS, null);
         String editedSubject = notificationSubject + Calendar.getInstance().getTime();
         editNotification("Check Cancel Edit Notification", notificationIndex,
-                testParams.getEditorUser(), editedSubject, message,
+                testParams.getUser(), editedSubject, message,
                 DISCNotificationEvents.PROCESS_STARTED, null, false);
         assertNotification("Check Cancel Edit Notification", notificationIndex, imapUser, subject,
                 message, DISCNotificationEvents.SUCCESS, null);
