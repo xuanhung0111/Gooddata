@@ -466,6 +466,10 @@ public class ProjectDetailPage extends AbstractFragment {
             cronFormat = cronTime.getKey();
         if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime()))
             cronFormat = cronTime.getValue().get(0) + " UTC";
+        if (cronTime.getKey().equals(ScheduleCronTimes.AFTER.getCronTime())) {
+            String executable = cronTime.getValue().get(1);
+            cronFormat = String.format("after %s completion", executable.substring(executable.lastIndexOf("/") + 1));
+        }
         assertEquals(cronFormat, schedulesTable.getScheduleCron(scheduleName).getText());
     }
 }

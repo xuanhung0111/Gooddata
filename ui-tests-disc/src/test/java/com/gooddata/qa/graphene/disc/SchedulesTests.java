@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import static org.testng.Assert.*;
 
 public class SchedulesTests extends AbstractSchedulesTests {
 
+    private static final String TRIGGER_SCHEDULE_MISSING = "Trigger schedule missing!";
     private final static String EXECUTION_HISTORY_EMPTY_STATE_MESSAGE =
             "No history available. This schedule has not been run yet.";
     private static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
@@ -696,7 +698,26 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.repeatManualRun(3, "/graph/successfulGraph.grf", DISCProcessTypes.GRAPH,
                     true);
             scheduleDetail.checkOkExecutionGroup(3, 0);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
 
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkProjectWithOneSchedule() throws InterruptedException, JSONException {
+        cleanProcessesInProjectDetail(testParams.getProjectId());
+
+        try {
+            String processName = "Check Schedule Trigger With 1 Schedule In Project";
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(), null);
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            projectDetailPage.clickOnNewScheduleButton();
+            waitForElementVisible(scheduleForm.getRoot());
+            scheduleForm.checkScheduleTriggerOptions(cronTime, true, null);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
         }
@@ -872,7 +893,207 @@ public class SchedulesTests extends AbstractSchedulesTests {
                 testParams.getProjectId(), graphName);
     }
 
-    @Test(dependsOnGroups = {"schedule"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkScheduleTriggerBySuccessfulSchedule() throws InterruptedException,
+            JSONException {
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+            String triggerScheduleName = "successfulGraph.grf";
+            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
+            String dependentScheduleExecutable = "/graph/errorGraph.grf";
+            String dependentScheduleName = "errorGraph.grf";
+            Map<String, String> scheduleUrls =
+                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
+                            triggerScheduleExecutable, dependentScheduleName,
+                            dependentScheduleExecutable);
+
+            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
+                    "Basic/graph/successfulGraph.grf");
+            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
+                    "Basic/graph/errorGraph.grf", 1, true, false, 1);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkScheduleTriggerByFailedSchedule() throws InterruptedException, JSONException {
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+            String triggerScheduleName = "errorGraph.grf";
+            String triggerScheduleExecutable = "/graph/errorGraph.grf";
+            String dependentScheduleExecutable = "/graph/successfulGraph.grf";
+            String dependentScheduleName = "successfulGraph.grf";
+            Map<String, String> scheduleUrls =
+                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
+                            triggerScheduleExecutable, dependentScheduleName,
+                            dependentScheduleExecutable);
+
+            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), false,
+                    "Basic/graph/errorGraph.grf");
+            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
+                    "Basic/graph/successfulGraph.grf", 1, false, false, 0);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkScheduleTriggerInLoop() throws InterruptedException, JSONException {
+        cleanProcessesInProjectDetail(testParams.getProjectId());
+
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+            String triggerScheduleName = "successfulGraph.grf";
+            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
+            String dependentScheduleExecutable = "/graph/errorGraph.grf";
+            String dependentScheduleName = "errorGraph.grf";
+            Map<String, String> scheduleUrls =
+                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
+                            triggerScheduleExecutable, dependentScheduleName,
+                            dependentScheduleExecutable);
+
+            Pair<String, List<String>> dependentScheduleCronTime =
+                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
+                            Arrays.asList(processName, triggerScheduleExecutable));
+            browser.get(scheduleUrls.get("triggerScheduleUrl"));
+            waitForElementVisible(scheduleDetail.getRoot());
+            scheduleDetail.checkScheduleTriggerOptions(dependentScheduleCronTime, true, null);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkScheduleTriggerByItself() throws InterruptedException, JSONException {
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+            String triggerScheduleName = "successfulGraph.grf";
+            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
+            Pair<String, List<String>> triggerScheduleCronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+            openProjectDetailPage(projectTitle, testParams.getProjectId());
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
+                    triggerScheduleExecutable, triggerScheduleCronTime, null);
+            assertNewSchedule(processName, triggerScheduleName, triggerScheduleExecutable,
+                    triggerScheduleCronTime, null);
+
+            Pair<String, List<String>> dependentSchduleCronTime =
+                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
+                            Arrays.asList(processName, triggerScheduleExecutable));
+            Map<String, String> expectedScheduleTriggerOptions = new HashMap<String, String>();
+            expectedScheduleTriggerOptions.put(processName, triggerScheduleExecutable);
+            projectDetailPage.clickOnNewScheduleButton();
+            waitForElementVisible(scheduleForm.getRoot());
+            scheduleForm.checkScheduleTriggerOptions(dependentSchduleCronTime, false,
+                    expectedScheduleTriggerOptions);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkDisableDependentSchedule() throws InterruptedException, JSONException {
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+            String triggerScheduleName = "successfulGraph.grf";
+            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
+            String dependentScheduleExecutable = "/graph/errorGraph.grf";
+            String dependentScheduleName = "errorGraph.grf";
+            Map<String, String> scheduleUrls =
+                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
+                            triggerScheduleExecutable, dependentScheduleName,
+                            dependentScheduleExecutable);
+
+            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
+                    "Basic/graph/successfulGraph.grf");
+            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
+                    "Basic/graph/errorGraph.grf", 1, true, false, 1);
+            scheduleDetail.disableSchedule();
+
+            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
+                    "Basic/graph/successfulGraph.grf");
+            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
+                    "Basic/graph/errorGraph.grf", 1, false, false, 1);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkMissingScheduleTrigger() throws InterruptedException, JSONException {
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+            String triggerScheduleName = "successfulGraph.grf";
+            String triggerScheduleExecutable = "/graph/successfulGraph.grf";
+            String dependentScheduleExecutable = "/graph/errorGraph.grf";
+            String dependentScheduleName = "errorGraph.grf";
+            Map<String, String> scheduleUrls =
+                    prepareDataForTriggerScheduleTest(processName, triggerScheduleName,
+                            triggerScheduleExecutable, dependentScheduleName,
+                            dependentScheduleExecutable);
+
+            browser.get(scheduleUrls.get("triggerScheduleUrl"));
+            waitForElementVisible(scheduleDetail.getRoot());
+            scheduleDetail.deleteSchedule(true);
+
+            openProjectDetailByUrl(testParams.getProjectId());
+            projectDetailPage.selectScheduleTab(processName);
+            assertEquals(schedulesTable.getScheduleCron(dependentScheduleName).getText(),
+                    TRIGGER_SCHEDULE_MISSING);
+            browser.get(scheduleUrls.get("dependentScheduleUrl"));
+            waitForElementVisible(scheduleDetail.getRoot());
+            scheduleDetail.checkTriggerScheduleMissing();
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkMultipleScheduleTriggers() throws JSONException, InterruptedException {
+        try {
+            String processName1 = "Check Schedule With Trigger Schedule 1";
+            String triggerScheduleName1 = "successfulGraph.grf";
+            String triggerScheduleExecutable1 = "/graph/successfulGraph.grf";
+            String dependentScheduleExecutable1 = "/graph/longTimeRunningGraph.grf";
+            String dependentScheduleName1 = "longTimeRunningGraph.grf";
+            Map<String, String> scheduleUrls =
+                    prepareDataForTriggerScheduleTest(processName1, triggerScheduleName1,
+                            triggerScheduleExecutable1, dependentScheduleName1,
+                            dependentScheduleExecutable1);
+
+            String processName2 = "Check Schedule With Trigger Schedule 2";
+            String triggerScheduleExecutable2 = dependentScheduleExecutable1;
+            String dependentScheduleExecutable2 = "/graph/errorGraph.grf";
+            String dependentScheduleName2 = "errorGraph.grf";
+            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                    DISCProcessTypes.GRAPH, processName2, Arrays.asList("errorGraph.grf",
+                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
+            Pair<String, List<String>> dependentScheduleCronTime =
+                    Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
+                            Arrays.asList(processName1, triggerScheduleExecutable2));
+            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName2,
+                    dependentScheduleName2, dependentScheduleExecutable2,
+                    dependentScheduleCronTime, null);
+            assertNewSchedule(processName2, dependentScheduleName2, dependentScheduleExecutable2,
+                    dependentScheduleCronTime, null);
+            String dependentScheduleUrl2 = browser.getCurrentUrl();
+
+            manualRunTriggerSchedule(scheduleUrls.get("triggerScheduleUrl"), true,
+                    "Basic/graph/successfulGraph.grf");
+            waitForAutoRunDependentSchedule(scheduleUrls.get("dependentScheduleUrl"),
+                    "Basic/graph/successfulGraph.grf", 1, true, true, 1);
+            waitForAutoRunDependentSchedule(dependentScheduleUrl2, "Basic/graph/errorGraph.grf", 1,
+                    true, false, 1);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnGroups = {"schedule", "schedule-trigger"}, groups = {"tests"})
     public void test() throws JSONException {
         successfulTest = true;
     }
@@ -926,5 +1147,55 @@ public class SchedulesTests extends AbstractSchedulesTests {
                 scheduleName, "/graph/" + executableName, defaultCronTime, null);
         assertNewSchedule(processName, scheduleName, "/graph/" + executableName, defaultCronTime,
                 null);
+    }
+
+    private Map<String, String> prepareDataForTriggerScheduleTest(String processName,
+            String triggerScheduleName, String triggerScheduleExecutable,
+            String dependentSheduleName, String dependentScheduleExecutable) throws JSONException,
+            InterruptedException {
+        Map<String, String> scheduleUrls = new HashMap<String, String>();
+        Pair<String, List<String>> triggerScheduleCronTime =
+                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
+        openProjectDetailPage(projectTitle, testParams.getProjectId());
+        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                DISCProcessTypes.GRAPH, processName,
+                Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
+                true);
+        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+                triggerScheduleName, triggerScheduleExecutable, triggerScheduleCronTime, null);
+        assertNewSchedule(processName, triggerScheduleName, triggerScheduleExecutable,
+                triggerScheduleCronTime, null);
+        scheduleUrls.put("triggerScheduleUrl", browser.getCurrentUrl());
+
+        Pair<String, List<String>> dependentScheduleCronTime =
+                Pair.of(ScheduleCronTimes.AFTER.getCronTime(),
+                        Arrays.asList(processName, triggerScheduleExecutable));
+        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+                dependentSheduleName, dependentScheduleExecutable, dependentScheduleCronTime, null);
+        assertNewSchedule(processName, dependentSheduleName, dependentScheduleExecutable,
+                dependentScheduleCronTime, null);
+        scheduleUrls.put("dependentScheduleUrl", browser.getCurrentUrl());
+        return scheduleUrls;
+    }
+
+    private void manualRunTriggerSchedule(String scheduleUrl, boolean isSuccessful,
+            String executablePath) throws InterruptedException {
+        browser.get(scheduleUrl);
+        waitForElementVisible(scheduleDetail.getRoot());
+        scheduleDetail.manualRun();
+        scheduleDetail.assertLastExecutionDetails(isSuccessful, true, false, executablePath,
+                DISCProcessTypes.GRAPH, 5);
+    }
+
+    private void waitForAutoRunDependentSchedule(String scheduleUrl, String executablePath,
+            int waitingTimeInMinutes, boolean isAutoRun, boolean isSuccessful,
+            int expectedExecutionNumber) throws InterruptedException {
+        browser.get(scheduleUrl);
+        waitForElementVisible(scheduleDetail.getRoot());
+        scheduleDetail.waitForAutoRunSchedule(waitingTimeInMinutes);
+        if (isAutoRun)
+            scheduleDetail.assertLastExecutionDetails(isSuccessful, false, false, executablePath,
+                    DISCProcessTypes.GRAPH, 5);
+        assertEquals(scheduleDetail.getExecutionItemsNumber(), expectedExecutionNumber);
     }
 }
