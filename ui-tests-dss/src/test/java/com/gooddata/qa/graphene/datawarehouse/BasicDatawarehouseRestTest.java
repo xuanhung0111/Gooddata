@@ -141,6 +141,8 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
     public void verifyInstanceEnabled() throws JSONException {
         verifyStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, "ENABLED");
         verifyStorageUsers();
+        verifyStorageSchemas();
+        verifyStorageSchema("default", "Default schema for new ADS instance");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
@@ -390,6 +392,20 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         return storageUrl + "/users";
     }
 
+    private void openStorageSchemasUrl() {
+        openStorageSchemaUrl(null);
+    }
+
+    private void openStorageSchemaUrl(final String schemaName) {
+        final String suffix = (schemaName == null) ? "" : "/" + schemaName;
+        browser.get(getBasicRootUrl() + getStorageSchemasUrl() + suffix);
+        waitForElementPresent(BY_GP_PRE_JSON, browser);
+    }
+
+    private String getStorageSchemasUrl() {
+        return storageUrl + "/schemas";
+    }
+
     private String getStorageJdbcUrl() {
         return storageUrl + "/jdbc";
     }
@@ -465,6 +481,8 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
                     "Instance parent link doesn't match");
             assertTrue(firstStorage.getJSONObject("links").has("self"), "Instance self link isn't present");
             assertTrue(firstStorage.getJSONObject("links").has("users"), "Instance users link isn't present");
+            assertTrue(firstStorage.getJSONObject("links").has("jdbc"), "Instance jdbc link isn't present");
+            assertTrue(firstStorage.getJSONObject("links").has("schemas"), "Instance schemas link isn't present");
             assertTrue(firstStorage.has("status"), "Instance status isn't present");
         }
         assertTrue(json.getJSONObject("instances").getJSONObject("links").getString("parent").endsWith("datawarehouse"),
@@ -489,6 +507,10 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
                 "Instance self link doesn't match");
         assertTrue(storage.getJSONObject("links").getString("users").equals(storageUrl + "/users"),
                 "Instance users link doesn't match");
+        assertTrue(storage.getJSONObject("links").getString("jdbc").equals(getStorageJdbcUrl()),
+                "Instance jdbc link doesn't match");
+        assertTrue(storage.getJSONObject("links").getString("schemas").equals(getStorageSchemasUrl()),
+                "Instance schemas link doesn't match");
         final String currentState = storage.getString("status");
         assertTrue(currentState.equals(state), format("Instance is in invalid state - %s.", currentState));
         userCreatedByUrl = storage.getString("createdBy");
@@ -516,6 +538,32 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         JSONObject jsonUser = loadJSON();
         assertTrue(jsonUser.getJSONObject("accountSetting").getString("login").equals(testParams.getUser()),
                 "Login of user in profile doesn't match");
+    }
+
+    private void verifyStorageSchemas() throws JSONException {
+        openStorageSchemasUrl();
+        final JSONObject jsonSchemas = loadJSON();
+        assertEquals(jsonSchemas.getJSONObject("schemas").getJSONObject("links").getString("self"), getStorageSchemasUrl(),
+                "Instance schemas self link doesn't match");
+        assertEquals(jsonSchemas.getJSONObject("schemas").getJSONObject("links").getString("parent"), storageUrl,
+                "Instance schemas parent link doesn't match");
+        assertTrue(jsonSchemas.getJSONObject("schemas").getJSONArray("items").length() == 1,
+                "Number of schemas doesn't match, default schema is missing");
+    }
+
+    private void verifyStorageSchema(final String schemaName, final String schemaDescription) throws JSONException{
+        openStorageSchemaUrl(schemaName);
+        final JSONObject jsonSchema = loadJSON();
+        assertEquals(jsonSchema.getJSONObject("schema").getString("name"), schemaName,
+                "Schema name doesn't match");
+        assertEquals(jsonSchema.getJSONObject("schema").getString("description"), schemaDescription,
+                "Schema description doesn't match");
+        assertEquals(jsonSchema.getJSONObject("schema").getJSONObject("links").getString("self"), getStorageSchemasUrl() + "/" + schemaName,
+                "Schema self link doesn't match");
+        assertEquals(jsonSchema.getJSONObject("schema").getJSONObject("links").getString("parent"), getStorageSchemasUrl(),
+                "Schema parent link doesn't match");
+        assertEquals(jsonSchema.getJSONObject("schema").getJSONObject("links").getString("instance"), storageUrl,
+                "Schema dss link doesn't match");
     }
 
     private void verifyStorageNotReady(final String url) throws JSONException {
