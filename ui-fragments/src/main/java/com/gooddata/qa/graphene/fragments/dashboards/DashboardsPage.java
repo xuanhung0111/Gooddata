@@ -82,9 +82,18 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(css = ".s-lockIcon")
     private WebElement lockIcon;
 
-	@FindBy (xpath = "//div[@class='yui3-d-embeddialog-content']")
-	private DashboardEmbedDialog dashboardEmbedDialog;
-    
+    @FindBy (xpath = "//div[@class='yui3-d-embeddialog-content']")
+    private DashboardEmbedDialog dashboardEmbedDialog;
+
+    /**
+     * Fragment represents link for saved view dialog on dashboard
+     * when saved view mode is turned on
+     * 
+     * @see SavedViewWidget
+     */
+    @FindBy(xpath = "//div[contains(@class,'savedFilters')]/button")
+    private SavedViewWidget savedViewWidget;
+
     private By emptyTabPlaceholder = By.xpath("//div[contains(@class, 'yui3-c-projectdashboard-placeholder-visible')]");
 
     private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
@@ -115,6 +124,10 @@ public class DashboardsPage extends AbstractFragment {
 
     public PermissionsDialog getPermissionsDialog() {
         return permissionsDialog;
+    }
+
+    public SavedViewWidget getSavedViewWidget() {
+        return savedViewWidget;
     }
 
     public String getDashboardName() {
@@ -226,13 +239,13 @@ public class DashboardsPage extends AbstractFragment {
         System.out.println("Dashboard " + tabName + " printed to Pdf");
         return tabName;
     }
-    
+
     public DashboardEmbedDialog embedDashboard() throws InterruptedException {
-    	waitForDashboardPageLoaded(browser);
-    	waitForElementVisible(editExportEmbedButton).click();
-    	waitForElementVisible(embedButton).click();
-    	waitForElementVisible(dashboardEmbedDialog.getRoot());
-    	return dashboardEmbedDialog;
+        waitForDashboardPageLoaded(browser);
+        waitForElementVisible(editExportEmbedButton).click();
+        waitForElementVisible(embedButton).click();
+        waitForElementVisible(dashboardEmbedDialog.getRoot());
+        return dashboardEmbedDialog;
     }
 
     public void addNewTab(String tabName) {
