@@ -135,7 +135,7 @@ public class DISCProjectsList extends AbstractTable {
     }
 
     public String getEmptyStateMessage() {
-        return waitForElementVisible(projectsEmptyState).getText();
+        return getEmptyState().getText();
     }
 
     public WebElement getEmptyState() {

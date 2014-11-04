@@ -23,6 +23,8 @@ public class SchedulesTests extends AbstractSchedulesTests {
     private final static String EXECUTION_HISTORY_EMPTY_STATE_MESSAGE =
             "No history available. This schedule has not been run yet.";
     private static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
+    private Pair<String, List<String>> defaultCronTime = Pair.of(
+            ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);;
 
     @BeforeClass
     public void initProperties() {
@@ -48,8 +50,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Create Schedule with Custom Input", "DWHS2.grf", "/graph/DWHS2.grf",
                     cronTime, parameters);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -60,8 +61,6 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
                     DISCProcessTypes.GRAPH, "Create Schedule for Specific Executable",
                     Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             projectDetailPage.getExecutableTabByProcessName(
                     "Create Schedule for Specific Executable").click();
             waitForElementVisible(projectDetailPage.getExecutableScheduleLink("DWHS2.grf")).click();
@@ -71,10 +70,9 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.clickOnCloseScheduleButton();
             waitForElementVisible(schedulesTable.getRoot());
             assertNewSchedule("Create Schedule for Specific Executable", "DWHS2.grf",
-                    "/graph/DWHS2.grf", cronTime, null);
+                    "/graph/DWHS2.grf", defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -85,8 +83,6 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
                     DISCProcessTypes.GRAPH, "Create Schedule from Schedule List",
                     Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             projectDetailPage.getNewScheduleLinkInSchedulesList(
                     "Create Schedule from Schedule List").click();
             waitForElementVisible(scheduleForm.getRoot());
@@ -95,10 +91,9 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.clickOnCloseScheduleButton();
             waitForElementNotPresent(scheduleDetail.getRoot());
             assertNewSchedule("Create Schedule from Schedule List", "DWHS1.grf",
-                    "/graph/DWHS1.grf", cronTime, null);
+                    "/graph/DWHS1.grf", defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -117,8 +112,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Edit Cron Time of Schedule", "DWHS1.grf", "/graph/DWHS1.grf",
                     cronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -136,8 +130,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     null, null, cronTime, null);
             assertNewSchedule("Schedule every day", "DWHS1.grf", "/graph/DWHS1.grf", cronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -156,8 +149,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Schedule with cron expression", "DWHS1.grf", "/graph/DWHS1.grf",
                     cronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -179,8 +171,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.assertLastExecutionDetails(true, true, false,
                     "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -205,8 +196,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.assertLastExecutionDetails(false, true, true,
                     "Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -229,8 +219,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Change Executable of Schedule", "errorGraph.grf",
                     "/graph/errorGraph.grf", cronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -277,8 +266,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Change Cron Time of Schedule", "successfulGraph.grf",
                     "/graph/successfulGraph.grf", newCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -308,8 +296,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Edit schedule parameters", "DWHS2.grf", "/graph/DWHS2.grf",
                     cronTime, changedParameters);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -342,8 +329,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Add New Parameters for Schedule", "DWHS2.grf", "/graph/DWHS2.grf",
                     cronTime, changedParameters);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -379,8 +365,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.checkScheduleWithIncorrectCron(incorrectCronTime,
                     scheduleDetail.getSaveChangedCronTimeButton());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -391,26 +376,23 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "cloudconnect",
                     DISCProcessTypes.GRAPH, "Check Broken Schedule",
                     Arrays.asList("DWHS1.grf", "DWHS2.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
                     "Check Broken Schedule", null, null, null, null);
-            assertNewSchedule("Check Broken Schedule", "DWHS1.grf", "/graph/DWHS1.grf", cronTime,
-                    null);
+            assertNewSchedule("Check Broken Schedule", "DWHS1.grf", "/graph/DWHS1.grf",
+                    defaultCronTime, null);
             redeployProcess(projectTitle, testParams.getProjectId(), "Check Broken Schedule",
                     "Basic", "Redeployed Process", DISCProcessTypes.GRAPH, Arrays.asList(
                             "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
                     true);
             projectDetailPage.checkBrokenScheduleSection("Redeployed Process");
-            assertBrokenSchedule("DWHS1.grf", "/graph/DWHS1.grf", cronTime);
+            assertBrokenSchedule("DWHS1.grf", "/graph/DWHS1.grf", defaultCronTime);
             brokenSchedulesTable.getScheduleTitle("DWHS1.grf").click();
             waitForElementVisible(scheduleDetail.getRoot());
             scheduleDetail.checkBrokenSchedule("DWHS1.grf", "/graph/errorGraph.grf");
             assertNewSchedule("Redeployed Process", "errorGraph.grf", "/graph/errorGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -441,8 +423,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Delete Schedule Parameter", "DWHS2.grf", "/graph/DWHS2.grf",
                     cronTime, changedParameters);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -472,8 +453,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Cancel Delete Schedule Parameter", "DWHS2.grf", "/graph/DWHS2.grf",
                     cronTime, parameters);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -493,8 +473,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     "/graph/errorGraph.grf", cronTime, null);
             scheduleDetail.addRetryDelay("5", true, false);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -531,8 +510,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Cancel Change Executable", "successfulGraph.grf",
                     "/graph/successfulGraph.grf", cronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -557,8 +535,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Cancel Change Cron Time of Schedule", "successfulGraph.grf",
                     "/graph/successfulGraph.grf", cronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -577,8 +554,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     cronTime, null);
             scheduleDetail.addRetryDelay("15", false, true);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -609,8 +585,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertNewSchedule("Cancel Edit schedule parameters", "DWHS2.grf", "/graph/DWHS2.grf",
                     cronTime, parameters);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -631,8 +606,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.deleteSchedule(false);
             waitForElementVisible(scheduleDetail.getRoot());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -643,18 +617,15 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
                     DISCProcessTypes.GRAPH, "Check Retry Schedule", Arrays.asList("errorGraph.grf",
                             "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Retry Schedule", null, "/graph/errorGraph.grf", cronTime, null);
+                    "Check Retry Schedule", null, "/graph/errorGraph.grf", defaultCronTime, null);
             assertNewSchedule("Check Retry Schedule", "errorGraph.grf", "/graph/errorGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
             scheduleDetail.addRetryDelay("15", true, true);
             scheduleDetail.removeRetryDelay(false);
             scheduleDetail.removeRetryDelay(true);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -666,19 +637,16 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     DISCProcessTypes.GRAPH, "Check Execution History Empty State", Arrays.asList(
                             "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
                     true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Execution History Empty State", null, "/graph/errorGraph.grf", cronTime,
-                    null);
+                    "Check Execution History Empty State", null, "/graph/errorGraph.grf",
+                    defaultCronTime, null);
             assertNewSchedule("Check Execution History Empty State", "errorGraph.grf",
-                    "/graph/errorGraph.grf", cronTime, null);
+                    "/graph/errorGraph.grf", defaultCronTime, null);
             assertNotNull(scheduleDetail.getExecutionHistoryEmptyState());
             assertEquals(EXECUTION_HISTORY_EMPTY_STATE_MESSAGE, scheduleDetail
                     .getExecutionHistoryEmptyState().getText());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -690,29 +658,26 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
                     DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
                             "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf", cronTime,
-                    null);
+                    "/graph/errorGraph.grf", defaultCronTime, null);
+            assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf",
+                    defaultCronTime, null);
             scheduleDetail.manualRun();
             assertTrue(scheduleDetail.isInScheduledState());
             assertTrue(scheduleDetail.isInRunningState());
             scheduleDetail.assertLastExecutionDetails(false, true, false,
                     "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
             createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
+                    "/graph/successfulGraph.grf", defaultCronTime, null);
             assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
             scheduleDetail.manualRun();
             assertTrue(scheduleDetail.isInScheduledState());
             assertTrue(scheduleDetail.isInRunningState());
             scheduleDetail.assertLastExecutionDetails(true, true, false,
                     "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -724,19 +689,16 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
                     DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
                             "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
+                    "/graph/successfulGraph.grf", defaultCronTime, null);
             assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
             scheduleDetail.repeatManualRun(3, "/graph/successfulGraph.grf", DISCProcessTypes.GRAPH,
                     true);
             scheduleDetail.checkOkExecutionGroup(3, 0);
 
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -745,18 +707,11 @@ public class SchedulesTests extends AbstractSchedulesTests {
         try {
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             String processName = "Create Schedule With Custom Name";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                    "Custom Schedule Name", "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    cronTime, null);
+            String scheduleName = "Custom Schedule Name";
+            String executableName = "successfulGraph.grf";
+            prepareScheduleWithCustomName(processName, scheduleName, executableName);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -765,22 +720,17 @@ public class SchedulesTests extends AbstractSchedulesTests {
         try {
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             String processName = "Edit Schedule With Custom Name";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
-            scheduleDetail.changeScheduleTitle("Custom Schedule Name", true, true);
+            String scheduleName = null;
+            String executableName = "successfulGraph.grf";
+            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+
+            String newScheduleName = "Custom Schedule Name";
+            scheduleDetail.changeScheduleTitle(newScheduleName, true, true);
             scheduleDetail.clickOnCloseScheduleButton();
-            assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    cronTime, null);
+            assertNewSchedule(processName, newScheduleName, "/graph/" + executableName,
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -792,17 +742,14 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
                     DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
                             "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
             projectDetailPage.clickOnNewScheduleButton();
             waitForElementVisible(scheduleForm.getRoot());
             scheduleForm.createScheduleWithInvalidScheduleName(processName,
                     "/graph/successfulGraph.grf", "", "Custom Schedule Name");
             assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -811,22 +758,16 @@ public class SchedulesTests extends AbstractSchedulesTests {
         try {
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             String processName = "Edit Schedule With Empty Custom Name";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+            String scheduleName = null;
+            String executableName = "successfulGraph.grf";
+            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+
             scheduleDetail.changeScheduleTitle("", true, false);
             scheduleDetail.clickOnCloseScheduleButton();
             assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -835,24 +776,18 @@ public class SchedulesTests extends AbstractSchedulesTests {
         try {
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             String processName = "Create Schedule With Not Unique Name";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+            String scheduleName = null;
+            String executableName = "successfulGraph.grf";
+            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+
             projectDetailPage.clickOnNewScheduleButton();
             waitForElementVisible(scheduleForm.getRoot());
             scheduleForm.createScheduleWithInvalidScheduleName(processName,
                     "/graph/successfulGraph.grf", "successfulGraph.grf", "Custom Schedule Name");
             assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -861,26 +796,20 @@ public class SchedulesTests extends AbstractSchedulesTests {
         try {
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             String processName = "Create Schedule With Custom Name";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+            String scheduleName = null;
+            String executableName = "successfulGraph.grf";
+            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+
             createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                    "Custom Schedule Name", "/graph/successfulGraph.grf", cronTime, null);
+                    "Custom Schedule Name", "/graph/successfulGraph.grf", defaultCronTime, null);
             assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
             scheduleDetail.changeScheduleTitle("successfulGraph.grf", true, false);
             scheduleDetail.clickOnCloseScheduleButton();
             assertNewSchedule(processName, "Custom Schedule Name", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -889,117 +818,113 @@ public class SchedulesTests extends AbstractSchedulesTests {
         try {
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             String processName = "Edit Schedule With Custom Name";
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, processName, Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null,
-                    "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+            String scheduleName = null;
+            String executableName = "successfulGraph.grf";
+            prepareScheduleWithCustomName(processName, scheduleName, executableName);
+
             scheduleDetail.changeScheduleTitle("Custom Schedule Name", false, true);
             scheduleDetail.clickOnCloseScheduleButton();
             assertNewSchedule(processName, "successfulGraph.grf", "/graph/successfulGraph.grf",
-                    cronTime, null);
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
-    public void createScheduleWithCustomNameForRubyScript() throws InterruptedException, JSONException {
+    public void createScheduleWithCustomNameForRubyScript() throws InterruptedException,
+            JSONException {
         try {
             openProjectDetailPage(projectTitle, testParams.getProjectId());
             String processName = "Create Schedule With Custom Name For Ruby Script";
             deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "ruby",
-                    DISCProcessTypes.RUBY, processName,
-                    Arrays.asList("ruby1.rb", "ruby2.rb"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(), null);
+                    DISCProcessTypes.RUBY, processName, Arrays.asList("ruby1.rb", "ruby2.rb"), true);
             createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
-                    "Custom Schedule Name", "/script/ruby1.rb", cronTime, null);
+                    "Custom Schedule Name", "/script/ruby1.rb", defaultCronTime, null);
             assertNewSchedule(processName, "Custom Schedule Name", "/script/ruby1.rb",
-                    cronTime, null);
+                    defaultCronTime, null);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
-    
+
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
-    public void checkCustomScheduleNameInFailedOverview() throws InterruptedException, JSONException {
-        try {
-            String processName = "Check Custom Schedule Name In Overview Page";
-            String scheduleName = "Custom Failed Schedule Name";
-            String graphName = "errorGraph.grf";
-            checkScheduleNameInOverviewPage(DISCOverviewProjectStates.FAILED, projectTitle, testParams.getProjectId(), processName, graphName, scheduleName);
-        } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-        }
+    public void checkCustomScheduleNameInFailedOverview() throws InterruptedException,
+            JSONException {
+        String graphName = "errorGraph.grf";
+        checkScheduleNameInOverviewPage(DISCOverviewProjectStates.FAILED, projectTitle,
+                testParams.getProjectId(), graphName);
     }
-    
+
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
-    public void checkCustomScheduleNameInSuccessfulOverview() throws InterruptedException, JSONException {
-        try {
-            String processName = "Check Custom Schedule Name In Overview Page";
-            String scheduleName = "Custom Successful Schedule Name";
-            String graphName = "successfulGraph.grf";
-            checkScheduleNameInOverviewPage(DISCOverviewProjectStates.SUCCESSFUL, projectTitle, testParams.getProjectId(), processName, graphName, scheduleName);
-        } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-        }
+    public void checkCustomScheduleNameInSuccessfulOverview() throws InterruptedException,
+            JSONException {
+        String graphName = "successfulGraph.grf";
+        checkScheduleNameInOverviewPage(DISCOverviewProjectStates.SUCCESSFUL, projectTitle,
+                testParams.getProjectId(), graphName);
     }
-    
+
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
-    public void checkCustomScheduleNameInRunningOverview() throws InterruptedException, JSONException {
-        try {
-            String processName = "Check Custom Schedule Name In Overview Page";
-            String scheduleName = "Custom Running Schedule Name";
-            String graphName = "longTimeRunningGraph.grf";
-            checkScheduleNameInOverviewPage(DISCOverviewProjectStates.RUNNING, projectTitle, testParams.getProjectId(), processName, graphName, scheduleName);
-        } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-        }
+    public void checkCustomScheduleNameInRunningOverview() throws InterruptedException,
+            JSONException {
+        String graphName = "longTimeRunningGraph.grf";
+        checkScheduleNameInOverviewPage(DISCOverviewProjectStates.RUNNING, projectTitle,
+                testParams.getProjectId(), graphName);
     }
 
     @Test(dependsOnGroups = {"schedule"}, groups = {"tests"})
     public void test() throws JSONException {
         successfulTest = true;
     }
-    
-    private void checkScheduleNameInOverviewPage(DISCOverviewProjectStates overviewState, String projectName,
-            String projectId, String processName, String graphName, String scheduleName) throws JSONException,
+
+    private void checkScheduleNameInOverviewPage(DISCOverviewProjectStates overviewState,
+            String projectName, String projectId, String graphName) throws JSONException,
             InterruptedException {
-        openProjectDetailPage(projectName, projectId);
-        deployInProjectDetailPage(projectName, projectId, "Basic", DISCProcessTypes.GRAPH,
-                processName,
+        try {
+            String processName = "Check Custom Schedule Name In Overview Page";
+            String scheduleName = "Custom Schedule Name";
+            openProjectDetailPage(projectName, projectId);
+            deployInProjectDetailPage(projectName, projectId, "Basic", DISCProcessTypes.GRAPH,
+                    processName, Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf",
+                            "successfulGraph.grf"), true);
+            Pair<String, List<String>> cronTime =
+                    Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(),
+                            Arrays.asList("59", "23"));
+            createScheduleForProcess(projectName, projectId, processName, scheduleName, "/graph/"
+                    + graphName, cronTime, null);
+            assertNewSchedule(processName, scheduleName, "/graph/" + graphName, cronTime, null);
+            scheduleDetail.manualRun();
+
+            if (overviewState.equals(DISCOverviewProjectStates.RUNNING))
+                assertTrue(scheduleDetail.isInRunningState());
+            else {
+                boolean isSuccessful = !overviewState.equals(DISCOverviewProjectStates.FAILED);
+                scheduleDetail.assertLastExecutionDetails(isSuccessful, true, false, "Basic/graph/"
+                        + graphName, DISCProcessTypes.GRAPH, 5);
+            }
+            String scheduleUrl = browser.getCurrentUrl();
+
+            openUrl(DISC_OVERVIEW_PAGE);
+            waitForElementVisible(discOverview.getRoot());
+            discOverview.selectOverviewState(overviewState);
+            waitForElementVisible(discOverviewProjects.getRoot());
+            discOverviewProjects.assertOverviewScheduleName(overviewState, projectName, projectId,
+                    true, scheduleUrl, scheduleName);
+        } finally {
+            cleanProcessesInProjectDetail(projectId);
+        }
+    }
+
+    private void prepareScheduleWithCustomName(String processName, String scheduleName,
+            String executableName) throws JSONException, InterruptedException {
+        scheduleName = scheduleName == null ? executableName : scheduleName;
+        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
+                DISCProcessTypes.GRAPH, processName,
                 Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
                 true);
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        createScheduleForProcess(projectName, projectId, processName, scheduleName, "/graph/" + graphName,
-                cronTime, null);
-        assertNewSchedule(processName, scheduleName, "/graph/" + graphName, cronTime, null);
-        scheduleDetail.manualRun();
-        
-        if (overviewState.equals(DISCOverviewProjectStates.RUNNING))
-            assertTrue(scheduleDetail.isInRunningState());
-        else {
-            boolean isSuccessful = !overviewState.equals(DISCOverviewProjectStates.FAILED);
-            scheduleDetail.assertLastExecutionDetails(isSuccessful, true, false, "Basic/graph/"
-                    + graphName, DISCProcessTypes.GRAPH, 5);
-        }
-        String scheduleUrl = browser.getCurrentUrl();
-        
-        openUrl(DISC_OVERVIEW_PAGE);
-        waitForElementVisible(discOverview.getRoot());
-        discOverview.selectOverviewState(overviewState);
-        waitForElementVisible(discOverviewProjects.getRoot());
-        discOverviewProjects.assertOverviewScheduleName(overviewState, projectName, projectId, true, scheduleUrl, scheduleName);
+        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName,
+                scheduleName, "/graph/" + executableName, defaultCronTime, null);
+        assertNewSchedule(processName, scheduleName, "/graph/" + executableName, defaultCronTime,
+                null);
     }
 }

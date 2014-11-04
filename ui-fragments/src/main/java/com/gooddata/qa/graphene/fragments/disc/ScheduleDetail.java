@@ -484,6 +484,7 @@ public class ScheduleDetail extends ScheduleForm {
         waitForElementVisible(manualRunButton);
         for (int i = 0; i < executionTimes; i++) {
             manualRun();
+            isInRunningState();
             assertLastExecutionDetails(isSuccessful, true, false, executablePath, processType, 5);
         }
     }
@@ -708,7 +709,7 @@ public class ScheduleDetail extends ScheduleForm {
             Thread.sleep(2000);
         scheduleTitleInput.sendKeys(newScheduleName);
         if (isSaved) {
-            saveScheduleTitleButton.click();
+            waitForElementVisible(saveScheduleTitleButton).click();
             if (!isValid) {
                 assertTrue(scheduleTitleInput.getAttribute("class").contains("has-error"));
                 waitForElementVisible(scheduleTitleErrorBubble);
@@ -719,6 +720,6 @@ public class ScheduleDetail extends ScheduleForm {
                             INVALID_SCHEDULE_TITLE_ERROR.replace("${scheduleName}", newScheduleName));
             }
         } else
-            cancelChangeScheduleTitleButton.click();
+            waitForElementVisible(cancelChangeScheduleTitleButton).click();
     }
 }
