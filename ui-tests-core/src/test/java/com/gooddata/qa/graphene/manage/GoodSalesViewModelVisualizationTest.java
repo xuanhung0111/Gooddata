@@ -45,7 +45,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"checkLDMImageTest"}, groups = {"viewModel"})
     public void checkLDMImageAfterChangeAttributeNameTest() throws ParseException, IOException, JSONException {
-        changeAttributeNameTest("Account", "Acsount");
+        changeAttributeName("Account", "Acsount");
 
         File tmpImage = getLDMImageFromGrayPage(URI);
         try {
@@ -62,7 +62,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
             assertTrue(diffPercent < 0.001);
         } finally {
             tmpImage.delete();
-            changeAttributeNameTest("Acsount", "Account");
+            changeAttributeName("Acsount", "Account");
         }
     }
 
@@ -72,7 +72,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     }
     
 
-    private void changeAttributeNameTest(String attributeName, String newName) {
+    private void changeAttributeName(String attributeName, String newName) {
         initAttributePage();
         attributePage.renameAttribute(attributeName, newName);
     }
@@ -86,7 +86,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
         URL url = new URL(new JSONObject(EntityUtils.toString(getResponse.getEntity()))
                                         .get("uri").toString());
-        File image = new File(testParams.loadProperty("java.io.tmpdir") + MODEL_IMAGE_FILE);
+        File image = new File(testParams.loadProperty("java.io.tmpdir"), MODEL_IMAGE_FILE);
         FileUtils.copyURLToFile(url, image);
 
         return image;
