@@ -282,4 +282,13 @@ public class DashboardEditBar extends AbstractFragment {
     public WebElement getSavedViewDisabledNotification() {
         return savedViewDisabledNotification;
     }
+
+    public void initInteractiveReportWidget() throws InterruptedException {
+        int widgetCountBefore = listDashboardWidgets.size();
+        waitForElementVisible(widgetMenuButton).click();
+        waitForElementVisible(dashboardAddWidgetPanel.getRoot());
+        dashboardAddWidgetPanel.initWidget(WidgetTypes.INTERACTIVE_REPORT);
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
+                "Widget wasn't added");
+    }
 }
