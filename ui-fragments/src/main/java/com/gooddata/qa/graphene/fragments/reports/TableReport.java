@@ -1,65 +1,206 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.testng.collections.Sets;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-
+import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+/**
+ * Fragment represents table report in
+ *  - Dashboard page
+ *  - Report page
+ *  - Drill dialog
+ */
 public class TableReport extends AbstractReport {
 
-    @FindBy(xpath = "//div[@class='containerBody']/div[4]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'element')]/span")
+    @FindBy(css = ".containerBody .gridTabPlate .gridTile .element span")
     private List<WebElement> attributeElementInGrid;
 
-    @FindBy(xpath = "//div[@class='containerBody']/div[5]/div[@class='gridTabPlate']/div[@class='gridTile']/div[contains(@class,'data')]")
+    @FindBy(css = ".containerBody .gridTabPlate .gridTile .metric span")
+    private List<WebElement> metricElementInGrid;
+
+    @FindBy(css = ".containerBody .gridTabPlate .gridTile .data")
     private List<WebElement> metricValuesInGrid;
 
-    @FindBy(xpath = "//div[@id='gridContainerTab']//div[contains(@class,'drillable')]")
+    @FindBy(css = ".drillable")
     private List<WebElement> drillableElements;
 
-    @FindBy(xpath = "//div[@id='analysisAttributesContainer']//span[contains(@class,'captionWrapper')]")
+    @FindBy(css = ".gridTab.mainHeaderTab .captionWrapper")
     private List<WebElement> attributesHeader;
 
+    @FindBy(css = ".containerBody .gridTabPlate .gridTile .metric span")
+    private List<WebElement> metricsHeader;
+
     public List<String> getAttributesHeader() {
-        List<String> attributes = new ArrayList<String>();
-        for (int i = 0; i < attributesHeader.size(); i++) {
-            String tmp = attributesHeader.get(i).getText();
-            attributes.add(tmp);
-        }
-        return attributes;
+        waitForReportLoading();
+        return Lists.newArrayList(Collections2.transform(attributesHeader,
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
+                return input.getText().trim();
+            }
+        }));
+    }
+
+    public Set<String> getMetricsHeader() {
+        waitForReportLoading();
+        return Sets.newHashSet(Collections2.transform(metricsHeader,
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
+                return input.getText().trim();
+            }
+        }));
     }
 
     public List<String> getAttributeElements() {
-	List<String> attributeElements = new ArrayList<String>();
-	for (int i = 0; i < attributeElementInGrid.size(); i++) {
-	    String tmp = attributeElementInGrid.get(i).getText();
-	    attributeElements.add(tmp);
-	}
-	return attributeElements;
+        waitForReportLoading();
+        return Lists.newArrayList(Collections2.transform(attributeElementInGrid,
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
+                return input.getText().trim();
+            }
+        }));
     }
 
     public List<Float> getMetricElements() {
-	List<Float> metricValues = new ArrayList<Float>();
-	for (int i = 0; i < metricValuesInGrid.size(); i++) {
-	    float tmp = ReportPage.getNumber(metricValuesInGrid.get(i)
-		    .getAttribute("title"));
-	    metricValues.add(tmp);
-	}
-	return metricValues;
+        waitForReportLoading();
+        return Lists.newArrayList(Collections2.transform(metricValuesInGrid,
+                new Function<WebElement, Float>() {
+            @Override
+            public Float apply(WebElement input) {
+                return ReportPage.getNumber(input.getAttribute("title"));
+            }
+        }));
     }
 
     public void verifyAttributeIsHyperlinkInReport() {
-	String drillToHyperLinkElement = "Open external link in a new window";
-	assertTrue(drillableElements.size() > 0,
-		"Attribute is NOT drillable");
-	for (WebElement element : drillableElements) {
-	    assertTrue(waitForElementVisible(element).getAttribute("title")
-		    .indexOf(drillToHyperLinkElement) > -1,
-		    "Some of elements are NOT drillable to external link!");
-	}
+        String drillToHyperLinkElement = "Open external link in a new window";
+        assertTrue(drillableElements.size() > 0, "Attribute is NOT drillable");
+        for (WebElement element : drillableElements) {
+            assertTrue(waitForElementVisible(element).getAttribute("title").indexOf(drillToHyperLinkElement) > -1,
+                       "Some of elements are NOT drillable to external link!");
+        }
+    }
+
+    public void clickOnAttributeToOpenDrillReport(String attributeName) {
+        waitForReportLoading();
+        for (WebElement e : attributeElementInGrid) {
+            if (!attributeName.equals(e.getText().trim()))
+                continue;
+            e.click();
+            break;
+        }
+    }
+
+    public boolean isRollupTotalVisible() {
+        waitForReportLoading();
+
+        try {
+            return browser.findElement(By.cssSelector(".totalHeader")).isDisplayed();
+        } catch(NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public void drillOnMetricValue() {
+        waitForReportLoading();
+        String cssClass = null;
+        for (WebElement e : drillableElements) {
+            cssClass = e.getAttribute("class");
+            if (cssClass.contains("rows") || cssClass.contains("columns"))
+                continue;
+
+            if (!cssClass.contains("even") && !cssClass.contains("odd"))
+                continue;
+
+            e.findElement(By.cssSelector("span")).click();
+            break;
+        }
+    }
+
+    public void drillOnAttributeValue() {
+        waitForReportLoading();
+        for (WebElement e : attributeElementInGrid) {
+            if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
+                continue;
+
+            e.click();
+            break;
+        }
+    }
+
+    public void waitForReportLoading() {
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                // wait for report idle when drill on metric values
+                try { Thread.sleep(100); } catch(InterruptedException e) {}
+
+                try {
+                    return !TableReport.this.getRoot().findElement(By.cssSelector(".c-report"))
+                            .getAttribute("class").contains("reloading");
+                } catch(NoSuchElementException e) {
+                    // in Report Page
+                    return !metricElementInGrid.isEmpty();
+                }
+            }
+        });
+    }
+
+    public void addDrilling(Pair<List<String>, String> pairs, String group) {
+        waitForElementVisible(this.getRoot()).click();
+        DashboardEditWidgetToolbarPanel toolbar = Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
+                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
+        toolbar.openConfigurationPanel();
+        
+        if (isAddDrillingButtonVisible()) {
+            waitForElementVisible(By.cssSelector(".s-btn-add_drilling"), browser).click();
+        } else {
+            waitForElementVisible(By.cssSelector(".s-btn-add_more___"), browser).click();
+        }
+        waitForElementVisible(By.cssSelector(".s-btn-select_metric___attribute___"), browser).click();
+
+        waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
+        SelectItemPopupPanel popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class,
+                browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
+
+        for (String item : pairs.getLeft()) {
+            popupPanel.searchAndSelectItem(item);
+        }
+        waitForElementVisible(By.cssSelector(".s-btn-select_attribute___report"), browser).click();
+        waitForElementVisible(popupPanel.getRoot());
+        popupPanel.changeGroup(group);
+        popupPanel.searchAndSelectItem(pairs.getRight());
+        waitForElementVisible(By.cssSelector(".s-btn-apply"), browser).click();
+    }
+
+    public void addDrilling(Pair<List<String>, String> pairs) {
+        addDrilling(pairs, "Attributes");
+    }
+
+    private boolean isAddDrillingButtonVisible() {
+        try {
+            return browser.findElement(By.cssSelector(".s-btn-add_drilling")).isDisplayed();
+        } catch(NoSuchElementException e) {
+            return false;
+        }
     }
 }

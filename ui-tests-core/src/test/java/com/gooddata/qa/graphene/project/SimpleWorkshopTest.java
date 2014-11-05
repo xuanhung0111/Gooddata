@@ -1,14 +1,12 @@
 package com.gooddata.qa.graphene.project;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
-import org.jboss.arquillian.graphene.Graphene;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
@@ -42,9 +40,9 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
         reportsPage.startCreateReport();
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
-        List<String> what = new ArrayList<String>();
-        what.add("Sum of Amount");
-        reportPage.createReport("Headline test", ReportTypes.HEADLINE, what, null);
+        reportPage.createReport(new ReportDefinition().withName("Headline test")
+                                                      .withType(ReportTypes.HEADLINE)
+                                                      .withWhats("Sum of Amount"));
         Screenshots.takeScreenshot(browser, "simple-ws-headline-report", this.getClass());
     }
 
@@ -64,8 +62,7 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
     public void verifyHeadlineReport() {
         initDashboardsPage();
         assertEquals(1, dashboardsPage.getContent().getNumberOfReports(), "Invalid report(s) count on dashboard");
-        OneNumberReport report = Graphene.createPageFragment(OneNumberReport.class,
-                dashboardsPage.getContent().getReport(0).getRoot());
+        OneNumberReport report = dashboardsPage.getContent().getReport(0, OneNumberReport.class);
         assertEquals(report.getValue(), "7,252,542.63", "Invalid value in headline report");
         assertEquals(report.getDescription(), "Sum of Amount", "Invalid description in headline report");
         successfulTest = true;

@@ -5,12 +5,14 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
 
 /**
  * This fragment is for editing filter when dashboard in edit mode
@@ -20,9 +22,6 @@ public class DashboardEditFilter extends AbstractFragment{
 
     @FindBy(xpath = "//div[contains(@class,'s-active-tab')]//div[contains(@class,'yui3-c-dashboardwidget-editMode')]")
     private List<WebElement> filters;
-
-    @FindBy(xpath = "//div[contains(@class,'s-dashboardwidget-toolbar')]")
-    private ToolbarPanel toolbarPanel;
 
     @FindBy(xpath = "//div[contains(@class,'yui3-c-tabtimefiltereditor-content')]")
     private TimeFilterEditorPanel timeFilterEditorPanel;
@@ -60,7 +59,7 @@ public class DashboardEditFilter extends AbstractFragment{
      */
     public void openToolbarPanel(WebElement filter) {
         waitForElementVisible(filter).click();
-        waitForElementVisible(toolbarPanel.getRoot());
+        waitForElementVisible(getToolbarPanel().getRoot());
     }
 
     /**
@@ -72,7 +71,7 @@ public class DashboardEditFilter extends AbstractFragment{
     public void deleteFilter(String timeOrAttribute) throws InterruptedException {
         WebElement filter = "time".equals(timeOrAttribute) ? getTimeFilter() : getAttributeFilter(timeOrAttribute);
         openToolbarPanel(filter);
-        waitForElementVisible(toolbarPanel.removeButton).click();
+        getToolbarPanel().removeWidget();
         Thread.sleep(1000);
         Assert.assertFalse(isDashboardContainsFilter(timeOrAttribute));
     }
@@ -100,26 +99,15 @@ public class DashboardEditFilter extends AbstractFragment{
      */
     public void changeTypeOfTimeFilter(String type) {
         openToolbarPanel(getTimeFilter());
-        waitForElementVisible(toolbarPanel.editButton).click();
+        getToolbarPanel().openEditPanel();
         waitForElementVisible(By.xpath(String.format(TimeFilterEditorPanel.TYPE, type)), browser).click();
         waitForElementVisible(timeFilterEditorPanel.applyButton).click();
         waitForElementNotVisible(timeFilterEditorPanel.getRoot());
     }
 
-    /**
-     * Toolbar panel is opened when clicking on filter when dashboard in edit mode
-     *
-     */
-    private static class ToolbarPanel extends AbstractFragment {
-
-        @FindBy(xpath = "//div[contains(@class,'yui3-toolbar-icon-config')]")
-        private WebElement configureButton;
-
-        @FindBy(xpath = "//div[contains(@class,'yui3-toolbar-icon-edit')]")
-        private WebElement editButton;
-
-        @FindBy(xpath = "//div[contains(@class,'yui3-toolbar-icon-remove')]")
-        private WebElement removeButton;
+    private DashboardEditWidgetToolbarPanel getToolbarPanel() {
+        return Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
+                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
     }
 
     /**

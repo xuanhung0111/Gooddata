@@ -1,19 +1,21 @@
 package com.gooddata.qa.graphene.reports;
 
-import java.util.Arrays;
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForReportsPageLoaded;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import com.gooddata.qa.graphene.enums.FilterTypes;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.enums.VariableTypes;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
+import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.enums.VariableTypes;
 
 @Test(groups = {"GoodSalesReportFilters"}, description = "Tests for GoodSales project (report filters functionality) in GD platform")
 public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
@@ -44,9 +46,10 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createReportTest() throws InterruptedException {
-        List<String> what = Arrays.asList("Amount");
-        List<String> how = Arrays.asList("Stage Name");
-        createReport(reportName, ReportTypes.TABLE, what, how, "Simple filter report");
+        createReport(new ReportDefinition().withName(reportName)
+                                           .withWhats("Amount")
+                                           .withHows("Stage Name"),
+                    "Simple filter report");
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
@@ -61,7 +64,8 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void attributeFilterTest() throws InterruptedException {
         initReport();
-        reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
+        reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", "Interest", 
+                "Discovery", "Short List", "Negotiation", "Closed Won", "Closed Lost"));
         reportPage.saveReport();
         checkRedBar(browser);
     }
@@ -69,7 +73,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rankingFilterTest() throws InterruptedException {
         initReport();
-        reportPage.addFilter(FilterTypes.RANK, data);
+        reportPage.addFilter(FilterItem.Factory.createRankingFilter(ResultSize.TOP.withSize(3), "Stage Name", "Amount"));
         reportPage.saveReport();
         checkRedBar(browser);
     }
@@ -77,7 +81,8 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
     public void rangeFilterTest() throws InterruptedException {
         initReport();
-        reportPage.addFilter(FilterTypes.RANGE, data);
+        reportPage.addFilter(FilterItem.Factory.createRangeFilter("Stage Name", "Amount",
+                Range.IS_GREATER_THAN_OR_EQUAL_TO.withNumber(100000)));
         reportPage.saveReport();
         checkRedBar(browser);
     }
@@ -85,9 +90,8 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest", "createVariableTest"}, groups = {"filter-tests"})
     public void promptFilterTest() throws InterruptedException {
         initReport();
-        data.put("variable", this.variableName);
-        data.put("promptElements", promptElements);
-        reportPage.addFilter(FilterTypes.PROMPT, data);
+        reportPage.addFilter(FilterItem.Factory.createVariableFilter(variableName,
+                "Interest", "Discovery", "Short List", "Negotiation"));
         reportPage.saveReport();
         checkRedBar(browser);
     }

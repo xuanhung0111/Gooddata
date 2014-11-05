@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -7,12 +9,10 @@ import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-
 public class ReportsPage extends AbstractFragment {
 
-    private static final By BY_ADD_FOLDER_INPUT = By.xpath("..//input");
-    private static final By BY_ADD_FOLDER_SUBMIT_BUTTON = By.xpath("../div//button[contains(@class,'s-newSpaceButton')]");
+    private static final By BY_ADD_FOLDER_INPUT = By.cssSelector("#newDomain input");
+    private static final By BY_ADD_FOLDER_SUBMIT_BUTTON = By.cssSelector("#newDomain button.s-newSpaceButton");
 
     @FindBy(id = "folderDomains")
     private ReportsFolders defaultFolders;
@@ -48,25 +48,26 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public void startCreateReport() {
-        waitForElementVisible(createReportButton);
-        createReportButton.click();
+        waitForElementVisible(createReportButton).click();
     }
 
     public void addNewFolder(String folderName) {
         int currentFoldersCount = customFolders.getNumberOfFolders();
-        addFolderButton.click();
-        waitForElementVisible(addFolderButton.findElement(BY_ADD_FOLDER_INPUT));
-        addFolderButton.findElement(BY_ADD_FOLDER_INPUT).sendKeys(folderName);
-        addFolderButton.findElement(BY_ADD_FOLDER_SUBMIT_BUTTON).click();
-        Assert.assertEquals(customFolders.getNumberOfFolders(), currentFoldersCount + 1, "Number of folders increased");
-        Assert.assertTrue(customFolders.getAllFolderNames().contains(folderName), "New folder name is present in list");
+
+        waitForElementVisible(addFolderButton).click();
+        WebElement folderInput = waitForElementVisible(BY_ADD_FOLDER_INPUT, browser);
+        folderInput.sendKeys(folderName);
+        waitForElementVisible(BY_ADD_FOLDER_SUBMIT_BUTTON, browser).click();
+
+        Assert.assertEquals(customFolders.getNumberOfFolders(), currentFoldersCount + 1, "Number of folders is not increased");
+        Assert.assertTrue(customFolders.getAllFolderNames().contains(folderName), "New folder name is not present in list");
     }
 
     public String getSelectedFolderName() {
-        return selectedFolderName.getText();
+        return waitForElementVisible(selectedFolderName).getText().trim();
     }
 
     public String getSelectedFolderDescription() {
-        return selectedFolderDescription.getText();
+        return waitForElementVisible(selectedFolderDescription).getText().trim();
     }
 }

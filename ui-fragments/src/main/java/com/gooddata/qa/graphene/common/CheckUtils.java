@@ -1,10 +1,14 @@
 package com.gooddata.qa.graphene.common;
 
+import java.util.Collection;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+
+import com.google.common.base.Predicate;
 
 import static org.testng.Assert.fail;
 
@@ -13,6 +17,9 @@ public class CheckUtils {
     private static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
     private static final By BY_RED_BAR_WARNING = By.cssSelector("div.c-status.box-warning");
     private static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
+
+    private CheckUtils() {
+    }
 
     public static void checkRedBar(WebDriver browser) {
         if (browser.findElements(BY_RED_BAR).size() != 0) {
@@ -120,5 +127,23 @@ public class CheckUtils {
 
     public static void waitForElementNotPresent(Select select) {
         Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().not().present();
+    }
+
+    public static void waitForCollectionIsEmpty(final Collection<WebElement> items) {
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                return items.isEmpty();
+            }
+        });
+    }
+
+    public static void waitForCollectionIsNotEmpty(final Collection<WebElement> items) {
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                return !items.isEmpty();
+            }
+        });
     }
 }

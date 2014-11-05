@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -13,8 +11,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
-import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.greypages.sfdccredentials.ConfigureSFDCCredentials;
 import com.gooddata.qa.graphene.fragments.reports.ReportWithImage;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
@@ -103,9 +101,10 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"configDrillToExternalPageTest"}, groups = {
             "tests"})
     public void createReportWithHyperlinkTest() throws InterruptedException {
-        List<String> what = Arrays.asList("Count of Image");
-        List<String> how = Arrays.asList(hyperlinkAttr);
-        createReport(hyperlinkReport, ReportTypes.TABLE, what, how, "Simple hyperlink report");
+        createReport(new ReportDefinition().withName(hyperlinkReport)
+                                           .withWhats("Count of Image")
+                                           .withHows(hyperlinkAttr), 
+                     "Simple hyperlink report");
     }
 
     @Test(dependsOnMethods = {"createReportWithHyperlinkTest"}, groups = {

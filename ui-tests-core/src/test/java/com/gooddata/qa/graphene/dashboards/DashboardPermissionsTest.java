@@ -119,7 +119,6 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         dashboardsPage.selectDashboard(lockedDashboardName);
         waitForDashboardPageLoaded(browser);
-        waitForElementVisible(dashboardsPage.getEditExportEmbedButton()).click();
         Assert.assertFalse(dashboardsPage.isEditButtonPresent());
     }
 

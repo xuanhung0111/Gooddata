@@ -1,15 +1,22 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
 
 public class DashboardsPage extends AbstractFragment {
 
@@ -22,32 +29,11 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(css = ".menuArrow")
     private WebElement dashboardSwitcherArrowMenu;
 
-    @FindBy(css = ".s-dashboards-menu")
-    private WebElement dashboardsMenu;
-
-    @FindBy(css = ".s-dashboards-menu-item")
-    private List<WebElement> dashboardSelectors;
-
     @FindBy(xpath = "//button[@title='Edit, Embed or Export']")
     private WebElement editExportEmbedButton;
 
-    @FindBy(css = ".s-edit")
-    private WebElement editButton;
-
-    @FindBy(css = ".s-export_to_pdf")
-    private WebElement exportPdfButton;
-
-    @FindBy(css = ".s-permissions")
-    private WebElement permissionsButton;
-
     @FindBy(xpath = "//button[@title='Download PDF']")
     private WebElement printPdfButton;
-
-    @FindBy(css = ".s-embed")
-    private WebElement embedButton;
-
-    @FindBy(css = ".s-add_dashboard")
-    private WebElement addDashboardButton;
 
     @FindBy(xpath = "//button[@title='Add a new tab']")
     private WebElement addNewTabButton;
@@ -102,7 +88,6 @@ public class DashboardsPage extends AbstractFragment {
 
     private By emptyTabPlaceholder = By.xpath("//div[contains(@class, 'yui3-c-projectdashboard-placeholder-visible')]");
 
-    private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
     private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
     private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
     private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
@@ -124,10 +109,6 @@ public class DashboardsPage extends AbstractFragment {
         return editDashboardBar;
     }
 
-    public WebElement getEditExportEmbedButton() {
-        return editExportEmbedButton;
-    }
-
     public PermissionsDialog getPermissionsDialog() {
         return permissionsDialog;
     }
@@ -137,8 +118,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public String getDashboardName() {
-        waitForElementVisible(dashboardSwitcherButton);
-        String name = dashboardSwitcherButton.getText();
+        String name = waitForElementVisible(dashboardSwitcherButton).getText();
         if (getDashboardsCount() > 1) {
             return name.substring(0, name.length() - 1);
         }
@@ -150,49 +130,25 @@ public class DashboardsPage extends AbstractFragment {
             System.out.println("Dashboard '" + dashboardName + "'already selected");
             return true;
         }
-        waitForElementVisible(dashboardSwitcherButton).click();
-        if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
-            for (WebElement elem : dashboardSelectors) {
-                if (elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title").equals(dashboardName)) {
-                    elem.findElement(BY_LINK).click();
-                    Thread.sleep(3000);
-                    waitForDashboardPageLoaded(browser);
-                    return true;
-                }
-            }
-        }
-        System.out.println("Dashboard not selected because it's not present!!!!");
-        return false;
+
+        return openDashboardMenu().selectDashboardByName(dashboardName);
     }
 
     public boolean selectDashboard(int dashboardIndex) throws InterruptedException {
-        waitForElementVisible(dashboardSwitcherButton).click();
+        DashboardMenu menu = openDashboardMenu();
         Thread.sleep(3000);
-        if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
-            for (WebElement elem : dashboardSelectors) {
-                if (Integer.valueOf(elem.getAttribute("gdc:index")) == dashboardIndex) {
-                    elem.findElement(BY_LINK).click();
-                    Thread.sleep(3000);
-                    waitForDashboardPageLoaded(browser);
-                    return true;
-                }
-            }
-        }
-        System.out.println("Dashboard not selected because it's not present!!!!");
-        return false;
+
+        return menu.selectDashboardByIndex(dashboardIndex);
     }
 
-    public List<String> getDashboardsNames() throws InterruptedException {
+    public List<String> getDashboardsNames() {
         List<String> dashboardsNames = new ArrayList<String>();
+        waitForDashboardPageLoaded(browser);
+
         if (dashboardSwitcherArrowMenu.isDisplayed()) {
+            dashboardsNames.addAll(openDashboardMenu().getAllItemNames());
             dashboardSwitcherArrowMenu.click();
-            waitForElementVisible(dashboardsMenu);
-            if (dashboardSelectors != null && dashboardSelectors.size() > 0) {
-                for (WebElement elem : dashboardSelectors) {
-                    dashboardsNames.add(elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title"));
-                }
-            }
-            dashboardSwitcherArrowMenu.click();
+
         } else if (dashboardSwitcherButton.isDisplayed()) {
             dashboardsNames.add(getDashboardName());
         }
@@ -200,9 +156,10 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public int getDashboardsCount() {
+        waitForDashboardPageLoaded(browser);
+
         if (dashboardSwitcherArrowMenu.isDisplayed()) {
-            dashboardSwitcherArrowMenu.click();
-            int dashboardsCount = dashboardSelectors.size();
+            int dashboardsCount = openDashboardMenu().getItemsCount();
             dashboardSwitcherArrowMenu.click();
             return dashboardsCount;
         } else if (dashboardSwitcherButton.isDisplayed()) {
@@ -213,8 +170,7 @@ public class DashboardsPage extends AbstractFragment {
 
     public void editDashboard() {
         waitForDashboardPageLoaded(browser);
-        waitForElementVisible(editExportEmbedButton).click();
-        waitForElementVisible(editButton).click();
+        openEditExportEmbedMenu().select("Edit");
         waitForElementPresent(editDashboardBar.getRoot());
     }
 
@@ -222,8 +178,7 @@ public class DashboardsPage extends AbstractFragment {
         tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
         String tabName = tabs.getTabLabel(0);
-        waitForElementVisible(editExportEmbedButton).click();
-        waitForElementVisible(exportPdfButton).click();
+        openEditExportEmbedMenu().select("Export to PDF");
         waitForElementVisible(BY_EXPORTING_PANEL, browser);
         Thread.sleep(3000);
         waitForElementNotPresent(BY_EXPORTING_PANEL);
@@ -248,8 +203,7 @@ public class DashboardsPage extends AbstractFragment {
 
     public DashboardEmbedDialog embedDashboard() throws InterruptedException {
         waitForDashboardPageLoaded(browser);
-        waitForElementVisible(editExportEmbedButton).click();
-        waitForElementVisible(embedButton).click();
+        openEditExportEmbedMenu().select("Embed");
         waitForElementVisible(dashboardEmbedDialog.getRoot());
         return dashboardEmbedDialog;
     }
@@ -277,8 +231,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public void addNewDashboard(String dashboardName) throws InterruptedException {
-        waitForElementVisible(editExportEmbedButton).click();
-        waitForElementVisible(addDashboardButton).click();
+        openEditExportEmbedMenu().select("Add Dashboard");
         waitForElementVisible(newDashboardNameInput).clear();
         newDashboardNameInput.click(); //sleep wasn't necessary, getting focus on the input field helps
         newDashboardNameInput.sendKeys(dashboardName);
@@ -294,8 +247,7 @@ public class DashboardsPage extends AbstractFragment {
 
     public void openPermissionsDialog() {
         waitForDashboardPageLoaded(browser);
-        waitForElementVisible(editExportEmbedButton).click();
-        waitForElementVisible(permissionsButton).click();
+        openEditExportEmbedMenu().select("Permissions");
         waitForElementVisible(permissionsDialog.getRoot());
     }
 
@@ -332,11 +284,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public boolean isEditButtonPresent() {
-        try {
-            return editButton.isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        return openEditExportEmbedMenu().contains("Edit");
     }
 
     public DashboardScheduleDialog scheduleDashboard() {
@@ -352,5 +300,22 @@ public class DashboardsPage extends AbstractFragment {
         } catch (NoSuchElementException nsee) {
             return false;
         }
+    }
+
+    private SimpleMenu openEditExportEmbedMenu() {
+        waitForElementVisible(editExportEmbedButton).click();
+        SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
+                waitForElementVisible(SimpleMenu.LOCATOR, browser));
+        waitForElementVisible(menu.getRoot());
+
+        return menu;
+    }
+
+    private DashboardMenu openDashboardMenu() {
+        waitForElementVisible(dashboardSwitcherButton).click();
+        DashboardMenu menu = Graphene.createPageFragment(DashboardMenu.class,
+                waitForElementVisible(DashboardMenu.LOCATOR, browser));
+        waitForElementVisible(menu.getRoot());
+        return menu;
     }
 }

@@ -14,10 +14,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.FilterTypes;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"GoodSalesMetrics"}, description = "Tests for GoodSales project (metric creation functionality) in GD platform")
@@ -476,21 +476,21 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             String attributeName, List<Float> metricValues,
             List<String> attributeValues) throws InterruptedException {
         System.out.println("Verifying metric values of " + metricName +" in report");
-        List<String> what = Arrays.asList(metricName);
-        if (metricName.contains("IFNULL")) {
-            what = Arrays.asList(metricName,"Amount");
-        }
-        List<String> how = null;
+
+        ReportDefinition reportDefinition = new ReportDefinition();
         if (attributeName != null) {
-            how = Arrays.asList(attributeName);
+            reportDefinition.withHows(attributeName);
         }
-        createReport("report_" + metricName, ReportTypes.TABLE, what, how,
-                "screenshot");
+        reportDefinition.withWhats(metricName);
+        if (metricName.contains("IFNULL")) {
+            reportDefinition.withWhats("Amount");
+        }
+        reportDefinition.withName("report_" + metricName);
+
+        createReport(reportDefinition, "screenshot");
+
         if (metricName.contains("WITHOUT_PF")) {
-            data = new HashMap<String, String>();
-            data.put("attribute", "Month/Year (Snapshot)");
-            data.put("attributeElements", "Apr 2012");
-            reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
+            reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Month/Year (Snapshot)", "Apr 2012"));
             reportPage.saveReport();
         }
         List<Float> metricValuesinGrid = reportPage.getTableReport()
