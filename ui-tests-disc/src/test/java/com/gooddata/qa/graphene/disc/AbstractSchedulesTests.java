@@ -13,10 +13,10 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
             String executable, Pair<String, List<String>> cronTime, Map<String, List<String>> parameters) throws InterruptedException {
         projectDetailPage.clickOnNewScheduleButton();
         waitForElementVisible(scheduleForm.getRoot());
-        scheduleForm.createNewSchedule(processName, executable, cronTime, parameters, null, true);
+        scheduleForm.createNewSchedule(processName, executable, cronTime, parameters, scheduleName, true);
         waitForElementPresent(scheduleDetail.getRoot());
         scheduleDetail.clickOnCloseScheduleButton();
-        waitForElementVisible(projectDetailPage.getRoot());
+        waitForElementNotPresent(scheduleDetail.getRoot());
     }
 
     protected void assertNewSchedule(String processName, String scheduleName,

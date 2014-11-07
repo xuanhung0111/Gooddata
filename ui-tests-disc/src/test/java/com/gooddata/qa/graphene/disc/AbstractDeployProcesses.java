@@ -301,4 +301,9 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
             deleteProject(projectToDelete.getValue());
         }
     }
+    
+    protected void cleanProcessesInProjectDetail(String projectId) throws InterruptedException {
+        openProjectDetailByUrl(projectId);
+        projectDetailPage.deleteAllProcesses();
+    }
 }

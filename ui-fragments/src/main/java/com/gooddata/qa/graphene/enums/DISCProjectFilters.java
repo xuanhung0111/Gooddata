@@ -2,20 +2,22 @@ package com.gooddata.qa.graphene.enums;
 
 public enum DISCProjectFilters {
 
-    ALL("all", ""),
-    FAILED("failed", "No failed data loading processes in any project."),
-    RUNNING("running", "No data loading processes are running in any project now."),
-    SCHEDULED("scheduled", "No data loading processes are scheduled to run in any project."),
-    SUCCESSFUL("successful", ""),
-    UNSCHEDULED("unscheduled", ""),
-    DISABLED("disabled", "");
+    ALL("all", "", "No projects matching \"${searchKey}\""),
+    FAILED("failed", "No failed data loading processes in any project.", "No failed projects matching \"${searchKey}\""),
+    RUNNING("running", "No data loading processes are running in any project now.", "No running projects matching \"${searchKey}\""),
+    SCHEDULED("scheduled", "No data loading processes are scheduled to run in any project.", "No scheduled projects matching \"${searchKey}\""),
+    SUCCESSFUL("successful", "", "No successful projects matching \"${searchKey}\""),
+    UNSCHEDULED("unscheduled", "", "No unscheduled projects matching \"${searchKey}\""),
+    DISABLED("disabled", "", "No disabled projects matching \"${searchKey}\"");
 
     private String option;
     private String emptyStateMessage;
+    private String emptySearchResultMessage;
 
-    private DISCProjectFilters(String option, String emptyStateMessage) {
+    private DISCProjectFilters(String option, String emptyStateMessage, String emptySearchResultMessage) {
         this.option = option;
         this.emptyStateMessage = emptyStateMessage;
+        this.emptySearchResultMessage = emptySearchResultMessage;
     }
 
     public String getOption() {
@@ -24,5 +26,9 @@ public enum DISCProjectFilters {
 
     public String getEmptyStateMessage() {
         return this.emptyStateMessage;
+    }
+    
+    public String getEmptySearchResultMessage() {
+        return this.emptySearchResultMessage;
     }
 }
