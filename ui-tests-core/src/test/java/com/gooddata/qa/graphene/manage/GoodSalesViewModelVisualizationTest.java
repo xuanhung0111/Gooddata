@@ -34,8 +34,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
         File tmpImage = getLDMImageFromGrayPage(URI);
         try {
             double diffPercent = getDiffPercentBetweenTwoImages(new File(testParams.loadProperty("imageFilePath"),
-                                                                         MODEL_IMAGE_FILE),
-                                                                tmpImage);
+                    MODEL_IMAGE_FILE), tmpImage);
             System.out.println("Diff percent between 2 images is " + diffPercent + " %.");
             assertTrue(diffPercent < 0.001);
         } finally {
@@ -50,8 +49,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
         File tmpImage = getLDMImageFromGrayPage(URI);
         try {
             double diffPercent = getDiffPercentBetweenTwoImages(new File(testParams.loadProperty("imageFilePath"),
-                                                                         MODEL_IMAGE_FILE),
-                                                                tmpImage);
+                    MODEL_IMAGE_FILE), tmpImage);
             System.out.println("Diff percent between 2 images is " + diffPercent + " %.");
             assertFalse(diffPercent < 0.001);
 
