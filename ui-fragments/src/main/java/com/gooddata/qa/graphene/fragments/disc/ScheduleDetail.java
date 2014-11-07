@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class ScheduleDetail extends ScheduleForm {
 
     private static final String INVALID_SCHEDULE_TITLE_ERROR = "\'${scheduleName}\' name already in use within the process. Change the name.";
     private static final String EMPTY_SCHEDULE_TITLE_ERROR = "can't be blank";
+    private static final String TRIGGER_SCHEDULE_MISSING_MESSAGE = "The schedule that triggers this schedule is missing. To run this schedule, set a new trigger or select a cron frequency.";
     private static final String DEFAULT_RETRY_DELAY_VALUE = "30";
     private static final String RESCHEDULE_FORM_MESSAGE =
             "Restart every minutes until success (or 30th consecutive failure)";
@@ -180,6 +182,9 @@ public class ScheduleDetail extends ScheduleForm {
 
     @FindBy(css = ".ait-execution-history-empty")
     protected WebElement executionHistoryEmptyState;
+    
+    @FindBy(css = ".error-trigger-message")
+    protected WebElement triggerScheduleMissingMessage;
 
     public void clickOnCloseScheduleButton() {
         waitForElementVisible(closeButton).click();
@@ -666,6 +671,10 @@ public class ScheduleDetail extends ScheduleForm {
                     System.out.println("Cron expression is set to... "
                             + cronExpression.getAttribute("value"));
                 }
+            } else if (cronTime.getKey().equals(ScheduleCronTimes.AFTER.getCronTime())) {
+                waitForElementVisible(selectTriggerSchedule);
+                Select selectTrigger = new Select(selectTriggerSchedule);
+                assertEquals(selectTrigger.getFirstSelectedOption().getText(), cronTime.getValue().get(1));
             }
             else {
                 if (cronTime.getValue().size() > 2 && cronTime.getValue().get(2) != null) {
@@ -721,5 +730,15 @@ public class ScheduleDetail extends ScheduleForm {
             }
         } else
             waitForElementVisible(cancelChangeScheduleTitleButton).click();
+    }
+
+    public void checkTriggerScheduleMissing() throws InterruptedException {
+        waitForElementVisible(triggerScheduleMissingMessage);
+        assertEquals(triggerScheduleMissingMessage.getText(), TRIGGER_SCHEDULE_MISSING_MESSAGE);
+        Pair<String, List<String>> defaultCronTime =
+                Pair.of(ScheduleCronTimes.CRON_EXPRESSION.getCronTime(), Arrays.asList("0 * * * *"));
+        assertCronTime(defaultCronTime);
+        waitForElementPresent(saveChangedCronTimeButton);
+        waitForElementNotPresent(cancelChangedCronTimeButton);
     }
 }

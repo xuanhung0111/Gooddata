@@ -23,12 +23,15 @@ public class ScheduleForm extends AbstractFragment {
 
     private static final String EMPTY_SCHEDULE_NAME_ERROR = "can't be blank";
     private static final String INVALID_SCHEDULE_NAME_ERROR = "\'${scheduleName}\' name already in use within the process. Change the name.";
+    private static final String EMPTY_SCHEDULE_TRIGGER_MESSAGE = "Schedules cannot be scheduled in a loop";
     protected static By BY_PARAMETER_VALUE = By.cssSelector(".param-value input");
     protected static By BY_PARAMETER_NAME = By.cssSelector(".param-name input");
     protected static By BY_PARAMETER_SHOW_SECURE_VALUE = By
             .cssSelector(".param-show-secure-value input");
     protected static By BY_PARAMETER_REMOVE_ACTION = By
             .cssSelector(".param-action a[title='Remove this parameter.']");
+    
+    protected String XPATH_SELECT_SCHEDULE_TRIGGER_OPTION = "//select/optgroup[@label='${optionGroup}']/option[text()='${option}']";
 
     @FindBy(css = ".ait-new-schedule-process-select-btn")
     protected WebElement selectProcessForNewSchedule;
@@ -48,6 +51,12 @@ public class ScheduleForm extends AbstractFragment {
     @FindBy(
             xpath = "//span[@class='option-content everyHour everyDay everyWeek cron-editor-line']/select")
     protected WebElement selectMinuteInHour;
+
+    @FindBy(css = ".whenSchedule select")
+    protected WebElement selectTriggerSchedule;
+    
+    @FindBy(css = ".whenSchedule")
+    protected WebElement triggerScheduleMessage;
 
     @FindBy(css = ".ait-schedule-cron-user-value input.input-text")
     protected WebElement cronExpression;
@@ -110,6 +119,13 @@ public class ScheduleForm extends AbstractFragment {
             select.selectByVisibleText(cronTime.getValue().get(0));
         }
     }
+    
+    public void selectTriggerSchedule(Pair<String, List<String>> cronTime) {
+        if (cronTime.getValue().get(0) != null) {
+            waitForElementVisible(selectTriggerSchedule);
+            selectTriggerSchedule.findElement(By.xpath(XPATH_SELECT_SCHEDULE_TRIGGER_OPTION.replace("${optionGroup}", cronTime.getValue().get(0)).replace("${option}", cronTime.getValue().get(1))));
+        }
+    }
 
     public void selectCron(Pair<String, List<String>> cronTime) throws InterruptedException {
         Select selectCron = new Select(cronPicker);
@@ -136,15 +152,12 @@ public class ScheduleForm extends AbstractFragment {
                 }
                 selectHourInDay(cronTime);
                 selectMinuteInHour(cronTime);
-            }
-            if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYDAY.getCronTime())) {
+            } else if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYDAY.getCronTime())) {
                 selectHourInDay(cronTime);
                 selectMinuteInHour(cronTime);
-            }
-            if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime())) {
+            } else if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime())) {
                 selectMinuteInHour(cronTime);
-            }
-            if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime())) {
+            } else if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime())) {
                 if (cronTime.getValue().get(0) != null) {
                     if (cronExpression.getAttribute("value").isEmpty())
                         Thread.sleep(1000);
@@ -160,6 +173,9 @@ public class ScheduleForm extends AbstractFragment {
                     System.out.println("Cron expression is set to... "
                             + cronExpression.getAttribute("value"));
                 }
+            } else if (cronTime.getKey().equals(ScheduleCronTimes.AFTER.getCronTime())) {
+                if (cronTime.getValue().get(0).equals(null))
+                    selectTriggerSchedule(cronTime);
             }
         }
     }
@@ -253,5 +269,26 @@ public class ScheduleForm extends AbstractFragment {
         }
         setScheduleName(validScheduleName);
         waitForElementVisible(confirmScheduleButton).click();
+    }
+    
+    public void checkScheduleTriggerOptions(Pair<String, List<String>> cronTime, boolean noOptions,
+            Map<String, String> expectedScheduleOptions) throws InterruptedException {
+        waitForElementVisible(getRoot());
+        selectCron(cronTime);
+        if (noOptions) {
+            waitForElementVisible(triggerScheduleMessage);
+            assertEquals(triggerScheduleMessage.getText(), EMPTY_SCHEDULE_TRIGGER_MESSAGE);
+            System.out.println(triggerScheduleMessage.getText());
+        } else {
+            waitForElementVisible(selectTriggerSchedule);
+            Select selectTrigger = new Select(selectTriggerSchedule);
+            assertEquals(selectTrigger.getOptions().size(), expectedScheduleOptions.size());
+            for (Entry<String, String> expectedScheduleOption : expectedScheduleOptions.entrySet()) {
+                assertNotNull(selectTriggerSchedule.findElement(By
+                        .xpath(XPATH_SELECT_SCHEDULE_TRIGGER_OPTION.replace("${optionGroup}",
+                                expectedScheduleOption.getKey()).replace("${option}",
+                                expectedScheduleOption.getValue()))));
+            }
+        }
     }
 }
