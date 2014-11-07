@@ -118,12 +118,6 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnGroups = {"init-data"}, groups = {"basic-tests"}, priority = 3)
     public void createSavedFilterViewTest() throws InterruptedException {
-        /*
-         * Bug id: https://jira.intgdc.com/browse/CL-5749
-         * 
-         * Because of this bug, I have to turn on saved view mode first, then save dashboard,
-         * and add filter after that
-         */
         initNewDashboard_AddFilter_TurnOnSavedView();
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
@@ -430,13 +424,14 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
         dashboardsPage.editDashboard();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.turnSavedViewOption(true);
-        dashboardEditBar.saveDashboard();
-
-        dashboardsPage.editDashboard();
         dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardEditBar.addTimeFilterToDashboard(-1, "this");
         dashboardEditBar.saveDashboard();
+
+        dashboardsPage.editDashboard();
+        dashboardEditBar.turnSavedViewOption(true);
+        dashboardEditBar.saveDashboard();
+
     }
 
     private FilterWidget getFilterWidget(String condition) {
