@@ -292,4 +292,8 @@ public class DashboardEditBar extends AbstractFragment {
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }
+
+    public void setParentsFilter(String filter, String parentFilterName) {
+        dashboardEditFilter.addParentFilters(filter, parentFilterName);
+    }
 }

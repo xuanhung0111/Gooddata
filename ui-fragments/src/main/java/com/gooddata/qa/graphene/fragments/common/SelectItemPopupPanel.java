@@ -27,7 +27,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
     private static final String BUTTON_GROUP_XPATH_LOCATOR = "//*[contains(@class,'gdc-buttonGroup')]//span[.='%s']";
 
     @FindBys({
-        @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.pickerRoot,.sndPanelFilter"),
+        @FindBy(css = ".overlayPlugin-plugged>:not(.gdc-hidden),.pickerRoot,.sndPanelFilter,.filter"),
         @FindBy(css = "input.gdc-input")
     })
     private WebElement searchInput;

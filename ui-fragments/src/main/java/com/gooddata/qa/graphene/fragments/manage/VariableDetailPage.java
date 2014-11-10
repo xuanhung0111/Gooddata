@@ -13,6 +13,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class VariableDetailPage extends AbstractFragment {
@@ -89,6 +90,9 @@ public class VariableDetailPage extends AbstractFragment {
     @FindBy(xpath = "//a[@class='interpolateProject']")
     private WebElement dataLink;
 
+    @FindBy(xpath = "//div[contains(@class, 'attributeElements')]//input[contains(@class, 'gdc-input')]")
+    private WebElement searchAttributeElement;
+
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectPropertiesPage;
 
@@ -121,8 +125,7 @@ public class VariableDetailPage extends AbstractFragment {
         String attribute = var.getAttribute();
         searchAttributeText.sendKeys(attribute);
         By listOfAttribute =
-                By.xpath(listOfAttributeLocator.replace("${label}", attribute.trim().toLowerCase()
-                        .replaceAll(" ", "_")));
+                By.xpath(listOfAttributeLocator.replace("${label}", CssUtils.simplifyText(attribute)));
         waitForElementVisible(listOfAttribute, browser);
         By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", attribute));
         waitForElementVisible(attributeToAdd, browser).click();
@@ -142,10 +145,11 @@ public class VariableDetailPage extends AbstractFragment {
 
     public void selectAttrElement(List<String> elements) {
         By listOfElement;
-        for (int i = 0; i < elements.size(); i++) {
+        for (String ele : elements) {
+            waitForElementVisible(searchAttributeElement).clear();
+            searchAttributeElement.sendKeys(ele);
             listOfElement =
-                    By.xpath(listOfElementLocator.replace("${label}", elements.get(i).trim()
-                            .toLowerCase().replaceAll(" ", "_")));
+                    By.xpath(listOfElementLocator.replace("${label}", CssUtils.simplifyText(ele)));
             waitForElementVisible(listOfElement, browser).click();
         }
         waitForElementVisible(setButton).click();

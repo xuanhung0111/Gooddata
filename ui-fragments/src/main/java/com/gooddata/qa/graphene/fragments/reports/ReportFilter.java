@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -17,17 +18,16 @@ import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
 import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class ReportFilter extends AbstractFragment {
 
-    private static final String ATTRIBUTE_IN_HOW_FROM_LIST =
+    private static final String ATTRIBUTE_IN_HOW_FROM_LIST = 
             "//div[contains(@class,'s-item-${label}') and contains(@class,'s-enabled')]//span";
-    private static final String ATTRIBUTE_NOT_IN_HOW_FROM_LIST =
-            "//div[contains(@class,'s-item-ticket_id') and contains(@class,'s-enabled') and contains(@class,'lastCell')]//span";
-
-    private By addFilterButton = By.cssSelector(".s-btn-add_filter");
+    
+    private static final By BY_ADD_FILTER_BUTTON = By.cssSelector(".s-btn-add_filter");
 
     @FindBy(xpath = "//div[contains(@class,'newFilterPicker')]")
     private WebElement filterPicker;
@@ -92,43 +92,35 @@ public class ReportFilter extends AbstractFragment {
     @FindBy(xpath = "//div[@id='gridContainerTab']")
     private TableReport report;
 
+    @FindBy(xpath = "//div[@id='reportContainerTab' and contains(@class, 'processingReport')]")
+    private WebElement reportProcessing;
+
     private String listOfElementLocator = 
             "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
-    private String attributeElementLocator = 
-            "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'s-item-${element}')]/input";
 
     public void addFilterSelectList(SelectFromListValuesFilterItem filterItem) {
         System.out.println("Adding attribute filter ......");
-        String attribute = filterItem.getAttribute();
-        List<String> lsAttributeElements = filterItem.getValues();
-        // report could be too large to display before filtering => there is no header/report visible
-        boolean attributeInHow = report.getAttributesHeader().contains(attribute);
-
-        Collections.sort(lsAttributeElements);
-        if (browser.findElements(addFilterButton).size() > 0) {
-            waitForElementVisible(addFilterButton, browser).click();
-        } //displayed if at least one filter added.
+        WebElement addFilterButton = waitForElementVisible(BY_ADD_FILTER_BUTTON, browser);
+        
+        if (!addFilterButton.getAttribute("class").contains("disabled")) {
+            addFilterButton.click();
+        }
         waitForElementVisible(filterPicker);
         waitForElementVisible(attributeFilterLink).click();
-        if (attributeInHow) {
-            selectElement(attribute);
-        } else {
-            selectElementNotInHow(attribute);
-        }
-        waitForElementVisible(selectElementButtonDialog).click();
-        waitForElementVisible(listOfElementWithCheckbox);
-        for (int i = 0; i < lsAttributeElements.size(); i++) {
-            waitForElementVisible(searchValueInput).clear();
-            searchValueInput.sendKeys(lsAttributeElements.get(i));
-            waitForElementVisible(
-                    By.xpath(createAttributeXPath(attributeElementLocator, "${element}", lsAttributeElements.get(i))),
-                    browser).click();
+        
+        Graphene.createPageFragment(SelectItemPopupPanel.class,
+                waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser))
+                .searchAndSelectItem(filterItem.getAttribute());
+
+        SelectItemPopupPanel panel =
+                Graphene.createPageFragment(SelectItemPopupPanel.class,
+                        waitForElementVisible(By.cssSelector(".listContainer"), browser));
+        for (String e : filterItem.getValues()) {
+            panel.searchAndSelectEmbedItem(e);
         }
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
-        waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
-        waitForElementVisible(report.getRoot());
     }
 
     private String createAttributeXPath(String locator, String placeHolder, String attributeName) {
@@ -138,12 +130,6 @@ public class ReportFilter extends AbstractFragment {
     private void selectElement(String elementName) {
         waitForElementVisible(By.xpath(createAttributeXPath(listOfElementLocator, "${label}", elementName)), browser);
         waitForElementVisible(By.xpath(createAttributeXPath(ATTRIBUTE_IN_HOW_FROM_LIST, "${label}", elementName)), browser).click();
-    }
-
-    private void selectElementNotInHow(String elementName) {
-        waitForElementVisible(By.xpath(createAttributeXPath(listOfElementLocator, "${label}", elementName)), browser);
-        waitForElementVisible(searchAttributeInput).sendKeys(elementName);
-        waitForElementVisible(By.xpath(createAttributeXPath(ATTRIBUTE_NOT_IN_HOW_FROM_LIST, "${label}", elementName)), browser).click();
     }
 
     public void addRankFilter(RankingFilterItem filterItem) throws InterruptedException {
@@ -163,8 +149,8 @@ public class ReportFilter extends AbstractFragment {
             rankedMetric.add(metricValuesinGrid.get(i));
         }
         Collections.sort(rankedMetric);
-        if (browser.findElements(addFilterButton).size() > 0) {
-            waitForElementVisible(addFilterButton, browser).click();
+        if (browser.findElements(BY_ADD_FILTER_BUTTON).size() > 0) {
+            waitForElementVisible(BY_ADD_FILTER_BUTTON, browser).click();
         } // displayed if at least one filter added.
         waitForElementVisible(filterPicker);
         waitForElementVisible(rankFilterLink).click();
@@ -194,7 +180,7 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
-        waitForTableReportRendered();
+        waitForReportRendered();
         waitForElementVisible(hideFiltersButton).click();
         metricValuesinGrid = report.getMetricElements();
         Collections.sort(metricValuesinGrid);
@@ -206,8 +192,8 @@ public class ReportFilter extends AbstractFragment {
         String attribute = filterItem.getAttribute();
         String metric = filterItem.getMetric();
         int rangeNumber = filterItem.getRange().getNumber();
-        if (browser.findElements(addFilterButton).size() > 0) {
-            waitForElementVisible(addFilterButton, browser).click();
+        if (browser.findElements(BY_ADD_FILTER_BUTTON).size() > 0) {
+            waitForElementVisible(BY_ADD_FILTER_BUTTON, browser).click();
         }// displayed if at least one filter added.
         waitForElementVisible(rangeFilterLink).click();
         waitForElementVisible(selectAttributeButton).click();
@@ -226,7 +212,7 @@ public class ReportFilter extends AbstractFragment {
         rangeNumberInput.sendKeys(String.valueOf(rangeNumber));
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
-        waitForTableReportRendered();
+        waitForReportRendered();
         waitForElementVisible(hideFiltersButton).click();
         waitForElementVisible(report.getRoot());
         List<Float> metricValuesInGrid = report.getMetricElements();
@@ -242,8 +228,8 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(report.getRoot());
         List<String> attrElementInGrid = report.getAttributeElements();
         lsPromptElements.retainAll(attrElementInGrid);
-        if (waitForElementVisible(addFilterButton, browser).isDisplayed()) {
-            waitForElementVisible(addFilterButton, browser).click();
+        if (waitForElementVisible(BY_ADD_FILTER_BUTTON, browser).isDisplayed()) {
+            waitForElementVisible(BY_ADD_FILTER_BUTTON, browser).click();
         }// displayed if at least one filter added.
         waitForElementVisible(promptFilterLink).click();
         waitForElementVisible(selectVariableButton).click();
@@ -254,18 +240,14 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
-        waitForTableReportRendered();
+        waitForReportRendered();
         waitForElementVisible(hideFiltersButton).click();
         attrElementInGrid = report.getAttributeElements();
         Assert.assertEquals(attrElementInGrid, lsPromptElements, "Report isn't applied filter correctly");
     }
 
-    public void waitForTableReportRendered() {
-        By gridContainerBody = By.xpath("//div[@id='gridContainerTab']/div[@id='gridContainer']"
-                + "/div[@class='containerBody']/div[contains(@class,'gridTab')]");
-        if (browser.findElements(gridContainerBody).size() > 0) {
-            waitForElementNotPresent(gridContainerBody);
-        }
-        waitForElementVisible(gridContainerBody, browser);
+    public void waitForReportRendered() {
+        waitForElementVisible(reportProcessing);
+        waitForElementNotVisible(reportProcessing);
     }
 }
