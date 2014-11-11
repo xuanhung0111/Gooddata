@@ -24,8 +24,6 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = {"GoodSalesUnsubscribe"}, description = "Tests for GoodSales project - unsubscribe in GD platform")
 public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private static final String FROM = "noreply@gooddata.com";
-
     private static final int TIMEOUT_MINUTES = 4;
     // mailbox polling interval in miliseconds
     private static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 10000;
@@ -47,19 +45,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     public void setUp() throws Exception {
         String identification = ": " + testParams.getHost() + " - " + testParams.getTestIdentification();
         reportTitle = reportTitle + identification;
-
-        imapHost = testParams.loadProperty("imap.host");
-        imapUser = testParams.loadProperty("imap.user");
-        imapPassword = testParams.loadProperty("imap.password");
     }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
-    public void verifyEmptySchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There is no schedule.");
-        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
-    }
-
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createReportSchedule() {

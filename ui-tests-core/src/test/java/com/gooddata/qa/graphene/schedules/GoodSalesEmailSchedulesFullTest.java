@@ -21,8 +21,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 @Test(groups = {"GoodSalesSchedules"}, description = "Tests for GoodSales project (email schedules functionality) in GD platform")
 public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private static final String FROM = "noreply@gooddata.com";
-
     private String reportTitle = "UI-Graphene-core-Report";
     private String dashboardTitle = "UI-Graphene-core-Dashboard";
 
@@ -35,17 +33,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         dashboardTitle = dashboardTitle + identification;
 
         attachmentsDirectory = new File(System.getProperty("maven.project.build.directory", "./target/attachments"));
-
-        imapHost = testParams.loadProperty("imap.host");
-        imapUser = testParams.loadProperty("imap.user");
-        imapPassword = testParams.loadProperty("imap.password");
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
-    public void verifyEmptySchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There is no schedule.");
-        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})

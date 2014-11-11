@@ -23,11 +23,31 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.gooddata.qa.utils.graphene.Screenshots;
 import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
+    protected static final String FROM = "noreply@gooddata.com";
+
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
+
+    @BeforeClass
+    public void setUpImap() throws Exception {
+        imapHost = testParams.loadProperty("imap.host");
+        imapUser = testParams.loadProperty("imap.user");
+        imapPassword = testParams.loadProperty("imap.password");
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
+    public void verifyEmptySchedules() {
+        initEmailSchedulesPage();
+        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There is no schedule.");
+        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
+    }
 
     protected void initEmailSchedulesPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");

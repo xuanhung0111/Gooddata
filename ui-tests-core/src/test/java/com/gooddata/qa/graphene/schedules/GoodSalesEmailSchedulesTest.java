@@ -11,13 +11,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 @Test(groups = {"GoodSalesSchedulesFull"}, description = "Tests for GoodSales project (email schedules functionality, incl. imap verification) in GD platform")
 public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
-    public void verifyEmptySchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There is no schedule.");
-        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
-    }
-
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createDashboardSchedule() {
         initEmailSchedulesPage();
