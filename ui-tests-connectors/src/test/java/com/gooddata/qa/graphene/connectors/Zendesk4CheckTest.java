@@ -336,7 +336,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             "zendeskAfterCreateTests", "connectorWalkthrough"})
     public void testReportMetricsCountAfterIncrementalSync() throws IOException, JSONException, InterruptedException {
         assertEquals(getNumberFromGDReport(BACKLOG_TICKETS_REPORT_NAME, "inc_added_objects"),
-                reportMetricsResults.get(BACKLOG_TICKETS_REPORT_NAME) + 1,
+                reportMetricsResults.get(BACKLOG_TICKETS_REPORT_NAME).intValue(),
                 "Backlog tickets count doesn't match after incremental sync");
     }
 
