@@ -14,7 +14,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
     public void verifyEmptySchedules() {
         initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
+        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There is no schedule.");
         Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
     }
 
@@ -39,7 +39,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     @Test(groups = {"tests"}, dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
         initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
+        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "Schedules are properly created.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
         successfulTest = true;
     }
