@@ -25,13 +25,13 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 @Test(groups = {"viewModelVisualization"}, description = "Test view model visualization")
 public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
-    private static final String URI                                             =    "/gdc/projects/%s/ldm";
+    private static final String MODEL_URI                                       =    "/gdc/projects/%s/ldm";
     private static final String MODEL_IMAGE_FILE                                =    "ldm.png";
     private static final String MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE =    "ldmAfterChangeAccountToAcsount.png";
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"viewModel"})
     public void checkLDMImageTest() throws InterruptedException, IOException, JSONException {
-        File tmpImage = getLDMImageFromGrayPage(URI);
+        File tmpImage = getLDMImageFromGrayPage();
         try {
             double diffPercent = getDiffPercentBetweenTwoImages(new File(testParams.loadProperty("imageFilePath"),
                     MODEL_IMAGE_FILE), tmpImage);
@@ -46,7 +46,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     public void checkLDMImageAfterChangeAttributeNameTest() throws ParseException, IOException, JSONException {
         changeAttributeName("Account", "Acsount");
 
-        File tmpImage = getLDMImageFromGrayPage(URI);
+        File tmpImage = getLDMImageFromGrayPage();
         try {
             double diffPercent = getDiffPercentBetweenTwoImages(new File(testParams.loadProperty("imageFilePath"),
                     MODEL_IMAGE_FILE), tmpImage);
@@ -54,8 +54,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
             assertFalse(diffPercent < 0.001);
 
             diffPercent = getDiffPercentBetweenTwoImages(new File(testParams.loadProperty("imageFilePath"),
-                                                                  MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE),
-                                                         tmpImage);
+                    MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE), tmpImage);
             System.out.println("Diff percent between 2 images is " + diffPercent + " %.");
             assertTrue(diffPercent < 0.001);
         } finally {
@@ -68,22 +67,22 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     public void teardown() {
         successfulTest = true;
     }
-    
+
 
     private void changeAttributeName(String attributeName, String newName) {
         initAttributePage();
         attributePage.renameAttribute(attributeName, newName);
     }
 
-    private File getLDMImageFromGrayPage(String uri) throws IOException, ParseException, JSONException {
+    private File getLDMImageFromGrayPage() throws IOException, ParseException, JSONException {
         getRestApiClient();
 
-        HttpRequestBase getRequest = restApiClient.newGetMethod(String.format(uri, testParams.getProjectId()));
+        HttpRequestBase getRequest = restApiClient.newGetMethod(String.format(MODEL_URI, testParams.getProjectId()));
         HttpResponse getResponse = restApiClient.execute(getRequest);
         assertEquals(getResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
 
         URL url = new URL(new JSONObject(EntityUtils.toString(getResponse.getEntity()))
-                                        .get("uri").toString());
+                .get("uri").toString());
         File image = new File(testParams.loadProperty("java.io.tmpdir"), MODEL_IMAGE_FILE);
         FileUtils.copyURLToFile(url, image);
 
