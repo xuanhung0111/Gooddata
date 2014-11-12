@@ -12,6 +12,7 @@ import org.testng.Assert;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import java.util.ArrayList;
 
 public class EmailSchedulePage extends AbstractFragment {
 
@@ -59,6 +60,36 @@ public class EmailSchedulePage extends AbstractFragment {
 
     @FindBy(css = "#unsubscribeTooltip div.bubble-primary .bubble-content .content")
     private WebElement unsubscribedTooltipAddresses;
+
+    @FindBy(css = ".timeScheduler .description")
+    private WebElement timeDescription;
+
+    @FindBy(css = ".dashboards .picker .selected label")
+    private List<WebElement> attachedDashboards;
+
+    public String getSubjectFromInput() {
+        return waitForElementVisible(emailSubjectInput).getAttribute("value");
+    }
+
+    public String getMessageFromInput() {
+        return waitForElementVisible(emailMessageInput).getAttribute("value");
+    }
+
+    public String getToFromInput() {
+        return waitForElementVisible(emailToInput).getAttribute("value");
+    }
+
+    public String getTimeDescription() {
+        return timeDescription.getText();
+    }
+
+    public List<String> getAttachedDashboards() {
+        List<String> selected = new ArrayList<String>();
+        for (WebElement label: attachedDashboards) {
+            selected.add(label.getText());
+        }
+        return selected;
+    }
 
     public void openSchedule(String scheduleName) {
         Graphene.guardAjax(getScheduleLink(scheduleName)).click();
