@@ -9,11 +9,15 @@ import java.util.Arrays;
 import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+
+import org.openqa.selenium.Cookie;
 import org.testng.annotations.Test;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
+    private final String FEATURE_FLAG_COOKIE_NAME = "GDC-FEATURE-DASHBOARD-SCHEDULE";
+    private final Cookie FEATURE_FLAG_COOKIE = new Cookie(FEATURE_FLAG_COOKIE_NAME, "1");
     private final String CUSTOM_SUBJECT = "Extremely useful subject";
     private final String CUSTOM_MESSAGE = "Extremely useful message";
     private final List<String> SCHEDULED_DASHBOARDS = Arrays.asList("Waterfall Analysis", "What's Changed");
@@ -21,6 +25,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createDashboardSchedule() {
+        // TODO remove after adding proper feature flag
+        this.browser.manage().addCookie(FEATURE_FLAG_COOKIE);
         initDashboardsPage();
         DashboardScheduleDialog scheduleDashboard = dashboardsPage.scheduleDashboard();
         scheduleDashboard.showCustomForm();
@@ -63,6 +69,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             timeDescription.contains(SCHEDULE_TIME),
             "Time description contains the given time. Expected '" + SCHEDULE_TIME + "', found '" + timeDescription + "'."
         );
+        // TODO remove after adding proper feature flag
+        this.browser.manage().deleteCookieNamed(FEATURE_FLAG_COOKIE_NAME);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
         successfulTest = true;
     }
