@@ -11,11 +11,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
-@Test(groups = {"GoodSalaesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
+@Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
     private final String CUSTOM_SUBJECT = "Extremely useful subject";
-    private final String CUSTOM_MESSAGE = "Extremaly useful message";
+    private final String CUSTOM_MESSAGE = "Extremely useful message";
     private final List<String> SCHEDULED_DASHBOARDS = Arrays.asList("Waterfall Analysis", "What's Changed");
     private final String SCHEDULE_TIME = "Daily at 12:30am";
 
