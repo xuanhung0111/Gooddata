@@ -23,88 +23,77 @@ import com.google.common.collect.Sets;
 
 public class InteractiveReportWidget extends AbstractFragment{
 
-    private static final By propertySelectionPanelLocator        =
+    private static final By propertySelectionPanelLocator =
             By.xpath("//div[contains(@class,'gd-dropdown') and not(contains(@class,'searchfield'))]");
 
-    private static final By searchPropertyFieldLocator           =
+    private static final By searchPropertyFieldLocator =
             By.cssSelector("div.searchfield input.searchfield-input");
 
-    private static final By colorLinkLocator                     =
+    private static final By colorLinkLocator =
             By.xpath("//div[contains(@class,'edit-panel-block-link')]/a[contains(text(),'color')]");
 
-    private static final By addTableAttributeLinkLocator         =
+    private static final By addTableAttributeLinkLocator =
             By.xpath("//div[contains(@class,'edit-panel-block-link')]/a[contains(text(),'table')]");
 
     // Just support add ONE table attribute at this moment
     private static final By configureTableAttributeButtonLocator =
             By.cssSelector(".edit-panel-block-row button");
 
-    private static final By reportTitleLocator                   =
-            By.cssSelector(".title");
+    private static final By reportTitleLocator = By.cssSelector(".title");
 
-    private static final By reportSubtitleLocator                =
-            By.cssSelector(".subtitle");
+    private static final By reportSubtitleLocator = By.cssSelector(".subtitle");
 
     // ********************** chart locators ********************** //
-    private static final By chartTrackersLocator                 =
-            By.cssSelector(".highcharts-tracker *");
+    private static final By chartTrackersLocator = By.cssSelector(".highcharts-tracker *");
 
-    private static final By chartLegendsLocator                  =
-            By.cssSelector(".highcharts-legend-item");
+    private static final By chartLegendsLocator = By.cssSelector(".highcharts-legend-item");
 
-    private static final By chartAlertTitleLocator               =
-            By.cssSelector(".alert-title");
+    private static final By chartAlertTitleLocator = By.cssSelector(".alert-title");
 
-    private static final By chartErrorTitleLocator               =
-            By.cssSelector(".explorer-message-title");
+    private static final By chartErrorTitleLocator = By.cssSelector(".explorer-message-title");
 
-    private static final By chartTooltipLocator                  =
-            By.cssSelector("div.highcharts-tooltip");
+    private static final By chartTooltipLocator = By.cssSelector("div.highcharts-tooltip");
 
     // ********************** table locators ********************** //
-    private static final By tableHeadersLocator                  =
-            By.cssSelector(".ember-table-header-row .ember-table-content");
+    private static final By tableHeadersLocator = By.cssSelector(".ember-table-header-row .ember-table-content");
 
-    private static final By tableRowsLocator                     =
+    private static final By tableRowsLocator =
             By.xpath("//div[contains(@class,'ember-table-body-container')]"
-                   + "//div[contains(@class,'ember-table-table-row') and not(contains(@style,'display:none'))]");
+                    + "//div[contains(@class,'ember-table-table-row') and not(contains(@style,'display:none'))]");
 
-    private static final By tableFooterLocator                   =
-            By.cssSelector(".ember-table-footer-container .ember-table-content");
+    private static final By tableFooterLocator = By.cssSelector(".ember-table-footer-container .ember-table-content");
 
-    private static final String CONFIGURE_ATTRIBUTE_BUTTON_XPATH    = "//div[contains(@class,'edit-panel-block') and ./label[.='%s']]//button";
+    private static final String CONFIGURE_ATTRIBUTE_BUTTON_XPATH = "//div[contains(@class,'edit-panel-block') and ./label[.='%s']]//button";
 
-    private static final String ATTRIBUTE_XPATH                     = "//div[./div[contains(@class,'is-collapsible')]/span[.='%s']]"
-                                                                    + "/following-sibling::div/div[contains(@class,'type-attribute') and "
-                                                                                                + "not(contains(@class, 'item-disabled'))]"
-                                                                    + "/span[.='%s']";
+    private static final String ATTRIBUTE_XPATH = "//div[./div[contains(@class,'is-collapsible')]/span[.='%s']]"
+            + "/following-sibling::div/div[contains(@class,'type-attribute') and not(contains(@class, 'item-disabled'))]"
+            + "/span[.='%s']";
 
-    private static final String INVALID_ATTRIBUTE_XPATH             = "//div[./div[contains(@class,'is-collapsible')]/span[.='%s']]"
-                                                                    + "/following-sibling::div/div[contains(@class,'type-attribute') and "
-                                                                                                + "contains(@class, 'item-disabled')]"
-                                                                    + "/span[.='%s']";
+    private static final String INVALID_ATTRIBUTE_XPATH = "//div[./div[contains(@class,'is-collapsible')]/span[.='%s']]"
+            + "/following-sibling::div/div[contains(@class,'type-attribute') and contains(@class, 'item-disabled')]"
+            + "/span[.='%s']";
 
-    private static final String METRIC_XPATH                        = "//div[./div[contains(@class,'is-collapsible')]/span[.='%s']]"
-                                                                    + "/following-sibling::div/div[contains(@class,'type-metric')]"
-                                                                    + "/span[.='%s']";
+    private static final String METRIC_XPATH = "//div[./div[contains(@class,'is-collapsible')]/span[.='%s']]"
+            + "/following-sibling::div/div[contains(@class,'type-metric')]/span[.='%s']";
 
     private static final String DELETE_TABLE_ATTRIBUTE_BUTTON_XPATH = "//div[contains(@class,'edit-panel-block-row') and"
-                                                                    + "//button[@title='%s']]/a";
+            + "//button[@title='%s']]/a";
 
-    private static final String INVALID_CONFIGURATION     = "Invalid configuration";
-    private static final String TOO_MANY_DATA_POINTS      = "Too many data points";
+    private static final String INVALID_CONFIGURATION = "Invalid configuration";
+    private static final String TOO_MANY_DATA_POINTS = "Too many data points";
 
-    private static final String DISABLE_BAR_CHART_COLOR             = "rgb(216,216,216)";
-    private static final String SELECTED_LINE_OR_AREA_COLOR         = "black";
+    private static final String DISABLE_BAR_CHART_COLOR = "rgb(216,216,216)";
+    private static final String SELECTED_LINE_OR_AREA_COLOR = "black";
 
     public InteractiveReportWidget selectChartType(final ChartType type) {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 WebElement chart = waitForElementVisible(By.cssSelector(String.format(".%s", type.toString())), browser);
                 chart.click();
                 assertTrue(chart.getAttribute("class").contains("active"),
-                           String.format("%s chart is not selected.", StringUtils.capitalize(type.toString())));
+                        String.format("%s chart is not selected.", StringUtils.capitalize(type.toString())));
 
                 return InteractiveReportWidget.this;
             }
@@ -113,16 +102,12 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget configureColor(String folder, String colorAttribute) {
         return configureAttribute(By.xpath(String.format(CONFIGURE_ATTRIBUTE_BUTTON_XPATH, "Color")),
-                                  folder,
-                                  colorAttribute,
-                                  ATTRIBUTE_XPATH);
+                folder, colorAttribute, ATTRIBUTE_XPATH);
     }
 
     public InteractiveReportWidget configureYAxis(String folder, String metric) {
         return configureAttribute(By.xpath(String.format(CONFIGURE_ATTRIBUTE_BUTTON_XPATH, "Y Axis")),
-                                  folder,
-                                  metric,
-                                  METRIC_XPATH);
+                folder, metric, METRIC_XPATH);
     }
 
     public InteractiveReportWidget configureXAxisWithValidAttribute(String folder, String attribute) {
@@ -135,7 +120,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget enableChartColor() {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 WebElement colorLink = waitForElementVisible(colorLinkLocator, browser);
                 if (colorLink.getText().startsWith("disable"))
@@ -153,14 +139,16 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget disableChartColor() {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 WebElement colorLink = waitForElementVisible(colorLinkLocator, browser);
                 if (colorLink.getText().startsWith("enable"))
                     // do nothing
                     return InteractiveReportWidget.this;
 
-                WebElement colorAttributeButton = waitForElementVisible(By.xpath(String.format(CONFIGURE_ATTRIBUTE_BUTTON_XPATH, "Color")), browser);
+                WebElement colorAttributeButton = waitForElementVisible(By.xpath(
+                        String.format(CONFIGURE_ATTRIBUTE_BUTTON_XPATH, "Color")), browser);
                 colorLink.click();
                 waitForElementNotVisible(colorAttributeButton);
                 assertTrue(colorLink.getText().startsWith("enable"));
@@ -172,7 +160,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget enableAbilityToAddMoreTableAttributes() {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 waitForElementVisible(addTableAttributeLinkLocator, browser).click();
                 waitForElementVisible(configureTableAttributeButtonLocator, browser);
@@ -188,9 +177,11 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget deleteTableAttribute(final String attribute) {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
-                WebElement deleteButton = waitForElementVisible(By.xpath(String.format(DELETE_TABLE_ATTRIBUTE_BUTTON_XPATH, attribute)), browser);
+                WebElement deleteButton = waitForElementVisible(By.xpath(
+                        String.format(DELETE_TABLE_ATTRIBUTE_BUTTON_XPATH, attribute)), browser);
                 deleteButton.click();
                 waitForElementNotVisible(deleteButton);
 
@@ -217,7 +208,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget clickOnTracker(final int index) {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 getChartTrackers().get(index).click();
 
@@ -228,7 +220,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget clickOnSeries(final int index) {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 getChartLegends().get(index).click();
 
@@ -239,7 +232,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget resetTrackerSelection() {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 waitForElementVisible(By.cssSelector(".highcharts-grid *"), browser).click();
 
@@ -250,7 +244,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public InteractiveReportWidget hoverOnTracker(final int index) {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 new Actions(browser).moveToElement(getChartTrackers().get(index)).perform();
 
@@ -261,7 +256,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public int getTotalTableRows() {
         return doActionInFrame(new InFrameAction<Integer>() {
-            @Override public Integer doAction() {
+            @Override
+            public Integer doAction() {
 
                 return getTableRows().size();
             }
@@ -270,7 +266,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public String getTotalTableRowsFromTableFooter() {
         return doActionInFrame(new InFrameAction<String>() {
-            @Override public String doAction() {
+            @Override
+            public String doAction() {
 
                 waitForTableContainer();
                 return browser.findElement(tableFooterLocator).getText().trim();
@@ -280,7 +277,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean isColorAppliedOnChart() {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 return getAllChartLegendColors().containsAll(getAllChartTrackerColors());
             }
@@ -289,7 +287,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean isChartTableContainsHeader(final String header) {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 return getTableHeaders().contains(header.toUpperCase());
             }
@@ -298,7 +297,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean areTableValuesInSpecificRowMatchedChartLegendNames(final String header) {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 return getAllChartLegendNames().containsAll(getAllValuesFromTableRow(header));
             }
@@ -307,7 +307,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean areTrackersSelectedWhenClickOnSeries(final ChartType type, final int index) {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 if (type == ChartType.BAR_CHART)
                     return areBarTrackersSelectedWhenClickOnSeries(index);
@@ -319,7 +320,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean isTrackerSelectionReset(final ChartType type) {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 if (type == ChartType.BAR_CHART)
                     return isBarTrackerSelectionReset();
@@ -331,7 +333,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean isChartSeriesReset() {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 return getAllChartLegendNames().contains("Series 1");
             }
@@ -340,7 +343,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean isTooltipVisible() {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 return !waitForElementVisible(chartTooltipLocator, browser).getAttribute("style").contains("visibility: hidden");
             }
@@ -349,7 +353,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean isTrackerSelected(final ChartType type, final int index) {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
                 if (type == ChartType.BAR_CHART)
                     return isBarTrackerSelected(index);
@@ -361,18 +366,22 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     public boolean isChartAlertMessageVisible() {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
-                return TOO_MANY_DATA_POINTS.equals(waitForElementVisible(chartAlertTitleLocator, browser).getText().trim());
+                return TOO_MANY_DATA_POINTS.equals(waitForElementVisible(
+                        chartAlertTitleLocator, browser).getText().trim());
             }
         });
     }
 
     public boolean isChartErrorMessageVisible() {
         return doActionInFrame(new InFrameAction<Boolean>() {
-            @Override public Boolean doAction() {
+            @Override
+            public Boolean doAction() {
 
-                return INVALID_CONFIGURATION.equals(waitForElementVisible(chartErrorTitleLocator, browser).getText().trim());
+                return INVALID_CONFIGURATION.equals(waitForElementVisible(
+                        chartErrorTitleLocator, browser).getText().trim());
             }
         });
     }
@@ -401,11 +410,11 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     // support Y_Axis, X_Axis, Color, Table
     private InteractiveReportWidget configureAttribute(final By byAttributeButton,
-                                                       final String folderName,
-                                                       final String attributeName,
-                                                       final String attributeTemplatePath) {
+            final String folderName, final String attributeName,
+            final String attributeTemplatePath) {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 waitForElementVisible(byAttributeButton, browser).click();
                 WebElement propertySelectionPanel = waitForElementVisible(propertySelectionPanelLocator, browser);
@@ -420,14 +429,13 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     private InteractiveReportWidget configureXAxis(String folder, String attribute, boolean isInvalidAttribute) {
         return configureAttribute(By.xpath(String.format(CONFIGURE_ATTRIBUTE_BUTTON_XPATH, "X Axis")),
-                                  folder,
-                                  attribute,
-                                  isInvalidAttribute ? INVALID_ATTRIBUTE_XPATH : ATTRIBUTE_XPATH);
+                folder, attribute, isInvalidAttribute ? INVALID_ATTRIBUTE_XPATH : ATTRIBUTE_XPATH);
     }
 
     private String getReportTitleOrSubtitle(final By byLocator, final boolean inEditMode) {
         return doActionInFrame(new InFrameAction<String>() {
-            @Override public String doAction() {
+            @Override
+            public String doAction() {
 
                 WebElement element = waitForElementVisible(byLocator, browser);
                 if (inEditMode)
@@ -438,9 +446,11 @@ public class InteractiveReportWidget extends AbstractFragment{
         });
     }
 
-    private InteractiveReportWidget changeReportTitleOrSubtitle(final By byLocator, final String newTitle, final boolean isTitle) {
+    private InteractiveReportWidget changeReportTitleOrSubtitle(final By byLocator,
+            final String newTitle, final boolean isTitle) {
         return doActionInFrame(new InFrameAction<InteractiveReportWidget>() {
-            @Override public InteractiveReportWidget doAction() {
+            @Override
+            public InteractiveReportWidget doAction() {
 
                 WebElement title = waitForElementVisible(byLocator, browser);
                 WebElement titleLabel = title.findElement(By.cssSelector("label"));
@@ -463,8 +473,10 @@ public class InteractiveReportWidget extends AbstractFragment{
     }
 
     private List<String> getAllChartLegendColors() {
-        return Lists.newArrayList(Collections2.transform(getChartLegends(), new Function<WebElement, String>() {
-            @Override public String apply(WebElement input) {
+        return Lists.newArrayList(Collections2.transform(getChartLegends(),
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
 
                 return input.findElement(By.cssSelector("path")).getAttribute("fill").trim();
             }
@@ -473,7 +485,8 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     private Collection<String> getAllChartLegendNames() {
         return Collections2.transform(getChartLegends(), new Function<WebElement, String>() {
-            @Override public String apply(WebElement input) {
+            @Override
+            public String apply(WebElement input) {
 
                 return input.findElement(By.cssSelector("tspan")).getText().trim();
             }
@@ -481,8 +494,10 @@ public class InteractiveReportWidget extends AbstractFragment{
     }
 
     private Collection<String> getAllChartTrackerColors() {
-        return Sets.newHashSet(Collections2.transform(getChartTrackers(), new Function<WebElement, String>() {
-            @Override public String apply(WebElement input) {
+        return Sets.newHashSet(Collections2.transform(getChartTrackers(),
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
 
                 return input.getAttribute("fill").trim();
             }
@@ -506,8 +521,10 @@ public class InteractiveReportWidget extends AbstractFragment{
 
     private List<String> getTableHeaders() {
         waitForTableHeader();
-        return Lists.newArrayList(Collections2.transform(browser.findElements(tableHeadersLocator), new Function<WebElement, String>() {
-            @Override public String apply(WebElement input) {
+        return Lists.newArrayList(Collections2.transform(browser.findElements(tableHeadersLocator),
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
 
                 return input.getText().trim();
             }
@@ -522,8 +539,10 @@ public class InteractiveReportWidget extends AbstractFragment{
         if (index == -1) 
             throw new IllegalArgumentException(String.format("Table does not contain '%s' header!", header));
 
-        return Sets.newHashSet(Collections2.transform(getTableRows(), new Function<WebElement, String>() {
-            @Override public String apply(WebElement input) {
+        return Sets.newHashSet(Collections2.transform(getTableRows(),
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
 
                 return input.findElements(By.cssSelector(".ember-table-content")).get(index).getText().trim();
             }
@@ -531,7 +550,8 @@ public class InteractiveReportWidget extends AbstractFragment{
     }
 
     private boolean areBarTrackersSelectedWhenClickOnSeries(int index) {
-        return Sets.newHashSet(getAllChartLegendColors().get(index), DISABLE_BAR_CHART_COLOR).containsAll(getAllChartTrackerColors());
+        return Sets.newHashSet(getAllChartLegendColors().get(index), DISABLE_BAR_CHART_COLOR)
+                .containsAll(getAllChartTrackerColors());
     }
 
     private boolean areLineOrAreaTrackersSelectedWhenClickOnSeries(int index) {
