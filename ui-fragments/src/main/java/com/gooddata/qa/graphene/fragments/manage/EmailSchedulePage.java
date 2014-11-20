@@ -12,6 +12,7 @@ import org.testng.Assert;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import java.util.ArrayList;
 
 public class EmailSchedulePage extends AbstractFragment {
 
@@ -60,9 +61,44 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = "#unsubscribeTooltip div.bubble-primary .bubble-content .content")
     private WebElement unsubscribedTooltipAddresses;
 
+    @FindBy(css = ".timeScheduler .description")
+    private WebElement timeDescription;
+
+    @FindBy(css = ".dashboards .picker .selected label")
+    private List<WebElement> attachedDashboards;
+
+    public String getSubjectFromInput() {
+        return waitForElementVisible(emailSubjectInput).getAttribute("value");
+    }
+
+    public String getMessageFromInput() {
+        return waitForElementVisible(emailMessageInput).getAttribute("value");
+    }
+
+    public String getToFromInput() {
+        return waitForElementVisible(emailToInput).getAttribute("value");
+    }
+
+    public String getTimeDescription() {
+        return timeDescription.getText();
+    }
+
+    public List<String> getAttachedDashboards() {
+        List<String> selected = new ArrayList<String>();
+        for (WebElement label: attachedDashboards) {
+            selected.add(label.getText());
+        }
+        return selected;
+    }
+
+    public void openSchedule(String scheduleName) {
+        Graphene.guardAjax(getScheduleLink(scheduleName)).click();
+        waitForElementVisible(scheduleDetail);
+    }
+
     public int getNumberOfSchedules() {
-        waitForElementPresent(schedulesTable);
-        int schedulesCount = schedulesTable.findElement(By.tagName("tbody")).findElements(By.tagName("tr")).size();
+        int schedulesCount = waitForElementPresent(schedulesTable).
+            findElement(By.tagName("tbody")).findElements(By.tagName("tr")).size();
         if (schedulesCount == 0 && noSchedulesMessage.isDisplayed()) {
             return 0;
         } else {
@@ -71,15 +107,13 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     public String getSubscribed(String scheduleName) {
-        Graphene.guardAjax(getScheduleLink(scheduleName)).click();
-        waitForElementVisible(emailToInput);
-        return emailToInput.getAttribute("value");
+        openSchedule(scheduleName);
+        return waitForElementVisible(emailToInput).getAttribute("value");
     }
 
     public String getUnsubscribed(String scheduleName) {
-        Graphene.guardAjax(getScheduleLink(scheduleName)).click();
-        waitForElementPresent(unsubscribeTooltip);
-        unsubscribeTooltip.click();
+        openSchedule(scheduleName);
+        waitForElementPresent(unsubscribeTooltip).click();
         return unsubscribedTooltipAddresses.getText();
     }
 
@@ -121,10 +155,8 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     public String getScheduleMailUriByName(String scheduleName) {
-        waitForElementPresent(schedulesTable);
-
         String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
-        WebElement aElement = schedulesTable.findElement(By.cssSelector(anchorSelector));
+        WebElement aElement = waitForElementPresent(schedulesTable).findElement(By.cssSelector(anchorSelector));
         String hRef = aElement.getAttribute("href");
 
         String[] hRefParts = hRef.split("\\|");
@@ -188,8 +220,7 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     private WebElement getScheduleLink(String scheduleName) {
-        waitForElementPresent(schedulesTable);
         String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
-        return schedulesTable.findElement(By.cssSelector(anchorSelector));
+        return waitForElementPresent(schedulesTable).findElement(By.cssSelector(anchorSelector));
     }
 }

@@ -21,8 +21,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 @Test(groups = {"GoodSalesSchedules"}, description = "Tests for GoodSales project (email schedules functionality) in GD platform")
 public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private static final String FROM = "noreply@gooddata.com";
-
     private String reportTitle = "UI-Graphene-core-Report";
     private String dashboardTitle = "UI-Graphene-core-Dashboard";
 
@@ -35,17 +33,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         dashboardTitle = dashboardTitle + identification;
 
         attachmentsDirectory = new File(System.getProperty("maven.project.build.directory", "./target/attachments"));
-
-        imapHost = testParams.loadProperty("imap.host");
-        imapUser = testParams.loadProperty("imap.user");
-        imapPassword = testParams.loadProperty("imap.password");
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
-    public void verifyEmptySchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
-        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -69,7 +56,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
         initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
+        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "Schedules are properly created.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
     }
 
@@ -125,12 +112,12 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         ImapClient.saveMessageAttachments(reportMessages[0], attachmentsDirectory);
 
         System.out.println("Email checks ...");
-        assertEquals(reportMessages.length, 1, "Expected one report message");
-        assertEquals(dashboardMessages.length, 1, "Expected one dashboard message");
+        assertEquals(reportMessages.length, 1, "Report message arrived.");
+        assertEquals(dashboardMessages.length, 1, "Dashboard message arrived.");
 
         // REPORT EXPORT
         List<Part> reportAttachmentParts = ImapClient.getAttachmentParts(reportMessages[0]);
-        assertEquals(reportAttachmentParts.size(), 4, "Expected 4 attachments for report");
+        assertEquals(reportAttachmentParts.size(), 4, "Report message has correct number of attachments.");
 
         Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
         verifyAttachment(pdfPart, "PDF", 3200);
@@ -148,9 +135,9 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
         // DASHBOARD EXPORT
         List<Part> dashboardAttachmentParts = ImapClient.getAttachmentParts(dashboardMessages[0]);
-        assertEquals(dashboardAttachmentParts.size(), 1, "Expected 1 attachment for dashboard");
+        assertEquals(dashboardAttachmentParts.size(), 1, "Dashboard message has correct number of attachments.");
         assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
-                "Dashboard attachment has PDF content type");
+                "Dashboard attachment has PDF content type.");
         verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 67000);
     }
 
@@ -160,6 +147,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private void verifyAttachment(Part attachment, String type, long minimalSize) throws Exception {
         assertTrue(attachment.getSize() > minimalSize,
-                   "Expected " + minimalSize + "B , but " + attachment.getSize() + "B found for " + type);
+                "The attachment (" + type + ") has the expected minimal size. Expected " + minimalSize + "B, found " + attachment.getSize() + "B.");
     }
 }

@@ -11,13 +11,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 @Test(groups = {"GoodSalesSchedulesFull"}, description = "Tests for GoodSales project (email schedules functionality, incl. imap verification) in GD platform")
 public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedules"})
-    public void verifyEmptySchedules() {
-        initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There are some not expected schedules");
-        Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
-    }
-
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createDashboardSchedule() {
         initEmailSchedulesPage();
@@ -39,7 +32,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     @Test(groups = {"tests"}, dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
         initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "2 schedules weren't created properly");
+        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "Schedules are properly created.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
         successfulTest = true;
     }

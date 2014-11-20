@@ -85,10 +85,16 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy (xpath = "//div[@class='yui3-d-embeddialog-content']")
     private DashboardEmbedDialog dashboardEmbedDialog;
 
+    @FindBy(css = ".s-scheduleButton")
+    private WebElement scheduleButton;
+
+    @FindBy(xpath = "//div[contains(@class,'s-mailScheduleDialog')]")
+    private DashboardScheduleDialog scheduleDialog;
+
     /**
      * Fragment represents link for saved view dialog on dashboard
      * when saved view mode is turned on
-     * 
+     *
      * @see SavedViewWidget
      */
     @FindBy(xpath = "//div[contains(@class,'savedFilters')]/button")
@@ -331,5 +337,12 @@ public class DashboardsPage extends AbstractFragment {
         } catch (NoSuchElementException e) {
             return false;
         }
+    }
+
+    public DashboardScheduleDialog scheduleDashboard() {
+        waitForDashboardPageLoaded(browser);
+        waitForElementVisible(scheduleButton).click();
+        waitForElementVisible(scheduleDialog.getRoot());
+        return scheduleDialog;
     }
 }
