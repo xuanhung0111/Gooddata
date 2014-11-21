@@ -345,4 +345,12 @@ public class DashboardsPage extends AbstractFragment {
         waitForElementVisible(scheduleDialog.getRoot());
         return scheduleDialog;
     }
+
+    public boolean isScheduleButtonVisible() {
+        try {
+            return scheduleButton.isDisplayed();
+        } catch (NoSuchElementException nsee) {
+            return false;
+        }
+    }
 }

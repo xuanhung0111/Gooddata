@@ -3,10 +3,14 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -69,9 +73,24 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             timeDescription.contains(SCHEDULE_TIME),
             "Time description contains the given time. Expected '" + SCHEDULE_TIME + "', found '" + timeDescription + "'."
         );
-        // TODO remove after adding proper feature flag
-        this.browser.manage().deleteCookieNamed(FEATURE_FLAG_COOKIE_NAME);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
-        successfulTest = true;
+    }
+
+    @Test(dependsOnGroups = {"schedules"}, groups = {"tests"})
+    public void verifyScheduleButtonPresenceOnEmbeddedDashboard() {
+        initDashboardsPage();
+        try {
+            DashboardEmbedDialog ded = dashboardsPage.embedDashboard();
+            this.browser.get(ded.getPreviewURI());
+            waitForDashboardPageLoaded(this.browser);
+            waitForElementVisible(dashboardsPage.getRoot());
+
+            assertTrue(dashboardsPage.isScheduleButtonVisible());
+            successfulTest = true;
+        } catch (Exception e) {} finally {
+            // TODO remove after adding proper feature flag
+            this.browser.manage().deleteCookieNamed(FEATURE_FLAG_COOKIE_NAME);
+            Screenshots.takeScreenshot(browser, "Goodsales-schedules-embedded-dashboard", this.getClass());
+        }
     }
 }
