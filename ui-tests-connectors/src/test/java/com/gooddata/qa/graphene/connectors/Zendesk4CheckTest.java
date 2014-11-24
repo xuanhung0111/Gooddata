@@ -3,15 +3,21 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.qa.graphene.enums.Connectors;
-import com.gooddata.qa.graphene.enums.FilterTypes;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.joda.time.DateTime;
 import org.json.JSONException;
@@ -19,12 +25,16 @@ import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.*;
-
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.assertEquals;
+import com.gooddata.qa.graphene.entity.HowItem;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.enums.Connectors;
+import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
+import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
 public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
@@ -302,33 +312,28 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private void createTicketEventsReport(int ticketId) throws InterruptedException {
-        List<HowItem> how = new ArrayList<HowItem>();
-        how.add(new HowItem("Text Field"));
-        how.add(new HowItem("[Text Field] New Value"));
-        how.add(new HowItem("[Text Field] Previous Value"));
-        how.add(new HowItem("Ticket Updates"));
-        how.add(new HowItem("Ticket Id"));
-
-        createReportTmp(TICKET_EVENTS_REPORT_NAME, ReportTypes.TABLE, new ArrayList<String>(), how, TICKET_EVENTS_REPORT_NAME);
+        createReport(new ReportDefinition().withName(TICKET_EVENTS_REPORT_NAME)
+                                           .withHows(new HowItem("Text Field"),
+                                                     new HowItem("[Text Field] New Value"),
+                                                     new HowItem("[Text Field] Previous Value"),
+                                                     new HowItem("Ticket Updates"),
+                                                     new HowItem("Ticket Id")),
+                     TICKET_EVENTS_REPORT_NAME);
         createReportTicketIdFilter(ticketId);
     }
 
     private void createReportTicketIdFilter(int ticketId) throws InterruptedException {
-        Map<String, String> data = new HashMap<String, String>();
-        data.put("attribute", "Ticket Id");
-        data.put("attributeElements", String.valueOf(ticketId));
-        reportPage.addFilter(FilterTypes.ATTRIBUTE, data);
+        reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Ticket Id", String.valueOf(ticketId)));
         reportPage.saveReport();
         waitForElementVisible(TABLE_REPORT_CONTAINER_LOCATION, browser);
     }
 
     private void createTicketTagsReport(int ticketId) throws InterruptedException {
-        List<HowItem> how = new ArrayList<HowItem>();
-        how.add(new HowItem("Ticket Tag", HowItem.Position.LEFT));
-        how.add(new HowItem("Ticket Tag Deleted Flag", HowItem.Position.LEFT));
-        how.add(new HowItem("Ticket Id", HowItem.Position.LEFT));
-
-        createReportTmp(TICKET_TAGS_REPORT_NAME, ReportTypes.TABLE, new ArrayList<String>(), how, TICKET_TAGS_REPORT_NAME);
+        createReport(new ReportDefinition().withName(TICKET_TAGS_REPORT_NAME)
+                                           .withHows(new HowItem("Ticket Tag", HowItem.Position.LEFT))
+                                           .withHows(new HowItem("Ticket Tag Deleted Flag", HowItem.Position.LEFT))
+                                           .withHows(new HowItem("Ticket Id", HowItem.Position.LEFT)),
+                     TICKET_TAGS_REPORT_NAME);
         createReportTicketIdFilter(ticketId);
     }
 
@@ -469,9 +474,10 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private void createBasicReport(String metric, String reportName) throws InterruptedException {
-        List<String> what = new ArrayList<String>();
-        what.add(metric);
-        createReport(reportName, ReportTypes.HEADLINE, what, null, reportName);
+        createReport(new ReportDefinition().withName(reportName)
+                                           .withType(ReportTypes.HEADLINE)
+                                           .withWhats(metric),
+                     reportName);
         waitForElementVisible(BY_ONE_NUMBER_REPORT, browser);
     }
 

@@ -2,10 +2,12 @@ package com.gooddata.qa.graphene.upload;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.HowItem;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -64,11 +66,19 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 		waitForAnalysisPageLoaded(browser);
 		waitForElementVisible(reportPage.getRoot());
 		assertNotNull(reportPage, "Report page not initialized!");
-        List<HowItem> howWithPosition = new ArrayList<HowItem>();
+        ReportDefinition reportDefinition = new ReportDefinition().withName(reportName)
+                                                                  .withType(reportType);
         for (String attributeName : how) {
-            howWithPosition.add(new HowItem(attributeName));
+            reportDefinition.withHows(new HowItem(attributeName));
         }
-        reportPage.createReport(reportName, reportType, what, howWithPosition);
+
+        if (what != null) {
+            for (String metric : what) {
+                reportDefinition.withWhats(metric);
+            }
+        }
+        
+        reportPage.createReport(reportDefinition);
 	}
 
 	protected void deleteDataset(String datasetName)

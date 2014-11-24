@@ -20,6 +20,7 @@ import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.DropDown;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -62,9 +63,6 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'yui3-d-modaldialog')]")
     private DashboardWebContent dashboardWebContent;
 
-    @FindBy(xpath = "//div[contains(@class,'reportPicker')]")
-    private DashboardAddReportPanel dashboardAddReportPanel;
-
     @FindBy(xpath = "//button[contains(@class,'s-btn-text')]")
     private WebElement addText;
 
@@ -100,6 +98,9 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'s-active-tab')]")
     private DashboardEditFilter dashboardEditFilter;
 
+    @FindBy(xpath = "//div[contains(@class,'reportPicker')]")
+    private DropDown reportPicker;
+
     public DashboardEditFilter getDashboardEditFilter() {
         return dashboardEditFilter;
     }
@@ -107,8 +108,8 @@ public class DashboardEditBar extends AbstractFragment {
     public void addReportToDashboard(String reportName) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(reportMenuButton).click();
-        waitForElementVisible(dashboardAddReportPanel.getRoot());
-        dashboardAddReportPanel.addReport(reportName); 
+        waitForElementVisible(reportPicker.getRoot());
+        reportPicker.searchAndSelectItem(reportName);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }

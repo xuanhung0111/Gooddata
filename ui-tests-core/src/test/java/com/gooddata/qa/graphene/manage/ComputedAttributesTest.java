@@ -14,7 +14,7 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
@@ -92,7 +92,10 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         List<String> expectedAttributeHeader = Arrays.asList("Sales Rep Ranking");
         List<String> expectedAttributeValues = Arrays.asList("Best", "Good", "Great", "Poor");
         List<Float> expectedMetricValues = Arrays.asList(3.4506136E7f, 8632501.0f, 3.8943492E7f, 3.4543328E7f);
-        createReport("Computed Attribute Report", ReportTypes.TABLE,  Arrays.asList("Amount"),  Arrays.asList("Sales Rep Ranking"), "Computed Attribute Report");
+        createReport(new ReportDefinition().withName("Computed Attribute Report")
+                                           .withWhats("Amount")
+                                           .withHows("Sales Rep Ranking"),
+                    "Computed Attribute Report");
         reportPage.saveReport();
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute", this.getClass());
         List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();

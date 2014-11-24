@@ -1,15 +1,19 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
 public class AttributeDetailPage extends AbstractFragment {
 
@@ -31,6 +35,12 @@ public class AttributeDetailPage extends AbstractFragment {
     @FindBy(css = "button.s-labelSaveButton")
     private WebElement labelSaveButton;
 
+    @FindBy(css = "button.s-btn-clear")
+    private WebElement clearExternalPageButton;
+
+    @FindBy(css = "button.pickAttribute")
+    private WebElement selectDrillAttributeButton;
+
     private static final By BY_EXTERNAL_PAGE_LINK = By.cssSelector("button.s-btn-external_page");
 
     // ************** Dialog rename attribute ************** //
@@ -39,9 +49,6 @@ public class AttributeDetailPage extends AbstractFragment {
     private static final By ATTRIBUTE_RENAME_INPUT_LOCATOR = By.cssSelector(".c-ipeEditorIn input");
     private static final By OK_BUTTON_LOCATOR              = By.cssSelector(".c-ipeEditorControls button");
     // ********************************************************
-
-    @FindBy(css = "button.s-btn-clear")
-    private WebElement clearExternalPageButton;
 
     public String getAttributeName() {
         return waitForElementVisible(attributeName).getText();
@@ -78,5 +85,29 @@ public class AttributeDetailPage extends AbstractFragment {
         waitForElementVisible(OK_BUTTON_LOCATOR, browser).click();
         waitForElementVisible(attributeName);
         assertEquals(getAttributeName(), newName, "new attribute name is not updated!");
+    }
+
+    public boolean isDrillToExternalPage() {
+        return waitForElementPresent(By.cssSelector(".link.option"), browser).getAttribute("style").contains("display: inline");
+    }
+
+    public void clearDrillingSetting() {
+        waitForElementVisible(clearExternalPageButton).click();
+        waitForElementNotVisible(clearExternalPageButton);
+    }
+
+    public void setDrillToAttribute(String attribute) {
+        waitForElementPresent(clearExternalPageButton);
+        if (!clearExternalPageButton.getAttribute("class").contains("gdc-hidden")) {
+            clearDrillingSetting();
+        }
+        waitForElementVisible(selectDrillAttributeButton).click();
+        SelectItemPopupPanel popup = Graphene.createPageFragment(SelectItemPopupPanel.class,
+                waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser));
+        popup.searchAndSelectItem(attribute);
+        waitForElementNotVisible(popup.getRoot());
+        waitForElementVisible(By.cssSelector(".attr.option"), browser);
+        waitForElementVisible(By.cssSelector(String.format("button.s-btn-%s",
+                CssUtils.simplifyText(attribute.toLowerCase()))), browser);
     }
 }

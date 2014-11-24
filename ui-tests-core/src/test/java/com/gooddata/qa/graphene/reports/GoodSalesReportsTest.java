@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -283,7 +286,20 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
             throws InterruptedException {
-        createReport(reportName, reportType, what, how, "GoodSales");
+        ReportDefinition reportDefinition = new ReportDefinition().withName(reportName)
+                                                                  .withType(reportType);
+
+        if (what != null) {
+            for (String metric : what)
+                reportDefinition.withWhats(metric);
+        }
+
+        if (how != null) {
+            for (String attribute : how)
+                reportDefinition.withHows(attribute);
+        }
+
+        createReport(reportDefinition, "GoodSales");
         createdReportsCount++;
     }
 

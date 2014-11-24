@@ -1,42 +1,53 @@
 package com.gooddata.qa.graphene.fragments.common;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import org.jboss.arquillian.graphene.Graphene;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.By;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class DropDown extends AbstractFragment {
 
-    @FindBy(css = ".gd-list-view")
-    private WebElement listView;
+    private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
-    @FindBy(xpath = "//div[contains(@class,'gd-dropdown-search')]/input")
+    @FindBy(css = ".searchfield input")
     private WebElement searchInput;
 
-    private static final String itemLocator = ".gd-list-view-item .s-%s";
+    @FindBy(css = ".gd-list-view-item span")
+    private List<WebElement> items;
 
     public void selectItem(String name) {
-        String itemCssSelector = String.format(itemLocator, simplifyText(name));
-        waitForElementVisible(listView);
-        By item = By.cssSelector(String.format(itemCssSelector));
-        waitForElementVisible(item, browser).click();
+        for (WebElement e : items) {
+            if (!name.equals(e.getText().trim()))
+                continue;
+
+            e.click();
+            break;
+        }
+
+        waitForElementNotVisible(this.getRoot());
     }
 
     public void searchItem(String name) {
-        waitForElementVisible(searchInput);
+        waitForElementVisible(this.getRoot());
+
+        waitForElementVisible(searchInput).clear();
+        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        waitForCollectionIsEmpty(items);
+
+        searchInput.clear();
         searchInput.sendKeys(name);
-        waitForElementVisible(listView);
+        waitForCollectionIsNotEmpty(items);
     }
 
     public void searchAndSelectItem(String name) {
         searchItem(name);
         selectItem(name);
-    }
-
-    private String simplifyText(String text) {
-        return text.trim().toLowerCase().replaceAll("[^a-zA-Z0-9]", "_");
     }
 }

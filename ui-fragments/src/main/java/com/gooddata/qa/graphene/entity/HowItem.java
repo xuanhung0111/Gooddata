@@ -1,26 +1,31 @@
 package com.gooddata.qa.graphene.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class HowItem {
 
     private Attribute attribute;
     private Position position;
+    private List<String> filterValues;
 
-    public HowItem(Attribute attribute, Position position) {
+    public HowItem(Attribute attribute, Position position, String... filterValues) {
         this.attribute = attribute;
         this.position = position;
+        this.filterValues = new ArrayList<String>(Arrays.asList(filterValues));
     }
 
-    public HowItem(Attribute attribute) {
-        this.attribute = attribute;
-        this.position = Position.LEFT;
+    public HowItem(Attribute attribute, String... filterValues) {
+        this(attribute, Position.LEFT, filterValues);
     }
 
-    public HowItem(String attributeName) {
-        this(new Attribute(attributeName));
+    public HowItem(String attributeName, String... filterValues) {
+        this(new Attribute(attributeName), filterValues);
     }
 
-    public HowItem(String attributeName, Position position) {
-        this(new Attribute(attributeName), position);
+    public HowItem(String attributeName, Position position, String... filterValues) {
+        this(new Attribute(attributeName), position, filterValues);
     }
 
     public Attribute getAttribute() {
@@ -39,8 +44,27 @@ public class HowItem {
         this.position = position;
     }
 
+    public List<String> getFilterValues() {
+        return filterValues;
+    }
+
+    public HowItem addFilterValue(String... values) {
+        filterValues.addAll(Arrays.asList(values));
+        return this;
+    }
+
     public static enum Position {
-        LEFT,
-        TOP
+        LEFT("sndAttributePosition_rows"),
+        TOP("sndAttributePosition_columns");
+
+        private String cssClass;
+
+        private Position(String cssClass) {
+            this.cssClass = cssClass;
+        }
+
+        public String getCssClass() {
+            return cssClass;
+        }
     }
 }

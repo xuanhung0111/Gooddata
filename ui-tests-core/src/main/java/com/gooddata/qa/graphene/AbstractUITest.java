@@ -1,8 +1,7 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.qa.graphene.entity.HowItem;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -21,7 +20,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -332,46 +330,15 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementVisible(reportsPage.getRoot());
     }
 
-    /** Backwards compatibility */
-    public void createReport(String reportName, ReportTypes reportType, List<String> what,
-                             List<String> how, String screenshotName) throws InterruptedException {
-        List<HowItem> howWithPosition = new ArrayList<HowItem>();
-
-        if (how != null) {
-            for (String attributeName : how) {
-                howWithPosition.add(new HowItem(attributeName));
-            }
-        }
-
-        createReportTmp(reportName, reportType, what, howWithPosition, screenshotName);
-    }
-
-    /**
-     * This is just temporary implementation of report creation at the moment.
-     * Future implementation of the method could process objects like this:
-     *
-     *  ReportDefinition reportDefinition = new ReportDefinition();
-     *  reportDefinition.setName(TICKET_EVENTS_REPORT_NAME);
-     *  reportDefinition.setType(ReportTypes.TABLE);
-     *  reportDefinition.addHow("Ticket Updates", HowItem.Position.LEFT);
-     *  reportDefinition.addHow(...);
-     *  reportDefinition.addWhat(what);
-     *  reportDefinition.addFilter(filter); // this could be filter of different types
-     *
-     *  ReportHelper reportHelper = new ReportHelper(browser); // could be implemented on REST or whatever
-     *  reportHelper.create(reportDefinition);
-     */
-    public void createReportTmp(String reportName, ReportTypes reportType, List<String> what,
-                             List<HowItem> how, String screenshotName) throws InterruptedException {
-        // TODO: add filter functionality
+    public void createReport(ReportDefinition reportDefinition, String screenshotName) throws InterruptedException {
         initReportsPage();
         selectReportsDomainFolder("My Reports");
         reportsPage.startCreateReport();
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
         assertNotNull(reportPage, "Report page not initialized!");
-        reportPage.createReport(reportName, reportType, what, how);
-        Screenshots.takeScreenshot(browser, screenshotName + "-" + reportName + "-" + reportType.getName(), this.getClass());
+        reportPage.createReport(reportDefinition);
+        Screenshots.takeScreenshot(browser, screenshotName + "-" + reportDefinition.getName() + "-" + reportDefinition.getType().getName(), this.getClass());
         checkRedBar(browser);
     }
 

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -12,14 +11,21 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 
+import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
+import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
+import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class ReportFilter extends AbstractFragment {
 
-    private static final String ATTRIBUTE_IN_HOW_FROM_LIST = "//div[contains(@class,'s-item-${label}') and contains(@class,'s-enabled')]//span";
-    private static final String ATTRIBUTE_NOT_IN_HOW_FROM_LIST = "//div[contains(@class,'s-item-ticket_id') and contains(@class,'s-enabled') and contains(@class,'lastCell')]//span";
+    private static final String ATTRIBUTE_IN_HOW_FROM_LIST =
+            "//div[contains(@class,'s-item-${label}') and contains(@class,'s-enabled')]//span";
+    private static final String ATTRIBUTE_NOT_IN_HOW_FROM_LIST =
+            "//div[contains(@class,'s-item-ticket_id') and contains(@class,'s-enabled') and contains(@class,'lastCell')]//span";
 
     private By addFilterButton = By.cssSelector(".s-btn-add_filter");
 
@@ -85,15 +91,16 @@ public class ReportFilter extends AbstractFragment {
 
     @FindBy(xpath = "//div[@id='gridContainerTab']")
     private TableReport report;
-    private String listOfElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
-    private String attributeElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'s-item-${element}')]/input";
 
-    public void addFilterSelectList(Map<String, String> data)
-            throws InterruptedException {
+    private String listOfElementLocator = 
+            "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
+    private String attributeElementLocator = 
+            "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'s-item-${element}')]/input";
+
+    public void addFilterSelectList(SelectFromListValuesFilterItem filterItem) {
         System.out.println("Adding attribute filter ......");
-        String attribute = data.get("attribute");
-        String attributeElements = data.get("attributeElements");
-        List<String> lsAttributeElements = Arrays.asList(attributeElements.split(", "));
+        String attribute = filterItem.getAttribute();
+        List<String> lsAttributeElements = filterItem.getValues();
         // report could be too large to display before filtering => there is no header/report visible
         boolean attributeInHow = report.getAttributesHeader().contains(attribute);
 
@@ -139,21 +146,18 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(By.xpath(createAttributeXPath(ATTRIBUTE_NOT_IN_HOW_FROM_LIST, "${label}", elementName)), browser).click();
     }
 
-    public void addRankFilter(Map<String, String> data)
-            throws InterruptedException {
+    public void addRankFilter(RankingFilterItem filterItem) throws InterruptedException {
         System.out.println("Adding Rank Filter ......");
-        String attribute = data.get("attribute");
-        String metric = data.get("metric");
-        String type = data.get("type");
-        String size = data.get("size");
-        String[] array = {"1", "3", "5", "10"};
+        String attribute = filterItem.getAttribute();
+        String metric = filterItem.getMetric();
+        RankingFilterItem.ResultSize resultSize = filterItem.getSize();
         waitForElementVisible(report.getRoot());
         List<Float> metricValuesinGrid = report.getMetricElements();
         Collections.sort(metricValuesinGrid);
-        if (type == "Top") {
+        if (resultSize == ResultSize.TOP) {
             Collections.reverse(metricValuesinGrid);
         }
-        int rankSize = Integer.parseInt(size);
+        int rankSize = resultSize.getSize();
         List<Float> rankedMetric = new ArrayList<Float>();
         for (int i = 0; i < rankSize; i++) {
             rankedMetric.add(metricValuesinGrid.get(i));
@@ -164,15 +168,15 @@ public class ReportFilter extends AbstractFragment {
         } // displayed if at least one filter added.
         waitForElementVisible(filterPicker);
         waitForElementVisible(rankFilterLink).click();
-        if (type.equals("Bottom")) {
+        if (resultSize == ResultSize.BOTTOM) {
             waitForElementVisible(bottomOption).click();
         } else {
             waitForElementVisible(topOption).click();
         }
         Thread.sleep(2000);
         waitForElementVisible(rankSizeSelect);
-        if (Arrays.asList(array).contains(size)) {
-            rankSizeSelect.selectByValue(size);
+        if (Arrays.asList(1, 3, 5, 10).contains(rankSize)) {
+            rankSizeSelect.selectByValue(String.valueOf(rankSize));
         } else {
             rankSizeSelect.selectByValue("3");
         }
@@ -195,15 +199,13 @@ public class ReportFilter extends AbstractFragment {
         metricValuesinGrid = report.getMetricElements();
         Collections.sort(metricValuesinGrid);
         Assert.assertEquals(metricValuesinGrid, rankedMetric, "Report isn't applied filter correctly");
-
     }
 
-    public void addRangeFilter(Map<String, String> data)
-            throws InterruptedException {
+    public void addRangeFilter(NumericRangeFilterItem filterItem) {
         System.out.println("Adding Range Filter ......");
-        String attribute = data.get("attribute");
-        String metric = data.get("metric");
-        String number = data.get("number");
+        String attribute = filterItem.getAttribute();
+        String metric = filterItem.getMetric();
+        int rangeNumber = filterItem.getRange().getNumber();
         if (browser.findElements(addFilterButton).size() > 0) {
             waitForElementVisible(addFilterButton, browser).click();
         }// displayed if at least one filter added.
@@ -221,25 +223,22 @@ public class ReportFilter extends AbstractFragment {
         selectElement(metric);
         waitForElementVisible(selectElementButtonDialog).click();
         waitForElementVisible(rangeNumberInput).clear();
-        rangeNumberInput.sendKeys(number);
+        rangeNumberInput.sendKeys(String.valueOf(rangeNumber));
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
         waitForTableReportRendered();
         waitForElementVisible(hideFiltersButton).click();
         waitForElementVisible(report.getRoot());
         List<Float> metricValuesInGrid = report.getMetricElements();
-        int rangeNumber = Integer.parseInt(number);
         for (int i = 0; i < metricValuesInGrid.size(); i++) {
             Assert.assertTrue(metricValuesInGrid.get(i) >= rangeNumber, "Report isn't applied filter correctly");
         }
     }
 
-    public void addPromtFiter(Map<String, String> data)
-            throws InterruptedException {
+    public void addPromtFiter(VariableFilterItem filterItem) {
         System.out.println("Adding Prompt Filter ......");
-        String variable = data.get("variable");
-        String promptElements = data.get("promptElements");
-        List<String> lsPromptElements = Arrays.asList(promptElements.split(", "));
+        String variable = filterItem.getVariable();
+        List<String> lsPromptElements = filterItem.getPromptElements();
         waitForElementVisible(report.getRoot());
         List<String> attrElementInGrid = report.getAttributeElements();
         lsPromptElements.retainAll(attrElementInGrid);
@@ -262,7 +261,8 @@ public class ReportFilter extends AbstractFragment {
     }
 
     public void waitForTableReportRendered() {
-        By gridContainerBody = By.xpath("//div[@id='gridContainerTab']/div[@id='gridContainer']/div[@class='containerBody']/div[contains(@class,'gridTab')]");
+        By gridContainerBody = By.xpath("//div[@id='gridContainerTab']/div[@id='gridContainer']"
+                + "/div[@class='containerBody']/div[contains(@class,'gridTab')]");
         if (browser.findElements(gridContainerBody).size() > 0) {
             waitForElementNotPresent(gridContainerBody);
         }

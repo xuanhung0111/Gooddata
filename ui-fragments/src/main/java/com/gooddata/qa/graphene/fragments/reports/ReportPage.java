@@ -1,20 +1,28 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.enums.FilterTypes;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.entity.HowItem;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
 
 import java.util.List;
-import java.util.Map;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
+import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
+import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
+import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
 
 public class ReportPage extends AbstractFragment {
 
@@ -103,28 +111,47 @@ public class ReportPage extends AbstractFragment {
         reportNameInput.sendKeys(reportName);
         waitForElementVisible(reportNameSaveButton).click();
         waitForElementNotVisible(reportNameInput);
-        Assert.assertEquals(this.reportName.getText(), reportName,
-                "Report name wasn't updated");
+        assertEquals(this.reportName.getText(), reportName, "Report name wasn't updated");
     }
 
     public String getReportName() {
         return reportName.getAttribute("title");
     }
 
-    public void createReport(String reportName, ReportTypes reportType,
-                             List<String> what, List<HowItem> how) throws InterruptedException {
-        setReportName(reportName);
-        visualiser.selectWhatArea(what); //metrics
-        visualiser.selectHowAreaWithPosition(how); //attributes
+    public void createReport(ReportDefinition reportDefinition) throws InterruptedException {
+        setReportName(reportDefinition.getName());
+
+        if (reportDefinition.shouldAddWhatToReport())
+            visualiser.selectWhatArea(reportDefinition.getWhats());
+
+        if (reportDefinition.shouldAddHowToReport())
+            visualiser.selectHowArea(reportDefinition.getHows());
+
         visualiser.finishReportChanges();
-        visualiser.selectReportVisualisation(reportType);
+
+        if (reportDefinition.shouldAddFilterToReport()) {
+            for (FilterItem filter : reportDefinition.getFilters()) {
+                addFilter(filter);
+            }
+        }
+
+        visualiser.selectReportVisualisation(reportDefinition.getType());
         waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(createReportButton);
-        Thread.sleep(2000);
-        createReportButton.click();
+        waitForElementVisible(createReportButton).click();
         waitForElementVisible(confirmDialogCreateButton).click();
         waitForElementNotVisible(confirmDialogCreateButton);
-        Assert.assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
+
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                return "Saved".equals(createReportButton.getText().trim());
+            }
+        });
+        // When Create button change its name to Saving, and then Saved, the create report process is not finished.
+        // Report have to refresh some parts, e.g. the What button have to enable, then disable, then enable.
+        // If we navigate to another url when create report is not finished, unsaved change dialog will appear.
+        // Use sleep here to make sure that process is finished
+        Thread.sleep(1000);
     }
 
     public void createSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal){
@@ -176,34 +203,32 @@ public class ReportPage extends AbstractFragment {
         return reportName;
     }
 
-    public void addFilter(FilterTypes filterType, Map<String, String> data)
-            throws InterruptedException {
+    public void addFilter(FilterItem filterItem) throws InterruptedException {
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(filterButton).click();
         waitForElementVisible(reportFilter.getRoot());
-        String textOnFilterButton = waitForElementVisible(filterButton)
-                .getText();
+        String textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountBefore = getNumber(textOnFilterButton);
-        switch (filterType) {
-            case ATTRIBUTE:
-                reportFilter.addFilterSelectList(data);
-                break;
-            case RANK:
-                reportFilter.addRankFilter(data);
-                break;
-            case RANGE:
-                reportFilter.addRangeFilter(data);
-                break;
-            case PROMPT:
-                reportFilter.addPromtFiter(data);
-                break;
-            default:
-                break;
+
+        if (filterItem instanceof SelectFromListValuesFilterItem) {
+            reportFilter.addFilterSelectList((SelectFromListValuesFilterItem) filterItem);
+
+        } else if (filterItem instanceof RankingFilterItem) {
+            reportFilter.addRankFilter((RankingFilterItem) filterItem);
+
+        } else if (filterItem instanceof NumericRangeFilterItem) {
+            reportFilter.addRangeFilter((NumericRangeFilterItem) filterItem);
+
+        } else if (filterItem instanceof VariableFilterItem) {
+            reportFilter.addPromtFiter((VariableFilterItem) filterItem);
+
+        } else {
+            throw new IllegalArgumentException("Unknow filter item: " + filterItem);
         }
+
         textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountAfter = getNumber(textOnFilterButton);
-        Assert.assertEquals(filterCountAfter, filterCountBefore + 1,
-                "Filter wasn't added");
+        assertEquals(filterCountAfter, filterCountBefore + 1, "Filter wasn't added");
         Thread.sleep(2000);
     }
 
@@ -214,8 +239,7 @@ public class ReportPage extends AbstractFragment {
             waitForElementVisible(confirmSaveButton).click();
         }
         Thread.sleep(3000);
-        Assert.assertEquals(createReportButton.getText(), "Saved",
-                "Report wasn't saved");
+        assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
     }
 
     public static float getNumber(String text) {

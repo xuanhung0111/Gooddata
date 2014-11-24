@@ -19,4 +19,6 @@ public abstract class AbstractFragment {
     }
 
     protected static final By BY_LINK = By.tagName("a");
+
+    protected static final By BY_PARENT = By.xpath("..");
 }
