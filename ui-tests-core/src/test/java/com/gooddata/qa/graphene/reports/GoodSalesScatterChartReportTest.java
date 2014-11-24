@@ -22,7 +22,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget.FilterPanel;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-public class ScatterChartReportTest extends GoodSalesAbstractTest {
+public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 
 	private static final By BY_IFRAME_SCATTER = By.xpath("//iframe[contains(@src,'iaa/scatter')]");
 	private static final long expectedDashboardExportSize = 42000;
