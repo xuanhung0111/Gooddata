@@ -209,6 +209,7 @@
                                     <configuration>
                                         <skip>${skipTests}</skip>
                                         <testFailureIgnore>true</testFailureIgnore>
+                                        <failIfNoTests>false</failIfNoTests>
                                         <suiteXmlFiles>
                                             <suiteXmlFile>src/test/resources/${testng.suite.xml}</suiteXmlFile>
                                         </suiteXmlFiles>
