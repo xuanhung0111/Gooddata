@@ -20,7 +20,7 @@
         <profile>
             <id>selenium</id>
             <properties>
-                <testng.suite.xml>testng-core-simple.xml</testng.suite.xml>
+                <testng.suite.xml>testng-core-dummy.xml</testng.suite.xml>
                 <propertiesPath>${modulePropertiesPath}</propertiesPath>
                 <csvFilePath>${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}geochart-csv</csvFilePath>
             </properties>
