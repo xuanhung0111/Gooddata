@@ -3,27 +3,21 @@ package com.gooddata.qa.graphene.reports;
 import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForReportsPageLoaded;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.enums.VariableTypes;
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 
 @Test(groups = {"GoodSalesReportFilters"}, description = "Tests for GoodSales project (report filters functionality) in GD platform")
 public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
-    private String reportName;
-    private String variableName;
-    private String promptElements;
-    private Map<String, String> data;
+    private static final String REPORT_NAME = "Test Filter";
+    private static final String VARIABLE_NAME = "F Stage Name";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -31,34 +25,19 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
-    public void initialize() throws InterruptedException, JSONException {
-        reportName = "Test Filter";
-        variableName = "F Stage Name";
-        data = new HashMap<String, String>();
-        data.put("attribute", "Stage Name");
-        data.put("attributeElements", "Interest, Discovery, Short List, Negotiation, Closed Won, Closed Lost");
-        data.put("metric", "Amount");
-        data.put("type", "Top"); // (valid elements: "Top", "Bottom")
-        data.put("size", "3"); // (valid elements: "1", "3", "5" , "10")
-        data.put("number", "100000");
-        promptElements = "Interest, Discovery, Short List, Negotiation";
-    }
-
-    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createReportTest() throws InterruptedException {
-        createReport(new ReportDefinition().withName(reportName)
+        createReport(new ReportDefinition().withName(REPORT_NAME)
                                            .withWhats("Amount")
                                            .withHows("Stage Name"),
                     "Simple filter report");
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void createVariableTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
-        data.put("variableName", this.variableName);
-        data.put("userValueFlag", "false");
-        data.put("attrElements", promptElements);
-        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
+                .withAttribute("Stage Name")
+                .withAttributeElements("Interest", "Discovery", "Short List", "Negotiation"));
     }
 
     @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
@@ -90,7 +69,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest", "createVariableTest"}, groups = {"filter-tests"})
     public void promptFilterTest() throws InterruptedException {
         initReport();
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter(variableName,
+        reportPage.addFilter(FilterItem.Factory.createVariableFilter(VARIABLE_NAME,
                 "Interest", "Discovery", "Short List", "Negotiation"));
         reportPage.saveReport();
         checkRedBar(browser);
@@ -104,6 +83,6 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     private void initReport() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
         waitForReportsPageLoaded(browser);
-        reportsPage.getReportsList().openReport(this.reportName);
+        reportsPage.getReportsList().openReport(REPORT_NAME);
     }
 }

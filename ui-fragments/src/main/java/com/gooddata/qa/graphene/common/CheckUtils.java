@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 
 import static org.testng.Assert.fail;
@@ -88,6 +89,11 @@ public class CheckUtils {
     public static Select waitForElementVisible(Select select) {
         Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().visible();
         return select;
+    }
+
+    public static WebElement waitForFragmentVisible(AbstractFragment fragment) {
+        Graphene.waitGui().until().element(fragment.getRoot()).is().visible();
+        return fragment.getRoot();
     }
 
     public static void waitForElementNotVisible(WebElement element) {

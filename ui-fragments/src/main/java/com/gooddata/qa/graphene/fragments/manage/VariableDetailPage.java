@@ -1,16 +1,19 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import static org.testng.Assert.*;
 
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class VariableDetailPage extends AbstractFragment {
 
@@ -89,110 +92,104 @@ public class VariableDetailPage extends AbstractFragment {
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectPropertiesPage;
 
-    private static final String listOfAttributeLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
+    private static final String listOfAttributeLocator =
+            "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
 
-    private static final String listOfElementLocator = "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-checkBox') and contains(@class,'s-item-${label}')]";
+    private static final String listOfElementLocator =
+            "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-checkBox') and contains(@class,'s-item-${label}')]";
 
     private static final String attributeToAddLocator = "//span[text()='${variableName}']";
 
-    public void createNumericVariable(String variableName, int number)
-	    throws InterruptedException {
-	waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(variableName);
-	waitForElementVisible(okNameButton).click();
-	waitForElementVisible(numericalVariable).click();
-	waitForElementVisible(scalarValueInput)
-		.sendKeys(String.valueOf(number));
-	waitForElementVisible(numericalVariable).click();
-	waitForElementVisible(saveChangeButton).click();
-	waitForElementVisible(unSavedBarInactive);
-	waitForElementVisible(dataLink).click();
+    public void createNumericVariable(NumericVariable var) throws InterruptedException {
+        waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(var.getName());
+        waitForElementVisible(okNameButton).click();
+        waitForElementVisible(numericalVariable).click();
+        waitForElementVisible(scalarValueInput).sendKeys(String.valueOf(var.getDefaultNumber()));
+        waitForElementVisible(numericalVariable).click();
+        waitForElementVisible(saveChangeButton).click();
+        waitForElementVisible(unSavedBarInactive);
+        waitForElementVisible(dataLink).click();
     }
 
-    public void createFilterVariable(String attribute, String variableName,
-	    List<String> elements, boolean userValueSet)
-	    throws InterruptedException {
-	waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(variableName);
-	waitForElementVisible(okNameButton).click();
-	waitForElementVisible(filterVariable).click();
-	waitForElementVisible(selectAttribute).click();
-	waitForElementVisible(searchAttributeText);
-	searchAttributeText.sendKeys(attribute);
-	By listOfAttribute = By.xpath(listOfAttributeLocator
-		.replace("${label}",
-			attribute.trim().toLowerCase().replaceAll(" ", "_")));
-	waitForElementVisible(listOfAttribute, browser);
-	By attributeToAdd = By.xpath(attributeToAddLocator.replace(
-		"${variableName}", attribute));
-	waitForElementVisible(attributeToAdd, browser).click();
-	waitForElementVisible(selectButton).click();
-	if (userValueSet) {
-	    waitForElementVisible(chooseButton).click();
-	} else {
-	    waitForElementVisible(editButton).click();
-	}
+    public void createFilterVariable(AttributeVariable var) throws InterruptedException {
+        waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(var.getName());
+        waitForElementVisible(okNameButton).click();
+        waitForElementVisible(filterVariable).click();
+        waitForElementVisible(selectAttribute).click();
+        waitForElementVisible(searchAttributeText);
 
-	selectAttrElement(elements);
-	waitForElementVisible(saveChangeButton).click();
-	waitForElementVisible(unSavedBarInactive);
-	waitForElementVisible(userTable);
-	waitForElementVisible(dataLink).click();
+        String attribute = var.getAttribute();
+        searchAttributeText.sendKeys(attribute);
+        By listOfAttribute =
+                By.xpath(listOfAttributeLocator.replace("${label}", attribute.trim().toLowerCase()
+                        .replaceAll(" ", "_")));
+        waitForElementVisible(listOfAttribute, browser);
+        By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", attribute));
+        waitForElementVisible(attributeToAdd, browser).click();
+        waitForElementVisible(selectButton).click();
+        if (var.isUserSpecificValues()) {
+            waitForElementVisible(chooseButton).click();
+        } else {
+            waitForElementVisible(editButton).click();
+        }
+
+        selectAttrElement(var.getAttributeElements());
+        waitForElementVisible(saveChangeButton).click();
+        waitForElementVisible(unSavedBarInactive);
+        waitForElementVisible(userTable);
+        waitForElementVisible(dataLink).click();
     }
 
     public void selectAttrElement(List<String> elements) {
-	By listOfElement;
-	for (int i = 0; i < elements.size(); i++) {
-	    listOfElement = By.xpath(listOfElementLocator.replace("${label}",
-		    elements.get(i).trim().toLowerCase().replaceAll(" ", "_")));
-	    waitForElementVisible(listOfElement, browser).click();
-	}
-	waitForElementVisible(setButton).click();
-	waitForElementNotVisible(setButton);
+        By listOfElement;
+        for (int i = 0; i < elements.size(); i++) {
+            listOfElement =
+                    By.xpath(listOfElementLocator.replace("${label}", elements.get(i).trim()
+                            .toLowerCase().replaceAll(" ", "_")));
+            waitForElementVisible(listOfElement, browser).click();
+        }
+        waitForElementVisible(setButton).click();
+        waitForElementNotVisible(setButton);
     }
 
-    public void setUserValueNumericVariable(int number)
-	    throws InterruptedException {
-	waitForElementVisible(userSetButton).click();// note
-	waitForElementVisible(userNumberSet).sendKeys(String.valueOf(number));
-	waitForElementVisible(userOkButton).click();
-	waitForElementNotVisible(userNumberSet);
-	assertEquals(waitForElementVisible(userNumberValue).getText(),
-		String.valueOf(number),
-		"Set value for specific user doesn't work properly");
-	waitForElementVisible(saveChangeButton).click();
-	waitForElementVisible(unSavedBarInactive);
-	waitForElementVisible(userTable);
-	waitForElementVisible(dataLink).click();
+    public void setUserValueNumericVariable(int number) throws InterruptedException {
+        waitForElementVisible(userSetButton).click();// note
+        waitForElementVisible(userNumberSet).sendKeys(String.valueOf(number));
+        waitForElementVisible(userOkButton).click();
+        waitForElementNotVisible(userNumberSet);
+        assertEquals(waitForElementVisible(userNumberValue).getText(), String.valueOf(number),
+                "Set value for specific user doesn't work properly");
+        waitForElementVisible(saveChangeButton).click();
+        waitForElementVisible(unSavedBarInactive);
+        waitForElementVisible(userTable);
+        waitForElementVisible(dataLink).click();
     }
 
-    public void verifyNumericalVariable(String expectedDefaultValue,
-	    String expectedUserNumber) {
-	waitForElementVisible(userTable);
-	String defValue = waitForElementVisible(scalarValueInput).getAttribute(
-		"value");
-	String userNumber = waitForElementVisible(userNumberValue).getText();
-	assertEquals(defValue, expectedDefaultValue,
-		"Default value of numeric variable is NOT set properly");
-	assertEquals(userNumber, expectedUserNumber,
-		"User specifc value of numeric variable is NOT set properly");
+    public void verifyNumericalVariable(NumericVariable var) {
+        waitForElementVisible(userTable);
+        String defValue = waitForElementVisible(scalarValueInput).getAttribute("value");
+        String userNumber = waitForElementVisible(userNumberValue).getText();
+        assertEquals(defValue, String.valueOf(var.getDefaultNumber()),
+                "Default value of numeric variable is NOT set properly");
+        assertEquals(userNumber, String.valueOf(var.getUserNumber()),
+                "User specifc value of numeric variable is NOT set properly");
     }
 
-    public void verifyAttributeVariable(List<String> elements,
-	    boolean userValueSet) {
-	waitForElementVisible(userTable);
-	if (userValueSet) {
-	    String userValue = waitForElementVisible(userListValue)
-		    .getAttribute("title");
-	    List<String> actualUserList = Arrays.asList(userValue.split(", "));
-	    assertEquals(actualUserList, elements,
-		    "User value of attribute variable is NOT set properly");
-	} else {
-	    String defaultValue = waitForElementVisible(selectedValues)
-		    .getAttribute("title");
-	    List<String> actualDefaultList = Arrays.asList(defaultValue
-		    .split(", "));
-	    assertEquals(actualDefaultList, elements,
-		    "Default value of attribute variable is NOT set properly");
-	}
+    public void verifyAttributeVariable(AttributeVariable var) {
+        waitForElementVisible(userTable);
+        List<String> elements = var.getAttributeElements();
+
+        if (var.isUserSpecificValues()) {
+            String userValue = waitForElementVisible(userListValue).getAttribute("title");
+            List<String> actualUserList = Arrays.asList(userValue.split(", "));
+            assertEquals(actualUserList, elements,
+                    "User value of attribute variable is NOT set properly");
+        } else {
+            String defaultValue = waitForElementVisible(selectedValues).getAttribute("title");
+            List<String> actualDefaultList = Arrays.asList(defaultValue.split(", "));
+            assertEquals(actualDefaultList, elements,
+                    "Default value of attribute variable is NOT set properly");
+        }
     }
 
 }
