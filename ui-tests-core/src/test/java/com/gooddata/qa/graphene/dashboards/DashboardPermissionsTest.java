@@ -89,7 +89,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         checkDashboardsNames(Arrays.asList(lockedDashboardName, unlockedDashboardName));
     }
 
-    @Test(dependsOnMethods = {"viewerCheckDashboardsList"}, groups = {"non-admin-tests"})
+    @Test(dependsOnMethods = {"initializeEditorAndViewerTests"}, groups = {"non-admin-tests"})
     public void viewerCheckLockIconIsNotVisible() throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.selectDashboard(lockedDashboardName);
@@ -105,7 +105,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         checkDashboardsNames(Arrays.asList(lockedDashboardName, unlockedDashboardName));
     }
 
-    @Test(dependsOnMethods = {"editorCheckDashboardsList"}, groups = {"non-admin-tests"})
+    @Test(dependsOnMethods = {"viewerCheckLockIconIsNotVisible"}, groups = {"non-admin-tests"})
     public void editorCheckLockIconIsVisible() throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.selectDashboard(lockedDashboardName);

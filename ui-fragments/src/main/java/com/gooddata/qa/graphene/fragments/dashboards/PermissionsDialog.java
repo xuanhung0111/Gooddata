@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class PermissionsDialog extends AbstractFragment {
 
-    @FindBy(css = ".s-btn-set_permissions")
+    @FindBy(css = ".s-btn-save_permissions")
     private WebElement setPermissions;
 
     @FindBy(css = ".s-btn-cancel")
