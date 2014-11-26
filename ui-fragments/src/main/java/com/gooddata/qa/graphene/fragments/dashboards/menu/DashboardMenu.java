@@ -17,6 +17,12 @@ public class DashboardMenu extends SimpleMenu {
 
     private static final By BY_DASHBOARD_SELECTOR_TITLE = By.xpath("a/span");
 
+    @Override
+    public int getItemsCount() {
+        // Do not count the first item. It is a label named "SELECT DASHBOARD"
+        return super.getItemsCount() - 1;
+    }
+
     public Collection<String> getAllItemNames() {
         waitForAllItemsVisible();
         return Lists.newArrayList(Iterables.transform(Iterables.skip(items, 1), new Function<WebElement, String>() {
