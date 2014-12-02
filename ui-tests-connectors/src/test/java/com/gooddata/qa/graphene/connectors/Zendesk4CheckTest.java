@@ -446,7 +446,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods = {"testFullLoad"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testFullLoad"}, groups = {"zendeskApiTests", "connectorWalkthrough"}, enabled = false)
     public void testReportMetricsCountAfterFullLoad() throws IOException, JSONException, InterruptedException {
         assertEquals(getNumberFromGDReport(TICKETS_REPORT_NAME, "full_final"),
                 reportMetricsResults.get(TICKETS_REPORT_NAME).intValue(),
