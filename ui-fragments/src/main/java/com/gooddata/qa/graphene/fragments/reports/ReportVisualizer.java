@@ -88,7 +88,7 @@ public class ReportVisualizer extends AbstractFragment {
 
     private String selectedFactLocator ="//select[contains(@class,'s-sme-objSelect')]/option[text()='${factName}']";
 
-    public void selectWhatArea(List<WhatItem> what) {
+    public void selectWhatArea(List<WhatItem> what) throws InterruptedException {
         waitForElementVisible(whatButton).click();
 
         for (WhatItem item : what) {
@@ -97,12 +97,13 @@ public class ReportVisualizer extends AbstractFragment {
         }
     }
 
-    private void selectAndConfigureMetric(WhatItem what) {
+    private void selectAndConfigureMetric(WhatItem what) throws InterruptedException {
         for (WebElement metric : whatMetrics) {
             if (!what.getMetric().equals(metric.getText().trim()))
                 continue;
 
             metric.findElement(By.cssSelector("input")).click();
+            Thread.sleep(2000);
 
             if (what.getDrillStep() == null)
                 break;
