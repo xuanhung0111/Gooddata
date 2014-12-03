@@ -1,19 +1,17 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import java.util.HashMap;
-import java.util.Map;
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.TextObject;
-import com.gooddata.qa.graphene.enums.VariableTypes;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"dashboardObjects"}, description = "Tests for simple project and dashboard objects functionality in GD platform")
 public class DashboardObjectsTest extends AbstractProjectTest {
@@ -35,12 +33,9 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
     public void createvariableTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
-        Map<String, String> data = new HashMap<String, String>();
-        data.put("variableName", this.variableName);
-        data.put("attribute", "Education");
-        data.put("attrElements", "Bachelors Degree, Graduate Degree");
-        data.put("userValueFlag", "false");
-        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        variablePage.createVariable(new AttributeVariable(variableName)
+                .withAttribute("Education")
+                .withAttributeElements("Bachelors Degree", "Graduate Degree"));
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})

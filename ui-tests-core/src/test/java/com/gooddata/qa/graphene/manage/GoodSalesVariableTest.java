@@ -1,76 +1,45 @@
 package com.gooddata.qa.graphene.manage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.VariableTypes;
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 
 @Test(groups = {"GoodSalesVariables"}, description = "Tests for GoodSales project (create/view and edit variable functionality) in GD platform")
 public class GoodSalesVariableTest extends ObjectAbstractTest {
-
-    private String attrName;
-    private String defaultNumber;
-    private String userNumber;
-    private Map<String, String> data;
-    ArrayList<String> lsAttrElements;
 
     @BeforeClass
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-variable";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
-    public void initialize() throws InterruptedException, JSONException {
-        this.attrName = "Stage Name";
-        description = "Graphene test on view and modify Variable";
-        tagName = "Graphene-test";
-        this.defaultNumber = "1234";
-        this.userNumber = "5678";
-        data = new HashMap<String, String>();
-    }
-
-    @Test(dependsOnMethods = {"initialize"}, groups = {"object-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"object-tests"})
     public void createNumericVariableTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
-        name = "Test variable" + System.currentTimeMillis();
-        data.put("variableName", name);
-        data.put("defaultNumber", this.defaultNumber);
-        data.put("userNumber", this.userNumber);
-        variablePage.createVariable(VariableTypes.NUMERIC, data);
+        variablePage.createVariable(new NumericVariable("Test variable" + System.currentTimeMillis())
+                .withDefaultNumber(1234)
+                .withUserNumber(5678));
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"object-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"object-tests"})
     public void createAttributeVariableDefaultValueTest()
             throws InterruptedException {
-        initAttributeVariable();
-        data.put("userValueFlag", "false");
-        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        variablePage.createVariable(initAttributeVariable());
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"object-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"object-tests"})
     public void createAttributeVariableUserValueTest()
             throws InterruptedException {
-        initAttributeVariable();
-        data.put("userValueFlag", "true");
-        variablePage.createVariable(VariableTypes.ATTRIBUTE, data);
+        variablePage.createVariable(initAttributeVariable()
+                .withUserSpecificValues());
     }
 
-    private void initAttributeVariable() {
+    private AttributeVariable initAttributeVariable() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
-        name = "Test variable" + System.currentTimeMillis();
-        data.put("variableName", name);
-        data.put("attribute", this.attrName);
-        lsAttrElements = new ArrayList<String>();
-        lsAttrElements.add("Interest");
-        lsAttrElements.add("Discovery");
-        String str = StringUtils.join(lsAttrElements, ", ");
-        data.put("attrElements", str);
+        return new AttributeVariable("Test variable" + System.currentTimeMillis())
+                        .withAttribute("Stage Name")
+                        .withAttributeElements("Interest", "Discovery");
     }
 
     @Override
