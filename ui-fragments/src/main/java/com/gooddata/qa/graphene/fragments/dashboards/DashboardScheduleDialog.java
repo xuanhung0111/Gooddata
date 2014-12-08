@@ -21,8 +21,29 @@ public class DashboardScheduleDialog extends AbstractFragment {
     @FindBy(css = ".tabs-dropdown-button")
     private WebElement tabsButton;
 
+    @FindBy(css = ".frequency-dropdown-button")
+    private WebElement frequencyButton;
+
     @FindBy(css = ".time-dropdown-button")
     private WebElement timeButton;
+
+    @FindBy(css= ".weekly-dropdown-button")
+    private WebElement weeklyButton;
+
+    @FindBy(css = ".ondaymulti-dropdown-button")
+    private WebElement weeklyOnDayButton;
+
+    @FindBy(css = ".dayofmonth-dropdown-button")
+    private WebElement dayOfMonthButton;
+
+    @FindBy(css = ".executeon-dropdown-button")
+    private WebElement executeOnButton;
+
+    @FindBy(css = ".weeknumber-dropdown-button")
+    private WebElement weekNumberButton;
+
+    @FindBy(css = ".onday-dropdown-button")
+    private WebElement onDayButton;
 
     @FindBy(css = ".custom-message")
     private WebElement showCustomFormButton;
@@ -75,22 +96,58 @@ public class DashboardScheduleDialog extends AbstractFragment {
         waitForElementVisible(emailMessageInput);
     }
 
-    public void selectTabs(int[] indexes) {
-        waitForElementVisible(tabsButton).click();
-        waitForDropDownList();
-        resetSelectedItems();
-        selectItems(indexes, true);
+    public void selectTabs(int[] indices) {
+        selectMultiple(indices, tabsButton);
+    }
+
+    public void selectFrequency(int index) {
+        selectSingle(index, frequencyButton);
     }
 
     public void selectTime(int index) {
-        waitForElementVisible(timeButton).click();
-        waitForDropDownList();
-        selectItems(new int[] {index}, false);
+        selectSingle(index, timeButton);
+    }
+
+    public void selectWeeklyEvery(int index) {
+        selectSingle(index, weeklyButton);
+    }
+
+    public void selectWeeklyOnDay(int[] indices) {
+        selectMultiple(indices, weeklyOnDayButton);
+    }
+
+    public void selectMonthlyOn(int index) {
+        selectSingle(index, executeOnButton);
+    }
+
+    public void selectDayOfMonth(int index) {
+        selectSingle(index, dayOfMonthButton);
+    }
+
+    public void selectRepeatEvery(int index) {
+        selectSingle(index, weekNumberButton);
+    }
+
+    public void selectDayOfWeek(int index) {
+        selectSingle(index, onDayButton);
     }
 
     public void schedule() {
         scheduleButton.click();
         waitForElementNotVisible(scheduleButton);
+    }
+
+    private void selectSingle(int index, WebElement button) {
+        waitForElementVisible(button).click();
+        waitForDropDownList();
+        selectItems(new int[] {index}, false);
+    }
+
+    private void selectMultiple(int[] indices, WebElement button) {
+        waitForElementVisible(button).click();
+        waitForDropDownList();
+        resetSelectedItems();
+        selectItems(indices, true);
     }
 
     private void selectItems(final int[] indexes, boolean confirm) {
