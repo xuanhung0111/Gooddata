@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
+import com.gooddata.qa.graphene.fragments.indigo.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
@@ -33,6 +34,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final By BY_PANEL_ROOT = By.id("root");
     protected static final By BY_IFRAME = By.tagName("iframe");
 
+    protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
     protected static final String PAGE_PROJECTS = "projects.html";
     protected static final String PAGE_UPLOAD = "upload.html";
@@ -153,6 +155,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
+    @FindBy(css = ".adi-editor")
+    protected AnalysisPage analysisPage;
+
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
      *
@@ -176,6 +181,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 user = testParams.getViewerUser();
                 password = testParams.getViewerPassword();
                 break;
+            default:
+                throw new IllegalArgumentException("Unknow user role " + userRole);
         }
         if (greyPages) {
             signInAtGreyPages(user, password);
@@ -370,9 +377,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         waitForDataPageLoaded(browser);
     }
-    
+
     public void initModelPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|ldmModel");
         waitForDataPageLoaded(browser);
+    }
+
+    public void initMetricPage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        waitForDataPageLoaded(browser);
+    }
+
+    public void initAnalysePage() {
+        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
+        waitForFragmentVisible(analysisPage);
     }
 }
