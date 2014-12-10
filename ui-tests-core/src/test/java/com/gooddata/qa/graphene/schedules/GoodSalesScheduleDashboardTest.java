@@ -33,7 +33,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private final String CUSTOM_SUBJECT = "Extremely useful subject";
     private final String CUSTOM_MESSAGE = "Extremely useful message";
     private final List<String> SCHEDULED_DASHBOARDS = Arrays.asList("Waterfall Analysis", "What's Changed");
-    private final String SCHEDULE_INFO = "This report will be sent daily at 12:30 AM PST to %s as a PDF file attachment.";
+    private final String SCHEDULE_INFO = "This dashboard will be sent daily at 12:30 AM PST to %s as a PDF attachment.";
     private final String SCHEDULE_TIME_MANAGE_PAGE = "Daily at 12:30am PT";
 
     @BeforeClass
@@ -71,7 +71,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String[] tabNames = expectedGoodSalesDashboardsAndTabs.get("Pipeline Analysis");
         assertEquals(
             scheduleDashboard.getCustomEmailSubject(),
-            "Scheduled report: Tabs: " + tabNames[1] + ", " + tabNames[5] + ", " + tabNames[6],
+            dashboardsPage.getDashboardName() + " dashboard: TABS: " + tabNames[1] + ", " + tabNames[5] + ", " + tabNames[6],
             "Update of Tabs is reflected in subject."
         );
         scheduleDashboard.setCustomEmailSubject(CUSTOM_SUBJECT);

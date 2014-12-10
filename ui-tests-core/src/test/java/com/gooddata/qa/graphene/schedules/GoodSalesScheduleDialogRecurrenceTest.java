@@ -16,14 +16,14 @@ import static org.testng.Assert.fail;
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {
     private enum RecurrenceType { WEEKLY, MONTHLY_DAY_OF_MONTH, MONTHLY_DAY_OF_WEEK };
     private final Object[][] CASES = new Object[][]{
-            {RecurrenceType.WEEKLY, 0, new int[]{0, 1}, "weekly on Mon, Tue at 12:30 AM"},
-            {RecurrenceType.WEEKLY, 1, new int[]{2}, "every 2 weeks on Wed at 12:30 AM"},
+            {RecurrenceType.WEEKLY, 0, new int[]{0, 1}, "weekly on Monday, Tuesday at 12:30 AM"},
+            {RecurrenceType.WEEKLY, 1, new int[]{2}, "every 2 weeks on Wednesday at 12:30 AM"},
             {RecurrenceType.MONTHLY_DAY_OF_MONTH, 1,  "monthly on day 2 at 12:30 AM"},
-            {RecurrenceType.MONTHLY_DAY_OF_WEEK, 0, 1, "monthly on First Tuesday at 12:30 AM"},
-            {RecurrenceType.MONTHLY_DAY_OF_WEEK, 2, 6, "monthly on Third Sunday at 12:30 AM"}
+            {RecurrenceType.MONTHLY_DAY_OF_WEEK, 0, 1, "monthly on the first Tuesday at 12:30 AM"},
+            {RecurrenceType.MONTHLY_DAY_OF_WEEK, 2, 6, "monthly on the third Sunday at 12:30 AM"}
     };
     private final String CUSTOM_SUBJECT = "Test subject";
-    private final String SCHEDULE_INFO = "This report will be sent %s PST to %s as a PDF attachment.";
+    private final String SCHEDULE_INFO = "This dashboard will be sent %s PST to %s as a PDF attachment.";
     private final String FEATURE_FLAG_COOKIE_NAME = "GDC-FEATURE-DASHBOARD-SCHEDULE";
     private final Cookie FEATURE_FLAG_COOKIE = new Cookie(FEATURE_FLAG_COOKIE_NAME, "1");
     private DashboardScheduleDialog scheduleDashboard;
@@ -69,7 +69,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
         String infoText = scheduleDashboard.getInfoText();
         String fullText = String.format(SCHEDULE_INFO, scheduleInfo, testParams.getUser());
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog-recurrence-weekly-" + scheduleInfo, this.getClass());
-        assertEquals(fullText, infoText, "Custom time is in info message");
+        assertEquals(infoText, fullText, "Custom time is in info message");
     }
 
     private void _testMonthly(Object[] testCase) {
@@ -89,6 +89,6 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
         String infoText = scheduleDashboard.getInfoText();
         String fullText = String.format(SCHEDULE_INFO, scheduleInfo, testParams.getUser());
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog-recurrence-monthly-" + scheduleInfo, this.getClass());
-        assertEquals(fullText, infoText, "Custom time is in info message");
+        assertEquals(infoText, fullText, "Custom time is in info message");
     }
 }
