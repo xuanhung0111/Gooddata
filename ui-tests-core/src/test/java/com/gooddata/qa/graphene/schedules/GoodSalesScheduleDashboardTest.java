@@ -41,18 +41,6 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         addUsersWithOtherRoles = true;
     }
 
-    @BeforeMethod
-    public void addFeatureCookie() {
-        // TODO remove after adding proper feature flag
-        this.browser.manage().addCookie(FEATURE_FLAG_COOKIE);
-    }
-
-    @AfterMethod
-    public void removeFeatureCookie() {
-        // TODO remove after adding proper feature flag
-        this.browser.manage().deleteCookieNamed(FEATURE_FLAG_COOKIE_NAME);
-    }
-
     // login with defined user role, fail test on error
     // TODO: why not login via grey pages?
     private void loginAs(UserRoles userRole) throws JSONException {
