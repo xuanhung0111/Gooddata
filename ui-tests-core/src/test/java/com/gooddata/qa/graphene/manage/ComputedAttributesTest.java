@@ -102,7 +102,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
         List<Float> metricValues = reportPage.getTableReport().getMetricElements();
         assertEquals(attributeHeaders, expectedAttributeHeader, "Attribute name is incorrrect");
-        assertEquals(attributeValues, expectedAttributeValues, "Attribute values are incorrrect");
+        assertEquals(attributeValues, expectedAttributeValues, "Attribute values are incorrrect " + attributeValues);
         assertEquals(metricValues, expectedMetricValues, "Metric values are incorrrect");
     }
 
