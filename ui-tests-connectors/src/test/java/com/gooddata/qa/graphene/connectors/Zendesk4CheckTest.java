@@ -224,7 +224,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     public void testOrganizationsCount() throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME, "full_start");
         reportMetricsResults.put(ORGANIZATIONS_REPORT_NAME, gdOrganizationsCount);
-        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations(),
+        // Zendesk 4 project contains one dummy organization - ATP-2954
+        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations() + 1,
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
     }
 
