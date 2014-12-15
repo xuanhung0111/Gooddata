@@ -293,7 +293,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             "zendeskAfterCreateTests", "connectorWalkthrough"})
     public void testOrganizationsCountAfterIncrementalSync() throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME, "inc_added_objects");
-        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations(),
+        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
         assertEquals(gdOrganizationsCount, reportMetricsResults.get(ORGANIZATIONS_REPORT_NAME) + 1,
                 "Organizations count doesn't match after incremental sync");
@@ -414,7 +414,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testOrganizationsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME, "inc_after_delete");
-        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations(),
+        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization,
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
         assertEquals(gdOrganizationsCount, reportMetricsResults.get(ORGANIZATIONS_REPORT_NAME).intValue(),
                 "Organizations count doesn't match after incremental sync");
