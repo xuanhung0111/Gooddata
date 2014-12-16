@@ -38,6 +38,12 @@ public class AttributeDetailPage extends AbstractFragment {
     @FindBy(css = "button.s-btn-clear")
     private WebElement clearExternalPageButton;
 
+    @FindBy(css = ".specialButton .s-btn-delete")
+    private WebElement deleteButton;
+
+    @FindBy(css = ".specialAction .info")
+    private WebElement deleteButtonInfo;
+
     @FindBy(css = "button.pickAttribute")
     private WebElement selectDrillAttributeButton;
 
@@ -109,5 +115,14 @@ public class AttributeDetailPage extends AbstractFragment {
         waitForElementVisible(By.cssSelector(".attr.option"), browser);
         waitForElementVisible(By.cssSelector(String.format("button.s-btn-%s",
                 CssUtils.simplifyText(attribute.toLowerCase()))), browser);
+    }
+
+    public boolean isDeleteButtonDisabled() {
+        waitForElementVisible(deleteButton);
+        return deleteButton.getAttribute("class").contains("disabled");
+    }
+
+    public String getDeleteButtonDescription() {
+        return deleteButtonInfo.getText();
     }
 }
