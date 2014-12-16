@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
+import com.gooddata.qa.CssUtils;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -16,6 +17,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import org.openqa.selenium.By;
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
@@ -33,6 +35,13 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     
     @FindBy (css = ".modelThumbContentImage")
     private WebElement modelImage;
+
+    @FindBy (css = ".s-btn-delete")
+    private WebElement btnDelete;
+
+    private static final String COMPUTED_ATTRIBUTE_NAME = "Sales Rep Ranking";
+
+    private static final String EXPECTED_DELETE_DESCRIPTION = "To delete this computed attribute you must delete its data set. Go to its Data Set administration page and click Delete.";
 
     @Test(dependsOnMethods = { "createProject" }, groups = { "computedAttributeTest" })
     public void createComputedAttribute() {
@@ -56,16 +65,19 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         createAttributePage.setBucket(1, "Good", "200");
         createAttributePage.setBucket(2, "Great", "250");
         createAttributePage.setBucket(3, "Best");
-        createAttributePage.setComputedAttributeName("Sales Rep Ranking");
+        createAttributePage.setComputedAttributeName(COMPUTED_ATTRIBUTE_NAME);
         Screenshots.takeScreenshot(browser, "computed-attribute-creation-page", this.getClass());
         createAttributePage.submit();
 
         waitForElementVisible(attributeBucketName);
         Screenshots.takeScreenshot(browser, "computed-attribute-details-page", this.getClass());
-        
+
         List<String> expectedBucketNames = Arrays.asList("Poor", "Good", "Great", "Best");
         List<String> expectedBucketRanges = Arrays.asList("# of Won Opps. <= 120", "120 < # of Won Opps. <= 200", "200 < # of Won Opps. <= 250", "250 < # of Won Opps.");
-        createAttributePage.checkCreatedComputedAttribute("Sales Rep Ranking", expectedBucketNames, expectedBucketRanges);
+        createAttributePage.checkCreatedComputedAttribute(COMPUTED_ATTRIBUTE_NAME, expectedBucketNames, expectedBucketRanges);
+
+        // check delete button is disabled right after computed attribute creation
+        checkDeleteButtonAndInfo();
     }
     
     @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
@@ -85,16 +97,24 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         
     	verifyLDMModelProject(185494);
     }
-    	
+
+    @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
+    public void checkAttributePageAfterComputedAttributeCreated() throws InterruptedException {
+        initAttributePage();
+        By computedAttributeItem = By.cssSelector(".s-title-" + CssUtils.simplifyText(COMPUTED_ATTRIBUTE_NAME) + " a");
+        waitForElementVisible(computedAttributeItem, browser).click();
+        // check after fresh attribute load
+        checkDeleteButtonAndInfo();
+    }
 
     @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
     public void createReportWithComputedAttribute() throws InterruptedException {
-        List<String> expectedAttributeHeader = Arrays.asList("Sales Rep Ranking");
+        List<String> expectedAttributeHeader = Arrays.asList(COMPUTED_ATTRIBUTE_NAME);
         List<String> expectedAttributeValues = Arrays.asList("Best", "Good", "Great", "Poor");
         List<Float> expectedMetricValues = Arrays.asList(3.4506136E7f, 8632501.0f, 3.8943492E7f, 3.4543328E7f);
         createReport(new ReportDefinition().withName("Computed Attribute Report")
                                            .withWhats("Amount")
-                                           .withHows("Sales Rep Ranking"),
+                                           .withHows(COMPUTED_ATTRIBUTE_NAME),
                     "Computed Attribute Report");
         reportPage.saveReport();
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute", this.getClass());
@@ -102,7 +122,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         List<String> attributeValues = reportPage.getTableReport().getAttributeElements();
         List<Float> metricValues = reportPage.getTableReport().getMetricElements();
         assertEquals(attributeHeaders, expectedAttributeHeader, "Attribute name is incorrrect");
-        assertEquals(attributeValues, expectedAttributeValues, "Attribute values are incorrrect");
+        assertEquals(attributeValues, expectedAttributeValues, "Attribute values are incorrrect " + attributeValues);
         assertEquals(metricValues, expectedMetricValues, "Metric values are incorrrect");
     }
 
@@ -113,5 +133,11 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     private boolean isCreatedButtonEnabled() {
         return ! btnCreateComputedAttribute.getAttribute("class").contains("disabled");
-    }   
+    }
+
+    // check that delete button is disabled and that there's expected explanation message
+    private void checkDeleteButtonAndInfo() {
+        assertTrue(attributeDetailPage.isDeleteButtonDisabled(), "Delete Button is Disabled");
+        assertEquals(attributeDetailPage.getDeleteButtonDescription(), EXPECTED_DELETE_DESCRIPTION);
+    }
 }

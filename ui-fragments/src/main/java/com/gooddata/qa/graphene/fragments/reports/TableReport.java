@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
  */
 public class TableReport extends AbstractReport {
 
-    @FindBy(css = ".containerBody .gridTabPlate .gridTile .element span")
+    @FindBy(css = ".containerBody .gridTabPlate .gridTile .element span.captionWrapper")
     private List<WebElement> attributeElementInGrid;
 
     @FindBy(css = ".containerBody .gridTabPlate .gridTile .metric span")
