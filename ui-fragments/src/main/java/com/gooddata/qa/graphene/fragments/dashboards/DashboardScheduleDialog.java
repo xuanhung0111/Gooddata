@@ -5,6 +5,8 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import java.util.List;
+
+import com.google.common.base.Joiner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -63,6 +65,9 @@ public class DashboardScheduleDialog extends AbstractFragment {
     @FindBy(css = ".s-email-body textarea")
     private WebElement emailMessageInput;
 
+    @FindBy(css = ".s-email-recipients textarea")
+    private WebElement emailRecipientsInput;
+
     @FindBy(css = ".s-schedule-info-message")
     private WebElement infoText;
 
@@ -94,6 +99,12 @@ public class DashboardScheduleDialog extends AbstractFragment {
         waitForElementVisible(showCustomFormButton).click();
         waitForElementVisible(emailSubjectInput);
         waitForElementVisible(emailMessageInput);
+    }
+
+    public void setCustomRecipients(List<String> recipients) {
+        waitForElementVisible(emailRecipientsInput).click();
+        emailRecipientsInput.clear();
+        emailRecipientsInput.sendKeys(Joiner.on(",").join(recipients));
     }
 
     public void selectTabs(int[] indices) {

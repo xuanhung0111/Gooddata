@@ -10,31 +10,27 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private final String FEATURE_FLAG_COOKIE_NAME = "GDC-FEATURE-DASHBOARD-SCHEDULE";
-    private final Cookie FEATURE_FLAG_COOKIE = new Cookie(FEATURE_FLAG_COOKIE_NAME, "1");
     private final String CUSTOM_SUBJECT = "Extremely useful subject";
     private final String CUSTOM_MESSAGE = "Extremely useful message";
+    private final List<String> CUSTOM_RECIPIENTS = Arrays.asList("bear+1@gooddata.com", "bear+2@gooddata.com");
     private final List<String> SCHEDULED_DASHBOARDS = Arrays.asList("Waterfall Analysis", "What's Changed");
-    private final String SCHEDULE_INFO = "This dashboard will be sent daily at 12:30 AM PST to %s as a PDF attachment.";
-    private final String SCHEDULE_TIME_MANAGE_PAGE = "Daily at 12:30am PT";
+    private final String SCHEDULE_INFO = "This dashboard will be sent daily at 12:30 AM PST to %s and 2 other recipients as a PDF attachment.";
+    private final String SCHEDULE_TIME_MANAGE_PAGE = "Daily at 12:30 AM PT";
 
     @BeforeClass
     public void addUsers() {
@@ -63,6 +59,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             "Update of Tabs is reflected in subject."
         );
         scheduleDashboard.setCustomEmailSubject(CUSTOM_SUBJECT);
+        scheduleDashboard.setCustomRecipients(CUSTOM_RECIPIENTS);
         scheduleDashboard.selectTabs(new int[] {1, 2});
         assertEquals(
             scheduleDashboard.getCustomEmailSubject(),
@@ -97,6 +94,25 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             "Time description contains the given time. Expected '" + SCHEDULE_TIME_MANAGE_PAGE + "', found '" + timeDescription + "'."
         );
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
+    }
+
+    @Test(dependsOnGroups = {"schedules"}, groups = {"tests"})
+    public void verifyRecipientsOfSchedule() throws JSONException, InterruptedException {
+        loginAs(UserRoles.ADMIN);
+        initEmailSchedulesPage();
+        // get object
+        String uri = emailSchedulesPage.getScheduleMailUriByName(CUSTOM_SUBJECT);
+        String[] parts = uri.split("/");
+        int id = Integer.parseInt(parts[parts.length - 1]);
+        JSONObject schedule = getObjectByID(id);
+        JSONArray recipientsJson = schedule.getJSONObject("scheduledMail").getJSONObject("content").getJSONArray("bcc");
+        Set<String> recipients = new HashSet<String>();
+        for(int i = 0; i < recipientsJson.length(); i++) {
+            recipients.add(recipientsJson.getString(i));
+        }
+        // verify bcc
+        Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-mdObject", this.getClass());
+        assertEquals(recipients, new HashSet<String>(CUSTOM_RECIPIENTS), "Recipients do not match.");
     }
 
     @Test(dependsOnGroups = {"schedules"}, groups = {"tests"})
