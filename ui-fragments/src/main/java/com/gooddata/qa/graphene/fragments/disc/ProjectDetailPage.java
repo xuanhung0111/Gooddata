@@ -2,16 +2,22 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.DISCScheduleStatus;
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
-import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages;
+import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -27,6 +33,8 @@ public class ProjectDetailPage extends AbstractFragment {
             .cssSelector(".ait-process-redeploy-btn");
     private final static By BY_CREATE_NEW_SCHEDULE_LINK = By.cssSelector(".action-important-link");
     private final static By BY_PROCESS_SCHEDULE_TAB = By.cssSelector(".ait-process-schedules-btn");
+    private final static By BY_PROCESS_EXECUTABLE_TABLE = By
+            .cssSelector(".ait-process-executable-list");
     private final static By BY_PROCESS_EXECUTABLE_TAB = By
             .cssSelector(".ait-process-executables-btn");
     private final static By BY_PROCESS_METADATA_TAB = By.cssSelector(".ait-process-metadata-btn");
@@ -41,8 +49,8 @@ public class ProjectDetailPage extends AbstractFragment {
             .cssSelector(".ait-process-notification-rules-btn");
 
     private static final String DELETE_PROCESS_DIALOG_MESSAGE =
-            "Are you sure you want to delete process %s?";
-    private static final String DELETE_PROCESS_DIALOG_TITLE = "Delete process %s";
+            "Are you sure you want to delete process \"%s\"?";
+    private static final String DELETE_PROCESS_DIALOG_TITLE = "Delete \"%s\" process";
     private final static String BROKEN_SCHEDULE_SECTION_MESSAGE =
             "The schedules cannot be executed. "
                     + "Its process has been re-deployed with modified graphs or a different folder structure.";
@@ -50,84 +58,86 @@ public class ProjectDetailPage extends AbstractFragment {
     private static final String EXECUTABLE_SCHEDULE_NUMBER = "Scheduled %d time%s";
 
     @FindBy(css = ".ait-project-title")
-    protected WebElement displayedProjectTitle;
+    private WebElement displayedProjectTitle;
 
     @FindBy(css = ".ait-project-metadata-list-item")
-    protected List<WebElement> projectMetadataItems;
+    private List<WebElement> projectMetadataItems;
 
     @FindBy(css = ".ait-process-metadata-list-item")
-    protected List<WebElement> processMetadataItems;
+    private List<WebElement> processMetadataItems;
 
     @FindBy(xpath = "//a/span[text()='Go to Dashboards']")
-    protected WebElement goToDashboardsLink;
+    private WebElement goToDashboardsLink;
 
     @FindBy(css = ".ait-project-empty-state .title")
-    protected WebElement projectEmptyStateTitle;
+    private WebElement projectEmptyStateTitle;
 
     @FindBy(css = ".ait-project-empty-state .message")
-    protected WebElement projectEmptyStateMessage;
+    private WebElement projectEmptyStateMessage;
 
     @FindBy(css = ".ait-project-deploy-process-btn")
-    protected WebElement deployProcessButton;
+    private WebElement deployProcessButton;
 
     @FindBy(css = ".ait-process-list-item")
-    protected List<WebElement> processes;
+    private List<WebElement> processes;
 
     @FindBy(css = ".ait-process-list-item.active")
-    protected WebElement activeProcess;
+    private WebElement activeProcess;
 
     @FindBy(css = ".ait-process-executable-list")
-    protected ExecutablesTable executablesTable;
+    private ExecutablesTable executablesTable;
 
     @FindBy(css = ".error_dialog .dialog-body")
-    protected WebElement deployErrorDialog;
+    private WebElement deployErrorDialog;
+
+    @FindBy(css = ".error_dialog .s-btn-ok")
+    private WebElement deployErrorDialogOKButton;
 
     @FindBy(css = ".ait-project-new-schedule-btn")
-    protected WebElement newScheduleButton;
+    private WebElement newScheduleButton;
 
-    @FindBy(css = ".ait-process-schedule-list")
-    protected List<SchedulesTable> schedulesTablesList;
+    @FindBy(css = ".ait-process-list-item.active")
+    private SchedulesTable scheduleTable;
 
     @FindBy(css = ".ait-process-delete-fragment")
-    protected WebElement processDeleteDialog;
+    private WebElement processDeleteDialog;
 
     @FindBy(css = ".dialog-title")
-    protected WebElement processDeleteDialogTitle;
+    private WebElement processDeleteDialogTitle;
 
     @FindBy(css = ".dialog-body")
-    protected WebElement processDeleteDialogMessage;
+    private WebElement processDeleteDialogMessage;
 
     @FindBy(css = ".ait-process-delete-confirm-btn")
-    protected WebElement processDeleteConfirmButton;
+    private WebElement processDeleteConfirmButton;
 
     @FindBy(css = ".ait-process-delete-cancel-btn")
-    protected WebElement processDeleteCancelButton;
+    private WebElement processDeleteCancelButton;
 
     public String getDisplayedProjectTitle() {
         return waitForElementVisible(displayedProjectTitle).getText();
     }
 
-    public String getProjectMetadata(String metadataKey) throws InterruptedException {
-        for (int i = 0; i < 10 && projectMetadataItems.size() == 0; i++) {
-            Thread.sleep(1000);
-        }
-        for (int i = 0; i < projectMetadataItems.size(); i++) {
-            if (projectMetadataItems.get(i).findElement(BY_PROJECT_METADATA_KEY).getText()
-                    .equals(metadataKey))
-                return projectMetadataItems.get(i).findElement(BY_PROJECT_METADATA_VALUE).getText();
-        }
-        return null;
+    public String getProjectMetadata(final String metadataKey) {
+        return Iterables.find(projectMetadataItems, new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement projectMetadataItem) {
+                return projectMetadataItem.findElement(BY_PROJECT_METADATA_KEY).getText()
+                        .equals(metadataKey);
+            }
+        }).findElement(BY_PROJECT_METADATA_VALUE).getText();
     }
 
-    public String getProcessMetadata(String metadataKey) throws InterruptedException {
-        for (int i = 0; i < 10 && processMetadataItems.size() == 0; i++) {
-            Thread.sleep(1000);
-        }
-        for (WebElement metadataItem : processMetadataItems) {
-            if (metadataItem.findElement(BY_PROCESS_METADATA_KEY).getText().equals(metadataKey))
-                return metadataItem.findElement(BY_PROCESS_METADATA_VALUE).getText();
-        }
-        return null;
+    public String getProcessMetadata(final String metadataKey) {
+        return Iterables.find(processMetadataItems, new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement processMetadataItem) {
+                return processMetadataItem.findElement(BY_PROCESS_METADATA_KEY).getText()
+                        .equals(metadataKey);
+            }
+        }).findElement(BY_PROCESS_METADATA_VALUE).getText();
     }
 
     public void goToDashboards() {
@@ -146,8 +156,27 @@ public class ProjectDetailPage extends AbstractFragment {
         return deployErrorDialog;
     }
 
+    public void closeDeployErrorDialogButton() {
+        waitForElementVisible(deployErrorDialogOKButton).click();
+    }
+
     public void clickOnDeployProcessButton() {
         waitForElementPresent(deployProcessButton).click();
+    }
+
+    public void assertNewDeployedProcessInList(String processName, DeployPackages deployPackage) {
+        WebElement process = findProcess(processName);
+        process.findElement(BY_PROCESS_SCHEDULE_TAB).click();
+        assertEquals("0 schedules", process.findElement(BY_PROCESS_SCHEDULE_TAB).getText());
+        process.findElement(BY_PROCESS_EXECUTABLE_TAB).click();
+        List<Executables> executables = deployPackage.getExecutables();
+        String executableTitle =
+                deployPackage.getPackageType().getProcessTypeExecutable()
+                        + (executables.size() > 1 ? "s" : "");
+        assertEquals(String.format("%d %s total", executables.size(), executableTitle), process
+                .findElement(BY_PROCESS_EXECUTABLE_TAB).getText());
+        waitForElementVisible(executablesTable.getRoot());
+        assertExecutableList(executables);
     }
 
     public void clickOnNewScheduleButton() {
@@ -161,95 +190,43 @@ public class ProjectDetailPage extends AbstractFragment {
         return processes.size();
     }
 
-    public WebElement getProcess(int processIndex) {
-        if (processIndex < 0 || processIndex > getNumberOfProcesses()) {
-            throw new IndexOutOfBoundsException();
-        }
-        return processes.get(processIndex);
+    public void assertExecutableList(List<Executables> executables) {
+        waitForElementVisible(BY_PROCESS_EXECUTABLE_TABLE, browser);
+        executablesTable.assertExecutableList(executables);
     }
 
-    public WebElement getActiveProcess() {
-        return waitForElementVisible(activeProcess);
-    }
-
-    public WebElement getScheduleTab(int processIndex) {
-        return waitForElementVisible(processes.get(processIndex).findElement(
-                BY_PROCESS_SCHEDULE_TAB));
-    }
-
-    public WebElement getExecutableTab(int processIndex) {
-        return waitForElementVisible(processes.get(processIndex).findElement(
-                BY_PROCESS_EXECUTABLE_TAB));
-    }
-
-    public WebElement getMetadataTab(int processIndex) {
-        return waitForElementVisible(processes.get(processIndex).findElement(
-                BY_PROCESS_METADATA_TAB));
-    }
-
-    public void assertExecutablesList(DISCProcessTypes processType, List<String> executables) {
-        executablesTable.assertExecutablesList(processType, executables);
-    }
-
-    public boolean assertProcessInList(String processName, DISCProcessTypes processType,
-            List<String> executables) {
-        for (int i = 0; i < this.getNumberOfProcesses(); i++) {
-            if (getProcess(i).findElement(BY_PROCESS_TITLE).getText().equals(processName)) {
-                getScheduleTab(i).click();
-                assertEquals(getScheduleTab(i).getText(), "0 schedules");
-                getExecutableTab(i).click();
-                String executableTitle = processType.getProcessTypeExecutable();
-                if (executables.size() > 1)
-                    executableTitle = processType.getProcessTypeExecutable() + "s";
-                assertEquals(getExecutableTab(i).getText(),
-                        String.format("%d %s total", executables.size(), executableTitle));
-                waitForElementVisible(executablesTable.getRoot());
-                assertExecutablesList(processType, executables);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public WebElement getElementFromSpecificProcess(String processName, By elementLocator) {
-        for (int i = 0; i < this.getNumberOfProcesses(); i++) {
-            waitForElementVisible(getProcess(i));
-            if (getProcess(i).findElement(BY_PROCESS_TITLE).getText().equals(processName)) {
-                return getProcess(i).findElement(elementLocator);
-            }
-        }
-        return null;
-    }
-
-    public void clickOnDownloadProcessButton(String processName) {
-        waitForElementVisible(
-                getElementFromSpecificProcess(processName, BY_PROCESS_DOWNLOAD_BUTTON)).click();
-    }
-
-    public void clickOnDeleteProcessButton(String processName) {
-        waitForElementVisible(getElementFromSpecificProcess(processName, BY_PROCESS_DELETE_BUTTON))
-                .click();
-        waitForElementVisible(processDeleteDialog);
+    public void assertActiveProcessInList(String processName, DeployPackages deployPackage,
+            ScheduleBuilder... schedules) {
+        waitForElementVisible(activeProcess);
+        assertEquals(activeProcess.findElement(BY_PROCESS_TITLE).getText(), processName);
+        activeProcess.findElement(BY_PROCESS_SCHEDULE_TAB).click();
+        String scheduleTabTitle =
+                String.format("%d schedule", schedules.length) + (schedules.length == 1 ? "" : "s");
+        assertEquals(activeProcess.findElement(BY_PROCESS_SCHEDULE_TAB).getText(), scheduleTabTitle);
+        activeProcess.findElement(BY_PROCESS_EXECUTABLE_TAB).click();
+        List<Executables> executableList = deployPackage.getExecutables();
+        String executableTabTitle =
+                String.format("%d %s total", executableList.size(), deployPackage.getPackageType()
+                        .getProcessTypeExecutable() + (executableList.size() > 1 ? "s" : ""));
+        assertEquals(activeProcess.findElement(BY_PROCESS_EXECUTABLE_TAB).getText(),
+                executableTabTitle);
+        assertExecutableList(executableList);
     }
 
     public WebElement getNewScheduleLinkInSchedulesList(String processName) {
-        return getElementFromSpecificProcess(processName, BY_CREATE_NEW_SCHEDULE_LINK);
+        return findProcess(processName).findElement(BY_CREATE_NEW_SCHEDULE_LINK);
     }
 
-    public WebElement getRedeployButton(String processName) {
-        return getElementFromSpecificProcess(processName, BY_PROCESS_REDEPLOY_BUTTON);
+    public void clickOnRedeployButton(String processName) {
+        findProcess(processName).findElement(BY_PROCESS_REDEPLOY_BUTTON).click();
     }
 
     public WebElement getExecutableTabByProcessName(String processName) {
-        return getElementFromSpecificProcess(processName, BY_PROCESS_EXECUTABLE_TAB);
+        return findProcess(processName).findElement(BY_PROCESS_EXECUTABLE_TAB);
     }
 
     public WebElement getScheduleTabByProcessName(String processName) {
-        return getElementFromSpecificProcess(processName, BY_PROCESS_SCHEDULE_TAB);
-    }
-
-    public WebElement getMetadataTabByProcessName(String processName) {
-        return getElementFromSpecificProcess(processName, BY_PROCESS_METADATA_TAB);
+        return findProcess(processName).findElement(BY_PROCESS_SCHEDULE_TAB);
     }
 
     public WebElement getExecutableScheduleLink(String executableName) {
@@ -257,35 +234,32 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public WebElement checkEmptySchedulesList(String processName) {
-        return getElementFromSpecificProcess(processName, BY_CREATE_NEW_SCHEDULE_LINK);
+        return findProcess(processName).findElement(BY_CREATE_NEW_SCHEDULE_LINK);
     }
 
     public void checkBrokenScheduleSection(String processName) {
+        waitForElementVisible(activeProcess).findElement(BY_PROCESS_SCHEDULE_TAB).click();
         System.out.println("Broken schedule message in project detail page: "
-                + getElementFromSpecificProcess(processName, BY_BROKEN_SCHEDULE_MESSAGE).getText());
+                + activeProcess.findElement(BY_BROKEN_SCHEDULE_MESSAGE).getText());
         assertEquals(BROKEN_SCHEDULE_SECTION_MESSAGE,
-                getElementFromSpecificProcess(processName, BY_BROKEN_SCHEDULE_MESSAGE).getText());
-    }
-
-    public String getProcessID(String processName) throws InterruptedException {
-        waitForElementVisible(getElementFromSpecificProcess(processName, BY_PROCESS_METADATA_TAB))
-                .click();
-        return getProcessMetadata(PROCESS_METADATA_ID);
-    }
-
-    public String getProcessTitle(WebElement process) {
-        return process.findElement(BY_PROCESS_TITLE).getText();
+                activeProcess.findElement(BY_BROKEN_SCHEDULE_MESSAGE).getText());
     }
 
     public void checkDownloadProcess(String processName, String downloadFolder, String projectID,
-            long minimumDownloadedFileSize) throws InterruptedException {
+            final long minimumDownloadedFileSize) {
         String processID = getProcessID(processName);
         clickOnDownloadProcessButton(processName);
-        File zipDownload =
+        final File zipDownload =
                 new File(downloadFolder + projectID + "_" + processID + "-decrypted.zip");
-        for (int i = 0; zipDownload.length() < minimumDownloadedFileSize && i < 10; i++) {
-            Thread.sleep(1000);
-        }
+        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
+                .until(new Predicate<WebDriver>() {
+
+                    @Override
+                    public boolean apply(WebDriver arg0) {
+                        System.out.println("Wait for downloading process!");
+                        return zipDownload.length() > minimumDownloadedFileSize;
+                    }
+                });
         System.out.println("Download file size: " + zipDownload.length());
         System.out.println("Download file path: " + zipDownload.getPath());
         System.out.println("Download file name: " + zipDownload.getName());
@@ -305,21 +279,31 @@ public class ProjectDetailPage extends AbstractFragment {
         }
     }
 
-    public void checkFocusedProcess(String processName) {
+    public void checkFocusedProcess(final String processName) {
         waitForElementVisible(activeProcess);
-        assertEquals(processName, getProcessTitle(activeProcess));
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return processName.equals(getProcessTitle(activeProcess));
+            }
+        });
     }
 
-    public void deleteProcess(String processName) throws InterruptedException {
-        int processNumberBeforeDelete = processes.size();
+    public void deleteProcess(String processName) {
+        final int processNumberBeforeDelete = processes.size();
         System.out.println("Process to delete: " + processName);
         clickOnDeleteProcessButton(processName);
         waitForElementVisible(processDeleteConfirmButton).click();
         waitForElementNotPresent(processDeleteDialog);
-        if (processNumberBeforeDelete == processes.size())
-            Thread.sleep(3000);
-        if (processNumberBeforeDelete > processes.size())
-            System.out.println("Process " + processName + " has been deleted!");
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return processes.size() == processNumberBeforeDelete - 1;
+            }
+        });
+        System.out.println("Process " + processName + " has been deleted!");
         waitForElementVisible(getRoot());
     }
 
@@ -328,9 +312,9 @@ public class ProjectDetailPage extends AbstractFragment {
         String deleteProcessMessage = String.format(DELETE_PROCESS_DIALOG_MESSAGE, processName);
         clickOnDeleteProcessButton(processName);
         waitForElementVisible(processDeleteDialogTitle);
-        assertEquals(deleteProcessTitle, processDeleteDialogTitle.getText());
+        assertEquals(processDeleteDialogTitle.getText(), deleteProcessTitle);
         waitForElementVisible(processDeleteDialogMessage);
-        assertEquals(deleteProcessMessage, processDeleteDialogMessage.getText());
+        assertEquals(processDeleteDialogMessage.getText(), deleteProcessMessage);
     }
 
     public void checkCancelDeleteProcess(String processName) {
@@ -340,7 +324,7 @@ public class ProjectDetailPage extends AbstractFragment {
         assertTrue(assertIsExistingProcess(processName));
     }
 
-    public void deleteAllProcesses() throws InterruptedException {
+    public void deleteAllProcesses() {
         for (int i = processes.size() - 1; i >= 0; i--) {
             deleteProcess(getProcessTitle(processes.get(i)));
         }
@@ -348,15 +332,12 @@ public class ProjectDetailPage extends AbstractFragment {
 
     public boolean assertIsExistingProcess(String processName) {
         waitForElementVisible(getRoot());
-        for (int i = 0; i < processes.size(); i++) {
-            if (getProcessTitle(processes.get(i)).equals(processName))
-                return true;
-        }
-        return false;
+        Optional<WebElement> existingProcess = tryToFindProcess(processName);
+        return existingProcess.isPresent();
     }
 
     public void checkExecutableScheduleNumber(String processName, String executableName,
-            int scheduleNumber) throws InterruptedException {
+            int scheduleNumber) {
         String executableScheduleNumber =
                 String.format(EXECUTABLE_SCHEDULE_NUMBER, scheduleNumber, (scheduleNumber > 1 ? "s"
                         : ""));
@@ -385,7 +366,35 @@ public class ProjectDetailPage extends AbstractFragment {
         assertActiveProcessTabs(processName, false, false, true);
     }
 
-    public void assertActiveProcessTabs(String processName, boolean activeScheduleTab,
+    public void assertScheduleStatus(String scheduleName, ScheduleStatus scheduleStatus) {
+        WebElement schedule = scheduleTable.getSchedule(scheduleName);
+        assertNotNull(schedule);
+        if (scheduleStatus == ScheduleStatus.ERROR)
+            assertTrue(schedule.getAttribute("class").contains("is-error"));
+        assertNotNull(schedule.findElement(scheduleStatus.getIconByCss()));
+        if (scheduleStatus == ScheduleStatus.UNSCHEDULED)
+            assertFalse(schedule.getAttribute("class").contains("is-error"));
+    }
+
+    public WebElement getNotificationButton(String processName) {
+        return waitForElementVisible(getElementFromSpecificProcess(processName,
+                BY_PROCESS_NOTIFICATION_RULE_BUTTON));
+    }
+
+    public void assertScheduleInList(final SchedulesTable schedulesTable,
+            final ScheduleBuilder scheduleBuilder) {
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return schedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()) != null;
+            }
+        });
+        assertEquals(schedulesTable.getScheduleCron(scheduleBuilder.getScheduleName()).getText(),
+                scheduleBuilder.getCronTimeBuilder().getCronFormatInProjectDetailPage());
+    }
+
+    private void assertActiveProcessTabs(String processName, boolean activeScheduleTab,
             boolean activeExecutableTab, boolean activeMetadataTab) {
         assertEquals(
                 getScheduleTabByProcessName(processName).getAttribute("class").contains("active"),
@@ -398,78 +407,52 @@ public class ProjectDetailPage extends AbstractFragment {
                 activeMetadataTab);
     }
 
-    public void assertScheduleStatus(String processName, String scheduleName,
-            DISCScheduleStatus scheduleStatus, boolean lastErrorExecution,
-            SchedulesTable scheduleTable) {
-        WebElement schedule = scheduleTable.getSchedule(scheduleName);
-        assertNotNull(schedule);
-        if (lastErrorExecution)
-            assertTrue(schedule.getAttribute("class").contains("is-error"));
-        else
-            assertFalse(schedule.getAttribute("class").contains("is-error"));
-        switch (scheduleStatus) {
-            case OK:
-                assertNotNull(schedule.findElement(DISCScheduleStatus.OK.getIconByCss()));
-                break;
-            case SCHEDULED:
-                assertNotNull(schedule.findElement(DISCScheduleStatus.SCHEDULED.getIconByCss()));
-                break;
-            case ERROR:
-                assertNotNull(schedule.findElement(DISCScheduleStatus.ERROR.getIconByCss()));
-                break;
-            case DISABLED:
-                assertNotNull(schedule.findElement(DISCScheduleStatus.DISABLED.getIconByCss()));
-                break;
-            case RUNNING:
-                assertNotNull(schedule.findElement(DISCScheduleStatus.RUNNING.getIconByCss()));
-                break;
-            case UNSCHEDULED:
-                assertFalse(schedule.getAttribute("class").contains("is-error"));
-                assertNotNull(schedule.findElement(DISCScheduleStatus.UNSCHEDULED.getIconByCss()));
-                break;
-        }
+    private void clickOnDeleteProcessButton(String processName) {
+        findProcess(processName).findElement(BY_PROCESS_DELETE_BUTTON).click();
+        waitForElementVisible(processDeleteDialog);
     }
 
-    public WebElement getNotificationButton(String processName) {
-        return waitForElementVisible(getElementFromSpecificProcess(processName,
-                BY_PROCESS_NOTIFICATION_RULE_BUTTON));
+    private void clickOnDownloadProcessButton(String processName) {
+        findProcess(processName).findElement(BY_PROCESS_DOWNLOAD_BUTTON).click();
     }
 
-    public void assertScheduleInList(SchedulesTable schedulesTable, String scheduleName,
-            String executablePath, Pair<String, List<String>> cronTime) throws InterruptedException {
-        for (int i = 0; i < 10 && schedulesTable.getScheduleTitle(scheduleName) == null; i++)
-            Thread.sleep(1000);
-        assertEquals(schedulesTable.getScheduleTitle(scheduleName).getText(), scheduleName);
-        if(!scheduleName.equals(executablePath.substring(executablePath.lastIndexOf("/") + 1)))
-            assertEquals(schedulesTable.getScheduleExecutablePath(scheduleName).getText(), executablePath);
-        String cronFormat = "";
-        String hourInDay = "";
-        if (cronTime.getValue() != null && cronTime.getValue().size() > 1)
-            hourInDay =
-                    cronTime.getValue().get(1).startsWith("0") ? cronTime.getValue().get(1)
-                            .substring(1) : cronTime.getValue().get(1);
-        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYWEEK.getCronTime()))
-            cronFormat =
-                    ScheduleCronTimes.CRON_EVERYWEEK
-                            .getCronFormat()
-                            .replace("${day}", cronTime.getValue().get(2))
-                            .replace("${hour}", hourInDay)
-                            .replace("${minute}", cronTime.getValue().get(0));
-        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYDAY.getCronTime()))
-            cronFormat =
-                    ScheduleCronTimes.CRON_EVERYDAY.getCronFormat()
-                            .replace("${hour}", hourInDay)
-                            .replace("${minute}", cronTime.getValue().get(0));
-        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime())
-                || cronTime.getKey().equals(ScheduleCronTimes.CRON_15_MINUTES.getCronTime())
-                || cronTime.getKey().equals(ScheduleCronTimes.CRON_30_MINUTES.getCronTime()))
-            cronFormat = cronTime.getKey();
-        if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime()))
-            cronFormat = cronTime.getValue().get(0) + " UTC";
-        if (cronTime.getKey().equals(ScheduleCronTimes.AFTER.getCronTime())) {
-            String executable = cronTime.getValue().get(1);
-            cronFormat = String.format("after %s completion", executable.substring(executable.lastIndexOf("/") + 1));
-        }
-        assertEquals(cronFormat, schedulesTable.getScheduleCron(scheduleName).getText());
+    private String getProcessID(String processName) {
+        waitForElementVisible(getElementFromSpecificProcess(processName, BY_PROCESS_METADATA_TAB))
+                .click();
+        return getProcessMetadata(PROCESS_METADATA_ID);
+    }
+
+    private String getProcessTitle(WebElement process) {
+        return process.findElement(BY_PROCESS_TITLE).getText();
+    }
+
+    private WebElement getMetadataTabByProcessName(String processName) {
+        return findProcess(processName).findElement(BY_PROCESS_METADATA_TAB);
+    }
+
+    private WebElement getElementFromSpecificProcess(String processName, By elementLocator) {
+        return findProcess(processName).findElement(elementLocator);
+    }
+
+    private Optional<WebElement> tryToFindProcess(final String processName) {
+        Optional<WebElement> existingProcess =
+                Iterables.tryFind(processes, new Predicate<WebElement>() {
+
+                    @Override
+                    public boolean apply(WebElement process) {
+                        return getProcessTitle(process).equals(processName);
+                    }
+                });
+        return existingProcess;
+    }
+
+    private WebElement findProcess(final String processName) {
+        return Iterables.find(processes, new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement process) {
+                return process.findElement(BY_PROCESS_TITLE).getText().equals(processName);
+            }
+        });
     }
 }

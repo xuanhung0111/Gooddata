@@ -2,128 +2,28 @@ package com.gooddata.qa.graphene.disc;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.DISCNotificationEvents;
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
-import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
-import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
-import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.graphene.entity.disc.ExecutionDetails;
+import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
+import com.gooddata.qa.graphene.entity.disc.NotificationParameters;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages;
+import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public class NotificationsTest extends AbstractSchedulesTests {
-
-    private static final List<String> BASIC_GRAPH_LIST = Arrays.asList("errorGraph.grf",
-            "longTimeRunningGraph.grf", "successfulGraph.grf");
-    private static final String NOTIFICATION_TEST_PROCESS = "Notification Test Process";
-    private static final String SUCCESS_NOTIFICATION_TEST_PROCESS = "Success Notification Test";
-    private static final String FAILURE_NOTIFICATION_TEST_PROCESS = "Failure Notification Test";
-    private static final String CUSTOM_NOTIFICATION_TEST_PROCESS = "Custom Event Notification Test";
-    private static final String REPEATED_FAILURES_NOTIFICATION_SUBJECT =
-            "Repeated data loading failure: \"%s\" process";
-    private static final String REPEATED_FAILURES_NOTIFICATION_BODY =
-            "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project (id: %s) has failed for the 5th time."
-                    + " We highly recommend disabling failing schedules until the issues are addressed: Go to"
-                    + " the schedule page Click \"Disable\" button If you require assistance with troubleshooting"
-                    + " data uploading, please visit the GoodData Support Portal. At your service, The GoodData Team";
-    private static final String REPEATED_FAILURES_NOTIFICATION_MESSAGE_1 =
-            "<p>the <a href=\"%s\">%s schedule</a> within the &quot;%s&quot; process of your &quot;%s&quot;"
-                    + " GoodData project (id: %s) has failed for the 5th time.</p>";
-    private static final String REPEATED_FAILURES_NOTIFICATION_MESSAGE_2 =
-            "<li>Go to the <a href=\"%s\">schedule page</a></li>";
-    private static final String SCHEDULE_DISABLED_NOTIFICATION_SUBJECT =
-            "Schedule disabled: \"%s\" process";
-    private static final String SCHEDULE_DISABLED_NOTIFICATION_BODY =
-            "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project "
-                    + "(id: %s) has been automatically disabled following its 30th consecutive failure. "
-                    + "To resume scheduled uploads from this process: Go to the schedule page Click "
-                    + "\"Enable\" If you require assistance with troubleshooting data uploading, "
-                    + "please visit the GoodData Support Portal. At your service, The GoodData Team";
-    private static final String SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1 =
-            "<p>the <a href=\"%s\">%s schedule</a> within the &quot;%s&quot; process of your &quot;%s&quot;"
-                    + " GoodData project (id: %s) has been <strong>automatically disabled</strong> following its "
-                    + "30th consecutive failure.</p>";
-    private static final String SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2 =
-            "<li>Go to the <a href=\"%s\">schedule page</a></li>";
-    private static final String NOTIFICATION_SUPPORT_MESSAGE =
-            "<p>If you require assistance with troubleshooting data uploading, please visit the "
-                    + "<a href=\"http://support.gooddata.com/entries/23541617-Automatic-Disabling-of-Failed-Schedules\">GoodData Support Portal</a>.</p>";
-    private static final String NOTIFICATION_RULES_EMPTY_STATE_MESSAGE =
-            "No event (eg. schedule start, finish, fail, etc.) will trigger a notification email.";
-
-    private static final String FROM = "no-reply@gooddata.com";
-
-    private String successNotificationSubject = "Success Notification_"
-            + Calendar.getInstance().getTime();
-    private String successNotificationMessage = "${params.PROJECT}" + "*" + "${params.USER}" + "*"
-            + "${params.USER_EMAIL}" + "*" + "${params.PROCESS_URI}" + "*" + "${params.PROCESS_ID}"
-            + "*" + "${params.PROCESS_NAME}" + "*" + "${params.EXECUTABLE}" + "*"
-            + "${params.SCHEDULE_ID}" + "*" + "${params.SCHEDULE_NAME}" + "*" + "${params.LOG}"
-            + "*" + "${params.START_TIME}" + "*" + "${params.FINISH_TIME}";
-    private String failureNotificationSubject = "Failure Notification_"
-            + Calendar.getInstance().getTime();
-    private String failureNotificationMessage = "${params.PROJECT}" + "*" + "${params.USER}" + "*"
-            + "${params.USER_EMAIL}" + "*" + "${params.PROCESS_URI}" + "*" + "${params.PROCESS_ID}"
-            + "*" + "${params.PROCESS_NAME}" + "*" + "${params.EXECUTABLE}" + "*"
-            + "${params.SCHEDULE_ID}" + "*" + "${params.SCHEDULE_NAME}" + "*" + "${params.LOG}"
-            + "*" + "${params.START_TIME}" + "*" + "${params.FINISH_TIME}" + "*"
-            + "${params.ERROR_MESSAGE}";
-    private String processStartedNotificationSubject = "Process Started Notification_"
-            + Calendar.getInstance().getTime();
-    private String processStartedNotificationMessage = "${params.PROJECT}" + "*" + "${params.USER}"
-            + "*" + "${params.USER_EMAIL}" + "*" + "${params.PROCESS_URI}" + "*"
-            + "${params.PROCESS_ID}" + "*" + "${params.PROCESS_NAME}" + "*"
-            + "${params.EXECUTABLE}" + "*" + "${params.SCHEDULE_ID}" + "*"
-            + "${params.SCHEDULE_NAME}" + "*" + "${params.LOG}" + "*" + "${params.START_TIME}";
-    private String processScheduledNotificationSubject = "Process Scheduled Notification_"
-            + Calendar.getInstance().getTime();
-    private String processScheduledNotificationMessage = "${params.PROJECT}" + "*"
-            + "${params.USER}" + "*" + "${params.USER_EMAIL}" + "*" + "${params.PROCESS_URI}" + "*"
-            + "${params.PROCESS_ID}" + "*" + "${params.EXECUTABLE}" + "*" + "${params.SCHEDULE_ID}"
-            + "*" + "${params.SCHEDULE_NAME}" + "*" + "${params.SCHEDULED_TIME}";
-    private String customEventNotificationSubject = "Custom Event_"
-            + Calendar.getInstance().getTime();
-    private String customEventNotificationMessage = "${params.hello}";
-    private String notificationSubject = "Notification Subject_";
-    private String notificationMessage = "${params.PROJECT}";
-
-    private String userProfileId;
-    private String successProcessUri;
-    private String failureProcessUri;
-    private String successfulScheduleId;
-    private String lastSuccessfulExecutionLogLink;
-    private String successfulStartTime;
-    private String successfulEndTime;
-    private String failedScheduleId;
-    private String lastFailedExecutionLogLink;
-    private String failedStartTime;
-    private String failedEndTime;
-    private String errorMessage;
-    private String processStartTime;
-
-    @FindBy(tagName = "pre")
-    private ObjectFragment objectFragment;
+public class NotificationsTest extends AbstractNotificationTest {
 
     @BeforeClass
     public void initProperties() {
@@ -138,709 +38,484 @@ public class NotificationsTest extends AbstractSchedulesTests {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void prepareDataForSucessEvent() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, SUCCESS_NOTIFICATION_TEST_PROCESS, BASIC_GRAPH_LIST, true);
+    public void prepareDataForSucessEvent() {
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.BASIC, SUCCESS_NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void prepareDataForFailureEvent() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, FAILURE_NOTIFICATION_TEST_PROCESS, BASIC_GRAPH_LIST, true);
+    public void prepareDataForFailureEvent() {
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.BASIC, FAILURE_NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void prepareDataForNotificationFormChecking() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, NOTIFICATION_TEST_PROCESS, BASIC_GRAPH_LIST, true);
+    public void prepareDataForNotificationFormChecking() {
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.BASIC, NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void prepareDataForCustomEvent() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "CTL_event",
-                DISCProcessTypes.GRAPH, CUSTOM_NOTIFICATION_TEST_PROCESS,
-                Arrays.asList("CTL_Function.grf"), true);
+    public void prepareDataForCustomEvent() {
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.CTL_EVENT, CUSTOM_NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"prepareDataForSucessEvent"}, groups = {"notification"})
     public void createNotificationForSuccessEvent() throws InterruptedException {
-        int notificationIndex =
-                createNotification(SUCCESS_NOTIFICATION_TEST_PROCESS, imapUser,
-                        successNotificationSubject, successNotificationMessage,
-                        DISCNotificationEvents.SUCCESS, null, true);
-        assertNotification(SUCCESS_NOTIFICATION_TEST_PROCESS, notificationIndex, imapUser,
-                successNotificationSubject, successNotificationMessage,
-                DISCNotificationEvents.SUCCESS, null);
+        NotificationBuilder notificationInfo =
+                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(successNotificationSubject)
+                        .setMessage(successNotificationMessage)
+                        .setEvent(NotificationEvents.SUCCESS);
+        createAndAssertNotification(notificationInfo);
     }
 
     @Test(dependsOnMethods = {"prepareDataForFailureEvent"}, groups = {"notification"})
     public void createNotificationForFailureEvent() throws InterruptedException {
-        int notificationIndex =
-                createNotification(FAILURE_NOTIFICATION_TEST_PROCESS, imapUser,
-                        failureNotificationSubject, failureNotificationMessage,
-                        DISCNotificationEvents.FAILURE, null, true);
-        assertNotification(FAILURE_NOTIFICATION_TEST_PROCESS, notificationIndex, imapUser,
-                failureNotificationSubject, failureNotificationMessage,
-                DISCNotificationEvents.FAILURE, null);
+        NotificationBuilder notificationInfo =
+                new NotificationBuilder().setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(failureNotificationSubject)
+                        .setMessage(failureNotificationMessage)
+                        .setEvent(NotificationEvents.FAILURE);
+        createAndAssertNotification(notificationInfo);
     }
 
     @Test(dependsOnMethods = {"prepareDataForSucessEvent"}, groups = {"notification"})
     public void createNotificationForProcessStartedEvent() throws InterruptedException {
-        int notificationIndex =
-                createNotification(SUCCESS_NOTIFICATION_TEST_PROCESS, imapUser,
-                        processStartedNotificationSubject, processStartedNotificationMessage,
-                        DISCNotificationEvents.PROCESS_STARTED, null, true);
-        assertNotification(SUCCESS_NOTIFICATION_TEST_PROCESS, notificationIndex, imapUser,
-                processStartedNotificationSubject, processStartedNotificationMessage,
-                DISCNotificationEvents.PROCESS_STARTED, null);
+        NotificationBuilder notificationInfo =
+                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(processStartedNotificationSubject)
+                        .setMessage(processStartedNotificationMessage)
+                        .setEvent(NotificationEvents.PROCESS_STARTED);
+        createAndAssertNotification(notificationInfo);
     }
 
     @Test(dependsOnMethods = {"prepareDataForSucessEvent"}, groups = {"notification"})
     public void createNotificationForProcessScheduledEvent() throws InterruptedException {
-        int notificationIndex =
-                createNotification(SUCCESS_NOTIFICATION_TEST_PROCESS, imapUser,
-                        processScheduledNotificationSubject, processScheduledNotificationMessage,
-                        DISCNotificationEvents.PROCESS_SCHEDULED, null, true);
-        assertNotification(SUCCESS_NOTIFICATION_TEST_PROCESS, notificationIndex, imapUser,
-                processScheduledNotificationSubject, processScheduledNotificationMessage,
-                DISCNotificationEvents.PROCESS_SCHEDULED, null);
+        NotificationBuilder notificationInfo =
+                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(processScheduledNotificationSubject)
+                        .setMessage(processScheduledNotificationMessage)
+                        .setEvent(NotificationEvents.PROCESS_SCHEDULED);
+        createAndAssertNotification(notificationInfo);
     }
 
     @Test(dependsOnMethods = {"prepareDataForCustomEvent"}, groups = {"notification"})
     public void createNotificationForCustomEvent() throws InterruptedException {
-        int notificationIndex =
-                createNotification(CUSTOM_NOTIFICATION_TEST_PROCESS, imapUser,
-                        customEventNotificationSubject, customEventNotificationMessage,
-                        DISCNotificationEvents.CUSTOM_EVENT, "welcomeEvent", true);
-        assertNotification(CUSTOM_NOTIFICATION_TEST_PROCESS, notificationIndex, imapUser,
-                customEventNotificationSubject, customEventNotificationMessage,
-                DISCNotificationEvents.CUSTOM_EVENT, "welcomeEvent");
+        NotificationBuilder notificationInfo =
+                new NotificationBuilder().setProcessName(CUSTOM_NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(customEventNotificationSubject)
+                        .setMessage(customEventNotificationMessage)
+                        .setEvent(NotificationEvents.CUSTOM_EVENT)
+                        .setCustomEventName("welcomeEvent");
+        createAndAssertNotification(notificationInfo);
     }
 
     @Test(dependsOnMethods = {"createNotificationForSuccessEvent"}, groups = {"notification"})
-    public void successEventTrigger() throws InterruptedException, ParseException, JSONException {
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                SUCCESS_NOTIFICATION_TEST_PROCESS, null, "/graph/successfulGraph.grf", cronTime,
-                null);
-        assertNewSchedule(SUCCESS_NOTIFICATION_TEST_PROCESS, "successfulGraph.grf",
-                "/graph/successfulGraph.grf", cronTime, null);
+    public void successEventTrigger() throws ParseException, JSONException {
+        openProjectDetailPage(getWorkingProject());
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
+                        .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+                        .setMinuteInHour("59");
+        createAndAssertSchedule(scheduleBuilder);
+        String scheduleUrl = browser.getCurrentUrl();
+
         scheduleDetail.manualRun();
-        scheduleDetail.assertLastExecutionDetails(true, true, false,
-                "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
-        successProcessUri = getProcessUri(browser.getCurrentUrl());
-        successfulScheduleId =
-                browser.getCurrentUrl().substring(browser.getCurrentUrl().lastIndexOf("/") + 1);
-        lastSuccessfulExecutionLogLink =
-                scheduleDetail.getLastExecutionLogLink().replace("ea.", "");
-        String gpExecutionDetailUrl = lastSuccessfulExecutionLogLink.replace("/log", "/detail");
-        Map<String, String> executionDetails = getExecutionInfoFromGreyPage(gpExecutionDetailUrl);
-        successfulStartTime = executionDetails.get("scheduledTime");
-        successfulEndTime = executionDetails.get("endTime");
-        processStartTime = executionDetails.get("startedTime");
+        scheduleDetail.assertSuccessfulExecution();
+        successProcessUri = getProcessUri(scheduleUrl);
+        successfulScheduleId = scheduleUrl.substring(scheduleUrl.lastIndexOf("/") + 1);
+        getExecutionInfoFromGreyPage(successfulExecutionDetails,
+                scheduleDetail.getLastExecutionLogLink());
     }
 
     @Test(dependsOnMethods = {"createNotificationForFailureEvent"}, groups = {"notification"})
-    public void failureEventTrigger() throws InterruptedException, ParseException, JSONException {
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                FAILURE_NOTIFICATION_TEST_PROCESS, null, "/graph/errorGraph.grf", cronTime, null);
-        assertNewSchedule(FAILURE_NOTIFICATION_TEST_PROCESS, "errorGraph.grf",
-                "/graph/errorGraph.grf", cronTime, null);
+    public void failureEventTrigger() throws ParseException, JSONException {
+        openProjectDetailPage(getWorkingProject());
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS)
+                        .setExecutable(Executables.FAILED_GRAPH)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+                        .setMinuteInHour("59");
+        createAndAssertSchedule(scheduleBuilder);
+
         scheduleDetail.manualRun();
-        scheduleDetail.assertLastExecutionDetails(false, true, false, "Basic/graph/errorGraph.grf",
-                DISCProcessTypes.GRAPH, 5);
-        failureProcessUri = getProcessUri(browser.getCurrentUrl());
-        failedScheduleId =
-                browser.getCurrentUrl().substring(browser.getCurrentUrl().lastIndexOf("/") + 1);
-        lastFailedExecutionLogLink =
-                scheduleDetail.getLastExecutionLogLink().replace("https://ea.", "https://");
-        String gpExecutionDetailUrl = lastFailedExecutionLogLink.replace("/log", "/detail");
-        Map<String, String> executionDetails = getExecutionInfoFromGreyPage(gpExecutionDetailUrl);
-        failedStartTime = executionDetails.get("scheduledTime");
-        failedEndTime = executionDetails.get("endTime");
-        errorMessage = executionDetails.get("errorMessage").replace("\n", "").replace("    ", "");
+        scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
+
+        String scheduleUrl = browser.getCurrentUrl();
+        failureProcessUri = getProcessUri(scheduleUrl);
+        failedScheduleId = scheduleUrl.substring(scheduleUrl.lastIndexOf("/") + 1);
+        getExecutionInfoFromGreyPage(failedExecutionDetails,
+                scheduleDetail.getLastExecutionLogLink());
     }
 
     @Test(dependsOnMethods = {"createNotificationForCustomEvent"}, groups = {"notification"})
-    public void customEventTrigger() throws InterruptedException, ParseException {
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                CUSTOM_NOTIFICATION_TEST_PROCESS, null, "/graph/CTL_Function.grf", cronTime, null);
-        assertNewSchedule(CUSTOM_NOTIFICATION_TEST_PROCESS, "CTL_Function.grf",
-                "/graph/CTL_Function.grf", cronTime, null);
+    public void customEventTrigger() throws ParseException {
+        openProjectDetailPage(getWorkingProject());
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(CUSTOM_NOTIFICATION_TEST_PROCESS)
+                        .setExecutable(Executables.CTL_GRAPH)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+                        .setMinuteInHour("59");
+        createAndAssertSchedule(scheduleBuilder);
+
         scheduleDetail.manualRun();
-        scheduleDetail.assertLastExecutionDetails(true, true, false,
-                "CTL_event/graph/CTL_Function.grf", DISCProcessTypes.GRAPH, 5);
+        scheduleDetail.assertSuccessfulExecution();
     }
 
     @Test(dependsOnMethods = {"successEventTrigger"}, groups = {"notification"})
-    public void checkSuccessMessage() throws InterruptedException, MessagingException, IOException {
-        List<String> expectedParamValues =
-                getBasicEventParamValues(successProcessUri, SUCCESS_NOTIFICATION_TEST_PROCESS,
-                        "Basic/graph/successfulGraph.grf", "successfulGraph.grf",
-                        successfulScheduleId, lastSuccessfulExecutionLogLink, successfulStartTime,
-                        successfulEndTime, null);
-        checkNotification(DISCNotificationEvents.SUCCESS, expectedParamValues);
+    public void checkSuccessMessage() throws MessagingException, IOException {
+        NotificationParameters expectedParams =
+                new NotificationParameters()
+                        .setProjectId(testParams.getProjectId())
+                        .setUser(userProfileId)
+                        .setUserEmail(testParams.getUser())
+                        .setProcessUri(successProcessUri)
+                        .setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
+                        .setExecutable(
+                                DeployPackages.BASIC.getPackageRootFolder()
+                                        + Executables.SUCCESSFUL_GRAPH.getExecutablePath())
+                        .setScheduleName(Executables.SUCCESSFUL_GRAPH.getExecutableName())
+                        .setScheduleId(successfulScheduleId)
+                        .setExecutionDetails(successfulExecutionDetails);
+        checkNotification(NotificationEvents.SUCCESS, expectedParams);
     }
 
     @Test(dependsOnMethods = {"successEventTrigger", "createNotificationForProcessStartedEvent"},
             groups = {"notification"})
-    public void checkProcessStartedSuccessMessage() throws InterruptedException,
-            MessagingException, IOException {
-        List<String> expectedParamValues =
-                getBasicEventParamValues(successProcessUri, SUCCESS_NOTIFICATION_TEST_PROCESS,
-                        "Basic/graph/successfulGraph.grf", "successfulGraph.grf",
-                        successfulScheduleId, lastSuccessfulExecutionLogLink, processStartTime,
-                        null, null);
-        checkNotification(DISCNotificationEvents.PROCESS_STARTED, expectedParamValues);
+    public void checkProcessStartedSuccessMessage() throws MessagingException, IOException {
+        NotificationParameters expectedParams =
+                new NotificationParameters()
+                        .setNotificationEvent(NotificationEvents.PROCESS_STARTED)
+                        .setProjectId(testParams.getProjectId())
+                        .setUser(userProfileId)
+                        .setUserEmail(testParams.getUser())
+                        .setProcessUri(successProcessUri)
+                        .setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
+                        .setExecutable(
+                                DeployPackages.BASIC.getPackageRootFolder()
+                                        + Executables.SUCCESSFUL_GRAPH.getExecutablePath())
+                        .setScheduleName(Executables.SUCCESSFUL_GRAPH.getExecutableName())
+                        .setScheduleId(successfulScheduleId)
+                        .setExecutionDetails(successfulExecutionDetails);
+        checkNotification(NotificationEvents.PROCESS_STARTED, expectedParams);
     }
 
     @Test(dependsOnMethods = {"successEventTrigger", "createNotificationForProcessScheduledEvent"},
             groups = {"notification"})
-    public void checkProcessScheduledSuccessMessage() throws InterruptedException,
-            MessagingException, IOException {
-        List<String> expectedParamValues =
-                getBasicEventParamValues(successProcessUri, null,
-                        "Basic/graph/successfulGraph.grf", "successfulGraph.grf",
-                        successfulScheduleId, null, successfulStartTime, null, null);
-        checkNotification(DISCNotificationEvents.PROCESS_SCHEDULED, expectedParamValues);
+    public void checkProcessScheduledSuccessMessage() throws MessagingException, IOException {
+        NotificationParameters expectedParams =
+                new NotificationParameters()
+                        .setNotificationEvent(NotificationEvents.PROCESS_SCHEDULED)
+                        .setProjectId(testParams.getProjectId())
+                        .setUser(userProfileId)
+                        .setUserEmail(testParams.getUser())
+                        .setProcessUri(successProcessUri)
+                        .setExecutable(
+                                DeployPackages.BASIC.getPackageRootFolder()
+                                        + Executables.SUCCESSFUL_GRAPH.getExecutablePath())
+                        .setScheduleName(Executables.SUCCESSFUL_GRAPH.getExecutableName())
+                        .setScheduleId(successfulScheduleId)
+                        .setExecutionDetails(successfulExecutionDetails);
+        checkNotification(NotificationEvents.PROCESS_SCHEDULED, expectedParams);
     }
 
     @Test(dependsOnMethods = {"failureEventTrigger"}, groups = {"notification"})
-    public void checkFailureMessage() throws InterruptedException, MessagingException, IOException {
-        List<String> expectedParamValues =
-                getBasicEventParamValues(failureProcessUri, FAILURE_NOTIFICATION_TEST_PROCESS,
-                        "Basic/graph/errorGraph.grf", "errorGraph.grf", failedScheduleId,
-                        lastFailedExecutionLogLink, failedStartTime, failedEndTime, errorMessage);
-        checkNotification(DISCNotificationEvents.FAILURE, expectedParamValues);
+    public void checkFailureMessage() throws MessagingException, IOException {
+        NotificationParameters expectedParams =
+                new NotificationParameters()
+                        .setNotificationEvent(NotificationEvents.FAILURE)
+                        .setProjectId(testParams.getProjectId())
+                        .setUser(userProfileId)
+                        .setUserEmail(testParams.getUser())
+                        .setProcessUri(failureProcessUri)
+                        .setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS)
+                        .setExecutable(
+                                DeployPackages.BASIC.getPackageRootFolder()
+                                        + Executables.FAILED_GRAPH.getExecutablePath())
+                        .setScheduleName(Executables.FAILED_GRAPH.getExecutableName())
+                        .setScheduleId(failedScheduleId)
+                        .setExecutionDetails(failedExecutionDetails);
+        checkNotification(NotificationEvents.FAILURE, expectedParams);
     }
 
     @Test(dependsOnMethods = {"customEventTrigger"}, groups = {"notification"})
-    public void checkCustomEventMessage() throws InterruptedException, MessagingException,
-            IOException {
-        ArrayList<String> expectedParamValues = new ArrayList<String>();
-        expectedParamValues.add("World");
-        checkNotification(DISCNotificationEvents.CUSTOM_EVENT, expectedParamValues);
+    public void checkCustomEventMessage() throws MessagingException, IOException {
+        NotificationParameters expectedParams =
+                new NotificationParameters().setCustomParam("World");
+        checkNotification(NotificationEvents.CUSTOM_EVENT, expectedParams);
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
-    public void checkEmptyNotificationFieldsError() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        discNotificationRules.clickOnAddNotificationButton();
-        discNotificationRules.checkInvalidNotificationFields(
-                discNotificationRules.getNotificationNumber() - 1, "", "", "",
-                DISCNotificationEvents.SUCCESS, "");
-    }
-
-    @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
-    public void checkEmailFieldError() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        discNotificationRules.clickOnAddNotificationButton();
-        discNotificationRules.checkInvalidNotificationFields(
-                discNotificationRules.getNotificationNumber() - 1, imapUser + "," + imapUser, null,
-                null, DISCNotificationEvents.SUCCESS, null);
-    }
-
-    @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
-    public void checkAvailableParams() throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+    public void checkEmptyNotificationFieldsError() {
+        openProjectDetailPage(getWorkingProject());
         projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
         waitForElementVisible(discNotificationRules.getRoot());
         discNotificationRules.clickOnAddNotificationButton();
         int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
+        discNotificationRules.checkEmptyNotificationFields(notificationIndex);
+    }
+
+    @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
+    public void checkEmailFieldError() {
+        openProjectDetailPage(getWorkingProject());
+        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
+        waitForElementVisible(discNotificationRules.getRoot());
+        discNotificationRules.clickOnAddNotificationButton();
+        int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
+        discNotificationRules.checkOnlyOneEmailError(notificationIndex);
+    }
+
+    @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
+    public void checkAvailableParams() {
+        openProjectDetailPage(getWorkingProject());
+        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
+        waitForElementVisible(discNotificationRules.getRoot());
+        discNotificationRules.clickOnAddNotificationButton();
+        int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
+
         System.out.println("Available params for Success Notification: "
                 + discNotificationRules.getAvailableParams());
-        String expectedParams = successNotificationMessage.replace("*", "");
-        assertEquals(expectedParams, discNotificationRules.getAvailableParams());
+        assertEquals(discNotificationRules.getAvailableParams(), successNotificationParams);
+
         discNotificationRules.setNotificationEvent(notificationIndex,
-                DISCNotificationEvents.PROCESS_SCHEDULED);
-        expectedParams = processScheduledNotificationMessage.replace("*", "");
+                NotificationEvents.PROCESS_SCHEDULED);
         System.out.println("Available params for Process Scheduled Notification: "
                 + discNotificationRules.getAvailableParams());
-        assertEquals(expectedParams, discNotificationRules.getAvailableParams());
+        assertEquals(discNotificationRules.getAvailableParams(), processScheduledNotificationParams);
+
         discNotificationRules.setNotificationEvent(notificationIndex,
-                DISCNotificationEvents.PROCESS_STARTED);
-        expectedParams = processStartedNotificationMessage.replace("*", "");
+                NotificationEvents.PROCESS_STARTED);
         System.out.println("Available params for Process Started Notification: "
                 + discNotificationRules.getAvailableParams());
-        assertEquals(expectedParams, discNotificationRules.getAvailableParams());
-        discNotificationRules.setNotificationEvent(notificationIndex,
-                DISCNotificationEvents.FAILURE);
-        expectedParams = failureNotificationMessage.replace("*", "");
+        assertEquals(discNotificationRules.getAvailableParams(), processStartedNotificationParams);
+
+        discNotificationRules.setNotificationEvent(notificationIndex, NotificationEvents.FAILURE);
         System.out.println("Available params for Failure Notification: "
                 + discNotificationRules.getAvailableParams());
-        assertEquals(expectedParams, discNotificationRules.getAvailableParams());
+        assertEquals(discNotificationRules.getAvailableParams(), failureNotificationParams);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkNotificationNumber() throws JSONException, InterruptedException {
+    public void checkNotificationNumber() {
+        String processName = "Check Notification Number";
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Notification Number", BASIC_GRAPH_LIST, true);
-            checkNotificationNumber(0, "Check Notification Number");
-            createNotification("Check Notification Number", imapUser, notificationSubject,
-                    notificationMessage, DISCNotificationEvents.SUCCESS, null, true);
-            checkNotificationNumber(1, "Check Notification Number");
-            createNotification("Check Notification Number", imapUser, notificationSubject,
-                    notificationMessage, DISCNotificationEvents.FAILURE, null, true);
-            checkNotificationNumber(2, "Check Notification Number");
+            openProjectDetailPage(getWorkingProject());
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+            NotificationBuilder notificationInfo =
+                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser)
+                            .setSubject(notificationSubject).setMessage(notificationMessage)
+                            .setEvent(NotificationEvents.SUCCESS);
+            checkNotificationNumber(0, processName);
+            createNotitication(notificationInfo);
+            checkNotificationNumber(1, processName);
+            createNotitication(notificationInfo);
+            checkNotificationNumber(2, processName);
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteProcess("Check Notification Number");
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
-    public void checkCancelCreateNotification() throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+    public void checkCancelCreateNotification() {
+        openProjectDetailPage(getWorkingProject());
         String notificationNumber =
                 projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).getText();
-        createNotification(NOTIFICATION_TEST_PROCESS, imapUser, notificationSubject,
-                notificationMessage, DISCNotificationEvents.FAILURE, null, false);
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+
+        NotificationBuilder notificationBuilder =
+                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(notificationSubject)
+                        .setMessage(notificationMessage).setSaved(false);
+        createNotitication(notificationBuilder);
+
+        openProjectDetailPage(getWorkingProject());
         assertEquals(projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).getText(),
                 notificationNumber);
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkDeleteNotification() throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+        openProjectDetailPage(getWorkingProject());
         projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
         waitForElementVisible(discNotificationRules.getRoot());
         int notificationNumber = discNotificationRules.getNotificationNumber();
-        int notificationIndex =
-                createNotification(NOTIFICATION_TEST_PROCESS, imapUser, notificationSubject,
-                        notificationMessage, DISCNotificationEvents.FAILURE, null, true);
-        deleteNotification(NOTIFICATION_TEST_PROCESS, notificationIndex, true);
+
+        NotificationBuilder notificationInfo =
+                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(notificationSubject)
+                        .setMessage(notificationMessage).setEvent(NotificationEvents.FAILURE)
+                        .setSaved(true);
+        createAndAssertNotification(notificationInfo);
+
+        deleteNotification(notificationInfo);
         checkNotificationNumber(notificationNumber, NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkCancelDeleteNotification() throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+        openProjectDetailPage(getWorkingProject());
         projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
         waitForElementVisible(discNotificationRules.getRoot());
         int notificationNumber = discNotificationRules.getNotificationNumber();
-        int notificationIndex =
-                createNotification(NOTIFICATION_TEST_PROCESS, imapUser, notificationSubject,
-                        notificationMessage, DISCNotificationEvents.FAILURE, null, true);
+
+        NotificationBuilder notificationInfo =
+                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS)
+                        .setEmail(imapUser).setSubject(notificationSubject)
+                        .setMessage(notificationMessage).setEvent(NotificationEvents.FAILURE)
+                        .setSaved(true);
+        createAndAssertNotification(notificationInfo);
         notificationNumber++;
-        deleteNotification(NOTIFICATION_TEST_PROCESS, notificationIndex, false);
+
+        deleteNotification(notificationInfo.setSaved(false));
         checkNotificationNumber(notificationNumber, NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkEditNotification() throws InterruptedException, ParseException,
             MessagingException, IOException, JSONException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, "Check Edit Notification", BASIC_GRAPH_LIST, true);
-        String subject = notificationSubject + Calendar.getInstance().getTime();
-        String message = "${params.PROJECT}" + "*" + "${params.FINISH_TIME}";
-        int notificationIndex =
-                createNotification("Check Edit Notification", testParams.getUser(), subject, message,
-                        DISCNotificationEvents.SUCCESS, null, true);
-        assertNotification("Check Edit Notification", notificationIndex, testParams.getUser(), subject,
-                message, DISCNotificationEvents.SUCCESS, null);
-        String editedSubject = notificationSubject + Calendar.getInstance().getTime();
-        editNotification("Check Edit Notification", notificationIndex, imapUser,
-                editedSubject, message, DISCNotificationEvents.PROCESS_STARTED, null, true);
-        assertNotification("Check Edit Notification", notificationIndex,
-                imapUser, editedSubject, message,
-                DISCNotificationEvents.PROCESS_STARTED, null);
-        checkNotificationNumber(notificationIndex + 1, "Check Edit Notification");
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                "Check Edit Notification", null, "/graph/successfulGraph.grf", cronTime, null);
-        assertNewSchedule("Check Edit Notification", "successfulGraph.grf",
-                "/graph/successfulGraph.grf", cronTime, null);
-        scheduleDetail.manualRun();
-        scheduleDetail.assertLastExecutionDetails(true, true, false,
-                "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
-        List<String> expectedParamValues = new ArrayList<String>();
-        expectedParamValues.add(testParams.getProjectId());
-        expectedParamValues.add("");
-        waitForNotification(editedSubject, expectedParamValues);
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Check Edit Notification";
+        try {
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+            String subject = notificationSubject + Calendar.getInstance().getTime();
+            String message =
+                    "params.PROJECT=${params.PROJECT}" + "*"
+                            + "params.FINISH_TIME=${params.FINISH_TIME}";
+
+            NotificationBuilder notificationInfo =
+                    new NotificationBuilder().setProcessName(processName)
+                            .setEmail(testParams.getUser()).setSubject(subject).setMessage(message)
+                            .setEvent(NotificationEvents.SUCCESS);
+            createAndAssertNotification(notificationInfo);
+
+            editNotification(notificationInfo.setEmail(imapUser)
+                    .setSubject(subject + Calendar.getInstance().getTime())
+                    .setEvent(NotificationEvents.PROCESS_STARTED));
+
+            openProjectDetailPage(getWorkingProject());
+            createAndAssertSchedule(new ScheduleBuilder().setProcessName(processName)
+                    .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                    .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+                    .setMinuteInHour("59"));
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+
+            NotificationParameters expectedParams =
+                    new NotificationParameters().setProjectId(testParams.getProjectId())
+                            .setExecutionDetails(new ExecutionDetails());
+            waitForNotification(notificationInfo.getSubject(), expectedParams);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkCancelEditNotification() throws InterruptedException, ParseException,
             MessagingException, IOException, JSONException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, "Check Cancel Edit Notification", BASIC_GRAPH_LIST, true);
-        String subject = notificationSubject + Calendar.getInstance().getTime();
-        String message = "${params.PROJECT}" + "*" + "${params.FINISH_TIME}";
-        int notificationIndex =
-                createNotification("Check Cancel Edit Notification", imapUser, subject, message,
-                        DISCNotificationEvents.SUCCESS, null, true);
-        assertNotification("Check Cancel Edit Notification", notificationIndex, imapUser, subject,
-                message, DISCNotificationEvents.SUCCESS, null);
-        String editedSubject = notificationSubject + Calendar.getInstance().getTime();
-        editNotification("Check Cancel Edit Notification", notificationIndex,
-                testParams.getUser(), editedSubject, message,
-                DISCNotificationEvents.PROCESS_STARTED, null, false);
-        assertNotification("Check Cancel Edit Notification", notificationIndex, imapUser, subject,
-                message, DISCNotificationEvents.SUCCESS, null);
-        checkNotificationNumber(notificationIndex + 1, "Check Cancel Edit Notification");
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                "Check Cancel Edit Notification", null, "/graph/successfulGraph.grf", cronTime,
-                null);
-        assertNewSchedule("Check Cancel Edit Notification", "successfulGraph.grf",
-                "/graph/successfulGraph.grf", cronTime, null);
-        scheduleDetail.manualRun();
-        scheduleDetail.assertLastExecutionDetails(true, true, false,
-                "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
-        lastSuccessfulExecutionLogLink =
-                scheduleDetail.getLastExecutionLogLink().replace("ea.", "");
-        String gpExecutionDetailUrl = lastSuccessfulExecutionLogLink.replace("/log", "/detail");
-        Map<String, String> executionDetails = getExecutionInfoFromGreyPage(gpExecutionDetailUrl);
-        successfulEndTime = executionDetails.get("endTime");
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Check Cancel Edit Notification";
+        try {
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-        List<String> expectedParamValues = new ArrayList<String>();
-        expectedParamValues.add(testParams.getProjectId());
-        expectedParamValues.add(successfulEndTime);
-        waitForNotification(subject, expectedParamValues);
+            String subject = notificationSubject + Calendar.getInstance().getTime();
+            String message =
+                    "params.PROJECT=${params.PROJECT}" + "*"
+                            + "params.FINISH_TIME=${params.FINISH_TIME}";
+
+            NotificationBuilder notificationInfo =
+                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser)
+                            .setSubject(subject).setMessage(message)
+                            .setEvent(NotificationEvents.SUCCESS);
+            createAndAssertNotification(notificationInfo);
+
+            NotificationBuilder editedNotificationInfo =
+                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser)
+                            .setSubject(notificationSubject + Calendar.getInstance().getTime())
+                            .setMessage(message).setEvent(NotificationEvents.PROCESS_STARTED)
+                            .setEmail(testParams.getUser()).setSaved(false);
+            editNotification(editedNotificationInfo);
+            assertNotification(notificationInfo);
+
+            openProjectDetailPage(getWorkingProject());
+            createAndAssertSchedule(new ScheduleBuilder().setProcessName(processName)
+                    .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                    .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+                    .setMinuteInHour("59"));
+
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+
+            ExecutionDetails executionDetails = new ExecutionDetails().setStatus(ScheduleStatus.OK);
+            getExecutionInfoFromGreyPage(executionDetails, scheduleDetail.getLastExecutionLogLink());
+
+            NotificationParameters expectedParams =
+                    new NotificationParameters().setProjectId(testParams.getProjectId())
+                            .setExecutionDetails(executionDetails);
+            waitForNotification(subject, expectedParams);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkRepeatedDataLoadingFailureNotification() throws InterruptedException,
-            JSONException, MessagingException, IOException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
+    public void checkRepeatedDataLoadingFailureNotification() throws JSONException,
+            MessagingException, IOException {
+        openProjectDetailPage(getWorkingProject());
         String processName =
                 "Check Repeated Failures Notification" + Calendar.getInstance().getTimeInMillis();
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, processName, BASIC_GRAPH_LIST, true);
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_EVERYDAY.getCronTime(), Arrays.asList("59", "23"));
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), processName, null, null,
-                cronTime, null);
-        assertNewSchedule(processName, "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
-        String scheduleUrl = browser.getCurrentUrl();
+        try {
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+                            .setMinuteInHour("59");
+            createAndAssertSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
-        scheduleDetail.repeatManualRun(5, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH,
-                false);
-        waitForRepeatedFailuresEmail(processName, "errorGraph.grf", scheduleUrl, false);
-        scheduleDetail.repeatManualRun(25, "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH,
-                false);
-        waitForRepeatedFailuresEmail(processName, "errorGraph.grf", scheduleUrl, true);
+            scheduleDetail.repeatManualRunFailedSchedule(5, scheduleBuilder.getExecutable());
+            waitForRepeatedFailuresEmail(scheduleBuilder);
+
+            scheduleDetail.repeatManualRunFailedSchedule(25, scheduleBuilder.getExecutable());
+            scheduleBuilder.setEnabled(false);
+            waitForRepeatedFailuresEmail(scheduleBuilder);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkEmptyStateNotificationList() throws InterruptedException, ParseException,
-            MessagingException, IOException, JSONException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, "Check Empty State Notification List", BASIC_GRAPH_LIST,
-                true);
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        projectDetailPage.getNotificationButton("Check Empty State Notification List").click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        assertTrue(discNotificationRules.getEmptyStateMessage().contains(
-                NOTIFICATION_RULES_EMPTY_STATE_MESSAGE));
-        System.out.println("Notification Rules Empty State Message: "
-                + discNotificationRules.getEmptyStateMessage());
-        discNotificationRules.closeNotificationRulesDialog();
+    public void checkEmptyStateNotificationList() {
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Check Empty State Notification List";
+        try {
+            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+            openProjectDetailPage(getWorkingProject());
+            projectDetailPage.getNotificationButton(processName).click();
+            waitForElementVisible(discNotificationRules.getRoot());
+            assertTrue(discNotificationRules.getEmptyStateMessage().contains(
+                    NOTIFICATION_RULES_EMPTY_STATE_MESSAGE));
+            System.out.println("Notification Rules Empty State Message: "
+                    + discNotificationRules.getEmptyStateMessage());
+            discNotificationRules.closeNotificationRulesDialog();
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
     }
 
     @Test(dependsOnGroups = {"notification"}, groups = {"tests"}, alwaysRun = true)
-    public void deleteProcesses() throws InterruptedException {
-        openProjectDetailByUrl(testParams.getProjectId());
-        projectDetailPage.deleteAllProcesses();
+    public void deleteProcesses() {
+        cleanProcessesInProjectDetail(testParams.getProjectId());
     }
 
     @Test(dependsOnGroups = {"notification"}, groups = {"tests"})
-    public void test() throws JSONException, InterruptedException {
+    public void test() {
         successfulTest = true;
-    }
-
-    private int createNotification(String processName, String email, String subject,
-            String message, DISCNotificationEvents event, String customEventName, boolean isSaved)
-            throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        projectDetailPage.getNotificationButton(processName).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        discNotificationRules.clickOnAddNotificationButton();
-        int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
-        discNotificationRules.setNotificationFields(notificationIndex, email, subject, message,
-                event, customEventName);
-        if (isSaved)
-            discNotificationRules.saveNotification(notificationIndex);
-        else
-            discNotificationRules.cancelSaveNotification(notificationIndex);
-        Thread.sleep(2000);
-        return notificationIndex;
-    }
-
-    private void assertNotification(String processName, int notificationIndex, String email,
-            String subject, String message, DISCNotificationEvents event, String customEventName)
-            throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        projectDetailPage.getNotificationButton(processName).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        if (notificationIndex >= 0) {
-            assertTrue(discNotificationRules.isNotExpanded(notificationIndex));
-            discNotificationRules.expandNotificationRule(notificationIndex);
-            discNotificationRules.assertNotificationFields(processName, notificationIndex, email,
-                    subject, message, event, customEventName);
-        }
-    }
-
-    private void editNotification(String processName, int notificationIndex, String email,
-            String subject, String message, DISCNotificationEvents event, String customEventName,
-            boolean isSaved) throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        projectDetailPage.getNotificationButton(processName).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        discNotificationRules.expandNotificationRule(notificationIndex);
-        if (!email.isEmpty())
-            discNotificationRules.clearNotificationEmail(notificationIndex);
-        if (!subject.isEmpty())
-            discNotificationRules.clearNotificationSubject(notificationIndex);
-        if (!message.isEmpty())
-            discNotificationRules.clearNotificationMessage(notificationIndex);
-        discNotificationRules.setNotificationFields(notificationIndex, email, subject, message,
-                event, customEventName);
-        if (isSaved)
-            discNotificationRules.saveNotification(notificationIndex);
-        else
-            discNotificationRules.cancelSaveNotification(notificationIndex);
-    }
-
-    private Message getNotification(ImapClient imapClient, String subject)
-            throws InterruptedException, MessagingException, IOException {
-        Message[] notifications = new Message[0];
-        for (int i = 0; i < 100 && notifications.length <= 0; i++) {
-            System.out.println("Wait for notification: " + subject);
-            notifications = imapClient.getMessagesFromInbox(FROM, subject);
-            Thread.sleep(2000);
-        }
-        assertTrue(notifications.length > 0, "Notification is not sent!");
-        assertTrue(notifications.length == 1, "More than 1 notification!");
-        System.out.println("Notification subject: " + notifications[0].getSubject());
-        System.out.println("Notification content: " + notifications[0].getContent().toString());
-        return notifications[0];
-    }
-
-    private void checkScheduleEventNotification(ImapClient imapClient, String subject,
-            List<String> expectedParamValues) throws InterruptedException, MessagingException,
-            IOException {
-        Message notification = getNotification(imapClient, subject);
-        ArrayList<String> paramValues = new ArrayList<String>();
-        String notificationContent = String.format(notification.getContent().toString()) + "*";
-        while (!notificationContent.isEmpty()) {
-            if (notificationContent.substring(0, notificationContent.indexOf("*")).contains(
-                    "https://ea."))
-                paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*"))
-                        .replace("https://ea.", "https://"));
-            else
-                paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*")));
-            System.out.println("Param value: " + paramValues.get(paramValues.size() - 1));
-            if (notificationContent.substring(notificationContent.indexOf("*")).equals("*"))
-                notificationContent = "";
-            else
-                notificationContent =
-                        notificationContent.substring(notificationContent.indexOf("*") + 1);
-        }
-        if (expectedParamValues == null)
-            throw new RuntimeException("");
-        String paramValue = "";
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0, n = expectedParamValues.size(); i < n; i++) {
-            if (paramValues.get(i).contains(SystemUtils.LINE_SEPARATOR)) {
-                builder.setLength(0);
-                for (String s : paramValues.get(i).split(SystemUtils.LINE_SEPARATOR)) {
-                    builder.append(s.trim());
-                }
-                paramValue = builder.toString();
-            } else {
-                paramValue = paramValues.get(i);
-            }
-            assertEquals(paramValue, expectedParamValues.get(i), "The expected param value is: "
-                    + expectedParamValues.get(i)
-                    + ", but the displayed param value in message is: " + paramValue);
-            System.out.println("Param value is displayed well in notification: "
-                    + paramValues.get(i));
-        }
-    }
-
-    private void waitForNotification(String subject, List<String> expectedParamValues)
-            throws InterruptedException, MessagingException, IOException {
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        try {
-            System.out.println("Waiting for notification...");
-            checkScheduleEventNotification(imapClient, subject, expectedParamValues);
-        } finally {
-            imapClient.close();
-        }
-    }
-
-    private void waitForRepeatedFailuresEmail(String processName, String scheduleName,
-            String scheduleUrl, boolean isDisabled) throws InterruptedException,
-            MessagingException, IOException {
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        try {
-            System.out.println("Waiting for notification...");
-            checkRepeatFailureEmail(imapClient, processName, scheduleName, scheduleUrl, isDisabled);
-        } finally {
-            imapClient.close();
-        }
-    }
-
-    private void checkNotification(DISCNotificationEvents event, List<String> expectedParamValues)
-            throws InterruptedException, MessagingException, IOException {
-        String notificationSubject = null;
-        switch (event) {
-            case SUCCESS:
-                notificationSubject = successNotificationSubject;
-                break;
-            case FAILURE:
-                notificationSubject = failureNotificationSubject;
-                break;
-            case PROCESS_STARTED:
-                notificationSubject = processStartedNotificationSubject;
-                break;
-            case PROCESS_SCHEDULED:
-                notificationSubject = processScheduledNotificationSubject;
-                break;
-            case CUSTOM_EVENT:
-                notificationSubject = customEventNotificationSubject;
-                break;
-        }
-        waitForNotification(notificationSubject, expectedParamValues);
-    }
-
-    private void checkNotificationNumber(int expectedNotificationNumber, String processName)
-            throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        waitForElementVisible(projectDetailPage.getRoot());
-        if (expectedNotificationNumber == 0) {
-            assertEquals(projectDetailPage.getNotificationButton(processName).getText(),
-                    "No notification rules");
-        } else {
-            String notificationNumber =
-                    String.valueOf(expectedNotificationNumber) + " notification rule"
-                            + (expectedNotificationNumber > 1 ? "s" : "");
-            assertEquals(projectDetailPage.getNotificationButton(processName).getText(),
-                    notificationNumber);
-        }
-        projectDetailPage.getNotificationButton(processName).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        assertEquals(expectedNotificationNumber, discNotificationRules.getNotificationNumber());
-    }
-
-    private void deleteNotification(String processName, int notificationIndex, boolean isConfirmed)
-            throws InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        projectDetailPage.getNotificationButton(processName).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        discNotificationRules.deleteNotification(notificationIndex, isConfirmed);
-    }
-
-    private String getProcessUri(String url) {
-        String processUri =
-                "/gdc/projects/" + testParams.getProjectId() + "/dataload/"
-                        + url.substring(url.indexOf("processes"), url.lastIndexOf("schedules") - 1);
-        return processUri;
-    }
-
-    private List<String> getBasicEventParamValues(String processUri, String processName,
-            String executable, String scheduleName, String scheduleId, String logLink,
-            String startTime, String endTime, String errorMessage) {
-        List<String> expectedParamValues = new ArrayList<String>();
-        expectedParamValues.add(testParams.getProjectId());
-        expectedParamValues.add(userProfileId);
-        expectedParamValues.add(testParams.getUser());
-        expectedParamValues.add(processUri);
-        expectedParamValues.add(processUri.substring(processUri.lastIndexOf("/") + 1));
-        if (processName != null)
-            expectedParamValues.add(processName);
-        expectedParamValues.add(executable);
-        expectedParamValues.add(scheduleId);
-        expectedParamValues.add(scheduleName);
-        if (logLink != null)
-            expectedParamValues.add(logLink);
-        expectedParamValues.add(startTime);
-        if (endTime != null)
-            expectedParamValues.add(endTime);
-        if (errorMessage != null)
-            expectedParamValues.add(errorMessage);
-        return expectedParamValues;
-    }
-
-    private void checkRepeatFailureEmail(ImapClient imapClient, String processName,
-            String scheduleName, String scheduleUrl, boolean isDisabled)
-            throws InterruptedException, MessagingException, IOException {
-        String subjectFormat =
-                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_SUBJECT
-                        : REPEATED_FAILURES_NOTIFICATION_SUBJECT;
-        String notificationSubject = String.format(subjectFormat, processName);
-        Message notification = getNotification(imapClient, notificationSubject);
-        String notificationMessage1 =
-                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1
-                        : REPEATED_FAILURES_NOTIFICATION_MESSAGE_1;
-        String notificationMessage2 =
-                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2
-                        : REPEATED_FAILURES_NOTIFICATION_MESSAGE_2;
-        String notificationBody =
-                isDisabled ? SCHEDULE_DISABLED_NOTIFICATION_BODY
-                        : REPEATED_FAILURES_NOTIFICATION_BODY;
-        Document message = Jsoup.parse(notification.getContent().toString());
-        System.out.println("Notification message: " + message.getElementsByTag("body").text());
-        assertEquals(
-                message.getElementsByTag("body").text(),
-                String.format(notificationBody, scheduleName, processName, projectTitle,
-                        testParams.getProjectId()));
-        assertEquals(
-                message.getElementsByTag("p").get(1).toString().replace("https://ea.", "https://"),
-                String.format(notificationMessage1, scheduleUrl, scheduleName, processName,
-                        projectTitle, testParams.getProjectId()));
-        assertEquals(
-                message.getElementsByTag("li").get(0).toString().replace("https://ea.", "https://"),
-                String.format(notificationMessage2, scheduleUrl));
-        assertEquals(message.getElementsByTag("p").get(3).toString(), NOTIFICATION_SUPPORT_MESSAGE);
-    }
-
-    private String timeFormat(String dateTime) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        return format2.format(format.parse(dateTime));
-    }
-
-    private Map<String, String> getExecutionInfoFromGreyPage(String gpExecutionDetailUrl)
-            throws JSONException, ParseException {
-        Map<String, String> executionDetails = new HashMap<String, String>();
-        browser.get(gpExecutionDetailUrl);
-        waitForElementVisible(objectFragment.getRoot());
-        JSONObject jsonObject = objectFragment.getObject();
-        JSONObject executionDetail = jsonObject.getJSONObject("executionDetail");
-        if (executionDetail.optJSONObject("error") != null)
-            executionDetails.put("errorMessage",
-                    executionDetail.getJSONObject("error").getString("message"));
-        executionDetails.put("scheduledTime", timeFormat(executionDetail.getString("created")));
-        executionDetails.put("startedTime", timeFormat(executionDetail.getString("started")));
-        executionDetails.put("endTime", timeFormat(executionDetail.getString("finished")));
-        return executionDetails;
     }
 }

@@ -7,10 +7,10 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
-public class DISCNavigation extends AbstractFragment {
+public class NavigationBar extends AbstractFragment {
 
     @FindBy(xpath = "//a[text()='Projects']")
-    protected WebElement projectsButton;
+    private WebElement projectsButton;
 
     public void clickOnProjectsButton() {
         waitForElementPresent(projectsButton).click();

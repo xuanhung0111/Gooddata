@@ -1,9 +1,10 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -11,8 +12,10 @@ import org.openqa.selenium.support.ui.Select;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-import com.gooddata.qa.graphene.enums.DISCNotificationEvents;
+import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
+import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
 
 public class NotificationRulesDialog extends AbstractFragment {
 
@@ -36,8 +39,7 @@ public class NotificationRulesDialog extends AbstractFragment {
     private String ERROR_NOTIFICATION_SUBJECT = "Subject cannot be empty.";
     private String ERROR_NOTIFICATION_MESSAGE = "Message cannot be empty.";
     private String ERROR_NOTIFICATION_CUSTOM_FIELD =
-            "Invalid Custom Event Name Bubble Message: The event name is invalid." + "*"
-                    + "Please insert alphanumeric characters only. No spaces.";
+            "The event name is invalid.([\\n]*[\\r]*)Please insert alphanumeric characters only. No spaces.";
 
     private By BY_NOTIFICATION_RULE_EMAIL = By
             .cssSelector(".ait-notification-rule-list-item-email input");
@@ -63,30 +65,115 @@ public class NotificationRulesDialog extends AbstractFragment {
         return waitForElementVisible(notificationRulesEmptyState).getText();
     }
 
-    public void clickOnAddNotificationButton() throws InterruptedException {
-        int notificationNumber = getNotificationNumber();
+    public void clickOnAddNotificationButton() {
+        final int notificationNumberBeforeAdding = getNotificationNumber();
         waitForElementVisible(addNotificationRuleButton).click();
-        for (int i = 0; i < 10 && notificationNumber == getNotificationNumber(); i++) {
-            Thread.sleep(1000);
-        }
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return notificationNumberBeforeAdding < getNotificationNumber();
+            }
+        });
     }
 
     public int getNotificationNumber() {
         return notificationRuleItems.size();
     }
 
-    public void setNotificationEmail(int notificationIndex, String email) {
-        notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_RULE_EMAIL)
-                .sendKeys(email);
+    public void setNotificationFields(NotificationBuilder notificationBuilder) {
+        WebElement notificationRuleItem = notificationRuleItems.get(notificationBuilder.getIndex());
+        waitForElementVisible(notificationRuleItem);
+        notificationRuleItem.findElement(BY_NOTIFICATION_RULE_EMAIL).sendKeys(
+                notificationBuilder.getEmail());
+        notificationRuleItem.findElement(BY_NOTIFICATION_SUBJECT).sendKeys(
+                notificationBuilder.getSubject());
+        notificationRuleItem.findElement(BY_NOTIFICATION_MESSAGE).sendKeys(
+                notificationBuilder.getMessage());
+        Select scheduleEvent =
+                new Select((notificationRuleItem).findElement(BY_NOTIFICATION_EVENT));
+        scheduleEvent.selectByVisibleText(notificationBuilder.getEvent().getEventOption());
+        if (notificationBuilder.getEvent() == NotificationEvents.CUSTOM_EVENT)
+            notificationRuleItem.findElement(BY_CUSTOM_EVENT_NAME).sendKeys(
+                    notificationBuilder.getCustomEventName());
     }
 
-    public String getNotificationEmail(int notificationIndex) throws InterruptedException {
-        for (int i = 0; i < 5
-                && notificationRuleItems.get(notificationIndex)
-                        .findElement(BY_NOTIFICATION_RULE_EMAIL).getAttribute("value").isEmpty(); i++)
-            Thread.sleep(1000);
-        return notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_RULE_EMAIL)
-                .getAttribute("value");
+    public void assertNotificationFields(NotificationBuilder notificationBuilder) {
+        final WebElement notificationRuleItem =
+                notificationRuleItems.get(notificationBuilder.getIndex());
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return !notificationRuleItem.findElement(BY_NOTIFICATION_RULE_EMAIL)
+                        .getAttribute("value").isEmpty();
+            }
+        });
+        assertEquals(
+                notificationRuleItem.findElement(BY_NOTIFICATION_RULE_EMAIL).getAttribute("value"),
+                notificationBuilder.getEmail());
+        assertEquals(notificationRuleItem.findElement(BY_NOTIFICATION_SUBJECT)
+                .getAttribute("value"), notificationBuilder.getSubject());
+        assertEquals(notificationRuleItem.findElement(BY_NOTIFICATION_MESSAGE)
+                .getAttribute("value"), notificationBuilder.getMessage());
+        Select scheduleEvent = new Select(notificationRuleItem.findElement(BY_NOTIFICATION_EVENT));
+        assertEquals(notificationBuilder.getEvent().getEventOption(), scheduleEvent
+                .getFirstSelectedOption().getText());
+        if (notificationBuilder.getEvent() == NotificationEvents.CUSTOM_EVENT)
+            assertEquals(
+                    notificationRuleItem.findElement(BY_CUSTOM_EVENT_NAME).getAttribute("value"),
+                    notificationBuilder.getCustomEventName());
+    }
+
+    public void closeNotificationRulesDialog() {
+        waitForElementVisible(closeNotificationRulesButton).click();
+        waitForElementNotPresent(getRoot());
+    }
+
+    public void checkEmptyNotificationFields(int notificationIndex) {
+        WebElement notificationRuleItem = notificationRuleItems.get(notificationIndex);
+
+        checkEmptyEmailField(notificationRuleItem);
+        checkEmptySubjectField(notificationRuleItem);
+        checkEmptyMessageField(notificationRuleItem);
+        checkEmptyCustomEventNameField(notificationIndex, notificationRuleItem);
+    }
+
+    public void checkOnlyOneEmailError(int notificationIndex) {
+        WebElement notificationRuleItem = notificationRuleItems.get(notificationIndex);
+        notificationRuleItem.findElement(BY_NOTIFICATION_RULE_EMAIL).sendKeys(
+                "abc@gmail.com,xyz@gmail.com");
+        notificationRuleItem.click();
+        notificationRuleItem.findElement(BY_NOTIFICATION_RULE_EMAIL).click();
+        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
+        waitForElementVisible(errorBubble);
+        System.out.println("Only One Email Error Message: " + errorBubble.getText());
+        assertEquals(ERROR_NOTIFICATION_EMAIL, errorBubble.getText());
+    }
+
+    public void deleteNotification(NotificationBuilder notificationInfo) {
+        expandNotificationRule(notificationInfo.getIndex());
+        notificationRuleItems.get(notificationInfo.getIndex())
+                .findElement(BY_DELETE_NOTIFICATION_BUTTON).click();
+        if (notificationInfo.isSaved())
+            waitForElementVisible(getRoot().findElement(BY_CONFIRM_DELETE_NOTIFICATION)).click();
+        else
+            waitForElementVisible(getRoot().findElement(BY_CANCEL_DELETE_NOTIFICATION)).click();
+    }
+
+    public boolean isNotExpanded(int notificationIndex) {
+        waitForElementVisible(notificationRuleItems.get(notificationIndex));
+        return notificationRuleItems.get(notificationIndex)
+                .findElement(BY_NOTIFICATION_EXPAND_BUTTON).getAttribute("class")
+                .contains("icon-navigatedown");
+    }
+
+    public void expandNotificationRule(int notificationIndex) {
+        waitForElementVisible(notificationRuleItems.get(notificationIndex));
+        if (notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_EXPAND_BUTTON)
+                .getAttribute("class").contains("icon-navigatedown"))
+            notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_EXPAND_BUTTON)
+                    .click();
     }
 
     public void clearNotificationEmail(int notificationIndex) {
@@ -94,68 +181,15 @@ public class NotificationRulesDialog extends AbstractFragment {
                 .clear();
     }
 
-    public void setNotificationEvent(int notificationIndex, DISCNotificationEvents event) {
+    public void setNotificationEvent(int notificationIndex, NotificationEvents event) {
         Select scheduleEvent =
                 new Select(notificationRuleItems.get(notificationIndex).findElement(
                         BY_NOTIFICATION_EVENT));
-        switch (event) {
-            case SUCCESS:
-                scheduleEvent.selectByVisibleText(DISCNotificationEvents.SUCCESS.getEventOption());
-                break;
-            case FAILURE:
-                scheduleEvent.selectByVisibleText(DISCNotificationEvents.FAILURE.getEventOption());
-                break;
-            case PROCESS_STARTED:
-                scheduleEvent.selectByVisibleText(DISCNotificationEvents.PROCESS_STARTED
-                        .getEventOption());
-                break;
-            case PROCESS_SCHEDULED:
-                scheduleEvent.selectByVisibleText(DISCNotificationEvents.PROCESS_SCHEDULED
-                        .getEventOption());
-                break;
-            case CUSTOM_EVENT:
-                scheduleEvent.selectByVisibleText(DISCNotificationEvents.CUSTOM_EVENT
-                        .getEventOption());
-                break;
-        }
-    }
-
-    public void setCustomEventName(int notifcationNumber, String customEventName) {
-        notificationRuleItems.get(notifcationNumber).findElement(BY_CUSTOM_EVENT_NAME)
-                .sendKeys(customEventName);
-    }
-
-    public String getCustomEventName(int notifcationNumber) {
-        return notificationRuleItems.get(notifcationNumber).findElement(BY_CUSTOM_EVENT_NAME)
-                .getAttribute("value");
-    }
-
-    public void clearCustomEventName(int notifcationNumber) {
-        notificationRuleItems.get(notifcationNumber).findElement(BY_CUSTOM_EVENT_NAME).clear();
-    }
-
-    public void setNotificationSubject(int notificationIndex, String subject) {
-        notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_SUBJECT)
-                .sendKeys(subject);
-    }
-
-    public String getNotificationSubject(int notificationIndex) {
-        return notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_SUBJECT)
-                .getAttribute("value");
+        scheduleEvent.selectByVisibleText(event.getEventOption());
     }
 
     public void clearNotificationSubject(int notificationIndex) {
         notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_SUBJECT).clear();
-    }
-
-    public void setNotificationMessage(int notificationIndex, String message) {
-        notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_MESSAGE)
-                .sendKeys(message);
-    }
-
-    public String getNotificationMessage(int notificationIndex) {
-        return notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_MESSAGE)
-                .getAttribute("value");
     }
 
     public void clearNotificationMessage(int notificationIndex) {
@@ -171,123 +205,72 @@ public class NotificationRulesDialog extends AbstractFragment {
     }
 
     public void saveNotification(int notificationIndex) {
-        notificationRuleItems.get(notificationIndex).findElement(BY_SAVE_BUTTON).click();
+        final WebElement notificationRuleItem = notificationRuleItems.get(notificationIndex);
+        notificationRuleItem.findElement(BY_SAVE_BUTTON).click();
+        waitForElementNotPresent(BY_SAVE_BUTTON);
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return !notificationRuleItem.getAttribute("class").contains("modified");
+            }
+        });
     }
 
     public void cancelSaveNotification(int notificationIndex) {
-        notificationRuleItems.get(notificationIndex).findElement(BY_CANCEL_BUTTON).click();
+        final WebElement notificationRuleItem = notificationRuleItems.get(notificationIndex);
+        notificationRuleItem.findElement(BY_CANCEL_BUTTON).click();
+        waitForElementNotPresent(BY_SAVE_BUTTON);
     }
 
-    public void setNotificationFields(int notificationIndex, String email, String subject,
-            String message, DISCNotificationEvents event, String customEventName) {
-        waitForElementVisible(notificationRuleItems.get(notificationIndex));
-        setNotificationEmail(notificationIndex, email);
-        setNotificationSubject(notificationIndex, subject);
-        setNotificationMessage(notificationIndex, message);
-        setNotificationEvent(notificationIndex, event);
-        if (customEventName != null)
-            setCustomEventName(notificationIndex, customEventName);
+    private void checkEmptyEmailField(WebElement notificationRuleItem) {
+        WebElement notificationEmailElement =
+                notificationRuleItem.findElement(BY_NOTIFICATION_RULE_EMAIL);
+        notificationEmailElement.sendKeys("");
+        notificationRuleItem.click();
+        notificationEmailElement.click();
+        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
+        waitForElementVisible(errorBubble);
+        System.out.println("Invalid Email Bubble Message: " + errorBubble.getText());
+        assertEquals(ERROR_NOTIFICATION_EMAIL, errorBubble.getText());
     }
 
-    public void expandNotificationRule(int notificationIndex) {
-        waitForElementVisible(notificationRuleItems.get(notificationIndex));
-        if (notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_EXPAND_BUTTON)
-                .getAttribute("class").contains("icon-navigatedown"))
-            notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_EXPAND_BUTTON)
-                    .click();
+    private void checkEmptySubjectField(WebElement notificationRuleItem) {
+        WebElement notificationSubjectElement =
+                notificationRuleItem.findElement(BY_NOTIFICATION_SUBJECT);
+        notificationSubjectElement.sendKeys("");
+        notificationRuleItem.click();
+        notificationSubjectElement.click();
+        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
+        waitForElementVisible(errorBubble);
+        System.out.println("Invalid Subject Bubble Message: " + errorBubble.getText());
+        assertEquals(ERROR_NOTIFICATION_SUBJECT, errorBubble.getText());
     }
 
-    public boolean isNotExpanded(int notificationIndex) {
-        waitForElementVisible(notificationRuleItems.get(notificationIndex));
-        return notificationRuleItems.get(notificationIndex)
-                .findElement(BY_NOTIFICATION_EXPAND_BUTTON).getAttribute("class")
-                .contains("icon-navigatedown");
+    private void checkEmptyMessageField(WebElement notificationRuleItem) {
+        WebElement notificationMessageElement =
+                notificationRuleItem.findElement(BY_NOTIFICATION_MESSAGE);
+        notificationMessageElement.sendKeys("");
+        notificationRuleItem.click();
+        notificationMessageElement.click();
+        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
+        waitForElementVisible(errorBubble);
+        System.out.println("Invalid Message Bubble Message: " + errorBubble.getText());
+        assertEquals(ERROR_NOTIFICATION_MESSAGE, errorBubble.getText());
     }
 
-    public void closeNotificationRulesDialog() {
-        waitForElementVisible(closeNotificationRulesButton).click();
-        waitForElementNotPresent(getRoot());
-    }
-
-    public void assertNotificationFields(String processName, int notificationIndex, String email,
-            String subject, String message, DISCNotificationEvents event, String customEventName)
-            throws InterruptedException {
-        assertEquals(email, getNotificationEmail(notificationIndex));
-        assertEquals(subject, getNotificationSubject(notificationIndex));
-        assertEquals(message, getNotificationMessage(notificationIndex));
-        Select scheduleEvent =
-                new Select(notificationRuleItems.get(notificationIndex).findElement(
-                        BY_NOTIFICATION_EVENT));
-        assertEquals(event.getEventOption(), scheduleEvent.getFirstSelectedOption().getText());
-        if (customEventName != null)
-            assertEquals(customEventName, getCustomEventName(notificationIndex));
-    }
-
-    public void checkInvalidNotificationFields(int notificationIndex, String email, String subject,
-            String message, DISCNotificationEvents event, String customEventName) {
-        if (email != null) {
-            setNotificationEmail(notificationIndex, email);
-            notificationRuleItems.get(notificationIndex).click();
-            notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_RULE_EMAIL)
-                    .click();
-            waitForElementVisible(notificationRuleItems.get(notificationIndex).findElement(
-                    BY_ERROR_BUBBLE));
-            System.out.println("Invalid Email Bubble Message: "
-                    + notificationRuleItems.get(notificationIndex).findElement(BY_ERROR_BUBBLE)
-                            .getText());
-            assertEquals(ERROR_NOTIFICATION_EMAIL, notificationRuleItems.get(notificationIndex)
-                    .findElement(BY_ERROR_BUBBLE).getText());
-        }
-        if (subject != null) {
-            setNotificationSubject(notificationIndex, subject);
-            notificationRuleItems.get(notificationIndex).click();
-            notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_SUBJECT)
-                    .click();
-            waitForElementVisible(notificationRuleItems.get(notificationIndex).findElement(
-                    BY_ERROR_BUBBLE));
-            System.out.println("Invalid Subject Bubble Message: "
-                    + notificationRuleItems.get(notificationIndex).findElement(BY_ERROR_BUBBLE)
-                            .getText());
-            assertEquals(ERROR_NOTIFICATION_SUBJECT, notificationRuleItems.get(notificationIndex)
-                    .findElement(BY_ERROR_BUBBLE).getText());
-        }
-        if (message != null) {
-            setNotificationMessage(notificationIndex, message);
-            notificationRuleItems.get(notificationIndex).click();
-            notificationRuleItems.get(notificationIndex).findElement(BY_NOTIFICATION_MESSAGE)
-                    .click();
-            waitForElementVisible(notificationRuleItems.get(notificationIndex).findElement(
-                    BY_ERROR_BUBBLE));
-            System.out.println("Invalid Message Bubble Message: "
-                    + notificationRuleItems.get(notificationIndex).findElement(BY_ERROR_BUBBLE)
-                            .getText());
-            assertEquals(ERROR_NOTIFICATION_MESSAGE, notificationRuleItems.get(notificationIndex)
-                    .findElement(BY_ERROR_BUBBLE).getText());
-        }
-        if (customEventName != null) {
-            setNotificationEvent(notificationIndex, DISCNotificationEvents.CUSTOM_EVENT);
-            setCustomEventName(notificationIndex, customEventName);
-            notificationRuleItems.get(notificationIndex).click();
-            notificationRuleItems.get(notificationIndex).findElement(BY_CUSTOM_EVENT_NAME).click();
-            waitForElementVisible(notificationRuleItems.get(notificationIndex).findElement(
-                    BY_ERROR_BUBBLE));
-            System.out.println("Invalid Custom Event Name Bubble Message: "
-                    + notificationRuleItems.get(notificationIndex).findElement(BY_ERROR_BUBBLE)
-                            .getText());
-            Pattern.matches(ERROR_NOTIFICATION_CUSTOM_FIELD,
-                    notificationRuleItems.get(notificationIndex).findElement(BY_ERROR_BUBBLE)
-                            .getText());
-        }
-    }
-
-    public void deleteNotification(int notificationIndex, boolean isConfirmed)
-            throws InterruptedException {
-        expandNotificationRule(notificationIndex);
-        notificationRuleItems.get(notificationIndex).findElement(BY_DELETE_NOTIFICATION_BUTTON)
-                .click();
-        if (isConfirmed)
-            waitForElementVisible(getRoot().findElement(BY_CONFIRM_DELETE_NOTIFICATION)).click();
-        else
-            waitForElementVisible(getRoot().findElement(BY_CANCEL_DELETE_NOTIFICATION)).click();
+    private void checkEmptyCustomEventNameField(int notificationIndex,
+            WebElement notificationRuleItem) {
+        setNotificationEvent(notificationIndex, NotificationEvents.CUSTOM_EVENT);
+        WebElement notificationCustomEventNameElement =
+                notificationRuleItem.findElement(BY_CUSTOM_EVENT_NAME);
+        notificationCustomEventNameElement.sendKeys("");
+        notificationRuleItem.click();
+        notificationCustomEventNameElement.click();
+        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
+        waitForElementVisible(errorBubble);
+        System.out.println("Invalid Custom Event Name Bubble Message: " + errorBubble.getText());
+        assertTrue(errorBubble.getText().matches(ERROR_NOTIFICATION_CUSTOM_FIELD),
+                errorBubble.getText());
     }
 }

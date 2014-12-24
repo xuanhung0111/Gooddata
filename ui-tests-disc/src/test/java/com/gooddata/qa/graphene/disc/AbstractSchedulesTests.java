@@ -1,39 +1,40 @@
 package com.gooddata.qa.graphene.disc;
 
-import java.util.List;
-import java.util.Map;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 
-import org.apache.commons.lang3.tuple.Pair;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
 
-    protected void createScheduleForProcess(String projectName, String projectId,
-            String processName, String scheduleName,
-            String executable, Pair<String, List<String>> cronTime, Map<String, List<String>> parameters) throws InterruptedException {
+    protected void assertBrokenSchedule(ScheduleBuilder scheduleBuilder) {
+        waitForElementVisible(brokenSchedulesTable.getRoot());
+        projectDetailPage.assertScheduleInList(brokenSchedulesTable, scheduleBuilder);
+    }
+
+    protected void createSchedule(ScheduleBuilder scheduleBuilder) {
         projectDetailPage.clickOnNewScheduleButton();
         waitForElementVisible(scheduleForm.getRoot());
-        scheduleForm.createNewSchedule(processName, executable, cronTime, parameters, scheduleName, true);
-        waitForElementPresent(scheduleDetail.getRoot());
-        scheduleDetail.clickOnCloseScheduleButton();
-        waitForElementNotPresent(scheduleDetail.getRoot());
+        scheduleForm.createNewSchedule(scheduleBuilder);
     }
 
-    protected void assertNewSchedule(String processName, String scheduleName,
-            String executable, Pair<String, List<String>> cronTime, Map<String, List<String>> parameters)
-            throws InterruptedException {
-        projectDetailPage.checkFocusedProcess(processName);
+    protected void assertSchedule(ScheduleBuilder scheduleBuilder) {
+        projectDetailPage.checkFocusedProcess(scheduleBuilder.getProcessName());
         waitForElementVisible(schedulesTable.getRoot());
-        projectDetailPage.assertScheduleInList(schedulesTable, scheduleName, executable, cronTime);
-        schedulesTable.getScheduleTitle(scheduleName).click();
+        projectDetailPage.assertScheduleInList(schedulesTable, scheduleBuilder);
+        schedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()).click();
         waitForElementVisible(scheduleDetail.getRoot());
-        scheduleDetail.assertScheduleDetail(scheduleName, executable, cronTime, parameters);
+        scheduleDetail.assertSchedule(scheduleBuilder);
     }
 
-    protected void assertBrokenSchedule(String scheduleName, String executable,
-            Pair<String, List<String>> cronTime)
-            throws InterruptedException {
-        waitForElementVisible(brokenSchedulesTable.getRoot());
-        projectDetailPage.assertScheduleInList(brokenSchedulesTable, scheduleName, executable, cronTime);
+    protected void createAndAssertSchedule(ScheduleBuilder scheduleBuilder) {
+        createSchedule(scheduleBuilder);
+        assertSchedule(scheduleBuilder);
+    }
+
+    protected void prepareScheduleWithBasicPackage(ScheduleBuilder scheduleBuilder) {
+        deployInProjectDetailPage(DeployPackages.BASIC, scheduleBuilder.getProcessName());
+        createAndAssertSchedule(scheduleBuilder);
+        scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
     }
 }

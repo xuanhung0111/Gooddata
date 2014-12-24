@@ -1,16 +1,14 @@
 package com.gooddata.qa.graphene.disc;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONException;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
-import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
+
+import static org.testng.Assert.*;
 
 public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
 
@@ -21,164 +19,155 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
-    public void checkScheduleAutoRun() throws JSONException, InterruptedException {
+    public void checkScheduleAutoRun() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Auto Run Schedule", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
-                            Arrays.asList("${minute}"));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Auto Run Schedule", null, "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Check Auto Run Schedule", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
-            scheduleDetail.waitForAutoRunSchedule(2);
-            scheduleDetail.assertLastExecutionDetails(true, false, false, null, null, 5);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Auto Run Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
+                            .setMinuteInHour("${minute}");
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.assertSuccessfulExecution();
         } finally {
-            scheduleDetail.disableSchedule();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
-    public void checkErrorExecution() throws JSONException, InterruptedException {
+    public void checkErrorExecution() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Error Execution of Schedule", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
-                            Arrays.asList("${minute}"));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Error Execution of Schedule", null, "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Error Execution of Schedule", "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
-            scheduleDetail.waitForAutoRunSchedule(2);
-            scheduleDetail.assertLastExecutionDetails(false, false, false,
-                    "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Error Execution of Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
+                            .setMinuteInHour("${minute}");
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
         } finally {
-            scheduleDetail.disableSchedule();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
-    public void checkRetryExecution() throws JSONException, InterruptedException {
+    public void checkRetryExecution() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Retry Schedule", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
-                            Arrays.asList("${minute}"));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Retry Schedule", null, "/graph/errorGraph.grf", cronTime, null);
-            assertNewSchedule("Check Retry Schedule", "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
-            scheduleDetail.addRetryDelay("15", true, true);
-            scheduleDetail.waitForAutoRunSchedule(2);
-            scheduleDetail.assertLastExecutionDetails(false, false, false,
-                    "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
-            scheduleDetail.waitForAutoRunSchedule(15);
-            scheduleDetail.assertLastExecutionDetails(false, false, false,
-                    "Basic/graph/errorGraph.grf", DISCProcessTypes.GRAPH, 5);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Retry Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
+                            .setMinuteInHour("${minute}");
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleBuilder.setRetryDelayInMinute(15);
+            scheduleDetail.addValidRetry(String.valueOf(scheduleBuilder.getRetryDelay()),
+                    Confirmation.SAVE_CHANGES);
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
+            scheduleDetail.waitForRetrySchedule(scheduleBuilder);
+            scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
         } finally {
-            scheduleDetail.disableSchedule();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
-    public void checkStopAutoExecution() throws JSONException, InterruptedException {
+    public void checkStopAutoExecution() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Stop Auto Execution", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_EVERYHOUR.getCronTime(),
-                            Arrays.asList("${minute}"));
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Stop Auto Execution", null, "/graph/longTimeRunningGraph.grf", cronTime, null);
-            assertNewSchedule("Check Stop Auto Execution", "longTimeRunningGraph.grf", "/graph/longTimeRunningGraph.grf", cronTime,
-                    null);
-            scheduleDetail.waitForAutoRunSchedule(2);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Stop Auto Execution";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
+                            .setMinuteInHour("${minute}");
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
             scheduleDetail.manualStop();
-            scheduleDetail.assertLastExecutionDetails(false, false, true,
-                    "Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
+            scheduleDetail.assertManualStoppedExecution();
         } finally {
-            scheduleDetail.disableSchedule();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
-    public void checkLongTimeExecution() throws JSONException, InterruptedException {
+    public void checkLongTimeExecution() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Check Long Time Execution", Arrays.asList(
-                            "errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                    true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(),
-                    "Check Long Time Execution", null, "/graph/longTimeRunningGraph.grf", cronTime, null);
-            assertNewSchedule("Check Long Time Execution", "longTimeRunningGraph.grf", "/graph/longTimeRunningGraph.grf", cronTime,
-                    null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Long Time Execution";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
             scheduleDetail.manualRun();
-            scheduleDetail.assertLastExecutionDetails(true, true, false,
-                    "Basic/graph/longTimeRunningGraph.grf", DISCProcessTypes.GRAPH, 5);
+            scheduleDetail.assertSuccessfulExecution();
         } finally {
-            scheduleDetail.disableSchedule();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
-    public void disableSchedule() throws JSONException, InterruptedException {
+    public void disableSchedule() {
         try {
-            openProjectDetailPage(projectTitle, testParams.getProjectId());
-            deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                    DISCProcessTypes.GRAPH, "Disable Schedule", Arrays.asList("errorGraph.grf",
-                            "longTimeRunningGraph.grf", "successfulGraph.grf"), true);
-            Pair<String, List<String>> cronTime =
-                    Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-            createScheduleForProcess(projectTitle, testParams.getProjectId(), "Disable Schedule",
-                     null, "/graph/successfulGraph.grf", cronTime, null);
-            assertNewSchedule("Disable Schedule", "successfulGraph.grf", "/graph/successfulGraph.grf", cronTime, null);
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Disable Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
             scheduleDetail.disableSchedule();
-            Assert.assertTrue(scheduleDetail.isDisabledSchedule(15, 0));
+            assertTrue(scheduleDetail.isDisabledSchedule(scheduleBuilder.getCronTimeBuilder()));
             scheduleDetail.manualRun();
-            scheduleDetail.assertLastExecutionDetails(true, true, false,
-                    "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
+            scheduleDetail.assertSuccessfulExecution();
             scheduleDetail.enableSchedule();
-            Assert.assertFalse(scheduleDetail.isDisabledSchedule(15, 1));
-            scheduleDetail.assertLastExecutionDetails(true, false, false,
-                    "Basic/graph/successfulGraph.grf", DISCProcessTypes.GRAPH, 5);
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.assertSuccessfulExecution();
         } finally {
-            scheduleDetail.disableSchedule();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
-    public void checkScheduleFailForManyTimes() throws JSONException, InterruptedException {
-        openProjectDetailPage(projectTitle, testParams.getProjectId());
-        deployInProjectDetailPage(projectTitle, testParams.getProjectId(), "Basic",
-                DISCProcessTypes.GRAPH, "Check Failed Schedule",
-                Arrays.asList("errorGraph.grf", "longTimeRunningGraph.grf", "successfulGraph.grf"),
-                true);
-        Pair<String, List<String>> cronTime =
-                Pair.of(ScheduleCronTimes.CRON_15_MINUTES.getCronTime(), null);
-        createScheduleForProcess(projectTitle, testParams.getProjectId(), "Check Failed Schedule", null,
-                null, cronTime, null);
-        assertNewSchedule("Check Failed Schedule", "errorGraph.grf", "/graph/errorGraph.grf", cronTime, null);
-        scheduleDetail.checkRepeatedFailureSchedule("Basic/graph/errorGraph.grf",
-                DISCProcessTypes.GRAPH);
-        Assert.assertTrue(scheduleDetail.isDisabledSchedule(15, 30));
+    public void checkScheduleFailForManyTimes() {
+        try {
+            openProjectDetailPage(getWorkingProject());
+
+            String processName = "Check Failed Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.checkRepeatedFailureSchedule(scheduleBuilder.getCronTimeBuilder(),
+                    scheduleBuilder.getExecutable());
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
     }
 
     @Test(dependsOnGroups = {"long-time-schedule"}, groups = {"tests"})
-    public void test() throws JSONException {
+    public void test() {
         successfulTest = true;
     }
 }

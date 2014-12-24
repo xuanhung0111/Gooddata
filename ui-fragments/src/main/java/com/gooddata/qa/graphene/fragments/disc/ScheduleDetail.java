@@ -1,29 +1,46 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.jboss.arquillian.graphene.Graphene;
+import org.jboss.arquillian.graphene.findby.FindByJQuery;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.enums.DISCProcessTypes;
-import com.gooddata.qa.graphene.enums.ScheduleCronTimes;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.CronTimeBuilder;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.google.common.base.Predicate;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Iterables;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
 public class ScheduleDetail extends ScheduleForm {
 
-    private static final String INVALID_SCHEDULE_TITLE_ERROR = "\'${scheduleName}\' name already in use within the process. Change the name.";
+    private static final int MAX_DELAY_TIME_WAITING_AUTO_RUN = 2; // In minutes
+
+    public enum Confirmation {
+        SAVE_CHANGES,
+        CANCEL_CHANGES;
+    }
+
+    private static final int MAX_SCHEDULE_RUN_TIME = 5; // In minutes
+
+    private static final String INVALID_SCHEDULE_TITLE_ERROR =
+            "\'${scheduleName}\' name already in use within the process. Change the name.";
     private static final String EMPTY_SCHEDULE_TITLE_ERROR = "can't be blank";
-    private static final String TRIGGER_SCHEDULE_MISSING_MESSAGE = "The schedule that triggers this schedule is missing. To run this schedule, set a new trigger or select a cron frequency.";
+    private static final String TRIGGER_SCHEDULE_MISSING_MESSAGE =
+            "The schedule that triggers this schedule is missing. To run this schedule, set a new trigger or select a cron frequency.";
     private static final String DEFAULT_RETRY_DELAY_VALUE = "30";
     private static final String RESCHEDULE_FORM_MESSAGE =
             "Restart every minutes until success (or 30th consecutive failure)";
@@ -55,267 +72,277 @@ public class ScheduleDetail extends ScheduleForm {
     private static final By BY_OK_GROUP_EXPAND_BUTTON = By.cssSelector(".icon-navigatedown");
 
     @FindBy(css = ".ait-schedule-title-section-heading")
-    protected WebElement scheduleTitle;
-    
+    private WebElement scheduleTitle;
+
     @FindBy(css = ".ait-schedule-title-field input")
-    protected WebElement scheduleTitleInput;
-    
+    private WebElement scheduleTitleInput;
+
     @FindBy(css = ".ait-schedule-title-edit-buttons .button-positive")
-    protected WebElement saveScheduleTitleButton;
-    
+    private WebElement saveScheduleTitleButton;
+
     @FindBy(css = ".ait-schedule-title-field .bubble-overlay")
-    protected WebElement scheduleTitleErrorBubble;
-    
+    private WebElement scheduleTitleErrorBubble;
+
     @FindBy(css = ".ait-schedule-title-edit-buttons .button-secondary")
-    protected WebElement cancelChangeScheduleTitleButton;
-    
+    private WebElement cancelChangeScheduleTitleButton;
+
     @FindBy(css = ".ait-schedule-close-btn .icon-delete")
-    protected WebElement closeButton;
+    private WebElement closeButton;
 
     @FindBy(css = ".ait-execution-history-item")
-    protected List<WebElement> scheduleExecutionItems;
+    private List<WebElement> scheduleExecutionItems;
+
+    @FindBy(css = ".ait-execution-history-item:first-child")
+    private WebElement lastExecutionItem;
 
     @FindBy(css = ".ait-schedule-reschedule-add-btn")
-    protected WebElement addRetryDelay;
+    private WebElement addRetryDelay;
 
     @FindBy(css = ".reschedule-form")
-    protected WebElement rescheduleForm;
+    private WebElement rescheduleForm;
 
     @FindBy(css = ".ait-schedule-reschedule-value input")
-    protected WebElement retryDelayInput;
+    private WebElement retryDelayInput;
 
     @FindBy(css = ".ait-schedule-reschedule-edit-buttons .button-positive")
-    protected WebElement saveRetryDelayButton;
+    private WebElement saveRetryDelayButton;
 
     @FindBy(css = ".ait-schedule-reschedule-edit-buttons .button-secondary")
-    protected WebElement cancelAddRetryDelayButton;
+    private WebElement cancelAddRetryDelayButton;
 
     @FindBy(css = ".ait-schedule-reschedule-value .bubble-overlay")
-    protected WebElement errorRetryDelayBubble;
+    private WebElement errorRetryDelayBubble;
 
     @FindBy(css = ".ait-schedule-reschedule-delete-btn")
-    protected WebElement removeRetryDelay;
+    private WebElement removeRetryDelay;
 
     @FindBy(css = ".ait-schedule-retry-delete .dialog-body")
-    protected WebElement removeRetryDialogBody;
+    private WebElement removeRetryDialogBody;
 
     @FindBy(css = ".ait-schedule-retry-delete-confirm-btn")
-    protected WebElement confirmRemoveRetryButton;
+    private WebElement confirmRemoveRetryButton;
 
     @FindBy(css = ".ait-schedule-retry-delete-cancel-btn")
-    protected WebElement cancelRemoveRetryButton;
+    private WebElement cancelRemoveRetryButton;
 
     @FindBy(css = ".ait-schedule-run-btn")
-    protected WebElement manualRunButton;
+    private WebElement manualRunButton;
 
     @FindBy(css = ".dialog-main.ait-schedule-run")
-    protected WebElement manualRunDialog;
+    private WebElement manualRunDialog;
 
     @FindBy(css = ".ait-schedule-run-confirm-btn")
-    protected WebElement confirmRunButton;
+    private WebElement confirmRunButton;
 
     @FindBy(css = ".ait-schedule-stop-btn")
-    protected WebElement manualStopButton;
+    private WebElement manualStopButton;
 
     @FindBy(css = ".overlay .dialog-main")
-    protected WebElement manualStopDialog;
+    private WebElement manualStopDialog;
 
     @FindBy(css = ".ait-schedule-cron-section .disable-button button")
-    protected WebElement disableScheduleButton;
+    private WebElement disableScheduleButton;
 
     @FindBy(css = ".schedule-title .status-icon-disabled")
-    protected WebElement disabledScheduleIcon;
+    private WebElement disabledScheduleIcon;
 
     @FindBy(css = ".ait-schedule-enable-btn")
-    protected WebElement enableScheduleButton;
+    private WebElement enableScheduleButton;
 
     @FindBy(css = ".ait-schedule-executable-edit-buttons .button-positive")
-    protected WebElement saveChangedExecutable;
+    private WebElement saveChangedExecutable;
 
     @FindBy(css = ".ait-schedule-executable-edit-buttons .button-secondary")
-    protected WebElement cancelChangedExecutable;
+    private WebElement cancelChangedExecutable;
 
     @FindBy(css = ".ait-schedule-delete-btn")
-    protected WebElement deleteScheduleButton;
+    private WebElement deleteScheduleButton;
 
     @FindBy(css = ".dialog-main.ait-schedule-delete-fragment")
-    protected WebElement deleteScheduleDialog;
+    private WebElement deleteScheduleDialog;
 
     @FindBy(css = ".ait-schedule-delete-confirm-btn")
-    protected WebElement confirmDeleteScheduleButton;
+    private WebElement confirmDeleteScheduleButton;
 
     @FindBy(css = ".ait-schedule-delete-cancel-btn")
-    protected WebElement cancelDeleteScheduleButton;
+    private WebElement cancelDeleteScheduleButton;
 
     @FindBy(css = ".ait-schedule-executable-edit-buttons .button-positive")
-    protected WebElement saveChangedCronTimeButton;
+    private WebElement saveChangedCronTimeButton;
 
     @FindBy(css = ".ait-schedule-executable-edit-buttons .button-secondary")
-    protected WebElement cancelChangedCronTimeButton;
+    private WebElement cancelChangedCronTimeButton;
 
     @FindBy(css = ".parameters-save-buttons .button-positive")
-    protected WebElement saveChangedParameterButton;
+    private WebElement saveChangedParameterButton;
 
     @FindBy(css = ".parameters-save-buttons .button-secondary")
-    protected WebElement cancelChangedParameterButton;
+    private WebElement cancelChangedParameterButton;
 
     @FindBy(css = ".broken-schedule-info")
-    protected WebElement brokenScheduleMessage;
+    private WebElement brokenScheduleMessage;
 
     @FindBy(css = ".broken-schedule-info .schedule-title-select")
-    protected WebElement brokenScheduleExecutable;
+    private WebElement brokenScheduleExecutable;
 
     @FindBy(css = ".ait-schedule-executable-edit-buttons .button-positive")
-    protected WebElement brokenScheduleSaveChangeButton;
+    private WebElement brokenScheduleSaveChangeButton;
 
     @FindBy(css = ".info-section")
-    protected WebElement failedScheduleInfoSection;
+    private WebElement failedScheduleInfoSection;
 
     @FindBy(css = ".ait-schedule-disabled .message p:nth-child(1)")
-    protected WebElement autoDisableScheduleMessage;
+    private WebElement autoDisableScheduleMessage;
 
     @FindBy(css = ".ait-schedule-disabled .message p:nth-child(2)")
-    protected WebElement autoDisableScheduleMoreInfo;
+    private WebElement autoDisableScheduleMoreInfo;
 
     @FindBy(css = ".ait-schedule-executable-select-btn")
-    protected WebElement selectExecutable;
+    private WebElement selectExecutable;
 
     @FindBy(css = ".ait-execution-history-empty")
-    protected WebElement executionHistoryEmptyState;
-    
+    private WebElement executionHistoryEmptyState;
+
     @FindBy(css = ".error-trigger-message")
-    protected WebElement triggerScheduleMissingMessage;
+    private WebElement triggerScheduleMissingMessage;
 
-    public void clickOnCloseScheduleButton() {
-        waitForElementVisible(closeButton).click();
-    }
+    @FindByJQuery(".ait-execution-history-item-description:contains(RUNNING)")
+    private WebElement runningExecutionItem;
 
-    public WebElement getSaveChangedCronTimeButton() {
-        return saveChangedCronTimeButton;
+    @FindByJQuery(".ait-execution-history-item-description:contains(SCHEDULED)")
+    private WebElement scheduledExecutionItem;
+
+    public void assertSchedule(final ScheduleBuilder scheduleBuilder) {
+        waitForElementVisible(scheduleTitle);
+        assertEquals(scheduleBuilder.getScheduleName(), scheduleTitle.getText());
+        waitForElementVisible(selectExecutable);
+        final Select select = new Select(selectExecutable);
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return select.getFirstSelectedOption().getText()
+                        .equals(scheduleBuilder.getExecutable().getExecutablePath());
+            }
+        });
+        assertCronTime(scheduleBuilder.getCronTimeBuilder());
+        if (!scheduleBuilder.getParameters().isEmpty())
+            assertScheduleParameters(scheduleBuilder.getParameters());
     }
 
     public WebElement getExecutionHistoryEmptyState() {
         return waitForElementVisible(executionHistoryEmptyState);
     }
 
-    public void waitForAutoRunSchedule(int waitingTimeInMinutes) throws InterruptedException {
-        int executionNumber = scheduleExecutionItems.size();
-        Calendar startWaitingTime = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("mm");
-        int startWaitingMinute = Integer.valueOf(sdf.format(startWaitingTime.getTime()));
-        for (int i = 0; i < waitingTimeInMinutes + 3; i++) {
-            System.out.println("Number of executions: " + scheduleExecutionItems.size());
-            if (scheduleExecutionItems.size() == executionNumber) {
-                System.out.println("Waiting for auto execution...");
-                Thread.sleep(60000);
-            } else {
-                if (scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText()
-                        .equals("SCHEDULED")) {
-                    System.out.println("Schedule is in SCHEDULED state...");
-                    Thread.sleep(60000);
-                } else {
-                    if (scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION)
-                            .getText().equals("RUNNING"))
-                        System.out.println("Schedule is in RUNNING state...");
-                    Calendar startExecutionTime = Calendar.getInstance();
-                    int startExecutionMinute =
-                            Integer.valueOf(sdf.format(startExecutionTime.getTime()));
-                    startExecutionMinute =
-                            startExecutionMinute > startWaitingMinute ? startExecutionMinute
-                                    : startExecutionMinute + 60;
-                    int delayTime =
-                            startExecutionMinute - startWaitingMinute - waitingTimeInMinutes;
-                    System.out.println("Delay time: " + delayTime);
-                    if (delayTime >= 0)
-                        System.out.println("Start time in minute: " + startExecutionMinute);
-                    else {
-                        System.out.println("Schedule execution started too early, started at: "
-                                + startExecutionMinute);
+    public void clickOnCloseScheduleButton() {
+        waitForElementVisible(closeButton).click();
+    }
+
+    public void tryToWaitForAutoRun(CronTimeBuilder cronTimebuilder) {
+        final int executionNumber = scheduleExecutionItems.size();
+        try {
+            Graphene.waitGui()
+                    .withTimeout(
+                            cronTimebuilder.getWaitingAutoRunInMinutes()
+                                    + MAX_DELAY_TIME_WAITING_AUTO_RUN, TimeUnit.MINUTES)
+                    .pollingEvery(10, TimeUnit.SECONDS)
+                    .withMessage("Schedule doesn't run automatically!")
+                    .until(new Predicate<WebDriver>() {
+
+                        @Override
+                        public boolean apply(WebDriver arg0) {
+                            System.out.println("Waiting for auto execution...");
+                            return scheduleExecutionItems.size() > executionNumber;
+                        }
+                    });
+        } catch (TimeoutException ex) {
+            System.out.println("Schedule doesn't run automatically");
+        }
+    }
+
+    public void waitForAutoRunSchedule(CronTimeBuilder cronTimebuilder) {
+        waitForAutoRun(cronTimebuilder.getWaitingAutoRunInMinutes());
+    }
+
+    public void waitForRetrySchedule(ScheduleBuilder scheduleBuilder) {
+        waitForAutoRun(scheduleBuilder.getRetryDelay());
+    }
+
+    public void waitForExecutionFinish() {
+        Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
+                .pollingEvery(10, TimeUnit.SECONDS)
+                .withMessage("Schedule execution is not finished!")
+                .until(new Predicate<WebDriver>() {
+
+                    @Override
+                    public boolean apply(WebDriver arg0) {
+                        System.out.println("Waiting for running schedule...");
+                        return getRoot().findElement(BY_RUN_STOP_BUTTON).getText().equals("Run");
                     }
-                    break;
-                }
-            }
-        }
+
+                });
+        waitForElementVisible(lastExecutionItem);
     }
 
-    public void assertLastExecutionDetails(boolean isSuccessful, boolean isManualRun,
-            boolean isStopped, String executablePath, DISCProcessTypes processType,
-            int waitingTimeInMinutes) throws InterruptedException {
-        for (int i = 0; i < waitingTimeInMinutes * 6; i++) {
-            if (getRoot().findElement(BY_RUN_STOP_BUTTON).getText().equals("Stop")) {
-                System.out.println("Waiting for running schedule...");
-                Thread.sleep(10000);
-            } else if (getRoot().findElement(BY_RUN_STOP_BUTTON).getText().equals("Run"))
-                break;
-        }
-        waitForElementVisible(scheduleExecutionItems.get(0));
-        assertTrue(scheduleExecutionItems.get(0).isDisplayed());
-        if (isSuccessful) {
-            assertTrue(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_STATUS)
-                    .findElement(BY_OK_STATUS_ICON).isDisplayed());
-            assertTrue(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION)
-                    .getText().contains("OK"));
-        } else {
-            assertTrue(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_STATUS)
-                    .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
-            System.out.println("Execution description: "
-                    + scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText());
-            if (isStopped) {
-                assertTrue(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION)
-                        .getText().equals("MANUALLY STOPPED"));
-            } else {
-                String errorMessage =
-                        String.format("%s=%s error:", processType.getProcessTypeExecutable(),
-                                executablePath).toLowerCase();
-                assertTrue(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION)
-                        .getText().toLowerCase().contains(errorMessage));
-            }
-        }
-        if (isManualRun)
-            assertTrue(scheduleExecutionItems.get(0).findElement(BY_MANUAL_ICON).isDisplayed());
-        assertTrue(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_LOG).isDisplayed());
-        assertTrue(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_LOG).isEnabled());
-        assertFalse(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_RUNTIME).getText()
-                .isEmpty());
-        System.out.println("Execution Runtime: "
-                + scheduleExecutionItems.get(0).findElement(BY_EXECUTION_RUNTIME).getText());
-        assertFalse(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DATE).getText()
-                .isEmpty());
-        System.out.println("Execution Date: "
-                + scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DATE).getText());
-        assertFalse(scheduleExecutionItems.get(0).findElement(BY_EXECUTION_TIMES).getText()
-                .isEmpty());
-        System.out.println("Execution Times: "
-                + scheduleExecutionItems.get(0).findElement(BY_EXECUTION_TIMES).getText());
+    public void assertSuccessfulExecution() {
+        waitForExecutionFinish();
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
+                .findElement(BY_OK_STATUS_ICON).isDisplayed());
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText().contains("OK"));
+        assertExecutionDetail();
     }
 
-    public void addRetryDelay(String retryDelay, boolean isSaved, boolean isValidDelayValue)
-            throws InterruptedException {
-        waitForElementVisible(selectExecutable);
-        Select select = new Select(selectExecutable);
-        if (select.getFirstSelectedOption().equals(select.getOptions().get(0)))
-            Thread.sleep(2000);
+    public void assertFailedExecution(Executables executable) {
+        waitForExecutionFinish();
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
+                .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
+        System.out.println("Error message of failed execution: "
+                + lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
+                .contains(executable.getErrorMessage()));
+        assertExecutionDetail();
+    }
+
+    public void assertFailedExecution(String errorMessage) {
+        waitForExecutionFinish();
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
+                .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
+        System.out.println("Error message of failed execution: "
+                + lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
+                .contains(errorMessage));
+        assertExecutionDetail();
+    }
+
+    public void assertManualStoppedExecution() {
+        waitForElementVisible(BY_ERROR_STATUS_ICON, browser);
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
+                .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
+                .equals("MANUALLY STOPPED"));
+        assertExecutionDetail();
+    }
+
+    public void assertManualRunExecution() {
+        assertTrue(lastExecutionItem.findElement(BY_MANUAL_ICON).isDisplayed());
+    }
+
+    public void checkRescheduleMessageAndDefault() {
         waitForElementVisible(addRetryDelay).click();
         waitForElementVisible(rescheduleForm);
         System.out.println("Reschedule form info: " + rescheduleForm.getText());
         assertEquals(RESCHEDULE_FORM_MESSAGE, rescheduleForm.getText());
         waitForElementVisible(retryDelayInput);
-        if (retryDelayInput.getAttribute("value").toString().isEmpty())
-            Thread.sleep(5000);
         assertEquals(DEFAULT_RETRY_DELAY_VALUE, retryDelayInput.getAttribute("value"));
-        waitForElementVisible(retryDelayInput).clear();
-        if (!retryDelayInput.getText().isEmpty())
-            Thread.sleep(1000);
-        retryDelayInput.sendKeys(String.valueOf(retryDelay));
-        if (isSaved) {
+        waitForElementVisible(cancelAddRetryDelayButton).click();
+    }
+
+    public void addValidRetry(String retryDelay, Confirmation saveChange) {
+        addRetry(retryDelay);
+        if (saveChange == Confirmation.SAVE_CHANGES) {
             waitForElementVisible(saveRetryDelayButton).click();
-            if (isValidDelayValue) {
-                waitForElementNotPresent(saveRetryDelayButton);
-                assertEquals(String.valueOf(retryDelay), retryDelayInput.getAttribute("value"));
-            } else {
-                assertTrue(retryDelayInput.getAttribute("class").contains("has-error"));
-                System.out.println("error retry delay: " + errorRetryDelayBubble.getText());
-            }
+            waitForElementNotPresent(saveRetryDelayButton);
+            assertEquals(String.valueOf(retryDelay), retryDelayInput.getAttribute("value"));
         } else {
             waitForElementVisible(cancelAddRetryDelayButton).click();
             waitForElementNotPresent(retryDelayInput);
@@ -323,10 +350,21 @@ public class ScheduleDetail extends ScheduleForm {
         }
     }
 
-    public void removeRetryDelay(boolean isConfirmed) {
+    public void addInvalidRetry(String invalidRetryDelay) {
+        addRetry(invalidRetryDelay);
+        waitForElementVisible(saveRetryDelayButton).click();
+        waitForElementVisible(errorRetryDelayBubble);
+        assertTrue(retryDelayInput.getAttribute("class").contains("has-error"));
+        String errorMessage = errorRetryDelayBubble.getText();
+        assertTrue(errorMessage
+                .matches("The minimal delay is every 15 minutes.([\\n]*[\\r]*)Use numbers only."));
+        System.out.println("Error retry delay: " + errorRetryDelayBubble.getText());
+    }
+
+    public void removeRetryDelay(Confirmation remove) {
         waitForElementVisible(removeRetryDelay).click();
         waitForElementVisible(removeRetryDialogBody);
-        if (isConfirmed) {
+        if (remove == Confirmation.SAVE_CHANGES) {
             waitForElementVisible(confirmRemoveRetryButton).click();
             waitForElementVisible(addRetryDelay);
         } else {
@@ -335,7 +373,7 @@ public class ScheduleDetail extends ScheduleForm {
         }
     }
 
-    public void manualRun() throws InterruptedException {
+    public void manualRun() {
         waitForElementVisible(manualRunButton).click();
         waitForElementVisible(manualRunDialog);
         waitForElementVisible(confirmRunButton).click();
@@ -343,9 +381,7 @@ public class ScheduleDetail extends ScheduleForm {
         System.out.println("Schedule is executed manually!");
     }
 
-    public void manualStop() throws InterruptedException {
-        if (scheduleExecutionItems.isEmpty())
-            Thread.sleep(60000);
+    public void manualStop() {
         waitForElementVisible(manualStopButton).click();
         waitForElementVisible(manualStopDialog);
         waitForElementVisible(manualStopDialog.findElement(BY_CONFIRM_STOP_EXECUTION)).click();
@@ -366,26 +402,27 @@ public class ScheduleDetail extends ScheduleForm {
         System.out.println("Schedule is enabled!");
     }
 
-    public boolean isDisabledSchedule(int waitingTimeInMinutes, int executionNumberBeforeDisable)
-            throws InterruptedException {
-        Calendar startWaitingTime = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("mm");
-        int startWaitingMinute = Integer.valueOf(sdf.format(startWaitingTime.getTime()));
-        int waitingTimeFromNow = waitingTimeInMinutes - startWaitingMinute % waitingTimeInMinutes;
-        waitForAutoRunSchedule(waitingTimeFromNow);
+    public boolean isDisabledSchedule(CronTimeBuilder cronTimeBuilder) {
+        int executionNumberBeforeDisable = scheduleExecutionItems.size();
+        tryToWaitForAutoRun(cronTimeBuilder);
         if (scheduleExecutionItems.size() > executionNumberBeforeDisable)
             return false;
         System.out.println("Schedule is disabled successfully!");
         return true;
     }
 
-    public void changeExecutable(String newExecutable, boolean isSaved) throws InterruptedException {
+    public void changeExecutable(Executables newExecutable, Confirmation saveChange) {
         waitForElementVisible(selectExecutable);
-        Select select = new Select(selectExecutable);
-        if (select.getFirstSelectedOption().equals(select.getOptions().get(0)))
-            Thread.sleep(2000);
-        select.selectByVisibleText(newExecutable);
-        if (isSaved) {
+        final Select select = new Select(selectExecutable);
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return !select.getFirstSelectedOption().equals(select.getOptions().get(0));
+            }
+        });
+        select.selectByVisibleText(newExecutable.getExecutablePath());
+        if (saveChange == Confirmation.SAVE_CHANGES) {
             waitForElementVisible(saveChangedExecutable).click();
             waitForElementNotPresent(saveChangedExecutable);
         } else {
@@ -394,172 +431,150 @@ public class ScheduleDetail extends ScheduleForm {
         clickOnCloseScheduleButton();
     }
 
-    public void deleteSchedule(boolean isConfirmed) {
+    public void changeCronTime(CronTimeBuilder cronTimeBuilder, Confirmation saveChange) {
         waitForElementVisible(getRoot());
-        waitForElementVisible(deleteScheduleButton).click();
-        waitForElementVisible(deleteScheduleDialog);
-        if (isConfirmed)
-            waitForElementVisible(confirmDeleteScheduleButton).click();
-        else
-            waitForElementVisible(cancelDeleteScheduleButton).click();
-        waitForElementNotPresent(deleteScheduleDialog);
-    }
-
-    public void changeCronTime(Pair<String, List<String>> newCronTime, boolean isSaved)
-            throws InterruptedException {
-        waitForElementVisible(getRoot());
-        selectCron(newCronTime);
-        if (isSaved)
+        selectCron(cronTimeBuilder);
+        if (saveChange == Confirmation.SAVE_CHANGES)
             waitForElementVisible(saveChangedCronTimeButton).click();
         else
             waitForElementVisible(cancelChangedCronTimeButton).click();
-        clickOnCloseScheduleButton();
     }
 
-    public void editScheduleParameters(Map<String, List<String>> changedParameters,
-            boolean newParameters, boolean isSaved) {
-        int index = 0;
-        if (!newParameters) {
-            for (Entry<String, List<String>> changedParameter : changedParameters.entrySet()) {
-                if (changedParameter.getValue() == null) {
-                    parameters.get(index).findElement(BY_PARAMETER_REMOVE_ACTION).click();
-                    waitForElementVisible(saveChangedParameterButton);
-                } else {
-                    WebElement parameterName = parameters.get(index).findElement(BY_PARAMETER_NAME);
-                    WebElement parameterValue =
-                            parameters.get(index).findElement(BY_PARAMETER_VALUE);
-                    parameterName.clear();
-                    parameterName.sendKeys(changedParameter.getKey());
-                    parameterValue.clear();
-                    parameterValue.sendKeys(changedParameter.getValue().get(1));
-                    index++;
-                }
-            }
-        } else {
-            addParameters(changedParameters);
-        }
-        if (isSaved)
+    public void confirmParamsChange(Confirmation saveChange) {
+        if (saveChange == Confirmation.SAVE_CHANGES)
             waitForElementVisible(saveChangedParameterButton).click();
         else
             waitForElementVisible(cancelChangedParameterButton).click();
-        clickOnCloseScheduleButton();
     }
 
-    public void assertScheduleParameters(Map<String, List<String>> expectedParameters)
-            throws InterruptedException {
-        waitForElementVisible(getRoot());
-        int i = 0;
-        if (expectedParameters != null) {
-            Thread.sleep(1000);
-            for (Entry<String, List<String>> parameter : expectedParameters.entrySet()) {
-                assertEquals(parameter.getKey(), parameters.get(i).findElement(BY_PARAMETER_NAME)
-                        .getAttribute("value"));
-                if (parameter.getValue().get(0).equals("secure")) {
-                    assertEquals("password", parameters.get(i).findElement(BY_PARAMETER_VALUE)
-                            .getAttribute("type"));
-                    assertEquals(
-                            "Secure parameter value",
-                            parameters.get(i).findElement(BY_PARAMETER_VALUE)
-                                    .getAttribute("placeholder"));
-                } else {
-                    assertEquals(parameter.getValue().get(1),
-                            parameters.get(i).findElement(BY_PARAMETER_VALUE).getAttribute("value"));
-                }
-                i++;
+    public void addNewParams(List<Parameter> newParams, Confirmation saveChange) {
+        addParameters(newParams);
+        confirmParamsChange(saveChange);
+    }
+
+    public void editParameter(final Parameter existingParam, Parameter editedParam) {
+        WebElement parameter = Iterables.find(parameters, new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement param) {
+                return param.findElement(BY_PARAMETER_NAME).getAttribute("value")
+                        .equals(existingParam.getParamName());
             }
-        }
+        });
+
+        WebElement paramName = parameter.findElement(BY_PARAMETER_NAME);
+        paramName.clear();
+        paramName.sendKeys(editedParam.getParamName());
+        WebElement paramValue = parameter.findElement(BY_PARAMETER_VALUE);
+        paramValue.clear();
+        paramValue.sendKeys(editedParam.getParamValue());
     }
 
-    public void checkBrokenSchedule(String oldExecutable, String newExecutable)
-            throws InterruptedException {
+    public void removeParameter(List<Parameter> paramsToRemove, Confirmation saveChange) {
+        for (final Parameter paramToRemove : paramsToRemove) {
+            Iterables.find(parameters, new Predicate<WebElement>() {
+
+                @Override
+                public boolean apply(WebElement param) {
+                    return param.findElement(BY_PARAMETER_NAME).getAttribute("value")
+                            .equals(paramToRemove.getParamName());
+                }
+            }).findElement(BY_PARAMETER_REMOVE_ACTION).click();
+        }
+        confirmParamsChange(saveChange);
+    }
+
+    public void checkMessageInBrokenScheduleDetail(String scheduleName) {
         waitForElementVisible(getRoot());
         waitForElementVisible(brokenScheduleMessage);
         System.out.println("Check broken schedule detail page...");
-        assertEquals(String.format(BROKEN_SCHEDULE_MESSAGE, oldExecutable),
+        assertEquals(String.format(BROKEN_SCHEDULE_MESSAGE, scheduleName),
                 brokenScheduleMessage.getText());
+    }
+
+    public void fixBrokenSchedule(Executables newExecutable) {
         Select select = new Select(brokenScheduleExecutable);
-        select.selectByVisibleText(newExecutable);
+        select.selectByVisibleText(newExecutable.getExecutablePath());
         waitForElementVisible(brokenScheduleSaveChangeButton).click();
         waitForElementNotPresent(brokenScheduleSaveChangeButton);
         clickOnCloseScheduleButton();
     }
 
-    public void repeatManualRun(int executionTimes, String executablePath,
-            DISCProcessTypes processType, boolean isSuccessful) throws InterruptedException {
-        waitForElementVisible(manualRunButton);
+    public void repeatManualRunSuccessfulSchedule(int executionTimes) {
         for (int i = 0; i < executionTimes; i++) {
             manualRun();
             isInRunningState();
-            assertLastExecutionDetails(isSuccessful, true, false, executablePath, processType, 5);
+            assertSuccessfulExecution();
         }
     }
 
-    public void checkRepeatedFailureSchedule(String executablePath, DISCProcessTypes processType)
-            throws InterruptedException {
-        waitForElementVisible(cronPicker);
-        repeatManualRun(5, executablePath, processType, false);
+    public void repeatManualRunFailedSchedule(int executionTimes, Executables executable) {
+        for (int i = 0; i < executionTimes; i++) {
+            manualRun();
+            isInRunningState();
+            assertFailedExecution(executable);
+        }
+    }
+
+    public void checkRepeatedFailureSchedule(CronTimeBuilder cronTimeBuilder, Executables executable) {
+        repeatManualRunFailedSchedule(5, executable);
         System.out.println("Schedule failed for the 5th time...");
         waitForElementVisible(failedScheduleInfoSection);
         assertEquals(
                 String.format(FAILED_SCHEDULE_FOR_5TH_TIME_MESSAGE, scheduleExecutionItems.size()),
                 failedScheduleInfoSection.getText());
-        repeatManualRun(25, executablePath, processType, false);
+        repeatManualRunFailedSchedule(25, executable);
         System.out.println("Schedule failed for the 30th time...");
         waitForElementVisible(autoDisableScheduleMessage);
         assertEquals(String.format(AUTO_DISABLED_SCHEDULE_MESSAGE, scheduleExecutionItems.size()),
                 autoDisableScheduleMessage.getText());
         assertEquals(AUTO_DISABLED_SCHEDULE_MORE_INFO, autoDisableScheduleMoreInfo.getText());
+        assertTrue(isDisabledSchedule(cronTimeBuilder));
     }
 
-    public boolean isInRunningState() throws InterruptedException {
-        for (int i = 0; i < 10 && scheduleExecutionItems.isEmpty(); i++)
-            Thread.sleep(1000);
-        for (int i = 0; i < 50; i++) {
-            if (scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText()
-                    .equals("RUNNING")) {
-                return true;
-            } else
-                Thread.sleep(3000);
+    public boolean isInRunningState() {
+        waitForCollectionIsNotEmpty(scheduleExecutionItems);
+        try {
+            Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
+                    .pollingEvery(10, TimeUnit.SECONDS).until().element(runningExecutionItem).is()
+                    .visible();
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
         }
-        return false;
     }
 
-    public boolean isInScheduledState() throws InterruptedException {
-        for (int i = 0; i < 10 && scheduleExecutionItems.isEmpty(); i++)
-            Thread.sleep(1000);
-        for (int i = 0; i < 50; i++) {
-            if (scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText()
-                    .equals("SCHEDULED")) {
-                return true;
-            } else
-                Thread.sleep(3000);
+    public boolean isInScheduledState() {
+        waitForCollectionIsNotEmpty(scheduleExecutionItems);
+        try {
+            waitForElementVisible(scheduledExecutionItem);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
         }
-        return false;
     }
 
     public String getLastExecutionDate() {
-        return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DATE).getText();
+        return lastExecutionItem.findElement(BY_EXECUTION_DATE).getText();
     }
 
     public String getLastExecutionTime() {
-        return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_TIMES).getText();
+        return lastExecutionItem.findElement(BY_EXECUTION_TIMES).getText();
     }
 
     public String getExecutionRuntime() {
-        return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_RUNTIME).getText();
+        return lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText();
     }
 
     public String getExecutionDescription() {
-        return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText();
+        return lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText();
     }
 
     public boolean isStarted() {
         return waitForElementVisible(manualStopButton).isDisplayed();
     }
 
-    public int getExecutionItemsNumber() throws InterruptedException {
-        for (int i = 0; i < 10 && scheduleExecutionItems.isEmpty(); i++)
-            Thread.sleep(1000);
+    public int getExecutionItemsNumber() {
         return scheduleExecutionItems.size();
     }
 
@@ -567,178 +582,231 @@ public class ScheduleDetail extends ScheduleForm {
         return waitForElementVisible(enableScheduleButton);
     }
 
-    public void expandLastOkExecutionGroup() {
-        scheduleExecutionItems.get(0).findElement(BY_OK_GROUP_EXPAND_BUTTON).click();
-    }
-
-    public void checkOkExecutionGroup(int okExecutionNumber, int okGroupIndex)
-            throws InterruptedException {
-        int scheduleExecutionNumber = scheduleExecutionItems.size();
+    public void checkOkExecutionGroup(final int okExecutionNumber, int okGroupIndex) {
+        final int scheduleExecutionNumber = scheduleExecutionItems.size();
         String groupDescription = String.format(OK_GROUP_DESCRIPTION_FORMAT, okExecutionNumber);
-        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_STATUS_ICON)
-                .isDisplayed());
-        System.out.println("Execution description of ok execution group: "
-                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DESCRIPTION)
-                        .getText());
-        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DESCRIPTION)
-                .getText().contains(groupDescription));
-        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_LAST_RUN)
-                .isDisplayed());
-        System.out.println("Execution description of ok execution group: "
-                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_RUNTIME)
-                        .getText());
-        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_RUNTIME)
-                .isDisplayed());
-        System.out.println("Execution description of ok execution group: "
-                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DATE).getText());
-        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_DATE)
-                .isDisplayed());
-        System.out.println("Execution description of ok execution group: "
-                + scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_TIMES)
-                        .getText());
-        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_TIMES)
-                .isDisplayed());
-        assertTrue(scheduleExecutionItems.get(okGroupIndex).findElement(BY_EXECUTION_LOG)
-                .isDisplayed());
-        waitForElementVisible(scheduleExecutionItems.get(okGroupIndex).findElement(
-                BY_OK_GROUP_EXPAND_BUTTON));
-        scheduleExecutionItems.get(okGroupIndex).findElement(BY_OK_GROUP_EXPAND_BUTTON).click();
-        for (int i = 0; i < 10 && scheduleExecutionItems.size() == scheduleExecutionNumber; i++) {
-            Thread.sleep(1000);
-        }
-        assertEquals(scheduleExecutionNumber + okExecutionNumber, scheduleExecutionItems.size());
-        for (int i = okGroupIndex; i < okGroupIndex + okExecutionNumber + 1; i++) {
-            if (i == okGroupIndex) {
-                assertTrue(scheduleExecutionItems.get(i).findElement(BY_OK_STATUS_ICON)
-                        .isDisplayed());
-                System.out.println("Execution description at " + i + " index: "
-                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-                                .getText());
-                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-                        .getText().contains(groupDescription));
-                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME)
-                        .isDisplayed());
-                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE)
-                        .isDisplayed());
-                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES)
-                        .isDisplayed());
-                assertFalse(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_LOG)
-                        .isDisplayed());
-            } else {
-                assertFalse(scheduleExecutionItems.get(i).findElement(BY_OK_STATUS_ICON)
-                        .isDisplayed());
-                System.out.println("Execution description at "+ i + " index: "
-                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-                                .getText());
-                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DESCRIPTION)
-                        .isDisplayed());
-                System.out.println("Execution description at " + i + " index: "
-                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME).getText());
-                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_RUNTIME)
-                        .isDisplayed());
-                System.out.println("Execution description at " + i + " index: "
-                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE).getText());
-                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_DATE)
-                        .isDisplayed());
-                System.out.println("Execution description at " + i + " index: "
-                        + scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES).getText());
-                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_TIMES)
-                        .isDisplayed());
-                assertTrue(scheduleExecutionItems.get(i).findElement(BY_EXECUTION_LOG)
-                        .isDisplayed());
+        WebElement okExecutionGroup = scheduleExecutionItems.get(okGroupIndex);
+
+        assertOkExecutionGroupInfo(okExecutionGroup, groupDescription);
+        okExecutionGroup.findElement(BY_OK_GROUP_EXPAND_BUTTON).click();
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return scheduleExecutionItems.size() == scheduleExecutionNumber + okExecutionNumber;
             }
-        }
-    }
-    
-	public String getLastExecutionLogLink () {
-		return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_LOG).getAttribute("href");
-	}
-	
-	public String getLastExecutionDescription() {
-		return scheduleExecutionItems.get(0).findElement(BY_EXECUTION_DESCRIPTION).getText();
-	}
-    
-    public void assertCronTime (Pair<String, List<String>> cronTime) throws InterruptedException {
-        Select selectCron = new Select(cronPicker);
-        assertEquals(selectCron.getFirstSelectedOption().getText(), cronTime.getKey());
-        if (cronTime.getValue() != null) {
-            if (cronTime.getKey().equals(ScheduleCronTimes.CRON_EXPRESSION.getCronTime())) {
-                if (cronTime.getValue().get(0) != null) {
-                    if (cronExpression.getAttribute("value").isEmpty())
-                        Thread.sleep(1000);
-                    assertEquals(cronTime.getValue().get(0),
-                            cronExpression.getAttribute("value"));
-                    System.out.println("Cron expression is set to... "
-                            + cronExpression.getAttribute("value"));
-                }
-            } else if (cronTime.getKey().equals(ScheduleCronTimes.AFTER.getCronTime())) {
-                waitForElementVisible(selectTriggerSchedule);
-                Select selectTrigger = new Select(selectTriggerSchedule);
-                assertEquals(selectTrigger.getFirstSelectedOption().getText(), cronTime.getValue().get(1));
-            }
-            else {
-                if (cronTime.getValue().size() > 2 && cronTime.getValue().get(2) != null) {
-                    waitForElementVisible(selectDayInWeek);
-                    Select selectWeek = new Select(selectDayInWeek);
-                    assertEquals(cronTime.getValue().get(2), selectWeek.getFirstSelectedOption().getText());
-                }
-                else if (cronTime.getValue().size() > 1 && cronTime.getValue().get(1) != null) {
-                    waitForElementVisible(selectHourInDay);
-                    Select selectHour = new Select(selectHourInDay);
-                    assertEquals(cronTime.getValue().get(1), selectHour.getFirstSelectedOption().getText());
-                }
-                else if (cronTime.getValue().size() > 0 && cronTime.getValue().get(0) != null) {
-                    waitForElementVisible(selectMinuteInHour);
-                    Select selectMinute = new Select(selectMinuteInHour);
-                    assertEquals(cronTime.getValue().get(0), selectMinute.getFirstSelectedOption().getText());
-                }
-            }
-        }
+        });
+        assertExecutionItemsInfo(okGroupIndex, okExecutionNumber, groupDescription);
     }
 
-    public void assertScheduleDetail(String scheduleName, String executable,
-            Pair<String, List<String>> cronTime, Map<String, List<String>> parameters)
-            throws InterruptedException {
-        waitForElementVisible(scheduleTitle);
-        assertEquals(scheduleName, scheduleTitle.getText());
-        waitForElementVisible(selectExecutable);
-        Select select = new Select(selectExecutable);
-        if (!select.getFirstSelectedOption().equals(executable))
-            Thread.sleep(2000);
-        assertEquals(select.getFirstSelectedOption().getText(), executable);
-        assertCronTime(cronTime);
-        assertScheduleParameters(parameters);
+    public String getLastExecutionLogLink() {
+        return lastExecutionItem.findElement(BY_EXECUTION_LOG).getAttribute("href");
     }
-    
-    public void changeScheduleTitle(String newScheduleName, boolean isSaved, boolean isValid)
-            throws InterruptedException {
-        waitForElementVisible(scheduleTitle).click();
-        waitForElementVisible(scheduleTitleInput).clear();
-        if (!scheduleTitleInput.getText().isEmpty())
-            Thread.sleep(2000);
-        scheduleTitleInput.sendKeys(newScheduleName);
-        if (isSaved) {
+
+    public void changeValidScheduleName(String newScheduleName, Confirmation saveChange) {
+        changeScheduleName(newScheduleName);
+        if (saveChange == Confirmation.SAVE_CHANGES)
             waitForElementVisible(saveScheduleTitleButton).click();
-            if (!isValid) {
-                assertTrue(scheduleTitleInput.getAttribute("class").contains("has-error"));
-                waitForElementVisible(scheduleTitleErrorBubble);
-                if (newScheduleName.isEmpty())
-                    assertEquals(scheduleTitleErrorBubble.getText(), EMPTY_SCHEDULE_TITLE_ERROR);
-                else
-                    assertEquals(scheduleTitleErrorBubble.getText(),
-                            INVALID_SCHEDULE_TITLE_ERROR.replace("${scheduleName}", newScheduleName));
-            }
-        } else
+        else
             waitForElementVisible(cancelChangeScheduleTitleButton).click();
     }
 
-    public void checkTriggerScheduleMissing() throws InterruptedException {
+    public void changeInvalidScheduleName(String invalidScheduleName) {
+        changeScheduleName(invalidScheduleName);
+        waitForElementVisible(saveScheduleTitleButton).click();
+        waitForElementVisible(scheduleTitleInput).click();
+        assertTrue(scheduleTitleInput.getAttribute("class").contains("has-error"));
+        waitForElementVisible(scheduleTitleErrorBubble);
+        if (invalidScheduleName.isEmpty())
+            assertEquals(scheduleTitleErrorBubble.getText(), EMPTY_SCHEDULE_TITLE_ERROR);
+        else
+            assertEquals(scheduleTitleErrorBubble.getText(),
+                    INVALID_SCHEDULE_TITLE_ERROR.replace("${scheduleName}", invalidScheduleName));
+
+        clickOnCloseScheduleButton();
+    }
+
+    public void checkTriggerScheduleMissing() {
         waitForElementVisible(triggerScheduleMissingMessage);
         assertEquals(triggerScheduleMissingMessage.getText(), TRIGGER_SCHEDULE_MISSING_MESSAGE);
-        Pair<String, List<String>> defaultCronTime =
-                Pair.of(ScheduleCronTimes.CRON_EXPRESSION.getCronTime(), Arrays.asList("0 * * * *"));
-        assertCronTime(defaultCronTime);
+        assertCronTime(new CronTimeBuilder().setCronTime(ScheduleCronTimes.CRON_EXPRESSION)
+                .setCronTimeExpression("0 * * * *"));
         waitForElementPresent(saveChangedCronTimeButton);
         waitForElementNotPresent(cancelChangedCronTimeButton);
+    }
+
+    public void deleteSchedule(Confirmation delete) {
+        waitForElementVisible(getRoot());
+        waitForElementVisible(deleteScheduleButton).click();
+        waitForElementVisible(deleteScheduleDialog);
+        if (delete == Confirmation.SAVE_CHANGES)
+            waitForElementVisible(confirmDeleteScheduleButton).click();
+        else
+            waitForElementVisible(cancelDeleteScheduleButton).click();
+        waitForElementNotPresent(deleteScheduleDialog);
+    }
+
+    private void waitForAutoRun(int waitingTimeInMinutes) {
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        final int executionNumberBeforeAutoRun = scheduleExecutionItems.size();
+        Graphene.waitGui()
+                .withTimeout(waitingTimeInMinutes + MAX_DELAY_TIME_WAITING_AUTO_RUN,
+                        TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
+                .withMessage("Schedule doesn't run automatically!")
+                .until(new Predicate<WebDriver>() {
+
+                    @Override
+                    public boolean apply(WebDriver arg0) {
+                        System.out.println("Waiting for auto execution...");
+                        return scheduleExecutionItems.size() > executionNumberBeforeAutoRun;
+                    }
+                });
+        stopwatch.stop();
+        assertEquals(scheduleExecutionItems.size(), executionNumberBeforeAutoRun + 1);
+        long delayTime = stopwatch.elapsed(TimeUnit.MINUTES) - waitingTimeInMinutes;
+        System.out.println("Delay time: " + delayTime);
+        assertTrue(delayTime >= -2 && delayTime <= 2, "Auto run at incorrect time! Delay time: "
+                + delayTime);
+    }
+
+    private void assertExecutionDetail() {
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_LOG).isDisplayed());
+        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_LOG).isEnabled());
+        assertFalse(lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText().isEmpty());
+        System.out.println("Execution Runtime: "
+                + lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText());
+        assertFalse(lastExecutionItem.findElement(BY_EXECUTION_DATE).getText().isEmpty());
+        System.out.println("Execution Date: "
+                + lastExecutionItem.findElement(BY_EXECUTION_DATE).getText());
+        assertFalse(lastExecutionItem.findElement(BY_EXECUTION_TIMES).getText().isEmpty());
+        System.out.println("Execution Times: "
+                + lastExecutionItem.findElement(BY_EXECUTION_TIMES).getText());
+    }
+
+    private void addRetry(String retryDelay) {
+        waitForElementVisible(addRetryDelay).click();
+        waitForElementVisible(rescheduleForm);
+        waitForElementVisible(retryDelayInput).clear();
+        retryDelayInput.sendKeys(String.valueOf(retryDelay));
+    }
+
+    private void changeScheduleName(String newScheduleName) {
+        waitForElementVisible(scheduleTitle).click();
+        waitForElementVisible(scheduleTitleInput).clear();
+        scheduleTitleInput.sendKeys(newScheduleName);
+    }
+
+    private void assertScheduleParameters(List<Parameter> expectedParams) {
+        for (final Parameter expectedParam : expectedParams) {
+            WebElement actualParam = Iterables.find(parameters, new Predicate<WebElement>() {
+
+                @Override
+                public boolean apply(WebElement param) {
+                    return param.findElement(BY_PARAMETER_NAME).getAttribute("value")
+                            .equals(expectedParam.getParamName());
+                }
+            });
+            if (expectedParam.isSecureParam()) {
+                assertEquals("password",
+                        actualParam.findElement(BY_PARAMETER_VALUE).getAttribute("type"));
+                assertEquals("Secure parameter value", actualParam.findElement(BY_PARAMETER_VALUE)
+                        .getAttribute("placeholder"));
+            } else {
+                assertEquals(actualParam.findElement(BY_PARAMETER_VALUE).getAttribute("value"),
+                        expectedParam.getParamValue());
+            }
+        }
+    }
+
+    private void assertCronTime(final CronTimeBuilder cronTimeBuilder) {
+        final Select selectCron = new Select(cronPicker);
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return selectCron.getFirstSelectedOption().getText()
+                        .equals(cronTimeBuilder.getCronTime().getCronTimeOption());
+            }
+        });
+        switch (cronTimeBuilder.getCronTime()) {
+            case CRON_EVERYWEEK:
+                waitForElementVisible(selectDayInWeek);
+                Select selectWeek = new Select(selectDayInWeek);
+                assertEquals(selectWeek.getFirstSelectedOption().getText(),
+                        cronTimeBuilder.getDayInWeek());
+            case CRON_EVERYDAY:
+                waitForElementVisible(selectHourInDay);
+                Select selectHour = new Select(selectHourInDay);
+                assertEquals(selectHour.getFirstSelectedOption().getText(),
+                        cronTimeBuilder.getHourInDay());
+            case CRON_EVERYHOUR:
+                waitForElementVisible(selectMinuteInHour);
+                Select selectMinute = new Select(selectMinuteInHour);
+                assertEquals(selectMinute.getFirstSelectedOption().getText(),
+                        cronTimeBuilder.getMinuteInHour());
+                break;
+            case AFTER:
+                waitForElementVisible(selectTriggerSchedule);
+                Select selectTrigger = new Select(selectTriggerSchedule);
+                assertEquals(selectTrigger.getFirstSelectedOption().getText(),
+                        cronTimeBuilder.getTriggerScheduleOption());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void assertOkExecutionGroupInfo(WebElement okExecutionGroup, String groupDescription) {
+        assertTrue(okExecutionGroup.findElement(BY_OK_STATUS_ICON).isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + okExecutionGroup.findElement(BY_EXECUTION_DESCRIPTION).getText());
+        assertTrue(okExecutionGroup.findElement(BY_EXECUTION_DESCRIPTION).getText()
+                .contains(groupDescription));
+        assertTrue(okExecutionGroup.findElement(BY_OK_LAST_RUN).isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + okExecutionGroup.findElement(BY_EXECUTION_RUNTIME).getText());
+        assertTrue(okExecutionGroup.findElement(BY_EXECUTION_RUNTIME).isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + okExecutionGroup.findElement(BY_EXECUTION_DATE).getText());
+        assertTrue(okExecutionGroup.findElement(BY_EXECUTION_DATE).isDisplayed());
+        System.out.println("Execution description of ok execution group: "
+                + okExecutionGroup.findElement(BY_EXECUTION_TIMES).getText());
+        assertTrue(okExecutionGroup.findElement(BY_EXECUTION_TIMES).isDisplayed());
+        assertTrue(okExecutionGroup.findElement(BY_EXECUTION_LOG).isDisplayed());
+        waitForElementVisible(okExecutionGroup.findElement(BY_OK_GROUP_EXPAND_BUTTON));
+    }
+
+    private void assertExecutionItemsInfo(int okGroupIndex, int okExecutionNumber,
+            String groupDescription) {
+        for (int i = okGroupIndex; i < okGroupIndex + okExecutionNumber + 1; i++) {
+            WebElement scheduleExecutionItem = scheduleExecutionItems.get(i);
+            if (i == okGroupIndex) {
+                assertTrue(scheduleExecutionItem.findElement(BY_OK_STATUS_ICON).isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
+                assertTrue(scheduleExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
+                        .contains(groupDescription));
+                assertFalse(scheduleExecutionItem.findElement(BY_EXECUTION_RUNTIME).isDisplayed());
+                assertFalse(scheduleExecutionItem.findElement(BY_EXECUTION_DATE).isDisplayed());
+                assertFalse(scheduleExecutionItem.findElement(BY_EXECUTION_TIMES).isDisplayed());
+                assertFalse(scheduleExecutionItem.findElement(BY_EXECUTION_LOG).isDisplayed());
+            } else {
+                assertFalse(scheduleExecutionItem.findElement(BY_OK_STATUS_ICON).isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
+                assertTrue(scheduleExecutionItem.findElement(BY_EXECUTION_DESCRIPTION)
+                        .isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText());
+                assertTrue(scheduleExecutionItem.findElement(BY_EXECUTION_RUNTIME).isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItem.findElement(BY_EXECUTION_DATE).getText());
+                assertTrue(scheduleExecutionItem.findElement(BY_EXECUTION_DATE).isDisplayed());
+                System.out.println("Execution description at " + i + " index: "
+                        + scheduleExecutionItem.findElement(BY_EXECUTION_TIMES).getText());
+                assertTrue(scheduleExecutionItem.findElement(BY_EXECUTION_TIMES).isDisplayed());
+                assertTrue(scheduleExecutionItem.findElement(BY_EXECUTION_LOG).isDisplayed());
+            }
+        }
     }
 }
