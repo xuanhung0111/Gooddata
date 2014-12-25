@@ -19,6 +19,7 @@
         <module>ui-tests-upload</module>
         <module>ui-tests-filters</module>
         <module>ui-tests-disc</module>
+        <module>ui-tests-dlui</module>
     </modules>
 
     <properties>
