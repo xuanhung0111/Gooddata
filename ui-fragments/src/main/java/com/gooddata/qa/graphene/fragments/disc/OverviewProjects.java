@@ -5,6 +5,7 @@ import static org.testng.Assert.*;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -127,7 +128,8 @@ public class OverviewProjects extends AbstractFragment {
         assertNotNull(overviewProject);
         try {
             overviewProject.findElement(BY_OVERVIEW_PROJECT_TITLE_LINK).click();
-            waitForElementVisible(projectDetail);
+            Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until().element(projectDetail)
+                    .is().visible();
         } catch (NoSuchElementException ex) {
             System.out.println("Non-admin user cannot access project detail page!");
         }
@@ -212,7 +214,8 @@ public class OverviewProjects extends AbstractFragment {
         return overviewProjects.size();
     }
 
-    public void assertOverviewScheduleName(OverviewProjectStates overviewState, ProjectInfo projectInfo, String scheduleUrl, String scheduleName) {
+    public void assertOverviewScheduleName(OverviewProjectStates overviewState,
+            ProjectInfo projectInfo, String scheduleUrl, String scheduleName) {
         String overviewScheduleLink = scheduleUrl.substring(scheduleUrl.indexOf("#"));
         String overviewScheduleName =
                 getOverviewScheduleName(overviewState, projectInfo, overviewScheduleLink)
@@ -343,43 +346,28 @@ public class OverviewProjects extends AbstractFragment {
                 overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText();
         String overviewProjectDate =
                 overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_DATE).getText();
-        String overviewProjectErrorMessage =
-                overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE).getText();
-        String overviewProjectOkInfo =
-                overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO).getText();
         if (projectScheduleNumber == 1) {
-            OverviewSchedule overviewSchedule =
+            OverviewSchedule expectedOverviewSchedule =
                     expectedOverviewProject.getOverviewProcesses().get(0).getOverviewSchedules()
                             .get(0);
-            if (projectState != OverviewProjectStates.SCHEDULED) {
-                assertFalse(overviewProjectLogLinkElement.isEnabled());
-                assertFalse(overviewProjectRuntime.isEmpty());
-                System.out.println("Project schedule runtime: " + overviewProjectRuntime);
-                assertEquals(overviewProjectDate, overviewSchedule.getOverviewExecutionDateTime(),
-                        "Incorrect execution date!");
-                if (projectState != OverviewProjectStates.RUNNING) {
-                    assertEquals(overviewProjectRuntime,
-                            overviewSchedule.getLastExecutionRunTime(),
-                            "Incorrect execution runtime!");
-                }
-                if (projectState == OverviewProjectStates.FAILED) {
-                    assertEquals(overviewProjectErrorMessage,
-                            overviewSchedule.getExecutionDescription(), "Incorrect error message!");
-                } else if (projectState == OverviewProjectStates.SUCCESSFUL) {
-                    assertEquals(overviewProjectOkInfo, overviewSchedule.getExecutionDescription(),
-                            "Incorrect successful info!");
-                }
-            }
+            if (projectState != OverviewProjectStates.SCHEDULED)
+                assertTrue(overviewProjectLogLinkElement.getAttribute("class").contains(
+                        "action-unavailable-icon"));
+            assertProjectInfoWithOnlyOneSchedule(projectState, overviewProjectDetail,
+                    expectedOverviewSchedule);
         } else if (projectScheduleNumber > 1) {
             if (projectState != OverviewProjectStates.SCHEDULED) {
                 assertTrue(overviewProjectRuntime.isEmpty());
                 assertTrue(overviewProjectDate.isEmpty());
                 if (projectState == OverviewProjectStates.FAILED) {
                     String errorMessage = String.format("%d schedules", projectScheduleNumber);
-                    assertEquals(overviewProjectErrorMessage, errorMessage);
+                    assertEquals(
+                            overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE)
+                                    .getText(), errorMessage);
                 } else if (projectState == OverviewProjectStates.SUCCESSFUL) {
                     String okInfo = String.format("%d schedules", projectScheduleNumber);
-                    assertEquals(overviewProjectOkInfo, okInfo);
+                    assertEquals(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_OK_INFO)
+                            .getText(), okInfo);
                 }
             }
         }

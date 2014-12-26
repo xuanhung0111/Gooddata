@@ -1,16 +1,21 @@
 package com.gooddata.qa.graphene.disc;
 
+import java.io.IOException;
+import java.text.ParseException;
+
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 
 import static org.testng.Assert.*;
 
-public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
+public class LongRunTimeTests extends AbstractDISC {
 
     @BeforeClass
     public void initProperties() {
@@ -21,7 +26,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleAutoRun() {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Check Auto Run Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -41,7 +46,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void checkErrorExecution() {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Check Error Execution of Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -61,7 +66,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void checkRetryExecution() {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Check Retry Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -86,7 +91,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void checkStopAutoExecution() {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Check Stop Auto Execution";
             ScheduleBuilder scheduleBuilder =
@@ -107,7 +112,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void checkLongTimeExecution() {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Check Long Time Execution";
             ScheduleBuilder scheduleBuilder =
@@ -126,7 +131,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void disableSchedule() {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Disable Schedule";
             ScheduleBuilder scheduleBuilder =
@@ -150,12 +155,12 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleFailForManyTimes() {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Check Failed Schedule";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setExecutable(Executables.SHORT_TIME_FAILED_GRAPH)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
@@ -166,4 +171,104 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkScheduleTriggerByFailedSchedule() {
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
+                    dependentScheduleBuilder);
+
+            manualRunTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            scheduleDetail.assertFailedExecution(triggerScheduleBuilder.getExecutable());
+            int dependentScheduleExecutionNumber =
+                    waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            assertEquals(dependentScheduleExecutionNumber, 0);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkMultipleScheduleTriggers() throws JSONException, InterruptedException {
+        try {
+            String processName1 = "Check Schedule With Trigger Schedule 1";
+
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setScheduleName("Trigger schedule").setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder1 =
+                    new ScheduleBuilder().setScheduleName("Dependent schedule 1").setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
+            prepareDataForTriggerScheduleTest(processName1, triggerScheduleBuilder,
+                    dependentScheduleBuilder1);
+
+            String processName2 = "Check Schedule With Trigger Schedule 2";
+            ScheduleBuilder dependentScheduleBuilder2 =
+                    new ScheduleBuilder()
+                            .setProcessName(processName2)
+                            .setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.AFTER)
+                            .setTriggerScheduleGroup(dependentScheduleBuilder1.getProcessName())
+                            .setTriggerScheduleOption(
+                                    dependentScheduleBuilder1.getExecutable().getExecutablePath());
+            prepareScheduleWithBasicPackage(dependentScheduleBuilder2);
+
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder1);
+            scheduleDetail.assertSuccessfulExecution();
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder2);
+            scheduleDetail.assertFailedExecution(dependentScheduleBuilder2.getExecutable());
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    public void checkDisableDependentSchedule() {
+        try {
+            String processName = "Check Schedule With Trigger Schedule";
+
+            ScheduleBuilder triggerScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+            ScheduleBuilder dependentScheduleBuilder =
+                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
+                    dependentScheduleBuilder);
+
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            scheduleDetail.assertFailedExecution(dependentScheduleBuilder.getExecutable());
+            scheduleDetail.disableSchedule();
+
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            int dependentScheduleExecutionNumber =
+                    waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            assertEquals(dependentScheduleExecutionNumber, 1);
+        } finally {
+            cleanProcessesInProjectDetail(testParams.getProjectId());
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    public void checkProjectsNotAdminInFailedState() throws ParseException, IOException,
+            JSONException, InterruptedException {
+        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.FAILED);
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    public void checkProjectsNotAdminInSucessfulState() throws ParseException, IOException,
+            JSONException, InterruptedException {
+        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.SUCCESSFUL);
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    public void checkProjectsNotAdminInRunningState() throws ParseException, IOException,
+            JSONException, InterruptedException {
+        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.RUNNING);
+    }
 }

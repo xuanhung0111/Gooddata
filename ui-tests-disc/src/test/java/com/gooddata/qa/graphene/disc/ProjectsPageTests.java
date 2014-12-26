@@ -1,7 +1,10 @@
 package com.gooddata.qa.graphene.disc;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -12,13 +15,12 @@ import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public class ProjectsPageTests extends AbstractSchedulesTests {
+public class ProjectsPageTests extends AbstractDISC {
 
     @BeforeClass
     public void initProperties() {
@@ -39,16 +41,14 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     public void checkFailedProjectsFilterOption() {
         try {
             String processName = "Check Failed Projects Filter Option";
-            prepareDataWithBasicPackage(ProjectStateFilters.FAILED, getWorkingProject(),
+            prepareDataForProjectsPageTest(ProjectStateFilters.FAILED, getWorkingProject(),
                     processName, Executables.FAILED_GRAPH);
 
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(ProjectStateFilters.FAILED, getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -56,16 +56,14 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     public void checkSuccessfulProjectsFilterOptions() {
         try {
             String processName = "Check Successful Projects Filter Option";
-            prepareDataWithBasicPackage(ProjectStateFilters.SUCCESSFUL, getWorkingProject(),
+            prepareDataForProjectsPageTest(ProjectStateFilters.SUCCESSFUL, getWorkingProject(),
                     processName, Executables.SUCCESSFUL_GRAPH);
 
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(ProjectStateFilters.SUCCESSFUL, getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -73,51 +71,33 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     public void checkRunningProjectsFilterOptions() {
         try {
             String processName = "Check Running Projects Filter Option";
-            prepareDataWithBasicPackage(ProjectStateFilters.RUNNING, getWorkingProject(),
+            prepareDataForProjectsPageTest(ProjectStateFilters.RUNNING, getWorkingProject(),
                     processName, Executables.LONG_TIME_RUNNING_GRAPH);
 
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(ProjectStateFilters.RUNNING, getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkScheduledProjectsFilterOptions() throws JSONException, InterruptedException {
         List<ProjectInfo> additionalProjects =
-                createMultipleProjects("Disc-test-scheduled-filter-option", 1);
-        openProjectDetailPage(getWorkingProject());
+                Arrays.asList(new ProjectInfo().setProjectName("Disc-test-scheduled-filter-option"));
+        createMultipleProjects(additionalProjects);
         try {
+            prepareDataForAdditionalProjects(additionalProjects);
             String processName = "Process for additional projects";
-            for (ProjectInfo project : additionalProjects) {
-                prepareDataWithBasicPackage(ProjectStateFilters.SCHEDULED, project, processName,
-                        Executables.LONG_TIME_RUNNING_GRAPH);
-                openProjectDetailPage(project);
-                for (int i = 1; i < 7; i++) {
-                    ScheduleBuilder scheduleBuilder =
-                            new ScheduleBuilder()
-                                    .setProcessName(processName)
-                                    .setScheduleName(
-                                            Executables.LONG_TIME_RUNNING_GRAPH.getExecutableName()
-                                                    + i)
-                                    .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH);
-                    createAndAssertSchedule(scheduleBuilder);
-                    scheduleDetail.manualRun();
-                }
-            }
-            prepareDataWithBasicPackage(ProjectStateFilters.SCHEDULED, getWorkingProject(),
+            prepareDataForProjectsPageTest(ProjectStateFilters.SCHEDULED, getWorkingProject(),
                     processName, Executables.LONG_TIME_RUNNING_GRAPH);
 
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(ProjectStateFilters.SCHEDULED, getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
             deleteProjects(additionalProjects);
         }
     }
@@ -127,15 +107,14 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         try {
             String processName = "Check Unscheduled Projects Filter Option";
             Executables executable = null;
-            prepareDataWithBasicPackage(ProjectStateFilters.UNSCHEDULED, getWorkingProject(),
+            prepareDataForProjectsPageTest(ProjectStateFilters.UNSCHEDULED, getWorkingProject(),
                     processName, executable);
 
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(ProjectStateFilters.UNSCHEDULED, getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -143,16 +122,14 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     public void checkDisabledProjectsFilterOptions() {
         try {
             String processName = "Check Disabled Projects Filter Option";
-            prepareDataWithBasicPackage(ProjectStateFilters.DISABLED, getWorkingProject(),
+            prepareDataForProjectsPageTest(ProjectStateFilters.DISABLED, getWorkingProject(),
                     processName, Executables.SUCCESSFUL_GRAPH);
 
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
             discProjectsPage.checkProjectFilter(ProjectStateFilters.DISABLED, getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -182,9 +159,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
             waitForElementVisible(discProjectsList.getRoot());
             discProjectsList.assertDataLoadingProcesses(2, 3, getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -192,7 +167,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     public void checkLastSuccessfulExecution() {
         try {
             String processName = "Check Last Successful Execution";
-            prepareDataWithBasicPackage(ProjectStateFilters.SUCCESSFUL, getWorkingProject(),
+            prepareDataForProjectsPageTest(ProjectStateFilters.SUCCESSFUL, getWorkingProject(),
                     processName, Executables.SUCCESSFUL_GRAPH);
             String lastSuccessfulExecutionDate = scheduleDetail.getLastExecutionDate();
             String lastSuccessfulExecutionTime = scheduleDetail.getLastExecutionTime();
@@ -209,8 +184,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
             discProjectsList.assertLastLoaded(lastSuccessfulExecutionDate,
                     lastSuccessfulExecutionTime.substring(14), getProjects());
         } finally {
-            openProjectDetailByUrl(testParams.getProjectId());
-            projectDetailPage.deleteAllProcesses();
+            cleanProcessesInProjectDetail(testParams.getProjectId());
         }
     }
 
@@ -224,13 +198,13 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
             signIn(false, UserRoles.VIEWER);
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
-            discProjectsList.assertProjectNotAdmin(projectTitle, testParams.getProjectId());
+            discProjectsList.assertProjectNotAdmin(getWorkingProject().getProjectName());
             openUrl(PAGE_PROJECTS);
             logout();
             signIn(false, UserRoles.EDITOR);
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
-            discProjectsList.assertProjectNotAdmin(projectTitle, testParams.getProjectId());
+            discProjectsList.assertProjectNotAdmin(getWorkingProject().getProjectName());
         } finally {
             openUrl(PAGE_PROJECTS);
             logout();
@@ -253,8 +227,14 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         int projectsNumber =
                 projectsPage.getProjectsElements().size()
                         + projectsPage.getDemoProjectsElements().size();
-        if (projectsPage.getProjectsElements().size() <= 20)
-            createMultipleProjects("Disc-test-paging-projects-page-", 20 - projectsNumber + 1);
+        if (projectsNumber <= 20) {
+            List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
+            for (int i = 0; i < 20 - projectsNumber + 1; i++) {
+                additionalProjects.add(new ProjectInfo().setProjectName("Disc-test-paging-projects-page-" + i));
+            }
+            createMultipleProjects(additionalProjects);
+        }
+        
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.checkPagingProjectsPage("20");
@@ -320,7 +300,9 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
     @Test(dependsOnMethods = {"createProject"})
     public void checkSearchUnicodeProjectName() throws JSONException, InterruptedException {
         String unicodeProjectName = "Tiếng Việt ພາສາລາວ  résumé";
-        List<ProjectInfo> additionalProjects = createMultipleProjects(unicodeProjectName, 1);
+        List<ProjectInfo> additionalProjects =
+                Arrays.asList(new ProjectInfo().setProjectName(unicodeProjectName));
+        createMultipleProjects(additionalProjects);
         try {
             openUrl(DISC_PROJECTS_PAGE_URL);
             waitForElementVisible(discProjectsPage.getRoot());
@@ -343,48 +325,5 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.checkDeleteSearchKey("no search result");
-    }
-
-    private void prepareDataWithBasicPackage(ProjectStateFilters projectFilter,
-            ProjectInfo workingProject, String processName, Executables executable) {
-        openProjectDetailPage(workingProject);
-        deployInProjectDetailPage(DeployPackages.BASIC, processName);
-        if (projectFilter == ProjectStateFilters.UNSCHEDULED)
-            return;
-
-        ScheduleBuilder scheduleBuilder =
-                new ScheduleBuilder().setProcessName(processName).setExecutable(executable)
-                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                        .setMinuteInHour("59");
-        createAndAssertSchedule(scheduleBuilder);
-        scheduleDetail.manualRun();
-        if (projectFilter == ProjectStateFilters.SCHEDULED)
-            return;
-
-        assertTrue(scheduleDetail.isInRunningState());
-        if (projectFilter == ProjectStateFilters.RUNNING)
-            return;
-
-        if (projectFilter == ProjectStateFilters.FAILED)
-            scheduleDetail.assertFailedExecution(executable);
-        else
-            scheduleDetail.assertSuccessfulExecution();
-
-        if (projectFilter == ProjectStateFilters.DISABLED)
-            scheduleDetail.disableSchedule();
-    }
-
-    private void checkSearchProjectInSpecificState(ProjectStateFilters projectFilter,
-            ProjectInfo project, String processName, Executables executable) {
-        try {
-            prepareDataWithBasicPackage(projectFilter, project, processName, executable);
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
-            discProjectsPage.searchProjectInSpecificState(projectFilter, project);
-        } finally {
-            openProjectDetailByUrl(project.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-
-        }
     }
 }

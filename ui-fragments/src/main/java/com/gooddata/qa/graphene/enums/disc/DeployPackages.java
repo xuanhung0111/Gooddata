@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum DeployPackages {
 
-    BASIC("Basic", "Basic", ProcessTypes.GRAPH, Executables.FAILED_GRAPH, Executables.LONG_TIME_RUNNING_GRAPH, Executables.SUCCESSFUL_GRAPH),
+    BASIC("Basic", "Basic", ProcessTypes.GRAPH, Executables.FAILED_GRAPH, Executables.LONG_TIME_RUNNING_GRAPH, Executables.SHORT_TIME_FAILED_GRAPH, Executables.SUCCESSFUL_GRAPH),
     CLOUDCONNECT("cloudconnect", "DWHS", ProcessTypes.GRAPH, Executables.DWHS1, Executables.DWHS2),
     RUBY("ruby", "ruby", ProcessTypes.RUBY, Executables.RUBY1, Executables.RUBY2),
     EXECUTABLES_GRAPH("executables", "executables", ProcessTypes.GRAPH, Executables.EXECUTABLES_GRAPH1, Executables.EXECUTABLES_GRAPH2,
@@ -54,6 +54,12 @@ public enum DeployPackages {
                 "Graph=Basic/graph/errorGraph.grf error: Graph=schedule_param transformation failed!: "
                 + "Component [GD Dataset Writer:GD_DATASET_WRITER] finished with status ERROR.: "
                 + "Unrecoverable error in SLI upload occurred."),
+        SHORT_TIME_FAILED_GRAPH(
+                "shortTimeErrorGraph.grf",
+                "graph",
+                "Graph=Basic/graph/shortTimeErrorGraph.grf error: Graph=schedule_param transformation failed!: "
+                        + "Component [GD Dataset Writer:GD_DATASET_WRITER] finished with status ERROR.: "
+                        + "Unrecoverable error in SLI upload occurred."),
         LONG_TIME_RUNNING_GRAPH("longTimeRunningGraph.grf", "graph"),
         DWHS1("DWHS1.grf", "graph"),
         DWHS2("DWHS2.grf", "graph"),

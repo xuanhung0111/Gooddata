@@ -2,6 +2,9 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -54,19 +57,19 @@ public class ProjectsList extends AbstractTable {
                 String.format("%d processes, %d schedules", processNumber, scheduleNumber);
         System.out.println("expectedDataLoadingProcess " + expectedDataLoadingProcess);
         for (ProjectInfo project : projects) {
-            assertEquals(expectedDataLoadingProcess,
-                    selectProjectWithAdminRole(project)
-                            .findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText());
+            assertEquals(expectedDataLoadingProcess, selectProjectWithAdminRole(project)
+                    .findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText());
         }
     }
 
-    public void assertProjectNotAdmin(String projectName, String projectId) {
+    public void assertProjectNotAdmin(String projectName) {
         waitForElementVisible(getRoot());
         WebElement selectedProject = selectProjectWithNonAdminRole(projectName);
         assertNotNull(selectedProject, "Project is not found!");
         try {
             selectedProject.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).click();
-            waitForElementVisible(projectDetail);
+            Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until().element(projectDetail)
+                    .is().visible();
         } catch (NoSuchElementException ex) {
             System.out.println("Non-admin user cannot access project detail page!");
         }
@@ -78,9 +81,10 @@ public class ProjectsList extends AbstractTable {
         String expectedLastLoaded = executionDate + " " + executionTime;
         System.out.println("expectedLastLoaded " + expectedLastLoaded);
         for (ProjectInfo project : projects) {
-            assertEquals(expectedLastLoaded,
-                    selectProjectWithAdminRole(project)
-                            .findElement(BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION).getText());
+            assertEquals(
+                    expectedLastLoaded,
+                    selectProjectWithAdminRole(project).findElement(
+                            BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION).getText());
         }
     }
 
@@ -90,7 +94,8 @@ public class ProjectsList extends AbstractTable {
             @Override
             public boolean apply(WebElement row) {
                 return row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-                        && row.findElement(BY_DISC_PROJECT_NAME).getText().equals(project.getProjectName())
+                        && row.findElement(BY_DISC_PROJECT_NAME).getText()
+                                .equals(project.getProjectName())
                         && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href")
                                 .contains(project.getProjectId());
             }
@@ -133,8 +138,7 @@ public class ProjectsList extends AbstractTable {
 
     public void checkOnProjects(List<ProjectInfo> projects) {
         for (ProjectInfo project : projects) {
-            WebElement selectedProject =
-                    selectProjectWithAdminRole(project);
+            WebElement selectedProject = selectProjectWithAdminRole(project);
             assertNotNull(selectedProject, "Project is not found!");
             selectedProject.findElement(BY_PROJECT_CHECKBOX).click();
         }

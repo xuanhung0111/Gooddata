@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.disc;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
@@ -183,19 +183,15 @@ public abstract class AbstractDeployProcesses extends AbstractProjectTest {
         checkDeployDialogMessageInProjectsPage(projects, deployPackage, processType, false);
     }
 
-    protected List<ProjectInfo> createMultipleProjects(String projectNamePrefix, int projectNumber)
+    protected void createMultipleProjects(List<ProjectInfo> additionalProjects)
             throws JSONException, InterruptedException {
-        List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
-        for (int i = 0; i < projectNumber; i++) {
+        for (ProjectInfo project : additionalProjects) {
             openUrl(PAGE_GDC_PROJECTS);
             waitForElementVisible(gpProject.getRoot());
-            additionalProjects.add(new ProjectInfo().setProjectName(
-                    projectNamePrefix + String.valueOf(i)).setProjectId(
-                    gpProject.createProject(projectNamePrefix + i, projectNamePrefix + i, null,
-                            testParams.getAuthorizationToken(), testParams.getDwhDriver(),
-                            projectCreateCheckIterations)));
+            project.setProjectId(gpProject.createProject(project.getProjectName(),
+                    project.getProjectName(), null, testParams.getAuthorizationToken(),
+                    testParams.getDwhDriver(), projectCreateCheckIterations));
         }
-        return additionalProjects;
     }
 
     protected void deleteProjects(List<ProjectInfo> projectsToDelete) {

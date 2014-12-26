@@ -18,7 +18,6 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
     private String PROJECT_EMPTY_STATE_MESSAGE =
             "How to deploy a process? Read Preparing a Data Loading Process article";
     private static final long expectedDownloadedProcessSize = 64000L;
-
     private String downloadFolder;
 
     @BeforeClass
