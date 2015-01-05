@@ -4,6 +4,8 @@ import com.gooddata.qa.graphene.enums.DWHDriver;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import org.json.JSONException;
+import org.testng.ITestContext;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -78,8 +80,34 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         assertEquals(validateProject(), "OK");
     }
 
-    @Test(dependsOnMethods = {"validateProjectAfterTests"}, alwaysRun = true)
-    public void deleteProject() {
-        deleteProjectByDeleteModeAndReuse(successfulTest);
+    @AfterClass
+    public void deleteProjectTearDown(ITestContext context) {
+        if (testParams.isReuseProject()) {
+            System.out.println("Project is being re-used and won't be deleted.");
+            return;
+        }
+        System.out.println("Delete mode is set to " + testParams.getDeleteMode().toString());
+        String projectId = testParams.getProjectId();
+        if (projectId != null && projectId.length() > 0) {
+            switch (testParams.getDeleteMode()) {
+                case DELETE_ALWAYS:
+                    System.out.println("Project will be deleted...");
+                    deleteProject(projectId);
+                    break;
+                case DELETE_IF_SUCCESSFUL:
+                    if (context.getFailedTests().size() == 0) {
+                        System.out.println("Test was successful, project will be deleted...");
+                        deleteProject(projectId);
+                    } else {
+                        System.out.println("Test wasn't successful, project won't be deleted...");
+                    }
+                    break;
+                case DELETE_NEVER:
+                    System.out.println("Delete mode set to NEVER, project won't be deleted...");
+                    break;
+            }
+        } else {
+            System.out.println("No project created -> no delete...");
+        }
     }
 }

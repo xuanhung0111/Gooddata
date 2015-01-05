@@ -109,7 +109,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         createProject();
         importProject(exportToken, statusPollingCheckIterations);
         validateProject();
-        deleteProject();
+        deleteProject(testParams.getProjectId());
 
         testParams.setProjectId(parentProjectId);
         successfulTest = true;

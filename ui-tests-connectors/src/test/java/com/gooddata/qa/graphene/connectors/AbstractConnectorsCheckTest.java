@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -90,7 +91,6 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     public void verifyProjectDashboards() throws InterruptedException {
         // verify created project and count dashboard tabs
         verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
-        successfulTest = true;
     }
 
     @Test(dependsOnGroups = {"connectorWalkthrough"}, alwaysRun = true)
@@ -105,7 +105,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"disableConnectorIntegration"}, groups = {"tests"}, alwaysRun = true)
-    public void deleteConnectorIntegration() throws JSONException {
+    public void deleteConnectorIntegration(ITestContext context) throws JSONException {
         if (integrationActivated) {
             openUrl(getIntegrationUri());
             waitForElementVisible(connector.getRoot());
@@ -116,7 +116,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
                     connector.deleteIntegration();
                     break;
                 case DELETE_IF_SUCCESSFUL:
-                    if (successfulTest) {
+                    if (context.getFailedTests().size() == 0) {
                         System.out.println("Test was successful, integration will be deleted...");
                         connector.deleteIntegration();
                     } else {

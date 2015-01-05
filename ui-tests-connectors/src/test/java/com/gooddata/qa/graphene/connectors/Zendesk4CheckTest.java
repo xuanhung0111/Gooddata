@@ -157,22 +157,22 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
     **/
 
-    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void createZendeskTicketsReport() throws InterruptedException {
         createBasicReport("# Tickets", TICKETS_REPORT_NAME);
     }
 
-    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void createZendeskUsersReport() throws InterruptedException {
         createBasicReport("# Users", USERS_REPORT_NAME);
     }
 
-    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void createZendeskOrganizationsReport() throws InterruptedException {
         createBasicReport("# Organizations", ORGANIZATIONS_REPORT_NAME);
     }
 
-    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void createZendeskTicketEventsReport() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String ticketEventsCountMetric = "# All Ticket Events";
@@ -185,7 +185,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         createBasicReport(ticketEventsCountMetric, TICKET_EVENTS_COUNT_REPORT_NAME);
     }
 
-    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"connectorWalkthrough"})
+    @Test(dependsOnMethods = {"testZendeskIntegration"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void createReportsForMetrics() throws InterruptedException {
         createBasicReport("# Backlog Tickets", BACKLOG_TICKETS_REPORT_NAME);
         //TODO other metrics will be added
