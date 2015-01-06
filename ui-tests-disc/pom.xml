@@ -40,5 +40,10 @@
   		<artifactId>ui-tests-core</artifactId>
   		<version>${project.parent.version}</version>
   	</dependency>
+      <dependency>
+          <groupId>com.gooddata.msf</groupId>
+          <artifactId>msf-dto</artifactId>
+          <version>1.0.85</version>
+      </dependency>
   </dependencies>
 </project>

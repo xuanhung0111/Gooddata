@@ -12,26 +12,18 @@ public class ScheduleBuilder {
     private String processName;
     private Executables executable;
     private String scheduleName;
-    private CronTimeBuilder cronTimeBuilder;
-    private List<Parameter> secureParameters;
-    private List<Parameter> parameters;
+    private boolean dataloadDatasetsOverlap;
+    private CronTimeBuilder cronTimeBuilder = new CronTimeBuilder();
+    private List<Parameter> secureParameters = new ArrayList<Parameter>();
+    private List<Parameter> parameters = new ArrayList<Parameter>();
     private String scheduleUrl;
-    private int retryDelay;
-    private boolean isEnabled;
-    private boolean isConfirmed;
-
-    public ScheduleBuilder() {
-        this.processName = null;
-        this.executable = null;
-        this.scheduleName = null;
-        this.cronTimeBuilder = new CronTimeBuilder();
-        this.parameters = new ArrayList<Parameter>();
-        this.secureParameters = new ArrayList<Parameter>();
-        this.scheduleUrl = null;
-        this.retryDelay = 0;
-        this.isEnabled = true;
-        this.isConfirmed = true;
-    }
+    private int retryDelay = 0;
+    private boolean isEnabled = true;
+    private boolean confirmed = true;
+    private boolean dataloadProcess;
+    private boolean synchronizeAllDatasets;
+    private List<String> datasetsToSynchronize;
+    private List<String> allDatasets;
 
     public ScheduleBuilder setProcessName(String processName) {
         this.processName = processName;
@@ -113,6 +105,15 @@ public class ScheduleBuilder {
         return this;
     }
 
+    public ScheduleBuilder setDataloadDatasetsOverlap(boolean dataloadDatasetsOverlap) {
+        this.dataloadDatasetsOverlap = dataloadDatasetsOverlap;
+        return this;
+    }
+
+    public boolean isDataloadDatasetsOverlap() {
+        return this.dataloadDatasetsOverlap;
+    }
+
     public ScheduleBuilder setTriggerScheduleGroup(String groupOption) {
         this.cronTimeBuilder.setTriggerScheduleGroup(groupOption);
         return this;
@@ -123,13 +124,59 @@ public class ScheduleBuilder {
         return this;
     }
 
-    public ScheduleBuilder isConfirm() {
-        this.isConfirmed = true;
+    public ScheduleBuilder setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
         return this;
     }
 
-    public ScheduleBuilder isCancel() {
-        this.isConfirmed = false;
+    public ScheduleBuilder setHasDataloadProcess(boolean hasDataloadProcess) {
+        this.dataloadProcess = hasDataloadProcess;
+        return this;
+    }
+
+    public boolean isDataloadProcess() {
+        return dataloadProcess;
+    }
+
+    public ScheduleBuilder setSynchronizeAllDatasets(boolean synchronizeAllDatasets) {
+        this.synchronizeAllDatasets = synchronizeAllDatasets;
+        return this;
+    }
+
+
+    public boolean isSynchronizeAllDatasets() {
+        return synchronizeAllDatasets;
+    }
+
+
+    public ScheduleBuilder setDatasetsToSynchronize(List<String> datasetsToSynchronize) {
+        this.datasetsToSynchronize = datasetsToSynchronize;
+        if (datasetsToSynchronize != null) {
+            this.synchronizeAllDatasets = false;
+        }
+
+        if (datasetsToSynchronize == null || datasetsToSynchronize.isEmpty()) {
+            this.dataloadDatasetsOverlap = false;
+        }
+        return this;
+    }
+
+
+    public List<String> getDatasetsToSynchronize() {
+        return datasetsToSynchronize;
+    }
+
+    public ScheduleBuilder setAllDatasets(List<String> allDatasets) {
+        this.allDatasets = allDatasets;
+        return this;
+    }
+
+    public List<String> getAllDatasets() {
+        return allDatasets;
+    }
+
+    public ScheduleBuilder hasExecutableProcess() {
+        this.dataloadProcess = false;
         return this;
     }
 
@@ -197,7 +244,7 @@ public class ScheduleBuilder {
     }
 
     public boolean isConfirmed() {
-        return isConfirmed;
+        return confirmed;
     }
 
     public static class CronTimeBuilder {

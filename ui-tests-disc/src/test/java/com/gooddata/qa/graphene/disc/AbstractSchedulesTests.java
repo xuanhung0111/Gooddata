@@ -24,6 +24,7 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
         projectDetailPage.assertScheduleInList(schedulesTable, scheduleBuilder);
         schedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()).click();
         waitForElementVisible(scheduleDetail.getRoot());
+
         scheduleDetail.assertSchedule(scheduleBuilder);
     }
 
