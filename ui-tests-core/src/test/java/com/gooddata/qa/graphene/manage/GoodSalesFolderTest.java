@@ -170,7 +170,6 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"editor-tests"}, groups = {"tests"})
     public void finalTest() throws JSONException {
-        successfulTest = true;
         logout();
         signIn(false, UserRoles.ADMIN);
     }

@@ -514,8 +514,4 @@ public class NotificationsTest extends AbstractNotificationTest {
         cleanProcessesInProjectDetail(testParams.getProjectId());
     }
 
-    @Test(dependsOnGroups = {"notification"}, groups = {"tests"})
-    public void test() {
-        successfulTest = true;
-    }
 }

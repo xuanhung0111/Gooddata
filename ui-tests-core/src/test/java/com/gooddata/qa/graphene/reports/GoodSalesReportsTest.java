@@ -281,7 +281,6 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         assertEquals(reportsPage.getReportsList().getNumberOfReports(),
                 expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
-        successfulTest = true;
     }
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)

@@ -615,6 +615,5 @@ public class UploadTests extends AbstractUploadTest {
 			"upload-special-kind-of-csv", "upload-different-date-formats",
 			"auto-guessed-ID-column", "crazy-footer", "invalid-delimiter" }, groups = { "tests" })
 	public void endOfTests() {
-		successfulTest = true;
 	}
 }

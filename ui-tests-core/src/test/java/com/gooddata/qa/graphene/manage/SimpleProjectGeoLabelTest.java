@@ -85,11 +85,6 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = {"tests"})
-    public void finalTest() {
-        successfulTest = true;
-    }
-
     private List<AttributeLabelTypes> getGeoLabels() {
         List<AttributeLabelTypes> list = new ArrayList<AttributeLabelTypes>();
         for (AttributeLabelTypes label : AttributeLabelTypes.values()) {

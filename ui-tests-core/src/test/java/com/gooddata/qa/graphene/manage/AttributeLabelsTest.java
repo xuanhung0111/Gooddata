@@ -116,11 +116,6 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         report.verifyAttributeIsHyperlinkInReport();
     }
 
-    @Test(dependsOnGroups = {"tests"})
-    public void finalTest() {
-        successfulTest = true;
-    }
-
     private void initReport(String reportName) {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
         waitForReportsPageLoaded(browser);

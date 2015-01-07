@@ -78,7 +78,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         statusValues = Arrays.asList("Lost", "Open", "Won");
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createShareMetric() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metricName = "Share % " + getCurrentDateString();
@@ -90,7 +90,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 productValues);
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createDifferentMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metric = "Amount";
@@ -102,7 +102,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 productValues);
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createRatioMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metricName = "Ratio " + getCurrentDateString();
@@ -111,7 +111,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         checkMetricValuesInReport(metricName, null, metricValues, null);
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createAggregationMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String fact0 = "Amount";
@@ -198,7 +198,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createNumericMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String metric0 = "Best Case";
@@ -244,7 +244,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createGranularityMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String fact0 = "Probability";
@@ -310,7 +310,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createLogicalMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String attrFolder0 = "Date dimension (Snapshot)";
@@ -384,7 +384,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"metric-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
     public void createFilterMetricTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         String attrFolder = "Date dimension (Snapshot)";
@@ -465,11 +465,6 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
             }
         }
-    }
-
-    @Test(dependsOnGroups = {"metric-tests"}, groups = {"tests"})
-    public void finalTest() {
-        successfulTest = true;
     }
 
     private void checkMetricValuesInReport(String metricName,

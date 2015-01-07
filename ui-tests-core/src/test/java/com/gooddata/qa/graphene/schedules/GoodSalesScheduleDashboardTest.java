@@ -131,8 +131,6 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         waitForElementPresent(By.cssSelector(".embedded.s-dashboardLoaded"), this.browser);
         assertTrue(dashboardsPage.isScheduleButtonVisible());
 
-        successfulTest = true;
-
         // re-login as admin for successfull project wipe; get to non-embedded to logout first
         initDashboardsPage();
         loginAs(UserRoles.ADMIN);

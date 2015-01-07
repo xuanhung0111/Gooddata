@@ -78,7 +78,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             System.out.println("ACCELERATE scheduled mails processing");
             pssClient.accelerate();
             checkMailbox(imapClient);
-            successfulTest = true;
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
             pssClient.decelerate();

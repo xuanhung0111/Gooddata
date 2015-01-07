@@ -75,7 +75,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         postPullIntegration(parseIntegrationEntry(webdavURL), statusPollingCheckIterations);
     }
 
-    @Test(dependsOnMethods = {"loadProject"}, dataProvider = "defaultRelations")
+    @Test(dependsOnMethods = {"loadProject"}, dataProvider = "defaultRelations", groups = {"tests"})
     public void createRel(String attributeTitle, String attrIdentifier, String relation, String relationAs) throws JSONException, InterruptedException {
         String createMAQL = "alter attribute {" + attrIdentifier + "} add relations " + relation + relationAs + ";";
         postMAQL(createMAQL, statusPollingCheckIterations);
@@ -88,7 +88,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         assertEquals(attrRel, relation + relationAs);
     }
 
-    @Test(dependsOnMethods = {"createRel"}, dataProvider = "defaultRelations")
+    @Test(dependsOnMethods = {"createRel"}, dataProvider = "defaultRelations", groups = {"tests"})
     public void alterAndCompute(String attributeTitle, String attrIdentifier, String relation, String relationAs) throws JSONException, InterruptedException {
         // get attribute
         int attributeID = attributeMapping.get(attrIdentifier);
@@ -115,11 +115,6 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         String createMAQL = "alter attribute {" + attrIdentifier + "} add relations " + relation + relationAs.replaceAll("\\?.*}", "?" + attributeElement.getValue()) + "};";
         System.out.println("createMAQL = " + createMAQL);
         postMAQL(createMAQL, statusPollingCheckIterations);
-    }
-
-    @Test(dependsOnMethods = {"alterAndCompute"}, groups = {"tests"})
-    public void endOfTests() {
-        successfulTest = true;
     }
 
     private String parseIntegrationEntry(String url) {

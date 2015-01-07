@@ -16,7 +16,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         projectTitle = "Disc-test-deploy-process";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployCloudConnectInProjectsPage() throws JSONException, InterruptedException {
         try {
             deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT,
@@ -26,7 +26,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployRubyInProjectsPage() throws JSONException, InterruptedException {
         try {
             deployInProjectsPage(getProjects(), DeployPackages.RUBY, "Ruby - Projects List Page");
@@ -35,7 +35,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployCloudConnectInProjectDetailPage() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -46,7 +46,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployRubyInProjectDetailPage() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -56,7 +56,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void redeployProcessWithDifferentPackage() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -68,7 +68,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void redeployProcessWithDifferentProcessType() throws JSONException,
             InterruptedException {
         try {
@@ -81,7 +81,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void redeployProcessWithSamePackage() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -94,14 +94,14 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void emptyInputErrorDeployment() throws InterruptedException {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
         deployForm.assertErrorOnDeployForm("", ProcessTypes.DEFAULT, "");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void notZipFileErrorDeployment() throws InterruptedException {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
@@ -109,7 +109,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
                 "Not zip file");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void tooLargeZipFileErrorDeployment() throws InterruptedException {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
@@ -117,27 +117,27 @@ public class DeployProcesses extends AbstractDeployProcesses {
                 ProcessTypes.DEFAULT, "Too large file");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployWithoutExecutablesInProjectsPage() throws JSONException, InterruptedException {
         failedDeployInProjectsPage(getProjects(), DeployPackages.NOT_EXECUTABLE,
                 ProcessTypes.DEFAULT, "Not Executables");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployCloudConnectWithRubyTypeInProjectsPage() throws JSONException,
             InterruptedException {
         failedDeployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT,
                 ProcessTypes.RUBY, "CloudConnect with Ruby type");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployRubyWithCloudConnectTypeInProjectsPage() throws JSONException,
             InterruptedException {
         failedDeployInProjectsPage(getProjects(), DeployPackages.RUBY, ProcessTypes.GRAPH,
                 "Ruby with CloudConnect type");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployWithoutExecutablesInProjectDetailPage() throws JSONException,
             InterruptedException {
         openProjectDetailPage(getWorkingProject());
@@ -145,7 +145,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
                 "Not Executable");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployCloudConnectWithRubyTypeInProjectDetailPage() throws JSONException,
             InterruptedException {
         openProjectDetailPage(getWorkingProject());
@@ -153,7 +153,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
                 "Deploy CloudConnect package with ruby type");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void deployRubyWithCloudConnectTypeInProjectDetailPage() throws JSONException,
             InterruptedException {
         openProjectDetailPage(getWorkingProject());
@@ -161,7 +161,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
                 "Deploy Ruby package with graph type");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void redeployWithoutExecutables() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -174,7 +174,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void redeployCloudConnectWithRubyType() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -187,7 +187,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void redeployRubyWithCloudConnectType() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -199,7 +199,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkDeployDialogMessageInProjectDetail() throws InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -210,7 +210,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkDeployDialogMessageInProjectsPage() throws InterruptedException {
         try {
             checkSuccessfulDeployDialogMessageInProjectsPage(getProjects(),
@@ -220,14 +220,10 @@ public class DeployProcesses extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkFailedDeployMessageInProjectsPage() throws InterruptedException {
         checkFailedDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
                 ProcessTypes.RUBY);
     }
 
-    @Test(dependsOnGroups = {"deploy"}, groups = {"tests"})
-    public void test() throws JSONException {
-        successfulTest = true;
-    }
 }

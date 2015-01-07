@@ -17,7 +17,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
         projectTitle = "GoodSales-test-fact";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests", "object-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"object-tests", "tests"})
     public void initialize() throws InterruptedException, JSONException {
         name = "Amount";
         this.factFolder = "Stage History";
@@ -25,7 +25,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
         tagName = "Graphene-test";
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests", "tests"})
     public void factAggregationsTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
         waitForElementVisible(factsTable.getRoot());
@@ -36,7 +36,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests"})
+    @Test(dependsOnMethods = {"initialize"}, groups = {"property-object-tests", "tests"})
     public void changeFactFolderTest() throws InterruptedException {
         initObject(name);
         factDetailPage.changeFactFolder(factFolder);

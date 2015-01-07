@@ -40,7 +40,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
                 .withAttributeElements("Interest", "Discovery", "Short List", "Negotiation"));
     }
 
-    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest"}, groups = {"tests"})
     public void attributeFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", "Interest", 
@@ -49,7 +49,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest"}, groups = {"tests"})
     public void rankingFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createRankingFilter(ResultSize.TOP.withSize(3), "Stage Name", "Amount"));
@@ -57,7 +57,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest"}, groups = {"tests"})
     public void rangeFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createRangeFilter("Stage Name", "Amount",
@@ -66,18 +66,13 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"createReportTest", "createVariableTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest", "createVariableTest"}, groups = {"tests"})
     public void promptFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(VARIABLE_NAME,
                 "Interest", "Discovery", "Short List", "Negotiation"));
         reportPage.saveReport();
         checkRedBar(browser);
-    }
-
-    @Test(dependsOnGroups = {"filter-tests"}, groups = {"tests"})
-    public void finalTest() throws InterruptedException {
-        successfulTest = true;
     }
 
     private void initReport() {

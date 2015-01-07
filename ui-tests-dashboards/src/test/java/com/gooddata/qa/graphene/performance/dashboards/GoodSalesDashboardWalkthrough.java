@@ -29,7 +29,6 @@ public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
         }
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output);
-        successfulTest = true;
     }
 
     private void createPerfOutputFile(String csvContent) throws JSONException {

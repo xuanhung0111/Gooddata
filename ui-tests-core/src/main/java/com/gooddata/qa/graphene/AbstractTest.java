@@ -36,8 +36,6 @@ public abstract class AbstractTest extends Arquillian {
 
     protected String startPage;
 
-    protected boolean successfulTest = false;
-
     @BeforeClass
     public void loadProperties() {
         propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") +

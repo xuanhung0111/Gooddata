@@ -112,7 +112,6 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         deleteProject(testParams.getProjectId());
 
         testParams.setProjectId(parentProjectId);
-        successfulTest = true;
     }
 
     private ArrayList<String> parsePopulatesFields(JSONArray populates) throws JSONException {

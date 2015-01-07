@@ -26,7 +26,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         projectTitle = "Disc-test-projects-page";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkProjectFilterOptions() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
@@ -35,7 +35,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                 .getSelectedFilterOption().getText());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkFailedProjectsFilterOption() {
         try {
             String processName = "Check Failed Projects Filter Option";
@@ -52,7 +52,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSuccessfulProjectsFilterOptions() {
         try {
             String processName = "Check Successful Projects Filter Option";
@@ -69,7 +69,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkRunningProjectsFilterOptions() {
         try {
             String processName = "Check Running Projects Filter Option";
@@ -86,7 +86,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkScheduledProjectsFilterOptions() throws JSONException, InterruptedException {
         List<ProjectInfo> additionalProjects =
                 createMultipleProjects("Disc-test-scheduled-filter-option", 1);
@@ -122,7 +122,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkUnscheduledProjectsFilterOptions() {
         try {
             String processName = "Check Unscheduled Projects Filter Option";
@@ -139,7 +139,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkDisabledProjectsFilterOptions() {
         try {
             String processName = "Check Disabled Projects Filter Option";
@@ -156,7 +156,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkDataLoadingProcess() {
         try {
             String processName1 = "Check Data Loading Processes 1";
@@ -188,7 +188,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkLastSuccessfulExecution() {
         try {
             String processName = "Check Last Successful Execution";
@@ -214,7 +214,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkProjectsNotAdmin() throws ParseException, IOException, JSONException,
             InterruptedException {
         try {
@@ -238,14 +238,14 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkPagingOptions() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.checkProjectsPagingOptions();
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkPagingProjectsPage() throws JSONException, InterruptedException {
         openUrl(PAGE_PROJECTS);
         waitForElementVisible(projectsPage.getRoot());
@@ -260,56 +260,56 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
         discProjectsPage.checkPagingProjectsPage("20");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkEmptySearchResult() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.checkEmptySearchResult("no search result");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchProjectByName() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.searchProjectByName(projectTitle);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchProjectById() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.searchProjectById(getWorkingProject());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchProjectInSuccessfulState() throws InterruptedException, JSONException {
         String processName = "Check Search Project In Successful State";
         checkSearchProjectInSpecificState(ProjectStateFilters.SUCCESSFUL, getWorkingProject(),
                 processName, Executables.SUCCESSFUL_GRAPH);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchProjectInFailedState() {
         String processName = "Check Search Project In Failed State";
         checkSearchProjectInSpecificState(ProjectStateFilters.FAILED, getWorkingProject(),
                 processName, Executables.FAILED_GRAPH);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchProjectInRunningState() {
         String processName = "Check Search Project In Running State";
         checkSearchProjectInSpecificState(ProjectStateFilters.RUNNING, getWorkingProject(),
                 processName, Executables.LONG_TIME_RUNNING_GRAPH);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchProjectInDisabledState() {
         String processName = "Check Search Project In Failed State";
         checkSearchProjectInSpecificState(ProjectStateFilters.DISABLED, getWorkingProject(),
                 processName, Executables.SUCCESSFUL_GRAPH);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchProjectInUnscheduledState() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
@@ -317,7 +317,7 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
                 getWorkingProject());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkSearchUnicodeProjectName() throws JSONException, InterruptedException {
         String unicodeProjectName = "Tiếng Việt ພາສາລາວ  résumé";
         List<ProjectInfo> additionalProjects = createMultipleProjects(unicodeProjectName, 1);
@@ -331,23 +331,18 @@ public class ProjectsPageTests extends AbstractSchedulesTests {
 
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkDefaultSearchBox() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.checkDefaultSearchBox();
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
     public void checkDeleteSearchKey() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.checkDeleteSearchKey("no search result");
-    }
-
-    @Test(dependsOnGroups = {"projects-page"}, groups = {"tests"})
-    public void test() {
-        successfulTest = true;
     }
 
     private void prepareDataWithBasicPackage(ProjectStateFilters projectFilter,

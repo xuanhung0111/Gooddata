@@ -65,6 +65,5 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
         OneNumberReport report = dashboardsPage.getContent().getReport(0, OneNumberReport.class);
         assertEquals(report.getValue(), "7,252,542.63", "Invalid value in headline report");
         assertEquals(report.getDescription(), "Sum of Amount", "Invalid description in headline report");
-        successfulTest = true;
     }
 }

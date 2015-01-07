@@ -109,7 +109,6 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         assertTrue(unsubscribed.contains(testParams.getUser()), "The 'To' user is in the list of unsubscribed users. Expected '" + testParams.getUser() + "', found '" + unsubscribed + "'.");
         assertTrue(unsubscribed.contains(getBccEmail()), "The 'Bcc' user is in the list of unsubscribed users. Expected '" + getBccEmail() + "', found '" + unsubscribed + "'.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-unsubscribed", this.getClass());
-        successfulTest = true;
     }
 
     // check email source for unsubscribe link and return this link

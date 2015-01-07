@@ -34,7 +34,6 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         initEmailSchedulesPage();
         assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "Schedules are properly created.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
-        successfulTest = true;
     }
 
 }
