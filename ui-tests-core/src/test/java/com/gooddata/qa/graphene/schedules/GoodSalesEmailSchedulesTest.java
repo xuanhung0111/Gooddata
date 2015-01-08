@@ -29,7 +29,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
     }
 
-    @Test(groups = {"tests"}, dependsOnGroups = {"schedules"})
+    @Test(dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
         initEmailSchedulesPage();
         assertEquals(emailSchedulesPage.getNumberOfSchedules(), 2, "Schedules are properly created.");

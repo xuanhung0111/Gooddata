@@ -29,7 +29,7 @@ public abstract class ObjectAbstractTest extends GoodSalesAbstractTest {
         objectDetailPage.addTag("graphene test adding tag");
     }
 
-    @Test(dependsOnGroups = {"property-object-tests"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"property-object-tests"})
     public void verifyAllPropertiesTest() {
         initObject(name);
         objectDetailPage.verifyAllPropertiesAtOnce(name, description, tagName);

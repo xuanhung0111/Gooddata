@@ -35,7 +35,7 @@ public class AnnieUITest extends AbstractProjectTest {
     private static final String ENABLE_DATA_EXPLORER = "enableDataExplorer";
     private static final String CSS_ADD_NEW_FIELDS_LOCATOR = ".s-btn-add_new_fields";
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void enableAnnieUIFeature() throws JSONException{
         try {
             openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|");

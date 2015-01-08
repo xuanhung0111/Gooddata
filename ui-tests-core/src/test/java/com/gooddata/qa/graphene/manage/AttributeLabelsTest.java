@@ -36,19 +36,19 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-attribute-labels";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void initialize() throws InterruptedException, JSONException {
         hyperlinkAttr = "Hyperlink";
         hyperlinkReport = "Hyperlink Report";
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"initialize"})
     public void initDataTest() throws InterruptedException {
         Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
         uploadCSV(csvFilePath + "attribute_labels.csv", columnIndexAndType, "attribute-labels");
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"initialize"})
     public void setSFDCCredentialsTest() throws InterruptedException,
             JSONException {
         openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/credentials/sfdc");
@@ -57,14 +57,13 @@ public class AttributeLabelsTest extends AbstractProjectTest {
                 testParams.loadProperty("sfdc.password") + testParams.loadProperty("sfdc.securityToken"));
     }
 
-    @Test(dependsOnMethods = {"initDataTest"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"initDataTest"})
     public void changeAttributeToImageTest() throws InterruptedException {
         changeAttributeLabel("Image", AttributeLabelTypes.IMAGE);
         changeAttributeLabel("Image_SFDC", AttributeLabelTypes.IMAGE);
     }
 
-    @Test(dependsOnMethods = {"changeAttributeToImageTest"}, groups = {
-            "tests"})
+    @Test(dependsOnMethods = {"changeAttributeToImageTest"})
     public void verifyReportWithImageTest() throws InterruptedException {
         initReport("Image Top 5");
         ReportWithImage report = Graphene.createPageFragment(
@@ -73,8 +72,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         report.verifyImageOnReport();
     }
 
-    @Test(dependsOnMethods = {"setSFDCCredentialsTest",
-            "changeAttributeToImageTest"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"setSFDCCredentialsTest", "changeAttributeToImageTest"})
     public void verifyReportWithImageSFDCTest() throws InterruptedException {
         initReport("Image_SFDC Top 5");
         ReportWithImage report = Graphene.createPageFragment(
@@ -84,22 +82,20 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     }
 
-    @Test(dependsOnMethods = {"initDataTest"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"initDataTest"})
     public void changeAttributeToHyperlinkTest() throws InterruptedException {
         changeAttributeLabel(hyperlinkAttr, AttributeLabelTypes.HYPERLINK);
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         attributePage.verifyHyperLink(hyperlinkAttr);
     }
 
-    @Test(dependsOnMethods = {"changeAttributeToHyperlinkTest"}, groups = {
-            "tests"})
+    @Test(dependsOnMethods = {"changeAttributeToHyperlinkTest"})
     public void configDrillToExternalPageTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         attributePage.configureDrillToExternalPage(hyperlinkAttr);
     }
 
-    @Test(dependsOnMethods = {"configDrillToExternalPageTest"}, groups = {
-            "tests"})
+    @Test(dependsOnMethods = {"configDrillToExternalPageTest"})
     public void createReportWithHyperlinkTest() throws InterruptedException {
         createReport(new ReportDefinition().withName(hyperlinkReport)
                                            .withWhats("Count of Image")
@@ -107,8 +103,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
                      "Simple hyperlink report");
     }
 
-    @Test(dependsOnMethods = {"createReportWithHyperlinkTest"}, groups = {
-            "tests"})
+    @Test(dependsOnMethods = {"createReportWithHyperlinkTest"})
     public void verifyReportWithHyperlinkTest() throws InterruptedException {
         initReport(hyperlinkReport);
         TableReport report = Graphene.createPageFragment(TableReport.class,

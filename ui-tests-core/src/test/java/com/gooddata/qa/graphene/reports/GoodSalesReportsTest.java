@@ -52,7 +52,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"verifyReportsPage"})
     public void createComputedAttributesTabularReport() throws InterruptedException, IOException, JSONException {
 
         By includeArea = By.xpath("//div[@title='Include']");
@@ -272,7 +272,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         prepareReport("Simple stacked bar chart report", ReportTypes.STACKED_BAR, what, how);
     }
 
-    @Test(dependsOnGroups = {"goodsales-chart", "chart-exports", "tabular-report-exports"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"goodsales-chart", "chart-exports", "tabular-report-exports"})
     public void verifyCreatedReports() throws InterruptedException {
         initReportsPage();
         selectReportsDomainFolder("All");

@@ -62,7 +62,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 			.xpath("//div[contains(@class,'bottomButtons')]//button[text()='Apply']");
 	private static final By noDataMessage = By.xpath("//div[@class='alert-title']");
 
-	@Test(dependsOnMethods = { "createProject" }, groups = { "addAndEditScatterWidgetTest", "tests"})
+	@Test(dependsOnMethods = { "createProject" }, groups = { "addAndEditScatterWidgetTest"})
 	public void addScatterWidgetTest() throws InterruptedException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("dataPointFolder", "Stage");
@@ -82,7 +82,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 		testScatterWidgetDisplaying();
 	}
 
-	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 2, groups = { "addAndEditScatterWidgetTest", "tests" })
+	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 2, groups = { "addAndEditScatterWidgetTest" })
 	public void addColorSeriesTest() throws InterruptedException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("colorAttributeFolder", "Stage");
@@ -153,7 +153,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 		dashboardEditBar.saveDashboard();
 	}
 
-	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 3, groups = { "addAndEditScatterWidgetTest", "tests" })
+	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 3, groups = { "addAndEditScatterWidgetTest" })
 	public void addAdditionalColumnTest() throws InterruptedException {
 		Map<String, ArrayList<HashMap<String, String>>> data = new HashMap<String, ArrayList<HashMap<String, String>>>();
 		ArrayList<HashMap<String, String>> attributeList = new ArrayList<HashMap<String, String>>();
@@ -195,7 +195,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 		dashboardEditBar.saveDashboard();
 	}
 
-	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 4, groups = { "addAndEditScatterWidgetTest", "tests" })
+	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 4, groups = { "addAndEditScatterWidgetTest" })
 	public void changeScatterExplorerTitle() throws InterruptedException {
 		String scatterTitleText = new String("New Scatter Explorer");
 		String scatterSubtitleText = new String("this is a test for scatter explorer");
@@ -275,7 +275,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 				"Scatter Subtitle is changed in CANCEL action");
 	}
 
-	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 5, groups = { "addAndEditScatterWidgetTest", "tests" })
+	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 5, groups = { "addAndEditScatterWidgetTest" })
 	public void shareScatterExplorerTest() throws InterruptedException {
 		initDashboardsPage();
 		DashboardEmbedDialog dialog = dashboardsPage.embedDashboard();
@@ -287,14 +287,14 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 		testScatterWidgetDisplaying();
 	}
 
-	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 6, groups = { "addAndEditScatterWidgetTest", "tests" })
+	@Test(dependsOnMethods = { "addScatterWidgetTest" }, priority = 6, groups = { "addAndEditScatterWidgetTest" })
 	public void exportDashboardContainingScatterExplorerTest() throws InterruptedException {
 		initDashboardsPage();
 		String exportedDashboardName = dashboardsPage.exportDashboardTab(0);
 		verifyDashboardExport(exportedDashboardName, expectedDashboardExportSize);
 	}
 
-	@Test(dependsOnGroups = { "addAndEditScatterWidgetTest" }, priority = 1, groups = { "advancedScatterWidgetTest", "tests" })
+	@Test(dependsOnGroups = { "addAndEditScatterWidgetTest" }, priority = 1, groups = { "advancedScatterWidgetTest" })
 	public void addScatterWidgetWithTooManyDataPointsTest() throws InterruptedException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("dataPointFolder", "Account");
@@ -328,7 +328,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 		assertEquals(alertMessageElement.getText().trim(), "Too many data points");
 	}
 
-	@Test(dependsOnGroups = { "addAndEditScatterWidgetTest" }, priority = 2, groups = { "advancedScatterWidgetTest", "tests" })
+	@Test(dependsOnGroups = { "addAndEditScatterWidgetTest" }, priority = 2, groups = { "advancedScatterWidgetTest" })
 	public void addScatterWidgetWithInvalidConfigurationTest() throws InterruptedException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("dataPointFolder", "Stage History");
@@ -365,7 +365,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 				"Invalid configuration");
 	}
 
-	@Test(dependsOnGroups = { "addAndEditScatterWidgetTest" }, priority = 3, groups = { "advancedScatterWidgetTest", "tests" })
+	@Test(dependsOnGroups = { "addAndEditScatterWidgetTest" }, priority = 3, groups = { "advancedScatterWidgetTest" })
 	public void applyFilterOnScatterWidgetTest() throws InterruptedException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("dataPointFolder", "Stage");

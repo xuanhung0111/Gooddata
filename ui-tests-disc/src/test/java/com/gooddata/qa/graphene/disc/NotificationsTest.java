@@ -509,7 +509,7 @@ public class NotificationsTest extends AbstractNotificationTest {
         }
     }
 
-    @Test(dependsOnGroups = {"notification"}, groups = {"tests"}, alwaysRun = true)
+    @Test(dependsOnGroups = {"notification"}, alwaysRun = true)
     public void deleteProcesses() {
         cleanProcessesInProjectDetail(testParams.getProjectId());
     }

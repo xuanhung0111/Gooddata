@@ -48,7 +48,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-compAttrs";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void loadProject() throws JSONException, URISyntaxException, IOException, InterruptedException {
         // create model
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
@@ -75,7 +75,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         postPullIntegration(parseIntegrationEntry(webdavURL), statusPollingCheckIterations);
     }
 
-    @Test(dependsOnMethods = {"loadProject"}, dataProvider = "defaultRelations", groups = {"tests"})
+    @Test(dependsOnMethods = {"loadProject"}, dataProvider = "defaultRelations")
     public void createRel(String attributeTitle, String attrIdentifier, String relation, String relationAs) throws JSONException, InterruptedException {
         String createMAQL = "alter attribute {" + attrIdentifier + "} add relations " + relation + relationAs + ";";
         postMAQL(createMAQL, statusPollingCheckIterations);
@@ -88,7 +88,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         assertEquals(attrRel, relation + relationAs);
     }
 
-    @Test(dependsOnMethods = {"createRel"}, dataProvider = "defaultRelations", groups = {"tests"})
+    @Test(dependsOnMethods = {"createRel"}, dataProvider = "defaultRelations")
     public void alterAndCompute(String attributeTitle, String attrIdentifier, String relation, String relationAs) throws JSONException, InterruptedException {
         // get attribute
         int attributeID = attributeMapping.get(attrIdentifier);

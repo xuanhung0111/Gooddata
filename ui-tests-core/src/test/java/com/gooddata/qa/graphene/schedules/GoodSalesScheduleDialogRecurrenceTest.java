@@ -28,7 +28,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
     private final Cookie FEATURE_FLAG_COOKIE = new Cookie(FEATURE_FLAG_COOKIE_NAME, "1");
     private DashboardScheduleDialog scheduleDashboard;
 
-    @Test(dependsOnGroups = {"schedules"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"schedules"})
     public void switchRecurrences () throws IllegalArgumentException {
         initDashboardsPage();
         scheduleDashboard = dashboardsPage.scheduleDashboard();

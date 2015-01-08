@@ -40,7 +40,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void initialize() throws InterruptedException, JSONException {
         newName = "New Folder";
         unicodeName = "ພາສາລາວ résumé اللغة";
@@ -168,7 +168,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"editor-tests"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"editor-tests"})
     public void finalTest() throws JSONException {
         logout();
         signIn(false, UserRoles.ADMIN);

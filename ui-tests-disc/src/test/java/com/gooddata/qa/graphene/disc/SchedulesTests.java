@@ -34,7 +34,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         projectTitle = "Disc-test-schedule";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCustomInput() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -58,7 +58,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleForSpecificExecutable() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -80,7 +80,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleFromSchedulesList() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -99,7 +99,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithEveryWeekCronTime() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -118,7 +118,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithEveryDayCronTime() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -137,7 +137,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCronExpression() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -156,7 +156,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkManualExecution() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -176,7 +176,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkStopManualExecution() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -197,7 +197,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void changeExecutableOfSchedule() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -217,7 +217,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void deleteSchedule() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -240,7 +240,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void changeScheduleCronTime() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -261,7 +261,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void editScheduleParameters() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -296,7 +296,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void addNewParametersForSchedule() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -328,7 +328,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithIncorrectCron() throws JSONException, InterruptedException {
         openProjectDetailPage(getWorkingProject());
 
@@ -342,7 +342,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         scheduleForm.checkScheduleWithIncorrectCron(cronTimeBuilder);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithIncorrectCron() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -365,7 +365,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkBrokenSchedule() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -400,7 +400,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkDeleteScheduleParams() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -428,7 +428,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelDeleteScheduleParams() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -456,7 +456,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkIncorrectRetryDelay() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -473,7 +473,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelCreateSchedule() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -492,7 +492,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelChangeScheduleExecutable() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -512,7 +512,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelChangeScheduleCronTime() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -533,7 +533,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelAddRetryDelay() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -552,7 +552,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelEditScheduleParams() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -581,7 +581,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelDeleteSchedule() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -600,7 +600,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkRemoveRetry() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -619,7 +619,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkExecutionHistoryEmptyState() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -638,7 +638,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleExecutionState() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -670,7 +670,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkSuccessfulExecutionGroup() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -689,7 +689,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCustomName() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -703,7 +703,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithCustomName() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -724,7 +724,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithEmptyCustomName() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -746,7 +746,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithEmptyCustomName() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -764,7 +764,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleNotUniqueName() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -788,7 +788,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void editScheduleWithNotUniqueName() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -812,7 +812,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void cancelEditScheduleName() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -832,7 +832,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createScheduleWithCustomNameForRubyScript() throws InterruptedException,
             JSONException {
         try {
@@ -851,25 +851,25 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCustomScheduleNameInFailedOverview() throws InterruptedException,
             JSONException {
         checkScheduleNameInOverviewPage(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCustomScheduleNameInSuccessfulOverview() throws InterruptedException,
             JSONException {
         checkScheduleNameInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCustomScheduleNameInRunningOverview() throws InterruptedException,
             JSONException {
         checkScheduleNameInOverviewPage(OverviewProjectStates.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProjectWithOneSchedule() throws InterruptedException, JSONException {
         cleanProcessesInProjectDetail(testParams.getProjectId());
 
@@ -887,7 +887,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleTriggerBySuccessfulSchedule() throws InterruptedException,
             JSONException {
         try {
@@ -908,7 +908,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleTriggerByFailedSchedule() throws InterruptedException, JSONException {
         try {
             String processName = "Check Schedule With Trigger Schedule";
@@ -930,7 +930,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleTriggerInLoop() throws InterruptedException, JSONException {
         cleanProcessesInProjectDetail(testParams.getProjectId());
 
@@ -952,7 +952,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleTriggerByItself() throws InterruptedException, JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -973,7 +973,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkDisableDependentSchedule() throws InterruptedException, JSONException {
         try {
             String processName = "Check Schedule With Trigger Schedule";
@@ -999,7 +999,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkMissingScheduleTrigger() throws InterruptedException, JSONException {
         try {
             String processName = "Check Schedule With Trigger Schedule";
@@ -1027,7 +1027,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkMultipleScheduleTriggers() throws JSONException, InterruptedException {
         try {
             String processName1 = "Check Schedule With Trigger Schedule 1";

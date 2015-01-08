@@ -113,7 +113,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dashboards-verification"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"dashboards-verification"})
     public void verifyDashboardTabsAfter() throws InterruptedException {
         verifyProjectDashboardsAndTabs(true, expectedGoodSalesDashboardsAndTabs, true);
     }

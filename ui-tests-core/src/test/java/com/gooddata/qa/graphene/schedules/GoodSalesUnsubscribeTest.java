@@ -71,7 +71,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         updateRecurrencyString(reportScheduleUri);
     }
 
-    @Test(groups = {"tests"}, dependsOnMethods = {"updateScheduledMail"})
+    @Test(dependsOnMethods = {"updateScheduledMail"})
     public void waitForMessageAndUnsubscribe() throws Exception {
         ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
@@ -102,7 +102,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         }
     }
 
-    @Test(groups = {"tests"}, dependsOnMethods = {"waitForMessageAndUnsubscribe"})
+    @Test(dependsOnMethods = {"waitForMessageAndUnsubscribe"})
     public void verifySuccesOfUnsubscribe() throws Exception {
         initEmailSchedulesPage();
         String unsubscribed = emailSchedulesPage.getUnsubscribed(reportTitle);

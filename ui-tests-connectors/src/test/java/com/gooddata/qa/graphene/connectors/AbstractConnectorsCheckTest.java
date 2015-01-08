@@ -104,7 +104,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"disableConnectorIntegration"}, groups = {"tests"}, alwaysRun = true)
+    @Test(dependsOnMethods = {"disableConnectorIntegration"}, alwaysRun = true)
     public void deleteConnectorIntegration(ITestContext context) throws JSONException {
         if (integrationActivated) {
             openUrl(getIntegrationUri());

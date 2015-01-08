@@ -79,7 +79,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     // login and test as admin
-    @Test(dependsOnGroups = {"schedules"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"schedules"})
     public void verifyDashboardSchedule() throws JSONException {
         loginAs(UserRoles.ADMIN);
         initEmailSchedulesPage();
@@ -96,7 +96,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
     }
 
-    @Test(dependsOnGroups = {"schedules"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"schedules"})
     public void verifyRecipientsOfSchedule() throws JSONException, InterruptedException {
         loginAs(UserRoles.ADMIN);
         initEmailSchedulesPage();
@@ -115,7 +115,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         assertEquals(recipients, new HashSet<String>(CUSTOM_RECIPIENTS), "Recipients do not match.");
     }
 
-    @Test(dependsOnGroups = {"schedules"}, groups = {"tests"})
+    @Test(dependsOnGroups = {"schedules"})
     public void verifyScheduleButtonPresenceOnEmbeddedDashboard() throws InterruptedException, JSONException {
         // get embed link as admin (not accessible for viewer)
         loginAs(UserRoles.ADMIN);

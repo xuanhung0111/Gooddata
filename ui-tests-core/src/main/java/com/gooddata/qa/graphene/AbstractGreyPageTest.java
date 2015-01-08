@@ -108,6 +108,7 @@ public class AbstractGreyPageTest extends AbstractTest {
         waitForElementPresent(validateFragment.getRoot());
         String statusReturning = validateFragment.validate();
         Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation", this.getClass());
+        System.out.println("Validation result: " + statusReturning);
         return statusReturning;
     }
 

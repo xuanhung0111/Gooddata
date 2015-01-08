@@ -28,7 +28,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-geos-labels";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void initialize() throws InterruptedException, JSONException {
         attributesList =
                 asList("Geo_pushpin", "AUS_State_Name", "AUS_State_ISO", "StateName", "StateID",
@@ -41,7 +41,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 "attribute_geo_labels");
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"initialize"})
     public void changeAttributeToGeoStateTest() throws InterruptedException {
         int i = 0;
         for (AttributeLabelTypes type : getGeoLabels()) {
@@ -51,7 +51,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"initialize"})
     public void verifyGeoLayersTest() throws InterruptedException {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -62,7 +62,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
         dashboardsPage.deleteDashboardTab(1);
     }
 
-    @Test(dependsOnMethods = {"initialize"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"initialize"})
     public void verifyGeoChartTest() throws InterruptedException {
         for (GeoAttributeLabels attributeLayer : GeoAttributeLabels.values()) {
             System.out.println("Verifying attribute " + attributeLayer + " ...");
