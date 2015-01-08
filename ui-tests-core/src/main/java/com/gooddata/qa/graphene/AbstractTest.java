@@ -74,10 +74,24 @@ public abstract class AbstractTest extends Arquillian {
         return getRootUrl().substring(0, rootUrl.length() - 1);
     }
 
+    /**
+     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for admin user and save it to the test context.
+     * @return {@link com.gooddata.qa.utils.http.RestApiClient} client for admin user
+     */
     public RestApiClient getRestApiClient() {
         if (restApiClient == null) {
-            restApiClient = new RestApiClient(testParams.getHost(), testParams.getUser(), testParams.getPassword(), true, false);
+            restApiClient = getRestApiClient(testParams.getUser(), testParams.getPassword());
         }
         return restApiClient;
+    }
+
+    /**
+     * Create {@link com.gooddata.qa.utils.http.RestApiClient} for specific user. It doesn't save it to the context!
+     * @param userLogin
+     * @param userPassword
+     * @return {@link com.gooddata.qa.utils.http.RestApiClient} for specific user.
+     */
+    public RestApiClient getRestApiClient(final String userLogin, final String userPassword) {
+        return new RestApiClient(testParams.getHost(), userLogin, userPassword, true, false);
     }
 }
