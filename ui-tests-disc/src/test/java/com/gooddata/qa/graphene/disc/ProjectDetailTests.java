@@ -29,7 +29,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         projectTitle = "Disc-test-project-detail";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProjectInfo() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -49,7 +49,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProcessInfo() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -75,7 +75,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkGoToDashboardsLink() {
         openProjectDetailPage(getWorkingProject());
         waitForElementVisible(projectDetailPage.getRoot());
@@ -83,7 +83,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         waitForDashboardPageLoaded(browser);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkEmptyProjectState() {
         openProjectDetailPage(getWorkingProject());
         waitForElementVisible(projectDetailPage.getRoot());
@@ -91,7 +91,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         assertEquals(PROJECT_EMPTY_STATE_MESSAGE, projectDetailPage.getProjectEmptyStateMessage());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void downloadProcess() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -106,7 +106,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkSortedProcesses() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -122,7 +122,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkSortedProcessesAfterRedeploy() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -140,7 +140,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkDeleteProcess() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -158,7 +158,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProcessDeleteDialog() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -173,7 +173,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCancelProcessDeleteDialog() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -186,7 +186,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkExecutableScheduleNumber() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -207,7 +207,7 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProcessScheduleList() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -252,8 +252,4 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnGroups = {"project-detail"}, groups = {"tests"})
-    public void test() {
-        successfulTest = true;
-    }
 }

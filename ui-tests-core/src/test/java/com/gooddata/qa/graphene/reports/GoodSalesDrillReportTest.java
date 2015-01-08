@@ -42,7 +42,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-drill-report";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createDrillReport() throws InterruptedException {
         initReportsPage();
         ReportDefinition reportDefinition = new ReportDefinition()
@@ -55,7 +55,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"createDrillReport"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createDrillReport"})
     public void drillOnDashboard() throws InterruptedException {
         try {
             addReportToDashboard(REPORT_NAME);
@@ -106,7 +106,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createDrillReport"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createDrillReport"})
     public void modifyOnDrillingOverlay() throws InterruptedException {
         try {
             addReportToDashboard(REPORT_NAME);
@@ -138,7 +138,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createDrillReport"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createDrillReport"})
     public void verifyReportInfoOnDrillingOverlay() throws InterruptedException {
         try {
             addReportToDashboard(REPORT_NAME);
@@ -181,7 +181,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createDrillReport"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createDrillReport"})
     public void verifyBreadcrumbInDrillingOverlay() throws InterruptedException {
         try {
             addReportToDashboard(REPORT_NAME);
@@ -197,7 +197,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createDrillReport"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createDrillReport"})
     public void drillAttribute() throws InterruptedException {
         initAttributePage();
         attributePage.initAttribute("Opportunity");
@@ -260,7 +260,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createDrillReport"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createDrillReport"})
     public void drillAcrossReport() throws InterruptedException {
         try {
             initDashboardsPage();
@@ -287,7 +287,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createDrillReport"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"createDrillReport"})
     public void overrideDrilldownAndDrillIn() throws InterruptedException {
         initAttributePage();
         attributePage.initAttribute("Activity");
@@ -346,7 +346,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"overrideDrilldownAndDrillIn"}, groups = {"drill-report"})
+    @Test(dependsOnMethods = {"overrideDrilldownAndDrillIn"})
     public void drillReportContainsFilter() throws InterruptedException {
         try {
             addReportToDashboard("Drill-Activity");
@@ -397,11 +397,6 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             attributePage.initAttribute("Activity");
             attributeDetailPage.clearDrillingSetting();
         }
-    }
-
-    @Test(dependsOnGroups = {"drill-report"}, groups = {"tests"})
-    public void finalTest() throws InterruptedException {
-        successfulTest = true;
     }
 
     private static void assertSetEquals(Set<?> actual, Set<?> expected, String message) {

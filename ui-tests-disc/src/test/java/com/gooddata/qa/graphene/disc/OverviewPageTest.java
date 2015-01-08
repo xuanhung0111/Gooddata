@@ -38,7 +38,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         startPage = DISC_OVERVIEW_PAGE;
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkDefaultOverviewState() {
         openOverviewPage();
         assertTrue(discOverview.isActive(OverviewProjectStates.FAILED));
@@ -47,46 +47,46 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         assertFalse(discOverview.isActive(OverviewProjectStates.SUCCESSFUL));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkEmptyFailedState() {
         openOverviewPage();
         checkFilteredOutProject(OverviewProjectStates.FAILED, getWorkingProject());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkEmptyRunningState() {
         openOverviewPage();
         checkFilteredOutProject(OverviewProjectStates.RUNNING, getWorkingProject());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkEmptyScheduledState() {
         openOverviewPage();
         checkFilteredOutProject(OverviewProjectStates.SCHEDULED, getWorkingProject());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkEmptySucessfulState() {
         openOverviewPage();
         checkFilteredOutProject(OverviewProjectStates.SUCCESSFUL, getWorkingProject());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkFailedStateNumber() {
         checkStateNumber(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkRunningStateNumber() {
         checkStateNumber(OverviewProjectStates.RUNNING);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkSuccessfulStateNumber() throws JSONException, InterruptedException {
         checkStateNumber(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduledStateNumber() {
         try {
             OverviewProjectDetails overviewProject = new OverviewProjectDetails();
@@ -106,7 +106,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkCombinedStatesNumber() {
         try {
             String processName = "Check Combined States Number";
@@ -142,7 +142,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkOverviewFailedProjects() throws ParseException {
         try {
             OverviewProjectDetails overviewProject =
@@ -165,7 +165,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkOverviewSuccessfulProject() throws ParseException {
         try {
             OverviewProjectDetails overviewProject =
@@ -191,7 +191,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(enabled = false, dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkOverviewScheduledProject() throws ParseException, JSONException,
             InterruptedException {
         List<ProjectInfo> additionalProjects =
@@ -218,7 +218,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkOverviewRunningProject() throws ParseException {
         try {
             OverviewProjectDetails overviewProject =
@@ -243,7 +243,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void restartFailedProjects() throws JSONException, InterruptedException {
         try {
             OverviewProjectDetails overviewProject =
@@ -267,7 +267,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void restartFailedSchedule() throws ParseException {
         try {
             checkBulkActionsOnSchedule(OverviewProjectStates.FAILED);
@@ -276,7 +276,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void disableFailedProjects() throws JSONException, InterruptedException {
         try {
             checkDisableProject(OverviewProjectStates.FAILED);
@@ -285,7 +285,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void disableFailedSchedule() throws JSONException, InterruptedException, ParseException {
         try {
             checkDisableSchedule(OverviewProjectStates.FAILED);
@@ -294,7 +294,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void runSuccessfulProjects() throws JSONException, InterruptedException {
         try {
             OverviewProjectDetails overviewProject =
@@ -316,7 +316,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void runSuccessfulSchedule() throws ParseException {
         try {
             checkBulkActionsOnSchedule(OverviewProjectStates.SUCCESSFUL);
@@ -325,7 +325,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void disableSuccessfulProjects() throws JSONException, InterruptedException {
         try {
             checkDisableProject(OverviewProjectStates.SUCCESSFUL);
@@ -334,7 +334,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void disableSuccessfulSchedule() throws ParseException {
         try {
             checkDisableSchedule(OverviewProjectStates.SUCCESSFUL);
@@ -343,7 +343,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void stopRunningProjects() throws JSONException, InterruptedException {
         try {
             OverviewProjectDetails overviewProject =
@@ -364,7 +364,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void stopRunningSchedule() throws ParseException {
         try {
             checkBulkActionsOnSchedule(OverviewProjectStates.RUNNING);
@@ -373,7 +373,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void disableRunningProjects() throws JSONException, InterruptedException {
         try {
             checkDisableProject(OverviewProjectStates.RUNNING);
@@ -382,7 +382,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void disableRunningSchedule() throws ParseException {
         try {
             checkDisableSchedule(OverviewProjectStates.RUNNING);
@@ -391,7 +391,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(enabled = false, dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void disableScheduledProjects() throws JSONException, InterruptedException {
         List<ProjectInfo> additionalProjects =
                 createMultipleProjects("Disc-test-scheduled-state", 1);
@@ -418,7 +418,7 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(enabled = false, dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void stopScheduledProjects() throws JSONException, InterruptedException {
         List<ProjectInfo> additionalProjects =
                 createMultipleProjects("Disc-test-scheduled-state", 1);
@@ -447,27 +447,22 @@ public class OverviewPageTest extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProjectsNotAdminInFailedState() throws ParseException, IOException,
             JSONException, InterruptedException {
         checkProjectNotAdmin(OverviewProjectStates.FAILED);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProjectsNotAdminInSucessfulState() throws ParseException, IOException,
             JSONException, InterruptedException {
         checkProjectNotAdmin(OverviewProjectStates.SUCCESSFUL);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkProjectsNotAdminInRunningState() throws ParseException, IOException,
             JSONException, InterruptedException {
         checkProjectNotAdmin(OverviewProjectStates.RUNNING);
-    }
-
-    @Test(dependsOnGroups = {"project-overview"}, groups = {"tests"})
-    public void test() {
-        successfulTest = true;
     }
 
     private void checkFilteredOutProject(OverviewProjectStates state, ProjectInfo projectInfo) {

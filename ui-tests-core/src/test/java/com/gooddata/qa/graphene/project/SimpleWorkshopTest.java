@@ -24,17 +24,17 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-ws";
     }
 
-    @Test(dependsOnMethods = {"createSimpleProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createSimpleProject"})
     public void uploadData() throws InterruptedException {
         uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
     }
 
-    @Test(dependsOnMethods = {"uploadData"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"uploadData"})
     public void addNewTab() throws InterruptedException {
         addNewTabOnDashboard("Default dashboard", "workshop", "simple-ws");
     }
 
-    @Test(dependsOnMethods = {"uploadData"}, groups = "tests")
+    @Test(dependsOnMethods = {"uploadData"})
     public void createBasicReport() throws InterruptedException {
         initReportsPage();
         reportsPage.startCreateReport();
@@ -46,7 +46,7 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
         Screenshots.takeScreenshot(browser, "simple-ws-headline-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"createBasicReport"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createBasicReport"})
     public void addReportOnDashboardTab() throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.getTabs().openTab(1);
@@ -58,13 +58,12 @@ public class SimpleWorkshopTest extends AbstractProjectTest {
         Screenshots.takeScreenshot(browser, "simple-ws-headline-report-dashboard", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"addReportOnDashboardTab"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"addReportOnDashboardTab"})
     public void verifyHeadlineReport() {
         initDashboardsPage();
         assertEquals(1, dashboardsPage.getContent().getNumberOfReports(), "Invalid report(s) count on dashboard");
         OneNumberReport report = dashboardsPage.getContent().getReport(0, OneNumberReport.class);
         assertEquals(report.getValue(), "7,252,542.63", "Invalid value in headline report");
         assertEquals(report.getDescription(), "Sum of Amount", "Invalid description in headline report");
-        successfulTest = true;
     }
 }

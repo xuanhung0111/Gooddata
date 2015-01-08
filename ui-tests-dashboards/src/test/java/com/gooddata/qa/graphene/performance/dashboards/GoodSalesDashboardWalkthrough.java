@@ -19,7 +19,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 @Test(groups = {"dashboardPerf"}, description = "Tests for performance od rendering dashboards in GoodSales project")
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void dashboardsWalkthrough() throws InterruptedException, JSONException {
         openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
         waitForDashboardPageLoaded(browser);
@@ -29,7 +29,6 @@ public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
         }
         String output = (String) ((JavascriptExecutor) browser).executeScript("return GDC.perf.logger.getCsEvents()");
         createPerfOutputFile(output);
-        successfulTest = true;
     }
 
     private void createPerfOutputFile(String csvContent) throws JSONException {

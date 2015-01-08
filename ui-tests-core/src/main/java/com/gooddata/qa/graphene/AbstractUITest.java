@@ -255,36 +255,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
     }
 
-    public void deleteProjectByDeleteModeAndReuse(boolean successfulTest) {
-        if (testParams.isReuseProject()) {
-            System.out.println("Project is being re-used and won't be deleted.");
-            return;
-        }
-        System.out.println("Delete mode is set to " + testParams.getDeleteMode().toString());
-        String projectId = testParams.getProjectId();
-        if (projectId != null && projectId.length() > 0) {
-            switch (testParams.getDeleteMode()) {
-                case DELETE_ALWAYS:
-                    System.out.println("Project will be deleted...");
-                    deleteProject(projectId);
-                    break;
-                case DELETE_IF_SUCCESSFUL:
-                    if (successfulTest) {
-                        System.out.println("Test was successful, project will be deleted...");
-                        deleteProject(projectId);
-                    } else {
-                        System.out.println("Test wasn't successful, project won't be deleted...");
-                    }
-                    break;
-                case DELETE_NEVER:
-                    System.out.println("Delete mode set to NEVER, project won't be deleted...");
-                    break;
-            }
-        } else {
-            System.out.println("No project created -> no delete...");
-        }
-    }
-
     public void deleteProject(String projectId) {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
         waitForProjectPageLoaded(browser);

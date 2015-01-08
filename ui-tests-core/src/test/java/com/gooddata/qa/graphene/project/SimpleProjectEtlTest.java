@@ -47,7 +47,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void loadProject() throws JSONException, URISyntaxException, IOException, InterruptedException {
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
         postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
@@ -67,7 +67,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), statusPollingCheckIterations);
     }
 
-    @Test(dependsOnMethods = {"loadProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"loadProject"})
     public void sliManifestsCompare() throws JSONException, IOException, InterruptedException {
         HashSet<Object> sliParts = new HashSet<Object>();
 
@@ -100,7 +100,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"loadProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"loadProject"})
     public void exportImportProject() throws JSONException, InterruptedException, IOException {
         String exportToken = exportProject(exportUsers, exportData, statusPollingCheckIterations);
         String parentProjectId = testParams.getProjectId();
@@ -109,10 +109,9 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         createProject();
         importProject(exportToken, statusPollingCheckIterations);
         validateProject();
-        deleteProject();
+        deleteProject(testParams.getProjectId());
 
         testParams.setProjectId(parentProjectId);
-        successfulTest = true;
     }
 
     private ArrayList<String> parsePopulatesFields(JSONArray populates) throws JSONException {

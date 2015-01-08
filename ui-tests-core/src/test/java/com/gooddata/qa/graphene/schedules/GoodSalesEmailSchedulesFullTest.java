@@ -70,7 +70,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         updateRecurrencyString(dashboardScheduleUri);
     }
 
-    @Test(groups = {"tests"}, dependsOnMethods = {"updateScheduledMailRecurrency"})
+    @Test(dependsOnMethods = {"updateScheduledMailRecurrency"})
     public void waitForMessages() throws Exception {
         ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
@@ -78,7 +78,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             System.out.println("ACCELERATE scheduled mails processing");
             pssClient.accelerate();
             checkMailbox(imapClient);
-            successfulTest = true;
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
             pssClient.decelerate();

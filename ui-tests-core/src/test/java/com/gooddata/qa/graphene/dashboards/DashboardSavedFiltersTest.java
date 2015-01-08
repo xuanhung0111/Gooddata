@@ -57,7 +57,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         uploadCSV(csvFilePath + "payroll.csv", null, "payroll");
     }
 
-    @Test(dependsOnGroups = {"init-data"}, groups = {"basic-tests"}, priority = 1)
+    @Test(dependsOnGroups = {"init-data"}, priority = 1)
     public void notificationWhenSavedViewTurnedOffTest() {
         DashboardEditBar dashboardEditBar = null;
         try {
@@ -88,7 +88,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         }
     }
 
-    @Test(dependsOnGroups = {"init-data"}, groups = {"basic-tests"}, priority = 2)
+    @Test(dependsOnGroups = {"init-data"}, priority = 2)
     public void checkDisableSavedFiltersFeatureFlagsTest() throws IOException, JSONException {
         try {
             disableSavedFilters(FEATURE_FLAGS_URI, true);
@@ -116,7 +116,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         }
     }
 
-    @Test(dependsOnGroups = {"init-data"}, groups = {"basic-tests"}, priority = 3)
+    @Test(dependsOnGroups = {"init-data"}, priority = 3)
     public void createSavedFilterViewTest() throws InterruptedException {
         initNewDashboard_AddFilter_TurnOnSavedView();
 
@@ -164,7 +164,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                             "New saved view is not saved as named 'last year'!");
     }
 
-    @Test(dependsOnMethods = {"createSavedFilterViewTest"}, groups = {"basic-tests"})
+    @Test(dependsOnMethods = {"createSavedFilterViewTest"})
     public void renameSavedFilterViewTest() throws InterruptedException {
         // change filter value so Selenium can loads all saved views
         getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
@@ -204,7 +204,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                           "Saved view 'previous year' is not created!");
     }
     
-    @Test(dependsOnMethods = {"renameSavedFilterViewTest"}, groups = {"basic-tests"})
+    @Test(dependsOnMethods = {"renameSavedFilterViewTest"})
     public void filterViewNamingUniquenessTest() throws InterruptedException {
         // change filter value so Selenium can loads all saved views
         getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
@@ -232,7 +232,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         waitForElementNotVisible(saveActiveViewDialog.getRoot());
     }
 
-    @Test(dependsOnMethods = {"filterViewNamingUniquenessTest"}, groups = {"basic-tests"})
+    @Test(dependsOnMethods = {"filterViewNamingUniquenessTest"})
     public void deleteSavedFilterViewTest() throws InterruptedException {
         // change filter value so Selenium can loads all saved views
         FilterWidget filter = getFilterWidget("date_dimension");
@@ -273,7 +273,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                            String.format("Saved view '%s' is not deleted!", PENULTIMATE_YEAR));
     }
 
-    @Test(dependsOnMethods = {"deleteSavedFilterViewTest"}, groups = {"basic-tests"})
+    @Test(dependsOnMethods = {"deleteSavedFilterViewTest"})
     public void savedFilterAfterSwitchBetweenDashboardsAndPagesTest() throws InterruptedException {
         FilterWidget timeFilter = getFilterWidget("date_dimension");
         timeFilter.changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
@@ -347,7 +347,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                             String.format("Saved view '%s' is not selected!", PENULTIMATE_YEAR));
     }
 
-    @Test(dependsOnMethods = {"savedFilterAfterSwitchBetweenDashboardsAndPagesTest"}, groups = {"basic-tests"})
+    @Test(dependsOnMethods = {"savedFilterAfterSwitchBetweenDashboardsAndPagesTest"})
     public void savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest() {
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
@@ -359,7 +359,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                             String.format("Saved view '%s' is not selected after changing type of time filter!", PENULTIMATE_YEAR));
     }
 
-    @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest"}, groups = {"basic-tests"})
+    @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest"})
     public void savedViewFilterDoNotApplyOnFiltersAfterRemovingTest() throws InterruptedException {
         try {
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -378,7 +378,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         }
     }
 
-    @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnFiltersAfterRemovingTest"}, groups = {"basic-tests"})
+    @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnFiltersAfterRemovingTest"})
     public void dashboardHasManyFiltersInManyTabsTest() throws InterruptedException {
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
@@ -411,11 +411,6 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
         waitForElementVisible(dashboardSaveActiveViewDialog.getCancelButton()).click();
         waitForElementNotVisible(dashboardSaveActiveViewDialog.getRoot());
-    }
-
-    @Test(dependsOnGroups = {"basic-tests"}, groups = {"tests"})
-    public void prepareForEndingTest() {
-        successfulTest = true;
     }
 
     private void initNewDashboard_AddFilter_TurnOnSavedView() throws InterruptedException {

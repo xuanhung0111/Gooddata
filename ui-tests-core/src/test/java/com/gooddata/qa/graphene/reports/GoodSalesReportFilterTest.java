@@ -24,7 +24,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-filter";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createReportTest() throws InterruptedException {
         createReport(new ReportDefinition().withName(REPORT_NAME)
                                            .withWhats("Amount")
@@ -32,7 +32,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
                     "Simple filter report");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void createVariableTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
@@ -40,7 +40,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
                 .withAttributeElements("Interest", "Discovery", "Short List", "Negotiation"));
     }
 
-    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest"})
     public void attributeFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", "Interest", 
@@ -49,7 +49,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest"})
     public void rankingFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createRankingFilter(ResultSize.TOP.withSize(3), "Stage Name", "Amount"));
@@ -57,7 +57,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"createReportTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest"})
     public void rangeFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createRangeFilter("Stage Name", "Amount",
@@ -66,18 +66,13 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
     }
 
-    @Test(dependsOnMethods = {"createReportTest", "createVariableTest"}, groups = {"filter-tests"})
+    @Test(dependsOnMethods = {"createReportTest", "createVariableTest"})
     public void promptFilterTest() throws InterruptedException {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(VARIABLE_NAME,
                 "Interest", "Discovery", "Short List", "Negotiation"));
         reportPage.saveReport();
         checkRedBar(browser);
-    }
-
-    @Test(dependsOnGroups = {"filter-tests"}, groups = {"tests"})
-    public void finalTest() throws InterruptedException {
-        successfulTest = true;
     }
 
     private void initReport() {

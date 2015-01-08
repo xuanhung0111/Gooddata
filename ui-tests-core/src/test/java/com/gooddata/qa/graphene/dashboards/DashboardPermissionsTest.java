@@ -26,7 +26,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void initialize() {
         lockedDashboardName = "Locked and Visible";
         unlockedDashboardName = "Unlocked and Visible";
@@ -82,7 +82,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         changePermissions(null, true);
     }
 
-    @Test(dependsOnMethods = {"initializeEditorAndViewerTests"}, groups = {"non-admin-tests"})
+    @Test(dependsOnGroups = {"admin-tests"}, groups = {"non-admin-tests"})
     public void viewerCheckDashboardsList() throws JSONException, InterruptedException {
         logout();
         signIn(false, UserRoles.VIEWER);
@@ -122,7 +122,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         Assert.assertFalse(dashboardsPage.isEditButtonPresent());
     }
 
-    @Test(dependsOnMethods = {"editorTryEditingLockedDashboard"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"editorTryEditingLockedDashboard"})
     public void adminCheckVisibleDashboards() throws JSONException, InterruptedException {
         logout();
         signIn(false, UserRoles.ADMIN);

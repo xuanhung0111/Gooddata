@@ -43,7 +43,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     private static final String EXPECTED_DELETE_DESCRIPTION = "To delete this computed attribute you must delete its data set. Go to its Data Set administration page and click Delete.";
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "computedAttributeTest" })
+    @Test(dependsOnMethods = { "createProject" })
     public void createComputedAttribute() {
         initAttributePage();
         attributePage.createAttribute();
@@ -80,7 +80,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         checkDeleteButtonAndInfo();
     }
     
-    @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
+    @Test(dependsOnMethods = { "createComputedAttribute" })
     public void checkOthersPageAfterComputedAttributeCreated() throws InterruptedException, ParseException, IOException, JSONException {
     	initAttributePage();
         Screenshots.takeScreenshot(browser, "attribute-list", this.getClass());
@@ -98,7 +98,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     	verifyLDMModelProject(185494);
     }
 
-    @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
+    @Test(dependsOnMethods = { "createComputedAttribute" })
     public void checkAttributePageAfterComputedAttributeCreated() throws InterruptedException {
         initAttributePage();
         By computedAttributeItem = By.cssSelector(".s-title-" + CssUtils.simplifyText(COMPUTED_ATTRIBUTE_NAME) + " a");
@@ -107,7 +107,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         checkDeleteButtonAndInfo();
     }
 
-    @Test(dependsOnMethods = { "createComputedAttribute" }, groups = { "computedAttributeTest" })
+    @Test(dependsOnMethods = { "createComputedAttribute" })
     public void createReportWithComputedAttribute() throws InterruptedException {
         List<String> expectedAttributeHeader = Arrays.asList(COMPUTED_ATTRIBUTE_NAME);
         List<String> expectedAttributeValues = Arrays.asList("Best", "Good", "Great", "Poor");
@@ -124,11 +124,6 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         assertEquals(attributeHeaders, expectedAttributeHeader, "Attribute name is incorrrect");
         assertEquals(attributeValues, expectedAttributeValues, "Attribute values are incorrrect " + attributeValues);
         assertEquals(metricValues, expectedMetricValues, "Metric values are incorrrect");
-    }
-
-    @Test(dependsOnGroups = { "computedAttributeTest" }, groups = { "tests" })
-    public void endOfTests() {
-        successfulTest = true;
     }
 
     private boolean isCreatedButtonEnabled() {

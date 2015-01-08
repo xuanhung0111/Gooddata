@@ -62,7 +62,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 			.xpath("//div[contains(@class,'bottomButtons')]//button[text()='Apply']");
 	private static final By noDataMessage = By.xpath("//div[@class='alert-title']");
 
-	@Test(dependsOnMethods = { "createProject" }, groups = { "addAndEditScatterWidgetTest" })
+	@Test(dependsOnMethods = { "createProject" }, groups = { "addAndEditScatterWidgetTest"})
 	public void addScatterWidgetTest() throws InterruptedException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("dataPointFolder", "Stage");
@@ -446,11 +446,6 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 				"Scatter widget is not filtered out values");
 	}
 
-	@Test(dependsOnGroups = { "addAndEditScatterWidgetTest", "advancedScatterWidgetTest" }, groups = { "tests" })
-	public void endOfTests() {
-		successfulTest = true;
-	}
-	
 	private void testScatterWidgetDisplaying() throws InterruptedException {
 		Thread.sleep(2000);
 		// hover on data point

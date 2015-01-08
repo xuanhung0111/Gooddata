@@ -609,12 +609,4 @@ public class UploadTests extends AbstractUploadTest {
 			this.cleanDashboardAndDatasets(datasets);
 		}
 	}
-
-	@Test(dependsOnGroups = { "upload-delimiter", "valid-delimiter",
-			"upload-special-case", "upload-change-column-type", "upload-error",
-			"upload-special-kind-of-csv", "upload-different-date-formats",
-			"auto-guessed-ID-column", "crazy-footer", "invalid-delimiter" }, groups = { "tests" })
-	public void endOfTests() {
-		successfulTest = true;
-	}
 }

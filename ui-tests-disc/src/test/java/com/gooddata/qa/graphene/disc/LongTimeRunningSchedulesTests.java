@@ -18,7 +18,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         projectTitle = "Disc-test-long-time-running-schedule";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleAutoRun() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -38,7 +38,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkErrorExecution() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -58,7 +58,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkRetryExecution() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -83,7 +83,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkStopAutoExecution() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -104,7 +104,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkLongTimeExecution() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -123,7 +123,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
+    @Test(dependsOnMethods = {"createProject"})
     public void disableSchedule() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -147,7 +147,7 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"long-time-schedule"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleFailForManyTimes() {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -166,8 +166,4 @@ public class LongTimeRunningSchedulesTests extends AbstractSchedulesTests {
         }
     }
 
-    @Test(dependsOnGroups = {"long-time-schedule"}, groups = {"tests"})
-    public void test() {
-        successfulTest = true;
-    }
 }

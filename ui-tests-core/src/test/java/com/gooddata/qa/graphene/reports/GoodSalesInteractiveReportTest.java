@@ -33,52 +33,52 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
         projectTitle = "GoodSales-test-interactive-report";
     }
     
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyTooLargeLineChart() throws InterruptedException {
         verifyTooLargeChartReport(LINE_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyTooLargeAreaChart() throws InterruptedException {
         verifyTooLargeChartReport(AREA_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyTooLargeBarChart() throws InterruptedException {
         verifyTooLargeChartReport(BAR_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyInvalidConfigurationLineChart() throws InterruptedException {
         verifyInvalidConfigurationChartReport(LINE_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyInvalidConfigurationAreaChart() throws InterruptedException {
         verifyInvalidConfigurationChartReport(AREA_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyInvalidConfigurationBarChart() throws InterruptedException {
         verifyInvalidConfigurationChartReport(BAR_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyLineChart() throws InterruptedException {
         verifyChartReport(LINE_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyAreaChart() throws InterruptedException {
         verifyChartReport(AREA_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void verifyBarChart() throws InterruptedException {
         verifyChartReport(BAR_CHART);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void workingOnColor() throws InterruptedException {
         try {
             addReportInNewDashboard(BAR_CHART);
@@ -126,7 +126,7 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void workingOnTabularExplorer() throws InterruptedException {
         try {
             addReportInNewDashboard(BAR_CHART);
@@ -158,7 +158,7 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void workingOnExplorerTitle() throws InterruptedException {
         try {
             addReportInNewDashboard(BAR_CHART);
@@ -181,7 +181,7 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void fillterOutAllValues() throws InterruptedException {
         try{
             addReportInNewDashboard(BAR_CHART);
@@ -208,7 +208,7 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"interactiveReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void shareAndExportDashboard() throws InterruptedException {
         try {
             addReportInNewDashboard(BAR_CHART);
@@ -225,11 +225,6 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
         } finally {
             dashboardsPage.deleteDashboard();
         }
-    }
-
-    @Test(dependsOnGroups = {"interactiveReport"}, groups = {"tests"})
-    public void prepareForEndingTest() {
-        successfulTest = true;
     }
 
     private void addReportInNewDashboard(InteractiveReportWidget.ChartType type) throws InterruptedException {

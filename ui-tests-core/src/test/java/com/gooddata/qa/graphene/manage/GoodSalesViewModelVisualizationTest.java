@@ -29,7 +29,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     private static final String MODEL_IMAGE_FILE                                =    "ldm.png";
     private static final String MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE =    "ldmAfterChangeAccountToAcsount.png";
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"viewModel"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkLDMImageTest() throws InterruptedException, IOException, JSONException {
         File tmpImage = getLDMImageFromGrayPage();
         try {
@@ -42,7 +42,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"checkLDMImageTest"}, groups = {"viewModel"})
+    @Test(dependsOnMethods = {"checkLDMImageTest"})
     public void checkLDMImageAfterChangeAttributeNameTest() throws ParseException, IOException, JSONException {
         changeAttributeName("Account", "Acsount");
 
@@ -62,12 +62,6 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
             changeAttributeName("Acsount", "Account");
         }
     }
-
-    @Test(dependsOnGroups = {"viewModel"}, groups = {"tests"})
-    public void teardown() {
-        successfulTest = true;
-    }
-
 
     private void changeAttributeName(String attributeName, String newName) {
         initAttributePage();

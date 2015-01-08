@@ -24,13 +24,13 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-dashboard-objects";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void uploadDataTest() throws InterruptedException {
         String csvFilePath = testParams.loadProperty("csvFilePath");
         uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
     }
 
-    @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"uploadDataTest"})
     public void createvariableTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         variablePage.createVariable(new AttributeVariable(variableName)
@@ -38,13 +38,13 @@ public class DashboardObjectsTest extends AbstractProjectTest {
                 .withAttributeElements("Bachelors Degree", "Graduate Degree"));
     }
 
-    @Test(dependsOnMethods = {"uploadDataTest"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"uploadDataTest"})
     public void changeStateLabelTest() throws InterruptedException {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
     }
 
-    @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"})
     public void addDashboardObjectsTest() throws InterruptedException {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -68,12 +68,11 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         dashboardEditBar.saveDashboard();
     }
 
-    @Test(dependsOnMethods = {"addDashboardObjectsTest"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"addDashboardObjectsTest"})
     public void printDashboardTest() throws InterruptedException {
         initDashboardsPage();
         String exportedDashboardName = dashboardsPage.printDashboardTab(0);
         verifyDashboardExport(exportedDashboardName.replace(" ", "_"), expectedDashboardExportSize);
         checkRedBar(browser);
-        successfulTest = true;
     }
 }

@@ -48,7 +48,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         projectTitle = "SimpleProject-test-compAttrs";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"tests"})
+    @Test(dependsOnMethods = {"createProject"})
     public void loadProject() throws JSONException, URISyntaxException, IOException, InterruptedException {
         // create model
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
@@ -115,11 +115,6 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         String createMAQL = "alter attribute {" + attrIdentifier + "} add relations " + relation + relationAs.replaceAll("\\?.*}", "?" + attributeElement.getValue()) + "};";
         System.out.println("createMAQL = " + createMAQL);
         postMAQL(createMAQL, statusPollingCheckIterations);
-    }
-
-    @Test(dependsOnMethods = {"alterAndCompute"}, groups = {"tests"})
-    public void endOfTests() {
-        successfulTest = true;
     }
 
     private String parseIntegrationEntry(String url) {
