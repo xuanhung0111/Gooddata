@@ -136,6 +136,10 @@ public class DashboardsPage extends AbstractFragment {
 
     public boolean selectDashboard(int dashboardIndex) throws InterruptedException {
         DashboardMenu menu = openDashboardMenu();
+        if (menu == null) {
+            System.out.println("This project has only one dashboard!");
+            return false;
+        }
         Thread.sleep(3000);
 
         return menu.selectDashboardByIndex(dashboardIndex);
@@ -312,7 +316,11 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     private DashboardMenu openDashboardMenu() {
-        waitForElementVisible(dashboardSwitcherButton).click();
+        waitForElementVisible(dashboardSwitcherButton);
+        if (dashboardSwitcherButton.getAttribute("class").contains("disabled")) {
+            return null;
+        }
+        dashboardSwitcherButton.click();
         DashboardMenu menu = Graphene.createPageFragment(DashboardMenu.class,
                 waitForElementVisible(DashboardMenu.LOCATOR, browser));
         waitForElementVisible(menu.getRoot());
