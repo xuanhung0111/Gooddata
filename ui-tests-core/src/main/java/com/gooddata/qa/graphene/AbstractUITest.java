@@ -214,8 +214,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForDashboardPageLoaded(browser);
         Thread.sleep(5000);
         waitForElementVisible(dashboardsPage.getRoot());
-        if (expectedDashboardsAndTabs == null) {
+        if (expectedDashboardsAndTabs == null || expectedDashboardsAndTabs.isEmpty()) {
+            System.out.println("Going to check all dashboard & tabs");
             int dashboardsCount = dashboardsPage.getDashboardsCount();
+            System.out.println("Dashboards count: " + dashboardsCount);
             for (int i = 1; i <= dashboardsCount; i++) {
                 dashboardsPage.selectDashboard(i);
                 Thread.sleep(5000);
@@ -223,6 +225,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 singleDashboardWalkthrough(validation, null, dashboardsPage.getDashboardName());
             }
         } else {
+            System.out.println("Going to check expected dashboards & tabs");
             for (String dashboardName : expectedDashboardsAndTabs.keySet()) {
                 int dashboardsCount = dashboardsPage.getDashboardsCount();
                 assertEquals(dashboardsCount, expectedDashboardsAndTabs.size(), "Number of dashboards doesn't match");
