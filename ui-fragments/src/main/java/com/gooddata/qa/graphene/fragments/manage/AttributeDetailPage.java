@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
@@ -119,6 +120,12 @@ public class AttributeDetailPage extends AbstractFragment {
 
     public boolean isDeleteButtonDisabled() {
         waitForElementVisible(deleteButton);
+
+        // check that the button is truly non-clickable, i.e. that the delete
+        // confirmation dialog does not appear
+        deleteButton.click();
+        waitForElementNotVisible(By.cssSelector(".t-confirmDelete"));
+
         return deleteButton.getAttribute("class").contains("disabled");
     }
 
