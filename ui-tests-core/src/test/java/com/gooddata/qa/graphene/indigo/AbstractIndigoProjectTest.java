@@ -280,7 +280,7 @@ public abstract class AbstractIndigoProjectTest extends AbstractProjectTest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withType(ReportType.TABLE)
-                .withMetrics(metric3).withCategories(attribute1));
+                .withMetrics(metric3).withCategories(attribute3));
         assertTrue(analysisPage.isExportToReportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
