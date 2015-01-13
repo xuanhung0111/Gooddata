@@ -108,6 +108,10 @@ public class CheckUtils {
         Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().not().visible();
     }
 
+    public static void waitForFragmentNotVisible(AbstractFragment fragment) {
+        Graphene.waitGui().until().element(fragment.getRoot()).is().not().visible();
+    }
+
     public static WebElement waitForElementPresent(By byElement, WebDriver browser) {
         Graphene.waitGui().until().element(byElement).is().present();
         return browser.findElement(byElement);
@@ -135,7 +139,7 @@ public class CheckUtils {
         Graphene.waitGui().until().element(select.getFirstSelectedOption()).is().not().present();
     }
 
-    public static void waitForCollectionIsEmpty(final Collection<WebElement> items) {
+    public static void waitForCollectionIsEmpty(final Collection<?> items) {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
@@ -144,7 +148,7 @@ public class CheckUtils {
         });
     }
 
-    public static void waitForCollectionIsNotEmpty(final Collection<WebElement> items) {
+    public static void waitForCollectionIsNotEmpty(final Collection<?> items) {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
