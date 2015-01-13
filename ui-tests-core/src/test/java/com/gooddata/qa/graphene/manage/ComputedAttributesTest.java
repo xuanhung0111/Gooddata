@@ -108,6 +108,23 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = { "createComputedAttribute" })
+    public void checkNavigationToDatasetAndBack() throws InterruptedException {
+        initAttributePage();
+        String titleSelector = ".s-title-" + CssUtils.simplifyText(COMPUTED_ATTRIBUTE_NAME);
+
+        By computedAttributeItem = By.cssSelector(titleSelector + " a");
+        waitForElementVisible(computedAttributeItem, browser).click();
+
+        By linkToDatasetItem = By.cssSelector(".specialAction .info a");
+        waitForElementVisible(linkToDatasetItem, browser).click();
+
+        By linkToAttribute = By.cssSelector("td " + titleSelector);
+        waitForElementVisible(linkToAttribute, browser).click();
+
+        checkDeleteButtonAndInfo();
+    }
+
+    @Test(dependsOnMethods = { "createComputedAttribute" })
     public void createReportWithComputedAttribute() throws InterruptedException {
         List<String> expectedAttributeHeader = Arrays.asList(COMPUTED_ATTRIBUTE_NAME);
         List<String> expectedAttributeValues = Arrays.asList("Best", "Good", "Great", "Poor");
