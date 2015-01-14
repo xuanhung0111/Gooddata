@@ -50,6 +50,14 @@ public class ObjectsTable extends AbstractTable {
         return false;
     }
 
+    public List<String> getAllItems() {
+        List<String> ret = new ArrayList<String>();
+        for (int i = 0, n = getNumberOfRows(); i < n; i++) {
+            ret.add(waitForElementVisible(rows.get(i)).findElement(BY_OBJECT_LINK).getText());
+        }
+        return ret;
+    }
+
     public void assertCheckboxes(boolean checkSelection, boolean expectedSelection) {
         List<WebElement> tableRows = getRows();
         for (WebElement tableRow : tableRows) {

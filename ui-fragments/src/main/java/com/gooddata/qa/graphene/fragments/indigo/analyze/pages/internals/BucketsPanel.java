@@ -22,28 +22,27 @@ public class BucketsPanel extends AbstractFragment {
     private CategoriesBucket categoriesBucket;
 
     public void addMetric(WebElement metric) {
-        waitForFragmentVisible(metricsBucket);
-        metricsBucket.addMetric(metric);
+        waitForFragmentVisible(metricsBucket).addMetric(metric);
     }
 
     public void addCategory(WebElement category) {
-        waitForFragmentVisible(categoriesBucket);
-        categoriesBucket.addCategory(category);
+        waitForFragmentVisible(categoriesBucket).addCategory(category);
+    }
+
+    public void removeCategory(String category) {
+        waitForFragmentVisible(categoriesBucket).removeCategory(category);
     }
 
     public void setReportType(ReportType type) {
-        waitForFragmentVisible(reportTypePicker);
-        reportTypePicker.setReportType(type);
+        waitForFragmentVisible(reportTypePicker).setReportType(type);
     }
 
     public boolean isReportTypeSelected(ReportType type) {
-        waitForFragmentVisible(reportTypePicker);
-        return reportTypePicker.isSelected(type);
+        return waitForFragmentVisible(reportTypePicker).isSelected(type);
     }
 
     public void turnOnShowInPercents() {
-        waitForFragmentVisible(metricsBucket);
-        metricsBucket.turnOnShowInPercents();
+        waitForFragmentVisible(metricsBucket).turnOnShowInPercents();
     }
 
     public boolean isBlankState() {
@@ -53,31 +52,26 @@ public class BucketsPanel extends AbstractFragment {
     }
 
     public List<String> getAllCategoryNames() {
-        return categoriesBucket.getItemsName();
+        return waitForFragmentVisible(categoriesBucket).getItemsName();
     }
 
     public boolean isShowPercentConfigEnabled() {
-        waitForFragmentVisible(metricsBucket);
-        return metricsBucket.isShowPercentConfigEnabled();
+        return waitForFragmentVisible(metricsBucket).isShowPercentConfigEnabled();
     }
 
     public boolean isCompareSamePeriodConfigEnabled() {
-        waitForFragmentVisible(metricsBucket);
-        return metricsBucket.isCompareSamePeriodConfigEnabled();
+        return waitForFragmentVisible(metricsBucket).isCompareSamePeriodConfigEnabled();
     }
 
     public boolean isShowPercentConfigSelected() {
-        waitForFragmentVisible(metricsBucket);
-        return metricsBucket.isShowPercentConfigSelected();
+        return waitForFragmentVisible(metricsBucket).isShowPercentConfigSelected();
     }
 
     public void changeGranularity(String time) {
-        waitForFragmentVisible(categoriesBucket);
-        categoriesBucket.changeGranularity(time);
+        waitForFragmentVisible(categoriesBucket).changeGranularity(time);
     }
 
     public List<String> getAllGranularities() {
-        waitForFragmentVisible(categoriesBucket);
-        return categoriesBucket.getAllGranularities();
+        return waitForFragmentVisible(categoriesBucket).getAllGranularities();
     }
 }

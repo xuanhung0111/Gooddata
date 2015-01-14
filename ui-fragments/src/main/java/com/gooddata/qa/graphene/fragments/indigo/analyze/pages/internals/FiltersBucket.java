@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -120,5 +121,16 @@ public class FiltersBucket extends AbstractFragment {
             }
         });
         return filter;
+    }
+
+    public List<String> getAllTimeFilterOptions() {
+        WebElement filter = getFilter("Date");
+        filter.click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        List<String> ret = panel.getAllPeriods();
+        filter.click();
+        waitForFragmentNotVisible(panel);
+        return ret;
     }
 }

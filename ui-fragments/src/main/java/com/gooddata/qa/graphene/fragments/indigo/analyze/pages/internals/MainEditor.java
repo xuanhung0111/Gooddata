@@ -1,7 +1,10 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+
+import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.graphene.enricher.WebElementUtils;
@@ -20,9 +23,10 @@ public class MainEditor extends AbstractFragment {
     @FindBy(css = ".s-bucket-filters")
     private FiltersBucket bucketsFilter;
 
-    @FindBy(css = ".adi-canvas-message h2")
+    @FindBy(css = CSS_EXPLORER_MESSAGE)
     private WebElement explorerMessage;
 
+    private static final String CSS_EXPLORER_MESSAGE = ".adi-canvas-message h2";
     private static final String CSS_REPORT = ".adi-chart-container:not(.invisible)";
     private static final By BY_TABLE_REPORT = By.cssSelector(".dda-table-component");
     private static final By BY_CHART_REPORT = By.cssSelector(".switchable-visualization-component");
@@ -86,5 +90,23 @@ public class MainEditor extends AbstractFragment {
     public WebElement getFilter(String dateOrAttribute) {
         waitForFragmentVisible(bucketsFilter);
         return bucketsFilter.getFilter(dateOrAttribute);
+    }
+
+    public boolean isExplorerMessageVisible() {
+        return browser.findElements(By.cssSelector(CSS_EXPLORER_MESSAGE)).size() > 0;
+    }
+
+    public List<String> getAllTimeFilterOptions() {
+        return waitForFragmentVisible(bucketsFilter).getAllTimeFilterOptions();
+    }
+
+    public void waitForReportComputing() {
+        try {
+            WebElement computingElement = waitForElementVisible(By.cssSelector(".adi-computing"), browser);
+            waitForElementNotVisible(computingElement);
+        } catch(Exception e) {
+            // in case report is rendered so fast, computing label is not shown.
+            // Ignore the exception.
+        }
     }
 }
