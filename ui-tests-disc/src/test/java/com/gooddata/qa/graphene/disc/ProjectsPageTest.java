@@ -22,7 +22,7 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public class ProjectsPageTests extends AbstractOverviewProjectsTest {
+public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @BeforeClass
     public void initProperties() {

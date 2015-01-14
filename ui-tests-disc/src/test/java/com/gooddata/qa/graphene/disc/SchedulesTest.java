@@ -20,7 +20,7 @@ import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public class SchedulesTests extends AbstractSchedulesTests {
+public class SchedulesTest extends AbstractSchedulesTests {
 
     private static final String TRIGGER_SCHEDULE_MISSING = "Trigger schedule missing!";
     private final static String EXECUTION_HISTORY_EMPTY_STATE_MESSAGE =

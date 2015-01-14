@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
 
-public class DeployProcesses extends AbstractDeployProcesses {
+public class DeployProcessTest extends AbstractDeployProcesses {
 
     @BeforeClass
     public void initProperties() {
