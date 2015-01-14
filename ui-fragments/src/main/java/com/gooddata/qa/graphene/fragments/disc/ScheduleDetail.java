@@ -333,17 +333,6 @@ public class ScheduleDetail extends ScheduleForm {
         assertExecutionDetail();
     }
 
-    public void assertFailedExecution(String errorMessage) {
-        waitForExecutionFinish();
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
-                .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
-        System.out.println("Error message of failed execution: "
-                + lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
-                .contains(errorMessage));
-        assertExecutionDetail();
-    }
-
     public void assertManualStoppedExecution() {
         waitForElementVisible(BY_ERROR_STATUS_ICON, browser);
         assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)

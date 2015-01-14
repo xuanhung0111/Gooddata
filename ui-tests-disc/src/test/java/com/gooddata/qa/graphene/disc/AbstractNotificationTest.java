@@ -33,7 +33,7 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
-public class AbstractNotificationTest extends AbstractSchedulesTests {
+public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected static final String NOTIFICATION_TEST_PROCESS = "Notification Test Process";
     protected static final String SUCCESS_NOTIFICATION_TEST_PROCESS = "Success Notification Test";
@@ -154,40 +154,6 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
     protected ExecutionDetails failedExecutionDetails = new ExecutionDetails()
             .setStatus(ScheduleStatus.ERROR);
 
-    protected NotificationBuilder createAndAssertNotification(
-            NotificationBuilder notificationBuilder) throws InterruptedException {
-        createNotitication(notificationBuilder);
-        Thread.sleep(2000); // Wait for notification is completely saved!
-        assertNotification(notificationBuilder);
-
-        return notificationBuilder;
-    }
-
-    protected NotificationBuilder createNotitication(NotificationBuilder notificationBuilder) {
-        openProjectDetailPage(getWorkingProject());
-        projectDetailPage.getNotificationButton(notificationBuilder.getProcessName()).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        discNotificationRules.clickOnAddNotificationButton();
-        int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
-        discNotificationRules
-                .setNotificationFields(notificationBuilder.setIndex(notificationIndex));
-        if (notificationBuilder.isSaved())
-            discNotificationRules.saveNotification(notificationIndex);
-        else
-            discNotificationRules.cancelSaveNotification(notificationIndex);
-
-        return notificationBuilder;
-    }
-
-    protected void assertNotification(NotificationBuilder notificationBuilder) {
-        openProjectDetailPage(getWorkingProject());
-        projectDetailPage.getNotificationButton(notificationBuilder.getProcessName()).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        assertTrue(discNotificationRules.isNotExpanded(notificationBuilder.getIndex()));
-        discNotificationRules.expandNotificationRule(notificationBuilder.getIndex());
-        discNotificationRules.assertNotificationFields(notificationBuilder);
-    }
-
     protected void editNotification(NotificationBuilder newNotificationBuilder) {
         openProjectDetailPage(getWorkingProject());
         projectDetailPage.getNotificationButton(newNotificationBuilder.getProcessName()).click();
@@ -204,8 +170,7 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
             discNotificationRules.cancelSaveNotification(notificationIndex);
     }
 
-    protected void waitForNotification(String subject, NotificationParameters expectedParams)
-            throws MessagingException, IOException {
+    protected void waitForNotification(String subject, NotificationParameters expectedParams) {
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
         try {
             System.out.println("Waiting for notification...");
@@ -215,8 +180,7 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
         }
     }
 
-    protected void waitForRepeatedFailuresEmail(ScheduleBuilder scheduleBuilder)
-            throws MessagingException, IOException {
+    protected void waitForRepeatedFailuresEmail(ScheduleBuilder scheduleBuilder) {
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
         try {
             System.out.println("Waiting for notification...");
@@ -226,8 +190,7 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
         }
     }
 
-    protected void checkNotification(NotificationEvents event, NotificationParameters expectedParams)
-            throws MessagingException, IOException {
+    protected void checkNotification(NotificationEvents event, NotificationParameters expectedParams) {
         String notificationSubject = null;
         switch (event) {
             case SUCCESS:
@@ -285,22 +248,48 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
     }
 
     protected void getExecutionInfoFromGreyPage(ExecutionDetails executionDetails,
-            String executionLogLink) throws JSONException, ParseException {
+            String executionLogLink) {
         executionDetails.setScheduleLogLink(executionLogLink);
         browser.get(executionLogLink.replace("ea.", "").replace("/log", "/detail"));
         waitForElementVisible(objectFragment.getRoot());
-        JSONObject jsonObject = objectFragment.getObject();
-        JSONObject executionDetail = jsonObject.getJSONObject("executionDetail");
-        executionDetails.setStartTime(timeFormat(executionDetail.getString("started")));
-        executionDetails.setEndTime(timeFormat(executionDetail.getString("finished")));
-        executionDetails.setScheduledTime(timeFormat(executionDetail.getString("created")));
-        if (executionDetails.getStatus().equals(ScheduleStatus.ERROR))
-            executionDetails.setErrorMessage(executionDetail.getJSONObject("error")
-                    .getString("message").replace("\n", "").replace("    ", ""));
+        JSONObject jsonObject = null;
+        JSONObject executionDetailJSONObject;
+        try {
+            jsonObject = objectFragment.getObject();
+            executionDetailJSONObject = jsonObject.getJSONObject("executionDetail");
+            executionDetails
+                    .setStartTime(timeFormat(executionDetailJSONObject.getString("started")));
+            executionDetails
+                    .setEndTime(timeFormat(executionDetailJSONObject.getString("finished")));
+            executionDetails.setScheduledTime(timeFormat(executionDetailJSONObject
+                    .getString("created")));
+            if (executionDetails.getStatus().equals(ScheduleStatus.ERROR))
+                executionDetails.setErrorMessage(executionDetailJSONObject.getJSONObject("error")
+                        .getString("message").replace("\n", "").replace("    ", ""));
+        } catch (JSONException e) {
+            System.out.println("There is problem with jsonObject: ");
+            e.printStackTrace();
+        }
     }
 
-    private void checkRepeatFailureEmail(ImapClient imapClient, ScheduleBuilder scheduleBuilder)
-            throws MessagingException, IOException {
+    protected static Message getNotification(final ImapClient imapClient, final String subject) {
+        Message[] notifications = new Message[0];
+
+        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(5, TimeUnit.SECONDS)
+                .withMessage("Notification is not sent!").until(new Predicate<WebDriver>() {
+
+                    @Override
+                    public boolean apply(WebDriver arg0) {
+                        System.out.println("Waiting for notification...");
+                        return imapClient.getMessagesFromInbox(FROM, subject).length > 0;
+                    }
+                });
+        notifications = imapClient.getMessagesFromInbox(FROM, subject);
+        assertTrue(notifications.length == 1, "More than 1 notification!");
+        return notifications[0];
+    }
+
+    private void checkRepeatFailureEmail(ImapClient imapClient, ScheduleBuilder scheduleBuilder) {
         boolean isEnabled = scheduleBuilder.isEnabled();
         String subjectFormat =
                 isEnabled ? REPEATED_FAILURES_NOTIFICATION_SUBJECT
@@ -318,7 +307,16 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
                         : SCHEDULE_DISABLED_NOTIFICATION_BODY;
 
         Message notification = getNotification(imapClient, notificationSubject);
-        Document message = Jsoup.parse(notification.getContent().toString());
+        Document message = null;
+        try {
+            message = Jsoup.parse(notification.getContent().toString());
+        } catch (IOException e) {
+            System.out.println("There is problem during parsing message: ");
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            System.out.println("There is problem during getting repeated failures email: ");
+            e.printStackTrace();
+        }
         System.out.println("Notification message: " + message.getElementsByTag("body").text());
 
         String scheduleName = scheduleBuilder.getScheduleName();
@@ -338,10 +336,19 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
     }
 
     private void checkScheduleEventNotification(ImapClient imapClient, String subject,
-            NotificationParameters expectedParams) throws MessagingException, IOException {
+            NotificationParameters expectedParams) {
         Message notification = getNotification(imapClient, subject);
         ArrayList<String> paramValues = new ArrayList<String>();
-        String notificationContent = notification.getContent().toString() + "*";
+        String notificationContent = "";
+        try {
+            notificationContent = notification.getContent().toString() + "*";
+        } catch (IOException e) {
+            System.out.println("There is problem when checking schedule event notification: ");
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            System.out.println("There is problem when checking schedule event notification: ");
+            e.printStackTrace();
+        }
         while (!notificationContent.isEmpty()) {
             if (notificationContent.substring(0, notificationContent.indexOf("*")).contains(
                     "params.LOG"))
@@ -371,29 +378,15 @@ public class AbstractNotificationTest extends AbstractSchedulesTests {
         }
     }
 
-    private Message getNotification(final ImapClient imapClient, final String subject)
-            throws MessagingException, IOException {
-        Message[] notifications = new Message[0];
-
-        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(5, TimeUnit.SECONDS)
-                .withMessage("Notification is not sent!").until(new Predicate<WebDriver>() {
-
-                    @Override
-                    public boolean apply(WebDriver arg0) {
-                        System.out.println("Waiting for notification...");
-                        return imapClient.getMessagesFromInbox(FROM, subject).length > 0;
-                    }
-                });
-        notifications = imapClient.getMessagesFromInbox(FROM, subject);
-        assertTrue(notifications.length == 1, "More than 1 notification!");
-        System.out.println("Notification subject: " + notifications[0].getSubject());
-        System.out.println("Notification content: " + notifications[0].getContent().toString());
-        return notifications[0];
-    }
-
-    private String timeFormat(String dateTime) throws ParseException {
+    private String timeFormat(String dateTime) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        return format2.format(format.parse(dateTime));
+        try {
+            return format2.format(format.parse(dateTime));
+        } catch (ParseException e) {
+            System.out.println("There is problem when parsing dateTime: " + dateTime);
+            e.printStackTrace();
+        }
+        return null;
     }
 }

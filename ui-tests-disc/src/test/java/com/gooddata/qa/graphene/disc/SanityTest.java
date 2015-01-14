@@ -1,35 +1,19 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-
-import javax.mail.MessagingException;
-
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.disc.ExecutionDetails;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
-import com.gooddata.qa.graphene.entity.disc.NotificationParameters;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
-import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.utils.mail.ImapClient;
 
-public class SanityTest extends AbstractDISC {
+public class SanityTest extends AbstractOverviewProjectsTest {
 
     @BeforeClass
     public void initProperties() {
@@ -38,9 +22,6 @@ public class SanityTest extends AbstractDISC {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
-        userProfileId =
-                testParams.loadProperty("userProfileUri").substring(
-                        testParams.loadProperty("userProfileUri").lastIndexOf("/") + 1);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
@@ -49,7 +30,7 @@ public class SanityTest extends AbstractDISC {
             deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT,
                     "CloudConnect - Projects List Page");
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -60,7 +41,7 @@ public class SanityTest extends AbstractDISC {
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT,
                     "CloudConnect - Project Detail Page");
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -72,31 +53,24 @@ public class SanityTest extends AbstractDISC {
             deployInProjectDetailPage(DeployPackages.EXECUTABLES_GRAPH, processName);
             redeployProcess(processName, DeployPackages.CLOUDCONNECT, processName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
-    public void createScheduleWithCustomInput() {
+    public void createAndAssertSchedule() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
 
             String processName = "Create Schedule with Custom Input";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
-
-            List<Parameter> paramList =
-                    Arrays.asList(
-                            new Parameter().setParamName("param").setParamValue("value"),
-                            new Parameter().setParamName("secure param")
-                                    .setParamValue("secure value").setSecureParam());
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.DWHS2)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                            .setParameters(paramList).isConfirm();
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
             createAndAssertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -116,7 +90,7 @@ public class SanityTest extends AbstractDISC {
             scheduleDetail.assertSuccessfulExecution();
             scheduleDetail.assertManualRunExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -136,22 +110,19 @@ public class SanityTest extends AbstractDISC {
             scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
             scheduleDetail.assertSuccessfulExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkNotification() throws InterruptedException, ParseException,
-            MessagingException, IOException, JSONException {
+    public void createAndAssertNotification() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         String processName = "Check Notification";
         try {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            String subject = notificationSubject + Calendar.getInstance().getTime();
-            String message =
-                    "params.PROJECT=${params.PROJECT}" + "*"
-                            + "params.FINISH_TIME=${params.FINISH_TIME}";
+            final String subject = "Notification Subject";
+            String message = "Notification message.";
 
             NotificationBuilder notificationInfo =
                     new NotificationBuilder().setProcessName(processName).setEmail(imapUser)
@@ -160,113 +131,83 @@ public class SanityTest extends AbstractDISC {
             createAndAssertNotification(notificationInfo);
 
             openProjectDetailByUrl(getWorkingProject().getProjectId());
-            createAndAssertSchedule(new ScheduleBuilder().setProcessName(processName)
-                    .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                    .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                    .setMinuteInHour("59"));
+            browser.navigate().refresh();
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR);
+            createSchedule(scheduleBuilder);
             scheduleDetail.manualRun();
             scheduleDetail.assertSuccessfulExecution();
 
-            ExecutionDetails executionDetails = new ExecutionDetails().setStatus(ScheduleStatus.OK);
-            getExecutionInfoFromGreyPage(executionDetails, scheduleDetail.getLastExecutionLogLink());
-
-            NotificationParameters expectedParams =
-                    new NotificationParameters().setProjectId(testParams.getProjectId())
-                            .setExecutionDetails(executionDetails);
-            waitForNotification(subject, expectedParams);
+            final ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
+            AbstractNotificationTest.getNotification(imapClient, subject);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-detail"})
-    public void checkGoToDashboardsLink() {
-        openProjectDetailPage(getWorkingProject());
-        waitForElementVisible(projectDetailPage.getRoot());
-        projectDetailPage.goToDashboards();
-        waitForDashboardPageLoaded(browser);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
     public void checkFailedOverviewNumber() {
-        checkOverviewStateNumber(OverviewProjectStates.FAILED);
+        try {
+            checkOverviewStateNumber(OverviewProjectStates.FAILED);
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
     public void checkRunningOverviewNumber() {
-        checkOverviewStateNumber(OverviewProjectStates.RUNNING);
+        try {
+            checkOverviewStateNumber(OverviewProjectStates.RUNNING);
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
     public void checkSuccessfulOverviewNumber() {
-        checkOverviewStateNumber(OverviewProjectStates.SUCCESSFUL);
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
-    public void checkProjectFilterOptions() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
-        discProjectsPage.checkProjectFilterOptions();
-        assertEquals(ProjectStateFilters.ALL.getOption(), discProjectsPage
-                .getSelectedFilterOption().getText());
+        try {
+            checkOverviewStateNumber(OverviewProjectStates.SUCCESSFUL);
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkFailedProjectsFilterOption() {
         try {
-            String processName = "Check Failed Projects Filter Option";
-            prepareDataForProjectsPageTest(ProjectStateFilters.FAILED, getWorkingProject(),
-                    processName, Executables.FAILED_GRAPH);
-
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
-            discProjectsPage.checkProjectFilter(ProjectStateFilters.FAILED, getProjects());
+            checkProjectsFilter(ProjectStateFilters.FAILED);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkSuccessfulProjectsFilterOptions() {
         try {
-            String processName = "Check Successful Projects Filter Option";
-            prepareDataForProjectsPageTest(ProjectStateFilters.SUCCESSFUL, getWorkingProject(),
-                    processName, Executables.SUCCESSFUL_GRAPH);
-
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
-            discProjectsPage.checkProjectFilter(ProjectStateFilters.SUCCESSFUL, getProjects());
+            checkProjectsFilter(ProjectStateFilters.SUCCESSFUL);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkRunningProjectsFilterOptions() {
         try {
-            String processName = "Check Running Projects Filter Option";
-            prepareDataForProjectsPageTest(ProjectStateFilters.RUNNING, getWorkingProject(),
-                    processName, Executables.LONG_TIME_RUNNING_GRAPH);
-
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
-            discProjectsPage.checkProjectFilter(ProjectStateFilters.RUNNING, getProjects());
+            checkProjectsFilter(ProjectStateFilters.RUNNING);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkSearchProjectByName() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
-        discProjectsPage.searchProjectByName(projectTitle);
+        checkSearchWorkingProjectByName();
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"projects-page"})
     public void checkSearchProjectById() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
-        discProjectsPage.searchProjectById(getWorkingProject());
+        checkSearchWorkingProjectById();
     }
 }

@@ -20,7 +20,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT,
                     "CloudConnect - Projects List Page");
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -29,7 +29,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
         try {
             deployInProjectsPage(getProjects(), DeployPackages.RUBY, "Ruby - Projects List Page");
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -40,7 +40,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT,
                     "CloudConnect - Project Detail Page");
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -50,7 +50,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
             deployInProjectDetailPage(DeployPackages.RUBY, "Ruby - Project Detail Page");
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -62,7 +62,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             deployInProjectDetailPage(DeployPackages.EXECUTABLES_GRAPH, processName);
             redeployProcess(processName, DeployPackages.CLOUDCONNECT, processName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -74,7 +74,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             deployInProjectDetailPage(DeployPackages.EXECUTABLES_GRAPH, processName);
             redeployProcess(processName, DeployPackages.EXECUTABLES_RUBY, processName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -87,7 +87,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             String newProcessName = "Redeploy process with the same package";
             redeployProcess(processName, DeployPackages.EXECUTABLES_GRAPH, newProcessName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -162,7 +162,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             failedRedeployProcess(processName, DeployPackages.NOT_EXECUTABLE, ProcessTypes.GRAPH,
                     processName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -175,7 +175,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             failedRedeployProcess(processName, DeployPackages.CLOUDCONNECT, ProcessTypes.RUBY,
                     processName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -187,7 +187,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             deployInProjectDetailPage(DeployPackages.RUBY, processName);
             failedRedeployProcess(processName, DeployPackages.RUBY, ProcessTypes.GRAPH, processName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -198,7 +198,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             checkSuccessfulDeployDialogMessageInProjectDetail(DeployPackages.BASIC,
                     ProcessTypes.GRAPH);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -208,7 +208,7 @@ public class DeployProcesses extends AbstractDeployProcesses {
             checkSuccessfulDeployDialogMessageInProjectsPage(getProjects(),
                     DeployPackages.BASIC, ProcessTypes.GRAPH);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 

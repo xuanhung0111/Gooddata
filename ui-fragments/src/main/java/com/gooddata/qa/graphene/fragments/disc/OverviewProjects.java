@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.fragments.disc;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -92,7 +91,7 @@ public class OverviewProjects extends AbstractFragment {
     private By BY_OVERVIEW_PROCESS_TITLE = By.cssSelector(".process-title");
 
     public void assertOverviewProject(OverviewProjectStates projectState,
-            OverviewProjectDetails expectedOverviewProject) throws ParseException {
+            OverviewProjectDetails expectedOverviewProject) {
         WebElement overviewProjectDetail =
                 getOverviewProjectWithAdminRole(expectedOverviewProject.getProjectInfo());
         assertNotNull(overviewProjectDetail);
@@ -122,7 +121,7 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     public void checkProjectNotAdmin(OverviewProjectStates projectState,
-            OverviewProjectDetails expectedOverviewProject) throws ParseException {
+            OverviewProjectDetails expectedOverviewProject) {
         WebElement overviewProject =
                 getOverviewProjectWithoutAdminRole(expectedOverviewProject.getProjectName());
         assertNotNull(overviewProject);
@@ -224,8 +223,7 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     private void assertProjectInfoWithOnlyOneSchedule(OverviewProjectStates projectState,
-            WebElement overviewProjectDetail, OverviewSchedule expectedOverviewSchedule)
-            throws ParseException {
+            WebElement overviewProjectDetail, OverviewSchedule expectedOverviewSchedule) {
         if (projectState != OverviewProjectStates.SCHEDULED) {
             assertTrue(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_LOG).isEnabled());
             assertFalse(overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_RUNTIME).getText()
@@ -274,7 +272,7 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     private void assertOverviewProcesses(OverviewProjectStates projectState,
-            List<OverviewProcess> expectedOverviewProcesses) throws ParseException {
+            List<OverviewProcess> expectedOverviewProcesses) {
         assertEquals(expectedOverviewProcesses.size(), overviewProcesses.size());
         for (final OverviewProcess expectedProcess : expectedOverviewProcesses) {
             WebElement overviewProcess =
@@ -298,8 +296,7 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     private void assertOverviewSchedules(OverviewProjectStates state,
-            List<OverviewSchedule> expectedSchedules, List<WebElement> overviewSchedules)
-            throws ParseException {
+            List<OverviewSchedule> expectedSchedules, List<WebElement> overviewSchedules) {
         for (final OverviewSchedule expectedSchedule : expectedSchedules) {
             WebElement overviewSchedule =
                     Iterables.find(overviewSchedules, new Predicate<WebElement>() {
@@ -335,7 +332,7 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     private void assertOverviewProjectWithoutAdminRole(OverviewProjectStates projectState,
-            OverviewProjectDetails expectedOverviewProject) throws ParseException {
+            OverviewProjectDetails expectedOverviewProject) {
         WebElement overviewProjectDetail =
                 getOverviewProjectWithoutAdminRole(expectedOverviewProject.getProjectName());
         assertNotNull(overviewProjectDetail);

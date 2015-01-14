@@ -6,10 +6,10 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.NoSuchElementException;
@@ -28,7 +28,7 @@ import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.google.common.base.Predicate;
 
-public class AbstractDISC extends AbstractNotificationTest {
+public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
     protected void checkFilteredOutOverviewProject(OverviewProjectStates state,
             ProjectInfo projectInfo) {
@@ -75,26 +75,21 @@ public class AbstractDISC extends AbstractNotificationTest {
     }
 
     protected void checkOverviewStateNumber(OverviewProjectStates projectState) {
-        try {
-            OverviewProjectDetails overviewProject =
-                    new OverviewProjectDetails().setProjectInfo(getWorkingProject());
-            OverviewProcess overviewProcess =
-                    overviewProject.newProcess().setProcessName("Check Overview Project Number");
-            OverviewSchedule overviewSchedule =
-                    overviewProcess.newSchedule().setScheduleName("Schedule");
-            overviewProcess.addSchedule(overviewSchedule);
-            overviewProject.addProcess(overviewProcess);
-            prepareDataForCheckingOverviewState(projectState, overviewProject);
+        OverviewProjectDetails overviewProject =
+                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProcess overviewProcess =
+                overviewProject.newProcess().setProcessName("Check Overview Project Number");
+        OverviewSchedule overviewSchedule =
+                overviewProcess.newSchedule().setScheduleName("Schedule");
+        overviewProcess.addSchedule(overviewSchedule);
+        overviewProject.addProcess(overviewProcess);
+        prepareDataForCheckingOverviewState(projectState, overviewProject);
 
-            openOverviewPage();
-            discOverview.selectOverviewState(projectState);
-            waitForElementVisible(discOverviewProjects.getRoot());
-            discOverview.assertOverviewStateNumber(projectState,
-                    discOverviewProjects.getOverviewProjectNumber());
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
-
+        openOverviewPage();
+        discOverview.selectOverviewState(projectState);
+        waitForElementVisible(discOverviewProjects.getRoot());
+        discOverview.assertOverviewStateNumber(projectState,
+                discOverviewProjects.getOverviewProjectNumber());
     }
 
     protected OverviewProjectDetails prepareDataForCheckingOverviewState(
@@ -122,7 +117,7 @@ public class AbstractDISC extends AbstractNotificationTest {
             overviewProcess.setProcessUrl(processUrl);
 
             for (OverviewSchedule overviewSchedule : overviewProcess.getOverviewSchedules()) {
-                createAndAssertSchedule(new ScheduleBuilder()
+                createSchedule(new ScheduleBuilder()
                         .setProcessName(overviewProcess.getProcessName()).setExecutable(executable)
                         .setScheduleName(overviewSchedule.getScheduleName())
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
@@ -130,10 +125,10 @@ public class AbstractDISC extends AbstractNotificationTest {
                 overviewSchedule.setScheduleUrl(browser.getCurrentUrl());
 
                 scheduleDetail.manualRun();
-                assertTrue(scheduleDetail.isInRunningState());
-                overviewSchedule.setLastExecutionDate(scheduleDetail.getLastExecutionDate());
 
                 if (state == OverviewProjectStates.RUNNING) {
+                    assertTrue(scheduleDetail.isInRunningState());
+                    overviewSchedule.setLastExecutionDate(scheduleDetail.getLastExecutionDate());
                     overviewSchedule.setLastExecutionTime(scheduleDetail.getLastExecutionTime());
                     continue;
                 }
@@ -143,6 +138,7 @@ public class AbstractDISC extends AbstractNotificationTest {
                 else if (state == OverviewProjectStates.SUCCESSFUL)
                     scheduleDetail.assertSuccessfulExecution();
 
+                overviewSchedule.setLastExecutionDate(scheduleDetail.getLastExecutionDate());
                 overviewSchedule.setExecutionDescription(scheduleDetail.getExecutionDescription());
                 overviewSchedule.setLastExecutionTime(scheduleDetail.getLastExecutionTime());
                 overviewSchedule.setLastExecutionRunTime(scheduleDetail.getExecutionRuntime());
@@ -151,20 +147,19 @@ public class AbstractDISC extends AbstractNotificationTest {
         return overviewProject;
     }
 
-    protected void checkOverviewProjectWithoutAdminRole(OverviewProjectStates projectState)
-            throws ParseException, IOException, JSONException, ParseException {
-        try {
-            OverviewProjectDetails overviewProject =
-                    new OverviewProjectDetails().setProjectInfo(getWorkingProject());
-            OverviewProcess overviewProcess =
-                    overviewProject.newProcess().setProcessName(
-                            "Check Overview Project With Non-Admin Role");
-            OverviewSchedule overviewSchedule =
-                    overviewProcess.newSchedule().setScheduleName("Schedule");
-            overviewProcess.addSchedule(overviewSchedule);
-            overviewProject.addProcess(overviewProcess);
-            prepareDataForCheckingOverviewState(projectState, overviewProject);
+    protected void checkOverviewProjectWithoutAdminRole(OverviewProjectStates projectState) {
+        OverviewProjectDetails overviewProject =
+                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProcess overviewProcess =
+                overviewProject.newProcess().setProcessName(
+                        "Check Overview Project With Non-Admin Role");
+        OverviewSchedule overviewSchedule =
+                overviewProcess.newSchedule().setScheduleName("Schedule");
+        overviewProcess.addSchedule(overviewSchedule);
+        overviewProject.addProcess(overviewProcess);
+        prepareDataForCheckingOverviewState(projectState, overviewProject);
 
+        try {
             addUsersWithOtherRolesToProject();
             openUrl(PAGE_PROJECTS);
             logout();
@@ -182,11 +177,24 @@ public class AbstractDISC extends AbstractNotificationTest {
             discOverview.selectOverviewState(projectState);
             waitForElementVisible(discOverviewProjects.getRoot());
             discOverviewProjects.checkProjectNotAdmin(projectState, overviewProject);
+        } catch (ParseException e) {
+            System.out.println("There is problem when adding user to project: ");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("There is problem when adding user to project: ");
+            e.printStackTrace();
+        } catch (JSONException e) {
+            System.out.println("There is problem when adding user to project or signIn: ");
+            e.printStackTrace();
         } finally {
             openUrl(PAGE_PROJECTS);
             logout();
-            signIn(false, UserRoles.ADMIN);
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            try {
+                signIn(false, UserRoles.ADMIN);
+            } catch (JSONException e) {
+                System.out.println("There is problem when signIn: ");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -230,8 +238,7 @@ public class AbstractDISC extends AbstractNotificationTest {
         return overviewProject;
     }
 
-    protected void disableScheduleInOverviewPage(OverviewProjectStates projectState)
-            throws ParseException {
+    protected void disableScheduleInOverviewPage(OverviewProjectStates projectState) {
         OverviewProjectDetails overviewProject =
                 new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
@@ -263,8 +270,7 @@ public class AbstractDISC extends AbstractNotificationTest {
         waitForElementVisible(scheduleDetail.getEnableButton());
     }
 
-    protected void bulkActionsScheduleInOverviewPage(OverviewProjectStates projectState)
-            throws ParseException {
+    protected void bulkActionsScheduleInOverviewPage(OverviewProjectStates projectState) {
         OverviewProjectDetails overviewProject =
                 new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
@@ -314,30 +320,49 @@ public class AbstractDISC extends AbstractNotificationTest {
 
     protected void cleanupProcessesAndProjects(boolean deleteProjects,
             List<ProjectInfo> additionalProjects) {
-        cleanProcessesInProjectDetail(testParams.getProjectId());
+        cleanProcessesInWorkingProject();
         if (deleteProjects)
             deleteProjects(additionalProjects);
     }
 
     protected void prepareDataForProjectsPageTest(ProjectStateFilters projectFilter,
-            ProjectInfo workingProject, String processName, Executables executable) {
+            ProjectInfo workingProject) {
         openProjectDetailByUrl(workingProject.getProjectId());
+        String processName = "Process for projects page tests";
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
         if (projectFilter == ProjectStateFilters.UNSCHEDULED)
             return;
+
+        Executables executable = null;
+        switch (projectFilter) {
+            case FAILED:
+                executable = Executables.FAILED_GRAPH;
+                break;
+            case SUCCESSFUL:
+                executable = Executables.SUCCESSFUL_GRAPH;
+                break;
+            case SCHEDULED:
+            case RUNNING:
+                executable = Executables.LONG_TIME_RUNNING_GRAPH;
+                break;
+            default:
+                executable = Executables.SUCCESSFUL_GRAPH;
+        }
 
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(processName).setExecutable(executable)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
                         .setMinuteInHour("59");
-        createAndAssertSchedule(scheduleBuilder);
+        createSchedule(scheduleBuilder);
         scheduleDetail.manualRun();
         if (projectFilter == ProjectStateFilters.SCHEDULED)
             return;
 
-        assertTrue(scheduleDetail.isInRunningState());
-        if (projectFilter == ProjectStateFilters.RUNNING)
+        if (projectFilter == ProjectStateFilters.RUNNING) {
+            assertTrue(scheduleDetail.isInRunningState());
             return;
+        }
 
         if (projectFilter == ProjectStateFilters.FAILED)
             scheduleDetail.assertFailedExecution(executable);
@@ -348,20 +373,31 @@ public class AbstractDISC extends AbstractNotificationTest {
             scheduleDetail.disableSchedule();
     }
 
-    protected void checkSearchProjectInSpecificState(ProjectStateFilters projectFilter,
-            ProjectInfo project, String processName, Executables executable) {
-        try {
-            prepareDataForProjectsPageTest(projectFilter, project, processName, executable);
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
-            discProjectsPage.searchProjectInSpecificState(projectFilter, project);
-        } finally {
-            openProjectDetailByUrl(project.getProjectId());
-            projectDetailPage.deleteAllProcesses();
-
-        }
+    protected void checkProjectsFilter(ProjectStateFilters projectState) {
+        prepareDataForProjectsPageTest(projectState, getWorkingProject());
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.checkProjectFilter(projectState, getProjects());
     }
 
+    protected void checkSearchProjectInSpecificState(ProjectStateFilters projectFilter) {
+        prepareDataForProjectsPageTest(projectFilter, getWorkingProject());
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.searchProjectInSpecificState(projectFilter, getWorkingProject());
+    }
+
+    protected void checkSearchWorkingProjectByName() {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.searchProjectByName(projectTitle);
+    }
+
+    protected void checkSearchWorkingProjectById() {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsPage.getRoot());
+        discProjectsPage.searchProjectById(getWorkingProject());
+    }
 
     protected void prepareDataForAdditionalProjects(List<ProjectInfo> additionalProjects) {
         String additionalProcessName = "Process for additional projects";
@@ -374,7 +410,7 @@ public class AbstractDISC extends AbstractNotificationTest {
 
     private void prepareAdditionalSchedulesForScheduledState(String additionalProcessName) {
         for (int i = 1; i < 7; i++) {
-            createAndAssertSchedule(new ScheduleBuilder().setProcessName(additionalProcessName)
+            createSchedule(new ScheduleBuilder().setProcessName(additionalProcessName)
                     .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
                     .setScheduleName("Schedule " + i).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
                     .setHourInDay("23").setMinuteInHour("59"));
@@ -391,7 +427,7 @@ public class AbstractDISC extends AbstractNotificationTest {
                             overviewProcess.getProcessName());
             overviewProcess.setProcessUrl(processUrl);
             for (OverviewSchedule overviewSchedule : overviewProcess.getOverviewSchedules()) {
-                createAndAssertSchedule(new ScheduleBuilder()
+                createSchedule(new ScheduleBuilder()
                         .setProcessName(overviewProcess.getProcessName())
                         .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
                         .setScheduleName(overviewSchedule.getScheduleName())

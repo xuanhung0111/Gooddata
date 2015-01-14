@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.disc;
 
+import java.lang.reflect.Method;
+
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -28,54 +31,49 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
         projectTitle = "Disc-test-project-detail";
     }
 
+    @AfterMethod
+    public void afterTest(Method m) {
+        cleanWorkingProjectAfterTest(m);
+    }
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkProjectInfo() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            String processName = "Check Project Info";
-            int processNumber = projectDetailPage.getNumberOfProcesses();
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Check Project Info";
+        int processNumber = projectDetailPage.getNumberOfProcesses();
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            assertEquals(processNumber + 1, projectDetailPage.getNumberOfProcesses(),
-                    "The number of processes is incorrect!");
-            openProjectDetailPage(getWorkingProject());
-            waitForElementVisible(projectDetailPage.getRoot());
-            assertEquals(projectTitle, projectDetailPage.getDisplayedProjectTitle());
-            assertEquals(testParams.getProjectId(),
-                    projectDetailPage.getProjectMetadata("Project ID"));
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        assertEquals(processNumber + 1, projectDetailPage.getNumberOfProcesses(),
+                "The number of processes is incorrect!");
+        openProjectDetailPage(getWorkingProject());
+        waitForElementVisible(projectDetailPage.getRoot());
+        assertEquals(projectTitle, projectDetailPage.getDisplayedProjectTitle());
+        assertEquals(testParams.getProjectId(), projectDetailPage.getProjectMetadata("Project ID"));
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProcessInfo() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            String processName = "Check Process Info";
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Check Process Info";
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            projectDetailPage.selectScheduleTab(processName);
-            waitForElementVisible(projectDetailPage.checkEmptySchedulesList(processName));
+        projectDetailPage.selectScheduleTab(processName);
+        waitForElementVisible(projectDetailPage.checkEmptySchedulesList(processName));
 
-            projectDetailPage.selectExecutableTab(processName);
-            projectDetailPage.assertExecutableList(DeployPackages.BASIC.getExecutables());
+        projectDetailPage.selectExecutableTab(processName);
+        projectDetailPage.assertExecutableList(DeployPackages.BASIC.getExecutables());
 
-            projectDetailPage.selectMetadataTab(processName);
-            String processID =
-                    browser.getCurrentUrl()
-                            .substring(browser.getCurrentUrl().indexOf("processes/"),
-                                    browser.getCurrentUrl().lastIndexOf("/"))
-                            .replace("processes/", "");
-            System.out.println("processID: " + processID);
-            assertEquals(processID, projectDetailPage.getProcessMetadata("Process ID"));
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        projectDetailPage.selectMetadataTab(processName);
+        String processID =
+                browser.getCurrentUrl()
+                        .substring(browser.getCurrentUrl().indexOf("processes/"),
+                                browser.getCurrentUrl().lastIndexOf("/")).replace("processes/", "");
+        System.out.println("processID: " + processID);
+        assertEquals(processID, projectDetailPage.getProcessMetadata("Process ID"));
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkGoToDashboardsLink() {
+    public void checkGoToDashboardsLinkInProjectDetailPage() {
         openProjectDetailPage(getWorkingProject());
         waitForElementVisible(projectDetailPage.getRoot());
         projectDetailPage.goToDashboards();
@@ -92,163 +90,131 @@ public class ProjectDetailTests extends AbstractSchedulesTests {
 
     @Test(dependsOnMethods = {"createProject"})
     public void downloadProcess() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            String processName = "Download Process Test";
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Download Process Test";
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            System.out.println("Download folder: " + downloadFolder);
-            projectDetailPage.checkDownloadProcess(processName, downloadFolder,
-                    testParams.getProjectId(), expectedDownloadedProcessSize);
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        System.out.println("Download folder: " + downloadFolder);
+        projectDetailPage.checkDownloadProcess(processName, downloadFolder,
+                testParams.getProjectId(), expectedDownloadedProcessSize);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkSortedProcesses() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
 
-            openProjectDetailPage(getWorkingProject());
-            projectDetailPage.checkSortedProcesses();
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        openProjectDetailPage(getWorkingProject());
+        projectDetailPage.checkSortedProcesses();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkSortedProcessesAfterRedeploy() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-R");
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-R");
 
-            openProjectDetailPage(getWorkingProject());
-            redeployProcess("Process-R", DeployPackages.BASIC, "Process-B");
+        openProjectDetailPage(getWorkingProject());
+        redeployProcess("Process-R", DeployPackages.BASIC, "Process-B");
 
-            openProjectDetailPage(getWorkingProject());
-            projectDetailPage.checkSortedProcesses();
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        openProjectDetailPage(getWorkingProject());
+        projectDetailPage.checkSortedProcesses();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkDeleteProcess() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-A");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-Z");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-P");
 
-            openProjectDetailPage(getWorkingProject());
-            projectDetailPage.deleteProcess("Process-P");
-            assertFalse(projectDetailPage.assertIsExistingProcess("Process-P"));
-            projectDetailPage.checkSortedProcesses();
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        openProjectDetailPage(getWorkingProject());
+        projectDetailPage.deleteProcess("Process-P");
+        assertFalse(projectDetailPage.assertIsExistingProcess("Process-P"));
+        projectDetailPage.checkSortedProcesses();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProcessDeleteDialog() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
-            String processName = "Process-A";
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        openProjectDetailPage(getWorkingProject());
+        deployInProjectDetailPage(DeployPackages.BASIC, "Process-B");
+        String processName = "Process-A";
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            openProjectDetailPage(getWorkingProject());
-            projectDetailPage.checkDeleteProcessDialog(processName);
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        openProjectDetailPage(getWorkingProject());
+        projectDetailPage.checkDeleteProcessDialog(processName);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkCancelProcessDeleteDialog() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            String processName = "Process-A";
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Process-A";
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            projectDetailPage.checkCancelDeleteProcess(processName);
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        projectDetailPage.checkCancelDeleteProcess(processName);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkExecutableScheduleNumber() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            String processName = "Process-A";
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
-            createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(
-                    Executables.SUCCESSFUL_GRAPH));
-            scheduleDetail.clickOnCloseScheduleButton();
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Process-A";
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(
+                Executables.SUCCESSFUL_GRAPH));
+        scheduleDetail.clickOnCloseScheduleButton();
 
-            projectDetailPage.checkExecutableScheduleNumber(processName,
-                    Executables.FAILED_GRAPH.getExecutableName(), 0);
-            projectDetailPage.checkExecutableScheduleNumber(processName,
-                    Executables.LONG_TIME_RUNNING_GRAPH.getExecutableName(), 0);
-            projectDetailPage.checkExecutableScheduleNumber(processName,
-                    Executables.SUCCESSFUL_GRAPH.getExecutableName(), 1);
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        projectDetailPage.checkExecutableScheduleNumber(processName,
+                Executables.FAILED_GRAPH.getExecutableName(), 0);
+        projectDetailPage.checkExecutableScheduleNumber(processName,
+                Executables.LONG_TIME_RUNNING_GRAPH.getExecutableName(), 0);
+        projectDetailPage.checkExecutableScheduleNumber(processName,
+                Executables.SUCCESSFUL_GRAPH.getExecutableName(), 1);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProcessScheduleList() {
-        try {
-            openProjectDetailPage(getWorkingProject());
-            String processName = "Check Process Schedule List";
-            deployInProjectDetailPage(DeployPackages.BASIC, processName);
-            ScheduleBuilder successfulScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(
-                            Executables.SUCCESSFUL_GRAPH);
-            createAndAssertSchedule(successfulScheduleBuilder);
+        openProjectDetailPage(getWorkingProject());
+        String processName = "Check Process Schedule List";
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
+        ScheduleBuilder successfulScheduleBuilder =
+                new ScheduleBuilder().setProcessName(processName).setExecutable(
+                        Executables.SUCCESSFUL_GRAPH);
+        createAndAssertSchedule(successfulScheduleBuilder);
 
-            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
-                    ScheduleStatus.UNSCHEDULED);
+        projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                ScheduleStatus.UNSCHEDULED);
 
-            scheduleDetail.manualRun();
-            scheduleDetail.isInScheduledState();
-            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
-                    ScheduleStatus.SCHEDULED);
+        scheduleDetail.manualRun();
+        scheduleDetail.isInScheduledState();
+        projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                ScheduleStatus.SCHEDULED);
 
-            scheduleDetail.isInRunningState();
-            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
-                    ScheduleStatus.RUNNING);
+        scheduleDetail.isInRunningState();
+        projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                ScheduleStatus.RUNNING);
 
-            scheduleDetail.assertSuccessfulExecution();
-            projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
-                    ScheduleStatus.OK);
+        scheduleDetail.assertSuccessfulExecution();
+        projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
+                ScheduleStatus.OK);
 
-            ScheduleBuilder failedScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).setExecutable(
-                            Executables.FAILED_GRAPH);
-            createAndAssertSchedule(failedScheduleBuilder);
+        ScheduleBuilder failedScheduleBuilder =
+                new ScheduleBuilder().setProcessName(processName).setExecutable(
+                        Executables.FAILED_GRAPH);
+        createAndAssertSchedule(failedScheduleBuilder);
 
-            scheduleDetail.manualRun();
-            scheduleDetail.assertFailedExecution(failedScheduleBuilder.getExecutable());
-            projectDetailPage.assertScheduleStatus(failedScheduleBuilder.getScheduleName(),
-                    ScheduleStatus.ERROR);
+        scheduleDetail.manualRun();
+        scheduleDetail.assertFailedExecution(failedScheduleBuilder.getExecutable());
+        projectDetailPage.assertScheduleStatus(failedScheduleBuilder.getScheduleName(),
+                ScheduleStatus.ERROR);
 
-            scheduleDetail.disableSchedule();
-            projectDetailPage.assertScheduleStatus(failedScheduleBuilder.getScheduleName(),
-                    ScheduleStatus.DISABLED);
-        } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
-        }
+        scheduleDetail.disableSchedule();
+        projectDetailPage.assertScheduleStatus(failedScheduleBuilder.getScheduleName(),
+                ScheduleStatus.DISABLED);
     }
 
 }

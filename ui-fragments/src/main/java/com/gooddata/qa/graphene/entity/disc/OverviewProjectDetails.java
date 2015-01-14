@@ -155,20 +155,26 @@ public class OverviewProjectDetails {
                 return this;
             }
 
-            public String getOverviewStartTime() throws ParseException {
+            public String getOverviewStartTime() {
                 String executionDateTime = getOverviewExecutionDateTime();
                 return executionDateTime.substring(0, executionDateTime.indexOf("-") - 1);
             }
 
-            public String getOverviewExecutionDateTime() throws ParseException {
+            public String getOverviewExecutionDateTime() {
                 SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss aa");
                 SimpleDateFormat format2 = new SimpleDateFormat("hh:mm aa");
-                String executionStartedTime =
-                        format2.format(format.parse(lastExecutionTime.substring(0,
-                                lastExecutionTime.lastIndexOf("-") - 1)));
-                String executionEndTime =
-                        format2.format(format.parse(lastExecutionTime.substring(lastExecutionTime
-                                .lastIndexOf("-") + 1)));
+                String executionStartedTime = "";
+                String executionEndTime = "";
+                try {
+                    executionStartedTime = format2.format(format.parse(lastExecutionTime.substring(0,
+                            lastExecutionTime.lastIndexOf("-") - 1)));
+                    executionEndTime =
+                            format2.format(format.parse(lastExecutionTime.substring(lastExecutionTime
+                                    .lastIndexOf("-") + 1)));
+                } catch (ParseException e) {
+                    System.out.println("There is problem when parsing execution time: ");
+                    e.printStackTrace();
+                }
                 return lastExecutionDate + " " + executionStartedTime + " - " + executionEndTime;
             }
         }

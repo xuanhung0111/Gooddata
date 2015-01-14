@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.disc;
 import java.util.Arrays;
 import java.util.List;
 
-import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -53,7 +52,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                             .setParameters(paramList).setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -75,7 +74,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertSchedule(scheduleBuilder.setProcessName(processName).setExecutable(
                     Executables.DWHS2));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -94,7 +93,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertSchedule(scheduleBuilder.setProcessName(processName).setExecutable(
                     Executables.DWHS1));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -113,7 +112,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             createSchedule(scheduleBuilder);
             assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -132,7 +131,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             createSchedule(scheduleBuilder);
             assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -151,7 +150,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             createSchedule(scheduleBuilder);
             assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -171,7 +170,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.assertSuccessfulExecution();
             scheduleDetail.assertManualRunExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -192,7 +191,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.manualStop();
             scheduleDetail.assertManualStoppedExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -212,7 +211,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertSchedule(scheduleBuilder.setExecutable(Executables.FAILED_GRAPH).setScheduleName(
                     Executables.FAILED_GRAPH.getExecutableName()));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -235,7 +234,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             waitForElementVisible(projectDetailPage.checkEmptySchedulesList(processName));
             Assert.assertTrue(projectDetailPage.checkEmptySchedulesList(processName).isDisplayed());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -256,7 +255,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     Confirmation.SAVE_CHANGES);
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -291,7 +290,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertSchedule(scheduleBuilder.editParam(param1, editedParam1).editParam(param2,
                     editedParam2));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -323,7 +322,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.addNewParams(newParams, Confirmation.SAVE_CHANGES);
             assertSchedule(scheduleBuilder.setParameters(newParams));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -360,7 +359,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                             .setCronTimeExpression("* * *");
             scheduleDetail.checkScheduleWithIncorrectCron(cronTimeBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -395,7 +394,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     .setScheduleName(Executables.FAILED_GRAPH.getExecutableName())
                     .setExecutable(newExecutable));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -423,7 +422,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     .removeParameter(Arrays.asList(param1, param2), Confirmation.SAVE_CHANGES);
             assertSchedule(scheduleBuilder.removeParam(param1).removeParam(param2));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -451,7 +450,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     Confirmation.CANCEL_CHANGES);
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -468,7 +467,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             prepareScheduleWithBasicPackage(scheduleBuilder);
             scheduleDetail.addInvalidRetry("5");
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -487,7 +486,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             waitForElementVisible(projectDetailPage.getRoot());
             projectDetailPage.assertActiveProcessInList(processName, DeployPackages.CLOUDCONNECT);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -507,7 +506,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.changeExecutable(Executables.FAILED_GRAPH, Confirmation.CANCEL_CHANGES);
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -528,7 +527,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     Confirmation.CANCEL_CHANGES);
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -547,7 +546,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.checkRescheduleMessageAndDefault();
             scheduleDetail.addValidRetry("15", Confirmation.CANCEL_CHANGES);;
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -576,7 +575,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.confirmParamsChange(Confirmation.CANCEL_CHANGES);
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -595,7 +594,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.deleteSchedule(Confirmation.CANCEL_CHANGES);
             waitForElementVisible(scheduleDetail.getRoot());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -614,7 +613,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.removeRetryDelay(Confirmation.CANCEL_CHANGES);
             scheduleDetail.removeRetryDelay(Confirmation.SAVE_CHANGES);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -633,7 +632,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertEquals(EXECUTION_HISTORY_EMPTY_STATE_MESSAGE, scheduleDetail
                     .getExecutionHistoryEmptyState().getText());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -665,7 +664,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             assertTrue(scheduleDetail.isInRunningState());
             scheduleDetail.assertSuccessfulExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -684,7 +683,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.repeatManualRunSuccessfulSchedule(3);
             scheduleDetail.checkOkExecutionGroup(3, 0);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -697,8 +696,9 @@ public class SchedulesTests extends AbstractSchedulesTests {
                             .setScheduleName("Custom Schedule Name")
                             .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
+            assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -719,7 +719,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
             assertSchedule(scheduleBuilder.setScheduleName(newScheduleName));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -741,7 +741,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     validScheduleName);
             assertSchedule(scheduleWithEmptyScheduleName.setScheduleName(validScheduleName));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -759,7 +759,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.changeInvalidScheduleName("");
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -783,7 +783,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleForm.createScheduleWithInvalidScheduleName(scheduleBuilder2, validScheduleName);
             assertSchedule(scheduleBuilder2.setScheduleName(validScheduleName));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -807,7 +807,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     .getExecutableName());
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -827,13 +827,12 @@ public class SchedulesTests extends AbstractSchedulesTests {
             scheduleDetail.clickOnCloseScheduleButton();
             assertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createScheduleWithCustomNameForRubyScript() throws InterruptedException,
-            JSONException {
+    public void createScheduleWithCustomNameForRubyScript() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
 
@@ -846,31 +845,28 @@ public class SchedulesTests extends AbstractSchedulesTests {
                             .setExecutable(Executables.RUBY1).setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkCustomScheduleNameInFailedOverview() throws InterruptedException,
-            JSONException {
+    public void checkCustomScheduleNameInFailedOverview() {
         checkScheduleNameInOverviewPage(OverviewProjectStates.FAILED);
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkCustomScheduleNameInSuccessfulOverview() throws InterruptedException,
-            JSONException {
+    public void checkCustomScheduleNameInSuccessfulOverview() {
         checkScheduleNameInOverviewPage(OverviewProjectStates.SUCCESSFUL);
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkCustomScheduleNameInRunningOverview() throws InterruptedException,
-            JSONException {
+    public void checkCustomScheduleNameInRunningOverview() {
         checkScheduleNameInOverviewPage(OverviewProjectStates.RUNNING);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProjectWithOneSchedule() {
-        cleanProcessesInProjectDetail(testParams.getProjectId());
+        cleanProcessesInWorkingProject();
 
         try {
             String processName = "Check Schedule Trigger With 1 Schedule In Project";
@@ -882,50 +878,51 @@ public class SchedulesTests extends AbstractSchedulesTests {
             waitForElementVisible(scheduleForm.getRoot());
             scheduleForm.checkNoTriggerScheduleOptions();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkScheduleTriggerBySuccessfulSchedule() throws InterruptedException,
-            JSONException {
+    public void checkScheduleTriggerBySuccessfulSchedule() {
         try {
             String processName = "Check Schedule With Trigger Schedule";
 
             ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
             ScheduleBuilder dependentScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
-            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
-                    dependentScheduleBuilder);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder);
 
             runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
             waitForAutoRunDependentSchedule(dependentScheduleBuilder);
             scheduleDetail.assertFailedExecution(dependentScheduleBuilder.getExecutable());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkScheduleTriggerInLoop() {
-        cleanProcessesInProjectDetail(testParams.getProjectId());
+        cleanProcessesInWorkingProject();
 
         try {
             String processName = "Check Schedule With Trigger Schedule";
 
             ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
             ScheduleBuilder dependentScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
-            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
-                    dependentScheduleBuilder);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder);
 
             browser.get(triggerScheduleBuilder.getScheduleUrl());
             waitForElementVisible(scheduleDetail.getRoot());
             scheduleDetail.checkNoTriggerScheduleOptions();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -946,7 +943,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             waitForElementVisible(scheduleForm.getRoot());
             scheduleForm.checkScheduleTriggerOptions(Arrays.asList(scheduleBuilder));
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -956,11 +953,12 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Check Schedule With Trigger Schedule";
 
             ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.SUCCESSFUL_GRAPH);
             ScheduleBuilder dependentScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
-            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
-                    dependentScheduleBuilder);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder);
 
             browser.get(triggerScheduleBuilder.getScheduleUrl());
             waitForElementVisible(scheduleDetail.getRoot());
@@ -974,7 +972,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             waitForElementVisible(scheduleDetail.getRoot());
             scheduleDetail.checkTriggerScheduleMissing();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 }

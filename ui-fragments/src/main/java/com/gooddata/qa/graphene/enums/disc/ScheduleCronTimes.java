@@ -14,7 +14,7 @@ public enum ScheduleCronTimes {
     CRON_30_MINUTES("every 30 minutes", "every 30 minutes", 30),
     CRON_15_MINUTES("every 15 minutes", "every 15 minutes", 15),
     CRON_EXPRESSION("cron expression", "${cronExpression} UTC", Integer.MAX_VALUE),
-    AFTER("after", "after ${triggerSchedule} completion", 2);
+    AFTER("after", "after ${triggerSchedule} completion", 0);
 
     private String cronTime;
     private String cronFormat;
@@ -41,7 +41,6 @@ public enum ScheduleCronTimes {
         int waitingTimeFromNow =
                 waitingAutoRunInMinutes - startWaitingTime.get(Calendar.MINUTE)
                         % waitingAutoRunInMinutes;
-        System.out.println("Waiting time in minutes from now: " + waitingTimeFromNow);
         return waitingTimeFromNow;
     }
 }

@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.disc;
 
-import org.json.JSONException;
-
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
@@ -9,46 +7,16 @@ import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
-public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
-
-    protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
+public abstract class AbstractSchedulesTests extends AbstractDISCTest {
 
     protected void assertBrokenSchedule(ScheduleBuilder scheduleBuilder) {
         waitForElementVisible(brokenSchedulesTable.getRoot());
         projectDetailPage.assertScheduleInList(brokenSchedulesTable, scheduleBuilder);
     }
-
-    protected void createSchedule(ScheduleBuilder scheduleBuilder) {
-        projectDetailPage.clickOnNewScheduleButton();
-        waitForElementVisible(scheduleForm.getRoot());
-        scheduleForm.createNewSchedule(scheduleBuilder);
-    }
-
-    protected void assertSchedule(ScheduleBuilder scheduleBuilder) {
-        projectDetailPage.checkFocusedProcess(scheduleBuilder.getProcessName());
-        waitForElementVisible(schedulesTable.getRoot());
-        projectDetailPage.assertScheduleInList(schedulesTable, scheduleBuilder);
-        schedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()).click();
-        waitForElementVisible(scheduleDetail.getRoot());
-
-        scheduleDetail.assertSchedule(scheduleBuilder);
-    }
-
-    protected void createAndAssertSchedule(ScheduleBuilder scheduleBuilder) {
-        createSchedule(scheduleBuilder);
-        assertSchedule(scheduleBuilder);
-    }
-
-    protected void prepareScheduleWithBasicPackage(ScheduleBuilder scheduleBuilder) {
-        deployInProjectDetailPage(DeployPackages.BASIC, scheduleBuilder.getProcessName());
-        createAndAssertSchedule(scheduleBuilder);
-        scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
-    }
-
-    protected void checkScheduleNameInOverviewPage(OverviewProjectStates overviewState)
-            throws JSONException {
+    
+    protected void checkScheduleNameInOverviewPage(OverviewProjectStates overviewState) {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
 
@@ -74,7 +42,7 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName).setScheduleName(scheduleName)
                             .setExecutable(graph).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
-                            .setHourInDay("23").setMinuteInHour("59").isConfirm();
+                            .setHourInDay("23").setMinuteInHour("59").setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
 
             scheduleDetail.manualRun();
@@ -101,26 +69,33 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
             discOverviewProjects.assertOverviewScheduleName(overviewState, getWorkingProject(),
                     scheduleBuilder.getScheduleUrl(), scheduleName);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
-    protected void prepareDataForTriggerScheduleTest(String processName,
-            ScheduleBuilder triggerScheduleBuilder, ScheduleBuilder dependentScheduleBuilder) {
+    protected void prepareDataForTriggerScheduleTest(ScheduleBuilder triggerScheduleBuilder,
+            ScheduleBuilder dependentScheduleBuilder) {
+        verifyScheduleForTriggerScheduleTest(triggerScheduleBuilder);
+        verifyScheduleForTriggerScheduleTest(dependentScheduleBuilder);
+
         openProjectDetailByUrl(getWorkingProject().getProjectId());
+        
+        String triggerScheduleProcess = triggerScheduleBuilder.getProcessName();
+        deployInProjectDetailPage(triggerScheduleBuilder.getExecutable().getExecutablePackage(),
+                triggerScheduleProcess);
+        String dependentScheduleProcess = dependentScheduleBuilder.getProcessName();
+        if (!triggerScheduleProcess.equals(dependentScheduleProcess))
+            deployInProjectDetailPage(dependentScheduleBuilder.getExecutable()
+                    .getExecutablePackage(), dependentScheduleProcess);
 
-        deployInProjectDetailPage(DeployPackages.BASIC, processName);
-
-        triggerScheduleBuilder.setProcessName(processName)
-                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
+        triggerScheduleBuilder.setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
                 .setMinuteInHour("59");
         createAndAssertSchedule(triggerScheduleBuilder);
         triggerScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
         dependentScheduleBuilder
-                .setProcessName(processName)
                 .setCronTime(ScheduleCronTimes.AFTER)
-                .setTriggerScheduleGroup(processName)
+                .setTriggerScheduleGroup(triggerScheduleProcess)
                 .setTriggerScheduleOption(
                         triggerScheduleBuilder.getExecutable().getExecutablePath());
         createAndAssertSchedule(dependentScheduleBuilder);
@@ -143,5 +118,11 @@ public abstract class AbstractSchedulesTests extends AbstractDeployProcesses {
         waitForElementVisible(scheduleDetail.getRoot());
         scheduleDetail.tryToWaitForAutoRun(scheduleBuilder.getCronTimeBuilder());
         return scheduleDetail.getExecutionItemsNumber();
+    }
+
+    private void verifyScheduleForTriggerScheduleTest(ScheduleBuilder scheduleBuilder) {
+        assertFalse(scheduleBuilder == null);
+        assertFalse(scheduleBuilder.getProcessName() == null);
+        assertFalse(scheduleBuilder.getExecutable() == null);
     }
 }

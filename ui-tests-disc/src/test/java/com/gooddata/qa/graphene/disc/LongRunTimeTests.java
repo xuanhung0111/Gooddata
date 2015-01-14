@@ -1,21 +1,16 @@
 package com.gooddata.qa.graphene.disc;
 
-import java.io.IOException;
-import java.text.ParseException;
-
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 
 import static org.testng.Assert.*;
 
-public class LongRunTimeTests extends AbstractDISC {
+public class LongRunTimeTests extends AbstractSchedulesTests {
 
     @BeforeClass
     public void initProperties() {
@@ -39,7 +34,7 @@ public class LongRunTimeTests extends AbstractDISC {
             scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
             scheduleDetail.assertSuccessfulExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -59,7 +54,7 @@ public class LongRunTimeTests extends AbstractDISC {
             scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
             scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -84,7 +79,7 @@ public class LongRunTimeTests extends AbstractDISC {
             scheduleDetail.waitForRetrySchedule(scheduleBuilder);
             scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -105,7 +100,7 @@ public class LongRunTimeTests extends AbstractDISC {
             scheduleDetail.manualStop();
             scheduleDetail.assertManualStoppedExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -124,7 +119,7 @@ public class LongRunTimeTests extends AbstractDISC {
             scheduleDetail.manualRun();
             scheduleDetail.assertSuccessfulExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -148,7 +143,7 @@ public class LongRunTimeTests extends AbstractDISC {
             scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
             scheduleDetail.assertSuccessfulExecution();
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -167,7 +162,7 @@ public class LongRunTimeTests extends AbstractDISC {
             scheduleDetail.checkRepeatedFailureSchedule(scheduleBuilder.getCronTimeBuilder(),
                     scheduleBuilder.getExecutable());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -177,11 +172,10 @@ public class LongRunTimeTests extends AbstractDISC {
             String processName = "Check Schedule With Trigger Schedule";
 
             ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH);
             ScheduleBuilder dependentScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
-            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
-                    dependentScheduleBuilder);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH);
+            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder);
 
             manualRunTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
             scheduleDetail.assertFailedExecution(triggerScheduleBuilder.getExecutable());
@@ -189,23 +183,22 @@ public class LongRunTimeTests extends AbstractDISC {
                     waitForAutoRunDependentSchedule(dependentScheduleBuilder);
             assertEquals(dependentScheduleExecutionNumber, 0);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
-    public void checkMultipleScheduleTriggers() throws JSONException, InterruptedException {
+    public void checkMultipleScheduleTriggers() {
         try {
             String processName1 = "Check Schedule With Trigger Schedule 1";
 
             ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setScheduleName("Trigger schedule").setExecutable(
+                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Trigger schedule").setExecutable(
                             Executables.SUCCESSFUL_GRAPH);
             ScheduleBuilder dependentScheduleBuilder1 =
-                    new ScheduleBuilder().setScheduleName("Dependent schedule 1").setExecutable(
+                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Dependent schedule 1").setExecutable(
                             Executables.SUCCESSFUL_GRAPH);
-            prepareDataForTriggerScheduleTest(processName1, triggerScheduleBuilder,
-                    dependentScheduleBuilder1);
+            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder1);
 
             String processName2 = "Check Schedule With Trigger Schedule 2";
             ScheduleBuilder dependentScheduleBuilder2 =
@@ -224,7 +217,7 @@ public class LongRunTimeTests extends AbstractDISC {
             waitForAutoRunDependentSchedule(dependentScheduleBuilder2);
             scheduleDetail.assertFailedExecution(dependentScheduleBuilder2.getExecutable());
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
     }
 
@@ -234,11 +227,10 @@ public class LongRunTimeTests extends AbstractDISC {
             String processName = "Check Schedule With Trigger Schedule";
 
             ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.SUCCESSFUL_GRAPH);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH);
             ScheduleBuilder dependentScheduleBuilder =
-                    new ScheduleBuilder().setExecutable(Executables.FAILED_GRAPH);
-            prepareDataForTriggerScheduleTest(processName, triggerScheduleBuilder,
-                    dependentScheduleBuilder);
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH);
+            prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder);
 
             runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
             waitForAutoRunDependentSchedule(dependentScheduleBuilder);
@@ -250,25 +242,7 @@ public class LongRunTimeTests extends AbstractDISC {
                     waitForAutoRunDependentSchedule(dependentScheduleBuilder);
             assertEquals(dependentScheduleExecutionNumber, 1);
         } finally {
-            cleanProcessesInProjectDetail(testParams.getProjectId());
+            cleanProcessesInWorkingProject();
         }
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
-    public void checkProjectsNotAdminInFailedState() throws ParseException, IOException,
-            JSONException, InterruptedException {
-        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.FAILED);
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
-    public void checkProjectsNotAdminInSucessfulState() throws ParseException, IOException,
-            JSONException, InterruptedException {
-        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.SUCCESSFUL);
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"project-overview"})
-    public void checkProjectsNotAdminInRunningState() throws ParseException, IOException,
-            JSONException, InterruptedException {
-        checkOverviewProjectWithoutAdminRole(OverviewProjectStates.RUNNING);
     }
 }
