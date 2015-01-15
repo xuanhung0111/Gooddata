@@ -1,35 +1,23 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.*;
+import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditFilter;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardSettingsDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
-import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
-import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption.createFeatureClassOption;
+import static com.gooddata.qa.utils.http.RestUtils.setFeatureFlags;
+import static org.testng.Assert.*;
 
 @Test(groups = {"dashboardSavedFilters"}, description = "Test saved filters work on dashboard in Portal")
 public class DashboardSavedFiltersTest extends AbstractProjectTest{
@@ -41,8 +29,6 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     private static final String LAST_YEAR             = String.valueOf(THIS_YEAR - 1);
     private static final String PENULTIMATE_YEAR      = String.valueOf(THIS_YEAR - 2);
 
-    private static final String FEATURE_FLAGS_URI     = "/gdc/internal/account/profile/featureFlags";
-    private static final String FEATURE_FLAGS         = "featureFlags";
     private static final String DISABLE_SAVED_FILTERS = "disableSavedFilters";
 
     @BeforeClass
@@ -91,7 +77,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnGroups = {"init-data"}, priority = 2)
     public void checkDisableSavedFiltersFeatureFlagsTest() throws IOException, JSONException {
         try {
-            disableSavedFilters(FEATURE_FLAGS_URI, true);
+            disableSavedFilters(true);
     
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
@@ -109,7 +95,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             waitForElementNotVisible(dashboardSettingsDialog.getRoot());
             dashboardEditBar.cancelDashboard();
         } finally {
-            disableSavedFilters(FEATURE_FLAGS_URI, false);
+            disableSavedFilters(false);
     
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
@@ -448,20 +434,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                   "Notification text is not correct!");
     }
 
-    private JSONObject getJSONObjectFrom(String uri) throws IOException, JSONException {
-        getRestApiClient();
-        HttpRequestBase getRequest = restApiClient.newGetMethod(uri);
-        HttpResponse getResponse = restApiClient.execute(getRequest);
-        assertEquals(getResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
-        String result = EntityUtils.toString(getResponse.getEntity());
-        return new JSONObject(result);
-    }
-
-    private void disableSavedFilters(String uri, boolean on) throws IOException, JSONException {
-        JSONObject json = getJSONObjectFrom(uri);
-        json.getJSONObject(FEATURE_FLAGS).put(DISABLE_SAVED_FILTERS, on);
-        HttpRequestBase putRequest = restApiClient.newPutMethod(FEATURE_FLAGS_URI, json.toString());
-        HttpResponse putResponse = restApiClient.execute(putRequest);
-        assertEquals(putResponse.getStatusLine().getStatusCode(), 204, "Invalid status code");
+    private void disableSavedFilters(boolean on) throws IOException, JSONException {
+        setFeatureFlags(getRestApiClient(), createFeatureClassOption(DISABLE_SAVED_FILTERS, on));
     }
 }

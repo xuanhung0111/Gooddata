@@ -1,15 +1,14 @@
 package com.gooddata.qa.graphene.common;
 
-import java.util.Collection;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
+import java.util.Collection;
 
 import static org.testng.Assert.fail;
 
@@ -91,9 +90,9 @@ public class CheckUtils {
         return select;
     }
 
-    public static WebElement waitForFragmentVisible(AbstractFragment fragment) {
+    public static <T extends AbstractFragment> T waitForFragmentVisible(T fragment) {
         Graphene.waitGui().until().element(fragment.getRoot()).is().visible();
-        return fragment.getRoot();
+        return fragment;
     }
 
     public static void waitForElementNotVisible(WebElement element) {
