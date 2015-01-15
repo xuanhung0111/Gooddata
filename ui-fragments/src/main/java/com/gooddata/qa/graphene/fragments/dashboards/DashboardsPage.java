@@ -1,22 +1,19 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.gooddata.qa.graphene.enums.PublishType;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
-import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardsPage extends AbstractFragment {
 
@@ -110,7 +107,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public PermissionsDialog getPermissionsDialog() {
-        return permissionsDialog;
+        return waitForFragmentVisible(permissionsDialog);
     }
 
     public SavedViewWidget getSavedViewWidget() {
@@ -152,7 +149,6 @@ public class DashboardsPage extends AbstractFragment {
         if (dashboardSwitcherArrowMenu.isDisplayed()) {
             dashboardsNames.addAll(openDashboardMenu().getAllItemNames());
             dashboardSwitcherArrowMenu.click();
-
         } else if (dashboardSwitcherButton.isDisplayed()) {
             dashboardsNames.add(getDashboardName());
         }
@@ -166,7 +162,7 @@ public class DashboardsPage extends AbstractFragment {
             int dashboardsCount = openDashboardMenu().getItemsCount();
             dashboardSwitcherArrowMenu.click();
             return dashboardsCount;
-        } else if (dashboardSwitcherButton.isDisplayed()) {
+        } else if (waitForElementPresent(dashboardSwitcherButton).isDisplayed()) {
             return 1;
         }
         return 0;
@@ -249,34 +245,36 @@ public class DashboardsPage extends AbstractFragment {
         editDashboardBar.deleteDashboard();
     }
 
-    public void openPermissionsDialog() {
+    public PermissionsDialog openPermissionsDialog() {
         waitForDashboardPageLoaded(browser);
         openEditExportEmbedMenu().select("Permissions");
-        waitForElementVisible(permissionsDialog.getRoot());
+        return getPermissionsDialog();
     }
 
     public void publishDashboard(boolean listed) {
         openPermissionsDialog();
-        permissionsDialog.publish(listed);
+        permissionsDialog.publish(listed ? PublishType.SPECIFIC_USERS_CAN_ACCESS : PublishType.EVERYONE_CAN_ACCESS);
         permissionsDialog.submit();
     }
 
     public void lockDashboard(boolean locked) {
         openPermissionsDialog();
         if (locked) {
-            permissionsDialog.lock();
-        } else {
             permissionsDialog.unlock();
+        } else {
+            permissionsDialog.lock();
         }
         permissionsDialog.submit();
     }
 
-    public void lockIconClick() {
+    public PermissionsDialog lockIconClick() {
         waitForElementVisible(lockIcon).click();
+        return getPermissionsDialog();
     }
 
-    public void unlistedIconClick() {
+    public PermissionsDialog unlistedIconClick() {
         waitForElementVisible(unlistedIcon).click();
+        return getPermissionsDialog();
     }
 
     public boolean isLocked() {
