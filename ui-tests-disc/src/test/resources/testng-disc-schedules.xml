@@ -11,5 +11,15 @@
             <class name="com.gooddata.qa.graphene.disc.SchedulesTests"/>
         </classes>
     </test>
+    <test name="DISC Dataload Schedules tests">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.disc.DataloadSchedulesTests"/>
+        </classes>
+    </test>
 
 </suite>

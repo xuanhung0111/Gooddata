@@ -51,7 +51,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.DWHS2)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                            .setParameters(paramList).isConfirm();
+                            .setParameters(paramList).setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
@@ -71,7 +71,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     projectDetailPage.getExecutableScheduleLink(Executables.DWHS2
                             .getExecutableName())).click();
             waitForElementVisible(scheduleForm.getRoot());
-            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().isConfirm();
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setConfirmed(true);
             scheduleForm.createNewSchedule(scheduleBuilder);
             assertSchedule(scheduleBuilder.setProcessName(processName).setExecutable(
                     Executables.DWHS2));
@@ -90,7 +90,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
             projectDetailPage.getNewScheduleLinkInSchedulesList(processName).click();
             waitForElementVisible(scheduleForm.getRoot());
-            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().isConfirm();
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setConfirmed(true);
             scheduleForm.createNewSchedule(scheduleBuilder);
             assertSchedule(scheduleBuilder.setProcessName(processName).setExecutable(
                     Executables.DWHS1));
@@ -313,7 +313,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.DWHS2)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                            .setParameters(paramList).isConfirm();
+                            .setParameters(paramList).setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
 
             List<Parameter> newParams =
@@ -353,7 +353,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.DWHS2)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
 
             CronTimeBuilder cronTimeBuilder =
@@ -374,7 +374,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
 
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName).isConfirm();
+                    new ScheduleBuilder().setProcessName(processName).setConfirmed(true);
             createSchedule(scheduleBuilder);
             assertSchedule(scheduleBuilder.setExecutable(Executables.DWHS1));
             scheduleDetail.clickOnCloseScheduleButton();
@@ -465,7 +465,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
             scheduleDetail.addInvalidRetry("5");
         } finally {
@@ -481,7 +481,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Cancel Create Schedule";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
 
-            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().isCancel();
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setConfirmed(false);
             createSchedule(scheduleBuilder);
             waitForElementNotPresent(scheduleForm.getRoot());
 
@@ -502,7 +502,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.changeExecutable(Executables.FAILED_GRAPH, Confirmation.CANCEL_CHANGES);
@@ -521,7 +521,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_30_MINUTES).isConfirm();
+                            .setCronTime(ScheduleCronTimes.CRON_30_MINUTES).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.changeCronTime(
@@ -542,7 +542,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_30_MINUTES).isConfirm();
+                            .setCronTime(ScheduleCronTimes.CRON_30_MINUTES).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.checkRescheduleMessageAndDefault();
@@ -590,7 +590,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).isConfirm();
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.deleteSchedule(Confirmation.CANCEL_CHANGES);
@@ -608,7 +608,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Check Retry Schedule";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.FAILED_GRAPH).isConfirm();
+                            .setExecutable(Executables.FAILED_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.addValidRetry("15", Confirmation.SAVE_CHANGES);
@@ -627,7 +627,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Check Execution History Empty State";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.FAILED_GRAPH).isConfirm();
+                            .setExecutable(Executables.FAILED_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             assertNotNull(scheduleDetail.getExecutionHistoryEmptyState());
@@ -647,7 +647,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.FAILED_GRAPH).isConfirm();
+                            .setExecutable(Executables.FAILED_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.manualRun();
@@ -657,7 +657,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
             ScheduleBuilder scheduleBuilder2 =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             openProjectDetailPage(getWorkingProject());
             createAndAssertSchedule(scheduleBuilder2);
 
@@ -679,7 +679,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
 
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.repeatManualRunSuccessfulSchedule(3);
@@ -696,7 +696,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName("Create Schedule With Custom Name")
                             .setScheduleName("Custom Schedule Name")
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
@@ -711,7 +711,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Edit Schedule With Custom Name";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             String newScheduleName = "Custom Schedule Name";
@@ -737,7 +737,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String validScheduleName = "Custom Schedule Name";
             ScheduleBuilder scheduleWithEmptyScheduleName =
                     new ScheduleBuilder().setProcessName(processName).setScheduleName("")
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             scheduleForm.createScheduleWithInvalidScheduleName(scheduleWithEmptyScheduleName,
                     validScheduleName);
             assertSchedule(scheduleWithEmptyScheduleName.setScheduleName(validScheduleName));
@@ -754,7 +754,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Edit Schedule With Empty Custom Name";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.changeInvalidScheduleName("");
@@ -772,7 +772,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Create Schedule With Not Unique Name";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             ScheduleBuilder scheduleBuilder2 =
@@ -795,13 +795,13 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Create Schedule With Custom Name";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             ScheduleBuilder scheduleBuilder2 =
                     new ScheduleBuilder().setProcessName(processName)
                             .setScheduleName("Custom Schedule Name")
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             createSchedule(scheduleBuilder2);
             assertSchedule(scheduleBuilder2);
             scheduleDetail.changeInvalidScheduleName(Executables.SUCCESSFUL_GRAPH
@@ -820,7 +820,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             String processName = "Edit Schedule With Custom Name";
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH).isConfirm();
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.changeValidScheduleName("Custom Schedule Name",
@@ -844,7 +844,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setScheduleName("Schedule of Ruby script")
-                            .setExecutable(Executables.RUBY1).isConfirm();
+                            .setExecutable(Executables.RUBY1).setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
         } finally {
             cleanProcessesInProjectDetail(testParams.getProjectId());
@@ -962,7 +962,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setScheduleName(triggerScheduleName)
-                            .setExecutable(triggerScheduleExecutable).isConfirm();
+                            .setExecutable(triggerScheduleExecutable).setConfirmed(true);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             projectDetailPage.clickOnNewScheduleButton();
@@ -1089,7 +1089,7 @@ public class SchedulesTests extends AbstractSchedulesTests {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName).setScheduleName(scheduleName)
                             .setExecutable(graph).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
-                            .setHourInDay("23").setMinuteInHour("59").isConfirm();
+                            .setHourInDay("23").setMinuteInHour("59").setConfirmed(true);
             createAndAssertSchedule(scheduleBuilder);
 
             scheduleDetail.manualRun();

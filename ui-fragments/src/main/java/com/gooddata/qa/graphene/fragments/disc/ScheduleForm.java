@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -46,6 +47,18 @@ public class ScheduleForm extends AbstractFragment {
 
     @FindBy(css = ".ait-new-schedule-process-select-btn")
     private WebElement selectProcessForNewSchedule;
+
+    @FindBy(css = ".ait-dataset-selection-radio-all")
+    private WebElement selectSynchronizeAllDatasets;
+
+    @FindBy(css = ".ait-dataset-selection-radio-custom")
+    private WebElement selectSynchronizeSelectedDatasets;
+
+    @FindBy(css = ".ait-dataset-selection-dropdown-button")
+    private WebElement openDatasetPickerButton;
+
+    @FindBy(css = ".ait-dataset-selection-dropdown")
+    private WebElement datasetDialog;
 
     @FindBy(css = ".ait-new-schedule-executable-select-btn")
     private WebElement selectExecutableForNewSchedule;
@@ -102,10 +115,20 @@ public class ScheduleForm extends AbstractFragment {
         selectCron(scheduleBuilder.getCronTimeBuilder());
         addParameters(scheduleBuilder.getParameters());
         setCustomScheduleName(scheduleBuilder);
-        if (scheduleBuilder.isConfirmed())
+
+        if (scheduleBuilder.isDataloadProcess()) {
+            if (scheduleBuilder.isSynchronizeAllDatasets()) {
+                setSynchronizeAllDatasets();
+            } else {
+                setDatasetsToSynchronize(scheduleBuilder.getDatasetsToSynchronize());
+            }
+        }
+
+        if (scheduleBuilder.isConfirmed()) {
             waitForElementVisible(BY_SCHEDULE_BUTTON, browser).click();
-        else
+        } else {
             waitForElementVisible(BY_CANCEL_BUTTON, browser).click();
+        }
     }
 
     public void createScheduleWithInvalidScheduleName(ScheduleBuilder scheduleBuilder,
@@ -236,6 +259,25 @@ public class ScheduleForm extends AbstractFragment {
         waitForElementVisible(selectExecutableForNewSchedule);
         Select select = new Select(selectExecutableForNewSchedule);
         select.selectByVisibleText(executable.getExecutablePath());
+    }
+
+    private void setSynchronizeAllDatasets() {
+        waitForElementVisible(selectSynchronizeAllDatasets).click();
+    }
+
+    private void setDatasetsToSynchronize(List<String> datasetsToSynchronize) {
+        waitForElementVisible(selectSynchronizeSelectedDatasets).click();
+        waitForElementVisible(openDatasetPickerButton).click();
+
+        List<WebElement> items =  waitForElementVisible(datasetDialog).findElements(By.className("gd-list-view-item"));
+
+        for(WebElement item: items) {
+            if (!datasetsToSynchronize.contains(item.getText())) {
+                item.click();
+            }
+        }
+
+        waitForElementVisible(datasetDialog).findElement(By.className("button-positive")).click();
     }
 
     private void selectDayInWeek(CronTimeBuilder cronTimeBuilder) {

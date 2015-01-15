@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.entity.disc;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 public class ProjectInfo {
 
     private String projectName;
@@ -21,5 +23,12 @@ public class ProjectInfo {
 
     public String getProjectId() {
         return projectId;
+    }
+
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("projectId", projectId)
+                .append("projectName", projectName)
+                .toString();
     }
 }

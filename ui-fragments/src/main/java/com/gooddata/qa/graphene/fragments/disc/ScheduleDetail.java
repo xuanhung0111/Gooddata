@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -125,6 +126,27 @@ public class ScheduleDetail extends ScheduleForm {
     @FindBy(css = ".ait-schedule-retry-delete-cancel-btn")
     private WebElement cancelRemoveRetryButton;
 
+    @FindBy(css = ".ait-dataset-selection-radio-all")
+    private WebElement selectSynchronizeAllDatasets;
+
+    @FindBy(css = ".ait-dataset-selection-radio-custom")
+    private WebElement selectSynchronizeSelectedDatasets;
+
+    @FindBy(css = ".ait-dataset-selection-dropdown-button")
+    private WebElement openDatasetPickerButton;
+
+    @FindBy(css = ".s-btn-select_all")
+    private WebElement selectAllCustomDatasetsButton;
+
+    @FindBy(css = ".s-btn-clear")
+    private WebElement selectNoneCustomDatasetsButton;
+
+    @FindBy(css = ".ait-dataset-selection-dropdown")
+    private WebElement datasetDialog;
+
+    @FindBy(css = ".datasets-messages")
+    private WebElement dataloadDatasetsMessages;
+
     @FindBy(css = ".ait-schedule-run-btn")
     private WebElement manualRunButton;
 
@@ -215,19 +237,27 @@ public class ScheduleDetail extends ScheduleForm {
     public void assertSchedule(final ScheduleBuilder scheduleBuilder) {
         waitForElementVisible(scheduleTitle);
         assertEquals(scheduleBuilder.getScheduleName(), scheduleTitle.getText());
-        waitForElementVisible(selectExecutable);
-        final Select select = new Select(selectExecutable);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
 
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return select.getFirstSelectedOption().getText()
-                        .equals(scheduleBuilder.getExecutable().getExecutablePath());
-            }
-        });
+        if (!scheduleBuilder.isDataloadProcess()) {
+            waitForElementVisible(selectExecutable);
+            final Select select = new Select(selectExecutable);
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return select.getFirstSelectedOption().getText()
+                            .equals(scheduleBuilder.getExecutable().getExecutablePath());
+                }
+            });
+        }
+
         assertCronTime(scheduleBuilder.getCronTimeBuilder());
         if (!scheduleBuilder.getParameters().isEmpty())
             assertScheduleParameters(scheduleBuilder.getParameters());
+
+        if(scheduleBuilder.isDataloadProcess()){
+            assertDataloadScheduleDatasets(scheduleBuilder);
+        }
     }
 
     public WebElement getExecutionHistoryEmptyState() {
@@ -611,6 +641,37 @@ public class ScheduleDetail extends ScheduleForm {
             waitForElementVisible(cancelChangeScheduleTitleButton).click();
     }
 
+    public void changeAndCheckDatasetDialog(ScheduleBuilder scheduleBuilder) {
+        assertTrue(!selectSynchronizeAllDatasets.isSelected());
+        assertTrue(selectSynchronizeSelectedDatasets.isSelected());
+        assertTrue(openDatasetPickerButton.getText().contains(scheduleBuilder.getDatasetsToSynchronize().size() + " of " + scheduleBuilder.getAllDatasets().size() + " datasets"));
+
+
+        openDatasetPickerButton.click();
+        assertChecked(scheduleBuilder.getDatasetsToSynchronize());
+
+        selectAllCustomDatasetsButton.click();
+        assertChecked(scheduleBuilder.getAllDatasets());
+
+        selectNoneCustomDatasetsButton.click();
+        assertChecked(Collections.<String>emptyList());
+
+        waitForElementVisible(datasetDialog).findElement(By.className("button-positive")).click();
+        scheduleBuilder.setDatasetsToSynchronize(Collections.<String>emptyList());
+        assertSchedule(scheduleBuilder);
+    }
+
+    private void assertChecked(List<String> datasetsToSynchronize) {
+        List<WebElement> items = waitForElementVisible(datasetDialog).findElements(By.className("gd-list-view-item"));
+        for (WebElement item : items) {
+            if (datasetsToSynchronize.contains(item.getText())) {
+                assertTrue(item.getAttribute("class").contains("is-selected"));
+            } else {
+                assertTrue(!item.getAttribute("class").contains("is-selected"));
+            }
+        }
+    }
+
     public void changeInvalidScheduleName(String invalidScheduleName) {
         changeScheduleName(invalidScheduleName);
         waitForElementVisible(saveScheduleTitleButton).click();
@@ -694,6 +755,21 @@ public class ScheduleDetail extends ScheduleForm {
         waitForElementVisible(scheduleTitle).click();
         waitForElementVisible(scheduleTitleInput).clear();
         scheduleTitleInput.sendKeys(newScheduleName);
+    }
+
+    private void assertDataloadScheduleDatasets(ScheduleBuilder scheduleBuilder) {
+        if (scheduleBuilder.isSynchronizeAllDatasets()) {
+            assertTrue(selectSynchronizeAllDatasets.isSelected());
+            assertTrue(!selectSynchronizeSelectedDatasets.isSelected());
+        } else {
+            assertTrue(!selectSynchronizeAllDatasets.isSelected());
+            assertTrue(selectSynchronizeSelectedDatasets.isSelected());
+            assertTrue(openDatasetPickerButton.getText().contains(scheduleBuilder.getDatasetsToSynchronize().size() + " of " + scheduleBuilder.getAllDatasets().size() + " datasets"));
+        }
+
+        if(scheduleBuilder.isDataloadDatasetsOverlap()) {
+            assertEquals(dataloadDatasetsMessages.getText(), "One or more of the selected datasets is already included in an existing schedule. If multiple schedules that load same dataset run concurrently, all schedules except the first will fail.");
+        }
     }
 
     private void assertScheduleParameters(List<Parameter> expectedParams) {
