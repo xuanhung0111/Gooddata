@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -25,6 +26,8 @@ public class CataloguePanel extends AbstractFragment {
 
     @FindBy(css = ".catalogue-container div.adi-bucket-item-handle>div")
     private List<WebElement> items;
+
+    private Actions actions;
 
     private static final By BY_INLINE_HELP = By.cssSelector(".inlineBubbleHelp");
 
@@ -48,8 +51,9 @@ public class CataloguePanel extends AbstractFragment {
 
     public String getTimeDescription(String time) {
         WebElement field = getTime(time);
-        WebElement iconElement = field.findElement(BY_PARENT).findElement(BY_INLINE_HELP);
-        new Actions(browser).moveToElement(field).moveToElement(iconElement).perform();
+        Actions actions = getActions();
+        actions.moveToElement(field).perform();
+        actions.moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getTimeDescription();
@@ -57,8 +61,9 @@ public class CataloguePanel extends AbstractFragment {
 
     public String getAttributeDescription(String attribute) {
         WebElement field = getCategory(attribute);
-        WebElement iconElement = field.findElement(BY_PARENT).findElement(BY_INLINE_HELP);
-        new Actions(browser).moveToElement(field).moveToElement(iconElement).perform();
+        Actions actions = getActions();
+        actions.moveToElement(field).perform();
+        actions.moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getAttributeDescription();
@@ -66,8 +71,13 @@ public class CataloguePanel extends AbstractFragment {
 
     public String getMetricDescription(String metric) {
         WebElement field = getMetric(metric);
-        WebElement iconElement = field.findElement(BY_PARENT).findElement(BY_INLINE_HELP);
-        new Actions(browser).moveToElement(field).moveToElement(iconElement).perform();
+
+        String javaScript = "var evObj = document.createEvent('MouseEvents');" +
+                "evObj.initMouseEvent(\"mouseover\",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);" +
+                "arguments[0].dispatchEvent(evObj);";
+        ((JavascriptExecutor)browser).executeScript(javaScript, field);
+
+        getActions().moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getMetricDescription();
@@ -99,5 +109,10 @@ public class CataloguePanel extends AbstractFragment {
                         && input.findElement(BY_PARENT).getAttribute("class").contains(type);
             }
         });
+    }
+
+    private Actions getActions() {
+        if (actions == null) actions = new Actions(browser);
+        return actions;
     }
 }

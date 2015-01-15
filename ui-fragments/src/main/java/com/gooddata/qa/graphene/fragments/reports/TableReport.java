@@ -91,6 +91,17 @@ public class TableReport extends AbstractReport {
         }));
     }
 
+    public List<String> getRawMetricElements() {
+        waitForReportLoading();
+        return Lists.newArrayList(Collections2.transform(metricValuesInGrid,
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
+                return input.getAttribute("title");
+            }
+        }));
+    }
+
     public void verifyAttributeIsHyperlinkInReport() {
         String drillToHyperLinkElement = "Open external link in a new window";
         assertTrue(drillableElements.size() > 0, "Attribute is NOT drillable");

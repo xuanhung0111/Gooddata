@@ -301,11 +301,11 @@ public abstract class AbstractIndigoProjectTest extends AbstractProjectTest {
         Iterator<String> attributes = tableReport.getAttributeElements().iterator();
 
         Thread.sleep(2000); // wait for metric values is calculated and loaded
-        Iterator<Float> metrics = tableReport.getMetricElements().iterator();
+        Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
 
         List<List<String>> content = new ArrayList<List<String>>();
         while (attributes.hasNext() && metrics.hasNext()) {
-            content.add(Arrays.asList(attributes.next(), String.valueOf(metrics.next())));
+            content.add(Arrays.asList(attributes.next(), metrics.next()));
         }
 
         assertEquals(content, analysisContent, "Content is not correct");
