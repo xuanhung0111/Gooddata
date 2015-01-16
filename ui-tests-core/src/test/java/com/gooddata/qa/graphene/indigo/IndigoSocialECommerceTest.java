@@ -16,7 +16,6 @@ public class IndigoSocialECommerceTest extends AbstractIndigoProjectTest {
     private static final String CHECKOUTS = "% Checkouts";
     private static final String DEVICE = "Device";
     private static final String CHANNEL = "Channel";
-    private static final String DECIMAL_METRIC = "Decimal metric";
 
     @BeforeClass
     public void initialize() {
@@ -25,7 +24,7 @@ public class IndigoSocialECommerceTest extends AbstractIndigoProjectTest {
 
         metric1 = ORDERS;
         metric2 = CHECKOUTS;
-        metric3 = DECIMAL_METRIC;
+        metric3 = ORDERS;
         attribute1 = DEVICE;
         attribute2 = CHANNEL;
         attribute3 = DEVICE;
@@ -52,6 +51,7 @@ public class IndigoSocialECommerceTest extends AbstractIndigoProjectTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreMetric() {
         initAnalysePage();
+
         StringBuilder expected = new StringBuilder(ORDERS).append("\n")
                 .append("Field Type\n")
                 .append("Metric\n")
