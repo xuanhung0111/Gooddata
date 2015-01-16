@@ -275,7 +275,7 @@ public class ScheduleDetail extends ScheduleForm {
                     .withTimeout(
                             cronTimebuilder.getWaitingAutoRunInMinutes()
                                     + MAX_DELAY_TIME_WAITING_AUTO_RUN, TimeUnit.MINUTES)
-                    .pollingEvery(10, TimeUnit.SECONDS)
+                    .pollingEvery(5, TimeUnit.SECONDS)
                     .withMessage("Schedule doesn't run automatically!")
                     .until(new Predicate<WebDriver>() {
 
@@ -300,7 +300,7 @@ public class ScheduleDetail extends ScheduleForm {
 
     public void waitForExecutionFinish() {
         Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
-                .pollingEvery(10, TimeUnit.SECONDS)
+                .pollingEvery(5, TimeUnit.SECONDS)
                 .withMessage("Schedule execution is not finished!")
                 .until(new Predicate<WebDriver>() {
 
@@ -330,17 +330,6 @@ public class ScheduleDetail extends ScheduleForm {
                 + lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
         assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
                 .contains(executable.getErrorMessage()));
-        assertExecutionDetail();
-    }
-
-    public void assertFailedExecution(String errorMessage) {
-        waitForExecutionFinish();
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
-                .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
-        System.out.println("Error message of failed execution: "
-                + lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
-                .contains(errorMessage));
         assertExecutionDetail();
     }
 
@@ -533,7 +522,6 @@ public class ScheduleDetail extends ScheduleForm {
     public void repeatManualRunSuccessfulSchedule(int executionTimes) {
         for (int i = 0; i < executionTimes; i++) {
             manualRun();
-            isInRunningState();
             assertSuccessfulExecution();
         }
     }
@@ -541,7 +529,6 @@ public class ScheduleDetail extends ScheduleForm {
     public void repeatManualRunFailedSchedule(int executionTimes, Executables executable) {
         for (int i = 0; i < executionTimes; i++) {
             manualRun();
-            isInRunningState();
             assertFailedExecution(executable);
         }
     }
@@ -566,7 +553,7 @@ public class ScheduleDetail extends ScheduleForm {
         waitForCollectionIsNotEmpty(scheduleExecutionItems);
         try {
             Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
-                    .pollingEvery(10, TimeUnit.SECONDS).until().element(runningExecutionItem).is()
+                    .pollingEvery(2, TimeUnit.SECONDS).until().element(runningExecutionItem).is()
                     .visible();
             return true;
         } catch (NoSuchElementException e) {
@@ -712,7 +699,7 @@ public class ScheduleDetail extends ScheduleForm {
         final int executionNumberBeforeAutoRun = scheduleExecutionItems.size();
         Graphene.waitGui()
                 .withTimeout(waitingTimeInMinutes + MAX_DELAY_TIME_WAITING_AUTO_RUN,
-                        TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
+                        TimeUnit.MINUTES).pollingEvery(5, TimeUnit.SECONDS)
                 .withMessage("Schedule doesn't run automatically!")
                 .until(new Predicate<WebDriver>() {
 
