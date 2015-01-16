@@ -8,7 +8,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.disc.SchedulesTests"/>
+            <class name="com.gooddata.qa.graphene.disc.SchedulesTest"/>
         </classes>
     </test>
     <test name="DISC Dataload Schedules tests">

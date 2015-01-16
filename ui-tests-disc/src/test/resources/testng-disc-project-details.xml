@@ -8,7 +8,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.disc.ProjectDetailTests"/>
+            <class name="com.gooddata.qa.graphene.disc.ProjectDetailTest"/>
         </classes>
     </test>
 

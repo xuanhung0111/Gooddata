@@ -8,7 +8,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.disc.DeployProcesses"/>
+            <class name="com.gooddata.qa.graphene.disc.DeployProcessTest"/>
         </classes>
     </test>
 
