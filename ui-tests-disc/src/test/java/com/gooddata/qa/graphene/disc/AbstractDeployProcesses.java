@@ -17,7 +17,7 @@ import static org.testng.Assert.*;
 public abstract class AbstractDeployProcesses extends AbstractDISCTest {
 
     private static final String FAILED_REDEPLOY_MESSAGE =
-            "Failed to re-deploy the %s process as %s. Reason: Process contains no executables.";
+            "Failed to re-deploy the \"%s\" process as \"%s\". Reason: Process contains no executables.";
     private static final String FAILED_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE =
             "Failed to deploy the %s process as %s. Reason: Process contains no executables.";
     private static final String SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE =

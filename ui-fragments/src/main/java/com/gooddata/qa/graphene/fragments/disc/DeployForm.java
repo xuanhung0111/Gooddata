@@ -53,8 +53,6 @@ public class DeployForm extends AbstractFragment {
     public void tryToDeployProcess(String zipFile, ProcessTypes processType, String processName) {
         waitForElementVisible(getRoot());
         setDeployProcessInput(zipFile, processType, processName);
-        assertFalse(inputFileHasError());
-        assertFalse(inputProcessNameHasError());
         waitForElementVisible(deployConfirmButton).click();
     }
 
@@ -64,21 +62,18 @@ public class DeployForm extends AbstractFragment {
         System.out.println("Re-deploy progress is finished!");
     }
 
-    public void assertErrorOnDeployForm(String zipFilePath, ProcessTypes processType,
-            String processName) {
-        setDeployProcessInput(zipFilePath, processType, processName);
-        getDeployConfirmButton().click();
-        if (zipFilePath.isEmpty()) {
-            waitForElementVisible(getFileInputErrorBubble());
-            assertTrue(inputFileHasError());
-            assertEquals(getFileInputErrorBubble().getText(),
-                    "A zip file is required. The file must be smaller than 1MB.");
-        }
-        if (processName.isEmpty()) {
-            assertTrue(inputProcessNameHasError());
-            getProcessName().click();
-            assertEquals(getProcessNameErrorBubble().getText(), "A process name is required");
-        }
+    public void assertInvalidPackageError() {
+        waitForElementVisible(getFileInputErrorBubble());
+        assertTrue(inputFileHasError());
+        assertEquals(getFileInputErrorBubble().getText(),
+                "A zip file is required. The file must be smaller than 1MB.");
+    }
+
+    public void assertInvalidProcessNameError() {
+        assertTrue(inputProcessNameHasError());
+        getProcessName().click();
+        waitForElementVisible(getProcessNameErrorBubble());
+        assertEquals(getProcessNameErrorBubble().getText(), "A process name is required");
     }
 
     public WebElement getDeployProcessDialog() {

@@ -95,23 +95,27 @@ public class DeployProcessTest extends AbstractDeployProcesses {
     public void emptyInputErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
-        deployForm.assertErrorOnDeployForm("", ProcessTypes.DEFAULT, "");
+        deployForm.tryToDeployProcess("", ProcessTypes.DEFAULT, "");
+        deployForm.assertInvalidPackageError();
+        deployForm.assertInvalidProcessNameError();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void notZipFileErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
-        deployForm.assertErrorOnDeployForm(zipFilePath + "not-zip-file.7z", ProcessTypes.DEFAULT,
+        deployForm.tryToDeployProcess(zipFilePath + "not-zip-file.7z", ProcessTypes.DEFAULT,
                 "Not zip file");
+        deployForm.assertInvalidPackageError();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void tooLargeZipFileErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
-        deployForm.assertErrorOnDeployForm(zipFilePath + "too-large-file.zip",
-                ProcessTypes.DEFAULT, "Too large file");
+        deployForm.tryToDeployProcess(zipFilePath + "too-large-file.zip", ProcessTypes.DEFAULT,
+                "Too large file");
+        deployForm.assertInvalidPackageError();
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -122,8 +126,8 @@ public class DeployProcessTest extends AbstractDeployProcesses {
 
     @Test(dependsOnMethods = {"createProject"})
     public void deployCloudConnectWithRubyTypeInProjectsPage() {
-        failedDeployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT,
-                ProcessTypes.RUBY, "CloudConnect with Ruby type");
+        failedDeployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT, ProcessTypes.RUBY,
+                "CloudConnect with Ruby type");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -205,8 +209,8 @@ public class DeployProcessTest extends AbstractDeployProcesses {
     @Test(dependsOnMethods = {"createProject"})
     public void checkDeployDialogMessageInProjectsPage() {
         try {
-            checkSuccessfulDeployDialogMessageInProjectsPage(getProjects(),
-                    DeployPackages.BASIC, ProcessTypes.GRAPH);
+            checkSuccessfulDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
+                    ProcessTypes.GRAPH);
         } finally {
             cleanProcessesInWorkingProject();
         }
