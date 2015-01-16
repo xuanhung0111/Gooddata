@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -55,9 +56,19 @@ public class FilterWidget extends AbstractFragment {
         return null;
     }
 
+    public List<String> getAllAttributeValues() {
+        openPanel();
+        return getPanel().getAllAtributeValues();
+    }    
+
     public void changeTimeFilterValueByClickInTimeLine(String dataRange) {
         openPanel();
         getTimePanel().changeValueByClickInTimeLine(dataRange);
+    }
+
+    public void changeTimeFilterByEnterFromAndToDate(String startTime, String endTime) {
+        openPanel();
+        getTimePanel().changeValueByEnterFromDateAndToDate(startTime, endTime);
     }
 
     public void changeAttributeFilterValue(String... values) {
@@ -96,7 +107,20 @@ public class FilterWidget extends AbstractFragment {
 
         @FindBy(css = ".s-afp-input")
         private WebElement search;
+        
+        @FindBy(css = "div.yui3-c-simpleColumn-underlay label.ellipsisEnabled")
+        private List<WebElement> listAttrValues;
 
+        public List<String> getAllAtributeValues() {
+            List<String> actualFilterElements = new ArrayList<String>();
+            waitForCollectionIsNotEmpty(listAttrValues);
+            for (WebElement ele : listAttrValues) {
+                actualFilterElements.add(waitForElementVisible(ele).getText());
+            }
+            waitForElementVisible(cancel).click();
+            return actualFilterElements;
+        }
+  
         public List<FilterPanelRow> getRows() {
             return rows;
         }
@@ -191,9 +215,18 @@ public class FilterWidget extends AbstractFragment {
      */
     public static class TimeFilterPanel extends AbstractFragment {
 
+        @FindBy(xpath = "//div[contains(@class,'fromInput')]//input[contains(@class, 'input')]")
+        private WebElement filterTimeFromInput;
+
+        @FindBy(xpath = "//div[contains(@class,'toInput')]//input[contains(@class, 'input')]")
+        private WebElement filterTimeToInput;
+
         private String timeLineLocator = "//div[text()='${time}']";
 
-        @FindBy(css = ".s-btn-apply")
+        @FindBy(xpath = "//div[contains(@class,'fromInput')]//label[@class = 'label']")
+        private WebElement fromLabel;
+ 
+        @FindBy(xpath = "//button[contains(@class,'s-btn-apply')]")
         private WebElement applyButton;
 
         /**
@@ -205,6 +238,16 @@ public class FilterWidget extends AbstractFragment {
             waitForElementVisible(By.xpath(timeLineLocator.replace("${time}", dataRange)), browser).click();
             waitForElementVisible(applyButton).click();
             waitForElementNotVisible(this.getRoot());
+        }
+
+        public void changeValueByEnterFromDateAndToDate(String startTime, String endTime) {
+            waitForElementVisible(filterTimeFromInput).clear();
+            waitForElementVisible(filterTimeToInput).clear();
+            filterTimeFromInput.sendKeys(startTime);
+            filterTimeFromInput.click();
+            filterTimeToInput.sendKeys(endTime);
+            filterTimeToInput.click();
+            waitForElementVisible(applyButton).click();
         }
     }
 }

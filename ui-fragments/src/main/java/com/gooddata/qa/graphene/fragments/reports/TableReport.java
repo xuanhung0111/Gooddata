@@ -21,6 +21,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+
 /**
  * Fragment represents table report in
  *  - Dashboard page
@@ -46,6 +47,13 @@ public class TableReport extends AbstractReport {
 
     @FindBy(css = ".containerBody .gridTabPlate .gridTile .metric span")
     private List<WebElement> metricsHeader;
+
+    @FindBy(xpath = "//div[contains(@class,'c-report-message')]")
+    private WebElement reportMessage;
+
+    private static final String NO_DATA = "No data";
+
+    private static final String REPORT_NOT_COMPUTABLE = "Report not computable due to improper metric definition.";
 
     public List<String> getAttributesHeader() {
         waitForReportLoading();
@@ -174,6 +182,15 @@ public class TableReport extends AbstractReport {
                 }
             }
         });
+    }
+
+    public boolean isNoData() {
+        return waitForElementVisible(reportMessage).getText().contains(NO_DATA);
+    }
+
+    public boolean isNotComputed() {
+        return waitForElementVisible(reportMessage.findElement(By.tagName("p"))).getText()
+                                                               .contains(REPORT_NOT_COMPUTABLE);
     }
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {

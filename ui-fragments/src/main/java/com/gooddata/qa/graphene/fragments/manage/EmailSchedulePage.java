@@ -43,10 +43,10 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".objectSelect .reports")
     private WebElement reportsSelector;
 
-    @FindBy(css = ".dashboards .picker .c-checkBox")
+    @FindBy(css = ".dashboards .picker .yui3-c-simpleColumn-window.loaded .c-checkBox")
     private List<WebElement> dashboardsList;
 
-    @FindBy(css = ".reports .picker .c-checkBox")
+    @FindBy(css = ".reports .picker .yui3-c-simpleColumn-window.loaded .c-checkBox")
     private List<WebElement> reportsList;
 
     @FindBy(css = ".reports .exportFormat .c-checkBox")
@@ -164,6 +164,7 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     private void selectDashboard(String dashboardName) {
+        waitForCollectionIsNotEmpty(dashboardsList);
         if (dashboardsList != null && dashboardsList.size() > 0) {
             for (WebElement elem : dashboardsList) {
                 if (elem.findElement(By.tagName("label")).getText().equals(dashboardName)) {
@@ -178,6 +179,7 @@ public class EmailSchedulePage extends AbstractFragment {
     }
 
     private void selectReport(String reportName) {
+        waitForCollectionIsNotEmpty(reportsList);
         if (reportsList != null && reportsList.size() > 0) {
             for (WebElement elem : reportsList) {
                 if (elem.findElement(By.tagName("label")).getText().equals(reportName)) {

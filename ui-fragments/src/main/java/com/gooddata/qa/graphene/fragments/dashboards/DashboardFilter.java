@@ -5,6 +5,8 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
@@ -27,11 +29,13 @@ public class DashboardFilter extends AbstractFragment {
     @FindBy(xpath = "//span[text()='Variable']")
     private WebElement promptFilter;
 
-    private String selectedAttributeLocator = "//div[contains(@class, 'attributes sliding')]//div[contains(@class,'${attributeName}')]";
+    private String selectedAttributeLocator = "div.attributes.sliding div.${attributeName}:not(gdc-hidden)";
 
-    private String attributeToAddLocator = "//div[contains(@class,'es_body')]/span[text()='${variableName}']";
-    
-    private String selectedPromptLocator = "//div[contains(@class, 'filter_prompts sliding')]//div[contains(@class,'${promptName}')]";
+    private String attributeToAddLocator =
+            "//div[contains(@class,'es_body')]/span[text()='${variableName}']";
+
+    private String selectedPromptLocator =
+            "//div[contains(@class, 'filter_prompts sliding')]//div[contains(@class,'${promptName}')]";
     
     private String addButton = "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']";
 
@@ -55,13 +59,13 @@ public class DashboardFilter extends AbstractFragment {
 	    waitForElementVisible(promptFilter).click();
 	    waitForElementVisible(lisPrompt);
 	    By selectedPrompt = By.xpath(selectedPromptLocator.replace(
-	    	"${promptName}", name.trim().toLowerCase().replaceAll(" ", "_")));
+	    	"${promptName}", CssUtils.simplifyText(name)));
 	    waitForElementVisible(promptSearchInput).sendKeys(name);
 	    waitForElementVisible(selectedPrompt, browser).click();
 
 	} else {
-		By listOfAttribute = By.xpath(selectedAttributeLocator.replace(
-			"${attributeName}", "s-item-" + name.trim().toLowerCase().replaceAll(" ", "_")));
+		By listOfAttribute = By.cssSelector(selectedAttributeLocator.replace(
+			"${attributeName}", "s-item-" + CssUtils.simplifyText(name)));
 	    waitForElementVisible(attributeSearchInput).sendKeys(name);
 	    waitForElementVisible(listOfAttribute, browser);
 	    By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", name));
