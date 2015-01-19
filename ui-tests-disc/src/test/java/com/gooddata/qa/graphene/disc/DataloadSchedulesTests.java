@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.disc;
 
+import com.gooddata.qa.graphene.disc.dto.Processes;
+import com.gooddata.qa.graphene.disc.dto.Process;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
-import com.gooddata.service.model.dataload.process.Processes;
-import com.gooddata.service.model.dataload.process.Process;
 import com.google.common.base.Predicate;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
