@@ -2,8 +2,10 @@ package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -12,7 +14,7 @@ import java.util.Collection;
 
 import static org.testng.Assert.fail;
 
-public class CheckUtils {
+public final class CheckUtils {
 
     private static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
     private static final By BY_RED_BAR_WARNING = By.cssSelector("div.c-status.box-warning");
@@ -21,63 +23,63 @@ public class CheckUtils {
     private CheckUtils() {
     }
 
-    public static void checkRedBar(WebDriver browser) {
-        if (browser.findElements(BY_RED_BAR).size() != 0) {
-            fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR).getText());
+    public static void checkRedBar(SearchContext searchContext) {
+        if (searchContext.findElements(BY_RED_BAR).size() != 0) {
+            fail("RED BAR APPEARED - " + searchContext.findElement(BY_RED_BAR).getText());
         }
-        if (browser.findElements(BY_RED_BAR_WARNING).size() != 0) {
-            fail("RED BAR APPEARED - " + browser.findElement(BY_RED_BAR_WARNING).getText());
+        if (searchContext.findElements(BY_RED_BAR_WARNING).size() != 0) {
+            fail("RED BAR APPEARED - " + searchContext.findElement(BY_RED_BAR_WARNING).getText());
         }
         //this kind of error appeared for the first time in geo chart
-        if (browser.findElements(BY_REPORT_ERROR).size() != 0 && browser.findElement(BY_REPORT_ERROR).isDisplayed()) {
-            fail("Report error APPEARED - " + browser.findElement(BY_REPORT_ERROR).getText());
+        if (searchContext.findElements(BY_REPORT_ERROR).size() != 0 && searchContext.findElement(BY_REPORT_ERROR).isDisplayed()) {
+            fail("Report error APPEARED - " + searchContext.findElement(BY_REPORT_ERROR).getText());
         }
     }
 
-    public static void waitForDashboardPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"), browser);
-        checkRedBar(browser);
+    public static void waitForDashboardPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"), searchContext);
+        checkRedBar(searchContext);
     }
 
-    public static void waitForReportsPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-domainPage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForReportsPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-domainPage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForDataPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-dataPage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForDataPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-dataPage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForProjectPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForProjectPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForPulsePageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-pulsePage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForPulsePageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-pulsePage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForProjectsPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForProjectsPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForEmailSchedulePageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForEmailSchedulePageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForAnalysisPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForAnalysisPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-analysisPage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForSchedulesPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForSchedulesPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForObjectPageLoaded(WebDriver browser) {
-        waitForElementVisible(By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]"), browser);
+    public static void waitForObjectPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static WebElement waitForElementVisible(By byElement, WebDriver browser) {
+    public static WebElement waitForElementVisible(By byElement, SearchContext searchContext) {
         Graphene.waitGui().until().element(byElement).is().visible();
-        return browser.findElement(byElement);
+        return searchContext.findElement(byElement);
     }
 
     public static WebElement waitForElementVisible(WebElement element) {
@@ -111,9 +113,9 @@ public class CheckUtils {
         Graphene.waitGui().until().element(fragment.getRoot()).is().not().visible();
     }
 
-    public static WebElement waitForElementPresent(By byElement, WebDriver browser) {
+    public static WebElement waitForElementPresent(By byElement, SearchContext searchContext) {
         Graphene.waitGui().until().element(byElement).is().present();
-        return browser.findElement(byElement);
+        return searchContext.findElement(byElement);
     }
 
     public static WebElement waitForElementPresent(WebElement element) {
