@@ -10,10 +10,10 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class UploadFragment extends AbstractFragment {
 
-	private static final By BY_ERROR_TITLE = By.cssSelector(".s-uploadIndex-errorTitle");
-	private static final By BY_ERROR_MESSAGE = By.cssSelector(".s-uploadIndex-errorMessage");
-	private static final By BY_ERROR_SUPPORT = By.cssSelector(".s-uploadIndex-errorSupport");
-	
+    private static final By BY_ERROR_TITLE = By.cssSelector(".s-uploadIndex-errorTitle");
+    private static final By BY_ERROR_MESSAGE = By.cssSelector(".s-uploadIndex-errorMessage");
+    private static final By BY_ERROR_SUPPORT = By.cssSelector(".s-uploadIndex-errorSupport");
+
     @FindBy
     private WebElement uploadFile;
 
@@ -33,21 +33,21 @@ public class UploadFragment extends AbstractFragment {
     public UploadColumns getUploadColumns() {
         return uploadColumns;
     }
-    
+
     public void confirmloadCsv() {
         waitForElementVisible(loadButton).click();
         waitForElementNotVisible(uploadColumns.getRoot());
     }
-    
+
     public WebElement getErrorTitle(WebElement errorMessageElement) {
-    	return errorMessageElement.findElement(BY_ERROR_TITLE);
+        return errorMessageElement.findElement(BY_ERROR_TITLE);
     }
-    
+
     public WebElement getErrorMessage(WebElement errorMessageElement) {
-    	return errorMessageElement.findElement(BY_ERROR_MESSAGE);
+        return errorMessageElement.findElement(BY_ERROR_MESSAGE);
     }
-    
+
     public WebElement getErrorSupport(WebElement errorMessageElement) {
-    	return errorMessageElement.findElement(BY_ERROR_SUPPORT);
+        return errorMessageElement.findElement(BY_ERROR_SUPPORT);
     }
 }
