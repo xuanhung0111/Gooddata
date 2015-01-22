@@ -15,6 +15,8 @@ import java.util.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,8 +31,9 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private final String CUSTOM_MESSAGE = "Extremely useful message";
     private final List<String> CUSTOM_RECIPIENTS = Arrays.asList("bear+1@gooddata.com", "bear+2@gooddata.com");
     private final List<String> SCHEDULED_DASHBOARDS = Arrays.asList("Waterfall Analysis", "What's Changed");
-    private final String SCHEDULE_INFO = "This dashboard will be sent daily at 12:30 AM PST to %s and 2 other recipients as a PDF attachment.";
+    private final String SCHEDULE_INFO = "This dashboard will be sent daily at 12:30 AM %s to %s and 2 other recipients as a PDF attachment.";
     private final String SCHEDULE_TIME_MANAGE_PAGE = "Daily at 12:30 AM PT";
+    private DateTimeZone tz = DateTimeZone.getDefault();
 
     @BeforeClass
     public void addUsers() {
@@ -68,9 +71,10 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         );
         scheduleDashboard.selectTime(1);
         String infoText = scheduleDashboard.getInfoText();
+        String tzId = tz.getShortName(DateTimeUtils.currentTimeMillis());
         assertTrue(
-            infoText.contains(String.format(SCHEDULE_INFO, testParams.getViewerUser())),
-            "Custom time is in info message, expected " + String.format(SCHEDULE_INFO, testParams.getViewerUser()) + ", found " + infoText + "."
+            infoText.contains(String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser())),
+            "Custom time is in info message, expected " + String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser()) + ", found " + infoText + "."
         );
         // check time in info text
         scheduleDashboard.setCustomEmailMessage(CUSTOM_MESSAGE);
@@ -110,9 +114,16 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         for(int i = 0; i < recipientsJson.length(); i++) {
             recipients.add(recipientsJson.getString(i));
         }
+        String timeZoneId = schedule.getJSONObject("scheduledMail")
+                                      .getJSONObject("content")
+                                      .getJSONObject("when")
+                                      .getString("timeZone");
+        DateTimeZone tzFromObj = DateTimeZone.forID(timeZoneId);
+
         // verify bcc
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-mdObject", this.getClass());
         assertEquals(recipients, new HashSet<String>(CUSTOM_RECIPIENTS), "Recipients do not match.");
+        assertEquals(tz.getStandardOffset(System.currentTimeMillis()), tzFromObj.getStandardOffset(System.currentTimeMillis()), "Timezones do not match");
     }
 
     @Test(dependsOnGroups = {"schedules"})
