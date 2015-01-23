@@ -7,20 +7,17 @@ import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog.ALERT_INFOBOX_CSS_SELECTOR;
 import static com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog.GRANTEES_PANEL;
-import static com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption.createFeatureClassOption;
 import static java.util.Arrays.asList;
 
 public class DashboardPermissionsTest extends GoodSalesAbstractTest {
@@ -29,8 +26,6 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     private static final String UNLOCKED_DASHBOARD_NAME = "Unlocked and Visible";
     private static final String ACL_DASHBOARD_NAME = "dashboardVisibleToViewerAndEditor";
 
-    private static final String ACL_FEATURE_FLAG_NAME = "ACL";
-    private static final String USER_MANAGEMENT_FEATURE_FLAG_NAME = "displayUserManagement";
     private String originalDashboardName;
 
     private String viewerLogin;
@@ -43,16 +38,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         editorLogin = testParams.getEditorUser();
     }
 
-    @Test(dependsOnMethods = {"createProject"}, alwaysRun = true, groups = {"before-tests-setup"})
-    public void addFeatureFlagsToUsers() throws IOException, JSONException {
-        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
-                createFeatureClassOption(ACL_FEATURE_FLAG_NAME, true), createFeatureClassOption(USER_MANAGEMENT_FEATURE_FLAG_NAME, true));
-    }
-
     /**
      * lock dashboard - only admins can edit
      */
-    @Test(dependsOnGroups = {"before-tests-setup"}, groups = {"admin-tests"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
     public void lockDashboard() {
         switchLockingDashboard(false);
     }
