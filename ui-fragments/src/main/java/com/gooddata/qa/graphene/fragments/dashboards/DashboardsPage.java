@@ -247,7 +247,7 @@ public class DashboardsPage extends AbstractFragment {
 
     public PermissionsDialog openPermissionsDialog() {
         waitForDashboardPageLoaded(browser);
-        openEditExportEmbedMenu().select("Permissions");
+        openEditExportEmbedMenu().select("Sharing & Permissions");
         return getPermissionsDialog();
     }
 
