@@ -41,7 +41,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     /**
      * lock dashboard - only admins can edit
      */
-    @Test(dependsOnGroups = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
     public void lockDashboard() {
         switchLockingDashboard(false);
     }
