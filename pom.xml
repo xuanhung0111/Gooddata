@@ -50,7 +50,7 @@
         <version.org.apache.maven.surefire-plugin>2.17</version.org.apache.maven.surefire-plugin>
         <json-path.version>0.9.1</json-path.version>
         <gooddata-http-client.version>0.8.2</gooddata-http-client.version>
-        <gooddata-java.version>0.8.0</gooddata-java.version>
+        <gooddata-java.version>0.10.1-SNAPSHOT</gooddata-java.version>
     </properties>
 
     <dependencyManagement>
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.3.1</version>
+            <version>4.3.2</version>
         </dependency>
 
         <dependency>
@@ -152,6 +152,12 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20080701</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+            <version>2.1.0</version>
         </dependency>
 
     </dependencies>

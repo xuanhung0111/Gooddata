@@ -94,4 +94,11 @@ public abstract class AbstractTest extends Arquillian {
     public RestApiClient getRestApiClient(final String userLogin, final String userPassword) {
         return new RestApiClient(testParams.getHost(), userLogin, userPassword, true, false);
     }
+
+    public GoodData getGoodDataClient() {
+        if (goodDataClient == null) {
+            goodDataClient = new GoodData(testParams.getHost(), testParams.getUser(), testParams.getPassword());
+        }
+        return goodDataClient;
+    }
 }
