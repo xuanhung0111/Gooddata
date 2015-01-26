@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -104,14 +105,20 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
     public void exportImportProject() throws JSONException, InterruptedException, IOException {
         String exportToken = exportProject(exportUsers, exportData, statusPollingCheckIterations);
         String parentProjectId = testParams.getProjectId();
-
+        boolean validationTimeoutOK = true;
         // New projectID is needed here. Load it from export, validate, delete and restore original one
         createProject();
         importProject(exportToken, statusPollingCheckIterations);
-        validateProject();
+        try {
+            validateProject();
+        } catch (TimeoutException e) {
+            validationTimeoutOK = false;
+            e.printStackTrace();
+        }
         deleteProject(testParams.getProjectId());
 
         testParams.setProjectId(parentProjectId);
+        assertTrue(validationTimeoutOK,"Project validation on imported project timeouted");
     }
 
     private ArrayList<String> parsePopulatesFields(JSONArray populates) throws JSONException {
