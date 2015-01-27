@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.indigo;
+package com.gooddata.qa.graphene.indigo.analyze;
 
 import static org.testng.Assert.assertEquals;
 
@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 
-public class IndigoSocialECommerceTest extends AbstractIndigoProjectTest {
+public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDesignerProjectTest {
 
     private static final String ORDERS = "% Orders";
     private static final String CHECKOUTS = "% Checkouts";

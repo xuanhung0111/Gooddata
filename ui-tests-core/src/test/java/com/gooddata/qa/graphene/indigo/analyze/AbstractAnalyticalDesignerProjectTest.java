@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.indigo;
+package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
@@ -21,14 +21,14 @@ import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
-import com.gooddata.qa.graphene.fragments.indigo.pages.internals.AttributeFilterPickerPanel;
-import com.gooddata.qa.graphene.fragments.indigo.recommendation.ComparisonRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.fragments.indigo.recommendation.TrendingRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
-public abstract class AbstractIndigoProjectTest extends AbstractProjectTest {
+public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProjectTest {
 
     protected static final String DATE = "Date";
 

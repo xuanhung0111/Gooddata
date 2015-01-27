@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.indigo.recommendation;
+package com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation;
 
 import java.util.List;
 

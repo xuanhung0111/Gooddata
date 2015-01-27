@@ -1,24 +1,23 @@
-package com.gooddata.qa.graphene.fragments.indigo.pages;
+package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import static org.testng.Assert.*;
-
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.fragments.indigo.pages.internals.BucketsPanel;
-import com.gooddata.qa.graphene.fragments.indigo.pages.internals.CataloguePanel;
-import com.gooddata.qa.graphene.fragments.indigo.pages.internals.MainEditor;
-import com.gooddata.qa.graphene.fragments.indigo.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.BucketsPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEditor;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class AnalysisPage extends AbstractFragment {
 
