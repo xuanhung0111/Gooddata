@@ -134,9 +134,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 switch (metric) {
                 case COVAR:
                 case COVARP:
-                case INTERCEPT:
                 case RSQ:
-                case SLOPE:
                     data.put("fact0", fact2);
                     data.put("fact1", fact3);
                     break;
@@ -175,10 +173,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                     break;
                 case COVAR:
                 case COVARP:
-                case INTERCEPT:
                 case PERCENTILE:
                 case RSQ:
-                case SLOPE:
                     checkMetricValuesInReport(metricName, productAttr,
                             metric.getMetricValues(), productValues);
                     break;
@@ -537,10 +533,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         COUNT("COUNT", "SELECT COUNT(${attr0},${attr1})", "1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f", "Aggregation"),
         COVAR("COVAR", "SELECT COVAR(${fact0},${fact1})", "2.26f, 8.17f, 38.61f, 59.28f, 14.13f, 52.22f", "Aggregation"),
         COVARP("COVARP", "SELECT COVARP(${fact0},${fact1})", "2.26f, 8.15f, 38.5f, 58.74f, 14.02f, 51.8f", "Aggregation"),
-        INTERCEPT("INTERCEPT", "SELECT INTERCEPT(${fact0},${fact1})", "41.11f, 39.99f, 36.74f, 30.09f, 38.14f, 35.12f", "Aggregation"),
         PERCENTILE("PERCENTILE", "SELECT PERCENTILE(${fact0},0.25)", "832.80f, 769.52f, 940.80f, 1348.12f, 1036.80f, 900f", "Aggregation"),
         RSQ("RSQ", "SELECT RSQ(${fact0},${fact1})", "0f, 0f, 0.02f, 0.05f, 0f, 0.03f", "Aggregation"),
-        SLOPE("SLOPE", "SELECT SLOPE(${fact0},${fact1})", "0.03f, 0.1f, 0.51f, 0.83f, 0.22f, 0.57f", "Aggregation"),
         STDEV("STDEV", "SELECT STDEV(${fact0})", "74188.03f, 66021.22f, 52967.24f, 48908.74f, 47954.34f, 169291.7f, 220273.73f, 204454.97f, 192490.02f", "Aggregation"),
         RUNSTDEV("RUNSTDEV", "SELECT RUNSTDEV(${fact0})", "74188.03f, 66965.11f, 58453.34f, 53987.64f, 51665.31f, 106485.98f, 148893.7f, 165539.55f, 171079.39f", "Aggregation"),
         VAR("VAR", "SELECT VAR(${fact0})", "5503864027f, 4358800996.88f, 2805528940.9f, 2392065115.96f, 2299618561.68f, 28659680430.94f, 48520516045.51f, 41801835719.68f, 37052408241.94f", "Aggregation"),
