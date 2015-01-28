@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.indigo.pages.internals;
+package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
@@ -15,7 +15,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.description.DescriptionPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 

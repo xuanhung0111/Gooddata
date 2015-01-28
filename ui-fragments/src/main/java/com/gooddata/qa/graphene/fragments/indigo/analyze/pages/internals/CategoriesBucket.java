@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.indigo.pages.internals;
+package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;

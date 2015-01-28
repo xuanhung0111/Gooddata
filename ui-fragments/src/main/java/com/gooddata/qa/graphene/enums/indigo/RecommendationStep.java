@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.enums.indigo;
 
 import com.gooddata.qa.graphene.entity.indigo.Recommendation;
-import com.gooddata.qa.graphene.fragments.indigo.recommendation.ComparisonRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.recommendation.SeeingPercentsRecommendation;
-import com.gooddata.qa.graphene.fragments.indigo.recommendation.TrendingRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.SeeingPercentsRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 
 public enum RecommendationStep {
 

@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.indigo.pages.internals;
+package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
@@ -12,8 +12,8 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.indigo.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.indigo.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class MainEditor extends AbstractFragment {
 
