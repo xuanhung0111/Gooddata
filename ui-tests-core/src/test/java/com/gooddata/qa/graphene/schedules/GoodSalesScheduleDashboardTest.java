@@ -54,13 +54,22 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         initDashboardsPage();
         DashboardScheduleDialog scheduleDashboard = dashboardsPage.scheduleDashboard();
         scheduleDashboard.showCustomForm();
-        scheduleDashboard.selectTabs(new int[] {1, 5, 6});
+
+        scheduleDashboard.selectTabs(new int[] {1});
         String[] tabNames = expectedGoodSalesDashboardsAndTabs.get("Pipeline Analysis");
         assertEquals(
-            scheduleDashboard.getCustomEmailSubject(),
-            dashboardsPage.getDashboardName() + " dashboard: TABS: " + tabNames[1] + ", " + tabNames[5] + ", " + tabNames[6],
-            "Update of Tabs is reflected in subject."
+                scheduleDashboard.getCustomEmailSubject(),
+                dashboardsPage.getDashboardName() + " Dashboard - " + tabNames[1],
+                "Update of one Tab is reflected in subject."
         );
+
+        scheduleDashboard.selectTabs(new int[] {1, 5, 6});
+        assertEquals(
+            scheduleDashboard.getCustomEmailSubject(),
+            dashboardsPage.getDashboardName() + " Dashboard",
+            "Update of multiple Tabs is reflected in subject."
+        );
+
         scheduleDashboard.setCustomEmailSubject(CUSTOM_SUBJECT);
         scheduleDashboard.setCustomRecipients(CUSTOM_RECIPIENTS);
         scheduleDashboard.selectTabs(new int[] {1, 2});
