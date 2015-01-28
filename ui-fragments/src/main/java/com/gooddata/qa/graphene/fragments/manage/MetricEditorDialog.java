@@ -223,9 +223,7 @@ public class MetricEditorDialog extends AbstractFragment {
             case CORREL:
             case COVAR:
             case COVARP:
-            case INTERCEPT:
             case RSQ:
-            case SLOPE:
                 selectFacts(data, 2);
                 break;
             default:
