@@ -3,8 +3,11 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForObjectPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+
+import java.util.List;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -74,4 +77,7 @@ public class AttributePage extends AbstractFragment {
         attributeDetailPage.renameAttribute(newName);
     }
 
+    public List<String> getAllAttributes() {
+        return waitForFragmentVisible(attributesTable).getAllItems();
+    }
 }

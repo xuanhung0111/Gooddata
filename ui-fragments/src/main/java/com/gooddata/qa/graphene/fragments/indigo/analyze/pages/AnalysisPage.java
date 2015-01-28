@@ -74,8 +74,7 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage removeFilter(String dateOrAttribute) {
-        waitForFragmentVisible(mainEditor);
-        mainEditor.removeFilter(dateOrAttribute);
+        waitForFragmentVisible(mainEditor).removeFilter(dateOrAttribute);
         return this;
     }
 
@@ -103,15 +102,18 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage removeCategory(String category) {
+        waitForFragmentVisible(bucketsPanel).removeCategory(category);
+        return this;
+    }
+
     public AnalysisPage changeReportType(ReportType type) {
-        waitForFragmentVisible(bucketsPanel);
-        bucketsPanel.setReportType(type);
+        waitForFragmentVisible(bucketsPanel).setReportType(type);
         return this;
     }
 
     public boolean isReportTypeSelected(ReportType type) {
-        waitForFragmentVisible(bucketsPanel);
-        return bucketsPanel.isReportTypeSelected(type);
+        return waitForFragmentVisible(bucketsPanel).isReportTypeSelected(type);
     }
 
     public AnalysisPage resetToBlankState() {
@@ -125,101 +127,96 @@ public class AnalysisPage extends AbstractFragment {
     }
 
     public AnalysisPage configTimeFilter(String period) {
-        waitForFragmentVisible(mainEditor);
-        mainEditor.configTimeFilter(period);
+        waitForFragmentVisible(mainEditor).configTimeFilter(period);
         return this;
     }
 
     public AnalysisPage configAttributeFilter(String attribute, String... values) {
-        waitForFragmentVisible(mainEditor);
-        mainEditor.configAttributeFilter(attribute, values);
+        waitForFragmentVisible(mainEditor).configAttributeFilter(attribute, values);
         return this;
     }
 
     public TableReport getTableReport() {
-        waitForFragmentVisible(mainEditor);
-        return mainEditor.getTableReport();
+        return waitForFragmentVisible(mainEditor).getTableReport();
     }
 
     public ChartReport getChartReport() {
-        waitForFragmentVisible(mainEditor);
-        return mainEditor.getChartReport();
+        return waitForFragmentVisible(mainEditor).getChartReport();
     }
 
     public String getTimeDescription(String time) {
-        waitForFragmentVisible(cataloguePanel);
-        return cataloguePanel.getTimeDescription(time);
+        return waitForFragmentVisible(cataloguePanel).getTimeDescription(time);
     }
 
     public String getAttributeDescription(String attribute) {
-        waitForFragmentVisible(cataloguePanel);
-        return cataloguePanel.getAttributeDescription(attribute);
+        return waitForFragmentVisible(cataloguePanel).getAttributeDescription(attribute);
     }
 
     public String getMetricDescription(String metric) {
-        waitForFragmentVisible(cataloguePanel);
-        return cataloguePanel.getMetricDescription(metric);
+        return waitForFragmentVisible(cataloguePanel).getMetricDescription(metric);
     }
 
     public List<String> getAllCategoryNames() {
-        waitForFragmentVisible(bucketsPanel);
-        return bucketsPanel.getAllCategoryNames();
+        return waitForFragmentVisible(bucketsPanel).getAllCategoryNames();
     }
 
     public boolean isExportToReportButtonEnabled() {
-        waitForFragmentVisible(pageHeader);
-        return pageHeader.isExportToReportButtonEnable();
+        return waitForFragmentVisible(pageHeader).isExportToReportButtonEnable();
     }
 
     public boolean isShowPercentConfigEnabled() {
-        waitForFragmentVisible(bucketsPanel);
-        return bucketsPanel.isShowPercentConfigEnabled();
+        return waitForFragmentVisible(bucketsPanel).isShowPercentConfigEnabled();
     }
 
     public boolean isShowPercentConfigSelected() {
-        waitForFragmentVisible(bucketsPanel);
-        return bucketsPanel.isShowPercentConfigSelected();
+        return waitForFragmentVisible(bucketsPanel).isShowPercentConfigSelected();
     }
 
     public boolean isCompareSamePeriodConfigEnabled() {
-        waitForFragmentVisible(bucketsPanel);
-        return bucketsPanel.isCompareSamePeriodConfigEnabled();
+        return waitForFragmentVisible(bucketsPanel).isCompareSamePeriodConfigEnabled();
     }
 
     public String getFilterText(String dateOrAttribute) {
-        waitForFragmentVisible(mainEditor);
-        return mainEditor.getFilterText(dateOrAttribute);
+        return waitForFragmentVisible(mainEditor).getFilterText(dateOrAttribute);
     }
 
     public boolean isFilterVisible(String dateOrAttribute) {
-        waitForFragmentVisible(mainEditor);
-        return mainEditor.isFilterVisible(dateOrAttribute);
+        return waitForFragmentVisible(mainEditor).isFilterVisible(dateOrAttribute);
     }
 
     public AnalysisPage exportReport() {
-        waitForFragmentVisible(pageHeader);
-        pageHeader.exportReport();
+        waitForFragmentVisible(pageHeader).exportReport();
         return this;
     }
 
     public String getExplorerMessage() {
-        waitForFragmentVisible(mainEditor);
-        return mainEditor.getExplorerMessage();
+        return waitForFragmentVisible(mainEditor).getExplorerMessage();
     }
 
     public AnalysisPage changeGranularity(String time) {
-        waitForFragmentVisible(bucketsPanel);
-        bucketsPanel.changeGranularity(time);
+        waitForFragmentVisible(bucketsPanel).changeGranularity(time);
         return this;
     }
 
     public List<String> getAllGranularities() {
-        waitForFragmentVisible(bucketsPanel);
-        return bucketsPanel.getAllGranularities();
+        return waitForFragmentVisible(bucketsPanel).getAllGranularities();
     }
 
     public WebElement getFilter(String dateOrAttribute) {
-        waitForFragmentVisible(mainEditor);
-        return mainEditor.getFilter(dateOrAttribute);
+        return waitForFragmentVisible(mainEditor).getFilter(dateOrAttribute);
     }
+
+    public boolean isExplorerMessageVisible() {
+        return waitForFragmentVisible(mainEditor).isExplorerMessageVisible();
+    }
+
+    public List<String> getAllTimeFilterOptions() {
+        return waitForFragmentVisible(mainEditor).getAllTimeFilterOptions();
+    }
+
+    public AnalysisPage waitForReportComputing() {
+        waitForFragmentVisible(mainEditor).waitForReportComputing();
+        return this;
+    }
+
 }
