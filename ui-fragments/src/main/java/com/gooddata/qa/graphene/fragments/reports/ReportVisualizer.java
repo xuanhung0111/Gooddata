@@ -20,6 +20,8 @@ import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public class ReportVisualizer extends AbstractFragment {
 
@@ -118,7 +120,7 @@ public class ReportVisualizer extends AbstractFragment {
         }
     }
 
-    public void selectHowArea(List<HowItem> how) {
+    public void selectHowArea(List<HowItem> how) throws InterruptedException {
         waitForElementVisible(howButton).click();
 
         for (HowItem howItem : how) {
@@ -141,10 +143,12 @@ public class ReportVisualizer extends AbstractFragment {
         }
     }
 
-    private WebElement selectAttributeWithPosition(Attribute attribute, HowItem.Position position) {
+    private WebElement selectAttributeWithPosition(Attribute attribute, HowItem.Position position) throws InterruptedException {
         String attributeName = attribute.getName();
-        WebElement attributeElement = selectAttribute(attributeName);
+        selectAttribute(attributeName);
 
+        Thread.sleep(500);
+        WebElement attributeElement = findAttribute(attributeName);
         WebElement attributePositionElement = waitForElementVisible(attributeElement.findElement(By.cssSelector("div")));
         String attributeClass =  attributePositionElement.getAttribute("class");
 
@@ -155,17 +159,18 @@ public class ReportVisualizer extends AbstractFragment {
         return attributeElement;
     }
 
-    private WebElement selectAttribute(String attribute) {
+    private void selectAttribute(String attribute) {
         searchAndWaitForItemReloaded(attributeFilterInput, attribute, howAttributes);
+        findAttribute(attribute).findElement(By.cssSelector("input")).click();
+    }
 
-        for (WebElement attr : howAttributes) {
-            if (!attribute.equals(attr.getText().trim()))
-                continue;
-
-            attr.findElement(By.cssSelector("input")).click();
-            return attr;
-        }
-        throw new IllegalArgumentException("Unknown attribute " + attribute);
+    private WebElement findAttribute(final String attribute) {
+        return Iterables.find(howAttributes, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return attribute.equals(input.getText().trim());
+            }
+        });
     }
 
     public void addSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal) {
@@ -224,4 +229,5 @@ public class ReportVisualizer extends AbstractFragment {
         input.sendKeys(searchItem);
         waitForCollectionIsNotEmpty(itemsShouldBeReloaded);
     }
+
 }

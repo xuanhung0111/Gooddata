@@ -127,7 +127,6 @@ public class ReportPage extends AbstractFragment {
         if (reportDefinition.shouldAddHowToReport())
             visualiser.selectHowArea(reportDefinition.getHows());
 
-        Thread.sleep(3000);
         visualiser.finishReportChanges();
 
         if (reportDefinition.shouldAddFilterToReport()) {
