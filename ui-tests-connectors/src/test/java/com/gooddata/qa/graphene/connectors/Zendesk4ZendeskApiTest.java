@@ -15,7 +15,7 @@ import java.io.IOException;
 import static org.testng.Assert.fail;
 
 @Test(groups = {"connectors", "zendesk4", "apiTests"}, description = "Checklist tests for Zendesk Helper")
-public class Zendesk4BasicApiTest extends AbstractGreyPageTest {
+public class Zendesk4ZendeskApiTest extends AbstractGreyPageTest {
 
     private String zendeskAPIUser;
     private String zendeskAPIPassword;
@@ -45,12 +45,7 @@ public class Zendesk4BasicApiTest extends AbstractGreyPageTest {
         useApiProxy = Boolean.parseBoolean(testParams.loadProperty("http.client.useApiProxy"));
     }
 
-    @Test
-    public void initGd() throws JSONException {
-        signInAtGreyPages(testParams.getUser(), testParams.getPassword());
-    }
-
-    @Test(dependsOnMethods = {"initGd"}, groups = {"zendeskApiTests"})
+    @Test(groups = {"zendeskApiTests"})
     public void initZendeskApiClient() {
         if (zendeskApiUrl.contains("staging") && !zendeskAPIUser.isEmpty() && !zendeskAPIPassword.isEmpty()) {
             zendeskHelper = new ZendeskHelper(new RestApiClient(zendeskApiUrl.replace("https://", ""),
@@ -60,17 +55,17 @@ public class Zendesk4BasicApiTest extends AbstractGreyPageTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initZendeskApiClient", "initGd"}, groups = {"zendeskApiTests"})
+    @Test(dependsOnMethods = {"initZendeskApiClient"}, groups = {"zendeskApiTests"})
     public void testTicketsCount() throws IOException, JSONException, InterruptedException {
         zendeskHelper.getNumberOfTickets();
     }
 
-    @Test(dependsOnMethods = {"initZendeskApiClient", "initGd"}, groups = {"zendeskApiTests"})
+    @Test(dependsOnMethods = {"initZendeskApiClient"}, groups = {"zendeskApiTests"})
     public void testUsersCount() throws IOException, JSONException, InterruptedException {
         zendeskHelper.getNumberOfUsers();
     }
 
-    @Test(dependsOnMethods = {"initZendeskApiClient", "initGd"},
+    @Test(dependsOnMethods = {"initZendeskApiClient"},
             groups = {"zendeskApiTests"})
     public void testOrganizationsCount() throws IOException, JSONException, InterruptedException {
         zendeskHelper.getNumberOfOrganizations();
