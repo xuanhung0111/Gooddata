@@ -148,6 +148,11 @@ public class DashboardScheduleDialog extends AbstractFragment {
         waitForElementNotVisible(scheduleButton);
     }
 
+    public boolean isFilterMessagePresent() {
+        By filteredInfoMessage = By.cssSelector(".s-dashboard-is-filtered");
+        return browser.findElements(filteredInfoMessage).size() > 0;
+    }
+
     private void selectSingle(int index, WebElement button) {
         waitForElementVisible(button).click();
         waitForDropDownList();

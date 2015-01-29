@@ -283,6 +283,18 @@ public class DashboardsPage extends AbstractFragment {
         return getPermissionsDialog();
     }
 
+    public FilterWidget getFilterWidget(String condition) {
+        // need to refresh page so filter widget can load its root element when accessing
+        browser.navigate().refresh();
+        waitForDashboardPageLoaded(browser);
+
+        for(FilterWidget filter : getFilters()) {
+            if(!filter.getRoot().getAttribute("class").contains("s-" + condition)) continue;
+            return filter;
+        }
+        return null;
+    }
+
     public boolean isLocked() {
         return lockIcon.isDisplayed();
     }
