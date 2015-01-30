@@ -159,7 +159,7 @@ public class ReportVisualizer extends AbstractFragment {
         return attributeElement;
     }
 
-    private void selectAttribute(String attribute) {
+    private void selectAttribute(String attribute) throws InterruptedException {
         searchAndWaitForItemReloaded(attributeFilterInput, attribute, howAttributes);
         findAttribute(attribute).findElement(By.cssSelector("input")).click();
     }
@@ -173,7 +173,8 @@ public class ReportVisualizer extends AbstractFragment {
         });
     }
 
-    public void addSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal) {
+    public void addSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact,
+            String metricName, boolean addToGlobal) {
         waitForElementVisible(whatButton).click();
 
         waitForElementVisible(createMetricButton).click();
@@ -220,13 +221,15 @@ public class ReportVisualizer extends AbstractFragment {
     }
 
     private void searchAndWaitForItemReloaded(WebElement input, String searchItem,
-            final List<WebElement> itemsShouldBeReloaded) {
+            final List<WebElement> itemsShouldBeReloaded) throws InterruptedException {
         waitForElementVisible(input).clear();
         input.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        Thread.sleep(1000);
         waitForCollectionIsEmpty(itemsShouldBeReloaded);
 
         input.clear();
         input.sendKeys(searchItem);
+        Thread.sleep(1000);
         waitForCollectionIsNotEmpty(itemsShouldBeReloaded);
     }
 
