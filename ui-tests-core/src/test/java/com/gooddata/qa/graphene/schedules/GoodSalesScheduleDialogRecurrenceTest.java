@@ -5,6 +5,8 @@ package com.gooddata.qa.graphene.schedules;
 
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.openqa.selenium.Cookie;
 import org.testng.annotations.*;
 
@@ -23,7 +25,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             {RecurrenceType.MONTHLY_DAY_OF_WEEK, 2, 6, "monthly on the third Sunday at 12:30 AM"}
     };
     private final String CUSTOM_SUBJECT = "Test subject";
-    private final String SCHEDULE_INFO = "This dashboard will be sent %s PST to %s as a PDF attachment.";
+    private final String SCHEDULE_INFO = "This dashboard will be sent %s %s to %s as a PDF attachment.";
     private final String FEATURE_FLAG_COOKIE_NAME = "GDC-FEATURE-DASHBOARD-SCHEDULE";
     private final Cookie FEATURE_FLAG_COOKIE = new Cookie(FEATURE_FLAG_COOKIE_NAME, "1");
     private DashboardScheduleDialog scheduleDashboard;
@@ -36,11 +38,11 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             RecurrenceType recurrence = (RecurrenceType) testCase[0];
             switch (recurrence) {
                 case WEEKLY:
-                    _testWeekly(((Integer) testCase[1]), ((int[]) testCase[2]), ((String) testCase[3]));
+                    testWeekly(((Integer) testCase[1]), ((int[]) testCase[2]), ((String) testCase[3]));
                     break;
                 case MONTHLY_DAY_OF_WEEK:
                 case MONTHLY_DAY_OF_MONTH:
-                    _testMonthly(testCase);
+                    testMonthly(testCase);
                     break;
                 default:
                     throw new IllegalArgumentException("Cannot test recurrence: " + recurrence);
@@ -49,18 +51,22 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
         }
     }
 
-    private void _testWeekly(int when, int[] days, String scheduleInfo) {
+    private String getTimezoneShortName() {
+        return DateTimeZone.getDefault().getShortName(DateTimeUtils.currentTimeMillis());
+    }
+
+    private void testWeekly(int when, int[] days, String scheduleInfo) {
         scheduleDashboard.selectFrequency(1); // weekly
         scheduleDashboard.selectWeeklyEvery(when);
         scheduleDashboard.selectWeeklyOnDay(days);
         scheduleDashboard.selectTime(1); // 12:30pm
         String infoText = scheduleDashboard.getInfoText();
-        String fullText = String.format(SCHEDULE_INFO, scheduleInfo, testParams.getUser());
+        String fullText = String.format(SCHEDULE_INFO, scheduleInfo, getTimezoneShortName(), testParams.getUser());
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog-recurrence-weekly-" + scheduleInfo, this.getClass());
         assertEquals(infoText, fullText, "Custom time is in info message");
     }
 
-    private void _testMonthly(Object[] testCase) {
+    private void testMonthly(Object[] testCase) {
         scheduleDashboard.selectFrequency(2); // monthly
         String scheduleInfo = "";
         if (RecurrenceType.MONTHLY_DAY_OF_MONTH.equals(testCase[0])) {
@@ -75,7 +81,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
         }
         scheduleDashboard.selectTime(1); // 12:30pm
         String infoText = scheduleDashboard.getInfoText();
-        String fullText = String.format(SCHEDULE_INFO, scheduleInfo, testParams.getUser());
+        String fullText = String.format(SCHEDULE_INFO, scheduleInfo, getTimezoneShortName(), testParams.getUser());
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog-recurrence-monthly-" + scheduleInfo, this.getClass());
         assertEquals(infoText, fullText, "Custom time is in info message");
     }
