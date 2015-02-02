@@ -27,7 +27,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             {RecurrenceType.MONTHLY_DAY_OF_WEEK, 2, 6, "monthly on the third Sunday at 12:30 AM"}
     };
     private final String SCHEDULE_INFO = "This dashboard will be sent %s %s to %s as a PDF attachment.";
-    private DashboardScheduleDialog scheduleDashboard;
+    private DashboardScheduleDialog dashboardScheduleDialog;
 
     @Test(dependsOnMethods =  {"verifyEmptySchedules"}, groups = {"schedules"})
     public void setFeatureFlags () throws JSONException, IOException, InterruptedException {
@@ -41,7 +41,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
     public void switchRecurrences () throws IllegalArgumentException, JSONException {
         signIn(true, UserRoles.ADMIN); // login with gray pages to reload application and have feature flag set
         initDashboardsPage();
-        scheduleDashboard = dashboardsPage.scheduleDashboard();
+        dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
         for (Object[] testCase : CASES) {
             RecurrenceType recurrence = (RecurrenceType) testCase[0];
             switch (recurrence) {
@@ -67,15 +67,15 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
 
     private void testWeekly(int when, int[] days, String scheduleInfo) {
         System.out.println(" - test weekly");
-        scheduleDashboard.selectFrequency(1); // weekly
+        dashboardScheduleDialog.selectFrequency(1); // weekly
         System.out.println(" -- frequency selected");
-        scheduleDashboard.selectWeeklyEvery(when);
+        dashboardScheduleDialog.selectWeeklyEvery(when);
         System.out.println(" -- when selected");
-        scheduleDashboard.selectWeeklyOnDay(days);
+        dashboardScheduleDialog.selectWeeklyOnDay(days);
         System.out.println(" -- days selected");
-        scheduleDashboard.selectTime(1); // 12:30pm
+        dashboardScheduleDialog.selectTime(1); // 12:30pm
         System.out.println(" -- time selected");
-        String infoText = scheduleDashboard.getInfoText();
+        String infoText = dashboardScheduleDialog.getInfoText();
         String fullText = String.format(SCHEDULE_INFO, scheduleInfo, getTimezoneShortName(), testParams.getUser());
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog-recurrence-weekly-" + scheduleInfo, this.getClass());
         assertEquals(infoText, fullText, "Custom time is in info message");
@@ -83,24 +83,24 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
 
     private void testMonthly(Object[] testCase) {
         System.out.println(" - test monthly");
-        scheduleDashboard.selectFrequency(2); // monthly
+        dashboardScheduleDialog.selectFrequency(2); // monthly
         System.out.println(" -- frequency selected");
         String scheduleInfo = "";
         if (RecurrenceType.MONTHLY_DAY_OF_MONTH.equals(testCase[0])) {
-            scheduleDashboard.selectMonthlyOn(0); // day of month
-            scheduleDashboard.selectDayOfMonth((Integer) testCase[1]); // which day of month
-            scheduleInfo = (String) testCase[3];
+            dashboardScheduleDialog.selectMonthlyOn(0); // day of month
+            dashboardScheduleDialog.selectDayOfMonth((Integer) testCase[1]); // which day of month
+            scheduleInfo = (String) testCase[2];
             System.out.println(" -- day of month selected");
         } else if (RecurrenceType.MONTHLY_DAY_OF_WEEK.equals(testCase[0])) {
-            scheduleDashboard.selectMonthlyOn(1); // day of week
-            scheduleDashboard.selectRepeatEvery((Integer) testCase[1]); // repeat every X weeks
-            scheduleDashboard.selectDayOfWeek((Integer) testCase[2]); // on which day
+            dashboardScheduleDialog.selectMonthlyOn(1); // day of week
+            dashboardScheduleDialog.selectRepeatEvery((Integer) testCase[1]); // repeat every X weeks
+            dashboardScheduleDialog.selectDayOfWeek((Integer) testCase[2]); // on which day
             scheduleInfo = (String) testCase[3];
             System.out.println(" -- day of week selected");
         }
-        scheduleDashboard.selectTime(1); // 12:30pm
+        dashboardScheduleDialog.selectTime(1); // 12:30pm
         System.out.println(" -- time selected");
-        String infoText = scheduleDashboard.getInfoText();
+        String infoText = dashboardScheduleDialog.getInfoText();
         String fullText = String.format(SCHEDULE_INFO, scheduleInfo, getTimezoneShortName(), testParams.getUser());
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog-recurrence-monthly-" + scheduleInfo, this.getClass());
         assertEquals(infoText, fullText, "Custom time is in info message");

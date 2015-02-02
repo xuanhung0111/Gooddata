@@ -307,7 +307,7 @@ public class DashboardsPage extends AbstractFragment {
         return openEditExportEmbedMenu().contains("Edit");
     }
 
-    public DashboardScheduleDialog scheduleDashboard() {
+    public DashboardScheduleDialog showDashboardScheduleDialog() {
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(scheduleButton).click();
         waitForElementVisible(scheduleDialog.getRoot());
