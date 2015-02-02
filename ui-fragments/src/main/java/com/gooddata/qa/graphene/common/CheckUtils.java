@@ -16,7 +16,9 @@ import static org.testng.Assert.fail;
 
 public final class CheckUtils {
 
-    private static final By BY_RED_BAR = By.xpath("//div[@id='status']/div[contains(@class, 'box-error')]//div[@class='leftContainer']");
+    private static final String STATUS_BAR_SELECTOR = "div#status > div.box-%s div.leftContainer";
+    private static final By BY_GREEN_BAR = By.cssSelector(String.format(STATUS_BAR_SELECTOR, "success"));
+    private static final By BY_RED_BAR = By.cssSelector(String.format(STATUS_BAR_SELECTOR, "error"));
     private static final By BY_RED_BAR_WARNING = By.cssSelector("div.c-status.box-warning");
     private static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
 
@@ -33,6 +35,18 @@ public final class CheckUtils {
         //this kind of error appeared for the first time in geo chart
         if (searchContext.findElements(BY_REPORT_ERROR).size() != 0 && searchContext.findElement(BY_REPORT_ERROR).isDisplayed()) {
             fail("Report error APPEARED - " + searchContext.findElement(BY_REPORT_ERROR).getText());
+        }
+    }
+
+    public static void checkGreenBar(SearchContext searchContext) {
+        waitForElementVisible(BY_GREEN_BAR, searchContext);
+    }
+
+    public static void checkGreenBar(SearchContext searchContext, String desiredMessage) {
+        String greenBarMessage = waitForElementVisible(BY_GREEN_BAR, searchContext).getText();
+
+        if (desiredMessage.length() != 0 && !greenBarMessage.equals(desiredMessage)) {
+            fail("WRONG GREEN BAR MESSAGE - is: " + greenBarMessage + " expected: " + desiredMessage);
         }
     }
 
