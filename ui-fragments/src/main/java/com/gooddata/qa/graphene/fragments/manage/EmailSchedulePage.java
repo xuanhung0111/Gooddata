@@ -71,6 +71,9 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".dashboards .picker .selected label")
     private List<WebElement> attachedDashboards;
 
+    @FindBy(css = ".listView .listTable .s-dataPage-listRow .title > a > span")
+    protected List<WebElement> scheduledEmailsTitles;
+
     public String getSubjectFromInput() {
         return waitForElementVisible(emailSubjectInput).getAttribute("value");
     }
@@ -108,6 +111,20 @@ public class EmailSchedulePage extends AbstractFragment {
         } else {
             return schedulesCount;
         }
+    }
+
+    public boolean isSchedulePresent(String title) {
+        if (this.getNumberOfSchedules() == 0) {
+            return false;
+        }
+
+        for (WebElement scheduledEmailsTitle : scheduledEmailsTitles) {
+            if (scheduledEmailsTitle.getAttribute("title").matches("^" + title + ".*$")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String getSubscribed(String scheduleName) {

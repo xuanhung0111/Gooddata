@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;
@@ -60,7 +61,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
     public void checkManagePageForScheduleExistence() {
         initEmailSchedulesPage();
-        assertFalse(emailSchedulesPage.scheduleIsPresent(custom_subject));
+        assertFalse(emailSchedulesPage.isSchedulePresent(custom_subject));
     }
 
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
