@@ -21,16 +21,14 @@ public class LoginFragment extends AbstractFragment {
     private static final String ERROR_CLASS = "has-error";
 
     public void login(String username, String password, boolean validLogin) {
-        waitForElementVisible(this.email).clear();
+        waitForElementVisible(email).clear();
         waitForElementVisible(this.password).clear();
-        this.email.sendKeys(username);
+        email.sendKeys(username);
         this.password.sendKeys(password);
+        waitForElementVisible(signInButton).click();
         if (validLogin) {
-            Graphene.guardAjax(signInButton).click();
             waitForElementNotVisible(this.getRoot());
             waitForElementNotVisible(email);
-        } else {
-            signInButton.click();
         }
     }
 
