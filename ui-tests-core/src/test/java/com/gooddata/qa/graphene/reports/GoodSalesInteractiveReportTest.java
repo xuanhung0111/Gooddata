@@ -26,7 +26,7 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
     @FindBy(xpath = "//iframe[contains(@src,'iaa/interactive_report')]")
     private InteractiveReportWidget interactiveReport;
 
-    private static final long expectedDashboardExportSize = 42000L;
+    private static final long expectedDashboardExportSize = 39000L;
 
     @BeforeClass
     public void setProjectTitle() {
