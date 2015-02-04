@@ -15,8 +15,8 @@ public class DeployForm extends AbstractFragment {
 
     private static final By BY_FILE_INPUT_ERROR = By
             .cssSelector(".select-zip .zip-name-text input");
-    private static final By BY_INPUT_ERROR_BUBBLE = By.cssSelector(".bubble-overlay");
-
+    private static final By BY_BUBBLE_ERROR = By
+            .cssSelector("div.bubble-negative.isActive div.content");
     private static final String XPATH_PROCESS_TYPE_OPTION =
             "//select/option[@value='${processType}']";
 
@@ -29,15 +29,10 @@ public class DeployForm extends AbstractFragment {
     @FindByJQuery("button:contains(Re-deployed)")
     private WebElement redeployedButton;
 
-    @FindBy(xpath = "//div[@class='select-zip']/div/input")
+    @FindBy(css = "div.select-zip>div>input")
     private WebElement zipFileInput;
 
-    @FindBy(
-            xpath = "//div[@class='deploy-process-dialog-area']/div[contains(@class, 'whole-line-text')]/div[contains(@class, 'bubble-overlay')]")
-    private WebElement processNameErrorBubble;
-
-    @FindBy(
-            xpath = "//div[@class='deploy-process-dialog-area']/div[contains(@class, 'whole-line-text')]/input")
+    @FindBy(css = "div.deploy-process-dialog-area>div.whole-line-text>input")
     private WebElement processNameInput;
 
     @FindBy(css = "div.deploy-process-button-area button.button-positive")
@@ -63,17 +58,15 @@ public class DeployForm extends AbstractFragment {
     }
 
     public void assertInvalidPackageError() {
-        waitForElementVisible(getFileInputErrorBubble());
         assertTrue(inputFileHasError());
-        assertEquals(getFileInputErrorBubble().getText(),
+        assertEquals(getErrorBubble().getText(),
                 "A zip file is required. The file must be smaller than 1MB.");
     }
 
     public void assertInvalidProcessNameError() {
         assertTrue(inputProcessNameHasError());
         getProcessName().click();
-        waitForElementVisible(getProcessNameErrorBubble());
-        assertEquals(getProcessNameErrorBubble().getText(), "A process name is required");
+        assertEquals(getErrorBubble().getText(), "A process name is required");
     }
 
     public WebElement getDeployProcessDialog() {
@@ -121,11 +114,8 @@ public class DeployForm extends AbstractFragment {
         return waitForElementVisible(processNameInput);
     }
 
-    private WebElement getFileInputErrorBubble() {
-        return waitForElementVisible(deployProcessDialog).findElement(BY_INPUT_ERROR_BUBBLE);
+    private WebElement getErrorBubble() {
+        return waitForElementVisible(BY_BUBBLE_ERROR,browser);
     }
 
-    private WebElement getProcessNameErrorBubble() {
-        return waitForElementVisible(processNameErrorBubble);
-    }
 }
