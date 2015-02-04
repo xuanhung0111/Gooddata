@@ -3,10 +3,15 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
+import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectExecutionContext;
+import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import org.json.JSONException;
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -35,14 +40,11 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         custom_subject = testParams.getTestIdentification();
     }
 
-    @BeforeClass
-    public void getMDBaseUri() {
-        md_base_uri = PAGE_GDC_MD + "/" + testParams.getProjectId();
-    }
-
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void createDashboardSchedule() throws JSONException {
         initDashboardsPage();
+
+        getMDBaseUri();
 
         setupFilters();
 
@@ -73,6 +75,10 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     @Test(dependsOnMethods = {"checkGreyPagesForScheduleExistence"}, groups = {"schedules"})
     public void checkScheduleExecutionContext() throws JSONException, InterruptedException {
         assertTrue(scheduleHasValidExecutionContext(custom_subject));
+    }
+
+    private void getMDBaseUri() {
+        md_base_uri = PAGE_GDC_MD + "/" + testParams.getProjectId();
     }
 
     private boolean scheduleHasValidExecutionContext(String title) throws JSONException, InterruptedException {
