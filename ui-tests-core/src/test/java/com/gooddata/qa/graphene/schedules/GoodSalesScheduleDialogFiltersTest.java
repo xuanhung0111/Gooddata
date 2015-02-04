@@ -10,11 +10,17 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectExecutionContex
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.openqa.selenium.support.FindBy;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.checkGreenBar;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -127,5 +133,22 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         dialog.selectTabs(new int[]{1});
         dialog.selectTime(1);
         dialog.setCustomEmailSubject(custom_subject);
+    }
+
+    @AfterClass
+    private void deleteEmailScheduleAndExecutionContext() throws JSONException, InterruptedException {
+        int scheduleId = getScheduleId(custom_subject);
+        int executionContextId = getExecutionContextId(scheduleId);
+
+        restApiClient = getRestApiClient();
+
+        deleteObject(scheduleId);
+        deleteObject(executionContextId);
+    }
+
+    private void deleteObject(int objectId) {
+        HttpRequestBase request = restApiClient.newDeleteMethod(getRootUrl() + md_base_uri + "/obj/" + Integer.toString(objectId));
+        HttpResponse response = restApiClient.execute(request);
+        EntityUtils.consumeQuietly(response.getEntity());
     }
 }
