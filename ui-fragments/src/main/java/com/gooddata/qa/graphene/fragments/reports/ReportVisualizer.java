@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.reports;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
@@ -191,7 +190,6 @@ public class ReportVisualizer extends AbstractFragment {
 
     public void finishReportChanges() {
         waitForElementVisible(doneButton).click();
-        waitForElementNotVisible(doneButton);
     }
 
     public void selectReportVisualisation(ReportTypes reportVisualizationType) {
@@ -200,7 +198,7 @@ public class ReportVisualizer extends AbstractFragment {
         reportVisualizationContainer.findElement(icon).click();
         waitForElementVisible(By.id(reportVisualizationType.getContainerTabId()), browser);
     }
-    
+
     public void createSnDFolder(String metricOnFact, String folderName)
             throws InterruptedException {
         waitForElementVisible(whatButton).click();
