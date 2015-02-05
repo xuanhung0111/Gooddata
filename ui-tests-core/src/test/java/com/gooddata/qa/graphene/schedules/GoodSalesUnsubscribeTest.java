@@ -24,10 +24,6 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = {"GoodSalesUnsubscribe"}, description = "Tests for GoodSales project - unsubscribe in GD platform")
 public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private static final int TIMEOUT_MINUTES = 4;
-    // mailbox polling interval in miliseconds
-    private static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 10000;
-
     private static final String unsubscribePattern = ".*If you no longer want to receive it, <a href=\"([^\"]*)\">click here</a>.*";
 
     private String reportTitle = "UI Graphene core Report";
@@ -137,25 +133,26 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
             throws InterruptedException {
         Message[] reportMessages = new Message[0];
 
-        int loops = 0,
-            maxLoops = 60000 / MAILBOX_POLL_INTERVAL_MILISECONDS * TIMEOUT_MINUTES;
-
-        while (reportMessages.length < expectedMessagesCount && loops < maxLoops) {
-            System.out.println("Waiting for messages, try " + (loops + 1));
+        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();
+             !messagesArrived(reportMessages, expectedMessagesCount) && loop < maxLoops; loop++) {
+            System.out.println("Waiting for messages, try " + (loop + 1));
 
             Message[] receivedMessages = imapClient.getMessagesFromInbox(from, subject);
             reportMessages = ArrayUtils.addAll(reportMessages, receivedMessages);
 
-            if (reportMessages.length >= expectedMessagesCount) {
+            if (messagesArrived(reportMessages, expectedMessagesCount)) {
                 System.out.println(String.format("Report export messages from %s arrived (subj: %s)", from, subject));
                 break;
             }
 
             Thread.sleep(MAILBOX_POLL_INTERVAL_MILISECONDS);
-            loops++;
         }
 
         return reportMessages;
+    }
+
+    private boolean messagesArrived(Message[] reportMessages, int expectedMessagesCount) {
+        return reportMessages.length >= expectedMessagesCount;
     }
 
     private String getBccEmail() {
