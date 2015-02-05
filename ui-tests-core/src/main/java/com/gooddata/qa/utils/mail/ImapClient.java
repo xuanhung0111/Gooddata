@@ -66,6 +66,7 @@ public class ImapClient {
                 inboxFolder.close(false);
             }
         } catch (MessagingException e) {
+            e.printStackTrace();
             throw new RuntimeException("Cannot get messages from inbox", e);
         }
 
