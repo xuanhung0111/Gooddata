@@ -33,7 +33,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     protected static final int MAILBOX_TIMEOUT_MINUTES = 6;
     // mailbox polling interval in miliseconds
-    protected static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 10000;
+    protected static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 30000;
 
     protected static final String FROM = "noreply@gooddata.com";
 
