@@ -31,6 +31,10 @@ import org.testng.annotations.Test;
 
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
+    protected static final int MAILBOX_TIMEOUT_MINUTES = 6;
+    // mailbox polling interval in miliseconds
+    protected static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 30000;
+
     protected static final String FROM = "noreply@gooddata.com";
 
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
@@ -130,6 +134,10 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
         System.out.println(" - added bcc to schedule: " + bccEmailsList);
         return mapper.writeValueAsString(rootNode);
+    }
+
+    protected int getMailboxMaxPollingLoops() {
+        return 60000 / MAILBOX_POLL_INTERVAL_MILISECONDS * MAILBOX_TIMEOUT_MINUTES;
     }
 
 }

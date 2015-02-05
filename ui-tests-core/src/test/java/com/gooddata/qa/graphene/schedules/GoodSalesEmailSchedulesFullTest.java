@@ -88,10 +88,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private void checkMailbox(ImapClient imapClient) throws Exception {
         Message[] reportMessages = new Message[0];
         Message[] dashboardMessages = new Message[0];
-        int loops = 0;
 
-        while (!bothEmailsArrived(reportMessages, dashboardMessages) && (loops < 36)) {  // 6 min
-            System.out.println("Waiting for messages, try " + (loops + 1));
+        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();
+             !bothEmailsArrived(reportMessages, dashboardMessages) && loop < maxLoops; loop++) {
+            System.out.println("Waiting for messages, try " + (loop + 1));
             reportMessages = imapClient.getMessagesFromInbox(FROM, reportTitle);
             dashboardMessages = imapClient.getMessagesFromInbox(FROM, dashboardTitle);
 
@@ -100,8 +100,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 break;
             }
 
-            Thread.sleep(10000);
-            loops++;
+            Thread.sleep(MAILBOX_POLL_INTERVAL_MILISECONDS);
         }
 
         System.out.println("Saving dashboard message ...");
