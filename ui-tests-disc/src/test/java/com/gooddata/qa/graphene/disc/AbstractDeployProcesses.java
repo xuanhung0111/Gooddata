@@ -91,6 +91,11 @@ public abstract class AbstractDeployProcesses extends AbstractDISCTest {
             ProcessTypes processType) {
         checkDeployDialogMessageInProjectDetail(deployPackage, processType, true);
     }
+    
+    protected void checkFailedDeployDialogMessageInProjectDetail(DeployPackages deployPackage,
+            ProcessTypes processType) {
+        checkDeployDialogMessageInProjectDetail(deployPackage, processType, false);
+    }
 
     protected void checkSuccessfulDeployDialogMessageInProjectsPage(List<ProjectInfo> projects,
             DeployPackages deployPackage, ProcessTypes processType) {
