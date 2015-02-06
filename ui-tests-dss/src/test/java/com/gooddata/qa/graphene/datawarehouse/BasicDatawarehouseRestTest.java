@@ -193,7 +193,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         // use non-datawarehouse-enabled authorization token to create a new datawarehouse
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, testParams.getAuthorizationToken(),
                 "Project group with name '" + testParams.getAuthorizationToken() + "' does not have valid DSS " +
-                        "connection information (DSS cluster and DSS project group source are missing).");
+                        "connection information (DSS cluster is missing).");
     }
 
     @Test(dependsOnMethods = {"createInstance"})
