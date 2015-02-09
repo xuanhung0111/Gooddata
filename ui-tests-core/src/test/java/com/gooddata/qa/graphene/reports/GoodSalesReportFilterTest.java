@@ -13,7 +13,8 @@ import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 
-@Test(groups = {"GoodSalesReportFilters"}, description = "Tests for GoodSales project (report filters functionality) in GD platform")
+@Test(groups = {"GoodSalesReportFilters"},
+      description = "Tests for GoodSales project (report filters functionality)")
 public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     private static final String REPORT_NAME = "Test Filter";
@@ -52,7 +53,8 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"})
     public void rankingFilterTest() throws InterruptedException {
         initReport();
-        reportPage.addFilter(FilterItem.Factory.createRankingFilter(ResultSize.TOP.withSize(3), "Stage Name", "Amount"));
+        reportPage.addFilter(FilterItem.Factory.createRankingFilter(ResultSize.TOP.withSize(3),
+                "Stage Name", "Amount"));
         reportPage.saveReport();
         checkRedBar(browser);
     }
