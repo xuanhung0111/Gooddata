@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -104,6 +103,12 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
         try {
             String content = IOUtils.toString(input);
             for (Pair<String,String> replaceString : replaceStrings) {
+                // process the hostname in svg file if it has some prefix (na1 or ea)
+                if (HOST_NAME.equals(replaceString.getRight())) {
+                    String pattern = "https://(\\w+.)*" + replaceString.getLeft();
+                    content = content.replaceAll(pattern,"https://" + replaceString.getRight());
+                    continue;
+                }
                 content = content.replaceAll(replaceString.getLeft(), replaceString.getRight());
             }
             output = new FileOutputStream(file);
