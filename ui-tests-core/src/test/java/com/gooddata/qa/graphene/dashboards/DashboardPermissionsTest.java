@@ -229,6 +229,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         addGranteesDialog.selectItem(viewerLogin);
         addGranteesDialog.share();
 
+        Thread.sleep(500);
         addedGrantees = permissionsDialog.getAddedGrantees();
         Assert.assertEquals(addedGrantees.size(), 3);
 
