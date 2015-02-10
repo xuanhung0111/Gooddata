@@ -145,10 +145,7 @@ public class NotificationRulesDialog extends AbstractFragment {
                 "abc@gmail.com,xyz@gmail.com");
         notificationRuleItem.click();
         notificationRuleItem.findElement(BY_NOTIFICATION_RULE_EMAIL).click();
-        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
-        waitForElementVisible(errorBubble);
-        System.out.println("Only One Email Error Message: " + errorBubble.getText());
-        assertEquals(ERROR_NOTIFICATION_EMAIL, errorBubble.getText());
+        assertEquals(waitForElementVisible(BY_ERROR_BUBBLE, browser).getText(), ERROR_NOTIFICATION_EMAIL);
     }
 
     public void deleteNotification(NotificationBuilder notificationInfo) {
@@ -229,10 +226,7 @@ public class NotificationRulesDialog extends AbstractFragment {
         notificationEmailElement.sendKeys("");
         notificationRuleItem.click();
         notificationEmailElement.click();
-        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
-        waitForElementVisible(errorBubble);
-        System.out.println("Invalid Email Bubble Message: " + errorBubble.getText());
-        assertEquals(ERROR_NOTIFICATION_EMAIL, errorBubble.getText());
+        assertEquals(waitForElementVisible(BY_ERROR_BUBBLE, browser).getText(), ERROR_NOTIFICATION_EMAIL);
     }
 
     private void checkEmptySubjectField(WebElement notificationRuleItem) {
@@ -241,10 +235,7 @@ public class NotificationRulesDialog extends AbstractFragment {
         notificationSubjectElement.sendKeys("");
         notificationRuleItem.click();
         notificationSubjectElement.click();
-        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
-        waitForElementVisible(errorBubble);
-        System.out.println("Invalid Subject Bubble Message: " + errorBubble.getText());
-        assertEquals(ERROR_NOTIFICATION_SUBJECT, errorBubble.getText());
+        assertEquals(waitForElementVisible(BY_ERROR_BUBBLE, browser).getText(), ERROR_NOTIFICATION_SUBJECT);
     }
 
     private void checkEmptyMessageField(WebElement notificationRuleItem) {
@@ -253,10 +244,7 @@ public class NotificationRulesDialog extends AbstractFragment {
         notificationMessageElement.sendKeys("");
         notificationRuleItem.click();
         notificationMessageElement.click();
-        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
-        waitForElementVisible(errorBubble);
-        System.out.println("Invalid Message Bubble Message: " + errorBubble.getText());
-        assertEquals(ERROR_NOTIFICATION_MESSAGE, errorBubble.getText());
+        assertEquals(waitForElementVisible(BY_ERROR_BUBBLE, browser).getText(), ERROR_NOTIFICATION_MESSAGE);
     }
 
     private void checkEmptyCustomEventNameField(int notificationIndex,
@@ -267,10 +255,9 @@ public class NotificationRulesDialog extends AbstractFragment {
         notificationCustomEventNameElement.sendKeys("");
         notificationRuleItem.click();
         notificationCustomEventNameElement.click();
-        WebElement errorBubble = notificationRuleItem.findElement(BY_ERROR_BUBBLE);
-        waitForElementVisible(errorBubble);
-        System.out.println("Invalid Custom Event Name Bubble Message: " + errorBubble.getText());
-        assertTrue(errorBubble.getText().matches(ERROR_NOTIFICATION_CUSTOM_FIELD),
-                errorBubble.getText());
+        String errorBubbleMessage = waitForElementVisible(BY_ERROR_BUBBLE, browser).getText();
+        System.out.println("Invalid Custom Event Name Bubble Message: " + errorBubbleMessage);
+        assertTrue(errorBubbleMessage.matches(ERROR_NOTIFICATION_CUSTOM_FIELD),
+                "Incorrect message: " + errorBubbleMessage);
     }
 }

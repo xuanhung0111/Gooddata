@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -39,6 +38,7 @@ public class ScheduleForm extends AbstractFragment {
             By.xpath("//button[contains(@class, 'ait-new-schedule-confirm-btn') and text()='Schedule']");
     protected static By BY_CANCEL_BUTTON = By
             .xpath("//a[contains(@class, 'ait-new-schedule-cancel-btn') and text()='Cancel']");
+    protected static By BY_ERROR_BUBBLE = By.cssSelector(".bubble.isActive");
     private static By BY_PARAMETER_SHOW_SECURE_VALUE = By
             .cssSelector(".param-show-secure-value input");
 
@@ -87,9 +87,6 @@ public class ScheduleForm extends AbstractFragment {
     @FindBy(css = ".ait-schedule-cron-user-value input.input-text")
     private WebElement cronExpression;
 
-    @FindBy(css = ".userCron .bubble-overlay")
-    private WebElement cronExpressionErrorBubble;
-
     @FindBy(xpath = "//div[@class='schedule-params-actions']//a[text()='Add parameter']")
     private WebElement addParameterLink;
 
@@ -105,9 +102,6 @@ public class ScheduleForm extends AbstractFragment {
 
     @FindBy(css = ".ait-new-schedule-fragment-name input")
     private WebElement scheduleNameInput;
-
-    @FindBy(css = ".ait-new-schedule-fragment-name .bubble-overlay")
-    private WebElement scheduleNameErrorBubble;
 
     public void createNewSchedule(ScheduleBuilder scheduleBuilder) {
         selectProcess(scheduleBuilder.getProcessName());
@@ -134,15 +128,14 @@ public class ScheduleForm extends AbstractFragment {
     public void createScheduleWithInvalidScheduleName(ScheduleBuilder scheduleBuilder,
             String validScheduleName) {
         createNewSchedule(scheduleBuilder);
+        String errorBubbleMessage = waitForElementVisible(BY_ERROR_BUBBLE, browser).getText();
         if (scheduleBuilder.getScheduleName().isEmpty()) {
             assertTrue(scheduleNameInput.getAttribute("class").contains("has-error"));
-            waitForElementVisible(scheduleNameErrorBubble);
-            assertEquals(scheduleNameErrorBubble.getText(), EMPTY_SCHEDULE_NAME_ERROR);
+            assertEquals(errorBubbleMessage, EMPTY_SCHEDULE_NAME_ERROR);
         } else {
             assertTrue(scheduleNameInput.getAttribute("class").contains("has-error"));
-            waitForElementVisible(scheduleNameErrorBubble);
             assertEquals(
-                    scheduleNameErrorBubble.getText(),
+                    errorBubbleMessage,
                     INVALID_SCHEDULE_NAME_ERROR.replace("${scheduleName}",
                             scheduleBuilder.getScheduleName()));
         }
@@ -154,12 +147,9 @@ public class ScheduleForm extends AbstractFragment {
         selectCron(cronTimeBuilder);
         getRoot().click();
         waitForElementVisible(cronExpression).click();
-        waitForElementVisible(cronExpressionErrorBubble);
-        System.out.println("cron exepression: " + cronExpression.getAttribute("class"));
-        System.out.println("cron bubble: " + cronExpressionErrorBubble.getText());
         assertTrue(cronExpression.getAttribute("class").contains("has-error"));
-        assertTrue(cronExpressionErrorBubble.getText().equals(
-                "Inserted cron format is invalid. Please verify and try again."));
+        assertEquals(waitForElementVisible(BY_ERROR_BUBBLE, browser).getText(),
+                "Inserted cron format is invalid. Please verify and try again.");
     }
 
     public void checkNoTriggerScheduleOptions() {
@@ -269,9 +259,10 @@ public class ScheduleForm extends AbstractFragment {
         waitForElementVisible(selectSynchronizeSelectedDatasets).click();
         waitForElementVisible(openDatasetPickerButton).click();
 
-        List<WebElement> items =  waitForElementVisible(datasetDialog).findElements(By.className("gd-list-view-item"));
-
-        for(WebElement item: items) {
+        List<WebElement> items =
+                waitForElementVisible(datasetDialog)
+                        .findElements(By.className("gd-list-view-item"));
+        for (WebElement item : items) {
             if (!datasetsToSynchronize.contains(item.getText())) {
                 item.click();
             }
