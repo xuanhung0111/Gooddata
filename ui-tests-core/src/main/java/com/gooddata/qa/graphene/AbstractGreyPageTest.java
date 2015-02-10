@@ -17,6 +17,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -27,6 +28,7 @@ import org.openqa.selenium.support.FindBy;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +52,8 @@ public class AbstractGreyPageTest extends AbstractTest {
     protected static final String PAGE_GDC_MD = PAGE_GDC + "/md";
     protected static final String PAGE_GDC_PROJECTS = PAGE_GDC + "/projects";
     protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
+    protected static final String HOST_NAME = "%{HostName}";
+    protected static final String PROJECT_ID = "%{ProjectID}";
 
     /**
      * ----- Grey pages fragments -----
@@ -182,14 +186,16 @@ public class AbstractGreyPageTest extends AbstractTest {
         return objectElementsFragment.getObjectElements();
     }
 
-    public void verifyLDMModelProject(long minimalSize) throws ParseException, IOException, JSONException {
+    @SuppressWarnings("unchecked")
+    public void verifyLDMModelProject(long expectedSize) throws ParseException, IOException, JSONException {
         //download folder is not created automatically
         new File(testParams.getDownloadFolder()).mkdir();
         File imageFileName = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + getLDMImageFile());
+        replaceContentInSVGFile(imageFileName, Pair.of(testParams.getHost(), HOST_NAME), Pair.of(testParams.getProjectId(), PROJECT_ID));
         System.out.println("imageFileName = " + imageFileName);
         long fileSize = imageFileName.length();
         System.out.println("File size: " + fileSize);
-        assertTrue(fileSize >= minimalSize, "LDM is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+        assertTrue(fileSize == expectedSize, "LDM is probably invalid, check the LDM image manually! Current size is " + fileSize + ", but" + expectedSize + "in size was expected");
     }
 
     protected void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
@@ -206,8 +212,8 @@ public class AbstractGreyPageTest extends AbstractTest {
     
     private String getLDMImageFile() throws ParseException, IOException, JSONException {
         String imageURI = RestUtils.getLDMImageURI(testParams.getHost(), testParams.getProjectId(), testParams.getUser(), testParams.getPassword());
-        int indexPNG = imageURI.indexOf(".png");
-        String imageFileName = imageURI.substring(0, indexPNG+4);
+        int indexSVG = imageURI.indexOf(".svg");
+        String imageFileName = imageURI.substring(0, indexSVG+4);
         imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/")+1);
         downloadFile(imageURI, imageFileName);
         return imageFileName;
@@ -223,5 +229,28 @@ public class AbstractGreyPageTest extends AbstractTest {
         }
         out.close();
         in.close();
+    }
+    
+    protected void replaceContentInSVGFile(File file, Pair<String,String>... replaceStrings)
+            throws IOException {
+        FileInputStream input = new FileInputStream(file);
+        FileOutputStream output = null;
+        try {
+            String content = IOUtils.toString(input);
+            for (Pair<String,String> replaceString : replaceStrings) {
+                // process the hostname in svg file if it has some prefix (na1 or ea)
+                if (HOST_NAME.equals(replaceString.getRight())) {
+                    String pattern = "https://(\\w+.)*" + replaceString.getLeft();
+                    content = content.replaceAll(pattern,"https://" + replaceString.getRight());
+                    continue;
+                }
+                content = content.replaceAll(replaceString.getLeft(), replaceString.getRight());
+            }
+            output = new FileOutputStream(file);
+            IOUtils.write(content, output);
+        } finally {
+            input.close();
+            if (output!= null) output.close();
+        }
     }
 }

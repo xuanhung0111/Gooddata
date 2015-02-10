@@ -95,7 +95,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         Thread.sleep(4000);
         Screenshots.takeScreenshot(browser, "project-model", this.getClass());
         
-    	verifyLDMModelProject(185494);
+    	verifyLDMModelProject(32393);
     }
 
     @Test(dependsOnMethods = { "createComputedAttribute" })

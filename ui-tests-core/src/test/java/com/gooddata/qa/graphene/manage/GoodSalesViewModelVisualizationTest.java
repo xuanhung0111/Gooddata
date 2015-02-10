@@ -4,15 +4,11 @@ import static org.testng.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -27,8 +23,6 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 @Test(groups = {"viewModelVisualization"}, description = "Test view model visualization")
 public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
 
-    private static final String HOST_NAME = "%{HostName}";
-    private static final String PROJECT_ID = "%{ProjectID}";
     private static final String MODEL_URI = "/gdc/projects/%s/ldm";
     private static final String MODEL_IMAGE_FILE = "ldm.svg";
     private static final String MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE = "ldmAfterChangeAccountToAcsount.svg";
@@ -95,22 +89,5 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
             reader2.close();
         }
         return true;
-    }
-
-    private void replaceContentInSVGFile(File file, Pair<String,String>... replaceStrings)
-            throws IOException {
-        FileInputStream input = new FileInputStream(file);
-        FileOutputStream output = null;
-        try {
-            String content = IOUtils.toString(input);
-            for (Pair<String,String> replaceString : replaceStrings) {
-                content = content.replaceAll(replaceString.getLeft(), replaceString.getRight());
-            }
-            output = new FileOutputStream(file);
-            IOUtils.write(content, output);
-        } finally {
-            input.close();
-            if (output!= null) output.close();
-        }
     }
 }
