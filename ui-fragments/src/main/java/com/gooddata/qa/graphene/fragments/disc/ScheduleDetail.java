@@ -81,9 +81,6 @@ public class ScheduleDetail extends ScheduleForm {
     @FindBy(css = ".ait-schedule-title-edit-buttons .button-positive")
     private WebElement saveScheduleTitleButton;
 
-    @FindBy(css = ".ait-schedule-title-field .bubble-overlay")
-    private WebElement scheduleTitleErrorBubble;
-
     @FindBy(css = ".ait-schedule-title-edit-buttons .button-secondary")
     private WebElement cancelChangeScheduleTitleButton;
 
@@ -110,9 +107,6 @@ public class ScheduleDetail extends ScheduleForm {
 
     @FindBy(css = ".ait-schedule-reschedule-edit-buttons .button-secondary")
     private WebElement cancelAddRetryDelayButton;
-
-    @FindBy(css = ".ait-schedule-reschedule-value .bubble-overlay")
-    private WebElement errorRetryDelayBubble;
 
     @FindBy(css = ".ait-schedule-reschedule-delete-btn")
     private WebElement removeRetryDelay;
@@ -255,7 +249,7 @@ public class ScheduleDetail extends ScheduleForm {
         if (!scheduleBuilder.getParameters().isEmpty())
             assertScheduleParameters(scheduleBuilder.getParameters());
 
-        if(scheduleBuilder.isDataloadProcess()){
+        if (scheduleBuilder.isDataloadProcess()) {
             assertDataloadScheduleDatasets(scheduleBuilder);
         }
     }
@@ -372,12 +366,11 @@ public class ScheduleDetail extends ScheduleForm {
     public void addInvalidRetry(String invalidRetryDelay) {
         addRetry(invalidRetryDelay);
         waitForElementVisible(saveRetryDelayButton).click();
-        waitForElementVisible(errorRetryDelayBubble);
-        assertTrue(retryDelayInput.getAttribute("class").contains("has-error"));
-        String errorMessage = errorRetryDelayBubble.getText();
-        assertTrue(errorMessage
+        assertTrue(waitForElementVisible(retryDelayInput).getAttribute("class").contains("has-error"));
+        String errorBubbleMessage = waitForElementVisible(BY_ERROR_BUBBLE, browser).getText();
+        System.out.println("Error retry delay: " + errorBubbleMessage);
+        assertTrue(errorBubbleMessage
                 .matches("The minimal delay is every 15 minutes.([\\n]*[\\r]*)Use numbers only."));
-        System.out.println("Error retry delay: " + errorRetryDelayBubble.getText());
     }
 
     public void removeRetryDelay(Confirmation remove) {
@@ -631,8 +624,9 @@ public class ScheduleDetail extends ScheduleForm {
     public void changeAndCheckDatasetDialog(ScheduleBuilder scheduleBuilder) {
         assertTrue(!selectSynchronizeAllDatasets.isSelected());
         assertTrue(selectSynchronizeSelectedDatasets.isSelected());
-        assertTrue(openDatasetPickerButton.getText().contains(scheduleBuilder.getDatasetsToSynchronize().size() + " of " + scheduleBuilder.getAllDatasets().size() + " datasets"));
-
+        assertTrue(openDatasetPickerButton.getText().contains(
+                scheduleBuilder.getDatasetsToSynchronize().size() + " of "
+                        + scheduleBuilder.getAllDatasets().size() + " datasets"));
 
         openDatasetPickerButton.click();
         assertChecked(scheduleBuilder.getDatasetsToSynchronize());
@@ -649,7 +643,9 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     private void assertChecked(List<String> datasetsToSynchronize) {
-        List<WebElement> items = waitForElementVisible(datasetDialog).findElements(By.className("gd-list-view-item"));
+        List<WebElement> items =
+                waitForElementVisible(datasetDialog)
+                        .findElements(By.className("gd-list-view-item"));
         for (WebElement item : items) {
             if (datasetsToSynchronize.contains(item.getText())) {
                 assertTrue(item.getAttribute("class").contains("is-selected"));
@@ -664,11 +660,11 @@ public class ScheduleDetail extends ScheduleForm {
         waitForElementVisible(saveScheduleTitleButton).click();
         waitForElementVisible(scheduleTitleInput).click();
         assertTrue(scheduleTitleInput.getAttribute("class").contains("has-error"));
-        waitForElementVisible(scheduleTitleErrorBubble);
+        String errorBubbleMessage = waitForElementVisible(BY_ERROR_BUBBLE, browser).getText();
         if (invalidScheduleName.isEmpty())
-            assertEquals(scheduleTitleErrorBubble.getText(), EMPTY_SCHEDULE_TITLE_ERROR);
+            assertEquals(errorBubbleMessage, EMPTY_SCHEDULE_TITLE_ERROR);
         else
-            assertEquals(scheduleTitleErrorBubble.getText(),
+            assertEquals(errorBubbleMessage,
                     INVALID_SCHEDULE_TITLE_ERROR.replace("${scheduleName}", invalidScheduleName));
 
         clickOnCloseScheduleButton();
@@ -751,11 +747,15 @@ public class ScheduleDetail extends ScheduleForm {
         } else {
             assertTrue(!selectSynchronizeAllDatasets.isSelected());
             assertTrue(selectSynchronizeSelectedDatasets.isSelected());
-            assertTrue(openDatasetPickerButton.getText().contains(scheduleBuilder.getDatasetsToSynchronize().size() + " of " + scheduleBuilder.getAllDatasets().size() + " datasets"));
+            assertTrue(openDatasetPickerButton.getText().contains(
+                    scheduleBuilder.getDatasetsToSynchronize().size() + " of "
+                            + scheduleBuilder.getAllDatasets().size() + " datasets"));
         }
 
-        if(scheduleBuilder.isDataloadDatasetsOverlap()) {
-            assertEquals(dataloadDatasetsMessages.getText(), "One or more of the selected datasets is already included in an existing schedule. If multiple schedules that load same dataset run concurrently, all schedules except the first will fail.");
+        if (scheduleBuilder.isDataloadDatasetsOverlap()) {
+            assertEquals(
+                    dataloadDatasetsMessages.getText(),
+                    "One or more of the selected datasets is already included in an existing schedule. If multiple schedules that load same dataset run concurrently, all schedules except the first will fail.");
         }
     }
 
