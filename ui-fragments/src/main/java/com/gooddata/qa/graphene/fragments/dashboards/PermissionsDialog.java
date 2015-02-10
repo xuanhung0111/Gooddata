@@ -36,12 +36,6 @@ public class PermissionsDialog extends AbstractFragment {
     @FindBy(css = ".visibility-options")
     private WebElement visibilityOptionsContainer;
 
-    @FindBy(css = ".s-everyone_can_access")
-    private WebElement everyOneCanAccessChoose;
-
-    @FindBy(css = ".s-specific_users_can_access")
-    private WebElement specificUsersAccessChoose;
-
     @FindBy(css = ".permissionDialog-addGranteesButton")
     private WebElement addGranteesButton;
 
@@ -50,6 +44,10 @@ public class PermissionsDialog extends AbstractFragment {
 
     @FindBy(css = ".searchfield-input")
     private WebElement searchForGranteeInput;
+
+    private static final String CAN_ACCESS_XPATH = "//div[text()='%s can access']";
+    private static final String SPECIFIC_USER = "Specific users";
+    private static final String EVERYONE = "Everyone";
 
     public WebElement getLockAdminRadio() {
         return lockAdminRadio;
@@ -122,11 +120,11 @@ public class PermissionsDialog extends AbstractFragment {
     }
 
     public void submitEveryOneCanAccess() {
-        waitForElementVisible(everyOneCanAccessChoose).click();
+        waitForElementVisible(By.xpath(String.format(CAN_ACCESS_XPATH, EVERYONE)), browser).click();
     }
 
     public void submitSpecificUsersAccess() {
-        waitForElementVisible(specificUsersAccessChoose).click();
+        waitForElementVisible(By.xpath(String.format(CAN_ACCESS_XPATH, SPECIFIC_USER)), browser).click();
     }
 
     public void openVisibilityPanel() {
