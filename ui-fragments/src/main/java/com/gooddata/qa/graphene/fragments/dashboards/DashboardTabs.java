@@ -14,7 +14,12 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 public class DashboardTabs extends AbstractFragment {
 
     private static final By BY_TAB_DROP_DOWN_BUTTON = By.cssSelector(".tab-dropdown");
-    private static final By BY_TABS_SCROLL_RIGHT_BUTTON = By.cssSelector(".scroll-right");
+
+    @FindBy(className = "scroll-right")
+    private WebElement scrollRightButton;
+
+    @FindBy(className = "scroll-left")
+    private WebElement scrollLeftButton;
 
     @FindBy(className = "yui3-dashboardtab")
     private List<DashboardTab> tabs;
@@ -34,7 +39,17 @@ public class DashboardTabs extends AbstractFragment {
      * @param i - tab index
      */
     public void openTab(int i) {
-        getTabWebElement(i).click();
+        while (true) {
+            // can not scroll to left anymore
+            if (Float.parseFloat(scrollLeftButton.getCssValue("opacity")) < 1.0)
+                break;
+            scrollLeftButton.click();
+        }
+        WebElement tab = getTabWebElement(i);
+        // if tab is not visible, we cannot get its label
+        while (getTabLabel(i).isEmpty())
+            scrollRightButton.click();
+        tab.click();
     }
 
     /**
@@ -88,7 +103,7 @@ public class DashboardTabs extends AbstractFragment {
         WebElement button = getTabWebElement(i).findElement(BY_TAB_DROP_DOWN_BUTTON);
         waitForElementPresent(button);
         while (!button.isDisplayed()) {
-            this.getRoot().findElement(BY_TABS_SCROLL_RIGHT_BUTTON).click();
+            waitForElementVisible(scrollRightButton).click();
         }
         button.click();
     }
