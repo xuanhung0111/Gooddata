@@ -33,7 +33,6 @@ ALTER DATATYPE {f_salesforce.f_closedsfdc} INT;
 ALTER DATASET {dataset.salesforce} ADD {dt.salesforce.closedsfdc};
 ALTER ATTRIBUTE {createdsfdc.date} ADD KEYS {f_salesforce.dt_createdsfdc_id};
 ALTER ATTRIBUTE {closedsfdc.date} ADD KEYS {f_salesforce.dt_closedsfdc_id};
-SYNCHRONIZE {dataset.salesforce} PRESERVE DATA;
 
 INCLUDE TEMPLATE "URN:GOODDATA:DATE" MODIFY (IDENTIFIER "first", TITLE "first");
 INCLUDE TEMPLATE "URN:GOODDATA:DATE" MODIFY (IDENTIFIER "second", TITLE "second");
@@ -66,4 +65,4 @@ ALTER ATTRIBUTE {fourth.date} ADD KEYS {f_test.dt_fourth_id};
 ALTER ATTRIBUTE {fifth.date} ADD KEYS {f_test.dt_fifth_id};
 CREATE ATTRIBUTE {attr.test.factsof} VISUAL(TITLE "Records of test") AS KEYS {f_test.id} FULLSET;
 ALTER DATASET {dataset.test} ADD {attr.test.factsof};
-SYNCHRONIZE {dataset.test};
+SYNCHRONIZE {dataset.test}, {dataset.salesforce} PRESERVE DATA;
