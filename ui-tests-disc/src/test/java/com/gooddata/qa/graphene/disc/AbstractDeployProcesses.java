@@ -91,7 +91,7 @@ public abstract class AbstractDeployProcesses extends AbstractDISCTest {
             ProcessTypes processType) {
         checkDeployDialogMessageInProjectDetail(deployPackage, processType, true);
     }
-    
+
     protected void checkFailedDeployDialogMessageInProjectDetail(DeployPackages deployPackage,
             ProcessTypes processType) {
         checkDeployDialogMessageInProjectDetail(deployPackage, processType, false);
@@ -116,19 +116,8 @@ public abstract class AbstractDeployProcesses extends AbstractDISCTest {
         final String progressDialogMessage =
                 String.format(DEPLOY_PROGRESS_MESSAGE_IN_PROJECTS_PAGE, zipFileName, processName);
         waitForElementVisible(deployForm.getRoot());
-        deployForm.setDeployProcessInput(zipFilePath + zipFileName, processType, processName);
-        assertFalse(deployForm.inputFileHasError());
-        assertFalse(deployForm.inputProcessNameHasError());
-        Screenshots.takeScreenshot(browser, "input-fields-deploy-" + processName, getClass());
-        deployForm.getDeployConfirmButton().click();
-
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return progressDialogMessage.equals(deployForm.getDeployProcessDialog().getText());
-            }
-        });
+        deployForm.checkDeployProgress(zipFilePath + zipFileName, processType, processName,
+                progressDialogMessage);
 
         if (isSuccessful) {
             final String successfulDeployMessage =
@@ -165,19 +154,7 @@ public abstract class AbstractDeployProcesses extends AbstractDISCTest {
                 String.format(DEPLOY_PROGRESS_MESSAGE_IN_PROJECT_DETAIL_PAGE, zipFileName,
                         processName);
         waitForElementVisible(deployForm.getRoot());
-        deployForm.setDeployProcessInput(zipFilePath + zipFileName, processType, processName);
-        assertFalse(deployForm.inputFileHasError());
-        assertFalse(deployForm.inputProcessNameHasError());
-        deployForm.getDeployConfirmButton().click();
-
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return expectedProgressDialogMessage.equals(deployForm.getDeployProcessDialog()
-                        .getText());
-            }
-        });
+        deployForm.checkDeployProgress(zipFilePath + zipFileName, processType, processName, expectedProgressDialogMessage);
 
         if (!isSuccessful)
             return;

@@ -1,12 +1,16 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.graphene.findby.FindByJQuery;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -37,6 +41,26 @@ public class DeployForm extends AbstractFragment {
 
     @FindBy(css = "div.deploy-process-button-area button.button-positive")
     private WebElement deployConfirmButton;
+
+    public void checkDeployProgress(String zipFile, ProcessTypes processType, String processName,
+            final String progressDialogMessage) {
+        setDeployProcessInput(zipFile, processType, processName);
+        assertFalse(inputFileHasError());
+        assertFalse(inputProcessNameHasError());
+        getDeployConfirmButton().click();
+
+        try {
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return progressDialogMessage.equals(getDeployProcessDialog().getText());
+                }
+            });
+        } catch (NoSuchElementException e) {
+            System.out.println("WARNING: Cannot get deploy progress message!");
+        }
+    }
 
     public void deployProcess(String zipFile, ProcessTypes processType, String processName) {
         tryToDeployProcess(zipFile, processType, processName);
@@ -115,7 +139,7 @@ public class DeployForm extends AbstractFragment {
     }
 
     private WebElement getErrorBubble() {
-        return waitForElementVisible(BY_BUBBLE_ERROR,browser);
+        return waitForElementVisible(BY_BUBBLE_ERROR, browser);
     }
 
 }
