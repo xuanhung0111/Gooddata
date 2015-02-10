@@ -29,15 +29,17 @@ public class DashboardFilter extends AbstractFragment {
     @FindBy(xpath = "//span[text()='Variable']")
     private WebElement promptFilter;
 
-    private String selectedAttributeLocator = "div.attributes.sliding div.${attributeName}:not(gdc-hidden)";
+    private String selectedAttributeLocator =
+            "div.attributes.sliding div.${attributeName}:not(gdc-hidden)";
 
     private String attributeToAddLocator =
             "//div[contains(@class,'es_body')]/span[text()='${variableName}']";
 
     private String selectedPromptLocator =
             "//div[contains(@class, 'filter_prompts sliding')]//div[contains(@class,'${promptName}')]";
-    
-    private String addButton = "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']";
+
+    private String addButton =
+            "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']";
 
     @FindBy(xpath = "//div[contains(@class,'yui3-c-collectionwidget-content')]/div[contains(@class,'c-label')]/span")
     private List<WebElement> dateFilterList;
@@ -53,46 +55,46 @@ public class DashboardFilter extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']")
     private WebElement addTimeButton;
 
-    public void addListFilter(DashFilterTypes type, String name)
-	    throws InterruptedException {
-	if (type == DashFilterTypes.PROMPT) {
-	    waitForElementVisible(promptFilter).click();
-	    waitForElementVisible(lisPrompt);
-	    By selectedPrompt = By.xpath(selectedPromptLocator.replace(
-	    	"${promptName}", CssUtils.simplifyText(name)));
-	    waitForElementVisible(promptSearchInput).sendKeys(name);
-	    waitForElementVisible(selectedPrompt, browser).click();
+    public void addListFilter(DashFilterTypes type, String name) throws InterruptedException {
+        if (type == DashFilterTypes.PROMPT) {
+            waitForElementVisible(promptFilter).click();
+            waitForElementVisible(lisPrompt);
+            By selectedPrompt =
+                    By.xpath(selectedPromptLocator.replace("${promptName}",
+                            CssUtils.simplifyText(name)));
+            waitForElementVisible(promptSearchInput).sendKeys(name);
+            waitForElementVisible(selectedPrompt, browser).click();
 
-	} else {
-		By listOfAttribute = By.cssSelector(selectedAttributeLocator.replace(
-			"${attributeName}", "s-item-" + CssUtils.simplifyText(name)));
-	    waitForElementVisible(attributeSearchInput).sendKeys(name);
-	    waitForElementVisible(listOfAttribute, browser);
-	    By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", name));
-	    waitForElementVisible(attributeToAdd, browser).click();
-	}
-	waitForElementVisible(addFilterButton).click();
-	Thread.sleep(2000);
+        } else {
+            By listOfAttribute =
+                    By.cssSelector(selectedAttributeLocator.replace("${attributeName}", "s-item-"
+                            + CssUtils.simplifyText(name)));
+            waitForElementVisible(attributeSearchInput).sendKeys(name);
+            waitForElementVisible(listOfAttribute, browser);
+            By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", name));
+            waitForElementVisible(attributeToAdd, browser).click();
+        }
+        waitForElementVisible(addFilterButton).click();
+        Thread.sleep(2000);
     }
 
-    public void addTimeFilter(int dateDimensionIndex, String dataRange)
-	    throws InterruptedException {
-    if (browser.findElements(By.xpath(addButton)).size() > 0 && addTimeButton.isDisplayed()) {
-	    waitForElementVisible(yearOption).click();
-	    WebElement selectYear = browser.findElement(By
-		    .xpath(timeLineLocator.replace("${time}", dataRange)));
-	    waitForElementVisible(selectYear).click();
-	    waitForElementVisible(addTimeButton).click();
-	} else {
-		waitForElementVisible(dateFilterList.get(dateDimensionIndex)).click();
-	    waitForElementVisible(nextButton).click();
-	    waitForElementVisible(yearOption).click();
-	    WebElement selectYear = browser.findElement(By
-		    .xpath(timeLineLocator.replace("${time}", dataRange)));
-	    waitForElementVisible(selectYear).click();
-	    waitForElementVisible(addTimeButton).click();
-	}
-	Thread.sleep(2000);
+    public void addTimeFilter(int dateDimensionIndex, String dataRange) throws InterruptedException {
+        if (browser.findElements(By.xpath(addButton)).size() > 0 && addTimeButton.isDisplayed()) {
+            waitForElementVisible(yearOption).click();
+            WebElement selectYear =
+                    browser.findElement(By.xpath(timeLineLocator.replace("${time}", dataRange)));
+            waitForElementVisible(selectYear).click();
+            waitForElementVisible(addTimeButton).click();
+        } else {
+            waitForElementVisible(dateFilterList.get(dateDimensionIndex)).click();
+            waitForElementVisible(nextButton).click();
+            waitForElementVisible(yearOption).click();
+            WebElement selectYear =
+                    browser.findElement(By.xpath(timeLineLocator.replace("${time}", dataRange)));
+            waitForElementVisible(selectYear).click();
+            waitForElementVisible(addTimeButton).click();
+        }
+        Thread.sleep(2000);
     }
 
 }
