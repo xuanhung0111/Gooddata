@@ -37,13 +37,16 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
 
     private AttributeVariable initAttributeVariable() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
-        return new AttributeVariable("Test variable" + System.currentTimeMillis())
+        name = "Test variable" + System.currentTimeMillis();
+        return new AttributeVariable(name)
                         .withAttribute("Stage Name")
                         .withAttributeElements("Interest", "Discovery");
     }
 
     @Override
     public void initObject(String variableName) {
+        description = "Test description";
+        tagName = "var";
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         variablePage.openVariableFromList(variableName);
     }

@@ -100,7 +100,7 @@ public class VariableDetailPage extends AbstractFragment {
             "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
 
     private static final String listOfElementLocator =
-            "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-checkBox') and contains(@class,'s-item-${label}')]";
+            "div.yui3-c-simpleColumn-underlay > div.c-checkBox.s-item-${label}:not(.gdc-hidden)";
 
     private static final String attributeToAddLocator = "//span[text()='${variableName}']";
 
@@ -149,7 +149,7 @@ public class VariableDetailPage extends AbstractFragment {
             waitForElementVisible(searchAttributeElement).clear();
             searchAttributeElement.sendKeys(ele);
             listOfElement =
-                    By.xpath(listOfElementLocator.replace("${label}", CssUtils.simplifyText(ele)));
+                    By.cssSelector(listOfElementLocator.replace("${label}", CssUtils.simplifyText(ele)));
             waitForElementVisible(listOfElement, browser).click();
         }
         waitForElementVisible(setButton).click();
