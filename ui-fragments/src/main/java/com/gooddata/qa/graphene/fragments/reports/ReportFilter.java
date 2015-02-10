@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -19,6 +20,7 @@ import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
@@ -91,9 +93,6 @@ public class ReportFilter extends AbstractFragment {
 
     @FindBy(xpath = "//div[@id='gridContainerTab']")
     private TableReport report;
-
-    @FindBy(xpath = "//div[@id='reportContainerTab' and contains(@class, 'processingReport')]")
-    private WebElement reportProcessing;
 
     private String listOfElementLocator = 
             "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
@@ -247,7 +246,14 @@ public class ReportFilter extends AbstractFragment {
     }
 
     public void waitForReportRendered() {
-        waitForElementVisible(reportProcessing);
-        waitForElementNotVisible(reportProcessing);
+        final WebElement reportContainer = waitForElementVisible(By.cssSelector("div#reportContainerTab"), browser);
+        if (reportContainer.getAttribute("class").contains("processingReport")) {
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+                @Override
+                public boolean apply(WebDriver browser) {
+                    return !reportContainer.getAttribute("class").contains("processingReport");
+                }
+            });
+        }
     }
 }

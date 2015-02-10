@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -51,7 +52,11 @@ public class SelectItemPopupPanel extends AbstractFragment {
         searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
         waitForCollectionIsEmpty(items);
 
-        searchInput.clear();
+        // Sometimes clear() does nothing, so using hot keys instead
+        searchInput.sendKeys(Keys.BACK_SPACE);
+        searchInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        searchInput.sendKeys(Keys.DELETE);
+
         searchInput.sendKeys(searchText);
         waitForCollectionIsNotEmpty(items);
     }

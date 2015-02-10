@@ -10,6 +10,7 @@ import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
@@ -56,6 +57,9 @@ public class FailureLoggingListener extends TestListenerAdapter {
             File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             FileUtils.copyFile(scrFile, imageOutputFile);
 
+        } catch(WebDriverException e) {
+            System.out.println("Unable to take screenshot of the page, see the error below");
+            e.printStackTrace();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
