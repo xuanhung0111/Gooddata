@@ -71,6 +71,7 @@ public class ScheduleDetail extends ScheduleForm {
     private static final By BY_RUN_STOP_BUTTON = By
             .xpath("//div[contains(@class, 'ait-schedule-title-section')]//button[1]");
     private static final By BY_OK_GROUP_EXPAND_BUTTON = By.cssSelector(".icon-navigatedown");
+    private static final By BY_PARAMETERS_EDIT_SECTION = By.cssSelector(".parameters-section.modified");
 
     @FindBy(css = ".ait-schedule-title-section-heading")
     private WebElement scheduleTitle;
@@ -457,6 +458,7 @@ public class ScheduleDetail extends ScheduleForm {
             waitForElementVisible(saveChangedParameterButton).click();
         else
             waitForElementVisible(cancelChangedParameterButton).click();
+        waitForElementNotPresent(BY_PARAMETERS_EDIT_SECTION);
     }
 
     public void addNewParams(List<Parameter> newParams, Confirmation saveChange) {

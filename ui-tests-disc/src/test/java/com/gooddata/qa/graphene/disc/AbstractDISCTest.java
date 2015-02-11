@@ -88,6 +88,7 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
             String redeployProcessName, ScheduleBuilder... schedules) {
         waitForElementVisible(projectDetailPage.getRoot());
         projectDetailPage.clickOnRedeployButton(processName);
+        waitForElementVisible(deployForm.getRoot());
         deployForm.redeployProcess(zipFilePath + redeployPackage.getPackageName(),
                 redeployPackage.getPackageType(), redeployProcessName);
         waitForElementNotPresent(deployForm.getRoot());

@@ -4,27 +4,22 @@ import com.gooddata.qa.graphene.disc.dto.Processes;
 import com.gooddata.qa.graphene.disc.dto.Process;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
-import com.google.common.base.Predicate;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.eclipse.sisu.bean.IgnoreSetters;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.WebDriver;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class DataloadSchedulesTests extends AbstractSchedulesTests {
 
@@ -34,18 +29,22 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
     private final int STATUS_POLLING_CHECK_ITERATIONS = 60;
 
     @BeforeClass
-    public void setUp() {
+    public void initProperties() {
         projectTitle = "Disc-test-dataload-schedule";
-        createDataloadProcessIfDoesntExist();
-        createDatasets();
     }
 
     @AfterClass
     public void tearDown() {
         deleteDataloadProcess();
     }
+    
+    @Test(dependsOnMethods = {"createProject"})
+    public void setUp() {
+        createDataloadProcessIfDoesntExist();
+        createDatasets();
+    }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule", "tests"})
+    @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests"})
     public void createDataloadScheduleWithAllDatasets() throws JSONException, InterruptedException {
         openProjectDetailPage(getWorkingProject());
 
@@ -58,7 +57,7 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
         createAndAssertSchedule(scheduleBuilder);
     }
 
-    @Test(dependsOnMethods = {"createProject", "createDataloadScheduleWithAllDatasets"}, groups = {"schedule", "tests"})
+    @Test(dependsOnMethods = {"setUp", "createDataloadScheduleWithAllDatasets"}, groups = {"schedule", "tests"})
     public void createDataloadScheduleWithCustomDatasets() throws JSONException, InterruptedException {
         openProjectDetailPage(getWorkingProject());
 
@@ -104,7 +103,7 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
         }
 
         try {
-            String maql = IOUtils.toString(getClass().getResource("/create-datasets.txt"));
+            String maql = IOUtils.toString(getClass().getResource("create-datasets.txt"));
             postMAQL(maql, STATUS_POLLING_CHECK_ITERATIONS);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to create datasets", e);
