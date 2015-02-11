@@ -1,17 +1,13 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.graphene.findby.FindByJQuery;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
-
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -48,15 +44,8 @@ public class DeployForm extends AbstractFragment {
         assertFalse(inputFileHasError());
         assertFalse(inputProcessNameHasError());
         getDeployConfirmButton().click();
-
         try {
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return progressDialogMessage.equals(getDeployProcessDialog().getText());
-                }
-            });
+            assertEquals(getDeployProcessDialog().getText(), progressDialogMessage);
         } catch (NoSuchElementException e) {
             System.out.println("WARNING: Cannot get deploy progress message!");
         }

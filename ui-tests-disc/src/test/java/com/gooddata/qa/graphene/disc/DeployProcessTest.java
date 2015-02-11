@@ -205,13 +205,12 @@ public class DeployProcessTest extends AbstractDeployProcesses {
             cleanProcessesInWorkingProject();
         }
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkFailedDeployMessageInProjectDetail() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
-            checkFailedDeployDialogMessageInProjectDetail(DeployPackages.BASIC,
-                    ProcessTypes.RUBY);
+            checkFailedDeployDialogMessageInProjectDetail(DeployPackages.BASIC, ProcessTypes.RUBY);
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -229,8 +228,12 @@ public class DeployProcessTest extends AbstractDeployProcesses {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkFailedDeployMessageInProjectsPage() {
-        checkFailedDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
-                ProcessTypes.RUBY);
+        try {
+            checkFailedDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
+                    ProcessTypes.RUBY);
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
     }
 
 }

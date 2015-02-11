@@ -17,6 +17,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -102,7 +103,7 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
         }
 
         try {
-            String maql = IOUtils.toString(getClass().getResource(System.getProperty("file.separator") + "create-datasets.txt"));
+            String maql = IOUtils.toString(getClass().getResource("create-datasets.txt"));
             postMAQL(maql, STATUS_POLLING_CHECK_ITERATIONS);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to create datasets", e);
