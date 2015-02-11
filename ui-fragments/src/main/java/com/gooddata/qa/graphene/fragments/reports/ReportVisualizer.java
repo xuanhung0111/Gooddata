@@ -51,9 +51,6 @@ public class ReportVisualizer extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class, 'reportEditorFilterArea')]/button")
     private WebElement filterButton;
 
-    @FindBy(xpath = "//form[@class='sndFooterForm']/button[text()='Done']")
-    private WebElement doneButton;
-
     @FindBy(xpath = "//label[@class='sndMetricFilterLabel']/../input")
     private WebElement metricFilterInput;
 
@@ -189,7 +186,7 @@ public class ReportVisualizer extends AbstractFragment {
     }
 
     public void finishReportChanges() {
-        waitForElementVisible(doneButton).click();
+        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser).click();
     }
 
     public void selectReportVisualisation(ReportTypes reportVisualizationType) {
