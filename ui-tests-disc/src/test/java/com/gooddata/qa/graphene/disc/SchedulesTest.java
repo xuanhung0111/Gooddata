@@ -544,7 +544,7 @@ public class SchedulesTest extends AbstractSchedulesTests {
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.checkRescheduleMessageAndDefault();
-            scheduleDetail.addValidRetry("15", Confirmation.CANCEL_CHANGES);;
+            scheduleDetail.addValidRetry("15", Confirmation.CANCEL_CHANGES);
         } finally {
             cleanProcessesInWorkingProject();
         }

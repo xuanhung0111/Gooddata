@@ -6,6 +6,7 @@ import static org.testng.Assert.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -86,6 +87,7 @@ public class OverviewProjects extends AbstractFragment {
     private By BY_OVERVIEW_PROJECT_SCHEDULE_LINK = By
             .cssSelector(".overview-project-cell-schedule-name a");
     private By BY_OVERVIEW_PROJECT_SCHEDULE_NAME = By.cssSelector(".title");
+    private By BY_OVERVIEW_PROJECT_SCHEDULE_GRAPH_NAME = By.cssSelector(".label");
     private By BY_OVERVIEW_PROJECT_SCHEDULE_ITEM = By
             .cssSelector(".overview-schedule-list .overview-schedule-item");
     private By BY_OVERVIEW_PROCESS_TITLE = By.cssSelector(".process-title");
@@ -213,13 +215,19 @@ public class OverviewProjects extends AbstractFragment {
         return overviewProjects.size();
     }
 
-    public void assertOverviewScheduleName(OverviewProjectStates overviewState,
-            ProjectInfo projectInfo, String scheduleUrl, String scheduleName) {
+    public void assertOverviewCustomScheduleName(OverviewProjectStates overviewState,
+                                                 ProjectInfo projectInfo, ScheduleBuilder scheduleBuilder) {
+        String scheduleUrl = scheduleBuilder.getScheduleUrl();
         String overviewScheduleLink = scheduleUrl.substring(scheduleUrl.indexOf("#"));
-        String overviewScheduleName =
-                getOverviewScheduleName(overviewState, projectInfo, overviewScheduleLink)
-                        .findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText();
-        assertEquals(overviewScheduleName, scheduleName);
+
+        WebElement scheduleWrapper = getOverviewScheduleName(overviewState, projectInfo, overviewScheduleLink);
+
+        String overviewScheduleName = scheduleWrapper.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText();
+        String overviewScheduleGraphName = scheduleWrapper
+                .findElement(BY_OVERVIEW_PROJECT_SCHEDULE_GRAPH_NAME).getText();
+
+        assertEquals(overviewScheduleName, scheduleBuilder.getScheduleName());
+        assertEquals(overviewScheduleGraphName, scheduleBuilder.getExecutable().getExecutablePath());
     }
 
     private void assertProjectInfoWithOnlyOneSchedule(OverviewProjectStates projectState,
