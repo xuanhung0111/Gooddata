@@ -5,11 +5,15 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
@@ -50,9 +54,6 @@ public class ObjectPropertiesPage extends AbstractFragment {
     @FindBy(xpath = "//button[contains(@class, 's-btn-change_folder')]")
     private WebElement changeFolderButton;
 
-    @FindBy(xpath = "//span[contains(@class,'loadingWheel') and not(contains(@class,'hidden'))]")
-    private WebElement loadingWheelFolder;
-
     @FindBy(xpath = "//p[@class = 'folderText']/a")
     private WebElement locatedInFolder;
 
@@ -62,14 +63,32 @@ public class ObjectPropertiesPage extends AbstractFragment {
     private final String folderLocator =
             "//div[@class = 'autocompletion']/div[@class = 'suggestions']/ul/li[text() = '${folder}']";
 
-    public void changeObjectFolder(String newFolderName) {
+    public void changeObjectFolder(final String newFolderName) {
         waitForElementVisible(changeFolderButton).click();
         By objectFolder = By.xpath(folderLocator.replace("${folder}", newFolderName));
         waitForElementVisible(objectFolder, browser).click();
-        waitForElementVisible(loadingWheelFolder);
-        waitForElementNotPresent(loadingWheelFolder);
-        assertEquals(locatedInFolder.getText(), newFolderName,
-                "Change folder doesn't work properly");
+
+        final WebElement loadingWheelFolder = waitForElementPresent(By.cssSelector("span.loadingWheel"), browser);
+        if (!loadingWheelFolder.getAttribute("class").contains("hidden")) {
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+                @Override
+                public boolean apply(WebDriver browser) {
+                    return loadingWheelFolder.getAttribute("class").contains("hidden");
+                }
+            });
+        }
+
+        try {
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+                @Override
+                public boolean apply(WebDriver browser) {
+                    return newFolderName.equals(locatedInFolder.getText());
+                }
+            });
+        } catch (TimeoutException e) {
+            System.out.println("Change folder doesn't work properly");
+            throw e;
+        }
     }
 
     public String changeObjectName(String newObjectName) {
