@@ -66,8 +66,7 @@ public abstract class AbstractSchedulesTests extends AbstractDISCTest {
             waitForElementVisible(discOverview.getRoot());
             discOverview.selectOverviewState(overviewState);
             waitForElementVisible(discOverviewProjects.getRoot());
-            discOverviewProjects.assertOverviewScheduleName(overviewState, getWorkingProject(),
-                    scheduleBuilder.getScheduleUrl(), scheduleName);
+            discOverviewProjects.assertOverviewCustomScheduleName(overviewState, getWorkingProject(), scheduleBuilder);
         } finally {
             cleanProcessesInWorkingProject();
         }
