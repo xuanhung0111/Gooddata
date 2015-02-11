@@ -16,8 +16,6 @@ import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class FactDetailPage extends AbstractFragment {
-    @FindBy(xpath = "//table[@class = 'factAggregations']")
-    private WebElement factAggregationTable;
 
     @FindBy(id = "objectUsedInContainer")
     private WebElement objectUsedInContainer;
@@ -73,7 +71,6 @@ public class FactDetailPage extends AbstractFragment {
 
     public void changeFactFolder(String newFolderName) {
         waitForObjectPageLoaded(browser);
-        waitForElementVisible(factAggregationTable);
         objectPropertiesPage.changeObjectFolder(newFolderName);
     }
 }
