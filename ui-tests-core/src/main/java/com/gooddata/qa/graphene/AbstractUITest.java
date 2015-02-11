@@ -356,7 +356,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         initProjectsPage();
         initDashboardsPage();
         initUploadPage();
-        waitForElementVisible(upload.getRoot());
         upload.uploadFile(filePath);
         Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());
         UploadColumns uploadColumns = upload.getUploadColumns();
