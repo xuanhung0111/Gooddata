@@ -96,7 +96,7 @@ public abstract class AbstractSchedulesTests extends AbstractDISCTest {
                 .setCronTime(ScheduleCronTimes.AFTER)
                 .setTriggerScheduleGroup(triggerScheduleProcess)
                 .setTriggerScheduleOption(
-                        triggerScheduleBuilder.getExecutable().getExecutablePath());
+                        triggerScheduleBuilder.getScheduleName());
         createAndAssertSchedule(dependentScheduleBuilder);
         dependentScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
     }
