@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -186,7 +187,7 @@ public class ReportVisualizer extends AbstractFragment {
     }
 
     public void finishReportChanges() {
-        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser).click();
+        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser).sendKeys(Keys.ENTER);
     }
 
     public void selectReportVisualisation(ReportTypes reportVisualizationType) {
