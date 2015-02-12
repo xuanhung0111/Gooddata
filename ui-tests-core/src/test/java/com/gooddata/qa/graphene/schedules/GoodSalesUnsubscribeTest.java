@@ -7,6 +7,9 @@ import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
+import org.apache.commons.lang3.ArrayUtils;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -14,10 +17,8 @@ import javax.mail.Message;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import org.apache.commons.lang3.ArrayUtils;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -102,7 +103,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     public void verifySuccesOfUnsubscribe() throws Exception {
         initEmailSchedulesPage();
         String unsubscribed = emailSchedulesPage.getUnsubscribed(reportTitle);
-        assertTrue(unsubscribed.contains(testParams.getUser()), "The 'To' user is in the list of unsubscribed users. Expected '" + testParams.getUser() + "', found '" + unsubscribed + "'.");
+        assertTrue(unsubscribed.contains(imapUser), "The 'To' email is in the list of unsubscribed users. Expected '" + imapUser + "', found '" + unsubscribed + "'.");
         assertTrue(unsubscribed.contains(getBccEmail()), "The 'Bcc' user is in the list of unsubscribed users. Expected '" + getBccEmail() + "', found '" + unsubscribed + "'.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-unsubscribed", this.getClass());
     }
@@ -156,6 +157,6 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     }
 
     private String getBccEmail() {
-        return testParams.getUser().replace("@", "+bcc@");
+        return imapUser.replace("@", "+bcc@");
     }
 }
