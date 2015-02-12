@@ -353,9 +353,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType, String screenshotName) throws InterruptedException {
-    	openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-    	waitForDashboardPageLoaded(browser);
-    	openUrl(PAGE_UPLOAD);
+        initProjectsPage();
+        initDashboardsPage();
+        initUploadPage();
         waitForElementVisible(upload.getRoot());
         upload.uploadFile(filePath);
         Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());
@@ -392,5 +392,21 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initAnalysePage() {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
         waitForFragmentVisible(analysisPage);
+    }
+    
+    public void initVariablePage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        waitForDataPageLoaded(browser);
+    }
+    
+    public void initProjectsPage() {
+        openUrl(PAGE_PROJECTS);
+        waitForProjectsPageLoaded(browser);
+        waitForElementVisible(projectsPage.getRoot());
+    }
+    
+    public void initUploadPage() {
+        openUrl(PAGE_UPLOAD);
+        waitForElementVisible(upload.getRoot());
     }
 }
