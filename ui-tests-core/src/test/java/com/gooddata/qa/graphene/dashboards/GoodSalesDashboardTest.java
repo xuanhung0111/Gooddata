@@ -26,6 +26,8 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(dashboardsPage.getRoot());
+        dashboardsPage.selectDashboard("Pipeline Analysis");
+        waitForDashboardPageLoaded(browser);
         exportedDashboardName = dashboardsPage.exportDashboardTab(0);
         checkRedBar(browser);
     }
