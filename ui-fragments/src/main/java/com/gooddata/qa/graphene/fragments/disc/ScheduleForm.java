@@ -177,7 +177,7 @@ public class ScheduleForm extends AbstractFragment {
                 return selectTriggerSchedule.findElement(By
                         .xpath(XPATH_SELECT_SCHEDULE_TRIGGER_OPTION.replace("${optionGroup}",
                                 scheduleOption.getProcessName()).replace("${option}",
-                                scheduleOption.getExecutable().getExecutablePath()))) != null;
+                                scheduleOption.getScheduleName()))) != null;
             }
         }));
         browser.navigate().refresh();
