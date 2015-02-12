@@ -9,10 +9,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import java.util.ArrayList;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForEmailSchedulePageLoaded;
 
 public class EmailSchedulePage extends AbstractFragment {
 
@@ -58,7 +62,7 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = "#unsubscribeTooltip span.info")
     private WebElement unsubscribeTooltip;
 
-    @FindBy(css = "#unsubscribeTooltip div.bubble-primary .bubble-content .content")
+    @FindBy(xpath = "//div[@id='gd-overlays']//div[contains(@class,'bubble-primary')]//div[contains(@class,'bubble-content')]//div[contains(@class,'content')]")
     private WebElement unsubscribedTooltipAddresses;
 
     @FindBy(css = ".timeScheduler .description")
@@ -114,7 +118,9 @@ public class EmailSchedulePage extends AbstractFragment {
     public String getUnsubscribed(String scheduleName) {
         openSchedule(scheduleName);
         waitForElementPresent(unsubscribeTooltip).click();
-        return unsubscribedTooltipAddresses.getText();
+        String unsubscribed = unsubscribedTooltipAddresses.getText();
+        System.out.println("Unsubscribed: " + unsubscribed);
+        return unsubscribed;
     }
 
     public String getNoSchedulesMessage() {
