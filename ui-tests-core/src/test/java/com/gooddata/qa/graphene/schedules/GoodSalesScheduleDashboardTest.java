@@ -7,14 +7,8 @@ import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-
-import java.util.*;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
@@ -23,6 +17,16 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -41,14 +45,23 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     // login with defined user role, fail test on error
-    // TODO: why not login via grey pages?
     private void loginAs(UserRoles userRole) throws JSONException {
         logout();
-        signIn(false, userRole);
+        signIn(true, userRole); // login with gray pages to reload application and have feature flag set
+    }
+
+    @Test(dependsOnMethods =  {"verifyEmptySchedules"}, groups = {"schedules"})
+    public void setFeatureFlags () throws JSONException, IOException {
+        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
+                FeatureFlagOption.createFeatureClassOption("dashboardSchedule", true)
+        );
+        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
+                FeatureFlagOption.createFeatureClassOption("dashboardScheduleRecipients", true)
+        );
     }
 
     // prepare viewer user and login
-    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"setFeatureFlags"}, groups = {"schedules"})
     public void createDashboardSchedule () throws JSONException {
         loginAs(UserRoles.VIEWER);
         initDashboardsPage();
