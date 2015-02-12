@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -9,8 +11,6 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardFilter extends AbstractFragment {
 
@@ -30,10 +30,7 @@ public class DashboardFilter extends AbstractFragment {
     private WebElement promptFilter;
 
     private String selectedAttributeLocator =
-            "div.attributes.sliding div.${attributeName}:not(gdc-hidden)";
-
-    private String attributeToAddLocator =
-            "//div[contains(@class,'es_body')]/span[text()='${variableName}']";
+            "div.attributes.sliding div.${attributeName}:not(.gdc-hidden):not(.hidden)";
 
     private String selectedPromptLocator =
             "//div[contains(@class, 'filter_prompts sliding')]//div[contains(@class,'${promptName}')]";
@@ -59,20 +56,14 @@ public class DashboardFilter extends AbstractFragment {
         if (type == DashFilterTypes.PROMPT) {
             waitForElementVisible(promptFilter).click();
             waitForElementVisible(lisPrompt);
-            By selectedPrompt =
-                    By.xpath(selectedPromptLocator.replace("${promptName}",
-                            CssUtils.simplifyText(name)));
+            By selectedPrompt = By.xpath(selectedPromptLocator.replace("${promptName}", CssUtils.simplifyText(name)));
             waitForElementVisible(promptSearchInput).sendKeys(name);
             waitForElementVisible(selectedPrompt, browser).click();
-
         } else {
-            By listOfAttribute =
-                    By.cssSelector(selectedAttributeLocator.replace("${attributeName}", "s-item-"
-                            + CssUtils.simplifyText(name)));
+            By attributeToAddLocator = By.cssSelector(selectedAttributeLocator.replace(
+                    "${attributeName}", "s-item-" + CssUtils.simplifyText(name)));
             waitForElementVisible(attributeSearchInput).sendKeys(name);
-            waitForElementVisible(listOfAttribute, browser);
-            By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", name));
-            waitForElementVisible(attributeToAdd, browser).click();
+            waitForElementVisible(attributeToAddLocator, browser).click();
         }
         waitForElementVisible(addFilterButton).click();
         Thread.sleep(2000);

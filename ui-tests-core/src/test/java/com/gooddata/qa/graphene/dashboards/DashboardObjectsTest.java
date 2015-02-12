@@ -20,7 +20,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     private static final long expectedDashboardExportSize = 65000L;
 
     @BeforeClass
-    public void initStartPage() {
+    public void setProjectTitle() {
         projectTitle = "SimpleProject-test-dashboard-objects";
     }
 
@@ -32,7 +32,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"uploadDataTest"})
     public void createvariableTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        initVariablePage();
         variablePage.createVariable(new AttributeVariable(variableName)
                 .withAttribute("Education")
                 .withAttributeElements("Bachelors Degree", "Graduate Degree"));
@@ -40,7 +40,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"uploadDataTest"})
     public void changeStateLabelTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        initAttributePage();
         attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
     }
 
