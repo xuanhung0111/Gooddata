@@ -92,6 +92,7 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
         deployForm.redeployProcess(zipFilePath + redeployPackage.getPackageName(),
                 redeployPackage.getPackageType(), redeployProcessName);
         waitForElementNotPresent(deployForm.getRoot());
+        assertFalse(projectDetailPage.isErrorDialogVisible());
         projectDetailPage.checkFocusedProcess(redeployProcessName);
         projectDetailPage
                 .assertActiveProcessInList(redeployProcessName, redeployPackage, schedules);
