@@ -124,7 +124,7 @@ public class DashboardEditFilter extends AbstractFragment{
         return Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
                 waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
     }
-    
+
     /**
      * add some parent filters for a filter
      * 

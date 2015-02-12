@@ -15,5 +15,4 @@ public enum DashFilterTypes {
         return label;
     }
 
-
 }

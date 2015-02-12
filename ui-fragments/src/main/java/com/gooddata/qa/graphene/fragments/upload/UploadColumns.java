@@ -69,7 +69,8 @@ public class UploadColumns extends AbstractFragment {
     }
 
     public String getColumnType(int columnIndex) {
-        return getColumnWebElement(columnIndex).findElement(BY_SELECT).findElement(BY_SELECTED_OPTION).getText();
+        return getColumnWebElement(columnIndex).findElement(BY_SELECT)
+                .findElement(BY_SELECTED_OPTION).getText();
     }
 
     public List<String> getColumnNames() {
@@ -88,20 +89,23 @@ public class UploadColumns extends AbstractFragment {
         return columnTypes;
     }
 
-	public void assertColumnsType(List<Integer> columnIndexes, List<String> dataTypes) throws InterruptedException {
-		int index = 0;
-		for(int columnIndex : columnIndexes) {
-			String dataType = dataTypes.get(index);
-			assertEquals(getColumnType(columnIndex), OptionDataType.valueOf(dataType).getOptionLabel());
-			index++;
-		}
-	}
+    public void assertColumnsType(List<Integer> columnIndexes, List<String> dataTypes)
+            throws InterruptedException {
+        int index = 0;
+        for (int columnIndex : columnIndexes) {
+            String dataType = dataTypes.get(index);
+            assertEquals(getColumnType(columnIndex), OptionDataType.valueOf(dataType)
+                    .getOptionLabel());
+            index++;
+        }
+    }
 
-	public void assertColumnsName(List<Integer> columnIndexes, List<String> columnNames) throws InterruptedException {
-		int index = 0;
-		for(int columnIndex : columnIndexes) {
-			assertEquals(getColumnName(columnIndex), columnNames.get(index));
-			index++;
-		}
-	}
+    public void assertColumnsName(List<Integer> columnIndexes, List<String> columnNames)
+            throws InterruptedException {
+        int index = 0;
+        for (int columnIndex : columnIndexes) {
+            assertEquals(getColumnName(columnIndex), columnNames.get(index));
+            index++;
+        }
+    }
 }

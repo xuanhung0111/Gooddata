@@ -22,14 +22,13 @@ public class ConfigureSFDCCredentials extends AbstractGreyPagesFragment {
     @FindBy(xpath = "div[@class='submit']/input")
     private WebElement setCredentialsButton;
 
-    public void setSFDCCredentials(String key, String secret)
-	    throws JSONException {
-	waitForElementVisible(keyField).sendKeys(key);
-	waitForElementVisible(secretField).sendKeys(secret);
-	Graphene.guardHttp(setCredentialsButton).click();
-	JSONObject json = loadJSON();
-	Assert.assertTrue(json.getJSONObject("credential").getString("key")
-		.equals(key), "SFDC credentials is NOT created properly!");
+    public void setSFDCCredentials(String key, String secret) throws JSONException {
+        waitForElementVisible(keyField).sendKeys(key);
+        waitForElementVisible(secretField).sendKeys(secret);
+        Graphene.guardHttp(setCredentialsButton).click();
+        JSONObject json = loadJSON();
+        Assert.assertTrue(json.getJSONObject("credential").getString("key").equals(key),
+                "SFDC credentials is NOT created properly!");
     }
 
 }

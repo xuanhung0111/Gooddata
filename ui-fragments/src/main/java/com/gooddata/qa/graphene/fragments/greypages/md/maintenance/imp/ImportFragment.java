@@ -24,6 +24,7 @@ public class ImportFragment extends AbstractGreyPagesFragment {
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         return waitForPollState("OK", checkIterations);
     }
+
     @Override
     protected String getPollState() throws JSONException {
         return loadJSON().getJSONObject("taskState").getString("status");

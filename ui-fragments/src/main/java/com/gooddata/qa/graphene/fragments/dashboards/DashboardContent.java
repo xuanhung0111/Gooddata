@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardContent extends AbstractFragment {
+
     @FindBy(css = ".c-projectdashboard-items .yui3-c-reportdashboardwidget")
     private List<WebElement> reports;
 
@@ -49,7 +50,7 @@ public class DashboardContent extends AbstractFragment {
         By eleBy =  By.xpath(REPORT_IMAGE_LOCATOR.replace("${reportName}", CssUtils.simplifyText(reportName)));
         return waitForElementVisible(eleBy, browser);
      }
-    
+
     public TableReport getTableReport(String reportName) {
         return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(this.getRoot().findElement(

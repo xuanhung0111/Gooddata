@@ -21,7 +21,6 @@ public class StorageFragment extends AbstractDatawarehouseFragment {
     @FindBy
     private WebElement authorizationToken;
 
-
     @FindBy(xpath = "div[@class='submit']/input")
     private WebElement submit;
 

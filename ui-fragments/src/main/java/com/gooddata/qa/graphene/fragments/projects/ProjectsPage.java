@@ -13,7 +13,7 @@ public class ProjectsPage extends AbstractFragment {
 
     @FindBy(xpath = "//ul[@id='myProjects']/li")
     private List<WebElement> projects;
-    
+
     @FindBy(xpath = "//ul[@id='demoProjects']/li")
     private List<WebElement> demoProjects;
 
@@ -22,9 +22,9 @@ public class ProjectsPage extends AbstractFragment {
     public List<WebElement> getProjectsElements() {
         return projects;
     }
-    
+
     public List<WebElement> getDemoProjectsElements() {
-    	return demoProjects;
+        return demoProjects;
     }
 
     public List<String> getProjectsIds() {
@@ -36,7 +36,9 @@ public class ProjectsPage extends AbstractFragment {
         boolean filter = projectSubstringFilter != null && projectSubstringFilter.length() > 0;
         for (WebElement elem : projects) {
             if (filter) {
-                if (!elem.findElement(BY_SPAN_PROJECT_TITLE).getText().contains(projectSubstringFilter)) continue;
+                if (!elem.findElement(BY_SPAN_PROJECT_TITLE).getText()
+                        .contains(projectSubstringFilter))
+                    continue;
             }
             String gdcLink = elem.getAttribute("gdc:link");
             projectIds.add(gdcLink.substring(gdcLink.lastIndexOf("/") + 1));

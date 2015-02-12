@@ -18,6 +18,7 @@ import com.google.common.base.Predicate;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class ObjectPropertiesPage extends AbstractFragment {
+
     @FindBy(css = ".s-name")
     private WebElement objectNameIpe;
 

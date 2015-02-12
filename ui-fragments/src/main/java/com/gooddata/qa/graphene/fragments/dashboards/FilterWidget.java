@@ -107,7 +107,7 @@ public class FilterWidget extends AbstractFragment {
 
         @FindBy(css = ".s-afp-input")
         private WebElement search;
-        
+
         @FindBy(css = "div.yui3-c-simpleColumn-underlay label.ellipsisEnabled")
         private List<WebElement> listAttrValues;
 
