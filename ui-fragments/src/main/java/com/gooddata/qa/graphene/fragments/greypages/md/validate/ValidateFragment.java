@@ -46,9 +46,7 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
         waitForElementNotPresent(BY_GP_PRE_JSON);
         return waitForElementVisible(By.xpath(LOCATOR_SPAN_STATUS), browser).getText();
-
     }
-
 
     public String validateOnly(Validation... data) {
         uncheckAll();

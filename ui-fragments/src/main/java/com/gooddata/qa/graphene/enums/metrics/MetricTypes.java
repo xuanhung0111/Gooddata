@@ -78,7 +78,7 @@ public enum MetricTypes {
     public String getLabel() {
         return label;
     }
-    
+
     public int getParametersCount() {
         return parametersCount;
     }

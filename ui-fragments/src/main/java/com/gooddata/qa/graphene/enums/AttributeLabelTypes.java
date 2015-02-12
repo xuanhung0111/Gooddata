@@ -23,16 +23,16 @@ public enum AttributeLabelTypes {
     private boolean geoLabel;
 
     private AttributeLabelTypes(String label, boolean geoLabel) {
-	this.label = label;
-	this.geoLabel = geoLabel;
+        this.label = label;
+        this.geoLabel = geoLabel;
     }
 
     public String getlabel() {
-	return label;
+        return label;
     }
-    
+
     public boolean isGeoLabel() {
-	return geoLabel;
+        return geoLabel;
     }
-    
+
 }

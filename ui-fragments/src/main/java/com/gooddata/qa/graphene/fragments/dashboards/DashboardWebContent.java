@@ -23,6 +23,5 @@ public class DashboardWebContent extends AbstractFragment {
         waitForElementVisible(saveWebContentButton).click();
         waitForElementNotVisible(saveWebContentButton);
         Thread.sleep(2000);
-
     }
 }

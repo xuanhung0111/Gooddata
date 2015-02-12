@@ -7,11 +7,11 @@ public enum VariableTypes {
     private final String label;
 
     private VariableTypes(String label) {
-	this.label = label;
+        this.label = label;
     }
 
     public String getlabel() {
-	return label;
+        return label;
     }
 
 }

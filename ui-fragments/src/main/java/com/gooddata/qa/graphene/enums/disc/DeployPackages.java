@@ -44,7 +44,6 @@ public enum DeployPackages {
         return this.rootFolder;
     }
 
-
     public ProcessTypes getPackageType() {
         return packageType;
     }

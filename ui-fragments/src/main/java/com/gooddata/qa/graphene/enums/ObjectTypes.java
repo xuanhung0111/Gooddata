@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.enums;
 
-
 public enum ObjectTypes {
 
     FACT("fact", "factsTable", "factsMenuItem"),
@@ -11,7 +10,7 @@ public enum ObjectTypes {
     private final String name;
 
     private final String objectsTableID;
-    
+
     private final String menuItem;
 
     private ObjectTypes(String name, String id, String menuItem) {
@@ -27,8 +26,8 @@ public enum ObjectTypes {
     public String getObjectsTableID() {
         return objectsTableID;
     }
-    
+
     public String getMenuItemXpath() {
-    	return "//li[@id='${menuItem}']".replace("${menuItem}", menuItem);
+        return "//li[@id='${menuItem}']".replace("${menuItem}", menuItem);
     }
 }

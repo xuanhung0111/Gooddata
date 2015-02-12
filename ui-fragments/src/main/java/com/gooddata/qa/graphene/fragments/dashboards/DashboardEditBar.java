@@ -257,7 +257,6 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementVisible(widget);
         Actions builder = new Actions(browser);
         builder.dragAndDropBy(widget, x, y).build().perform();
-
     }
 
     /**
