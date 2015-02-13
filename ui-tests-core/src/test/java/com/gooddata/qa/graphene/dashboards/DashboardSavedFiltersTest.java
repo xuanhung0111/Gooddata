@@ -23,7 +23,7 @@ import static org.testng.Assert.*;
 public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     private static final String FIRST_DASHBOARD_NAME  = "Dashboard 1";
-    private static final String SECOND_DASHBOARD_NAME = "Default dashboard";
+    private static final String SECOND_DASHBOARD_NAME = "Dashboard 2";
 
     private static final int    THIS_YEAR             = Calendar.getInstance().get(Calendar.YEAR);
     private static final String LAST_YEAR             = String.valueOf(THIS_YEAR - 1);
@@ -104,7 +104,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnGroups = {"init-data"}, priority = 3)
     public void createSavedFilterViewTest() throws InterruptedException {
-        initNewDashboard_AddFilter_TurnOnSavedView();
+        initNewDashboard_AddFilter_TurnOnSavedView(FIRST_DASHBOARD_NAME);
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         assertTrue(savedViewWidget.isDefaultViewButtonPresent(),
@@ -261,34 +261,35 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnMethods = {"deleteSavedFilterViewTest"})
     public void savedFilterAfterSwitchBetweenDashboardsAndPagesTest() throws InterruptedException {
-        FilterWidget timeFilter = getFilterWidget("date_dimension");
-        timeFilter.changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
+        // Add more saved view for first dashboard
+        dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
+        getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu();
         savedViewWidget.saveCurrentView(PENULTIMATE_YEAR);
 
-        dashboardsPage.selectDashboard(SECOND_DASHBOARD_NAME);
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+        // Create new dashboard SECOND_DASHBOARD_NAME to test
+        initNewDashboard_AddFilter_TurnOnSavedView(SECOND_DASHBOARD_NAME);
         dashboardsPage.editDashboard();
-        dashboardEditBar.turnSavedViewOption(true);
+        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Department");
+        dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
         dashboardEditBar.saveDashboard();
 
+        // Create saved view 1 "Abundant Foodz"
         Thread.sleep(1000);
         FilterWidget departmentFilter = getFilterWidget("department");
         departmentFilter.changeAttributeFilterValue("Abundant Foodz");
-        FilterWidget countyFilter = getFilterWidget("county");
-        countyFilter.changeAttributeFilterValue("Austin");
         savedViewWidget.openSavedViewMenu();
-        savedViewWidget.saveCurrentView("Abundant Foodz", "County");
+        savedViewWidget.saveCurrentView("Abundant Foodz");
 
-        String countyValue = countyFilter.getCurrentValue();
-        assertEquals(countyValue, "All",
+        assertEquals(getFilterWidget("county").getCurrentValue(), "All",
                             "Value of 'County' is not 'All'!");
         Thread.sleep(1000);
-        String departmentValue = departmentFilter.getCurrentValue();
-        assertEquals(departmentValue, "Abundant Foodz",
+        assertEquals(departmentFilter.getCurrentValue(), "Abundant Foodz",
                             "Value of 'Department' is not 'Abundant Foodz'!");
 
+        // Create saved view 2 "Earthy Foodz"
         departmentFilter.changeAttributeFilterValue("Earthy Foodz");
         savedViewWidget.openSavedViewMenu();
         savedViewWidget.saveCurrentView("Earthy Foodz");
@@ -334,7 +335,8 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"savedFilterAfterSwitchBetweenDashboardsAndPagesTest"})
-    public void savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest() {
+    public void savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest() throws InterruptedException {
+        dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         DashboardEditFilter dashboardEditFilter = dashboardEditBar.getDashboardEditFilter();
@@ -399,9 +401,9 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         waitForElementNotVisible(dashboardSaveActiveViewDialog.getRoot());
     }
 
-    private void initNewDashboard_AddFilter_TurnOnSavedView() throws InterruptedException {
+    private void initNewDashboard_AddFilter_TurnOnSavedView(String dashboardName) throws InterruptedException {
         initDashboardsPage();
-        dashboardsPage.addNewDashboard(FIRST_DASHBOARD_NAME);
+        dashboardsPage.addNewDashboard(dashboardName);
 
         dashboardsPage.editDashboard();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
