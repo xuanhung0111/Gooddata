@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
+import java.util.Calendar;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -121,7 +123,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         try {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-            final String subject = "Notification Subject";
+            final String subject = "Notification Subject_" + Calendar.getInstance().getTime();
             String message = "Notification message.";
 
             NotificationBuilder notificationInfo =
