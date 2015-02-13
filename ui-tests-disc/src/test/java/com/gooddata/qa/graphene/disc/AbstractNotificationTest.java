@@ -262,7 +262,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
             executionDetails.setScheduledTime(executionDetailJSONObject.getString("created"));
             if (executionDetails.getStatus().equals(ScheduleStatus.ERROR))
                 executionDetails.setErrorMessage(executionDetailJSONObject.getJSONObject("error")
-                        .getString("message").replace("\n", "").replace("    ", ""));
+                        .getString("message").replaceAll("\n(\\s*)", ""));
         } catch (JSONException e) {
             System.out.println("There is problem with jsonObject: ");
             e.printStackTrace();
@@ -382,16 +382,16 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     private long timeDifferenceInSecond(String expectedTime, String actualTime) {
-        long compareResult = 0;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
-            compareResult =
+            long compareResult =
                     format2.parse(actualTime).getTime() - format.parse(expectedTime).getTime();
+            return TimeUnit.MILLISECONDS.toSeconds(compareResult);
         } catch (ParseException e) {
             System.out.println("Exeception in parsing time:");
             e.printStackTrace();
         }
-        return TimeUnit.MILLISECONDS.toSeconds(compareResult);
+        return 0;
     }
 }

@@ -195,6 +195,10 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
+    /*
+     * The tests for checking deploy dialog message are disabled until MSF-7601, MSF-6156 are
+     * considered by MSF team
+     */
     @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkDeployDialogMessageInProjectDetail() {
         try {
