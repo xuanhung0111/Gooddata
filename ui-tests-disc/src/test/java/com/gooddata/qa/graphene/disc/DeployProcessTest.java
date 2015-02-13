@@ -195,7 +195,7 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkDeployDialogMessageInProjectDetail() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -206,7 +206,7 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkFailedDeployMessageInProjectDetail() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -216,7 +216,7 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkDeployDialogMessageInProjectsPage() {
         try {
             checkSuccessfulDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
@@ -226,7 +226,7 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkFailedDeployMessageInProjectsPage() {
         try {
             checkFailedDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
