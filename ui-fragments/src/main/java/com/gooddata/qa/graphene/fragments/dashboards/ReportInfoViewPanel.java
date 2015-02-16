@@ -1,11 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -14,7 +12,6 @@ import org.openqa.selenium.support.FindBy;
 import com.beust.jcommander.internal.Lists;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 
@@ -72,13 +69,6 @@ public class ReportInfoViewPanel extends AbstractFragment {
 
     public void downloadReportAsFormat(ExportFormat format) {
         waitForElementVisible(downloadAsButton).click();
-        SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
-                waitForElementVisible(SimpleMenu.LOCATOR, browser));
-
-        if (!menu.contains(format.getLabel()))
-            throw new IllegalArgumentException(String.format("Does not support format %s!", format.getLabel()));
-
-        menu.select(format.getLabel());
-        waitForElementNotVisible(menu.getRoot());
+        waitForElementVisible(By.xpath(String.format("//a[text()='%s']", format.getLabel())), browser).click();
     }
 }
