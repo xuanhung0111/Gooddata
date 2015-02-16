@@ -32,6 +32,20 @@ mvn clean install -Pselenium
 ```
 Or you can run all tests together from parent project.
 
+### Running single test suite
+Specify test suite you want to run by _test_ parameter.
+```
+mvn -Dtest=SchedulesTest integration-test -Pselenium
+```
+Please note test suite name needs to be suffixed by Test not Tests. Otherwise it's not possible to run it separately.
+
+### Debugging
+Run integration test with [Surefire](http://maven.apache.org/surefire/maven-surefire-plugin/) plugin debug option.
+```
+mvn -Dmaven.surefire.debug integration-test -Pselenium
+```
+Test execution should wait for attaching debugger to 5005 port. See [example configuration](https://www.dropbox.com/s/v0h86cwkrf6j4n4/maven-debugger.png?dl=0) of maven-debug inside IntelliJ IDEA.
+
 ### Jenkins build
 Done - see more details on above confluence page.
 
