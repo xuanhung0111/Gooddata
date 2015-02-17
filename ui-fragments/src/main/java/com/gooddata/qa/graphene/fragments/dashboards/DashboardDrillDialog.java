@@ -111,7 +111,7 @@ public class DashboardDrillDialog extends AbstractFragment {
     }
 
     public boolean isReportInfoButtonVisible() {
-        return waitForElementPresent(reportInfoButton).isDisplayed();
+        return waitForElementPresent(reportInfoButton).isEnabled();
     }
 
     public ReportInfoViewPanel openReportInfoViewPanel() {

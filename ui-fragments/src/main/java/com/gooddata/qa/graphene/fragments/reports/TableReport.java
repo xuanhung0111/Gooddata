@@ -144,13 +144,29 @@ public class TableReport extends AbstractReport {
         String cssClass = null;
         for (WebElement e : drillableElements) {
             cssClass = e.getAttribute("class");
-            if (cssClass.contains("rows") || cssClass.contains("columns"))
-                continue;
 
             if (!cssClass.contains("even") && !cssClass.contains("odd"))
                 continue;
 
             e.findElement(By.cssSelector("span")).click();
+            break;
+        }
+    }
+
+    public void drillOnMetricValue(String value) {
+        waitForReportLoading();
+        String cssClass = null;
+        WebElement spanElement = null;
+        for (WebElement e : drillableElements) {
+            cssClass = e.getAttribute("class");
+
+            if (!cssClass.contains("even") && !cssClass.contains("odd"))
+                continue;
+
+            spanElement = e.findElement(By.cssSelector("span"));
+            if (!value.equals(spanElement.getText()))
+                continue;
+            spanElement.click();
             break;
         }
     }
@@ -171,7 +187,7 @@ public class TableReport extends AbstractReport {
             @Override
             public boolean apply(WebDriver input) {
                 // wait for report idle when drill on metric values
-                try { Thread.sleep(100); } catch(InterruptedException e) {}
+                try { Thread.sleep(1000); } catch(InterruptedException e) {}
 
                 try {
                     return !TableReport.this.getRoot().findElement(By.cssSelector(".c-report"))

@@ -174,7 +174,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             reportInfoPanel.downloadReportAsFormat(ExportFormat.PDF_PORTRAIT);
             Thread.sleep(4000);
-            verifyReportExport(ExportFormat.PDF_PORTRAIT, "Interest_ 2010", 30000L);
+            verifyReportExport(ExportFormat.PDF_PORTRAIT, "2010", 30000L);
             checkRedBar(browser);
         } finally {
             dashboardsPage.deleteDashboard();
@@ -326,7 +326,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "Email with AirSplat on Apr-21-11"), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.drillOnMetricValue();
+            tableReport.drillOnMetricValue("1");
             assertTrue(tableReportInDialog.isRollupTotalVisible());
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Status"));
             assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("# of Activities"),
@@ -375,7 +375,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(drillDialog.getBreadcrumbsString(), StringUtils.join(Arrays.asList("Drill-Activity", "Email with Bulbs.com on Aug-0..."), ">>"));
             drillDialog.closeDialog();
 
-            tableReport.drillOnMetricValue();
+            tableReport.drillOnMetricValue("1");
             assertTrue(tableReportInDialog.isRollupTotalVisible());
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Account"));
             assertSetEquals(tableReportInDialog.getMetricsHeader(), Sets.newHashSet("# of Activities"),
