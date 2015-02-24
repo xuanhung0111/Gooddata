@@ -257,15 +257,12 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         try {
             jsonObject = objectFragment.getObject();
             executionDetailJSONObject = jsonObject.getJSONObject("executionDetail");
-            executionDetails
-                    .setStartTime(timeFormat(executionDetailJSONObject.getString("started")));
-            executionDetails
-                    .setEndTime(timeFormat(executionDetailJSONObject.getString("finished")));
-            executionDetails.setScheduledTime(timeFormat(executionDetailJSONObject
-                    .getString("created")));
+            executionDetails.setStartTime(executionDetailJSONObject.getString("started"));
+            executionDetails.setEndTime(executionDetailJSONObject.getString("finished"));
+            executionDetails.setScheduledTime(executionDetailJSONObject.getString("created"));
             if (executionDetails.getStatus().equals(ScheduleStatus.ERROR))
                 executionDetails.setErrorMessage(executionDetailJSONObject.getJSONObject("error")
-                        .getString("message").replace("\n", "").replace("    ", ""));
+                        .getString("message").replaceAll("\n(\\s*)", ""));
         } catch (JSONException e) {
             System.out.println("There is problem with jsonObject: ");
             e.printStackTrace();
@@ -374,19 +371,27 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                 }
                 paramValue = builder.toString();
             }
-            assertEquals(paramValue, expectedParams.getParamValue(paramName));
+            if (paramName.contains("TIME")) {
+                long timeDifferenceInSeconds =
+                        timeDifferenceInSecond(expectedParams.getParamValue(paramName), paramValue);
+                assertTrue(timeDifferenceInSeconds >= -2 && timeDifferenceInSeconds <= 2,
+                        "Not allowed time difference in seconds: " + timeDifferenceInSeconds);
+            } else
+                assertEquals(paramValue, expectedParams.getParamValue(paramName));
         }
     }
 
-    private String timeFormat(String dateTime) {
+    private long timeDifferenceInSecond(String expectedTime, String actualTime) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
-            return format2.format(format.parse(dateTime));
+            long compareResult =
+                    format2.parse(actualTime).getTime() - format.parse(expectedTime).getTime();
+            return TimeUnit.MILLISECONDS.toSeconds(compareResult);
         } catch (ParseException e) {
-            System.out.println("There is problem when parsing dateTime: " + dateTime);
+            System.out.println("Exeception in parsing time:");
             e.printStackTrace();
         }
-        return null;
+        return 0;
     }
 }

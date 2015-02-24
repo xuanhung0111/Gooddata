@@ -195,7 +195,11 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    /*
+     * The tests for checking deploy dialog message are disabled until MSF-7601, MSF-6156 are
+     * considered by MSF team
+     */
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkDeployDialogMessageInProjectDetail() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -206,7 +210,7 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkFailedDeployMessageInProjectDetail() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -216,7 +220,7 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkDeployDialogMessageInProjectsPage() {
         try {
             checkSuccessfulDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
@@ -226,7 +230,7 @@ public class DeployProcessTest extends AbstractDeployProcesses {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkFailedDeployMessageInProjectsPage() {
         try {
             checkFailedDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,

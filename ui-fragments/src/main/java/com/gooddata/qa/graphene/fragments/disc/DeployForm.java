@@ -26,9 +26,6 @@ public class DeployForm extends AbstractFragment {
     @FindByJQuery("button:contains(Deployed)")
     private WebElement deployedButton;
 
-    @FindByJQuery("button:contains(Re-deployed)")
-    private WebElement redeployedButton;
-
     @FindBy(css = "div.select-zip>div>input")
     private WebElement zipFileInput;
 
@@ -66,7 +63,6 @@ public class DeployForm extends AbstractFragment {
 
     public void redeployProcess(String zipFile, ProcessTypes processType, String processName) {
         tryToDeployProcess(zipFile, processType, processName);
-        waitForElementVisible(redeployedButton);
         System.out.println("Re-deploy progress is finished!");
     }
 

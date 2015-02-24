@@ -47,6 +47,7 @@ public class ProjectDetailPage extends AbstractFragment {
             .cssSelector(".ait-process-metadata-value");
     private final static By BY_PROCESS_NOTIFICATION_RULE_BUTTON = By
             .cssSelector(".ait-process-notification-rules-btn");
+    private final static By BY_DEPLOY_ERROR_DIALOG = By.cssSelector(".error_dialog .dialog-body"); 
 
     private static final String DELETE_PROCESS_DIALOG_MESSAGE =
             "Are you sure you want to delete process \"%s\"?";
@@ -86,9 +87,6 @@ public class ProjectDetailPage extends AbstractFragment {
 
     @FindBy(css = ".ait-process-executable-list")
     private ExecutablesTable executablesTable;
-
-    @FindBy(css = ".error_dialog .dialog-body")
-    private WebElement deployErrorDialog;
 
     @FindBy(css = ".error_dialog .s-btn-ok")
     private WebElement deployErrorDialogOKButton;
@@ -153,7 +151,11 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public WebElement getDeployErrorDialog() {
-        return deployErrorDialog;
+        return waitForElementVisible(BY_DEPLOY_ERROR_DIALOG, browser);
+    }
+    
+    public boolean isErrorDialogVisible() {
+        return getRoot().findElements(BY_DEPLOY_ERROR_DIALOG).size() > 0;
     }
 
     public void closeDeployErrorDialogButton() {

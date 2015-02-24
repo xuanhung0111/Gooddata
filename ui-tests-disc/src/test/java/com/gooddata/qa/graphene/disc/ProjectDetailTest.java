@@ -119,7 +119,7 @@ public class ProjectDetailTest extends AbstractSchedulesTests {
         deployInProjectDetailPage(DeployPackages.BASIC, "Process-R");
 
         openProjectDetailPage(getWorkingProject());
-        redeployProcess("Process-R", DeployPackages.BASIC, "Process-B");
+        redeployProcess("Process-R", DeployPackages.EXECUTABLES_GRAPH, "Process-B");
 
         openProjectDetailPage(getWorkingProject());
         projectDetailPage.checkSortedProcesses();
