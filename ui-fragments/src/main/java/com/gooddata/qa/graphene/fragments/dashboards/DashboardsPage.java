@@ -4,8 +4,10 @@ import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -232,11 +234,12 @@ public class DashboardsPage extends AbstractFragment {
 
     public void addNewDashboard(String dashboardName) throws InterruptedException {
         openEditExportEmbedMenu().select("Add Dashboard");
-        waitForElementVisible(newDashboardNameInput).clear();
+        waitForElementVisible(newDashboardNameInput);
+        
         newDashboardNameInput.click(); //sleep wasn't necessary, getting focus on the input field helps
+        newDashboardNameInput.clear();
         newDashboardNameInput.sendKeys(dashboardName);
-        System.out.println(newDashboardNameInput.getText());
-        Thread.sleep(2000);
+        newDashboardNameInput.sendKeys(Keys.ENTER);
         editDashboardBar.saveDashboard();
     }
 
@@ -253,17 +256,20 @@ public class DashboardsPage extends AbstractFragment {
 
     public void publishDashboard(boolean listed) {
         openPermissionsDialog();
-        permissionsDialog.publish(listed ? PublishType.SPECIFIC_USERS_CAN_ACCESS : PublishType.EVERYONE_CAN_ACCESS);
+        
+        permissionsDialog.publish(listed ? PublishType.EVERYONE_CAN_ACCESS : PublishType.SPECIFIC_USERS_CAN_ACCESS);
         permissionsDialog.submit();
     }
 
-    public void lockDashboard(boolean locked) {
+    public void lockDashboard(boolean lock) {
         openPermissionsDialog();
-        if (locked) {
-            permissionsDialog.unlock();
-        } else {
+        
+        if (lock) {
             permissionsDialog.lock();
+        } else {
+            permissionsDialog.unlock();
         }
+        
         permissionsDialog.submit();
     }
 

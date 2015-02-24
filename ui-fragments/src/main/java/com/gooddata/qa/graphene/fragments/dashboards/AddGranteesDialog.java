@@ -1,7 +1,12 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -25,7 +30,7 @@ public class AddGranteesDialog extends AbstractFragment {
     @FindBy(css = ".gd-list-view-noResults")
     private WebElement noResultsOutput;
 
-    private static final By GRANTEES = By.cssSelector(".grantee-email");
+    private static final By GRANTEES = By.cssSelector(".grantee-candidate");
 
     public int getGranteesCount(final String searchText, boolean expectResult) throws InterruptedException {
         waitForElementVisible(root);
@@ -45,18 +50,23 @@ public class AddGranteesDialog extends AbstractFragment {
     }
 
     public int getNumberOfGrantees() {
-        waitForCollectionIsNotEmpty(getGrantees());
-        return getGrantees().size();
+        return waitForCollectionIsNotEmpty(getGrantees()).size();
     }
 
-    public void selectItem(String name) {
-        for (WebElement e : getGrantees()) {
-            if (!name.equals(e.getText().trim())) {
-                continue;
-            }
-            e.click();
-            break;
-        }
+    public void selectItem(final String name) {
+    	final By loginSelector = By.cssSelector(".grantee-email");
+    	final By groupNameSelector = By.cssSelector(".grantee-name");
+    	final By groupSelector = By.cssSelector(".grantee-group");
+    	
+    	Iterables.find(waitForCollectionIsNotEmpty(getGrantees()), new Predicate<WebElement>() {
+			@Override
+			public boolean apply(WebElement e) {
+				boolean isGroup = e.findElements(groupSelector).size() > 0;
+				WebElement nameElement = e.findElement(isGroup ? groupNameSelector : loginSelector);
+				
+				return name.equals(nameElement.getText().trim());
+			}
+		}).click();
     }
 
     public List<WebElement> getGrantees() {
@@ -65,6 +75,7 @@ public class AddGranteesDialog extends AbstractFragment {
 
     public void share() {
         waitForElementVisible(shareButton).click();
+        waitForElementNotVisible(getRoot());
     }
 
     public void cancel() {

@@ -1,6 +1,7 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.qa.graphene.enums.UserRoles;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
@@ -9,12 +10,16 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.util.UriTemplate;
+import org.testng.Assert;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.openqa.selenium.WebElement;
 
 public class RestUtils {
@@ -30,6 +35,8 @@ public class RestUtils {
     private static final String PROJECT_FEATURE_FLAG_VALUE_IDENTIFIER = "value";
     private static final String PROJECT_FEATURE_FLAG_KEY_IDENTIFIER = "key";
     private static final String PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER = "featureFlag";
+    
+    private static final String GROUPS_URI = "/gdc/internal/usergroups";
 
     private RestUtils() {
     }
@@ -47,6 +54,28 @@ public class RestUtils {
         JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
         assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"), "User isn't assigned properly into the project");
         System.out.println(String.format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId, domainUser));
+    }
+    
+    public static void addUserGroup(RestApiClient restApiClient, String projectId, final String name) {
+    	final String projectUri = "/gdc/projects/" + projectId;
+        
+        @SuppressWarnings("serial")
+        JSONObject payload = new JSONObject(new HashMap<String, Object>() {{
+            put("userGroup", new HashMap<String, Object>() {{
+                put("content", new HashMap<String, Object>() {{
+                    put("name", name);
+                    put("project", projectUri);
+                }});
+            }});
+        }});
+
+        HttpRequestBase request = restApiClient.newPostMethod(GROUPS_URI, payload.toString());
+        HttpResponse response = restApiClient.execute(request);
+        
+        int statusCode = response.getStatusLine().getStatusCode();
+        boolean successful = statusCode != 201 && statusCode != 409;
+        
+        assertTrue(successful, "User group could not be created, got HTTP " + statusCode);
     }
 
     public static String getLDMImageURI(String host, String projectId, String user, String password) throws ParseException, IOException, JSONException {
