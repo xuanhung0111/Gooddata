@@ -186,7 +186,11 @@ public class ReportVisualizer extends AbstractFragment {
         waitForElementVisible(addMetricButton).click();
     }
 
-    public void finishReportChanges() {
+    public void finishReportChanges() throws InterruptedException {
+        // When webapp do a lot of CRUD things, its rendering job will work slowly,
+        // so need a short time to wait in case like this
+        Thread.sleep(2000);
+
         waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser).sendKeys(Keys.ENTER);
     }
 
