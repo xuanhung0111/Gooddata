@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import org.jboss.arquillian.graphene.findby.FindByJQuery;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -22,9 +21,6 @@ public class DeployForm extends AbstractFragment {
 
     @FindBy(css = "div.deploy-process-dialog-area")
     private WebElement deployProcessDialog;
-
-    @FindByJQuery("button:contains(Deployed)")
-    private WebElement deployedButton;
 
     @FindBy(css = "div.select-zip>div>input")
     private WebElement zipFileInput;
@@ -50,7 +46,6 @@ public class DeployForm extends AbstractFragment {
 
     public void deployProcess(String zipFile, ProcessTypes processType, String processName) {
         tryToDeployProcess(zipFile, processType, processName);
-        waitForElementVisible(deployedButton);
         System.out.println("Deploy progress is finished!");
         waitForElementNotPresent(getRoot());
     }

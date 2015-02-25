@@ -75,7 +75,7 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
         projectDetailPage.clickOnDeployProcessButton();
         deployForm.deployProcess(zipFilePath + deployPackage.getPackageName(),
                 deployPackage.getPackageType(), processName);
-        waitForElementNotPresent(deployForm.getRoot());
+        assertFalse(projectDetailPage.isErrorDialogVisible());
         processUrl = browser.getCurrentUrl();
         projectDetailPage.checkFocusedProcess(processName);
         projectDetailPage.assertActiveProcessInList(processName, deployPackage);
