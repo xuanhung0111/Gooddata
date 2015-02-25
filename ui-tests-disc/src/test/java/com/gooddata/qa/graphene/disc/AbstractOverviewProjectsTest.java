@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,13 +29,20 @@ import com.google.common.base.Predicate;
 public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
     protected void checkFilteredOutOverviewProject(OverviewProjectStates state,
-            ProjectInfo projectInfo) {
+            final ProjectInfo projectInfo) {
         discOverview.selectOverviewState(state);
         waitForElementVisible(discOverviewProjects.getRoot());
         if (discOverview.getStateNumber(state).equals("0"))
             discOverviewProjects.assertOverviewEmptyState(state);
-        else
-            assertNull(discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo));
+        else {
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo) == null;
+                }
+            });
+        }
     }
 
     protected void checkOtherOverviewStates(OverviewProjectStates state, ProjectInfo projectInfo) {
