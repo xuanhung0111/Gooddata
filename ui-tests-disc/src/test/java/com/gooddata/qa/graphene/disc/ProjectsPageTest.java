@@ -195,9 +195,9 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         int projectsNumber =
                 projectsPage.getProjectsElements().size()
                         + projectsPage.getDemoProjectsElements().size();
-        if (projectsNumber <= 20) {
+        if (projectsNumber <= 25) {
             List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
-            for (int i = 0; i < 20 - projectsNumber + 1; i++) {
+            for (int i = 0; i < 25 - projectsNumber + 1; i++) {
                 ProjectInfo projectInfo =
                         new ProjectInfo().setProjectName("Disc-test-paging-projects-page-" + i);
                 additionalProjects.add(projectInfo);
