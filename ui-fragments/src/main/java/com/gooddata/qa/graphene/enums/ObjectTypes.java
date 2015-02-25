@@ -5,7 +5,8 @@ public enum ObjectTypes {
     FACT("fact", "factsTable", "factsMenuItem"),
     ATTRIBUTE("attribute", "attributesTable", "attributesMenuItem"),
     METRIC("metric", "metricsTable", "metricsMenuItem"),
-    VARIABLE("variable", "variablesTable", "variablesMenuItem");
+    VARIABLE("variable", "variablesTable", "variablesMenuItem"),
+    MODEL("model", "ldmModelMenuItem");
 
     private final String name;
 
@@ -17,6 +18,10 @@ public enum ObjectTypes {
         this.name = name;
         this.objectsTableID = id;
         this.menuItem = menuItem;
+    }
+
+    private ObjectTypes(String name, String menuItem) {
+        this(name, null, menuItem);
     }
 
     public String getName() {

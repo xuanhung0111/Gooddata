@@ -27,9 +27,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = { "object-tests" })
     public void factAggregationsTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
-        waitForElementVisible(factsTable.getRoot());
-        waitForDataPageLoaded(browser);
+        initFactPage();
         factsTable.selectObject(name);
         for (SimpleMetricTypes metricType : SimpleMetricTypes.values()) {
             factDetailPage.createSimpleMetric(metricType, name);
@@ -44,9 +42,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
 
     @Override
     public void initObject(String factName) {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
-        waitForDataPageLoaded(browser);
-        waitForElementVisible(factsTable.getRoot());
+        initFactPage();
         factsTable.selectObject(factName);
     }
 }

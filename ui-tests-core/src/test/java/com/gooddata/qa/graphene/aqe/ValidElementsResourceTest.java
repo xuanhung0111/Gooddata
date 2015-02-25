@@ -85,10 +85,10 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      */
     @Test(dependsOnMethods = {"initialize"})
     public void checkForFilteredVariable() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        initAttributePage();
         variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
-                                                        .withAttribute(MonthYearCreatedAttr)
-                                                        .withAttributeElements("Jan 2010", "Feb 2010", "Mar 2010"));
+            .withAttribute(MonthYearCreatedAttr)
+            .withAttributeElements("Jan 2010", "Feb 2010", "Mar 2010"));
     }
     
     /*

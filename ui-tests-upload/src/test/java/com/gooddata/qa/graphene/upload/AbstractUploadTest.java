@@ -83,9 +83,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	protected void deleteDataset(String datasetName)
 			throws InterruptedException {
-		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|dataSet");
-		waitForElementVisible(datasetsTable.getRoot());
-		waitForDataPageLoaded(browser);
+	    initManagePage();
         datasetsTable.selectObject(datasetName);
         datasetDetailPage.deleteDataset();
 	}
@@ -98,19 +96,15 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	protected void checkAttributeName(String attributeName)
 			throws InterruptedException {
-		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
-		waitForElementVisible(attributesTable.getRoot());
-		waitForDataPageLoaded(browser);
+		initAttributePage();
 		System.out.println("Check attribute name is displayed well.");
 		assertTrue(attributesTable.selectObject(attributeName));
 	}
 
 	protected void selectFileToUpload(String fileName)
 			throws InterruptedException {
-		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-		waitForDashboardPageLoaded(browser);
-		openUrl(PAGE_UPLOAD);
-		waitForElementVisible(upload.getRoot());
+		initDashboardsPage();
+		initUploadPage();
         upload.uploadFile(csvFilePath + fileName + ".csv");
 	}
 	
@@ -127,10 +121,8 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	}
 	
 	protected void uploadInvalidCSVFile(String fileName, String errorTitle, String errorMessage, String errorSupport) throws InterruptedException{
-		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-		waitForDashboardPageLoaded(browser);
-		openUrl(PAGE_UPLOAD);
-		waitForElementVisible(upload.getRoot());
+		initDashboardsPage();
+		initUploadPage();
 		String filePath = csvFilePath + fileName + ".csv";
 		System.out.println("Going to upload file: " + filePath);
 		waitForElementPresent(uploadFile).sendKeys(filePath);
@@ -194,8 +186,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	protected void cleanDashboardAndDatasets(List<String> datasets)
 			throws InterruptedException {
-		openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-        waitForDashboardPageLoaded(browser);
+		initDashboardsPage();
 		deleteDashboard();
 		for (String dataset : datasets) {
 			deleteDataset(dataset);

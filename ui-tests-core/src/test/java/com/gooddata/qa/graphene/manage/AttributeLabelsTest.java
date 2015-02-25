@@ -85,13 +85,13 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"initDataTest"})
     public void changeAttributeToHyperlinkTest() throws InterruptedException {
         changeAttributeLabel(hyperlinkAttr, AttributeLabelTypes.HYPERLINK);
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        initAttributePage();
         attributePage.verifyHyperLink(hyperlinkAttr);
     }
 
     @Test(dependsOnMethods = {"changeAttributeToHyperlinkTest"})
     public void configDrillToExternalPageTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        initAttributePage();
         attributePage.configureDrillToExternalPage(hyperlinkAttr);
     }
 
@@ -112,15 +112,14 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     private void initReport(String reportName) {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
-        waitForReportsPageLoaded(browser);
+        initReportsPage();
         reportsPage.getReportsList().openReport(reportName);
         waitForAnalysisPageLoaded(browser);
     }
 
     private void changeAttributeLabel(String attribute, AttributeLabelTypes label)
             throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        initAttributePage();
         attributePage.configureAttributeLabel(attribute, label);
     }
 

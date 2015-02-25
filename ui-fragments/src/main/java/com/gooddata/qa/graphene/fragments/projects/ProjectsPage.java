@@ -45,5 +45,4 @@ public class ProjectsPage extends AbstractFragment {
         }
         return projectIds;
     }
-
 }

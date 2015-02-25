@@ -38,13 +38,13 @@ public class AnnieUITest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"})
     public void enableAnnieUIFeature() throws JSONException{
         try {
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|");
+            initManagePage();
             assertTrue(browser.findElements(By.cssSelector(CSS_ADD_NEW_FIELDS_LOCATOR)).size() == 0);
     
             enableDataExplorerFeature(true);
 
-            openUrl(startPage);
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|");
+            initProjectsPage();
+            initManagePage();
             waitForElementVisible(addNewFieldsButton).click();
             browser.switchTo().frame(waitForElementVisible(dluiFrame));
             waitForElementVisible(annieDialog);
