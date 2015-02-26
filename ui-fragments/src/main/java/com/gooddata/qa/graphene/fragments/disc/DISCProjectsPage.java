@@ -8,6 +8,7 @@ import java.util.List;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -197,13 +198,19 @@ public class DISCProjectsPage extends AbstractFragment {
     public void searchProjectById(ProjectInfo project) {
         enterSearchKey(project.getProjectId());
         waitForElementVisible(discProjectsList.getRoot());
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
+        try {
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
 
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return discProjectsList.getNumberOfRows() == 1;
-            }
-        });
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return discProjectsList.getNumberOfRows() == 1;
+                }
+            });
+        } catch (TimeoutException e) {
+            assertEquals(discProjectsList.getNumberOfRows(), 1,
+                    "Incorrect number of projects in search result: "
+                            + discProjectsList.getNumberOfRows());
+        }
         assertNotNull(discProjectsList.selectProjectWithAdminRole(project));
     }
 
@@ -283,7 +290,7 @@ public class DISCProjectsPage extends AbstractFragment {
                     + filteredProject.getProjectId() + ") is in filtered list.");
         }
     }
-    
+
     private void waitForSearchingProgress() {
         try {
             waitForElementVisible(searchingProgress);

@@ -130,8 +130,12 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
         discOverview.assertOverviewStateNumber(OverviewProjectStates.SUCCESSFUL,
                 discOverviewProjects.getOverviewProjectNumber());
-        // Remove checking step in SCHEDULED state until MSF-7415 is fixed
         checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, getWorkingProject());
+        /*
+         * Remove checking step in SCHEDULED state until MSF-7415 is fixed
+         * 
+         * checkFilteredOutOverviewProject(OverviewProjectStates.SCHEDULED, getWorkingProject());
+         */
     }
 
     @Test(dependsOnMethods = {"createProject"})

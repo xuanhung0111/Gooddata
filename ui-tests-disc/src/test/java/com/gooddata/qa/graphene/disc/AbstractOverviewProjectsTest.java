@@ -11,6 +11,7 @@ import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
@@ -28,6 +29,8 @@ import com.google.common.base.Predicate;
 
 public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
+    private static final int NUMBER_OF_ADDITIONAL_SCHEDULES = 10;
+
     protected void checkFilteredOutOverviewProject(OverviewProjectStates state,
             final ProjectInfo projectInfo) {
         discOverview.selectOverviewState(state);
@@ -35,21 +38,32 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         if (discOverview.getStateNumber(state).equals("0"))
             discOverviewProjects.assertOverviewEmptyState(state);
         else {
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
+            try {
+                Graphene.waitGui().until(new Predicate<WebDriver>() {
 
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo) == null;
-                }
-            });
+                    @Override
+                    public boolean apply(WebDriver arg0) {
+                        return discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo) == null;
+                    }
+                });
+            } catch (TimeoutException e) {
+                assertNull(discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo),
+                        "Project is not filtered out on overview page!");
+            }
         }
     }
 
-    // Remove checking step in SCHEDULED state until MSF-7415 is fixed
     protected void checkOtherOverviewStates(OverviewProjectStates state, ProjectInfo projectInfo) {
         List<OverviewProjectStates> projectStateToCheck =
                 Arrays.asList(OverviewProjectStates.FAILED, OverviewProjectStates.RUNNING,
                         OverviewProjectStates.SUCCESSFUL);
+        /*
+         * Remove checking step in SCHEDULED state until MSF-7415 is fixed
+         * 
+         * List<OverviewProjectStates> projectStateToCheck =
+         * Arrays.asList(OverviewProjectStates.FAILED, OverviewProjectStates.RUNNING,
+         * OverviewProjectStates.SCHEDULED, OverviewProjectStates.SUCCESSFUL);
+         */
         for (OverviewProjectStates projectState : projectStateToCheck) {
             if (projectState == state)
                 continue;
@@ -417,7 +431,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     }
 
     private void prepareAdditionalSchedulesForScheduledState(String additionalProcessName) {
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i < NUMBER_OF_ADDITIONAL_SCHEDULES; i++) {
             createSchedule(new ScheduleBuilder().setProcessName(additionalProcessName)
                     .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
                     .setScheduleName("Schedule " + i).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
