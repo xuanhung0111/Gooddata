@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
+
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -136,8 +136,7 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
         try {
             Thread.sleep(2000); // Wait for notification is completely saved!
         } catch (InterruptedException e) {
-            System.out.println("There is an interruption during waiting for created notification!");
-            e.printStackTrace();
+            fail("There is an interruption during waiting for created notification: " + e);
         }
         assertNotification(notificationBuilder);
 
@@ -186,11 +185,9 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
                         project.getProjectName(), null, testParams.getAuthorizationToken(),
                         testParams.getDwhDriver(), projectCreateCheckIterations));
             } catch (JSONException e) {
-                System.out.println("There is problem when creating new project: ");
-                e.printStackTrace();
+                fail("There is problem when creating new project: " + e);
             } catch (InterruptedException e) {
-                System.out.println("There is problem when creating new project: ");
-                e.printStackTrace();
+                fail("There is problem when creating new project: " + e);
             }
         }
     }

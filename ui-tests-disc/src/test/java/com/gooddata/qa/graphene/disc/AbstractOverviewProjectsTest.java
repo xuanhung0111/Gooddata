@@ -47,8 +47,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
                     }
                 });
             } catch (TimeoutException e) {
-                assertNull(discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo),
-                        "Project is not filtered out on overview page!");
+                fail("Project is not filtered out on overview page! " + e);
             }
         }
     }
@@ -198,22 +197,18 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
             waitForElementVisible(discOverviewProjects.getRoot());
             discOverviewProjects.checkProjectNotAdmin(projectState, overviewProject);
         } catch (ParseException e) {
-            System.out.println("There is problem when adding user to project: ");
-            e.printStackTrace();
+            fail("There is problem when adding user to project: " + e);
         } catch (IOException e) {
-            System.out.println("There is problem when adding user to project: ");
-            e.printStackTrace();
+            fail("There is problem when adding user to project: " + e);
         } catch (JSONException e) {
-            System.out.println("There is problem when adding user to project or signIn: ");
-            e.printStackTrace();
+            fail("There is problem when adding user to project or signIn: " + e);
         } finally {
             openUrl(PAGE_PROJECTS);
             logout();
             try {
                 signIn(false, UserRoles.ADMIN);
             } catch (JSONException e) {
-                System.out.println("There is problem when signIn: ");
-                e.printStackTrace();
+                fail("There is problem when signIn: " + e);
             }
         }
     }

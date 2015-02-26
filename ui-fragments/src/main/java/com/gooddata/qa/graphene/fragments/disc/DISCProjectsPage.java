@@ -207,9 +207,8 @@ public class DISCProjectsPage extends AbstractFragment {
                 }
             });
         } catch (TimeoutException e) {
-            assertEquals(discProjectsList.getNumberOfRows(), 1,
-                    "Incorrect number of projects in search result: "
-                            + discProjectsList.getNumberOfRows());
+            fail("Incorrect number of projects in search result: "
+                    + discProjectsList.getNumberOfRows());
         }
         assertNotNull(discProjectsList.selectProjectWithAdminRole(project));
     }
