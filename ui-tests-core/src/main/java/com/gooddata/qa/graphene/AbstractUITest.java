@@ -298,6 +298,35 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
         Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
     }
+    
+    public void createDashboard(String name) throws InterruptedException {
+        initDashboardsPage();
+        dashboardsPage.addNewDashboard(name);
+        initDashboardsPage();
+    }
+    
+    public void createDashboard(String name, boolean lock, boolean publish) throws InterruptedException {
+    	createDashboard(name);
+    	lockDashboard(lock);
+    	publishDashboard(publish);
+    }
+    
+    public void lockDashboard(boolean lock) {
+        initDashboardsPage();
+        dashboardsPage.lockDashboard(lock);
+        waitForElementVisible(dashboardsPage.getRoot());
+    }
+
+    public void publishDashboard(boolean publish) {
+        initDashboardsPage();
+        dashboardsPage.publishDashboard(publish);
+        waitForElementVisible(dashboardsPage.getRoot());
+    }
+    
+    public void selectDashboard(String name) throws InterruptedException {
+        initDashboardsPage();
+        dashboardsPage.selectDashboard(name);
+    }
 
     public void initReportsPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage");

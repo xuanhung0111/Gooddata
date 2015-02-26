@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -36,6 +37,12 @@ public class PermissionsDialog extends AbstractFragment {
     @FindBy(css = ".visibility-options")
     private WebElement visibilityOptionsContainer;
 
+    @FindBy(xpath = "//div[@id='gd-overlays']//div[contains(@class,'s-everyone_can_access')]/div")
+    private WebElement everyOneCanAccessChoose;
+    
+    @FindBy(xpath = "//div[@id='gd-overlays']//div[contains(@class,'s-specific_users_can_access')]/div")
+    private WebElement specificUsersAccessChoose;
+
     @FindBy(css = ".permissionDialog-addGranteesButton")
     private WebElement addGranteesButton;
 
@@ -44,10 +51,6 @@ public class PermissionsDialog extends AbstractFragment {
 
     @FindBy(css = ".searchfield-input")
     private WebElement searchForGranteeInput;
-
-    private static final String CAN_ACCESS_XPATH = "//div[text()='%s can access']";
-    private static final String SPECIFIC_USER = "Specific users";
-    private static final String EVERYONE = "Everyone";
 
     public WebElement getLockAdminRadio() {
         return lockAdminRadio;
@@ -120,11 +123,11 @@ public class PermissionsDialog extends AbstractFragment {
     }
 
     public void submitEveryOneCanAccess() {
-        waitForElementVisible(By.xpath(String.format(CAN_ACCESS_XPATH, EVERYONE)), browser).click();
+        waitForElementVisible(everyOneCanAccessChoose).click();
     }
 
     public void submitSpecificUsersAccess() {
-        waitForElementVisible(By.xpath(String.format(CAN_ACCESS_XPATH, SPECIFIC_USER)), browser).click();
+        waitForElementVisible(specificUsersAccessChoose).click();
     }
 
     public void openVisibilityPanel() {
@@ -133,6 +136,7 @@ public class PermissionsDialog extends AbstractFragment {
 
     public void submit() {
         waitForElementVisible(submitButton).click();
+        waitForElementNotVisible(getRoot());
     }
 
     public void cancel() {
