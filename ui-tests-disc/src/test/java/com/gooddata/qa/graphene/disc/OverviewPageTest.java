@@ -57,7 +57,9 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, getWorkingProject());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    // Disable this test until MSF-7415 is fixed, because this test fails randomly when run DISC
+    // tests in parallel
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkEmptyScheduledState() {
         openOverviewPage();
         checkFilteredOutOverviewProject(OverviewProjectStates.SCHEDULED, getWorkingProject());
@@ -129,7 +131,11 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         discOverview.assertOverviewStateNumber(OverviewProjectStates.SUCCESSFUL,
                 discOverviewProjects.getOverviewProjectNumber());
         checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, getWorkingProject());
-        checkFilteredOutOverviewProject(OverviewProjectStates.SCHEDULED, getWorkingProject());
+        /*
+         * Remove checking step in SCHEDULED state until MSF-7415 is fixed
+         * 
+         * checkFilteredOutOverviewProject(OverviewProjectStates.SCHEDULED, getWorkingProject());
+         */
     }
 
     @Test(dependsOnMethods = {"createProject"})

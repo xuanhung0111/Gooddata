@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+
+import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -264,8 +264,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                 executionDetails.setErrorMessage(executionDetailJSONObject.getJSONObject("error")
                         .getString("message").replaceAll("\n(\\s*)", ""));
         } catch (JSONException e) {
-            System.out.println("There is problem with jsonObject: ");
-            e.printStackTrace();
+            fail("There is problem with jsonObject: " + e);
         }
     }
 
@@ -308,11 +307,9 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         try {
             message = Jsoup.parse(notification.getContent().toString());
         } catch (IOException e) {
-            System.out.println("There is problem during parsing message: ");
-            e.printStackTrace();
+            fail("There is problem during parsing message: " + e);
         } catch (MessagingException e) {
-            System.out.println("There is problem during getting repeated failures email: ");
-            e.printStackTrace();
+            fail("There is problem during getting repeated failures email: " + e);
         }
         System.out.println("Notification message: " + message.getElementsByTag("body").text());
 
@@ -340,11 +337,9 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         try {
             notificationContent = notification.getContent().toString() + "*";
         } catch (IOException e) {
-            System.out.println("There is problem when checking schedule event notification: ");
-            e.printStackTrace();
+            fail("There is problem when checking schedule event notification: " + e);
         } catch (MessagingException e) {
-            System.out.println("There is problem when checking schedule event notification: ");
-            e.printStackTrace();
+            fail("There is problem when checking schedule event notification: " + e);
         }
         while (!notificationContent.isEmpty()) {
             if (notificationContent.substring(0, notificationContent.indexOf("*")).contains(
@@ -389,8 +384,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                     format2.parse(actualTime).getTime() - format.parse(expectedTime).getTime();
             return TimeUnit.MILLISECONDS.toSeconds(compareResult);
         } catch (ParseException e) {
-            System.out.println("Exeception in parsing time:");
-            e.printStackTrace();
+            fail("Exeception in parsing time: " + e);
         }
         return 0;
     }

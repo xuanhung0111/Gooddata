@@ -4,9 +4,12 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -180,12 +183,14 @@ public class DISCProjectsPage extends AbstractFragment {
 
     public void searchProjectByName(String searchKey) {
         enterSearchKey(searchKey);
+        waitForSearchingProgress();
         waitForElementVisible(discProjectsList.getRoot());
         discProjectsList.assertSearchProjectsByName(searchKey);
     }
 
     public void searchProjectByUnicodeName(String unicodeSearchKey) {
         enterSearchKey(unicodeSearchKey);
+        waitForSearchingProgress();
         waitForElementVisible(discProjectsList.getRoot());
         discProjectsList.assertSearchProjectByUnicodeName(unicodeSearchKey);
     }
@@ -193,8 +198,18 @@ public class DISCProjectsPage extends AbstractFragment {
     public void searchProjectById(ProjectInfo project) {
         enterSearchKey(project.getProjectId());
         waitForElementVisible(discProjectsList.getRoot());
-        assertEquals(discProjectsList.getNumberOfRows(), 1,
-                "Actual project number in search result: " + discProjectsList.getNumberOfRows());
+        try {
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return discProjectsList.getNumberOfRows() == 1;
+                }
+            });
+        } catch (TimeoutException e) {
+            fail("Incorrect number of projects in search result: "
+                    + discProjectsList.getNumberOfRows());
+        }
         assertNotNull(discProjectsList.selectProjectWithAdminRole(project));
     }
 
@@ -234,12 +249,6 @@ public class DISCProjectsPage extends AbstractFragment {
         waitForElementVisible(searchBox).sendKeys(searchKey);
         System.out.println("Enter search key: " + searchBox.getAttribute("value"));
         waitForElementVisible(searchButton).click();
-        try {
-            waitForElementVisible(searchingProgress);
-        } catch (NoSuchElementException ex) {
-            System.out
-                    .println("Searching progress doesn't display, please check the search result...");
-        }
     }
 
     private void selectFilterOption(ProjectStateFilters option) {
@@ -278,6 +287,15 @@ public class DISCProjectsPage extends AbstractFragment {
                     "Project doesn't present in filtered list!");
             System.out.println("Project " + filteredProject.getProjectName() + " (id = "
                     + filteredProject.getProjectId() + ") is in filtered list.");
+        }
+    }
+
+    private void waitForSearchingProgress() {
+        try {
+            waitForElementVisible(searchingProgress);
+        } catch (NoSuchElementException ex) {
+            System.out
+                    .println("Searching progress doesn't display, please check the search result...");
         }
     }
 }

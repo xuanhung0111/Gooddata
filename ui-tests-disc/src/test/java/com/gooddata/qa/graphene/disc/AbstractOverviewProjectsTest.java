@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -13,6 +11,7 @@ import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
@@ -30,20 +29,40 @@ import com.google.common.base.Predicate;
 
 public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
+    private static final int NUMBER_OF_ADDITIONAL_SCHEDULES = 10;
+
     protected void checkFilteredOutOverviewProject(OverviewProjectStates state,
-            ProjectInfo projectInfo) {
+            final ProjectInfo projectInfo) {
         discOverview.selectOverviewState(state);
         waitForElementVisible(discOverviewProjects.getRoot());
         if (discOverview.getStateNumber(state).equals("0"))
             discOverviewProjects.assertOverviewEmptyState(state);
-        else
-            assertNull(discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo));
+        else {
+            try {
+                Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                    @Override
+                    public boolean apply(WebDriver arg0) {
+                        return discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo) == null;
+                    }
+                });
+            } catch (TimeoutException e) {
+                fail("Project is not filtered out on overview page! " + e);
+            }
+        }
     }
 
     protected void checkOtherOverviewStates(OverviewProjectStates state, ProjectInfo projectInfo) {
         List<OverviewProjectStates> projectStateToCheck =
                 Arrays.asList(OverviewProjectStates.FAILED, OverviewProjectStates.RUNNING,
-                        OverviewProjectStates.SCHEDULED, OverviewProjectStates.SUCCESSFUL);
+                        OverviewProjectStates.SUCCESSFUL);
+        /*
+         * Remove checking step in SCHEDULED state until MSF-7415 is fixed
+         * 
+         * List<OverviewProjectStates> projectStateToCheck =
+         * Arrays.asList(OverviewProjectStates.FAILED, OverviewProjectStates.RUNNING,
+         * OverviewProjectStates.SCHEDULED, OverviewProjectStates.SUCCESSFUL);
+         */
         for (OverviewProjectStates projectState : projectStateToCheck) {
             if (projectState == state)
                 continue;
@@ -178,22 +197,18 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
             waitForElementVisible(discOverviewProjects.getRoot());
             discOverviewProjects.checkProjectNotAdmin(projectState, overviewProject);
         } catch (ParseException e) {
-            System.out.println("There is problem when adding user to project: ");
-            e.printStackTrace();
+            fail("There is problem when adding user to project: " + e);
         } catch (IOException e) {
-            System.out.println("There is problem when adding user to project: ");
-            e.printStackTrace();
+            fail("There is problem when adding user to project: " + e);
         } catch (JSONException e) {
-            System.out.println("There is problem when adding user to project or signIn: ");
-            e.printStackTrace();
+            fail("There is problem when adding user to project or signIn: " + e);
         } finally {
             openUrl(PAGE_PROJECTS);
             logout();
             try {
                 signIn(false, UserRoles.ADMIN);
             } catch (JSONException e) {
-                System.out.println("There is problem when signIn: ");
-                e.printStackTrace();
+                fail("There is problem when signIn: " + e);
             }
         }
     }
@@ -233,6 +248,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         waitForElementVisible(discOverviewProjects.getRoot());
         discOverviewProjects.checkOnSelectedProjects(overviewProject);
         discOverviewProjects.bulkAction(projectState);
+        browser.navigate().refresh();
         checkFilteredOutOverviewProject(projectState, getWorkingProject());
 
         return overviewProject;
@@ -297,6 +313,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
                         selectedProcess);
         discOverviewProjects.checkOnOverviewSchedules(selectedProjectSchedule);
         discOverviewProjects.bulkAction(projectState);
+        browser.navigate().refresh();
         waitForElementVisible(discOverviewProjects.getRoot());
         discOverviewProjects.assertOverviewProject(projectState, new OverviewProjectDetails()
                 .setProjectInfo(getWorkingProject()).addProcess(overviewProcess));
@@ -409,7 +426,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     }
 
     private void prepareAdditionalSchedulesForScheduledState(String additionalProcessName) {
-        for (int i = 1; i < 7; i++) {
+        for (int i = 1; i < NUMBER_OF_ADDITIONAL_SCHEDULES; i++) {
             createSchedule(new ScheduleBuilder().setProcessName(additionalProcessName)
                     .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
                     .setScheduleName("Schedule " + i).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)

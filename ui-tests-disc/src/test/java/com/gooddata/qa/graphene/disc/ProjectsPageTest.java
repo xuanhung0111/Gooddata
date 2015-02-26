@@ -24,6 +24,8 @@ import static org.testng.Assert.*;
 
 public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
+    private static final int MINIMUM_NUMBER_OF_PROJECTS = 25;
+
     @BeforeClass
     public void initProperties() {
         zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
@@ -195,9 +197,9 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         int projectsNumber =
                 projectsPage.getProjectsElements().size()
                         + projectsPage.getDemoProjectsElements().size();
-        if (projectsNumber <= 20) {
+        if (projectsNumber <= MINIMUM_NUMBER_OF_PROJECTS) {
             List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
-            for (int i = 0; i < 20 - projectsNumber + 1; i++) {
+            for (int i = 0; i < 25 - projectsNumber + 1; i++) {
                 ProjectInfo projectInfo =
                         new ProjectInfo().setProjectName("Disc-test-paging-projects-page-" + i);
                 additionalProjects.add(projectInfo);
