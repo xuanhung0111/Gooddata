@@ -35,7 +35,7 @@ public class ScheduleDetail extends ScheduleForm {
         CANCEL_CHANGES;
     }
 
-    private static final int MAX_SCHEDULE_RUN_TIME = 5; // In minutes
+    private static final int MAX_SCHEDULE_RUN_TIME = 15; // In minutes
 
     private static final String INVALID_SCHEDULE_TITLE_ERROR =
             "\'${scheduleName}\' name already in use within the process. Change the name.";
