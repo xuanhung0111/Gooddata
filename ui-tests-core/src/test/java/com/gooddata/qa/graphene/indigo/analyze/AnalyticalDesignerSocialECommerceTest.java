@@ -30,12 +30,12 @@ public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDes
         attribute3 = DEVICE;
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {COMPARISON_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
     public void testComparisonAndPoPAttribute() {
         testComparisonAndPoPAttribute(11);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreAttribute() {
         initAnalysePage();
         StringBuilder expected = new StringBuilder(DEVICE).append("\n")
@@ -48,7 +48,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDes
         assertEquals(analysisPage.getAttributeDescription(DEVICE), expected.toString());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreMetric() {
         initAnalysePage();
 
@@ -60,23 +60,23 @@ public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDes
         assertEquals(analysisPage.getMetricDescription(ORDERS), expected.toString());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void compararisonRecommendationOverrideDateFilter() {
         compararisonRecommendationOverrideDateFilter(11);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void filterOnAttribute() {
         filterOnAttribute(DEVICE + ": Mobile, Tablet", "Mobile", "Tablet");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void attributeFilterIsRemovedWhenRemoveAttributeInCatalogue() {
         attributeFilterIsRemovedWhenRemoveAttributeInCatalogue(DEVICE + ": Mobile, Tablet", "Mobile", "Tablet");
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods = {"createProject"}, groups = {CHART_REPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(ORDERS)
@@ -89,7 +89,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDes
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods = {"createProject"}, groups = {TABLE_REPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics("Engagement")

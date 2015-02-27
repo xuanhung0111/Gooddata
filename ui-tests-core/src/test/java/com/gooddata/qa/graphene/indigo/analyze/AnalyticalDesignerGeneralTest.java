@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
@@ -16,6 +17,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -95,6 +98,19 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
                 return input.getTitle();
             }
         }));
+    }
+
+    @Test(dependsOnMethods = {"init"}, groups = {"projectInit"})
+    public void turnOffWalkme() {
+        initAnalysePage();
+
+        try {
+            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-close"), browser);
+            walkmeCloseElement.click();
+            waitForElementNotPresent(walkmeCloseElement);
+        } catch (TimeoutException e) {
+            System.out.println("Walkme dialog is not appeared!");
+        }
     }
 
     @Test(dependsOnGroups = {"projectInit"})
