@@ -3,18 +3,18 @@ package com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
 import java.util.List;
 
-
 public class QueryScheduledEmailsFragment extends AbstractGreyPagesFragment {
+    public final static int WRONG_ID = -1;
+
     @FindBy(css = "ul li strong a")
     protected List<WebElement> scheduleLinks;
 
-    public final static int WRONG_ID = -1;
-
     public boolean existsScheduleWithTitle(String title) {
         for (WebElement scheduleLink : scheduleLinks) {
-            if(scheduleLink.getText().equals(title)) {
+            if (scheduleLink.getText().equals(title)) {
                 return true;
             }
         }
@@ -26,9 +26,9 @@ public class QueryScheduledEmailsFragment extends AbstractGreyPagesFragment {
         int objectID = QueryScheduledEmailsFragment.WRONG_ID;
 
         for (WebElement scheduleLink : scheduleLinks) {
-            if(scheduleLink.getText().equals(title)) {
+            if (scheduleLink.getText().equals(title)) {
                 String[] uriParts = scheduleLink.getAttribute("href").split("/");
-                objectID = Integer.parseInt(uriParts[uriParts.length-1]);
+                objectID = Integer.parseInt(uriParts[uriParts.length - 1]);
                 break;
             }
         }

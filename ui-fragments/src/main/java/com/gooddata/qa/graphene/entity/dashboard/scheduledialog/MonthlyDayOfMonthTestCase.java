@@ -10,7 +10,7 @@ public class MonthlyDayOfMonthTestCase extends AbstractRecurrenceTestCase {
         this.dayOfMonth = dayOfMonth;
     }
 
-    @java.lang.Override
+    @Override
     public void setDialogConfiguration(DashboardScheduleDialog dashboardScheduleDialog) {
         setDialogBasics(dashboardScheduleDialog);
         dashboardScheduleDialog.selectMonthlyOn(MonthRecurrenceType.DAY_OF_MONTH.getValue());

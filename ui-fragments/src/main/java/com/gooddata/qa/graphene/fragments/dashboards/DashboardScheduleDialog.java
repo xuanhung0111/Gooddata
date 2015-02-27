@@ -4,14 +4,15 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import java.util.List;
-
 import com.google.common.base.Joiner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import java.util.List;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 public class DashboardScheduleDialog extends AbstractFragment {
 
@@ -29,7 +30,7 @@ public class DashboardScheduleDialog extends AbstractFragment {
     @FindBy(css = ".time-dropdown-button")
     private WebElement timeButton;
 
-    @FindBy(css= ".weekly-dropdown-button")
+    @FindBy(css = ".weekly-dropdown-button")
     private WebElement weeklyButton;
 
     @FindBy(css = ".ondaymulti-dropdown-button")
@@ -75,24 +76,24 @@ public class DashboardScheduleDialog extends AbstractFragment {
         return waitForElementVisible(emailSubjectInput).getAttribute("value");
     }
 
-    public String getCustomEmailMessage() {
-        return waitForElementVisible(emailMessageInput).getText();
-    }
-
-    public String getInfoText() {
-        return waitForElementVisible(infoText).getText();
-    }
-
     public void setCustomEmailSubject(String newValue) {
         waitForElementVisible(emailSubjectInput).click();
         emailSubjectInput.clear();
         emailSubjectInput.sendKeys(newValue);
     }
 
+    public String getCustomEmailMessage() {
+        return waitForElementVisible(emailMessageInput).getText();
+    }
+
     public void setCustomEmailMessage(String newValue) {
         waitForElementVisible(emailMessageInput).click();
         emailMessageInput.clear();
         emailMessageInput.sendKeys(newValue);
+    }
+
+    public String getInfoText() {
+        return waitForElementVisible(infoText).getText();
     }
 
     public void showCustomForm() {
@@ -156,7 +157,7 @@ public class DashboardScheduleDialog extends AbstractFragment {
     private void selectSingle(int index, WebElement button) {
         waitForElementVisible(button).click();
         waitForDropDownList();
-        selectItems(new int[] {index}, false);
+        selectItems(new int[]{index}, false);
     }
 
     private void selectMultiple(int[] indices, WebElement button) {
@@ -167,7 +168,7 @@ public class DashboardScheduleDialog extends AbstractFragment {
     }
 
     private void selectItems(final int[] indexes, boolean confirm) {
-        for (int index: indexes) {
+        for (int index : indexes) {
             dropDownList.get(index).click();
         }
         if (confirm) {

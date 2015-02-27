@@ -3,9 +3,12 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
+import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.AbstractRecurrenceTestCase;
+import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfMonthTestCase;
+import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfWeekTestCase;
+import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.WeeklyTestCase;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
-import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.*;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import org.joda.time.DateTimeUtils;
@@ -21,11 +24,6 @@ import static org.testng.Assert.assertEquals;
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {
     private final String SCHEDULE_INFO = "This dashboard will be sent %s %s to %s as a PDF attachment.";
     private DashboardScheduleDialog dashboardScheduleDialog;
-
-    private String getTimezoneShortName() {
-        return DateTimeZone.getDefault().getShortName(DateTimeUtils.currentTimeMillis());
-    }
-
     private AbstractRecurrenceTestCase[] CASES = new AbstractRecurrenceTestCase[]{
             new WeeklyTestCase(
                     "weekly on Monday, Tuesday at 12:30 AM",
@@ -67,16 +65,20 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             )
     };
 
-    @Test(dependsOnMethods =  {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void setFeatureFlags () throws JSONException, IOException, InterruptedException {
+    private String getTimezoneShortName() {
+        return DateTimeZone.getDefault().getShortName(DateTimeUtils.currentTimeMillis());
+    }
+
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    public void setFeatureFlags() throws JSONException, IOException, InterruptedException {
         RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
-                RestUtils.FeatureFlagOption.createFeatureClassOption("dashboardSchedule", true)
+                RestUtils.FeatureFlagOption.createFeatureClassOption("dashboardScheduleRecipients", true)
         );
         logout();
     }
 
     @Test(dependsOnGroups = {"schedules"})
-    public void testRecurrences () throws IllegalArgumentException, JSONException {
+    public void testRecurrences() throws IllegalArgumentException, JSONException {
         signIn(true, UserRoles.ADMIN); // login with gray pages to reload application and have feature flag set
         initDashboardsPage();
         dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();

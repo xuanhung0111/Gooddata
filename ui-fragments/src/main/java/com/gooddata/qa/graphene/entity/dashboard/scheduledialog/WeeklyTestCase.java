@@ -6,7 +6,7 @@ public class WeeklyTestCase extends AbstractRecurrenceTestCase {
     public final EveryXWeeks weekFrequency;
     public final DayOfWeek[] days;
 
-    public WeeklyTestCase(String message, DayTime time,  DayOfWeek[] days, EveryXWeeks weekFrequency) {
+    public WeeklyTestCase(String message, DayTime time, DayOfWeek[] days, EveryXWeeks weekFrequency) {
         super(RecurrenceType.WEEKLY, time, message);
         this.weekFrequency = weekFrequency;
         this.days = days;
@@ -22,7 +22,7 @@ public class WeeklyTestCase extends AbstractRecurrenceTestCase {
         return intDays;
     }
 
-    @java.lang.Override
+    @Override
     public void setDialogConfiguration(DashboardScheduleDialog dashboardScheduleDialog) {
         setDialogBasics(dashboardScheduleDialog);
         dashboardScheduleDialog.selectWeeklyEvery(weekFrequency.getValue());

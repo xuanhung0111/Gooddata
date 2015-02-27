@@ -27,8 +27,6 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSchedulesTest {
 
-    private final String SUCCESSFULY_SCHEDULED_MESSAGE = "Dashboard scheduled successfully.";
-
     @FindBy(tagName = "fieldset")
     protected QueryScheduledEmailsFragment queryScheduledEmailsFragment;
 
@@ -38,12 +36,12 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     @FindBy(tagName = "pre")
     protected ObjectExecutionContext executionContextFragments;
 
-    private String custom_subject;
-    private String md_base_uri;
+    private String customSubject;
+    private String mdBaseUri;
 
     @BeforeClass
     public void getCustomSubject() {
-        custom_subject = testParams.getTestIdentification();
+        customSubject = testParams.getTestIdentification();
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -63,28 +61,28 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog", this.getClass());
 
         dialog.schedule();
-        checkGreenBar(browser, SUCCESSFULY_SCHEDULED_MESSAGE);
+        checkGreenBar(browser, "Dashboard scheduled successfully.");
     }
 
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
     public void checkManagePageForScheduleExistence() {
         initEmailSchedulesPage();
-        assertFalse(emailSchedulesPage.isSchedulePresent(custom_subject));
+        assertFalse(emailSchedulesPage.isSchedulePresent(customSubject));
     }
 
     @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
     public void checkGreyPagesForScheduleExistence() {
         initGreyPage("/query/scheduledmails", queryScheduledEmailsFragment);
-        assertTrue(queryScheduledEmailsFragment.existsScheduleWithTitle(custom_subject));
+        assertTrue(queryScheduledEmailsFragment.existsScheduleWithTitle(customSubject));
     }
 
     @Test(dependsOnMethods = {"checkGreyPagesForScheduleExistence"}, groups = {"schedules"})
     public void checkScheduleExecutionContext() throws JSONException, InterruptedException {
-        assertTrue(scheduleHasValidExecutionContext(custom_subject));
+        assertTrue(scheduleHasValidExecutionContext(customSubject));
     }
 
     private void getMDBaseUri() {
-        md_base_uri = PAGE_GDC_MD + "/" + testParams.getProjectId();
+        mdBaseUri = PAGE_GDC_MD + "/" + testParams.getProjectId();
     }
 
     private boolean scheduleHasValidExecutionContext(String title) throws JSONException, InterruptedException {
@@ -119,7 +117,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     }
 
     private void initGreyPage(String uriSuffix, AbstractFragment fragment) {
-        openUrl(md_base_uri.concat(uriSuffix));
+        openUrl(mdBaseUri.concat(uriSuffix));
         waitForElementPresent(fragment.getRoot());
     }
 
@@ -132,12 +130,12 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         dialog.showCustomForm();
         dialog.selectTabs(new int[]{1});
         dialog.selectTime(1);
-        dialog.setCustomEmailSubject(custom_subject);
+        dialog.setCustomEmailSubject(customSubject);
     }
 
     @AfterClass
     private void deleteEmailScheduleAndExecutionContext() throws JSONException, InterruptedException {
-        int scheduleId = getScheduleId(custom_subject);
+        int scheduleId = getScheduleId(customSubject);
         int executionContextId = getExecutionContextId(scheduleId);
 
         restApiClient = getRestApiClient();
@@ -147,7 +145,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     }
 
     private void deleteObject(int objectId) {
-        HttpRequestBase request = restApiClient.newDeleteMethod(getRootUrl() + md_base_uri + "/obj/" + Integer.toString(objectId));
+        HttpRequestBase request = restApiClient.newDeleteMethod(getRootUrl() + mdBaseUri + "/obj/" + Integer.toString(objectId));
         HttpResponse response = restApiClient.execute(request);
         EntityUtils.consumeQuietly(response.getEntity());
     }

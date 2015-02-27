@@ -4,7 +4,6 @@ import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -18,6 +17,11 @@ import java.util.List;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardsPage extends AbstractFragment {
+
+    private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
+    private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
+    private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
+    private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
 
     @FindBy(xpath = "//div[@id='abovePage']/div[contains(@class,'yui3-dashboardtabs-content')]")
     private DashboardTabs tabs;
@@ -67,7 +71,7 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(css = ".s-lockIcon")
     private WebElement lockIcon;
 
-    @FindBy (xpath = "//div[@class='yui3-d-embeddialog-content']")
+    @FindBy(xpath = "//div[@class='yui3-d-embeddialog-content']")
     private DashboardEmbedDialog dashboardEmbedDialog;
 
     @FindBy(css = ".s-scheduleButton")
@@ -84,13 +88,7 @@ public class DashboardsPage extends AbstractFragment {
      */
     @FindBy(xpath = "//div[contains(@class,'savedFilters')]/button")
     private SavedViewWidget savedViewWidget;
-
     private By emptyTabPlaceholder = By.xpath("//div[contains(@class, 'yui3-c-projectdashboard-placeholder-visible')]");
-
-    private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
-    private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
-    private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
-    private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
 
     public DashboardTabs getTabs() {
         return tabs;
@@ -195,7 +193,7 @@ public class DashboardsPage extends AbstractFragment {
         String tabName = tabs.getTabLabel(0);
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(printPdfButton).click();
-        waitForElementVisible(BY_PRINTING_PANEL,browser);
+        waitForElementVisible(BY_PRINTING_PANEL, browser);
         Thread.sleep(3000);
         waitForElementNotPresent(BY_PRINTING_PANEL);
         Thread.sleep(3000);
@@ -235,7 +233,7 @@ public class DashboardsPage extends AbstractFragment {
     public void addNewDashboard(String dashboardName) throws InterruptedException {
         openEditExportEmbedMenu().select("Add Dashboard");
         waitForElementVisible(newDashboardNameInput);
-        
+
         newDashboardNameInput.click(); //sleep wasn't necessary, getting focus on the input field helps
         newDashboardNameInput.clear();
         newDashboardNameInput.sendKeys(dashboardName);
@@ -256,20 +254,20 @@ public class DashboardsPage extends AbstractFragment {
 
     public void publishDashboard(boolean listed) {
         openPermissionsDialog();
-        
+
         permissionsDialog.publish(listed ? PublishType.EVERYONE_CAN_ACCESS : PublishType.SPECIFIC_USERS_CAN_ACCESS);
         permissionsDialog.submit();
     }
 
     public void lockDashboard(boolean lock) {
         openPermissionsDialog();
-        
+
         if (lock) {
             permissionsDialog.lock();
         } else {
             permissionsDialog.unlock();
         }
-        
+
         permissionsDialog.submit();
     }
 
@@ -288,8 +286,8 @@ public class DashboardsPage extends AbstractFragment {
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
 
-        for(FilterWidget filter : getFilters()) {
-            if(!filter.getRoot().getAttribute("class").contains("s-" + condition)) continue;
+        for (FilterWidget filter : getFilters()) {
+            if (!filter.getRoot().getAttribute("class").contains("s-" + condition)) continue;
             return filter;
         }
         return null;

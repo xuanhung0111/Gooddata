@@ -3,8 +3,6 @@ package com.gooddata.qa.graphene.fragments.greypages.md.obj;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static org.testng.Assert.assertFalse;
-
 public class ObjectScheduledEmailFragment extends ObjectFragment {
 
     public final static int WRONG_ID = -1;
@@ -14,11 +12,11 @@ public class ObjectScheduledEmailFragment extends ObjectFragment {
     }
 
     public int getExecutionContextId() throws JSONException, InterruptedException {
-        if(hasExecutionContext()) {
+        if (hasExecutionContext()) {
             String executionContextUri = getDashboardAttachment().getString("executionContext");
             String[] uriParts = executionContextUri.split("/");
 
-            return Integer.parseInt(uriParts[uriParts.length-1]);
+            return Integer.parseInt(uriParts[uriParts.length - 1]);
         } else {
             return ObjectScheduledEmailFragment.WRONG_ID;
         }
@@ -26,10 +24,10 @@ public class ObjectScheduledEmailFragment extends ObjectFragment {
 
     private JSONObject getDashboardAttachment() throws JSONException, InterruptedException {
         JSONObject attachment = getObject()
-                                .getJSONObject("scheduledMail")
-                                .getJSONObject("content")
-                                .getJSONArray("attachments")
-                                .getJSONObject(0);
+                .getJSONObject("scheduledMail")
+                .getJSONObject("content")
+                .getJSONArray("attachments")
+                .getJSONObject(0);
 
         return attachment.getJSONObject("dashboardAttachment");
     }

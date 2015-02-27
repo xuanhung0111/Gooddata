@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -170,7 +169,7 @@ public final class CheckUtils {
                 return !items.isEmpty();
             }
         });
-        
+
         return items;
     }
 }

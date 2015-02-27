@@ -1,20 +1,18 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForReportsPageLoaded;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
 
 @Test(groups = {"GoodSalesReportFilters"},
-      description = "Tests for GoodSales project (report filters functionality)")
+        description = "Tests for GoodSales project (report filters functionality)")
 public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     private static final String REPORT_NAME = "Test Filter";
@@ -28,9 +26,9 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createReportTest() throws InterruptedException {
         createReport(new ReportDefinition().withName(REPORT_NAME)
-                                           .withWhats("Amount")
-                                           .withHows("Stage Name"),
-                    "Simple filter report");
+                        .withWhats("Amount")
+                        .withHows("Stage Name"),
+                "Simple filter report");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -44,7 +42,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"})
     public void attributeFilterTest() throws InterruptedException {
         initReport();
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", "Interest", 
+        reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", "Interest",
                 "Discovery", "Short List", "Negotiation", "Closed Won", "Closed Lost"));
         reportPage.saveReport();
         checkRedBar(browser);

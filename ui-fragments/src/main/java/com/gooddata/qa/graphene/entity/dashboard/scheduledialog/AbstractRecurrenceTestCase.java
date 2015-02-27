@@ -2,18 +2,44 @@ package com.gooddata.qa.graphene.entity.dashboard.scheduledialog;
 
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 
-abstract public class AbstractRecurrenceTestCase {
-    protected final String message;
-
+public abstract class AbstractRecurrenceTestCase {
+    public static int MONTH_FIRST_DAY = 1;
+    public static int MONTH_MAX_DAYS = 31;
+    public static int MONTH_LAST_DAY = -1;
+    public static int[] MONTH_DAYS = generateMonthDays();
     public final RecurrenceType recurrence;
     public final DayTime time;
+    protected final String message;
 
     public AbstractRecurrenceTestCase(RecurrenceType recurrence, DayTime time, String message) {
         this.recurrence = recurrence;
         this.time = time;
         this.message = message;
     }
-    
+
+    private static int[] generateMonthDays() {
+        int[] monthDays = new int[MONTH_MAX_DAYS + 1];
+
+        monthDays[0] = MONTH_LAST_DAY;
+
+        for (int day = MONTH_FIRST_DAY; day < MONTH_MAX_DAYS; day++) {
+            monthDays[day] = day - 1;
+        }
+
+        return monthDays;
+    }
+
+    protected void setDialogBasics(DashboardScheduleDialog dashboardScheduleDialog) {
+        dashboardScheduleDialog.selectFrequency(recurrence.getValue());
+        dashboardScheduleDialog.selectTime(time.getValue());
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public abstract void setDialogConfiguration(DashboardScheduleDialog dashboardScheduleDialog);
+
     public static enum RecurrenceType {
         DAILY(0),
         WEEKLY(1),
@@ -113,32 +139,4 @@ abstract public class AbstractRecurrenceTestCase {
             return value;
         }
     }
-
-    public static int MONTH_FIRST_DAY = 1;
-    public static int MONTH_MAX_DAYS = 31;
-    public static int MONTH_LAST_DAY = -1;
-    public static int[] MONTH_DAYS = generateMonthDays();
-
-    private static int[] generateMonthDays() {
-        int[] monthDays = new int[MONTH_MAX_DAYS+1];
-
-        monthDays[0] = MONTH_LAST_DAY;
-
-        for (int day = MONTH_FIRST_DAY; day < MONTH_MAX_DAYS; day++) {
-            monthDays[day] = day - 1;
-        }
-
-        return monthDays;
-    }
-
-    protected void setDialogBasics(DashboardScheduleDialog dashboardScheduleDialog) {
-        dashboardScheduleDialog.selectFrequency(recurrence.getValue());
-        dashboardScheduleDialog.selectTime(time.getValue());
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    abstract public void setDialogConfiguration(DashboardScheduleDialog dashboardScheduleDialog);
 }
