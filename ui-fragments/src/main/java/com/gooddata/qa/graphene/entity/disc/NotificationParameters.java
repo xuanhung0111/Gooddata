@@ -3,15 +3,11 @@ package com.gooddata.qa.graphene.entity.disc;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
-
 public class NotificationParameters {
 
-    private NotificationEvents notificationEvent;
     private Map<String, String> availableParameters;
 
     public NotificationParameters() {
-        notificationEvent = NotificationEvents.SUCCESS;
         availableParameters = new HashMap<String, String>();
     }
 
@@ -21,11 +17,6 @@ public class NotificationParameters {
         else
             throw new UnsupportedOperationException("The parameter " + paramName
                     + " is not available!");
-    }
-
-    public NotificationParameters setNotificationEvent(NotificationEvents notificationEvent) {
-        this.notificationEvent = notificationEvent;
-        return this;
     }
 
     public NotificationParameters setProjectId(String projectId) {
@@ -75,10 +66,7 @@ public class NotificationParameters {
             executionDetails = new ExecutionDetails();
         availableParameters.put("params.LOG", executionDetails.getScheduleLogLink());
         availableParameters.put("params.SCHEDULED_TIME", executionDetails.getScheduledTime());
-        if (notificationEvent == NotificationEvents.PROCESS_STARTED)
-            availableParameters.put("params.START_TIME", executionDetails.getStartTime());
-        else
-            availableParameters.put("params.START_TIME", executionDetails.getScheduledTime());
+        availableParameters.put("params.START_TIME", executionDetails.getStartTime());
         availableParameters.put("params.FINISH_TIME", executionDetails.getEndTime());
         availableParameters.put("params.ERROR_MESSAGE", executionDetails.getErrorMessage());
         return this;
