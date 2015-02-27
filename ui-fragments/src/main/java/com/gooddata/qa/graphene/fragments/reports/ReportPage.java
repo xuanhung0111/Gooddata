@@ -119,6 +119,10 @@ public class ReportPage extends AbstractFragment {
     }
 
     public void createReport(ReportDefinition reportDefinition) throws InterruptedException {
+        // Wait to avoid red bar randomly
+        // Red bar message: An error occurred while performing this operation.
+        Thread.sleep(3000);
+
         setReportName(reportDefinition.getName());
 
         if (reportDefinition.shouldAddWhatToReport())
@@ -161,6 +165,10 @@ public class ReportPage extends AbstractFragment {
     }
 
     public String exportReport(ExportFormat format) throws InterruptedException {
+        // Wait to avoid red bar randomly
+        // Red bar message: An error occurred while performing this operation.
+        Thread.sleep(3000);
+
         String reportName = getReportName();
         waitForElementVisible(exportButton).click();
         WebElement currentExportLink = null;
