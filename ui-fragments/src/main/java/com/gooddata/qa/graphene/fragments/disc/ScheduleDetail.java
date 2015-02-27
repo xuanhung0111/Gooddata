@@ -550,6 +550,12 @@ public class ScheduleDetail extends ScheduleForm {
             Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
                     .pollingEvery(2, TimeUnit.SECONDS).until().element(runningExecutionItem).is()
                     .visible();
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver arg0) {
+                    return !lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText().isEmpty();
+                }});
             return true;
         } catch (NoSuchElementException e) {
             return false;
