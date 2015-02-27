@@ -194,9 +194,13 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     private void initDataPage(String page) {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|dataPage|" + page);
-        waitForDataPageLoaded(browser);
+        if (page.equalsIgnoreCase("attributes")) {
+            initAttributePage();
+        } else if (page.equalsIgnoreCase("facts")) {
+            initFactPage();
+        } else {
+            initMetricPage();
+        }
     }
 
     private void createSnDFolder(String folderName) throws InterruptedException {

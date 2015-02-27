@@ -227,8 +227,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void openObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType) {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage");
-        waitForDataPageLoaded(browser);
+        initManagePage();
         waitForElementVisible(dataPage.getMenuItem(objectType)).click();
         waitForDataPageLoaded(browser);
         waitForElementVisible(objectsTable.getRoot());

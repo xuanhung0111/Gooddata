@@ -16,7 +16,7 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
     public void createNumericVariableTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        initVariablePage();
         variablePage.createVariable(new NumericVariable("Test variable" + System.currentTimeMillis())
                 .withDefaultNumber(1234)
                 .withUserNumber(5678));
@@ -36,7 +36,7 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
     }
 
     private AttributeVariable initAttributeVariable() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        initVariablePage();
         name = "Test variable" + System.currentTimeMillis();
         return new AttributeVariable(name)
                         .withAttribute("Stage Name")
@@ -47,7 +47,7 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
     public void initObject(String variableName) {
         description = "Test description";
         tagName = "var";
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        initVariablePage();
         variablePage.openVariableFromList(variableName);
     }
 }

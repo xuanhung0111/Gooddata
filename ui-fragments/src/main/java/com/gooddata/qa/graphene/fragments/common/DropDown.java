@@ -50,4 +50,9 @@ public class DropDown extends AbstractFragment {
         searchItem(name);
         selectItem(name);
     }
+
+    public void selectFirstItem() {
+        waitForCollectionIsNotEmpty(items);
+        items.get(0).click();
+    }
 }

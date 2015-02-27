@@ -35,7 +35,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void createVariableTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
                 .withAttribute("Stage Name")
                 .withAttributeElements("Interest", "Discovery", "Short List", "Negotiation"));
@@ -78,8 +78,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     private void initReport() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage|");
-        waitForReportsPageLoaded(browser);
+        initReportsPage();
         reportsPage.getReportsList().openReport(REPORT_NAME);
     }
 }

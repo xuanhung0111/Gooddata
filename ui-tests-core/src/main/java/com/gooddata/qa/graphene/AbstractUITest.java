@@ -2,7 +2,9 @@ package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -39,6 +41,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_PROJECTS = "projects.html";
     protected static final String PAGE_UPLOAD = "upload.html";
     protected static final String PAGE_LOGIN = "account.html#/login";
+    protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
 
     /**
      * ----- UI fragmnets -----
@@ -142,16 +145,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = ".active .broken-schedules-section .selectable-domain-table")
     protected SchedulesTable brokenSchedulesTable;
-    
+
     @FindBy(css = ".ait-projects-fragment")
     protected DISCProjectsPage discProjectsPage;
-    
+
     @FindBy(css = ".ait-notification-rules-fragment")
     protected NotificationRulesDialog discNotificationRules;
 
     @FindBy(css = ".ait-overview-fragment")
     protected OverviewStates discOverview;
-    
+
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
@@ -210,7 +213,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void verifyProjectDashboardsAndTabs(boolean validation, Map<String, String[]> expectedDashboardsAndTabs,
                                                boolean openPage) throws InterruptedException {
         if (openPage) {
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         }
         waitForDashboardPageLoaded(browser);
@@ -269,13 +272,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         System.out.println("Deleted project: " + projectId);
     }
 
-    public void initDashboardsPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-        waitForDashboardPageLoaded(browser);
-        waitForElementVisible(dashboardsPage.getRoot());
-    }
-
     public void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) throws InterruptedException {
         initDashboardsPage();
         assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
@@ -298,19 +294,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
         Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
     }
-    
+
     public void createDashboard(String name) throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(name);
         initDashboardsPage();
     }
-    
+
     public void createDashboard(String name, boolean lock, boolean publish) throws InterruptedException {
-    	createDashboard(name);
-    	lockDashboard(lock);
-    	publishDashboard(publish);
+        createDashboard(name);
+        lockDashboard(lock);
+        publishDashboard(publish);
     }
-    
+
     public void lockDashboard(boolean lock) {
         initDashboardsPage();
         dashboardsPage.lockDashboard(lock);
@@ -322,16 +318,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         dashboardsPage.publishDashboard(publish);
         waitForElementVisible(dashboardsPage.getRoot());
     }
-    
+
     public void selectDashboard(String name) throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.selectDashboard(name);
-    }
-
-    public void initReportsPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage");
-        waitForReportsPageLoaded(browser);
-        waitForElementVisible(reportsPage.getRoot());
     }
 
     public void createReport(ReportDefinition reportDefinition, String screenshotName) throws InterruptedException {
@@ -347,7 +337,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyDashboardExport(String dashboardName, long minimalSize) {
-    	File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName.replaceAll(" ", "_") + ".pdf");
+        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName.replaceAll(" ", "_") + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
         System.out.println(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
         long fileSize = pdfExport.length();
@@ -375,7 +365,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 reportsPage.getSelectedFolderName());
     }
 
-    public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType, String screenshotName) throws InterruptedException {
+    public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType,
+            String screenshotName) throws InterruptedException {
         initProjectsPage();
         initDashboardsPage();
         initUploadPage();
@@ -396,39 +387,130 @@ public class AbstractUITest extends AbstractGreyPageTest {
         Screenshots.takeScreenshot(browser, screenshotName + "-dashboard", this.getClass());
     }
 
+    private void goToCurrentProject() {
+        final String currentUrl = browser.getCurrentUrl();
+
+        if (currentUrl.contains(PAGE_UI_PROJECT_PREFIX)) {
+            if (currentUrl.contains(testParams.getProjectId()))
+                return;
+            ApplicationHeaderBar.selectProject(testParams.getProjectId(), browser);
+        } else {
+            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
+        }
+
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+        waitForDashboardPageLoaded(browser);
+        waitForElementVisible(dashboardsPage.getRoot());
+    }
+
+    public void initDashboardsPage() {
+        goToCurrentProject();
+        if (browser.getCurrentUrl().contains(DASHBOARD_PAGE_SUFFIX)) {
+            // already in dashboard page
+            return;
+        }
+        ApplicationHeaderBar.goToDashboardsPage(browser);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+        waitForDashboardPageLoaded(browser);
+        waitForElementVisible(dashboardsPage.getRoot());
+    }
+
+    public void initReportsPage() {
+        goToCurrentProject();
+        ApplicationHeaderBar.goToReportsPage(browser);
+        waitForReportsPageLoaded(browser);
+        waitForElementVisible(reportsPage.getRoot());
+    }
+
     public void initAttributePage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        initManagePage();
+        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.ATTRIBUTE)).click();
         waitForDataPageLoaded(browser);
     }
 
     public void initModelPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|ldmModel");
+        initManagePage();
+        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.MODEL)).click();
         waitForDataPageLoaded(browser);
     }
 
     public void initMetricPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initManagePage();
+        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.METRIC)).click();
         waitForDataPageLoaded(browser);
     }
 
     public void initAnalysePage() {
-        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
+        goToCurrentProject();
+        ApplicationHeaderBar.goToAnalysisPage(browser);
         waitForFragmentVisible(analysisPage);
     }
-    
+
     public void initVariablePage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        initManagePage();
+        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.VARIABLE)).click();
         waitForDataPageLoaded(browser);
     }
-    
+
+    public void initFactPage() {
+        initManagePage();
+        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.FACT)).click();
+        waitForDataPageLoaded(browser);
+    }
+
+    public void initManagePage() {
+        goToCurrentProject();
+        ApplicationHeaderBar.goToManagePage(browser);
+        waitForDataPageLoaded(browser);
+    }
+
     public void initProjectsPage() {
         openUrl(PAGE_PROJECTS);
         waitForProjectsPageLoaded(browser);
         waitForElementVisible(projectsPage.getRoot());
     }
-    
+
     public void initUploadPage() {
         openUrl(PAGE_UPLOAD);
         waitForElementVisible(upload.getRoot());
+    }
+
+    public void initDashboardsPageByUrl() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+        waitForDashboardPageLoaded(browser);
+        waitForElementVisible(dashboardsPage.getRoot());
+    }
+
+    public void initReportsPageByUrl() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage");
+        waitForReportsPageLoaded(browser);
+        waitForElementVisible(reportsPage.getRoot());
+    }
+
+    public void initAttributePageByUrl() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+        waitForDataPageLoaded(browser);
+    }
+
+    public void initModelPageByUrl() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|ldmModel");
+        waitForDataPageLoaded(browser);
+    }
+
+    public void initMetricPageByUrl() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        waitForDataPageLoaded(browser);
+    }
+
+    public void initAnalysePageByUrl() {
+        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
+        waitForFragmentVisible(analysisPage);
+    }
+    
+
+    public void initVariablePageByUrl() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        waitForDataPageLoaded(browser);
     }
 }

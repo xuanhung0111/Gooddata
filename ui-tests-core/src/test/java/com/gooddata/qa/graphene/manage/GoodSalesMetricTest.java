@@ -80,7 +80,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"})
     public void createShareMetric() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String metricName = "Share % " + getCurrentDateString();
         String metric = "Amount";
         metricEditorPage.createShareMetric(metricName, metric, attrFolder, attr);
@@ -92,7 +92,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"})
     public void createDifferentMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String metric = "Amount";
         String metricName = "Difference " + getCurrentDateString();
         metricEditorPage.createDifferentMetric(metricName, metric, attrFolder, attr, attrValue);
@@ -104,7 +104,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"})
     public void createRatioMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String metricName = "Ratio " + getCurrentDateString();
         metricEditorPage.createRatioMetric(metricName, ratioMetric1, ratioMetric2);
         List<Float> metricValues = Arrays.asList(3.61f);
@@ -113,7 +113,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"})
     public void createAggregationMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String fact0 = "Amount";
         String fact1 = "Probability";
         String fact2 = "Velocity";
@@ -189,14 +189,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                             metric.getMetricValues(), quarterYearValues);
                     break;
                 }
-                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+                initMetricPage();
             }
         }
     }
 
     @Test(dependsOnMethods = {"initialize"})
     public void createNumericMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String metric0 = "Best Case";
         String metric1 = "Amount";
         String metric2 = "Win Rate";
@@ -235,14 +235,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                     checkMetricValuesInReport(metricName, productAttr, metric.getMetricValues(), productValues);
                     break;
                 }
-                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+                initMetricPage();
             }
         }
     }
 
     @Test(dependsOnMethods = {"initialize"})
     public void createGranularityMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String fact0 = "Probability";
         String attrFolder0 = "Date dimension (Snapshot)";
         String attrFolder1 = "Date dimension (Closed)";
@@ -301,14 +301,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                             metric.getMetricValues(), productValues);
                     break;
                 }
-                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+                initMetricPage();
             }
         }
     }
 
     @Test(dependsOnMethods = {"initialize"})
     public void createLogicalMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String attrFolder0 = "Date dimension (Snapshot)";
         String attr0 = "Year (Snapshot)";
         String attrValue0 = "2011";
@@ -375,14 +375,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                             metric.getMetricValues(), productValues);
                     break;
                 }
-                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+                initMetricPage();
             }
         }
     }
 
     @Test(dependsOnMethods = {"initialize"})
     public void createFilterMetricTest() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+        initMetricPage();
         String attrFolder = "Date dimension (Snapshot)";
         String attr = "Year (Snapshot)";
         String attrValue0 = "2010";
@@ -458,7 +458,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                             MetricList.NOT_IN.getMetricValues(), quartersIn2012);
                     break;
                 }
-                openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
+                initMetricPage();
             }
         }
     }

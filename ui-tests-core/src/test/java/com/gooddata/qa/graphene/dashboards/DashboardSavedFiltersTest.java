@@ -324,9 +324,8 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         }
 
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
-        waitForDashboardPageLoaded(browser);
+        initVariablePage();
+        initDashboardsPage();
         Thread.sleep(2000);
 
         assertEquals(waitForElementVisible(savedViewWidget.getRoot()).getText(),

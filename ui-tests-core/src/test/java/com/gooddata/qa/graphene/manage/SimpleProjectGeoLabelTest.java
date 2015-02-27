@@ -45,7 +45,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     public void changeAttributeToGeoStateTest() throws InterruptedException {
         int i = 0;
         for (AttributeLabelTypes type : getGeoLabels()) {
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
+            initAttributePage();
             attributePage.configureAttributeLabel(attributesList.get(i), type);
             i++;
         }

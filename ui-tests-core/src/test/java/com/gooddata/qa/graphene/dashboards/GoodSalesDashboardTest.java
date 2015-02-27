@@ -23,9 +23,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
     public void exportFirstDashboard() throws InterruptedException {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage");
-        waitForDashboardPageLoaded(browser);
-        waitForElementVisible(dashboardsPage.getRoot());
+        initDashboardsPage();
         dashboardsPage.selectDashboard("Pipeline Analysis");
         waitForDashboardPageLoaded(browser);
         exportedDashboardName = dashboardsPage.exportDashboardTab(0);
