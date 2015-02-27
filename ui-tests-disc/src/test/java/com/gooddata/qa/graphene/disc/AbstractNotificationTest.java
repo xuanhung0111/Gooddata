@@ -366,7 +366,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                 }
                 paramValue = builder.toString();
             }
-            if (paramName.contains("TIME")) {
+            if (paramName.contains("TIME") && !paramValue.isEmpty()) {
                 long timeDifferenceInSeconds =
                         timeDifferenceInSecond(expectedParams.getParamValue(paramName), paramValue);
                 assertTrue(timeDifferenceInSeconds >= -2 && timeDifferenceInSeconds <= 2,
