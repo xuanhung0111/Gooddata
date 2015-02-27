@@ -31,12 +31,12 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
         attribute3 = CLICKTHROUGHS_ID;
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {COMPARISON_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
     public void testComparisonAndPoPAttribute() {
         testComparisonAndPoPAttribute(12);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreAttribute() {
         initAnalysePage();
         StringBuilder expected = new StringBuilder(CAMPAIGNS).append("\n")
@@ -49,7 +49,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
         assertEquals(analysisPage.getAttributeDescription(CAMPAIGNS), expected.toString());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreMetric() {
         initAnalysePage();
         StringBuilder expected = new StringBuilder(EMAIL_OPEN).append("\n")
@@ -60,25 +60,25 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
         assertEquals(analysisPage.getMetricDescription(EMAIL_OPEN), expected.toString());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void compararisonRecommendationOverrideDateFilter() {
         compararisonRecommendationOverrideDateFilter(12);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void filterOnAttribute() {
         filterOnAttribute(CAMPAIGNS + ": Email Promot..., Top Sellers ...",
                 "Email Promotions", "Top Sellers Blog Series");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void attributeFilterIsRemovedWhenRemoveAttributeInCatalogue() {
         attributeFilterIsRemovedWhenRemoveAttributeInCatalogue(CAMPAIGNS + ": Email Promot..., Top Sellers ...",
                 "Email Promotions", "Top Sellers Blog Series");
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods = {"createProject"}, groups = {CHART_REPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)
@@ -91,7 +91,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods = {"createProject"}, groups = {TABLE_REPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)

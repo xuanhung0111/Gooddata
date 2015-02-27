@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -57,7 +59,20 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         projectCreateCheckIterations = 60; // 5 minutes
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {CUSTOM_DISCOVERY_GROUP})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    public void turnOffWalkme() {
+        initAnalysePage();
+
+        try {
+            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-close"), browser);
+            walkmeCloseElement.click();
+            waitForElementNotPresent(walkmeCloseElement);
+        } catch (TimeoutException e) {
+            System.out.println("Walkme dialog is not appeared!");
+        }
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
     public void testCustomDiscovery() {
         initAnalysePage();
 
@@ -79,7 +94,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {CUSTOM_DISCOVERY_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
     public void testWithAttribute() {
         initAnalysePage();
 
@@ -96,7 +111,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getHeaders(), Arrays.asList(attribute1.toUpperCase()));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {CUSTOM_DISCOVERY_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
     public void dragMetricToColumnChartShortcutPanel() {
         initAnalysePage();
 
@@ -116,7 +131,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 3);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {CUSTOM_DISCOVERY_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
     public void dragMetricToTrendShortcutPanel() {
         initAnalysePage();
 
@@ -131,7 +146,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {CONTRIBUTION_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CONTRIBUTION_GROUP})
     public void testSimpleContribution() {
         initAnalysePage();
 
@@ -157,7 +172,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(analysisPage.isShowPercentConfigSelected());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {CONTRIBUTION_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CONTRIBUTION_GROUP})
     public void testAnotherApproachToShowContribution() {
         initAnalysePage();
 
@@ -176,7 +191,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {COMPARISON_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
     public void testSimpleComparison() {
         initAnalysePage();
 
@@ -203,7 +218,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {TRENDING_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
     public void supportParameter() {
         initAnalysePage();
 
@@ -229,7 +244,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 12);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {TRENDING_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
     public void displayInColumnChartWithOnlyMetric() {
         initAnalysePage();
 
@@ -254,7 +269,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {TRENDING_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
 
@@ -265,7 +280,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreDate() {
         initAnalysePage();
         StringBuilder expected = new StringBuilder(DATE).append("\n")
@@ -275,7 +290,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(analysisPage.getTimeDescription(DATE), expected.toString());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {EXPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {EXPORT_GROUP})
     public void exportCustomDiscovery() throws InterruptedException {
         initAnalysePage();
 
@@ -322,7 +337,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         browser.switchTo().window(currentWindowHandel);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {EXPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {EXPORT_GROUP})
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
@@ -331,7 +346,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void filterOnDateAttribute() {
         initAnalysePage();
 
@@ -346,7 +361,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 6);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void testDateInCategoryAndDateInFilter() {
         initAnalysePage();
 
@@ -357,7 +372,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
 
@@ -375,7 +390,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 4);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void dragAndDropAttributeToFilterBucket() {
         initAnalysePage();
 
@@ -388,7 +403,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(analysisPage.addFilter(attribute2).getFilterText(attribute2), attribute2 + ": All");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {FILTER_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void addFilterDoesNotHideRecommendation() {
         initAnalysePage();
 
@@ -409,7 +424,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {PERIOD_OVER_PERIOD_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
     public void testSimplePoP() {
         initAnalysePage();
 
@@ -436,7 +451,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {PERIOD_OVER_PERIOD_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
     public void testAnotherApproachToShowPoP() {
         initAnalysePage();
 
@@ -455,7 +470,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {RESET_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {RESET_GROUP})
     public void testResetFunction() {
         initAnalysePage();
 
