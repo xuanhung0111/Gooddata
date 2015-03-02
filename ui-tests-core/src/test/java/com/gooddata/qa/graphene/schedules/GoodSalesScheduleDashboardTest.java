@@ -50,8 +50,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         signIn(true, userRole); // login with gray pages to reload application and have feature flag set
     }
 
-    @Test(dependsOnMethods =  {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void setFeatureFlags () throws JSONException, IOException {
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
+    public void setFeatureFlags() throws JSONException, IOException {
         RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
                 FeatureFlagOption.createFeatureClassOption("dashboardSchedule", true)
         );
@@ -62,46 +62,48 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     // prepare viewer user and login
     @Test(dependsOnMethods = {"setFeatureFlags"}, groups = {"schedules"})
-    public void createDashboardSchedule () throws JSONException {
+    public void createDashboardSchedule() throws JSONException {
         loginAs(UserRoles.VIEWER);
         initDashboardsPage();
-        DashboardScheduleDialog scheduleDashboard = dashboardsPage.scheduleDashboard();
-        scheduleDashboard.showCustomForm();
 
-        scheduleDashboard.selectTabs(new int[] {1});
+        DashboardScheduleDialog dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
+        dashboardScheduleDialog.showCustomForm();
+
+        dashboardScheduleDialog.selectTabs(new int[]{1});
         String[] tabNames = expectedGoodSalesDashboardsAndTabs.get("Pipeline Analysis");
         assertEquals(
-                scheduleDashboard.getCustomEmailSubject(),
+                dashboardScheduleDialog.getCustomEmailSubject(),
                 dashboardsPage.getDashboardName() + " Dashboard - " + tabNames[1],
                 "Update of one Tab is reflected in subject."
         );
 
-        scheduleDashboard.selectTabs(new int[] {1, 5, 6});
+        dashboardScheduleDialog.selectTabs(new int[]{1, 5, 6});
         assertEquals(
-            scheduleDashboard.getCustomEmailSubject(),
-            dashboardsPage.getDashboardName() + " Dashboard",
-            "Update of multiple Tabs is reflected in subject."
+                dashboardScheduleDialog.getCustomEmailSubject(),
+                dashboardsPage.getDashboardName() + " Dashboard",
+                "Update of multiple Tabs is reflected in subject."
         );
 
-        scheduleDashboard.setCustomEmailSubject(CUSTOM_SUBJECT);
-        scheduleDashboard.setCustomRecipients(CUSTOM_RECIPIENTS);
-        scheduleDashboard.selectTabs(new int[] {1, 2});
+        dashboardScheduleDialog.setCustomEmailSubject(CUSTOM_SUBJECT);
+        dashboardScheduleDialog.setCustomRecipients(CUSTOM_RECIPIENTS);
+        dashboardScheduleDialog.selectTabs(new int[]{1, 2});
+
         assertEquals(
-            scheduleDashboard.getCustomEmailSubject(),
-            CUSTOM_SUBJECT,
-            "Update of Tabs is not reflected in subject."
+                dashboardScheduleDialog.getCustomEmailSubject(),
+                CUSTOM_SUBJECT,
+                "Update of Tabs is not reflected in subject."
         );
-        scheduleDashboard.selectTime(1);
-        String infoText = scheduleDashboard.getInfoText();
+        dashboardScheduleDialog.selectTime(1);
+        String infoText = dashboardScheduleDialog.getInfoText();
         String tzId = tz.getShortName(DateTimeUtils.currentTimeMillis());
         assertTrue(
-            infoText.contains(String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser())),
-            "Custom time is in info message, expected " + String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser()) + ", found " + infoText + "."
+                infoText.contains(String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser())),
+                "Custom time is in info message, expected " + String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser()) + ", found " + infoText + "."
         );
         // check time in info text
-        scheduleDashboard.setCustomEmailMessage(CUSTOM_MESSAGE);
+        dashboardScheduleDialog.setCustomEmailMessage(CUSTOM_MESSAGE);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog", this.getClass());
-        scheduleDashboard.schedule();
+        dashboardScheduleDialog.schedule();
     }
 
     // login and test as admin
@@ -116,8 +118,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         assertEquals(emailSchedulesPage.getAttachedDashboards(), SCHEDULED_DASHBOARDS, "The selected dashboards are attached to scheduled e-mail.");
         String timeDescription = emailSchedulesPage.getTimeDescription();
         assertTrue(
-            timeDescription.contains(SCHEDULE_TIME_MANAGE_PAGE),
-            "Time description contains the given time. Expected '" + SCHEDULE_TIME_MANAGE_PAGE + "', found '" + timeDescription + "'."
+                timeDescription.contains(SCHEDULE_TIME_MANAGE_PAGE),
+                "Time description contains the given time. Expected '" + SCHEDULE_TIME_MANAGE_PAGE + "', found '" + timeDescription + "'."
         );
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
     }
@@ -133,13 +135,13 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         JSONObject schedule = getObjectByID(id);
         JSONArray recipientsJson = schedule.getJSONObject("scheduledMail").getJSONObject("content").getJSONArray("bcc");
         Set<String> recipients = new HashSet<String>();
-        for(int i = 0; i < recipientsJson.length(); i++) {
+        for (int i = 0; i < recipientsJson.length(); i++) {
             recipients.add(recipientsJson.getString(i));
         }
         String timeZoneId = schedule.getJSONObject("scheduledMail")
-                                      .getJSONObject("content")
-                                      .getJSONObject("when")
-                                      .getString("timeZone");
+                .getJSONObject("content")
+                .getJSONObject("when")
+                .getString("timeZone");
         DateTimeZone tzFromObj = DateTimeZone.forID(timeZoneId);
 
         // verify bcc

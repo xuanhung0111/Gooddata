@@ -12,13 +12,12 @@ import org.testng.Assert;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForEmailSchedulePageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class EmailSchedulePage extends AbstractFragment {
+
+    @FindBy(css = ".listView .listTable .s-dataPage-listRow .title > a > span")
+    protected List<WebElement> scheduledEmailsTitles;
 
     @FindBy(css = ".s-btn-schedule_new_email")
     private WebElement addScheduleButton;
@@ -89,7 +88,7 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public List<String> getAttachedDashboards() {
         List<String> selected = new ArrayList<String>();
-        for (WebElement label: attachedDashboards) {
+        for (WebElement label : attachedDashboards) {
             selected.add(label.getText());
         }
         return selected;
@@ -102,12 +101,26 @@ public class EmailSchedulePage extends AbstractFragment {
 
     public int getNumberOfSchedules() {
         int schedulesCount = waitForElementPresent(schedulesTable).
-            findElement(By.tagName("tbody")).findElements(By.tagName("tr")).size();
+                findElement(By.tagName("tbody")).findElements(By.tagName("tr")).size();
         if (schedulesCount == 0 && noSchedulesMessage.isDisplayed()) {
             return 0;
         } else {
             return schedulesCount;
         }
+    }
+
+    public boolean isSchedulePresent(String title) {
+        if (this.getNumberOfSchedules() == 0) {
+            return false;
+        }
+
+        for (WebElement scheduledEmailsTitle : scheduledEmailsTitles) {
+            if (scheduledEmailsTitle.getAttribute("title").matches("^" + title + ".*$")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String getSubscribed(String scheduleName) {
