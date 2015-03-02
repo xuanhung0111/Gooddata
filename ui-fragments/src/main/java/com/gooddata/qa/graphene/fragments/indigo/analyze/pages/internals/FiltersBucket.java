@@ -7,6 +7,8 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisib
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -33,6 +35,9 @@ public class FiltersBucket extends AbstractFragment {
     private static final String LOADING = "...";
     private static final By BY_FILTER_TEXT = By.cssSelector(".button-text");
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
+
+    private static final SimpleDateFormat inputFormat = new SimpleDateFormat("MM/dd/yyyy");
+    private static final SimpleDateFormat outputFormat = new SimpleDateFormat("MMM d, yyyy");
 
     public void addFilter(WebElement filter) {
         int oldFiltersCount = filters.size();
@@ -132,5 +137,38 @@ public class FiltersBucket extends AbstractFragment {
         filter.click();
         waitForFragmentNotVisible(panel);
         return ret;
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     */
+    public void configTimeFilterByRangeButNotApply(String from, String to) {
+        WebElement filter = getFilter("Date");
+        String oldFilterText = getFilterTextHelper(filter);
+        openDatePanelOfFilter(filter).configTimeFilterByRangeButNotApply(from, to);
+        assertEquals(getFilterTextHelper(filter), oldFilterText);
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     * @throws ParseException 
+     */
+    public void configTimeFilterByRange(String from, String to) throws ParseException {
+        WebElement filter = getFilter("Date");
+        openDatePanelOfFilter(filter).configTimeFilterByRange(from, to);
+        assertEquals(getFilterTextHelper(filter),
+                "Date: " + getAnotherTimeFormat(from) + " – " + getAnotherTimeFormat(to));
+    }
+
+    private String getAnotherTimeFormat(String time) throws ParseException {
+        return outputFormat.format(inputFormat.parse(time));
+    }
+
+    private DateFilterPickerPanel openDatePanelOfFilter(WebElement filter) {
+        filter.click();
+        return Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
     }
 }

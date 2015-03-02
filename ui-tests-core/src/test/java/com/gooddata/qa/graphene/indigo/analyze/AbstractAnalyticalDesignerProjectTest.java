@@ -2,10 +2,12 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -29,6 +31,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
 public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProjectTest {
 
@@ -483,6 +486,45 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
     }
 
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
+    public void allowDateFilterByRange() throws ParseException, InterruptedException {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(attribute1)
+                .withFilters(DATE));
+        ChartReport report = analysisPage.getChartReport();
+        assertEquals(report.getTrackersCount(), 3);
+        assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
+        analysisPage.configTimeFilterByRangeButNotApply("01/12/2014", "01/12/2015").exportReport();
+        String currentWindowHandel = browser.getWindowHandle();
+        for (String handel : browser.getWindowHandles()) {
+            if (!handel.equals(currentWindowHandel))
+                browser.switchTo().window(handel);
+        }
+        waitForFragmentVisible(reportPage);
+        Screenshots.takeScreenshot(browser, "allowDateFilterByRange-emptyFilters", getClass());
+        assertTrue(reportPage.getFilters().isEmpty());
+        browser.close();
+        browser.switchTo().window(currentWindowHandel);
+
+        analysisPage.configTimeFilterByRange("01/12/2014", "01/12/2015");
+        analysisPage.waitForReportComputing();
+        assertEquals(report.getTrackersCount(), 3);
+        analysisPage.exportReport();
+        currentWindowHandel = browser.getWindowHandle();
+        for (String handel : browser.getWindowHandles()) {
+            if (!handel.equals(currentWindowHandel))
+                browser.switchTo().window(handel);
+        }
+        waitForFragmentVisible(reportPage);
+        List<String> filters = reportPage.getFilters();
+        Screenshots.takeScreenshot(browser, "allowDateFilterByRange-dateFilters", getClass());
+        assertEquals(filters.size(), 1);
+        assertEquals(filters.get(0), "Date (Date) is between 01/12/2014 and 01/12/2015");
+        browser.close();
+        browser.switchTo().window(currentWindowHandel);
+    }
+
     @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
     public void testSimplePoP() {
         initAnalysePage();
@@ -619,4 +661,5 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(tableReport.getHeaders(), headers);
         assertEquals(tableReport.getContent(), content);
     }
+
 }

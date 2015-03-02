@@ -18,7 +18,7 @@ public class BucketsPanel extends AbstractFragment {
     @FindBy(css = ".s-bucket-metrics")
     private MetricsBucket metricsBucket;
 
-    @FindBy(css = ".s-bucket-category")
+    @FindBy(css = ".s-bucket-categories")
     private CategoriesBucket categoriesBucket;
 
     public void addMetric(WebElement metric) {

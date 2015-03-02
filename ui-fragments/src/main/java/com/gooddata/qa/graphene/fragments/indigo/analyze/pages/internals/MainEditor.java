@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -108,5 +109,22 @@ public class MainEditor extends AbstractFragment {
             // in case report is rendered so fast, computing label is not shown.
             // Ignore the exception.
         }
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     */
+    public void configTimeFilterByRangeButNotApply(String from, String to) {
+        waitForFragmentVisible(bucketsFilter).configTimeFilterByRangeButNotApply(from, to);
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     * @throws ParseException 
+     */
+    public void configTimeFilterByRange(String from, String to) throws ParseException {
+        waitForFragmentVisible(bucketsFilter).configTimeFilterByRange(from, to);
     }
 }
