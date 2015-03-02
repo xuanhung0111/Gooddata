@@ -183,7 +183,6 @@ public class NotificationsTest extends AbstractNotificationTest {
     public void checkProcessStartedSuccessMessage() {
         NotificationParameters expectedParams =
                 new NotificationParameters()
-                        .setNotificationEvent(NotificationEvents.PROCESS_STARTED)
                         .setProjectId(testParams.getProjectId())
                         .setUser(userProfileId)
                         .setUserEmail(testParams.getUser())
@@ -203,7 +202,6 @@ public class NotificationsTest extends AbstractNotificationTest {
     public void checkProcessScheduledSuccessMessage() {
         NotificationParameters expectedParams =
                 new NotificationParameters()
-                        .setNotificationEvent(NotificationEvents.PROCESS_SCHEDULED)
                         .setProjectId(testParams.getProjectId())
                         .setUser(userProfileId)
                         .setUserEmail(testParams.getUser())
@@ -221,7 +219,6 @@ public class NotificationsTest extends AbstractNotificationTest {
     public void checkFailureMessage() {
         NotificationParameters expectedParams =
                 new NotificationParameters()
-                        .setNotificationEvent(NotificationEvents.FAILURE)
                         .setProjectId(testParams.getProjectId())
                         .setUser(userProfileId)
                         .setUserEmail(testParams.getUser())
