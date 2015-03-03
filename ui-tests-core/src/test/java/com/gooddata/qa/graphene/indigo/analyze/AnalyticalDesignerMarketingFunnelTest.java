@@ -31,11 +31,6 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
         attribute3 = CLICKTHROUGHS_ID;
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
-    public void testComparisonAndPoPAttribute() {
-        testComparisonAndPoPAttribute(12);
-    }
-
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreAttribute() {
         initAnalysePage();
@@ -58,11 +53,6 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
                 .append("Defined As\n")
                 .append("SELECT Email Status = Open / # of Emails\n");
         assertEquals(analysisPage.getMetricDescription(EMAIL_OPEN), expected.toString());
-    }
-
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
-    public void compararisonRecommendationOverrideDateFilter() {
-        compararisonRecommendationOverrideDateFilter(12);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
