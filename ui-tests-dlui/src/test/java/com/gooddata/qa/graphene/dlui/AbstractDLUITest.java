@@ -60,9 +60,6 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     @FindBy(css = ".s-btn-add_data")
     private WebElement addDataButton;
 
-    @FindBy(tagName = "form")
-    private InstanceFragment storageForm;
-
     @FindBy(css = ".annie-dialog-main")
     protected AnnieUIDialogFragment annieUIDialog;
 

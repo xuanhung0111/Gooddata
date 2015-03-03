@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
+import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
+import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
 import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.etl.pull.PullFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragment;
@@ -94,6 +96,12 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     @FindBy(tagName = "form")
     protected SingleLoadInterfaceFragment singleLoadInterfaceFragment;
+
+    @FindBy(tagName = "form")
+    protected InstanceFragment storageForm;
+
+    @FindBy(tagName = "form")
+    protected InstanceUsersFragment storageUsersForm;
 
     public JSONObject loadJSON() throws JSONException {
         waitForElementPresent(BY_GP_PRE_JSON, browser);
