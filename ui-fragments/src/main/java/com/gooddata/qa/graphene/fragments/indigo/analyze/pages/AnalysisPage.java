@@ -103,6 +103,17 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage addInapplicableCategory(String category) {
+        waitForFragmentVisible(bucketsPanel);
+        waitForFragmentVisible(cataloguePanel);
+        bucketsPanel.addCategory(cataloguePanel.getInapplicableCategory(category));
+        return this;
+    }
+
+    public List<String> getAllCatalogueItemsInViewPort() {
+        return waitForFragmentVisible(cataloguePanel).getAllCatalogueItemsInViewPort();
+    }
+
     public AnalysisPage removeCategory(String category) {
         waitForFragmentVisible(bucketsPanel).removeCategory(category);
         return this;
@@ -239,4 +250,7 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public boolean searchBucketItem(String item) {
+        return waitForFragmentVisible(cataloguePanel).searchBucketItem(item);
+    }
 }
