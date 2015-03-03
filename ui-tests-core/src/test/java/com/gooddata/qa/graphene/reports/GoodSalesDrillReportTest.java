@@ -49,8 +49,8 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             .withName(REPORT_NAME)
             .withWhats(new WhatItem("Amount", "Account"))
             .withWhats("Avg. Amount")
-            .withHows("Stage Name", "Year (Snapshot)");
-
+            .withHows("Stage Name")
+            .withHows(new HowItem("Year (Snapshot)", HowItem.Position.TOP));
         createReport(reportDefinition, REPORT_NAME);
         checkRedBar(browser);
     }
@@ -263,7 +263,6 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void drillAcrossReport() throws InterruptedException {
         try {
-            initDashboardsPage();
             addReportToDashboard(REPORT_NAME);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -298,7 +297,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             .withName("Drill-Activity")
             .withWhats(new WhatItem("# of Activities", "Account"))
             .withHows(new HowItem("Activity", "Email with AirSplat on Apr-21-11"))
-            .withHows("Year (Activity)");
+            .withHows(new HowItem("Year (Activity)", HowItem.Position.TOP));
 
         createReport(reportDefinition, "Drill-Activity");
         checkRedBar(browser);
