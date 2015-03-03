@@ -17,7 +17,6 @@ import org.springframework.web.util.UriTemplate;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -165,6 +164,14 @@ public class RestUtils {
         HttpRequestBase putRequest = restApiClient.newPutMethod(FEATURE_FLAGS_URI, json.toString());
         HttpResponse putResponse = restApiClient.execute(putRequest);
         assertEquals(putResponse.getStatusLine().getStatusCode(), 204, "Invalid status code");
+    }
+
+    public static boolean isFeatureFlagEnabled(final RestApiClient restApiClient, final String featureFlagName)
+            throws IOException, JSONException {
+        JSONObject flags = getJSONObjectFrom(restApiClient, FEATURE_FLAGS_URI).getJSONObject(FEATURE_FLAGS);
+        if (!flags.has(featureFlagName))
+            return false;
+        return Boolean.getBoolean(flags.getString(featureFlagName));
     }
 
     public static void setFeatureFlagsToProject(final RestApiClient restApiClient, final String projectId, final FeatureFlagOption... featureFlagOptions) throws JSONException {

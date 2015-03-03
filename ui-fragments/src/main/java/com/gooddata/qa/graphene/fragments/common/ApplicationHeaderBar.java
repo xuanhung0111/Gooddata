@@ -27,6 +27,9 @@ public class ApplicationHeaderBar extends AbstractFragment {
     @FindBy(className = "analysis-link")
     private WebElement analysisLink;
 
+    @FindBy(className = "users-link")
+    private WebElement usersLink;
+
     private static ApplicationHeaderBar getInstance(WebDriver browser) {
         return Graphene.createPageFragment(ApplicationHeaderBar.class,
                 waitForElementVisible(By.className("appHeader"), browser));
@@ -54,6 +57,10 @@ public class ApplicationHeaderBar extends AbstractFragment {
 
     public static void goToAnalysisPage(WebDriver browser) {
         waitForElementVisible(getInstance(browser).analysisLink).click();
+    }
+
+    public static void goToUserManagementPage(WebDriver browser) {
+        waitForElementVisible(getInstance(browser).usersLink).click();
     }
 
     public static void selectProject(String idOrName, WebDriver browser) {
