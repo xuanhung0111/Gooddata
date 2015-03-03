@@ -30,11 +30,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDes
         attribute3 = DEVICE;
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
-    public void testComparisonAndPoPAttribute() {
-        testComparisonAndPoPAttribute(11);
-    }
-
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
     public void exploreAttribute() {
         initAnalysePage();
@@ -58,11 +53,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDes
                 .append("Defined As\n")
                 .append("select Orders/(Visits+Cart Additions+Checkouts+Orders)\n");
         assertEquals(analysisPage.getMetricDescription(ORDERS), expected.toString());
-    }
-
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
-    public void compararisonRecommendationOverrideDateFilter() {
-        compararisonRecommendationOverrideDateFilter(11);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})

@@ -218,6 +218,43 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
+    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
+    public void testComparisonAndPoPAttribute() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
+        ChartReport report = analysisPage.getChartReport();
+        assertEquals(report.getTrackersCount(), 1);
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+
+        ComparisonRecommendation comparisonRecommendation =
+                recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
+        comparisonRecommendation.select(attribute1).apply();
+        assertTrue(analysisPage.getAllCategoryNames().contains(attribute1));
+        assertEquals(analysisPage.getFilterText(attribute1), attribute1 + ": All");
+        assertEquals(report.getTrackersCount(), 3);
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+
+        comparisonRecommendation =
+                recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
+        comparisonRecommendation.select("This month").apply();
+        assertEquals(analysisPage.getFilterText(DATE), DATE + ": This month");
+        assertEquals(report.getTrackersCount(), 6);
+        List<String> legends = report.getLegends();
+        assertEquals(legends.size(), 2);
+        assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
+
+        analysisPage.addCategory(attribute2);
+        assertEquals(analysisPage.getFilterText(attribute2), attribute2 + ": All");
+        assertEquals(report.getTrackersCount(), 12);
+        legends = report.getLegends();
+        assertEquals(legends.size(), 2);
+        assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
+    }
+
     @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
     public void supportParameter() {
         initAnalysePage();
@@ -424,6 +461,28 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
+    public void compararisonRecommendationOverrideDateFilter() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1)
+                .withCategories(attribute2).withFilters(DATE));
+        analysisPage.configTimeFilter("Last year");
+        ChartReport report = analysisPage.getChartReport();
+        assertEquals(report.getTrackersCount(), 6);
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        ComparisonRecommendation comparisonRecommendation =
+                recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
+        comparisonRecommendation.select("This month").apply();
+        assertEquals(analysisPage.getFilterText(DATE), DATE + ": This month");
+        assertEquals(report.getTrackersCount(), 12);
+        List<String> legends = report.getLegends();
+        assertEquals(legends.size(), 2);
+        assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
+    }
+
     @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
     public void testSimplePoP() {
         initAnalysePage();
@@ -490,63 +549,6 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 3);
 
         analysisPage.resetToBlankState();
-    }
-
-    protected void testComparisonAndPoPAttribute(int trackersCountInLastState) {
-        initAnalysePage();
-
-        analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
-        ChartReport report = analysisPage.getChartReport();
-        assertEquals(report.getTrackersCount(), 1);
-        RecommendationContainer recommendationContainer =
-                Graphene.createPageFragment(RecommendationContainer.class,
-                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
-
-        ComparisonRecommendation comparisonRecommendation =
-                recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select(attribute1).apply();
-        assertTrue(analysisPage.getAllCategoryNames().contains(attribute1));
-        assertEquals(analysisPage.getFilterText(attribute1), attribute1 + ": All");
-        assertEquals(report.getTrackersCount(), 3);
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
-
-        comparisonRecommendation =
-                recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": This month");
-        assertEquals(report.getTrackersCount(), 6);
-        List<String> legends = report.getLegends();
-        assertEquals(legends.size(), 2);
-        assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
-
-        analysisPage.addCategory(attribute2);
-        assertEquals(analysisPage.getFilterText(attribute2), attribute2 + ": All");
-        assertEquals(report.getTrackersCount(), trackersCountInLastState);
-        legends = report.getLegends();
-        assertEquals(legends.size(), 2);
-        assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
-    }
-
-    protected void compararisonRecommendationOverrideDateFilter(int trackersCountInLastState) {
-        initAnalysePage();
-
-        analysisPage.createReport(new ReportDefinition().withMetrics(metric1)
-                .withCategories(attribute2).withFilters(DATE));
-        analysisPage.configTimeFilter("Last year");
-        ChartReport report = analysisPage.getChartReport();
-        assertEquals(report.getTrackersCount(), 6);
-        RecommendationContainer recommendationContainer =
-                Graphene.createPageFragment(RecommendationContainer.class,
-                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        ComparisonRecommendation comparisonRecommendation =
-                recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": This month");
-        assertEquals(report.getTrackersCount(), trackersCountInLastState);
-        List<String> legends = report.getLegends();
-        assertEquals(legends.size(), 2);
-        assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
     }
 
     protected void filterOnAttribute(String filterText, String... filterValues) {
