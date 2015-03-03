@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.http;
 
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -54,7 +55,7 @@ public class RestUtils {
     }
     
     public static void addUserGroup(RestApiClient restApiClient, String projectId, final String name) {
-    	final String projectUri = "/gdc/projects/" + projectId;
+        final String projectUri = "/gdc/projects/" + projectId;
         
         @SuppressWarnings("serial")
         JSONObject payload = new JSONObject(new HashMap<String, Object>() {{
@@ -134,6 +135,12 @@ public class RestUtils {
             final HttpResponse postResponse = restApiClient.execute(postRequest);
             assertEquals(postResponse.getStatusLine().getStatusCode(), 201, "Invalid status code");
         }
+    }
+
+    public static void enableFeatureFlagInProject(RestApiClient restApiClient, String projectId,
+            ProjectFeatureFlags featureFlag) throws JSONException {
+        setFeatureFlagsToProject(restApiClient, projectId,
+                new FeatureFlagOption(featureFlag.getFlagName(), true));
     }
 
     /**

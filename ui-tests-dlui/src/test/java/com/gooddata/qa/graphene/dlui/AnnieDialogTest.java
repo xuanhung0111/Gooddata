@@ -12,9 +12,9 @@ import com.gooddata.qa.graphene.entity.dlui.Dataset;
 import com.gooddata.qa.graphene.entity.dlui.Field;
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.dlui.ProcessInfo;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.dlui.AdditionalDatasets;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public class AnnieDialogTest extends AbstractDLUITest {
 
@@ -38,11 +38,10 @@ public class AnnieDialogTest extends AbstractDLUITest {
     @Test(dependsOnMethods = "createProject")
     public void initialData() {
         try {
-            RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
-                    FeatureFlagOption.createFeatureClassOption(ENABLE_DATA_EXPLORER, true));
+            RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                    ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
         } catch (JSONException e) {
-            throw new IllegalStateException("There is a problem when enable data explorer flag! ",
-                    e);
+            throw new IllegalStateException("There is a problem when enable data explorer! ", e);
         }
 
         createModelForGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);

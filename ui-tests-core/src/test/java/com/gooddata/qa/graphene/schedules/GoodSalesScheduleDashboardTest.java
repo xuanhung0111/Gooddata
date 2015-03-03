@@ -3,12 +3,12 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
@@ -52,12 +52,10 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void setFeatureFlags() throws JSONException, IOException {
-        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
-                FeatureFlagOption.createFeatureClassOption("dashboardSchedule", true)
-        );
-        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
-                FeatureFlagOption.createFeatureClassOption("dashboardScheduleRecipients", true)
-        );
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DASHBOARD_SCHEDULE);
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
     }
 
     // prepare viewer user and login
