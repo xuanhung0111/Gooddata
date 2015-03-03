@@ -1,7 +1,6 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.qa.graphene.enums.UserRoles;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
@@ -9,18 +8,16 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.WebElement;
 import org.springframework.web.util.UriTemplate;
-import org.testng.Assert;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import org.openqa.selenium.WebElement;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.testng.Assert.*;
 
 public class RestUtils {
 
@@ -73,7 +70,7 @@ public class RestUtils {
         HttpResponse response = restApiClient.execute(request);
         
         int statusCode = response.getStatusLine().getStatusCode();
-        boolean successful = statusCode != 201 && statusCode != 409;
+        boolean successful = statusCode == CREATED.value() || statusCode == CONFLICT.value();
         
         assertTrue(successful, "User group could not be created, got HTTP " + statusCode);
     }
