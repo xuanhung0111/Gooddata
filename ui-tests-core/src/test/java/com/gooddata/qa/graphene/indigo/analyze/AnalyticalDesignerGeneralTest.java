@@ -337,7 +337,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             }
         }, "testSimpleComparison");
 
-        assertTrue(analysisPage.getAllCategoryNames().contains(attribute));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
         assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -349,7 +349,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             }
         }, "testSimpleComparison");
 
-        assertTrue(analysisPage.getAllCategoryNames().contains(attribute));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
         assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -377,7 +377,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         TrendingRecommendation trendingRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
         trendingRecommendation.select("Month").apply();
-        assertTrue(analysisPage.getAllCategoryNames().contains(DATE));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertTrue(analysisPage.isFilterVisible(DATE));
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
         assertTrue(analysisPage.isShowPercentConfigEnabled());
@@ -442,7 +442,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             }
         }, "displayWhenDraggingFirstMetric");
 
-        assertTrue(analysisPage.getAllCategoryNames().contains(DATE));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertTrue(analysisPage.isFilterVisible(DATE));
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
@@ -735,7 +735,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getAllCategoryNames().contains(DATE));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertTrue(analysisPage.isFilterVisible(DATE));
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -789,6 +789,61 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(legends.size(), 2);
         assertEquals(legends, Arrays.asList(metric + " - previous year", metric));
     }
+
+  @Test(dependsOnGroups = {"projectInit"})
+  public void testUndoRedo() {
+      int baseTrackerCount1;
+      int baseTrackerCount2;
+      initAnalysePage();
+
+      String metric = doSafetyMetricAction(new SafetyActionAdapter() {
+          @Override
+          public void action(String metric) {
+              analysisPage.createReport(new ReportDefinition().withMetrics(metric));
+          }
+      }, "testUndoRedo");
+      ChartReport report = analysisPage.getChartReport();
+      baseTrackerCount1 = report.getTrackersCount();
+
+      analysisPage.undo();
+      analysisPage.waitForReportComputing();
+      assertFalse(analysisPage.getAllAddedMetricNames().contains(metric));
+      assertTrue(analysisPage.isBucketBlankState(), "Metric is not removed after using 'Undo'");
+      assertTrue(analysisPage.isMainEditorBlankState(), "Report is not loaded correctly after using 'Undo'");
+
+      analysisPage.redo();
+      analysisPage.waitForReportComputing();
+      assertTrue(analysisPage.getAllAddedMetricNames().contains(metric));
+      assertEquals(report.getTrackersCount(), baseTrackerCount1);
+
+      String attribute = doSafetyAttributeAction(metric, new SafetyActionAdapter() {
+          @Override
+          public void action(String attribute) {
+              analysisPage.addCategory(attribute);
+          }
+      }, "testUndoRedo");
+      baseTrackerCount2 = report.getTrackersCount();
+
+      analysisPage.undo();
+      analysisPage.waitForReportComputing();
+      assertFalse(analysisPage.getAllAddedCategoryNames().contains(attribute));
+      assertEquals(report.getTrackersCount(),baseTrackerCount1);
+
+      analysisPage.redo();
+      analysisPage.waitForReportComputing();
+      assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
+      assertEquals(report.getTrackersCount(), baseTrackerCount2);
+      
+      // change report type
+      analysisPage.changeReportType(ReportType.TABLE);
+      assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
+
+      analysisPage.undo();
+      assertTrue(analysisPage.isReportTypeSelected(ReportType.COLUMN_CHART));
+
+      analysisPage.redo();
+      assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
+  }
 
     private String getRandomMetric() {
         String metric;

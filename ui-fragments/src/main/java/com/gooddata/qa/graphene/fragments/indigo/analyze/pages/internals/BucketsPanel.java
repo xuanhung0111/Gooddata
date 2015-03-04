@@ -25,6 +25,10 @@ public class BucketsPanel extends AbstractFragment {
         waitForFragmentVisible(metricsBucket).addMetric(metric);
     }
 
+    public void removeMetric(String metric) {
+        waitForFragmentVisible(metricsBucket).removeMetric(metric);
+    }
+
     public void addCategory(WebElement category) {
         waitForFragmentVisible(categoriesBucket).addCategory(category);
     }
@@ -51,8 +55,12 @@ public class BucketsPanel extends AbstractFragment {
         return metricsBucket.isEmpty() && categoriesBucket.isEmpty();
     }
 
-    public List<String> getAllCategoryNames() {
-        return waitForFragmentVisible(categoriesBucket).getItemsName();
+    public List<String> getAllAddedCategoryNames() {
+        return waitForFragmentVisible(categoriesBucket).getItemNames();
+    }
+
+    public List<String> getAllAddedMetricNames() {
+        return waitForFragmentVisible(metricsBucket).getItemNames();
     }
 
     public boolean isShowPercentConfigEnabled() {
@@ -73,5 +81,13 @@ public class BucketsPanel extends AbstractFragment {
 
     public List<String> getAllGranularities() {
         return waitForFragmentVisible(categoriesBucket).getAllGranularities();
+    }
+
+    public boolean isMetricBucketEmpty() {
+        return waitForFragmentVisible(metricsBucket).isEmpty();
+    }
+
+    public boolean isCategoryBucketEmpty() {
+        return waitForFragmentVisible(categoriesBucket).isEmpty();
     }
 }

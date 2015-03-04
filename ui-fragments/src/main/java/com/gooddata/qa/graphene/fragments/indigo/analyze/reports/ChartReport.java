@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -29,6 +30,12 @@ public class ChartReport extends AbstractFragment {
 
     @FindBy(css = "div.highcharts-tooltip")
     private WebElement tooltip;
+
+    @FindBy(css = ".highcharts-data-labels tspan")
+    private List<WebElement> dataLabels;
+
+    @FindBy(css = ".highcharts-axis-labels text[text-anchor = 'middle'] tspan")
+    private List<WebElement> axisLabels;
 
     private static final String DESELECTED_COLOR = "rgb(216,216,216)";
 
@@ -111,6 +118,31 @@ public class ChartReport extends AbstractFragment {
 
     public String getLegendColorByName(String name) {
         return findLegendByName(name).findElement(By.cssSelector("span")).getCssValue("fill");
+    }
+
+    public List<String> getDataLabels() {
+        waitForCollectionIsNotEmpty(dataLabels);
+        return Lists.newArrayList(Collections2.transform(dataLabels,
+                new Function<WebElement, String>(){
+            @Override
+            public String apply(WebElement input) {
+                return input.getText().trim();
+            }
+        }));
+    }
+
+    public List<String> getAxisLabels() {
+        // Axis labels will be empty in case report has no attribute.
+        if (axisLabels.isEmpty())
+            return Collections.emptyList();
+
+        return Lists.newArrayList(Collections2.transform(axisLabels,
+                new Function<WebElement, String>(){
+            @Override
+            public String apply(WebElement input) {
+                return input.getText().trim();
+            }
+        }));
     }
 
     public ChartReport clickOnLegendByName(String name) {
