@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
@@ -128,6 +129,25 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage configTimeFilter(String period) {
         waitForFragmentVisible(mainEditor).configTimeFilter(period);
+        return this;
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     */
+    public AnalysisPage configTimeFilterByRangeButNotApply(String from, String to) {
+        waitForFragmentVisible(mainEditor).configTimeFilterByRangeButNotApply(from, to);
+        return this;
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     * @throws ParseException 
+     */
+    public AnalysisPage configTimeFilterByRange(String from, String to) throws ParseException {
+        waitForFragmentVisible(mainEditor).configTimeFilterByRange(from, to);
         return this;
     }
 

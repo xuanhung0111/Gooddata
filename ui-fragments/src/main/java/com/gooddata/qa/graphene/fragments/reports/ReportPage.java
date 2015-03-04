@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisibl
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -22,7 +23,10 @@ import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 public class ReportPage extends AbstractFragment {
 
@@ -262,5 +266,26 @@ public class ReportPage extends AbstractFragment {
             number = Float.parseFloat(tmp);
         }
         return number;
+    }
+
+    public List<String> getFilters() throws InterruptedException {
+        String textOnFilterButton = waitForElementVisible(filterButton).getText();
+        float filterCount = getNumber(textOnFilterButton);
+        if (filterCount == 0)
+            return Collections.emptyList();
+
+        // Need to sleep here. If we go too fast, action click is still successful
+        // but nothing happen
+        Thread.sleep(3000);
+        filterButton.click();
+        waitForElementVisible(reportFilter.getRoot());
+        return Lists.newArrayList(Collections2.transform(reportFilter.getRoot()
+                .findElements(By.cssSelector(".filterLinesContainer li span.text")),
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement element) {
+                return element.getText().trim();
+            }
+        }));
     }
 }

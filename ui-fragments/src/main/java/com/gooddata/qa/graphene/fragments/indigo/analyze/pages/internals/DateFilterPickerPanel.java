@@ -17,8 +17,26 @@ import com.google.common.collect.Lists;
 
 public class DateFilterPickerPanel extends AbstractFragment {
 
-    @FindBy(css = ".filter-picker-text")
+    // presets and date range sections are just small parts. No need to separate more fragments now.
+
+    @FindBy(css = ".adi-tab-presets .filter-picker-text")
     private List<WebElement> periods;
+
+    // ****************  date range section  ****************
+    @FindBy(className = "s-tab-date-range")
+    private WebElement dateRangeSection;
+
+    @FindBy(css = ".adi-date-input-from > input")
+    private WebElement fromDate;
+
+    @FindBy(css = ".adi-date-input-to > input")
+    private WebElement toDate;
+
+    @FindBy(css = ".adi-tab-date-range .s-btn-cancel")
+    private WebElement cancelButton;
+
+    @FindBy(css = ".adi-tab-date-range .s-btn-apply")
+    private WebElement applyButton;
 
     public static final By LOCATOR = By.cssSelector(".adi-date-filter-picker");
 
@@ -42,5 +60,33 @@ public class DateFilterPickerPanel extends AbstractFragment {
                 return input.getText();
             }
         }));
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     */
+    public void configTimeFilterByRangeButNotApply(String from, String to) {
+        configTimeFilterByRangeHelper(from, to, false);
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     */
+    public void configTimeFilterByRange(String from, String to) {
+        configTimeFilterByRangeHelper(from, to, true);
+    }
+
+    private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
+        waitForElementVisible(dateRangeSection).click();
+        waitForElementVisible(fromDate).clear();
+        fromDate.sendKeys(from);
+
+        waitForElementVisible(toDate).clear();
+        toDate.sendKeys(to);
+
+        waitForElementVisible(apply ? applyButton : cancelButton).click();
+        waitForFragmentNotVisible(this);
     }
 }
