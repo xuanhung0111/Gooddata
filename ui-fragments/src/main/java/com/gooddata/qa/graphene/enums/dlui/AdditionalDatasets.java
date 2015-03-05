@@ -9,30 +9,32 @@ import com.google.common.collect.Lists;
 
 public enum AdditionalDatasets {
 
-    PERSON_WITH_NEW_FIELDS("person", new Field().setFieldName("Position").setFieldType(FieldTypes.ATTRIBUTE)),
-    PERSON_WITH_NEW_DATE_FIELD("person", new Field().setFieldName("Position").setFieldType(FieldTypes.ATTRIBUTE),
-            new Field().setFieldName("Date").setFieldType(FieldTypes.DATE)),
-    OPPORTUNITY_WITH_NEW_FIELDS("opportunity", new Field().setFieldName("Title2").setFieldType(FieldTypes.ATTRIBUTE),
-            new Field().setFieldName("Label").setFieldType(FieldTypes.LABLE_HYPERLINK),
-            new Field().setFieldName("Totalprice2").setFieldType(FieldTypes.FACT)),
-    OPPORTUNITY_WITH_NEW_DATE_FIELD("opportunity", new Field().setFieldName("Title2").setFieldType(FieldTypes.ATTRIBUTE),
-            new Field().setFieldName("Label").setFieldType(FieldTypes.LABLE_HYPERLINK),
-            new Field().setFieldName("Totalprice2").setFieldType(FieldTypes.FACT),
-            new Field().setFieldName("Date").setFieldType(FieldTypes.DATE));
-    
-    private String datasetName;
+    PERSON_WITH_NEW_FIELDS("person", new Field("Position",
+            FieldTypes.ATTRIBUTE)),
+    PERSON_WITH_NEW_DATE_FIELD("person", new Field("Position",
+            FieldTypes.ATTRIBUTE), new Field("Date", FieldTypes.DATE)),
+    OPPORTUNITY_WITH_NEW_FIELDS("opportunity", new Field("Title2",
+            FieldTypes.ATTRIBUTE), new Field("Label",
+            FieldTypes.LABLE_HYPERLINK), new Field("Totalprice2",
+            FieldTypes.FACT)),
+    OPPORTUNITY_WITH_NEW_DATE_FIELD("opportunity", new Field("Title2",
+            FieldTypes.ATTRIBUTE), new Field("Label",
+            FieldTypes.LABLE_HYPERLINK), new Field("Totalprice2",
+            FieldTypes.FACT), new Field("Date", FieldTypes.DATE));
+
+    private String name;
     private List<Field> fields;
-    
-    private AdditionalDatasets(String datasetName, Field... fields) {
-        this.datasetName = datasetName;
+
+    private AdditionalDatasets(String name, Field... fields) {
+        this.name = name;
         this.fields = Arrays.asList(fields);
     }
-    
+
     public List<Field> getFields() {
         return Lists.newArrayList(fields);
     }
-    
+
     public String getName() {
-        return this.datasetName;
+        return this.name;
     }
 }

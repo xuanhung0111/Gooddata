@@ -2,24 +2,27 @@ package com.gooddata.qa.graphene.entity.dlui;
 
 public class Field {
 
-    private String fieldName;
-    private FieldTypes fieldType;
+    private String name;
+    private FieldTypes type;
 
-    public String getFieldName() {
-        return fieldName;
+    public Field() {}
+
+    public Field(String name, FieldTypes type) {
+        this.name = name;
+        this.type = type;
     }
 
-    public Field setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-        return this;
+    public String getName() {
+        return name;
     }
 
-    public FieldTypes getFieldType() {
-        return fieldType;
+    public FieldTypes getType() {
+        return type;
     }
 
-    public Field setFieldType(FieldTypes fieldType) {
-        this.fieldType = fieldType;
+    public Field setNameAndType(String name, FieldTypes type) {
+        this.name = name;
+        this.type = type;
         return this;
     }
 
@@ -29,9 +32,9 @@ public class Field {
         FACT("facts"),
         DATE("dates"),
         LABLE_HYPERLINK("labels & hyperlinks");
-        
+
         private String filterName;
-        
+
         private FieldTypes(String filterName) {
             this.filterName = filterName;
         }

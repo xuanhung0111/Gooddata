@@ -6,6 +6,7 @@ import static org.testng.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 
 import org.apache.commons.io.FileUtils;
@@ -17,6 +18,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
@@ -29,21 +31,11 @@ import com.gooddata.qa.utils.webdav.WebDavClient;
 
 public abstract class AbstractDLUITest extends AbstractProjectTest {
 
-
-
     private static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
-
-    private static final String ANNIE_DIALOG_HEADLINE = "Add data";
-
-    private static final String ANNIE_DIALOG_EMPTY_STATE_MESSAGE =
-            "Your project already contains all existing data. If you"
-                    + " need to add more data, contact a project admin or GoodData Customer Support.";
-
-    private static final String ANNIE_DIALOG_EMPTY_STATE_HEADING = "No additional data available.";
-
     private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
             "DLUI/graph/CreateAndCopyDataToADS.grf";
-    private static final int statusPollingCheckIterations = 60;
+
+    private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
 
     private static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     private static final String PROCESS_EXECUTION_URI = DATALOAD_PROCESS_URI + "%s/executions";
@@ -52,7 +44,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             + "%s/schemas/default";
     private static final String OUTPUTSTAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
 
-    private String DATAlOAD_PROCESS_NAME = "Dataload Process";
+    private static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
 
     private JSONObject cloudConnectProcess = new JSONObject();
     private JSONObject processExecution = new JSONObject();
@@ -71,9 +63,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected ProjectInfo getWorkingProject() {
         if (workingProject == null)
-            workingProject =
-                    new ProjectInfo().setProjectName(projectTitle).setProjectId(
-                            testParams.getProjectId());
+            workingProject = new ProjectInfo(projectTitle, testParams.getProjectId());
         return workingProject;
     }
 
@@ -81,7 +71,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         String processUri = String.format(DATALOAD_PROCESS_URI, getWorkingProject().getProjectId());
         LinkedHashMap<String, String> objMap = new LinkedHashMap<String, String>();
         objMap.put("type", "DATALOAD");
-        objMap.put("name", DATAlOAD_PROCESS_NAME);
+        objMap.put("name", DEFAULT_DATAlOAD_PROCESS_NAME);
         JSONObject dataloadProcessObj = new JSONObject();
         try {
             dataloadProcessObj.put("process", objMap);
@@ -101,18 +91,19 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         return responseStatusCode;
     }
 
+    protected boolean dataloadProcessIsCreated() {
+        return createDataLoadProcess() == HttpStatus.CONFLICT.value();
+    }
+
     protected void createModelForGDProject(String maqlFile) {
         String maql = "";
         try {
             maql = FileUtils.readFileToString(new File(maqlFile));
-            postMAQL(maql, statusPollingCheckIterations);
+            postMAQL(maql, STATUS_POLLING_CHECK_ITERATIONS);
         } catch (IOException e) {
             throw new IllegalStateException(
                     "There is an exeception during reading file to string!", e);
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is an exeception during creating model for GD project! ", e);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             throw new IllegalStateException(
                     "There is an exeception during creating model for GD project! ", e);
         }
@@ -126,24 +117,23 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         try {
             adsUrl =
                     storageForm
-                            .createStorage(adsInstance.getAdsName(),
-                                    adsInstance.getAdsDescription(),
-                                    adsInstance.getAdsAuthorizationToken());
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is an exeception during creating new ads instance! ", e);
-        } catch (InterruptedException e) {
+                            .createStorage(adsInstance.getName(),
+                                    adsInstance.getDescription(),
+                                    adsInstance.getAuthorizationToken());
+        } catch (Exception e) {
             throw new IllegalStateException(
                     "There is an exeception during creating new ads instance! ", e);
         }
-        adsInstance.setAdsId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
-        System.out.println("adsId: " + adsInstance.getAdsId());
+
+        adsInstance.setId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
+        System.out.println("adsId: " + adsInstance.getId());
     }
-    
+
     protected void deleteADSInstance(ADSInstance adsInstance) {
-        openUrl(ADS_INSTANCES_URI + adsInstance.getAdsId());
-        waitForElementVisible(BY_GP_FORM_SECOND, browser);
-        InstanceFragment storage = createPageFragment(InstanceFragment.class, browser.findElement(BY_GP_FORM_SECOND));
+        openUrl(ADS_INSTANCES_URI + adsInstance.getId());
+        InstanceFragment storage =
+                createPageFragment(InstanceFragment.class,
+                        waitForElementVisible(BY_GP_FORM_SECOND, browser));
         assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
         storage.deleteStorageSuccess();
     }
@@ -151,23 +141,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     protected int createCloudConnectProcess(ProcessInfo processInfo) {
         String uploadFilePath =
                 uploadZipFileToWebDav(dluiZipFilePath + CLOUDCONNECT_PROCESS_PACKAGE, null);
-
         String processesUri =
                 String.format(DATALOAD_PROCESS_URI, getWorkingProject().getProjectId());
-        try {
-            LinkedHashMap<String, String> objMap = new LinkedHashMap<String, String>();
-            objMap.put("type", "GRAPH");
-            objMap.put("name", processInfo.getProcessName());
-            objMap.put("path", uploadFilePath.substring(uploadFilePath.indexOf("/uploads")) + "/"
-                    + CLOUDCONNECT_PROCESS_PACKAGE);
-            cloudConnectProcess.put("process", objMap);
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is a problem when create JSON object for creating CloudConnect process! ",
-                    e);
-        }
+        prepareCCProcessCreationBody(processInfo, uploadFilePath);
         String postBody = cloudConnectProcess.toString();
         System.out.println("postBody: " + postBody);
+
         HttpRequestBase postRequest = getRestApiClient().newPostMethod(processesUri, postBody);
         HttpResponse postResponse = getRestApiClient().execute(postRequest);
         int responseStatusCode = postResponse.getStatusLine().getStatusCode();
@@ -190,20 +169,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         String createTableSql = "";
         String copyTableSql = "";
         try {
-            createTableSql = FileUtils.readFileToString(new File(createTableSqlFile), "utf-8");
-            copyTableSql = FileUtils.readFileToString(new File(copyTableSqlFile), "utf-8");
-            LinkedHashMap<String, Object> objMap = new LinkedHashMap<String, Object>();
-            LinkedHashMap<String, String> paramMap = new LinkedHashMap<String, String>();
-            paramMap.put(DLUIProcessParameters.ADSUSER.getJsonObjectKey(), testParams.getUser());
-            paramMap.put(DLUIProcessParameters.ADSPASSWORD.getJsonObjectKey(),
-                    testParams.getPassword());
-            paramMap.put(DLUIProcessParameters.ADSURL.getJsonObjectKey(), adsUrl);
-            paramMap.put(DLUIProcessParameters.CREATE_TABLE_SQL.getJsonObjectKey(), createTableSql);
-            paramMap.put(DLUIProcessParameters.COPY_TABLE_SQL.getJsonObjectKey(), copyTableSql);
-            objMap.put(DLUIProcessParameters.EXECUTABLE.getJsonObjectKey(),
-                    DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS);
-            objMap.put("params", paramMap);
-            processExecution.put("execution", objMap);
+            createTableSql =
+                    FileUtils
+                            .readFileToString(new File(createTableSqlFile), StandardCharsets.UTF_8);
+            copyTableSql =
+                    FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
+            prepareProcessExecutionBody(adsUrl, createTableSql, copyTableSql);
             String postBody = processExecution.toString();
             System.out.println("postBody: " + postBody);
             HttpRequestBase postRequest =
@@ -220,9 +191,6 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         } catch (IOException e) {
             throw new IllegalStateException(
                     "There is an exeception during reading file to string! ", e);
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is a problem with JSON object when executing an process! ", e);
         }
     }
 
@@ -275,9 +243,38 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         waitForElementVisible(annieUIDialog.getRoot());
     }
 
-    protected void checkEmptyAnnieDialog() {
-        assertEquals(annieUIDialog.getAnnieDialogHeadline(), ANNIE_DIALOG_HEADLINE);
-        assertEquals(annieUIDialog.getEmptyStateHeading(), ANNIE_DIALOG_EMPTY_STATE_HEADING);
-        assertEquals(annieUIDialog.getEmptyStateMessage(), ANNIE_DIALOG_EMPTY_STATE_MESSAGE);
+    private void prepareProcessExecutionBody(String adsUrl, String createTableSql,
+            String copyTableSql) {
+        LinkedHashMap<String, Object> objMap = new LinkedHashMap<String, Object>();
+        LinkedHashMap<String, String> paramMap = new LinkedHashMap<String, String>();
+        paramMap.put(DLUIProcessParameters.ADSUSER.getJsonObjectKey(), testParams.getUser());
+        paramMap.put(DLUIProcessParameters.ADSPASSWORD.getJsonObjectKey(), testParams.getPassword());
+        paramMap.put(DLUIProcessParameters.ADSURL.getJsonObjectKey(), adsUrl);
+        paramMap.put(DLUIProcessParameters.CREATE_TABLE_SQL.getJsonObjectKey(), createTableSql);
+        paramMap.put(DLUIProcessParameters.COPY_TABLE_SQL.getJsonObjectKey(), copyTableSql);
+        objMap.put(DLUIProcessParameters.EXECUTABLE.getJsonObjectKey(),
+                DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS);
+        objMap.put("params", paramMap);
+        try {
+            processExecution.put("execution", objMap);
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is a problem with JSON object when executing an process! ", e);
+        }
+    }
+
+    private void prepareCCProcessCreationBody(ProcessInfo processInfo, String uploadFilePath) {
+        try {
+            LinkedHashMap<String, String> objMap = new LinkedHashMap<String, String>();
+            objMap.put("type", "GRAPH");
+            objMap.put("name", processInfo.getProcessName());
+            objMap.put("path", uploadFilePath.substring(uploadFilePath.indexOf("/uploads")) + "/"
+                    + CLOUDCONNECT_PROCESS_PACKAGE);
+            cloudConnectProcess.put("process", objMap);
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is a problem when create JSON object for creating CloudConnect process! ",
+                    e);
+        }
     }
 }

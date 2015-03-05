@@ -6,6 +6,13 @@ public class ProjectInfo {
 
     private String projectName;
     private String projectId;
+    
+    public ProjectInfo() {}
+
+    public ProjectInfo(String projectName, String projectId) {
+        this.projectName = projectName;
+        this.projectId = projectId;
+    }
 
     public ProjectInfo setProjectName(String projectName) {
         this.projectName = projectName;

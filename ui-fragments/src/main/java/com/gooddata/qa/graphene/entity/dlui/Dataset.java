@@ -3,19 +3,27 @@ package com.gooddata.qa.graphene.entity.dlui;
 import java.util.List;
 
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
+import com.gooddata.qa.graphene.enums.dlui.AdditionalDatasets;
 import com.google.common.collect.Lists;
 
 public class Dataset {
 
-    private String datasetName;
+    private String name;
     private List<Field> fields = Lists.newArrayList();
 
-    public String getName() {
-        return datasetName;
+    public Dataset() {}
+
+    public Dataset(AdditionalDatasets dataset) {
+        this.name = dataset.getName();
+        this.fields.addAll(dataset.getFields());
     }
 
-    public Dataset setName(String datasetName) {
-        this.datasetName = datasetName;
+    public String getName() {
+        return name;
+    }
+
+    public Dataset setName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -25,14 +33,18 @@ public class Dataset {
 
         List<Field> filteredFields = Lists.newArrayList();
         for (Field field : this.fields) {
-            if (field.getFieldType() == fieldType)
+            if (field.getType() == fieldType)
                 filteredFields.add(field);
         }
         return filteredFields;
     }
-
-    public Dataset setFields(List<Field> fields) {
-        this.fields.addAll(fields);
+    
+    public Dataset setFields(Field... fields) {
+        this.fields = Lists.newArrayList(fields);
         return this;
+    }
+    
+    public void removeFields(Field... fields) {
+        this.fields.removeAll(Lists.newArrayList(fields));
     }
 }

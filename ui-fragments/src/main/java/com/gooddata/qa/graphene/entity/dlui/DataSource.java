@@ -1,22 +1,32 @@
 package com.gooddata.qa.graphene.entity.dlui;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
+import com.gooddata.qa.graphene.enums.dlui.ADSTables;
+import com.gooddata.qa.graphene.enums.dlui.AdditionalDatasets;
 import com.google.common.collect.Lists;
 
 public class DataSource {
 
-    private String datasourceName;
+    private String name;
     private List<Dataset> datasets = Lists.newArrayList();
-
-    public String getName() {
-        return datasourceName;
+    
+    public DataSource() {}
+    
+    public DataSource(ADSTables adsTable) {
+        this.name = adsTable.getDatasourceName();
+        for(AdditionalDatasets additionalDataset : adsTable.getAdditionalDatasets()) {
+            this.datasets.add(new Dataset(additionalDataset));
+        }
     }
 
-    public DataSource setName(String datasourceName) {
-        this.datasourceName = datasourceName;
+    public String getName() {
+        return name;
+    }
+
+    public DataSource setName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -33,7 +43,7 @@ public class DataSource {
         return filteredDataset;
     }
 
-    public DataSource setDatasets(Collection<Dataset> datasets) {
+    public DataSource setDatasets(Dataset... datasets) {
         this.datasets = Lists.newArrayList(datasets);
         return this;
     }

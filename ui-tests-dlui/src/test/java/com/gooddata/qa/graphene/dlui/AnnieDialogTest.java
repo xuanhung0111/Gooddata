@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.dlui;
 
-import java.util.Arrays;
-
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.*;
 
 import com.gooddata.qa.graphene.entity.dlui.ADSInstance;
 import com.gooddata.qa.graphene.entity.dlui.DataSource;
@@ -13,8 +13,10 @@ import com.gooddata.qa.graphene.entity.dlui.Field;
 import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.dlui.ProcessInfo;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.dlui.ADSTables;
 import com.gooddata.qa.graphene.enums.dlui.AdditionalDatasets;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.google.common.collect.Lists;
 
 public class AnnieDialogTest extends AbstractDLUITest {
 
@@ -22,14 +24,16 @@ public class AnnieDialogTest extends AbstractDLUITest {
 
     private static final String DEFAULT_DATA_SOURCE_NAME = "Unknown data source";
 
-    private static final String ADS_URL = "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
+    private static final String ADS_URL =
+            "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
 
     private ProcessInfo cloudconnectProcess;
     private ADSInstance adsInstance;
 
     @BeforeClass
     public void initProperties() {
-        dluiZipFilePath = testParams.loadProperty("dluiZipFilePath") + testParams.getFolderSeparator();
+        dluiZipFilePath =
+                testParams.loadProperty("dluiZipFilePath") + testParams.getFolderSeparator();
         maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
         sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
         projectTitle = "Dlui-annie-dialog-test";
@@ -47,15 +51,12 @@ public class AnnieDialogTest extends AbstractDLUITest {
         createModelForGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
 
         adsInstance =
-                new ADSInstance()
-                        .setAdsName("ADS Instance for DLUI test")
-                        .setAdsDescription("ADS Instance for DLUI test")
-                        .setAdsAuthorizationToken(testParams.loadProperty("dss.authorizationToken"));
+                new ADSInstance().setName("ADS Instance for DLUI test").setAuthorizationToken(
+                        testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
 
-        createDataLoadProcess();
-
-        setDefaultSchemaForOutputStage(testParams.getProjectId(), adsInstance.getAdsId());
+        setDefaultSchemaForOutputStage(testParams.getProjectId(), adsInstance.getId());
+        assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
 
         cloudconnectProcess =
                 new ProcessInfo().setProjectId(testParams.getProjectId())
@@ -65,156 +66,94 @@ public class AnnieDialogTest extends AbstractDLUITest {
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
     public void checkEmptyStateInAnnieDialog() {
-        createADSTableWithAdditionalFields("createTable.txt", "copyTable.txt");
+        createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
+
         openAnnieDialog();
-        checkEmptyAnnieDialog();
+        annieUIDialog.checkEmptyAnnieDialog();
     }
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
     public void checkAvailableAdditionalFields() {
-        createADSTableWithAdditionalFields("createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFields.txt");
-
-        AdditionalDatasets personWithNewFields = AdditionalDatasets.PERSON_WITH_NEW_FIELDS;
-        Dataset personDataset =
-                new Dataset().setName(personWithNewFields.getName()).setFields(
-                        personWithNewFields.getFields());
-
-        AdditionalDatasets opportunityWithNewFields =
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS;
-        Dataset opportunityDataset =
-                new Dataset().setName(opportunityWithNewFields.getName()).setFields(
-                        opportunityWithNewFields.getFields());
-
-        DataSource datasource =
-                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(
-                        Arrays.asList(personDataset, opportunityDataset));
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.ALL);
+        annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
     }
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
     public void checkAvailableAdditionalAttributes() {
-        createADSTableWithAdditionalFields("createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFields.txt");
-
-        AdditionalDatasets personWithNewFields = AdditionalDatasets.PERSON_WITH_NEW_FIELDS;
-        Dataset personDataset =
-                new Dataset().setName(personWithNewFields.getName()).setFields(
-                        personWithNewFields.getFields());
-
-        AdditionalDatasets opportunityWithNewFields =
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS;
-        Dataset opportunityDataset =
-                new Dataset().setName(opportunityWithNewFields.getName()).setFields(
-                        opportunityWithNewFields.getFields());
-
-        DataSource datasource =
-                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(
-                        Arrays.asList(personDataset, opportunityDataset));
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.ATTRIBUTE);
+        annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.ATTRIBUTE);
     }
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
     public void checkAvailableAdditionalFacts() {
-        createADSTableWithAdditionalFields("createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFields.txt");
-
-        AdditionalDatasets personWithNewFields = AdditionalDatasets.PERSON_WITH_NEW_FIELDS;
-        Dataset personDataset =
-                new Dataset().setName(personWithNewFields.getName()).setFields(
-                        personWithNewFields.getFields());
-
-        AdditionalDatasets opportunityWithNewFields =
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS;
-        Dataset opportunityDataset =
-                new Dataset().setName(opportunityWithNewFields.getName()).setFields(
-                        opportunityWithNewFields.getFields());
-        DataSource datasource =
-                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(
-                        Arrays.asList(personDataset, opportunityDataset));
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.FACT);
+        annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.FACT);
     }
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
-    public void checkAvailableAdditionalFieldsFilter() {
-        createADSTableWithAdditionalFields("createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFields.txt");
-
-        AdditionalDatasets personWithNewFields = AdditionalDatasets.PERSON_WITH_NEW_FIELDS;
-        Dataset personDataset =
-                new Dataset().setName(personWithNewFields.getName()).setFields(
-                        personWithNewFields.getFields());
-
-        AdditionalDatasets opportunityWithNewFields =
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS;
-        Dataset opportunityDataset =
-                new Dataset().setName(opportunityWithNewFields.getName()).setFields(
-                        opportunityWithNewFields.getFields());
-
-        DataSource datasource =
-                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(
-                        Arrays.asList(personDataset, opportunityDataset));
+    public void checkAvailableAdditionalLabelHyperlink() {
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.ATTRIBUTE);
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.FACT);
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.DATE);
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.LABLE_HYPERLINK);
+        annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.LABLE_HYPERLINK);
     }
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
     public void checkAdditionalDateField() {
-        createADSTableWithAdditionalFields("createTableWithAdditionalDate.txt",
-                "copyTableWithAdditionalDate.txt");
-
-        AdditionalDatasets personWithNewFields = AdditionalDatasets.PERSON_WITH_NEW_FIELDS;
-        Dataset personDataset =
-                new Dataset().setName(personWithNewFields.getName()).setFields(
-                        personWithNewFields.getFields());
-        AdditionalDatasets opportunityWithNewDate =
-                AdditionalDatasets.OPPORTUNITY_WITH_NEW_DATE_FIELD;
-        Dataset opportunityDataset =
-                new Dataset().setName(opportunityWithNewDate.getName()).setFields(
-                        opportunityWithNewDate.getFields());
-        DataSource datasource =
-                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(
-                        Arrays.asList(personDataset, opportunityDataset));
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE);
 
         openAnnieDialog();
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.DATE);
+        annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.DATE);
     }
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
     public void checkEmptyStateWithDateFilter() {
-        createADSTableWithAdditionalFields("createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFields.txt");
-        DataSource datasource = new DataSource();
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.DATE);
+        annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.DATE);
     }
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
     public void checkSearchAllFields() {
-        createADSTableWithAdditionalFields("createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFields.txt");
-        Field field = new Field().setFieldName("Position").setFieldType(FieldTypes.ATTRIBUTE);
+        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+        Field field = new Field().setNameAndType("Position", FieldTypes.ATTRIBUTE);
         Dataset dataset =
                 new Dataset().setName(AdditionalDatasets.PERSON_WITH_NEW_FIELDS.getName())
-                        .setFields(Arrays.asList(field));
-        DataSource datasource =
-                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(
-                        Arrays.asList(dataset));
+                        .setFields(field);
+        DataSource dataSource =
+                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(dataset);
 
         openAnnieDialog();
-        annieUIDialog.searchFields("Pos");
-        annieUIDialog.checkAvailableAdditionalFields(datasource, FieldTypes.ALL);
+        annieUIDialog.enterSearchKey("Pos");
+        annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
+    }
+
+    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest")
+    public void selectAndDeselectFields() {
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+        Dataset selectedDataset1 = new Dataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS);
+        Field selectedField1 = new Field("Position", FieldTypes.ATTRIBUTE);
+
+        Dataset selectedDataset2 = new Dataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+        Field selectedField2 = new Field("Title2", FieldTypes.ATTRIBUTE);
+
+        openAnnieDialog();
+        annieUIDialog.selectFields(dataSource, selectedDataset2, selectedField2);
+        annieUIDialog.selectFields(dataSource, selectedDataset1, selectedField1);
+
+        annieUIDialog.checkSelectionArea(Lists.newArrayList(selectedField2, selectedField1));
+
+        annieUIDialog.deselectFieldsInSelectionArea(selectedField2);
+        annieUIDialog.deselectFields(dataSource, selectedDataset1, selectedField1);
     }
 
     @Test(dependsOnGroups = "annieDialogTest", alwaysRun = true)
@@ -222,12 +161,18 @@ public class AnnieDialogTest extends AbstractDLUITest {
         deleteADSInstance(adsInstance);
     }
 
-    private void createADSTableWithAdditionalFields(String createTableSqlFile,
-            String copyTableSqlFile) {
+    private DataSource prepareADSTable(ADSTables adsTable) {
+        createUpdateADSTable(adsTable);
+        DataSource dataSource = new DataSource(adsTable);
+
+        return dataSource;
+    }
+
+    private void createUpdateADSTable(ADSTables adsTable) {
         executeProcess(
                 cloudconnectProcess.getProcessId(),
                 ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
-                        adsInstance.getAdsId()), sqlFilePath + createTableSqlFile, sqlFilePath
-                        + copyTableSqlFile);
+                        adsInstance.getId()), sqlFilePath + adsTable.getCreateTableSqlFile(),
+                sqlFilePath + adsTable.getCopyTableSqlFile());
     }
 }

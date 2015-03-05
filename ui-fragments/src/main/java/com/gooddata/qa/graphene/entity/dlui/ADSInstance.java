@@ -2,44 +2,44 @@ package com.gooddata.qa.graphene.entity.dlui;
 
 public class ADSInstance {
 
-    private String adsName;
-    private String adsDescription;
-    private String adsAuthorizationToken;
-    private String adsId;
+    private String name;
+    private String description = "";
+    private String authorizationToken;
+    private String id;
 
-    public String getAdsAuthorizationToken() {
-        return adsAuthorizationToken;
+    public String getAuthorizationToken() {
+        return authorizationToken;
     }
 
-    public ADSInstance setAdsAuthorizationToken(String adsAuthorizationToken) {
-        this.adsAuthorizationToken = adsAuthorizationToken;
+    public ADSInstance setAuthorizationToken(String authorizationToken) {
+        this.authorizationToken = authorizationToken;
         return this;
     }
 
-    public String getAdsDescription() {
-        return adsDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public ADSInstance setAdsDescription(String adsDescription) {
-        this.adsDescription = adsDescription;
+    public ADSInstance setDescription(String description) {
+        this.description = description;
         return this;
     }
 
-    public String getAdsName() {
-        return adsName;
+    public String getName() {
+        return name;
     }
 
-    public ADSInstance setAdsName(String adsName) {
-        this.adsName = adsName;
+    public ADSInstance setName(String name) {
+        this.name = name;
         return this;
     }
 
-    public String getAdsId() {
-        return adsId;
+    public String getId() {
+        return id;
     }
 
-    public ADSInstance setAdsId(String adsId) {
-        this.adsId = adsId;
+    public ADSInstance setId(String id) {
+        this.id = id;
         return this;
     }
 }
