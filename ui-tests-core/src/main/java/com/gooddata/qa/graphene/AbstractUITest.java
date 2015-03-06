@@ -394,6 +394,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
             if (currentUrl.contains(testParams.getProjectId()))
                 return;
             ApplicationHeaderBar.selectProject(testParams.getProjectId(), browser);
+        } else if (currentUrl.contains(PAGE_PROJECTS)) {
+            waitForProjectsPageLoaded(browser);
+            waitForFragmentVisible(projectsPage);
+            projectsPage.goToProject(testParams.getProjectId());
         } else {
             openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
         }
