@@ -1,6 +1,7 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.qa.graphene.enums.UserRoles;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
@@ -25,6 +26,7 @@ public class RestUtils {
     private static final String roleUriLink = "/gdc/projects/%s/roles/%s";
     private static final String addUserContentBody = "{\"user\":{\"content\":{\"userRoles\":[\"%s\"],\"status\":\"ENABLED\"},\"links\":{\"self\":\"%s\"}}}";
     private static final String ldmLink = "/gdc/projects/%s/ldm";
+    private static final String dashboardEditModeLink = "/gdc/md/%s/obj/%s?mode=edit";
 
     private static final String FEATURE_FLAGS_URI = "/gdc/internal/account/profile/featureFlags";
     private static final String FEATURE_FLAGS = "featureFlags";
@@ -34,6 +36,9 @@ public class RestUtils {
     private static final String PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER = "featureFlag";
     
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
+    
+    public static final String TARGET_POPUP = "pop-up";
+    public static final String TARGET_EXPORT = "export";
 
     private RestUtils() {
     }
@@ -134,6 +139,39 @@ public class RestUtils {
             final HttpResponse postResponse = restApiClient.execute(postRequest);
             assertEquals(postResponse.getStatusLine().getStatusCode(), 201, "Invalid status code");
         }
+    }
+    
+    public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, String projectID, 
+            String dashboardID) throws JSONException, IOException {
+        setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_POPUP, null);
+    }
+    
+    public static void setDrillReportTargetAsExport(final RestApiClient restApiClient, String projectID,
+            String dashboardID, String exportFormat) throws JSONException, IOException {
+        setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_EXPORT, exportFormat);
+    }
+    
+    private static void setDrillReportTarget(final RestApiClient restApiClient, String projectID,
+            String dashboardID, String target, String exportFormat) throws JSONException, IOException {
+        String dashboardEditModeURI = String.format(dashboardEditModeLink, projectID, dashboardID);
+        HttpRequestBase getRequest = restApiClient.newGetMethod(dashboardEditModeURI);
+        HttpResponse response = restApiClient.execute(getRequest);
+        assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
+        JSONObject json = new JSONObject(EntityUtils.toString(response.getEntity()));
+        JSONObject drills = json.getJSONObject("projectDashboard").getJSONObject("content").getJSONArray("tabs").
+                getJSONObject(0).getJSONArray("items").getJSONObject(0).getJSONObject("reportItem").
+                getJSONArray("drills").getJSONObject(0);
+        drills.put("target", target);
+        if (TARGET_POPUP.equals(target)) {
+            drills.remove("export");
+        } else if (TARGET_EXPORT.equals(target)) {
+            JSONObject exportOptions = new JSONObject();
+            exportOptions.put("format", exportFormat);
+            drills.put("export", exportOptions );
+        }
+        HttpRequestBase postRequest = restApiClient.newPostMethod(dashboardEditModeURI, json.toString());
+        response = restApiClient.execute(postRequest);
+        assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
     }
 
     /**

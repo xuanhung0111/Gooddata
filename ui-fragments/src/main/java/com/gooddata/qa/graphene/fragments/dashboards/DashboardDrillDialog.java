@@ -37,6 +37,7 @@ public class DashboardDrillDialog extends AbstractFragment {
 
     private static final By REPORT_LOCATOR = By.cssSelector(".report");
     private static final String LOADING = "Loading...";
+    public static final By LOCATOR = By.cssSelector(".c-drillDialog");
 
     public <T extends AbstractReport> T getReport(Class<T> clazz) {
         return Graphene.createPageFragment(clazz, waitForElementVisible(REPORT_LOCATOR, browser));

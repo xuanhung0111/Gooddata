@@ -58,7 +58,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void drillOnDashboard() throws InterruptedException {
         try {
-            addReportToDashboard(REPORT_NAME);
+            addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
     
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertFalse(tableReport.isRollupTotalVisible());
@@ -69,7 +69,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             tableReport.clickOnAttributeToOpenDrillReport("2010");
             DashboardDrillDialog drillDialog = 
                     Graphene.createPageFragment(DashboardDrillDialog.class,
-                            waitForElementVisible(By.cssSelector(".c-drillDialog"), browser));
+                            waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
 
             tableReport = drillDialog.getReport(TableReport.class);
             assertTrue(tableReport.isRollupTotalVisible());
@@ -109,7 +109,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void modifyOnDrillingOverlay() throws InterruptedException {
         try {
-            addReportToDashboard(REPORT_NAME);
+            addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
             DashboardDrillDialog drillDialog = drillReportYear2010();
             TableReport tableReport = drillDialog.getReport(TableReport.class);
@@ -141,7 +141,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void verifyReportInfoOnDrillingOverlay() throws InterruptedException {
         try {
-            addReportToDashboard(REPORT_NAME);
+            addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
             DashboardDrillDialog drillDialog = drillReportYear2010();
 
@@ -184,7 +184,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void verifyBreadcrumbInDrillingOverlay() throws InterruptedException {
         try {
-            addReportToDashboard(REPORT_NAME);
+            addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
             DashboardDrillDialog drillDialog = drillReportYear2010();
 
@@ -218,7 +218,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
 
         try {
-            addReportToDashboard("Drill-Opportunity");
+            addReportToNewDashboard("Drill-Opportunity", TEST_DASHBOAD_NAME);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnMetricValue();
             tableReport.waitForReportLoading();
@@ -247,7 +247,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             tableReport.waitForReportLoading();
 
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
-                    waitForElementVisible(By.cssSelector(".c-drillDialog"), browser));
+                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             tableReport = drillDialog.getReport(TableReport.class);
             assertEquals(tableReport.getAttributesHeader(), Arrays.asList("Account"));
             drillDialog.closeDialog();
@@ -263,7 +263,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createDrillReport"})
     public void drillAcrossReport() throws InterruptedException {
         try {
-            addReportToDashboard(REPORT_NAME);
+            addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
@@ -273,7 +273,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             
             tableReport.drillOnAttributeValue();
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
-                    waitForElementVisible(By.cssSelector(".c-drillDialog"), browser));
+                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             tableReport = drillDialog.getReport(TableReport.class);
             assertTrue(tableReport.isRollupTotalVisible());
             assertEquals(tableReport.getAttributesHeader(), Arrays.asList("Year (Snapshot)", "Account"));
@@ -303,7 +303,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
 
         try {
-            addReportToDashboard("Drill-Activity");
+            addReportToNewDashboard("Drill-Activity", TEST_DASHBOAD_NAME);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
 
@@ -316,7 +316,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             tableReport.drillOnAttributeValue();
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
-                    waitForElementVisible(By.cssSelector(".c-drillDialog"), browser));
+                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
             assertTrue(tableReportInDialog.isRollupTotalVisible());
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Year (Activity)", "Priority"));
@@ -348,7 +348,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"overrideDrilldownAndDrillIn"})
     public void drillReportContainsFilter() throws InterruptedException {
         try {
-            addReportToDashboard("Drill-Activity");
+            addReportToNewDashboard("Drill-Activity", TEST_DASHBOAD_NAME);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
@@ -365,7 +365,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             tableReport.drillOnAttributeValue();
             DashboardDrillDialog drillDialog = Graphene.createPageFragment(DashboardDrillDialog.class,
-                    waitForElementVisible(By.cssSelector(".c-drillDialog"), browser));
+                    waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
             TableReport tableReportInDialog = drillDialog.getReport(TableReport.class);
             assertTrue(tableReportInDialog.isRollupTotalVisible());
             assertEquals(tableReportInDialog.getAttributesHeader(), Arrays.asList("Year (Activity)", "Activity Type"));
@@ -406,21 +406,11 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             fail(message);
     }
 
-    private void addReportToDashboard(String name) throws InterruptedException {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard(TEST_DASHBOAD_NAME);
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.editDashboard();
-        dashboardEditBar.addReportToDashboard(name);
-        dashboardEditBar.saveDashboard();
-        checkRedBar(browser);
-    }
-
     private DashboardDrillDialog drillReportYear2010() {
         TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
         tableReport.clickOnAttributeToOpenDrillReport("2010");
 
         return Graphene.createPageFragment(DashboardDrillDialog.class,
-                waitForElementVisible(By.cssSelector(".c-drillDialog"), browser));
+                waitForElementVisible(DashboardDrillDialog.LOCATOR, browser));
     }
 }

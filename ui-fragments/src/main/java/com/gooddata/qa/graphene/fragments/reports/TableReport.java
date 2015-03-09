@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
@@ -15,6 +15,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.collections.Sets;
 
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.google.common.base.Function;
@@ -52,7 +53,9 @@ public class TableReport extends AbstractReport {
     private WebElement reportMessage;
 
     private static final String NO_DATA = "No data";
-
+    
+    private static final String S_BTN_APPLY = ".s-btn-apply";
+    
     private static final String REPORT_NOT_COMPUTABLE = "Report not computable due to improper metric definition.";
 
     public List<String> getAttributesHeader() {
@@ -139,7 +142,7 @@ public class TableReport extends AbstractReport {
         }
     }
 
-    public void drillOnMetricValue() {
+    public void drillOnMetricValue() throws IllegalArgumentException {
         waitForReportLoading();
         String cssClass = null;
         for (WebElement e : drillableElements) {
@@ -149,11 +152,12 @@ public class TableReport extends AbstractReport {
                 continue;
 
             e.findElement(By.cssSelector("span")).click();
-            break;
+            return;
         }
+        throw new IllegalArgumentException("No metric value to drill on");
     }
 
-    public void drillOnMetricValue(String value) {
+    public void drillOnMetricValue(String value) throws IllegalArgumentException {
         waitForReportLoading();
         String cssClass = null;
         WebElement spanElement = null;
@@ -167,19 +171,35 @@ public class TableReport extends AbstractReport {
             if (!value.equals(spanElement.getText()))
                 continue;
             spanElement.click();
-            break;
+            return;
         }
+        throw new IllegalArgumentException(String.format("No metric value %s to drill on", value));
     }
 
-    public void drillOnAttributeValue() {
+    public void drillOnAttributeValue() throws IllegalArgumentException {
         waitForReportLoading();
         for (WebElement e : attributeElementInGrid) {
             if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
                 continue;
 
             e.click();
+            return;
+        }
+        throw new IllegalArgumentException("No attribute value to drill on");
+    }
+    
+    public void drillOnAttributeValue(String value) throws IllegalArgumentException {
+        waitForReportLoading();
+        for (WebElement e : attributeElementInGrid) {
+            if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
+                continue;
+
+            if (!value.equals(e.getText()))
+                continue;
+            e.click();
             break;
         }
+        throw new IllegalArgumentException(String.format("No attribute value %s to drill on", value));
     }
 
     public void waitForReportLoading() {
@@ -233,11 +253,63 @@ public class TableReport extends AbstractReport {
         waitForElementVisible(popupPanel.getRoot());
         popupPanel.changeGroup(group);
         popupPanel.searchAndSelectItem(pairs.getRight());
-        waitForElementVisible(By.cssSelector(".s-btn-apply"), browser).click();
+        waitForElementVisible(By.cssSelector(S_BTN_APPLY), browser).click();
     }
 
     public void addDrilling(Pair<List<String>, String> pairs) {
         addDrilling(pairs, "Attributes");
+    }
+    
+    public void editDrilling(Pair<List<String>, String> oldDrilling, Pair<List<String>, String> newDrilling, String group) {
+        waitForElementVisible(this.getRoot()).click();
+        DashboardEditWidgetToolbarPanel toolbar = Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
+                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
+        toolbar.openConfigurationPanel();
+        
+        SelectItemPopupPanel popupPanel = null;
+        String btnSelector = null;
+        if (!oldDrilling.getLeft().equals(newDrilling.getLeft())) {
+            btnSelector = ".s-btn";
+            for (String item: oldDrilling.getLeft()) {
+                btnSelector = btnSelector + "-" + CssUtils.simplifyText(item);
+            }
+            
+            waitForElementVisible(By.cssSelector(btnSelector), browser).click();   
+            popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class,
+                    browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
+            waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
+            
+            for (String item : newDrilling.getLeft()) {
+                popupPanel.searchAndSelectItem(item);
+            }
+    
+        }
+        if (!oldDrilling.getRight().equals(newDrilling.getRight())) {
+            btnSelector = ".s-btn" + "-" + CssUtils.simplifyText(oldDrilling.getRight());
+            waitForElementVisible(By.cssSelector(btnSelector), browser).click();
+            if (popupPanel == null) {
+                popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class,
+                        browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
+            } else {
+                waitForElementVisible(popupPanel.getRoot());    
+            }
+            popupPanel.changeGroup(group);
+            popupPanel.searchAndSelectItem(newDrilling.getRight());    
+        }
+        waitForElementVisible(By.cssSelector(S_BTN_APPLY), browser).click();
+    }
+    
+    public void deleteDrilling(List<String> drillSourceName) {
+        waitForElementVisible(this.getRoot()).click();
+        DashboardEditWidgetToolbarPanel toolbar = Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
+                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
+        toolbar.openConfigurationPanel();
+        String btnSelector = ".s-btn";
+        for (String item: drillSourceName) {
+            btnSelector = btnSelector + "-" + CssUtils.simplifyText(item);
+        }
+        waitForElementVisible(By.cssSelector(btnSelector), browser).findElement(BY_PARENT).findElement(By.cssSelector(".deleteButton")).click();
+        waitForElementVisible(By.cssSelector(S_BTN_APPLY), browser).click();
     }
 
     private boolean isAddDrillingButtonVisible() {
