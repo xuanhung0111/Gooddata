@@ -155,6 +155,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1)
                 .withCategories(attribute2));
+        analysisPage.waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 6);
         RecommendationContainer recommendationContainer =
@@ -169,10 +170,11 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
         analysisPage.addCategory(attribute1);
+        analysisPage.waitForReportComputing();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 3);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigSelected());
+        assertFalse(analysisPage.isShowPercentConfigSelected());
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CONTRIBUTION_GROUP})
@@ -539,17 +541,18 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         recommendationContainer.getRecommendation(RecommendationStep.COMPARE).apply();
+        analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 6);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
 
         analysisPage.addMetric(metric2);
-        assertEquals(report.getTrackersCount(), 3);
+        analysisPage.waitForReportComputing();
+        assertEquals(report.getTrackersCount(), 6);
         legends = report.getLegends();
-        assertEquals(legends.size(), 1);
-        assertEquals(legends, Arrays.asList("Series 1"));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertEquals(legends.size(), 2);
+        assertEquals(legends, Arrays.asList(metric1, metric2));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
@@ -643,9 +646,9 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0), tooltip);
-        assertEquals(chartReport.getLegends(), Arrays.asList("Series 1"));
+        assertEquals(chartReport.getLegends(), reportDefinition.getMetrics());
         assertEquals(chartReport.getLegendColors(), Arrays.asList("rgb(109, 118, 128)"));
-        assertEquals(chartReport.getLegendColorByName("Series 1"), "rgb(109, 118, 128)");
+        assertEquals(chartReport.getLegendColorByName(reportDefinition.getMetrics().get(0)), "rgb(109, 118, 128)");
 //        assertTrue(chartReport.clickOnTrackerByIndex(0).isTrackerInSelectedStateByIndex(0));
 //        assertFalse(chartReport.isTrackerInSelectedStateByIndex(1));
 //        assertTrue(chartReport.clickOnLegendByName("Series 1").isTrackerInNormalStateByIndex(0));

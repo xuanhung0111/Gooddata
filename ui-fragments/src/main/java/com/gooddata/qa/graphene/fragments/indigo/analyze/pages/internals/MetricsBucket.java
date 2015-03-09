@@ -2,8 +2,9 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -11,6 +12,9 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 public class MetricsBucket extends AbstractFragment {
 
@@ -23,15 +27,25 @@ public class MetricsBucket extends AbstractFragment {
     @FindBy(css = ".s-show-pop")
     private WebElement compareToSamePeriod;
 
+    @FindBy(css = ".adi-bucket-item")
+    private List<WebElement> items;
+
     private static final String DISABLED = "is-disabled";
     private static final String EMPTY = "s-bucket-empty";
+    private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
 
     public void addMetric(WebElement metric) {
         new Actions(browser).dragAndDrop(metric, waitForElementVisible(getRoot())).perform();
-        assertEquals(
-                waitForElementVisible(
-                        By.cssSelector(".s-bucket-metrics .adi-bucket-item-handle>div"), browser)
-                        .getText().trim(), metric.getText().trim());
+        assertTrue(getItemNames().contains(metric.getText().trim()));
+    }
+
+    public List<String> getItemNames() {
+        return Lists.newArrayList(Collections2.transform(items, new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
+                return input.findElement(BY_TEXT).getText();
+            }
+        }));
     }
 
     public boolean isEmpty() {
