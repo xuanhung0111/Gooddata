@@ -29,6 +29,8 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
         attribute1 = CAMPAIGNS;
         attribute2 = CHANNEL;
         attribute3 = CLICKTHROUGHS_ID;
+
+        notAvailableAttribute = "OpportunityID";
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})

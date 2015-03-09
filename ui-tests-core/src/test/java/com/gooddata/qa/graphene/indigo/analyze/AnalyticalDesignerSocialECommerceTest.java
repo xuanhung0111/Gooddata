@@ -28,6 +28,8 @@ public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDes
         attribute1 = DEVICE;
         attribute2 = CHANNEL;
         attribute3 = DEVICE;
+
+        notAvailableAttribute = "Company";
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})

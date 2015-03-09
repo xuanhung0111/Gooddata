@@ -56,6 +56,8 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
     protected String attribute2;
     protected String attribute3;
 
+    protected String notAvailableAttribute;
+
     @BeforeClass
     public void initStartPage() {
         startPage = "projects.html";
@@ -147,6 +149,25 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
+    public void testAccessibilityGuidanceForAttributesMetrics() throws InterruptedException {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
+        analysisPage.addInapplicableCategory(notAvailableAttribute);
+        assertEquals(analysisPage.getExplorerMessage(), "Visualization cannot be displayed");
+        Screenshots.takeScreenshot(browser,
+                "testAccessibilityGuidanceForAttributesMetrics - inapplicableCategory", getClass());
+
+        assertTrue(analysisPage.searchBucketItem(notAvailableAttribute));
+        Screenshots.takeScreenshot(browser, 
+                "testAccessibilityGuidanceForAttributesMetrics - searchInapplicableCategory", getClass());
+        assertTrue(analysisPage.getAllCatalogueItemsInViewPort().contains(notAvailableAttribute));
+        assertFalse(analysisPage.searchBucketItem(notAvailableAttribute + "not found"));
+        Screenshots.takeScreenshot(browser,
+                "testAccessibilityGuidanceForAttributesMetrics - searchNotFound", getClass());
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CONTRIBUTION_GROUP})
