@@ -74,6 +74,11 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage turnOnShowInPercents() {
+        waitForFragmentVisible(bucketsPanel).turnOnShowInPercents();
+        return this;
+    }
+
     public AnalysisPage removeFilter(String dateOrAttribute) {
         waitForFragmentVisible(mainEditor).removeFilter(dateOrAttribute);
         return this;
