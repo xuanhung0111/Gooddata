@@ -8,6 +8,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public class ProjectsPage extends AbstractFragment {
 
@@ -40,9 +42,22 @@ public class ProjectsPage extends AbstractFragment {
                         .contains(projectSubstringFilter))
                     continue;
             }
-            String gdcLink = elem.getAttribute("gdc:link");
-            projectIds.add(gdcLink.substring(gdcLink.lastIndexOf("/") + 1));
+            projectIds.add(getProjectIdFrom(elem));
         }
         return projectIds;
+    }
+
+    public void goToProject(final String projectId) {
+        Iterables.find(Iterables.concat(demoProjects, projects), new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement project) {
+                return projectId.equals(getProjectIdFrom(project));
+            }
+        }).click();
+    }
+
+    private String getProjectIdFrom(WebElement project) {
+        String gdcLink = project.getAttribute("gdc:link");
+        return gdcLink.substring(gdcLink.lastIndexOf("/") + 1);
     }
 }
