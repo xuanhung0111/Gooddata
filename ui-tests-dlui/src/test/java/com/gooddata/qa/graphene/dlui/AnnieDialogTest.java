@@ -51,7 +51,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         createModelForGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
 
         adsInstance =
-                new ADSInstance().setName("ADS Instance for DLUI test").setAuthorizationToken(
+                new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
                         testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
 
@@ -59,8 +59,8 @@ public class AnnieDialogTest extends AbstractDLUITest {
         assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
 
         cloudconnectProcess =
-                new ProcessInfo().setProjectId(testParams.getProjectId())
-                        .setProcessName("Initial Data for ADS Instance").setProcessType("GRAPH");
+                new ProcessInfo().withProjectId(testParams.getProjectId())
+                        .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
         createCloudConnectProcess(cloudconnectProcess);
     }
 
@@ -124,12 +124,12 @@ public class AnnieDialogTest extends AbstractDLUITest {
     public void checkSearchAllFields() {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
-        Field field = new Field().setNameAndType("Position", FieldTypes.ATTRIBUTE);
+        Field field = new Field("Position", FieldTypes.ATTRIBUTE);
         Dataset dataset =
-                new Dataset().setName(AdditionalDatasets.PERSON_WITH_NEW_FIELDS.getName())
-                        .setFields(field);
+                new Dataset().withName(AdditionalDatasets.PERSON_WITH_NEW_FIELDS.getName())
+                        .withFields(field);
         DataSource dataSource =
-                new DataSource().setName(DEFAULT_DATA_SOURCE_NAME).setDatasets(dataset);
+                new DataSource().withName(DEFAULT_DATA_SOURCE_NAME).withDatasets(dataset);
 
         openAnnieDialog();
         annieUIDialog.enterSearchKey("Pos");

@@ -25,7 +25,7 @@ public class DataSource {
         return name;
     }
 
-    public DataSource setName(String name) {
+    public DataSource withName(String name) {
         this.name = name;
         return this;
     }
@@ -43,7 +43,7 @@ public class DataSource {
         return filteredDataset;
     }
 
-    public DataSource setDatasets(Dataset... datasets) {
+    public DataSource withDatasets(Dataset... datasets) {
         this.datasets = Lists.newArrayList(datasets);
         return this;
     }

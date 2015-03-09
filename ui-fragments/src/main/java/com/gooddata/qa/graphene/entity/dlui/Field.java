@@ -20,12 +20,6 @@ public class Field {
         return type;
     }
 
-    public Field setNameAndType(String name, FieldTypes type) {
-        this.name = name;
-        this.type = type;
-        return this;
-    }
-
     public enum FieldTypes {
         ALL("all data"),
         ATTRIBUTE("attributes"),

@@ -11,7 +11,7 @@ public class ADSInstance {
         return authorizationToken;
     }
 
-    public ADSInstance setAuthorizationToken(String authorizationToken) {
+    public ADSInstance withAuthorizationToken(String authorizationToken) {
         this.authorizationToken = authorizationToken;
         return this;
     }
@@ -20,7 +20,7 @@ public class ADSInstance {
         return description;
     }
 
-    public ADSInstance setDescription(String description) {
+    public ADSInstance withDescription(String description) {
         this.description = description;
         return this;
     }
@@ -29,7 +29,7 @@ public class ADSInstance {
         return name;
     }
 
-    public ADSInstance setName(String name) {
+    public ADSInstance withName(String name) {
         this.name = name;
         return this;
     }
@@ -38,7 +38,7 @@ public class ADSInstance {
         return id;
     }
 
-    public ADSInstance setId(String id) {
+    public ADSInstance withId(String id) {
         this.id = id;
         return this;
     }

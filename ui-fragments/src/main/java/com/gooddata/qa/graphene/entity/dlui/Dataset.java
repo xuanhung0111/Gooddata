@@ -22,7 +22,7 @@ public class Dataset {
         return name;
     }
 
-    public Dataset setName(String name) {
+    public Dataset withName(String name) {
         this.name = name;
         return this;
     }
@@ -39,7 +39,7 @@ public class Dataset {
         return filteredFields;
     }
     
-    public Dataset setFields(Field... fields) {
+    public Dataset withFields(Field... fields) {
         this.fields = Lists.newArrayList(fields);
         return this;
     }

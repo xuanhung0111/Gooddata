@@ -125,7 +125,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                     "There is an exeception during creating new ads instance! ", e);
         }
 
-        adsInstance.setId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
+        adsInstance.withId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
         System.out.println("adsId: " + adsInstance.getId());
     }
 
@@ -153,7 +153,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
         System.out.println(postResponse.getFirstHeader("Location"));
         String processUri = postResponse.getFirstHeader("Location").getValue();
-        processInfo.setProcessId(processUri.substring(processUri.lastIndexOf("/") + 1));
+        processInfo.withProcessId(processUri.substring(processUri.lastIndexOf("/") + 1));
         System.out.println("Process id: " + processInfo.getProcessId());
 
         EntityUtils.consumeQuietly(postResponse.getEntity());

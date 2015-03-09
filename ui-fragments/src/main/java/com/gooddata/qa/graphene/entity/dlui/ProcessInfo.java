@@ -11,7 +11,7 @@ public class ProcessInfo {
         return projectId;
     }
 
-    public ProcessInfo setProjectId(String projectId) {
+    public ProcessInfo withProjectId(String projectId) {
         this.projectId = projectId;
         return this;
     }
@@ -20,7 +20,7 @@ public class ProcessInfo {
         return processName;
     }
 
-    public ProcessInfo setProcessName(String processName) {
+    public ProcessInfo withProcessName(String processName) {
         this.processName = processName;
         return this;
     }
@@ -29,7 +29,7 @@ public class ProcessInfo {
         return processType;
     }
 
-    public ProcessInfo setProcessType(String processType) {
+    public ProcessInfo withProcessType(String processType) {
         this.processType = processType;
         return this;
     }
@@ -38,7 +38,7 @@ public class ProcessInfo {
         return processId;
     }
 
-    public ProcessInfo setProcessId(String processId) {
+    public ProcessInfo withProcessId(String processId) {
         this.processId = processId;
         return this;
     }
