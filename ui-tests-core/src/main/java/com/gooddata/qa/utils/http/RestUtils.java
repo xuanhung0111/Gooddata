@@ -10,6 +10,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriTemplate;
 
 import java.io.IOException;
@@ -27,6 +28,11 @@ public class RestUtils {
     private static final String addUserContentBody = "{\"user\":{\"content\":{\"userRoles\":[\"%s\"],\"status\":\"ENABLED\"},\"links\":{\"self\":\"%s\"}}}";
     private static final String ldmLink = "/gdc/projects/%s/ldm";
     private static final String dashboardEditModeLink = "/gdc/md/%s/obj/%s?mode=edit";
+    private static final String domainUsersUri = "/gdc/account/domains/default/users";
+    private static final String createUserContentBody =
+            "{\"accountSetting\":{\"login\":\"%s\",\"password\":\"%s\","
+            + "\"email\":\"%s\",\"verifyPassword\":\"%s\","
+            + "\"firstName\":\"FirstName\",\"lastName\":\"LastName\"}}";
 
     private static final String FEATURE_FLAGS_URI = "/gdc/internal/account/profile/featureFlags";
     private static final String FEATURE_FLAGS = "featureFlags";
@@ -41,6 +47,34 @@ public class RestUtils {
     public static final String TARGET_EXPORT = "export";
 
     private RestUtils() {
+    }
+
+    public static String createNewUser(String host, String domainUser, String domainPassword,
+            String userEmail, String userPassword) throws ParseException, JSONException,
+            IOException {
+        String contentBody =
+                String.format(createUserContentBody, userEmail, userPassword, userEmail,
+                        userPassword);
+        RestApiClient restApiClient =
+                new RestApiClient(host, domainUser, domainPassword, true, false);
+        HttpRequestBase postRequest = restApiClient.newPostMethod(domainUsersUri, contentBody);
+        HttpResponse postReponse = restApiClient.execute(postRequest);
+        assertEquals(postReponse.getStatusLine().getStatusCode(), HttpStatus.CREATED.value(),
+                "New user is not created!");
+        JSONObject jsonObj = new JSONObject(EntityUtils.toString(postReponse.getEntity()));
+        System.out.println("New user uri: " + jsonObj.getString("uri"));
+
+        return jsonObj.getString("uri");
+    }
+
+    public static void deleteUser(String host, String domainUser, String domainPassword,
+            String deletetedUserUri) {
+        RestApiClient restApiClient =
+                new RestApiClient(host, domainUser, domainPassword, true, false);
+        HttpRequestBase deleteRequest = restApiClient.newDeleteMethod(deletetedUserUri);
+        HttpResponse deleteReponse = restApiClient.execute(deleteRequest);
+        assertEquals(deleteReponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
+                "User is not deleted!");
     }
 
     public static void addUserToProject(String host, String projectId, String domainUser,
@@ -59,7 +93,7 @@ public class RestUtils {
     }
     
     public static void addUserGroup(RestApiClient restApiClient, String projectId, final String name) {
-    	final String projectUri = "/gdc/projects/" + projectId;
+        final String projectUri = "/gdc/projects/" + projectId;
         
         @SuppressWarnings("serial")
         JSONObject payload = new JSONObject(new HashMap<String, Object>() {{

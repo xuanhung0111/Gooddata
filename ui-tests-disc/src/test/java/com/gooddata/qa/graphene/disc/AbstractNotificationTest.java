@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-
 import static org.testng.Assert.*;
 
 import java.io.IOException;
@@ -30,6 +29,7 @@ import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
@@ -153,6 +153,23 @@ public class AbstractNotificationTest extends AbstractDISCTest {
             .setStatus(ScheduleStatus.OK);
     protected ExecutionDetails failedExecutionDetails = new ExecutionDetails()
             .setStatus(ScheduleStatus.ERROR);
+
+    protected String createGdcUserWithImapUser(String imapUser, String imapPassword) {
+        try {
+            String imapUserUri =
+                    RestUtils.createNewUser(testParams.getHost(), testParams.getUser(),
+                            testParams.getPassword(), imapUser, imapPassword);
+            return imapUserUri;
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeception when creating a new user!", e);
+        }
+    }
+
+    protected void deleteImapUser(String imapUserUri) {
+        if (!imapUserUri.isEmpty())
+            RestUtils.deleteUser(testParams.getHost(), testParams.getUser(),
+                    testParams.getPassword(), imapUserUri);
+    }
 
     protected void editNotification(NotificationBuilder newNotificationBuilder) {
         openProjectDetailPage(getWorkingProject());

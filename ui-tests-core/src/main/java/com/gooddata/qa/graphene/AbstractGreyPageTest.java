@@ -203,7 +203,7 @@ public class AbstractGreyPageTest extends AbstractTest {
         addUserToProject(testParams.getViewerProfileUri(), UserRoles.VIEWER);
     }
 
-    private void addUserToProject(String profileUri, UserRoles userRole) throws ParseException, IOException, JSONException {
+    protected void addUserToProject(String profileUri, UserRoles userRole) throws ParseException, IOException, JSONException {
         RestUtils.addUserToProject(testParams.getHost(),
                 testParams.getProjectId(), testParams.getUser(),
                 testParams.getPassword(), profileUri,
