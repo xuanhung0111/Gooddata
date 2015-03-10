@@ -119,6 +119,11 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage removeMetric(String metric) {
+        waitForFragmentVisible(bucketsPanel).removeMetric(metric);
+        return this;
+    }
+
     public AnalysisPage changeReportType(ReportType type) {
         waitForFragmentVisible(bucketsPanel).setReportType(type);
         return this;
@@ -187,8 +192,12 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(cataloguePanel).getMetricDescription(metric);
     }
 
-    public List<String> getAllCategoryNames() {
-        return waitForFragmentVisible(bucketsPanel).getAllCategoryNames();
+    public List<String> getAllAddedCategoryNames() {
+        return waitForFragmentVisible(bucketsPanel).getAllAddedCategoryNames();
+    }
+
+    public List<String> getAllAddedMetricNames() {
+        return waitForFragmentVisible(bucketsPanel).getAllAddedMetricNames();
     }
 
     public boolean isExportToReportButtonEnabled() {
@@ -252,5 +261,39 @@ public class AnalysisPage extends AbstractFragment {
 
     public boolean searchBucketItem(String item) {
         return waitForFragmentVisible(cataloguePanel).searchBucketItem(item);
+    }
+
+    public AnalysisPage undo() {
+        waitForFragmentVisible(pageHeader).undo();
+        return this;
+    }
+
+    public AnalysisPage redo() {
+        waitForFragmentVisible(pageHeader).redo();
+        return this;
+    }
+
+    public boolean isUndoButtonEnabled() {
+        return waitForFragmentVisible(pageHeader).isUndoButtonEnabled();
+    }
+
+    public boolean isRedoButtonEnabled() {
+        return waitForFragmentVisible(pageHeader).isRedoButtonEnabled();
+    }
+
+    public boolean isMetricBucketEmpty() {
+        return waitForFragmentVisible(bucketsPanel).isMetricBucketEmpty();
+    }
+
+    public boolean isCategoryBucketEmpty() {
+        return waitForFragmentVisible(bucketsPanel).isCategoryBucketEmpty();
+    }
+
+    public boolean isBucketBlankState() {
+        return waitForFragmentVisible(bucketsPanel).isBlankState();
+    }
+
+    public boolean isMainEditorBlankState() {
+        return waitForFragmentVisible(mainEditor).isBlankState();
     }
 }

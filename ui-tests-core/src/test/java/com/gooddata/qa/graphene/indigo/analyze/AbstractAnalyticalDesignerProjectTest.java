@@ -25,6 +25,7 @@ import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
@@ -48,6 +49,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
     protected static final String RESET_GROUP = "reset";
     protected static final String CHART_REPORT_GROUP = "chart_report";
     protected static final String TABLE_REPORT_GROUP = "table_report";
+    protected static final String UNDO_REDO_GROUP = "undo_redo";
 
     protected String metric1;
     protected String metric2;
@@ -232,13 +234,13 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(attribute1).apply();
-        assertTrue(analysisPage.getAllCategoryNames().contains(attribute1));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute1));
         assertEquals(analysisPage.getFilterText(attribute1), attribute1 + ": All");
         assertEquals(report.getTrackersCount(), 3);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.addCategory(attribute2);
-        assertTrue(analysisPage.getAllCategoryNames().contains(attribute2));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute2));
         assertEquals(analysisPage.getFilterText(attribute2), attribute2 + ": All");
         assertEquals(report.getTrackersCount(), 6);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -259,7 +261,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(attribute1).apply();
-        assertTrue(analysisPage.getAllCategoryNames().contains(attribute1));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute1));
         assertEquals(analysisPage.getFilterText(attribute1), attribute1 + ": All");
         assertEquals(report.getTrackersCount(), 3);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -297,7 +299,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         TrendingRecommendation trendingRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
         trendingRecommendation.select("Month").apply();
-        assertTrue(analysisPage.getAllCategoryNames().contains(DATE));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertTrue(analysisPage.isFilterVisible(DATE));
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
         assertTrue(analysisPage.isShowPercentConfigEnabled());
@@ -337,7 +339,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         initAnalysePage();
 
         analysisPage.dragAndDropMetricToShortcutPanel(metric1, ShortcutPanel.TRENDED_OVER_TIME);
-        assertTrue(analysisPage.getAllCategoryNames().contains(DATE));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertTrue(analysisPage.isFilterVisible(DATE));
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 4);
@@ -589,7 +591,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getAllCategoryNames().contains(DATE));
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertTrue(analysisPage.isFilterVisible(DATE));
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -615,6 +617,104 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 3);
 
         analysisPage.resetToBlankState();
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
+    public void testUndoRedoAfterAddMetric() {
+        initAnalysePage();
+
+        analysisPage.addMetric(metric1);
+        CurrentState baseState = CurrentState.getCurrentState(analysisPage);
+
+        checkUndoRedoForEmptyState(true);
+        checkUndoRedoForReport(baseState, false);
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
+    public void testUndoRedoAfterAddAtribute() {
+        initAnalysePage();
+
+        analysisPage.addCategory(attribute1);
+        analysisPage.waitForReportComputing();
+
+        checkUndoRedoForEmptyState(true);
+
+        analysisPage.redo();
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute1));
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
+    public void testUndoRedoAfterRemoveMetricAndAttribute() {
+        initAnalysePage();
+
+        analysisPage.addMetric(metric1);
+        CurrentState baseState = CurrentState.getCurrentState(analysisPage);
+
+        analysisPage.removeMetric(metric1);
+        assertFalse(analysisPage.getAllAddedMetricNames().contains(metric1));
+
+        checkUndoRedoForReport(baseState, true);
+        checkUndoRedoForEmptyState(false);
+
+        analysisPage.addMetric(metric1);
+        analysisPage.addCategory(attribute1);
+        CurrentState baseStateWithAttribute = CurrentState.getCurrentState(analysisPage);
+
+        analysisPage.removeCategory(attribute1);
+        analysisPage.waitForReportComputing();
+
+        checkUndoRedoForReport(baseStateWithAttribute, true);
+        checkUndoRedoForReport(baseState, false);
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
+    public void testUndoRedoAfterAddFilter() {
+        int actionsCount = 0;
+        initAnalysePage();
+
+        analysisPage.addCategory(attribute1); actionsCount++;
+        analysisPage.addMetric(metric1); actionsCount++;
+        analysisPage.addFilter(attribute2); actionsCount++;
+
+        analysisPage.undo();
+        assertFalse(analysisPage.isFilterVisible(attribute2));
+
+        analysisPage.redo();
+        assertTrue(analysisPage.isFilterVisible(attribute2));
+
+        analysisPage.removeFilter(attribute2);
+        actionsCount++;
+        assertFalse(analysisPage.isFilterVisible(attribute2));
+        Screenshots.takeScreenshot(browser, "Indigo_remove_filter", this.getClass());
+
+        analysisPage.undo();
+        assertTrue(analysisPage.isFilterVisible(attribute2));
+
+        analysisPage.redo();
+        assertFalse(analysisPage.isFilterVisible(attribute2));
+
+        // Check that the undo must go back to the start of his session
+        assertTrue(analysisPage.isUndoButtonEnabled());
+        assertFalse(analysisPage.isRedoButtonEnabled());
+        for (int i = 1; i <= actionsCount; i++) {
+            analysisPage.undo();
+        }
+        assertFalse(analysisPage.isUndoButtonEnabled());
+        assertTrue(analysisPage.isRedoButtonEnabled());
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
+    public void testUndoRedoAfterChangeReportType() {
+        initAnalysePage();
+
+        analysisPage.changeReportType(ReportType.TABLE);
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
+
+        analysisPage.undo();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.COLUMN_CHART));
+
+        analysisPage.redo();
+        assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
     }
 
     protected void filterOnAttribute(String filterText, String... filterValues) {
@@ -670,10 +770,6 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(chartReport.getLegends(), reportDefinition.getMetrics());
         assertEquals(chartReport.getLegendColors(), Arrays.asList("rgb(109, 118, 128)"));
         assertEquals(chartReport.getLegendColorByName(reportDefinition.getMetrics().get(0)), "rgb(109, 118, 128)");
-//        assertTrue(chartReport.clickOnTrackerByIndex(0).isTrackerInSelectedStateByIndex(0));
-//        assertFalse(chartReport.isTrackerInSelectedStateByIndex(1));
-//        assertTrue(chartReport.clickOnLegendByName("Series 1").isTrackerInNormalStateByIndex(0));
-//        assertTrue(chartReport.isTrackerInNormalStateByIndex(1));
     }
 
     protected void verifyTableReportContent(ReportDefinition reportDefinition, List<String> headers, List<List<String>> content) {
@@ -686,4 +782,70 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(tableReport.getContent(), content);
     }
 
+    private void checkUndoRedoForReport(CurrentState expectedState, boolean isUndo) {
+      if (isUndo) analysisPage.undo();
+      else
+          analysisPage.redo();
+
+      if (expectedState == null) {
+          assertTrue(analysisPage.isBucketBlankState());
+          assertTrue(analysisPage.isMainEditorBlankState());
+      } else {
+          CurrentState currentState = CurrentState.getCurrentState(analysisPage);
+          assertTrue(currentState.equals(expectedState));
+      }
+    }
+
+    private void checkUndoRedoForEmptyState(boolean isUndo) {
+        checkUndoRedoForReport(null, isUndo);
+    }
+
+    private static class CurrentState {
+        private AnalysisPage analysisPage;
+
+        private int reportTrackerCount;
+        private List<String> addedAttributes;
+        private List<String> addedMetrics;
+        private List<String> reportDataLables;
+        private List<String> reportAxisLables;
+
+        public static CurrentState getCurrentState(AnalysisPage analysisPage) {
+            return new CurrentState(analysisPage).saveCurrentState();
+        }
+
+        private CurrentState(AnalysisPage analysisPage) {
+            this.analysisPage = analysisPage;
+        }
+
+        private CurrentState saveCurrentState() {
+            analysisPage.waitForReportComputing();
+            ChartReport report = analysisPage.getChartReport();
+
+            reportTrackerCount = report.getTrackersCount();
+            addedMetrics = analysisPage.getAllAddedMetricNames();
+            addedAttributes = analysisPage.getAllAddedCategoryNames();
+
+            reportDataLables = report.getDataLabels();
+            reportAxisLables = report.getAxisLabels();
+
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object obj){
+            if (!(obj instanceof CurrentState))
+                return false;
+
+            CurrentState state = (CurrentState)obj;
+
+            if (this.reportTrackerCount != state.reportTrackerCount ||
+                !this.addedAttributes.equals(state.addedAttributes) ||
+                !this.addedMetrics.equals(state.addedMetrics) ||
+                !this.reportDataLables.equals(state.reportDataLables) ||
+                !this.reportAxisLables.equals(state.reportAxisLables))
+                return false;
+
+            return true;
+        }
+    }
 }

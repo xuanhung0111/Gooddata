@@ -15,6 +15,12 @@ public class AnalysisPageHeader extends AbstractFragment {
     @FindBy(css = ".s-btn-open_as_report")
     private WebElement exportToReportButton;
 
+    @FindBy(css = ".s-undo")
+    private WebElement undoButton;
+
+    @FindBy(css = ".s-redo")
+    private WebElement redoButton;
+
     private static final String DISABLED = "disabled";
 
     public void resetToBlankState() {
@@ -27,5 +33,21 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     public boolean isExportToReportButtonEnable() {
         return !waitForElementVisible(exportToReportButton).getAttribute("class").contains(DISABLED);
+    }
+
+    public void undo() {
+        waitForElementVisible(undoButton).click();
+    }
+
+    public void redo() {
+        waitForElementVisible(redoButton).click();
+    }
+
+    public boolean isUndoButtonEnabled() {
+        return !waitForElementVisible(undoButton).getAttribute("class").contains(DISABLED);
+    }
+
+    public boolean isRedoButtonEnabled() {
+        return !waitForElementVisible(redoButton).getAttribute("class").contains(DISABLED);
     }
 }

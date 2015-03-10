@@ -58,8 +58,11 @@ public class FiltersBucket extends AbstractFragment {
         int oldFiltersCount = filters.size();
         WebElement filter = getFilter(dateOrAttribute);
 
-        new Actions(browser).dragAndDrop(filter, waitForElementPresent(BY_TRASH_PANEL, browser))
-                .perform();
+        Actions action = new Actions(browser);
+        action.clickAndHold(filter).moveToElement(addFilterBucket).perform();
+        action.moveToElement(waitForElementPresent(BY_TRASH_PANEL, browser)).perform();
+        action.release().perform();
+
         assertEquals(filters.size(), oldFiltersCount - 1, "Filter is not removed successfully");
     }
 
