@@ -332,6 +332,8 @@ public class DashboardsPage extends AbstractFragment {
     private DashboardMenu openDashboardMenu() {
         waitForElementVisible(dashboardSwitcherButton);
         if (dashboardSwitcherButton.getAttribute("class").contains("disabled")) {
+            System.out.println("Dashboard switcher button is disabled!"
+                    + "That means project just has only one dashboard!");
             return null;
         }
         dashboardSwitcherButton.click();

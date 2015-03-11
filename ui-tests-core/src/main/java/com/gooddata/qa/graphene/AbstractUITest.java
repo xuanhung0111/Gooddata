@@ -390,18 +390,24 @@ public class AbstractUITest extends AbstractGreyPageTest {
     private void goToCurrentProject() {
         final String currentUrl = browser.getCurrentUrl();
 
+        if (currentUrl.contains(PAGE_PROJECTS)) {
+            waitForProjectsPageLoaded(browser);
+            waitForFragmentVisible(projectsPage);
+            projectsPage.goToProject(testParams.getProjectId());
+            waitForDashboardPage();
+        }
+
         if (currentUrl.contains(PAGE_UI_PROJECT_PREFIX)) {
             if (currentUrl.contains(testParams.getProjectId()))
                 return;
             ApplicationHeaderBar.selectProject(testParams.getProjectId(), browser);
-        } else if (currentUrl.contains(PAGE_PROJECTS)) {
-            waitForProjectsPageLoaded(browser);
-            waitForFragmentVisible(projectsPage);
-            projectsPage.goToProject(testParams.getProjectId());
         } else {
             openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
         }
+        waitForDashboardPage();
+    }
 
+    private void waitForDashboardPage() {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(dashboardsPage.getRoot());
@@ -414,9 +420,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             return;
         }
         ApplicationHeaderBar.goToDashboardsPage(browser);
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-        waitForDashboardPageLoaded(browser);
-        waitForElementVisible(dashboardsPage.getRoot());
+        waitForDashboardPage();
     }
 
     public void initReportsPage() {
@@ -481,9 +485,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void initDashboardsPageByUrl() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-        waitForDashboardPageLoaded(browser);
-        waitForElementVisible(dashboardsPage.getRoot());
+        waitForDashboardPage();
     }
 
     public void initReportsPageByUrl() {
