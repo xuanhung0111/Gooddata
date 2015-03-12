@@ -109,6 +109,9 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
         } else {
             fail("Dashboard wasn't selected and not deleted");
         }
+        // webapp can use this time to update a dashboard has been deleted
+        // to avoid RED BAR - Dashboard no longer exists
+        Thread.sleep(5000);
     }
 
     @Test(dependsOnGroups = {"dashboards-verification"})

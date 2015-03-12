@@ -212,9 +212,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void verifyProjectDashboardsAndTabs(boolean validation, Map<String, String[]> expectedDashboardsAndTabs,
                                                boolean openPage) throws InterruptedException {
+        // sleep to avoid RED BAR - An error occurred while performing this operation.
+        Thread.sleep(5000);
         if (openPage) {
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
-            waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+            initDashboardsPage();
         }
         waitForDashboardPageLoaded(browser);
         Thread.sleep(5000);
