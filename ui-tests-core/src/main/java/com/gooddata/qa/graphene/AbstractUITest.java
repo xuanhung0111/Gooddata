@@ -389,7 +389,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     private void goToCurrentProject() {
-        final String currentUrl = browser.getCurrentUrl();
+        String currentUrl = browser.getCurrentUrl();
 
         if (currentUrl.contains(PAGE_PROJECTS)) {
             waitForProjectsPageLoaded(browser);
@@ -398,6 +398,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             waitForDashboardPage();
         }
 
+        currentUrl = browser.getCurrentUrl();
         if (currentUrl.contains(PAGE_UI_PROJECT_PREFIX)) {
             if (currentUrl.contains(testParams.getProjectId()))
                 return;
@@ -409,7 +410,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     private void waitForDashboardPage() {
-        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(dashboardsPage.getRoot());
     }
