@@ -157,8 +157,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     protected String createGdcUserWithImapUser(String imapUser, String imapPassword) {
         try {
             String imapUserUri =
-                    RestUtils.createNewUser(testParams.getHost(), testParams.getUser(),
-                            testParams.getPassword(), imapUser, imapPassword);
+                    RestUtils.createNewUser(getRestApiClient(), imapUser, imapPassword);
             return imapUserUri;
         } catch (Exception e) {
             throw new IllegalStateException("There is an exeception when creating a new user!", e);
@@ -167,8 +166,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected void deleteImapUser(String imapUserUri) {
         if (!imapUserUri.isEmpty())
-            RestUtils.deleteUser(testParams.getHost(), testParams.getUser(),
-                    testParams.getPassword(), imapUserUri);
+            RestUtils.deleteUser(getRestApiClient(), imapUserUri);
     }
 
     protected void editNotification(NotificationBuilder newNotificationBuilder) {

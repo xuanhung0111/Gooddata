@@ -515,5 +515,4 @@ public class NotificationsTest extends AbstractNotificationTest {
     public void deleteProcesses() {
         cleanProcessesInWorkingProject();
     }
-
 }

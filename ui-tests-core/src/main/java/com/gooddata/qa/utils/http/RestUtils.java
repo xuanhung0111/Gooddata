@@ -16,6 +16,7 @@ import org.springframework.web.util.UriTemplate;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -29,10 +30,24 @@ public class RestUtils {
     private static final String ldmLink = "/gdc/projects/%s/ldm";
     private static final String dashboardEditModeLink = "/gdc/md/%s/obj/%s?mode=edit";
     private static final String domainUsersUri = "/gdc/account/domains/default/users";
-    private static final String createUserContentBody =
-            "{\"accountSetting\":{\"login\":\"%s\",\"password\":\"%s\","
-            + "\"email\":\"%s\",\"verifyPassword\":\"%s\","
-            + "\"firstName\":\"FirstName\",\"lastName\":\"LastName\"}}";
+    private static final String createUserContentBody;
+    static {
+        try {
+            createUserContentBody = new JSONObject() {{
+                put("accountSetting", new JSONObject() {{
+                    put("login", "${userEmail}");
+                    put("password", "${userPassword}");
+                    put("email", "${userEmail}");
+                    put("verifyPassword", "${userPassword}");
+                    put("firstName", "FirstName");
+                    put("lastName", "LastName");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exeception during json object initialization! ", e);
+        }
+    }
 
     private static final String FEATURE_FLAGS_URI = "/gdc/internal/account/profile/featureFlags";
     private static final String FEATURE_FLAGS = "featureFlags";
@@ -49,28 +64,23 @@ public class RestUtils {
     private RestUtils() {
     }
 
-    public static String createNewUser(String host, String domainUser, String domainPassword,
-            String userEmail, String userPassword) throws ParseException, JSONException,
-            IOException {
+    public static String createNewUser(RestApiClient restApiClient, String userEmail,
+            String userPassword) throws ParseException, JSONException, IOException {
         String contentBody =
-                String.format(createUserContentBody, userEmail, userPassword, userEmail,
+                createUserContentBody.replace("${userEmail}", userEmail).replace("${userPassword}",
                         userPassword);
-        RestApiClient restApiClient =
-                new RestApiClient(host, domainUser, domainPassword, true, false);
         HttpRequestBase postRequest = restApiClient.newPostMethod(domainUsersUri, contentBody);
         HttpResponse postReponse = restApiClient.execute(postRequest);
         assertEquals(postReponse.getStatusLine().getStatusCode(), HttpStatus.CREATED.value(),
                 "New user is not created!");
-        JSONObject jsonObj = new JSONObject(EntityUtils.toString(postReponse.getEntity()));
-        System.out.println("New user uri: " + jsonObj.getString("uri"));
+        String userUri =
+                new JSONObject(EntityUtils.toString(postReponse.getEntity())).getString("uri");
+        System.out.println("New user uri: " + userUri);
 
-        return jsonObj.getString("uri");
+        return userUri;
     }
 
-    public static void deleteUser(String host, String domainUser, String domainPassword,
-            String deletetedUserUri) {
-        RestApiClient restApiClient =
-                new RestApiClient(host, domainUser, domainPassword, true, false);
+    public static void deleteUser(RestApiClient restApiClient, String deletetedUserUri) {
         HttpRequestBase deleteRequest = restApiClient.newDeleteMethod(deletetedUserUri);
         HttpResponse deleteReponse = restApiClient.execute(deleteRequest);
         assertEquals(deleteReponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
