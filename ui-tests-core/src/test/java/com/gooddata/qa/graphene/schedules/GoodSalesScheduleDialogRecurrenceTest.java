@@ -7,10 +7,12 @@ import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.AbstractRecurren
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfMonthTestCase;
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfWeekTestCase;
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.WeeklyTestCase;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
+
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.json.JSONException;
@@ -71,9 +73,8 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void setFeatureFlags() throws JSONException, IOException, InterruptedException {
-        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
-                RestUtils.FeatureFlagOption.createFeatureClassOption("dashboardScheduleRecipients", true)
-        );
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
         logout();
     }
 

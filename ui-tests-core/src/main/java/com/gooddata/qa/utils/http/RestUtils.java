@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.http;
 
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 
 import org.apache.http.HttpResponse;
@@ -216,6 +217,12 @@ public class RestUtils {
         HttpRequestBase postRequest = restApiClient.newPostMethod(dashboardEditModeURI, json.toString());
         response = restApiClient.execute(postRequest);
         assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
+    }
+
+    public static void enableFeatureFlagInProject(RestApiClient restApiClient, String projectId,
+            ProjectFeatureFlags featureFlag) throws JSONException {
+        setFeatureFlagsToProject(restApiClient, projectId,
+                new FeatureFlagOption(featureFlag.getFlagName(), true));
     }
 
     /**
