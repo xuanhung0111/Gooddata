@@ -402,7 +402,6 @@ public class NotificationsTest extends AbstractNotificationTest {
         } finally {
             cleanProcessesInWorkingProject();
         }
-
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
@@ -450,7 +449,6 @@ public class NotificationsTest extends AbstractNotificationTest {
         } finally {
             cleanProcessesInWorkingProject();
         }
-
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
@@ -475,10 +473,12 @@ public class NotificationsTest extends AbstractNotificationTest {
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
-            scheduleDetail.repeatManualRunFailedSchedule(5, scheduleBuilder.getExecutable());
+            scheduleDetail.repeatManualRunFailedSchedule(getNumberOfFailuresToSendMail(),
+                    scheduleBuilder.getExecutable());
             waitForRepeatedFailuresEmail(scheduleBuilder);
 
-            scheduleDetail.repeatManualRunFailedSchedule(25, scheduleBuilder.getExecutable());
+            scheduleDetail.repeatManualRunFailedSchedule(getNumberOfFailuresToDisableSchedule()
+                    - getNumberOfFailuresToSendMail(), scheduleBuilder.getExecutable());
             scheduleBuilder.setEnabled(false);
             waitForRepeatedFailuresEmail(scheduleBuilder);
         } catch (Exception e) {
