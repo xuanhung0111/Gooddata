@@ -32,8 +32,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
 
     @BeforeClass
     public void initProperties() {
-        dluiZipFilePath =
-                testParams.loadProperty("dluiZipFilePath") + testParams.getFolderSeparator();
+        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
         sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
         projectTitle = "Dlui-annie-dialog-test";

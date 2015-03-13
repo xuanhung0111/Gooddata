@@ -59,7 +59,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected String maqlFilePath;
     protected String sqlFilePath;
-    protected String dluiZipFilePath;
+    protected String zipFilePath;
 
     protected ProjectInfo getWorkingProject() {
         if (workingProject == null)
@@ -140,7 +140,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected int createCloudConnectProcess(ProcessInfo processInfo) {
         String uploadFilePath =
-                uploadZipFileToWebDav(dluiZipFilePath + CLOUDCONNECT_PROCESS_PACKAGE, null);
+                uploadZipFileToWebDav(zipFilePath + CLOUDCONNECT_PROCESS_PACKAGE, null);
         String processesUri =
                 String.format(DATALOAD_PROCESS_URI, getWorkingProject().getProjectId());
         prepareCCProcessCreationBody(processInfo, uploadFilePath);
