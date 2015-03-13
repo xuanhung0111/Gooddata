@@ -22,11 +22,11 @@ import static org.testng.Assert.*;
 public class ProjectsList extends AbstractTable {
 
     private String XPATH_PROJECT_NAME =
-            "//td[contains(@class, 'ait-project-list-item-title')]/a[contains(text(),'${searchKey}')]";
+            "//.[contains(@class, 'ait-project-list-item-title') and contains(text(),'${searchKey}')]";
     private String XPATH_PROJECT_NAME_NOT_ADMIN =
             "//span[@class = 'project-not-admin-title ait-project-list-item-title' and contains(text(), '${searchKey}')]";
 
-    private static final By BY_DISC_PROJECT_NAME = By.cssSelector(".ait-project-list-item-title a");
+    private static final By BY_DISC_PROJECT_NAME = By.cssSelector(".ait-project-list-item-title");
     private static final By BY_PROJECT_CHECKBOX = By.cssSelector("td.project-checkbox-cell input");
     private static final By BY_DISC_PROJECT_NAME_NOT_ADMIN = By
             .cssSelector(".project-name-user-not-admin-cell .ait-project-list-item-title");

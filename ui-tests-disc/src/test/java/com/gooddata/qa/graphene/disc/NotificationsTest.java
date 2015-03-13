@@ -9,12 +9,12 @@ import com.gooddata.qa.graphene.entity.disc.ExecutionDetails;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
 import com.gooddata.qa.graphene.entity.disc.NotificationParameters;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
-
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -402,7 +402,6 @@ public class NotificationsTest extends AbstractNotificationTest {
         } finally {
             cleanProcessesInWorkingProject();
         }
-
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
@@ -450,15 +449,21 @@ public class NotificationsTest extends AbstractNotificationTest {
         } finally {
             cleanProcessesInWorkingProject();
         }
-
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkRepeatedDataLoadingFailureNotification() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
-        String processName =
-                "Check Repeated Failures Notification" + Calendar.getInstance().getTimeInMillis();
+        String imapUserUri = "";
         try {
+            imapUserUri = createGdcUserWithImapUser(imapUser, imapPassword);
+            addUserToProject(imapUserUri, UserRoles.ADMIN);
+            logout();
+
+            signInAtUI(imapUser, imapPassword);
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+            String processName =
+                    "Check Repeated Failures Notification"
+                            + Calendar.getInstance().getTimeInMillis();
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
@@ -468,14 +473,22 @@ public class NotificationsTest extends AbstractNotificationTest {
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
-            scheduleDetail.repeatManualRunFailedSchedule(5, scheduleBuilder.getExecutable());
+            scheduleDetail.repeatManualRunFailedSchedule(getNumberOfFailuresToSendMail(),
+                    scheduleBuilder.getExecutable());
             waitForRepeatedFailuresEmail(scheduleBuilder);
 
-            scheduleDetail.repeatManualRunFailedSchedule(25, scheduleBuilder.getExecutable());
+            scheduleDetail.repeatManualRunFailedSchedule(getNumberOfFailuresToDisableSchedule()
+                    - getNumberOfFailuresToSendMail(), scheduleBuilder.getExecutable());
             scheduleBuilder.setEnabled(false);
             waitForRepeatedFailuresEmail(scheduleBuilder);
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeception when adding user to project!",
+                    e);
         } finally {
             cleanProcessesInWorkingProject();
+            logout();
+            signInAtUI(testParams.getUser(), testParams.getPassword());
+            deleteImapUser(imapUserUri);
         }
     }
 
@@ -502,5 +515,4 @@ public class NotificationsTest extends AbstractNotificationTest {
     public void deleteProcesses() {
         cleanProcessesInWorkingProject();
     }
-
 }

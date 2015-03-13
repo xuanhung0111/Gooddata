@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-
 import static org.testng.Assert.*;
 
 import java.io.IOException;
@@ -30,6 +29,7 @@ import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
@@ -43,27 +43,27 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     protected static final String REPEATED_FAILURES_NOTIFICATION_SUBJECT =
             "Repeated data loading failure: \"%s\" process";
     protected static final String REPEATED_FAILURES_NOTIFICATION_BODY =
-            "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project (id: %s) has failed for the 5th time."
+            "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project (id: %s) has failed for the ${numberOfFailures}th time."
                     + " We highly recommend disabling failing schedules until the issues are addressed: Go to"
                     + " the schedule page Click \"Disable\" button If you require assistance with troubleshooting"
                     + " data uploading, please visit the GoodData Support Portal. At your service, The GoodData Team";
     protected static final String REPEATED_FAILURES_NOTIFICATION_MESSAGE_1 =
             "<p>the <a href=\"%s\">%s schedule</a> within the &quot;%s&quot; process of your &quot;%s&quot;"
-                    + " GoodData project (id: %s) has failed for the 5th time.</p>";
+                    + " GoodData project (id: %s) has failed for the ${numberOfFailures}th time.</p>";
     protected static final String REPEATED_FAILURES_NOTIFICATION_MESSAGE_2 =
             "<li>Go to the <a href=\"%s\">schedule page</a></li>";
     protected static final String SCHEDULE_DISABLED_NOTIFICATION_SUBJECT =
             "Schedule disabled: \"%s\" process";
     protected static final String SCHEDULE_DISABLED_NOTIFICATION_BODY =
             "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project "
-                    + "(id: %s) has been automatically disabled following its 30th consecutive failure. "
+                    + "(id: %s) has been automatically disabled following its ${numberOfFailures}th consecutive failure. "
                     + "To resume scheduled uploads from this process: Go to the schedule page Click "
                     + "\"Enable\" If you require assistance with troubleshooting data uploading, "
                     + "please visit the GoodData Support Portal. At your service, The GoodData Team";
     protected static final String SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1 =
             "<p>the <a href=\"%s\">%s schedule</a> within the &quot;%s&quot; process of your &quot;%s&quot;"
                     + " GoodData project (id: %s) has been <strong>automatically disabled</strong> following its "
-                    + "30th consecutive failure.</p>";
+                    + "${numberOfFailures}th consecutive failure.</p>";
     protected static final String SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2 =
             "<li>Go to the <a href=\"%s\">schedule page</a></li>";
     protected static final String NOTIFICATION_SUPPORT_MESSAGE =
@@ -153,6 +153,49 @@ public class AbstractNotificationTest extends AbstractDISCTest {
             .setStatus(ScheduleStatus.OK);
     protected ExecutionDetails failedExecutionDetails = new ExecutionDetails()
             .setStatus(ScheduleStatus.ERROR);
+
+    enum RepeatedDataLoadingFailureNumber {
+        TO_SEND_MAIL(2, 5),
+        TO_DISABLE_SCHEDULE(3, 30);
+
+        private int piNumber;
+        private int stagingNumber;
+
+        private RepeatedDataLoadingFailureNumber(int pi, int staging) {
+            this.piNumber = pi;
+            this.stagingNumber = staging;
+        }
+
+        public int getNumber(String host) {
+            if (host.contains("staging"))
+                return stagingNumber;
+            else
+                return piNumber;
+        }
+    }
+
+    protected int getNumberOfFailuresToSendMail() {
+        return RepeatedDataLoadingFailureNumber.TO_SEND_MAIL.getNumber(testParams.getHost());
+    }
+
+    protected int getNumberOfFailuresToDisableSchedule() {
+        return RepeatedDataLoadingFailureNumber.TO_DISABLE_SCHEDULE.getNumber(testParams.getHost());
+    }
+
+    protected String createGdcUserWithImapUser(String imapUser, String imapPassword) {
+        try {
+            String imapUserUri =
+                    RestUtils.createNewUser(getRestApiClient(), imapUser, imapPassword);
+            return imapUserUri;
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeception when creating a new user!", e);
+        }
+    }
+
+    protected void deleteImapUser(String imapUserUri) {
+        if (!imapUserUri.isEmpty())
+            RestUtils.deleteUser(getRestApiClient(), imapUserUri);
+    }
 
     protected void editNotification(NotificationBuilder newNotificationBuilder) {
         openProjectDetailPage(getWorkingProject());
@@ -293,14 +336,18 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         String processName = scheduleBuilder.getProcessName();
         String notificationSubject = String.format(subjectFormat, processName);
         String notificationMessage1 =
-                isEnabled ? REPEATED_FAILURES_NOTIFICATION_MESSAGE_1
-                        : SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1;
+                isEnabled ? REPEATED_FAILURES_NOTIFICATION_MESSAGE_1.replace("${numberOfFailures}",
+                        Integer.toString(getNumberOfFailuresToSendMail()))
+                        : SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1.replace("${numberOfFailures}",
+                                Integer.toString(getNumberOfFailuresToDisableSchedule()));
         String notificationMessage2 =
                 isEnabled ? REPEATED_FAILURES_NOTIFICATION_MESSAGE_2
                         : SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2;
         String notificationBody =
-                isEnabled ? REPEATED_FAILURES_NOTIFICATION_BODY
-                        : SCHEDULE_DISABLED_NOTIFICATION_BODY;
+                isEnabled ? REPEATED_FAILURES_NOTIFICATION_BODY.replace("${numberOfFailures}",
+                        Integer.toString(getNumberOfFailuresToSendMail()))
+                        : SCHEDULE_DISABLED_NOTIFICATION_BODY.replace("${numberOfFailures}",
+                                Integer.toString(getNumberOfFailuresToDisableSchedule()));
 
         Message notification = getNotification(imapClient, notificationSubject);
         Document message = null;

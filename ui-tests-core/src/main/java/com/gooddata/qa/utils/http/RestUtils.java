@@ -10,11 +10,13 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriTemplate;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -27,6 +29,25 @@ public class RestUtils {
     private static final String addUserContentBody = "{\"user\":{\"content\":{\"userRoles\":[\"%s\"],\"status\":\"ENABLED\"},\"links\":{\"self\":\"%s\"}}}";
     private static final String ldmLink = "/gdc/projects/%s/ldm";
     private static final String dashboardEditModeLink = "/gdc/md/%s/obj/%s?mode=edit";
+    private static final String domainUsersUri = "/gdc/account/domains/default/users";
+    private static final String createUserContentBody;
+    static {
+        try {
+            createUserContentBody = new JSONObject() {{
+                put("accountSetting", new JSONObject() {{
+                    put("login", "${userEmail}");
+                    put("password", "${userPassword}");
+                    put("email", "${userEmail}");
+                    put("verifyPassword", "${userPassword}");
+                    put("firstName", "FirstName");
+                    put("lastName", "LastName");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exeception during json object initialization! ", e);
+        }
+    }
 
     private static final String FEATURE_FLAGS_URI = "/gdc/internal/account/profile/featureFlags";
     private static final String FEATURE_FLAGS = "featureFlags";
@@ -41,6 +62,29 @@ public class RestUtils {
     public static final String TARGET_EXPORT = "export";
 
     private RestUtils() {
+    }
+
+    public static String createNewUser(RestApiClient restApiClient, String userEmail,
+            String userPassword) throws ParseException, JSONException, IOException {
+        String contentBody =
+                createUserContentBody.replace("${userEmail}", userEmail).replace("${userPassword}",
+                        userPassword);
+        HttpRequestBase postRequest = restApiClient.newPostMethod(domainUsersUri, contentBody);
+        HttpResponse postReponse = restApiClient.execute(postRequest);
+        assertEquals(postReponse.getStatusLine().getStatusCode(), HttpStatus.CREATED.value(),
+                "New user is not created!");
+        String userUri =
+                new JSONObject(EntityUtils.toString(postReponse.getEntity())).getString("uri");
+        System.out.println("New user uri: " + userUri);
+
+        return userUri;
+    }
+
+    public static void deleteUser(RestApiClient restApiClient, String deletetedUserUri) {
+        HttpRequestBase deleteRequest = restApiClient.newDeleteMethod(deletetedUserUri);
+        HttpResponse deleteReponse = restApiClient.execute(deleteRequest);
+        assertEquals(deleteReponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
+                "User is not deleted!");
     }
 
     public static void addUserToProject(String host, String projectId, String domainUser,
@@ -59,7 +103,7 @@ public class RestUtils {
     }
     
     public static void addUserGroup(RestApiClient restApiClient, String projectId, final String name) {
-    	final String projectUri = "/gdc/projects/" + projectId;
+        final String projectUri = "/gdc/projects/" + projectId;
         
         @SuppressWarnings("serial")
         JSONObject payload = new JSONObject(new HashMap<String, Object>() {{
