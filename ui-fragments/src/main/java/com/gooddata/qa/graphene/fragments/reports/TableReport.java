@@ -54,7 +54,7 @@ public class TableReport extends AbstractReport {
 
     private static final String NO_DATA = "No data";
     
-    private static final String S_BTN_APPLY = ".s-btn-apply";
+    private static final By BY_BUTTON_APPLY = By.cssSelector(".s-btn-apply");
     
     private static final String REPORT_NOT_COMPUTABLE = "Report not computable due to improper metric definition.";
 
@@ -253,7 +253,7 @@ public class TableReport extends AbstractReport {
         waitForElementVisible(popupPanel.getRoot());
         popupPanel.changeGroup(group);
         popupPanel.searchAndSelectItem(pairs.getRight());
-        waitForElementVisible(By.cssSelector(S_BTN_APPLY), browser).click();
+        waitForElementVisible(BY_BUTTON_APPLY, browser).click();
     }
 
     public void addDrilling(Pair<List<String>, String> pairs) {
@@ -296,7 +296,7 @@ public class TableReport extends AbstractReport {
             popupPanel.changeGroup(group);
             popupPanel.searchAndSelectItem(newDrilling.getRight());    
         }
-        waitForElementVisible(By.cssSelector(S_BTN_APPLY), browser).click();
+        waitForElementVisible(BY_BUTTON_APPLY, browser).click();
     }
     
     public void deleteDrilling(List<String> drillSourceName) {
@@ -309,7 +309,7 @@ public class TableReport extends AbstractReport {
             btnSelector = btnSelector + "-" + CssUtils.simplifyText(item);
         }
         waitForElementVisible(By.cssSelector(btnSelector), browser).findElement(BY_PARENT).findElement(By.cssSelector(".deleteButton")).click();
-        waitForElementVisible(By.cssSelector(S_BTN_APPLY), browser).click();
+        waitForElementVisible(BY_BUTTON_APPLY, browser).click();
     }
 
     private boolean isAddDrillingButtonVisible() {
