@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
@@ -295,6 +296,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
         Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
     }
+    
+    public void addReportToNewDashboard(String reportName, String dashboardName) throws InterruptedException {
+        initDashboardsPage();
+        dashboardsPage.addNewDashboard(dashboardName);
+        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+        dashboardsPage.editDashboard();
+        dashboardEditBar.addReportToDashboard(reportName);
+        dashboardEditBar.saveDashboard();
+        checkRedBar(browser);
+    }
 
     public void createDashboard(String name) throws InterruptedException {
         initDashboardsPage();
@@ -349,6 +360,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
         String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "." + format.getName();
         File export = new File(fileURL);
+        System.out.println("pdfExport = " + export);
         long fileSize = export.length();
         System.out.println("File size: " + fileSize);
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
