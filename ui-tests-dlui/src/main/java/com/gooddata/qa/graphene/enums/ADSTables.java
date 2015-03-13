@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums.dlui;
+package com.gooddata.qa.graphene.enums;
 
 import java.util.Arrays;
 import java.util.List;

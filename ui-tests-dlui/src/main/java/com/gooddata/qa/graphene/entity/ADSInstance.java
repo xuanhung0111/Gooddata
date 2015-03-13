@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.entity.dlui;
+package com.gooddata.qa.graphene.entity;
 
 public class ADSInstance {
 

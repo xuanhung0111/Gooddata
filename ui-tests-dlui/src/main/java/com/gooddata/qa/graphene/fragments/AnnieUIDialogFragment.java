@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.dlui;
+package com.gooddata.qa.graphene.fragments;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,10 +9,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.dlui.DataSource;
-import com.gooddata.qa.graphene.entity.dlui.Dataset;
-import com.gooddata.qa.graphene.entity.dlui.Field;
-import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.DataSource;
+import com.gooddata.qa.graphene.entity.Dataset;
+import com.gooddata.qa.graphene.entity.Field;
+import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;

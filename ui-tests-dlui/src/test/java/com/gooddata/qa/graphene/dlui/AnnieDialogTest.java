@@ -6,15 +6,15 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
 
-import com.gooddata.qa.graphene.entity.dlui.ADSInstance;
-import com.gooddata.qa.graphene.entity.dlui.DataSource;
-import com.gooddata.qa.graphene.entity.dlui.Dataset;
-import com.gooddata.qa.graphene.entity.dlui.Field;
-import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.dlui.ProcessInfo;
+import com.gooddata.qa.graphene.entity.ADSInstance;
+import com.gooddata.qa.graphene.entity.DataSource;
+import com.gooddata.qa.graphene.entity.Dataset;
+import com.gooddata.qa.graphene.entity.Field;
+import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.ProcessInfo;
+import com.gooddata.qa.graphene.enums.ADSTables;
+import com.gooddata.qa.graphene.enums.AdditionalDatasets;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.dlui.ADSTables;
-import com.gooddata.qa.graphene.enums.dlui.AdditionalDatasets;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 

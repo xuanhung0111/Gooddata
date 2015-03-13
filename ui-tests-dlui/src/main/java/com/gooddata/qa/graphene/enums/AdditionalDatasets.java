@@ -1,10 +1,10 @@
-package com.gooddata.qa.graphene.enums.dlui;
+package com.gooddata.qa.graphene.enums;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.gooddata.qa.graphene.entity.dlui.Field;
-import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.Field;
+import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.google.common.collect.Lists;
 
 public enum AdditionalDatasets {

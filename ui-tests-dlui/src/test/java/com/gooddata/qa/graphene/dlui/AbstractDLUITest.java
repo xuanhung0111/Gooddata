@@ -21,11 +21,11 @@ import org.openqa.selenium.support.FindBy;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.ADSInstance;
+import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
-import com.gooddata.qa.graphene.entity.dlui.ADSInstance;
-import com.gooddata.qa.graphene.entity.dlui.ProcessInfo;
-import com.gooddata.qa.graphene.enums.dlui.DLUIProcessParameters;
-import com.gooddata.qa.graphene.fragments.dlui.AnnieUIDialogFragment;
+import com.gooddata.qa.graphene.enums.DLUIProcessParameters;
+import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 

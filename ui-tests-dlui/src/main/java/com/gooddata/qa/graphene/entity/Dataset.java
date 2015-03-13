@@ -1,9 +1,9 @@
-package com.gooddata.qa.graphene.entity.dlui;
+package com.gooddata.qa.graphene.entity;
 
 import java.util.List;
 
-import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
-import com.gooddata.qa.graphene.enums.dlui.AdditionalDatasets;
+import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.enums.AdditionalDatasets;
 import com.google.common.collect.Lists;
 
 public class Dataset {

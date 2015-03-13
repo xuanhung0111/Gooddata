@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums.dlui;
+package com.gooddata.qa.graphene.enums;
 
 public enum DLUIProcessParameters {
 
