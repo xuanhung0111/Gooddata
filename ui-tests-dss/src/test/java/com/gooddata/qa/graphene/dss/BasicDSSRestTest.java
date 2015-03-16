@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -37,6 +38,9 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     private static final String NEW_USER_ROLE = "dataAdmin";
     private static final String NEW_USER_UPDATED_ROLE = "admin";
+
+    @FindBy(tagName = "form")
+    private StorageFragment storageForm;
 
     @BeforeClass
     public void initStartPage() {
