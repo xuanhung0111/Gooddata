@@ -259,6 +259,10 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public boolean isReportComputing() {
+        return waitForFragmentVisible(mainEditor).isReportComputing();
+    }
+
     public boolean searchBucketItem(String item) {
         return waitForFragmentVisible(cataloguePanel).searchBucketItem(item);
     }

@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -546,6 +547,28 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         date.add(Calendar.DAY_OF_MONTH, -29);
         assertEquals(panel.getFromDate(), getTimeString(date));
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
+    public void switchingDateRangeNotComputeReport() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(attribute1)
+                .withFilters(DATE));
+        ChartReport report = analysisPage.getChartReport();
+        assertEquals(report.getTrackersCount(), 3);
+        assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
+
+        WebElement dateFilter = analysisPage.getFilter(DATE);
+        dateFilter.click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        panel.changeToDateRangeSection();
+        assertFalse(analysisPage.isReportComputing());
+        panel.changeToPresetsSection();
+        assertFalse(analysisPage.isReportComputing());
+        dateFilter.click();
+        waitForFragmentNotVisible(panel);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
