@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.entity;
 
+import org.openqa.selenium.By;
+
 public class Field {
 
     private String name;
@@ -33,8 +35,8 @@ public class Field {
             this.filterName = filterName;
         }
 
-        public String getFilterName() {
-            return this.filterName;
+        public By getFilterBy() {
+            return By.xpath(String.format("//a[text()='%s']", this.filterName));
         }
     }
 }
