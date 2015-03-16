@@ -1,0 +1,1 @@
+ALTER ATTRIBUTE {date.date} DROP KEYS {f_person.dt_date_id};DROP ALL IN {date.dataset.dt};DROP {date.dim_date};SYNCHRONIZE {dataset.person} PRESERVE DATA;

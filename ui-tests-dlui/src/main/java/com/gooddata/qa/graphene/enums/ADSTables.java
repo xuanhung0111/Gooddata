@@ -19,12 +19,17 @@ public enum ADSTables {
             "copyTableWithAdditionalDate.txt",
             "Unknown data source",
             AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD,
-            AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+            AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
+    WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt");
 
     private String createTableSqlFile;
     private String copyTableSqlFile;
     private String datasourceName;
     private List<AdditionalDatasets> additionalDatasets = Lists.newArrayList();
+
+    private ADSTables(String createTableSqlFile, String copyTableSqlFile) {
+        this(createTableSqlFile, copyTableSqlFile, "");
+    }
 
     private ADSTables(String createTableSqlFile, String copyTableSqlFile, String datasourceName,
             AdditionalDatasets... datasets) {

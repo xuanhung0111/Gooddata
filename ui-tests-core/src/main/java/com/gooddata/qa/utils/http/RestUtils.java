@@ -35,6 +35,7 @@ public class RestUtils {
     private static final String USERS_LINK = "/gdc/projects/%s/users";
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
     private static final String LDM_LINK = "/gdc/projects/%s/ldm";
+    private static final String LDM_MANAGE_LINK = "/gdc/md/%s/ldm/manage2";
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";
     private static final String OBJ_LINK = "/gdc/md/%s/obj/";
     private static final String MUF_LINK = "/gdc/md/%s/userfilters";
@@ -48,6 +49,7 @@ public class RestUtils {
     private static final String PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER = "featureFlag";
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
     private static final String CREATE_USER_CONTENT_BODY;
+    private static final String UPDATE_LDM_BODY;
     private static final String MUF_OBJ;
     private static final String USER_FILTER;
     
@@ -69,6 +71,18 @@ public class RestUtils {
         } catch (JSONException e) {
             throw new IllegalStateException(
                     "There is an exception during json object initialization! ", e);
+        }
+    }
+    static {
+        try {
+            UPDATE_LDM_BODY = new JSONObject() {{
+                put("manage", new JSONObject() {{
+                    put("maql", "${maql}");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exeception during json object initialization! ", e);
         }
     }
 
@@ -352,6 +366,52 @@ public class RestUtils {
            
         }
         
+    }
+
+    public static String updateLDM(RestApiClient restApiClient, String projectId, String maql) {
+        String contentBody = UPDATE_LDM_BODY.replace("${maql}", maql);
+        HttpRequestBase postRequest =
+                restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody);
+        HttpResponse postResponse = restApiClient.execute(postRequest);
+        assertEquals(postResponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
+                "LDM is not updated successful!");
+
+        String pollingUri = "";
+        try {
+            JSONObject responseBody =
+                    new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+            pollingUri =
+                    responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "There is an excetion when getting polling uri of LDM update!", e);
+        }
+
+        EntityUtils.consumeQuietly(postResponse.getEntity());
+
+        return pollingUri;
+    }
+
+    public static String getPollingState(RestApiClient restApiClient, String pollingUri) {
+        HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
+        HttpResponse getResponse;
+        String state = "";
+        try {
+            do {
+                getResponse = restApiClient.execute(getRequest);
+                state =
+                        new JSONObject(EntityUtils.toString(getResponse.getEntity()))
+                                .getJSONObject("wTaskStatus").get("status").toString();
+                System.out.println("Current polling state is: " + state);
+                Thread.sleep(2000);
+            } while ("RUNNING".equals(state));
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeption when polling state!", e);
+        }
+
+        EntityUtils.consumeQuietly(getResponse.getEntity());
+
+        return state;
     }
 
     public static void enableFeatureFlagInProject(RestApiClient restApiClient, String projectId,

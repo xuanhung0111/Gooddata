@@ -49,8 +49,8 @@ public class SelectionArea extends AbstractFragment {
             assertTrue(Iterables.any(expectedFields, new Predicate<Field>() {
 
                 @Override
-                public boolean apply(Field arg0) {
-                    return arg0.getName().equals(selectedField.getText());
+                public boolean apply(Field field) {
+                    return field.getName().equals(selectedField.getText());
                 }
             }), "The field " + selectedField.getText() + "is not selected!");
             selectedFieldTitles.add(selectedField.getText());

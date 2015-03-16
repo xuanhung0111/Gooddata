@@ -33,13 +33,30 @@ public class DataSourceList extends AbstractFragment {
     private String XPATH_FIELDS =
             "//.[contains(@class, 'dataset')]//label[text()='${dataset}']//../..//li[not(contains(@class, 'is-none'))]";
 
+    private By BY_SOURCE_ITEM_SELECTION_HINT = By.cssSelector(".source-item-selection-hint");
+    private By BY_DATASET_ITEM_SELECTION_HINT = By.cssSelector(".category-item-section-hint");
 
-    public void clickOnFields(DataSource dataSource, Dataset dataset, boolean isChecked,
-            Field... fields) {
-        WebElement dataSourceElement = selectDataSource(dataSource);
-        WebElement datasetElement = selectDataset(dataSourceElement, dataset);
-        for (Field field : fields) {
-            clickOnField(datasetElement, field, isChecked);
+    public void checkSelectedFieldNumber(DataSource selectedDataSource) {
+        WebElement dataSourceElement = selectDataSource(selectedDataSource);
+        int totalSelectedFieldNumber = 0;
+        for (Dataset selectedDataset : selectedDataSource.getSelectedDataSets()) {
+            WebElement datasetElement = selectDataset(dataSourceElement, selectedDataset);
+            assertEquals(datasetElement.findElement(BY_DATASET_ITEM_SELECTION_HINT).getText(),
+                    String.format("(%d)", selectedDataset.getSelectedFields().size()));
+            totalSelectedFieldNumber += selectedDataset.getSelectedFields().size();
+        }
+        assertEquals(dataSourceElement.findElement(BY_SOURCE_ITEM_SELECTION_HINT).getText(),
+                String.format("%d selected", totalSelectedFieldNumber),
+                "Incorrect selected field number in DataSource: " + selectedDataSource.getName());
+    }
+
+    public void clickOnFields(DataSource selectedDataSource, boolean isChecked) {
+        WebElement dataSourceElement = selectDataSource(selectedDataSource);
+        for (Dataset selectedDataset : selectedDataSource.getSelectedDataSets()) {
+            WebElement datasetElement = selectDataset(dataSourceElement, selectedDataset);
+            for (Field field : selectedDataset.getSelectedFields()) {
+                clickOnField(datasetElement, field, isChecked);
+            }
         }
     }
 
@@ -51,28 +68,21 @@ public class DataSourceList extends AbstractFragment {
         checkAvailableDatasets(datasourceElement, datasetInSpecificFilter, fieldType);
     }
 
-    private void clickOnField(WebElement datasetElement, Field field, boolean isChecked) {
+    private void clickOnField(WebElement datasetElement, Field field, final boolean isChecked) {
         final WebElement fieldElement =
                 waitForElementVisible(
                         By.xpath(XPATH_FIELD.replace("${fieldName}", field.getName())),
                         datasetElement);
         fieldElement.click();
-        if (isChecked)
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
 
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return fieldElement.getAttribute("class").contains("is-strong");
-                }
-            });
-        else
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
 
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return !fieldElement.getAttribute("class").contains("is-strong");
-                }
-            });
+            @Override
+            public boolean apply(WebDriver browser) {
+                boolean result = fieldElement.getAttribute("class").contains("is-strong");
+                return isChecked ? result : !result;
+            }
+        });
     }
 
 
