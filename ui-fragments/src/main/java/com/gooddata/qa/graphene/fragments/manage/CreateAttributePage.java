@@ -23,6 +23,9 @@ public class CreateAttributePage extends AbstractFragment {
     @FindBy(css = ".computed-attribute-submit")
     private WebElement submitButton;
 
+    @FindBy(css = "div#p-objectPage h1 a span")
+    private WebElement backDataPageLink;
+
     @FindBy(css = ".computed-attribute-attribute")
     private WebElement attributeButton;
 
@@ -47,13 +50,15 @@ public class CreateAttributePage extends AbstractFragment {
     @FindBy(css = ".buckets .row")
     private List<WebElement> bucketingRows;
 
-    private static final String bucketNameLocator = ".row-item .bucket-name input";
+    private static final By bubleContentLocator = By.cssSelector(".bubble-content .content");
 
-    private static final String bucketToLocator = ".row-item .bucket-range input";
+    private static final By bucketNameLocator = By.cssSelector(".row-item .bucket-name input");
 
-    private static final String attributeBucketName = ".s-attributeBucketName";
+    private static final By bucketToLocator = By.cssSelector(".row-item .bucket-range input");
 
-    private static final String attributeBucketRange = ".s-attributeBucketRange";
+    private static final By attributeBucketNameLocator = By.cssSelector(".s-attributeBucketName");
+
+    private static final By attributeBucketRangeLocator = By.cssSelector(".s-attributeBucketRange");
 
     public void selectAttribute(String name) {
         waitForElementVisible(attributeButton).click();
@@ -77,6 +82,10 @@ public class CreateAttributePage extends AbstractFragment {
     public void setBucket(int index, String name) {
         setBucketName(index, name);
     }
+    
+    public String getBubleText() {
+        return waitForElementVisible(bubleContentLocator, browser).getText();
+    }
 
     public void setComputedAttributeName(String name) {
         waitForElementVisible(computedAttributeName).sendKeys(name);
@@ -86,16 +95,20 @@ public class CreateAttributePage extends AbstractFragment {
         waitForElementVisible(submitButton).click();
     }
 
+    public void cancel() {
+        waitForElementVisible(backDataPageLink).click();
+    }
+
     private WebElement getBucketElement(int index) {
         return bucketingRows.get(index);
     }
 
     private WebElement getBucketNameElement(int index) {
-        return getBucketElement(index).findElement(By.cssSelector(bucketNameLocator));
+        return getBucketElement(index).findElement(bucketNameLocator);
     }
 
     private WebElement getBucketToElement(int index) {
-        return getBucketElement(index).findElement(By.cssSelector(bucketToLocator));
+        return getBucketElement(index).findElement(bucketToLocator);
     }
 
     private void setBucketName(int index, String name) {
@@ -111,11 +124,11 @@ public class CreateAttributePage extends AbstractFragment {
     }
 
     public void checkCreatedComputedAttribute(String attributeName, List<String> expectedBucketNames, List<String> expectedBucketRanges) {
-        waitForElementVisible(By.cssSelector(attributeBucketName), browser);
+        waitForElementVisible(attributeBucketNameLocator, browser);
         assertEquals(computedAttributeNameInViewMode.getText(), attributeName);
         for (int i = 0; i < expectedBucketNames.size(); i++) {
-            assertEquals(bucketTableRows.get(i).findElement(By.cssSelector(attributeBucketName)).getText(), expectedBucketNames.get(i), "Wrong bucket name");
-            assertEquals(bucketTableRows.get(i).findElement(By.cssSelector(attributeBucketRange)).getText(), expectedBucketRanges.get(i), "Wrong bucket range");
+            assertEquals(bucketTableRows.get(i).findElement(attributeBucketNameLocator).getText(), expectedBucketNames.get(i), "Wrong bucket name");
+            assertEquals(bucketTableRows.get(i).findElement(attributeBucketRangeLocator).getText(), expectedBucketRanges.get(i), "Wrong bucket range");
         }
     }
 }

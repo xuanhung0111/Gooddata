@@ -16,6 +16,11 @@ public class MetricDetailsPage extends AbstractFragment {
 
     @FindBy(xpath = "//span[contains(@class,'metric_format')]")
     private WebElement metricFormat;
+    
+    @FindBy(css = "#p-objectPage .s-btn-delete")
+    private WebElement deleteButton;
+
+    private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
     private static final By inputEditor = By.className("ipeEditor");
 
@@ -40,5 +45,11 @@ public class MetricDetailsPage extends AbstractFragment {
         waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
         waitForElementNotVisible(input);
         assertEquals(getMetricFormat(), newFormat, "New format is not applied!");
+    }
+
+    public void deleteMetric() throws InterruptedException {
+        waitForElementVisible(deleteButton).click();
+        waitForElementVisible(confirmDeleteButtonLocator, browser).click();
+        waitForDataPageLoaded(browser);
     }
 }

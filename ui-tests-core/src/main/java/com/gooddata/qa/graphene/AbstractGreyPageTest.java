@@ -207,7 +207,15 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     protected void addUsersWithOtherRolesToProject() throws ParseException, IOException, JSONException {
+        addEditorUserToProject();
+        addViewerUserToProject();
+    }
+
+    protected void addEditorUserToProject() throws ParseException, IOException, JSONException {
         addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
+    }
+
+    protected void addViewerUserToProject() throws ParseException, IOException, JSONException {
         addUserToProject(testParams.getViewerProfileUri(), UserRoles.VIEWER);
     }
 

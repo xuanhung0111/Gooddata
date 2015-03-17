@@ -33,7 +33,7 @@ public class DashboardFilter extends AbstractFragment {
             "div.attributes.sliding div.${attributeName}:not(.gdc-hidden):not(.hidden)";
 
     private String selectedPromptLocator =
-            "//div[contains(@class, 'filter_prompts sliding')]//div[contains(@class,'${promptName}')]";
+            ".filter_prompts .s-item-${promptName}:not(.gdc-hidden):not(.hidden)";
 
     private String addButton =
             "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']";
@@ -56,7 +56,7 @@ public class DashboardFilter extends AbstractFragment {
         if (type == DashFilterTypes.PROMPT) {
             waitForElementVisible(promptFilter).click();
             waitForElementVisible(lisPrompt);
-            By selectedPrompt = By.xpath(selectedPromptLocator.replace("${promptName}", CssUtils.simplifyText(name)));
+            By selectedPrompt = By.cssSelector(selectedPromptLocator.replace("${promptName}", CssUtils.simplifyText(name)));
             waitForElementVisible(promptSearchInput).sendKeys(name);
             waitForElementVisible(selectedPrompt, browser).click();
         } else {
