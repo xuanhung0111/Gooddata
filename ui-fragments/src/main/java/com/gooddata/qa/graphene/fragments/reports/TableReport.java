@@ -15,9 +15,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.collections.Sets;
 
-import com.gooddata.qa.CssUtils;
-import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
-import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -53,9 +52,7 @@ public class TableReport extends AbstractReport {
     private WebElement reportMessage;
 
     private static final String NO_DATA = "No data";
-    
-    private static final By BY_BUTTON_APPLY = By.cssSelector(".s-btn-apply");
-    
+
     private static final String REPORT_NOT_COMPUTABLE = "Report not computable due to improper metric definition.";
 
     public List<String> getAttributesHeader() {
@@ -187,7 +184,7 @@ public class TableReport extends AbstractReport {
         }
         throw new IllegalArgumentException("No attribute value to drill on");
     }
-    
+
     public void drillOnAttributeValue(String value) throws IllegalArgumentException {
         waitForReportLoading();
         for (WebElement e : attributeElementInGrid) {
@@ -230,27 +227,10 @@ public class TableReport extends AbstractReport {
     }
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
-        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getRoot(), browser);
-
-        if (isAddDrillingButtonVisible()) {
-            waitForElementVisible(By.cssSelector(".s-btn-add_drilling"), browser).click();
-        } else {
-            waitForElementVisible(By.cssSelector(".s-btn-add_more___"), browser).click();
-        }
-        waitForElementVisible(By.cssSelector(".s-btn-select_metric___attribute___"), browser).click();
-
-        waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
-        SelectItemPopupPanel popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class,
-                browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
-
-        for (String item : pairs.getLeft()) {
-            popupPanel.searchAndSelectItem(item);
-        }
-        waitForElementVisible(By.cssSelector(".s-btn-select_attribute___report"), browser).click();
-        waitForElementVisible(popupPanel.getRoot());
-        popupPanel.changeGroup(group);
-        popupPanel.searchAndSelectItem(pairs.getRight());
-        waitForElementVisible(BY_BUTTON_APPLY, browser).click();
+        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
+        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING,
+                DrillingConfigPanel.class).addDrilling(pairs, group);
+        configPanel.saveConfiguration();
     }
 
     public void addDrilling(Pair<List<String>, String> pairs) {
@@ -259,58 +239,16 @@ public class TableReport extends AbstractReport {
 
     public void editDrilling(Pair<List<String>, String> oldDrilling,
             Pair<List<String>, String> newDrilling, String group) {
-        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getRoot(), browser);
-
-        SelectItemPopupPanel popupPanel = null;
-        String btnSelector = null;
-        if (!oldDrilling.getLeft().equals(newDrilling.getLeft())) {
-            btnSelector = ".s-btn";
-            for (String item: oldDrilling.getLeft()) {
-                btnSelector = btnSelector + "-" + CssUtils.simplifyText(item);
-            }
-
-            waitForElementVisible(By.cssSelector(btnSelector), browser).click();   
-            popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class,
-                    browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
-            waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
-
-            for (String item : newDrilling.getLeft()) {
-                popupPanel.searchAndSelectItem(item);
-            }
-    
-        }
-        if (!oldDrilling.getRight().equals(newDrilling.getRight())) {
-            btnSelector = ".s-btn" + "-" + CssUtils.simplifyText(oldDrilling.getRight());
-            waitForElementVisible(By.cssSelector(btnSelector), browser).click();
-            if (popupPanel == null) {
-                popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class,
-                        browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
-            } else {
-                waitForElementVisible(popupPanel.getRoot());    
-            }
-            popupPanel.changeGroup(group);
-            popupPanel.searchAndSelectItem(newDrilling.getRight());    
-        }
-        waitForElementVisible(BY_BUTTON_APPLY, browser).click();
+        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
+        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING,
+                DrillingConfigPanel.class).editDrilling(oldDrilling, newDrilling, group);
+        configPanel.saveConfiguration();
     }
 
     public void deleteDrilling(List<String> drillSourceName) {
-        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getRoot(), browser);
-
-        String btnSelector = ".s-btn";
-        for (String item: drillSourceName) {
-            btnSelector = btnSelector + "-" + CssUtils.simplifyText(item);
-        }
-        waitForElementVisible(By.cssSelector(btnSelector), browser).findElement(BY_PARENT)
-            .findElement(By.cssSelector(".deleteButton")).click();
-        waitForElementVisible(BY_BUTTON_APPLY, browser).click();
-    }
-
-    private boolean isAddDrillingButtonVisible() {
-        try {
-            return browser.findElement(By.cssSelector(".s-btn-add_drilling")).isDisplayed();
-        } catch(NoSuchElementException e) {
-            return false;
-        }
+        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
+        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING,
+                DrillingConfigPanel.class).deleteDrilling(drillSourceName);
+        configPanel.saveConfiguration();
     }
 }
