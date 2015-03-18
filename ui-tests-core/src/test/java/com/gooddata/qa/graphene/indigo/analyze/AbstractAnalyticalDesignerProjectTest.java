@@ -684,7 +684,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         initAnalysePage();
 
         analysisPage.addMetric(metric1);
-        CurrentState baseState = CurrentState.getCurrentState(analysisPage);
+        ReportState baseState = ReportState.getCurrentState(analysisPage);
 
         checkUndoRedoForEmptyState(true);
         checkUndoRedoForReport(baseState, false);
@@ -708,7 +708,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         initAnalysePage();
 
         analysisPage.addMetric(metric1);
-        CurrentState baseState = CurrentState.getCurrentState(analysisPage);
+        ReportState baseState = ReportState.getCurrentState(analysisPage);
 
         analysisPage.removeMetric(metric1);
         assertFalse(analysisPage.getAllAddedMetricNames().contains(metric1));
@@ -718,7 +718,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         analysisPage.addMetric(metric1);
         analysisPage.addCategory(attribute1);
-        CurrentState baseStateWithAttribute = CurrentState.getCurrentState(analysisPage);
+        ReportState baseStateWithAttribute = ReportState.getCurrentState(analysisPage);
 
         analysisPage.removeCategory(attribute1);
         analysisPage.waitForReportComputing();
@@ -775,6 +775,32 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         analysisPage.redo();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
+    public void testUndoAfterReset() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(attribute1));
+        ReportState baseState = ReportState.getCurrentState(analysisPage);
+        analysisPage.resetToBlankState();
+        checkUndoRedoForReport(baseState, true);
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
+    public void testUndoNotApplicableOnNonActiveSession() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
+        ReportState baseState = ReportState.getCurrentState(analysisPage);
+        analysisPage.addCategory(attribute1)
+            .searchBucketItem(attribute2);
+        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList("DATA FIELDS", attribute2));
+        checkUndoRedoForReport(baseState, true);
+        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList("DATA FIELDS", attribute2));
+
+        analysisPage.addCategory(attribute1).exportReport();
+        checkUndoRedoForReport(baseState, true);
     }
 
     protected void filterOnAttribute(String filterText, String... filterValues) {
@@ -842,16 +868,18 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(tableReport.getContent(), content);
     }
 
-    private void checkUndoRedoForReport(CurrentState expectedState, boolean isUndo) {
-      if (isUndo) analysisPage.undo();
-      else
+    private void checkUndoRedoForReport(ReportState expectedState, boolean isUndo) {
+      if (isUndo) {
+          analysisPage.undo();
+      } else {
           analysisPage.redo();
+      }
 
       if (expectedState == null) {
           assertTrue(analysisPage.isBucketBlankState());
           assertTrue(analysisPage.isMainEditorBlankState());
       } else {
-          CurrentState currentState = CurrentState.getCurrentState(analysisPage);
+          ReportState currentState = ReportState.getCurrentState(analysisPage);
           assertTrue(currentState.equals(expectedState));
       }
     }
@@ -868,7 +896,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         return timeBuilder.toString();
     }
 
-    private static class CurrentState {
+    private static class ReportState {
         private AnalysisPage analysisPage;
 
         private int reportTrackerCount;
@@ -877,15 +905,15 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         private List<String> reportDataLables;
         private List<String> reportAxisLables;
 
-        public static CurrentState getCurrentState(AnalysisPage analysisPage) {
-            return new CurrentState(analysisPage).saveCurrentState();
+        public static ReportState getCurrentState(AnalysisPage analysisPage) {
+            return new ReportState(analysisPage).saveCurrentState();
         }
 
-        private CurrentState(AnalysisPage analysisPage) {
+        private ReportState(AnalysisPage analysisPage) {
             this.analysisPage = analysisPage;
         }
 
-        private CurrentState saveCurrentState() {
+        private ReportState saveCurrentState() {
             analysisPage.waitForReportComputing();
             ChartReport report = analysisPage.getChartReport();
 
@@ -901,10 +929,10 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         @Override
         public boolean equals(Object obj){
-            if (!(obj instanceof CurrentState))
+            if (!(obj instanceof ReportState))
                 return false;
 
-            CurrentState state = (CurrentState)obj;
+            ReportState state = (ReportState)obj;
 
             if (this.reportTrackerCount != state.reportTrackerCount ||
                 !this.addedAttributes.equals(state.addedAttributes) ||
