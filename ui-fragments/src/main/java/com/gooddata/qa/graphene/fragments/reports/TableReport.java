@@ -230,11 +230,8 @@ public class TableReport extends AbstractReport {
     }
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
-        waitForElementVisible(this.getRoot()).click();
-        DashboardEditWidgetToolbarPanel toolbar = Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
-                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
-        toolbar.openConfigurationPanel();
-        
+        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getRoot(), browser);
+
         if (isAddDrillingButtonVisible()) {
             waitForElementVisible(By.cssSelector(".s-btn-add_drilling"), browser).click();
         } else {
@@ -259,13 +256,11 @@ public class TableReport extends AbstractReport {
     public void addDrilling(Pair<List<String>, String> pairs) {
         addDrilling(pairs, "Attributes");
     }
-    
-    public void editDrilling(Pair<List<String>, String> oldDrilling, Pair<List<String>, String> newDrilling, String group) {
-        waitForElementVisible(this.getRoot()).click();
-        DashboardEditWidgetToolbarPanel toolbar = Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
-                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
-        toolbar.openConfigurationPanel();
-        
+
+    public void editDrilling(Pair<List<String>, String> oldDrilling,
+            Pair<List<String>, String> newDrilling, String group) {
+        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getRoot(), browser);
+
         SelectItemPopupPanel popupPanel = null;
         String btnSelector = null;
         if (!oldDrilling.getLeft().equals(newDrilling.getLeft())) {
@@ -273,12 +268,12 @@ public class TableReport extends AbstractReport {
             for (String item: oldDrilling.getLeft()) {
                 btnSelector = btnSelector + "-" + CssUtils.simplifyText(item);
             }
-            
+
             waitForElementVisible(By.cssSelector(btnSelector), browser).click();   
             popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class,
                     browser.findElements(SelectItemPopupPanel.LOCATOR).get(1));
             waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
-            
+
             for (String item : newDrilling.getLeft()) {
                 popupPanel.searchAndSelectItem(item);
             }
@@ -298,17 +293,16 @@ public class TableReport extends AbstractReport {
         }
         waitForElementVisible(BY_BUTTON_APPLY, browser).click();
     }
-    
+
     public void deleteDrilling(List<String> drillSourceName) {
-        waitForElementVisible(this.getRoot()).click();
-        DashboardEditWidgetToolbarPanel toolbar = Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
-                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
-        toolbar.openConfigurationPanel();
+        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getRoot(), browser);
+
         String btnSelector = ".s-btn";
         for (String item: drillSourceName) {
             btnSelector = btnSelector + "-" + CssUtils.simplifyText(item);
         }
-        waitForElementVisible(By.cssSelector(btnSelector), browser).findElement(BY_PARENT).findElement(By.cssSelector(".deleteButton")).click();
+        waitForElementVisible(By.cssSelector(btnSelector), browser).findElement(BY_PARENT)
+            .findElement(By.cssSelector(".deleteButton")).click();
         waitForElementVisible(BY_BUTTON_APPLY, browser).click();
     }
 

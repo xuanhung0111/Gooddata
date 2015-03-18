@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.apache.commons.lang3.text.WordUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -67,17 +66,6 @@ public class DashboardEditFilter extends AbstractFragment{
     }
 
     /**
-     * open toolbar panel for editing filter
-     * 
-     * @param filter
-     * @see ToolbarPanel
-     */
-    public void openToolbarPanel(WebElement filter) {
-        waitForElementVisible(filter).click();
-        waitForElementVisible(getToolbarPanel().getRoot());
-    }
- 
-    /**
      * delete filter in dashboard
      * 
      * @param timeOrAttribute
@@ -85,8 +73,7 @@ public class DashboardEditFilter extends AbstractFragment{
      */
     public void deleteFilter(String timeOrAttribute) throws InterruptedException {
         WebElement filter = "time".equals(timeOrAttribute) ? getTimeFilter() : getAttributeFilter(timeOrAttribute);
-        openToolbarPanel(filter);
-        getToolbarPanel().removeWidget();
+        DashboardEditWidgetToolbarPanel.removeWidget(filter, browser);
         Thread.sleep(1000);
         Assert.assertFalse(isDashboardContainsFilter(timeOrAttribute));
     }
@@ -113,16 +100,10 @@ public class DashboardEditFilter extends AbstractFragment{
      * @param   type
      */
     public void changeTypeOfTimeFilter(String type) {
-        openToolbarPanel(getTimeFilter());
-        getToolbarPanel().openEditPanel();
+        DashboardEditWidgetToolbarPanel.openEditPanelFor(getTimeFilter(), browser);
         waitForElementVisible(By.xpath(String.format(TimeFilterEditorPanel.TYPE, type)), browser).click();
         waitForElementVisible(timeFilterEditorPanel.applyButton).click();
         waitForElementNotVisible(timeFilterEditorPanel.getRoot());
-    }
-
-    private DashboardEditWidgetToolbarPanel getToolbarPanel() {
-        return Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
-                waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
     }
 
     /**
@@ -131,11 +112,7 @@ public class DashboardEditFilter extends AbstractFragment{
      * @param parentFilterNames
      */
     public void addParentFilters(String filterName, String... parentFilterNames) {
-        waitForElementVisible(getAttributeFilter(filterName)).click();
-        DashboardEditWidgetToolbarPanel widgetToolbar =
-                Graphene.createPageFragment(DashboardEditWidgetToolbarPanel.class,
-                        waitForElementVisible(DashboardEditWidgetToolbarPanel.LOCATOR, browser));
-        widgetToolbar.openConfigurationPanel();
+        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getAttributeFilter(filterName), browser);
         getFilterConfigurationPanel().addParentsFilter(parentFilterNames);
     }
  
