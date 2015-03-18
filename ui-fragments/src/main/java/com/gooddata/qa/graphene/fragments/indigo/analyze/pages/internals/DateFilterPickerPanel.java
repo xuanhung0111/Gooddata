@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
@@ -62,6 +63,20 @@ public class DateFilterPickerPanel extends AbstractFragment {
         }));
     }
 
+    public void hoverOnPeriod(final String period) {
+        waitForCollectionIsNotEmpty(periods);
+        new Actions(browser).moveToElement(Iterables.find(periods, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return period.equals(input.getText());
+            }
+        })).perform();
+    }
+
+    public String getTooltipFromPeriod() {
+        return waitForElementVisible(By.cssSelector(".bubble-content > .content"), browser).getText().trim();
+    }
+
     /**
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
@@ -76,6 +91,18 @@ public class DateFilterPickerPanel extends AbstractFragment {
      */
     public void configTimeFilterByRange(String from, String to) {
         configTimeFilterByRangeHelper(from, to, true);
+    }
+
+    public void changeToDateRangeSection() {
+        waitForElementVisible(dateRangeSection).click();
+    }
+
+    public String getFromDate() {
+        return waitForElementVisible(fromDate).getAttribute("value");
+    }
+
+    public String getToDate() {
+        return waitForElementVisible(toDate).getAttribute("value");
     }
 
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {

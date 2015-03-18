@@ -8,10 +8,13 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -27,6 +30,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
@@ -512,6 +516,39 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
+    public void checkTooltipDateFilterPreset() {
+        initAnalysePage();
+
+        analysisPage.addFilter(DATE);
+        analysisPage.getFilter(DATE).click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+        panel.hoverOnPeriod("This month");
+        String currentMonthYear = new SimpleDateFormat("MMM YYYY")
+            .format(Calendar.getInstance(TimeZone.getTimeZone("GMT-7:00")).getTime());
+        System.out.println(currentMonthYear);
+        assertTrue(panel.getTooltipFromPeriod().startsWith(currentMonthYear));
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
+    public void checkDefaultValueInDateRange() {
+        initAnalysePage();
+
+        analysisPage.addFilter(DATE);
+        analysisPage.getFilter(DATE).click();
+        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
+                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+
+        panel.changeToDateRangeSection();
+
+        Calendar date = Calendar.getInstance(TimeZone.getTimeZone("GMT-7:00"));
+        assertEquals(panel.getToDate(), getTimeString(date));
+
+        date.add(Calendar.DAY_OF_MONTH, -29);
+        assertEquals(panel.getFromDate(), getTimeString(date));
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void allowDateFilterByRange() throws ParseException, InterruptedException {
         initAnalysePage();
 
@@ -798,6 +835,14 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
     private void checkUndoRedoForEmptyState(boolean isUndo) {
         checkUndoRedoForReport(null, isUndo);
+    }
+
+    private String getTimeString(Calendar date) {
+        StringBuilder timeBuilder = new StringBuilder();
+        timeBuilder.append(String.format("%02d", date.get(Calendar.MONTH) + 1)).append("/");
+        timeBuilder.append(String.format("%02d", date.get(Calendar.DAY_OF_MONTH))).append("/");
+        timeBuilder.append(date.get(Calendar.YEAR));
+        return timeBuilder.toString();
     }
 
     private static class CurrentState {
