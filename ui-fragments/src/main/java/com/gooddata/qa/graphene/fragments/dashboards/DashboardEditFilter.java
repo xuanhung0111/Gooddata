@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -14,6 +13,8 @@ import org.testng.Assert;
 import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.ParentFiltersConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 
 /**
  * This fragment is for editing filter when dashboard in edit mode
@@ -27,9 +28,6 @@ public class DashboardEditFilter extends AbstractFragment{
     @FindBy(xpath = "//div[contains(@class,'yui3-c-tabtimefiltereditor-content')]")
     private TimeFilterEditorPanel timeFilterEditorPanel;
 
-    @FindBy(xpath = "//div[contains(@class, 'yui3-widget-stacked') and not(contains(@class, 'yui3-overlay-hidden'))]")
-    private AttributeFilterConfigurationPanel filterConfigurationPanel;
- 
     /**
      * return time filter in dashboard
      * 
@@ -42,15 +40,6 @@ public class DashboardEditFilter extends AbstractFragment{
         return null;
     }
 
-    /**
-     * return attribute filter configuration panel in edit mode
-     * 
-     * @return
-     */
-    public AttributeFilterConfigurationPanel getFilterConfigurationPanel() {
-        return filterConfigurationPanel;
-    }
- 
     /**
      * return attribute filter in dashboard base on its name
      * 
@@ -112,8 +101,11 @@ public class DashboardEditFilter extends AbstractFragment{
      * @param parentFilterNames
      */
     public void addParentFilters(String filterName, String... parentFilterNames) {
-        DashboardEditWidgetToolbarPanel.openConfigurationPanelFor(getAttributeFilter(filterName), browser);
-        getFilterConfigurationPanel().addParentsFilter(parentFilterNames);
+        WidgetConfigPanel configPanel = WidgetConfigPanel.
+                openConfigurationPanelFor(getAttributeFilter(filterName), browser);
+
+        configPanel.getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class)
+            .addParentsFilter(parentFilterNames);
     }
  
     /**
@@ -126,35 +118,5 @@ public class DashboardEditFilter extends AbstractFragment{
 
         @FindBy(xpath = "//div[contains(@class,'timefiltereditor')]//button[contains(@class,'s-btn-apply')]")
         private WebElement applyButton;
-    }
-
-    /**
-     * panel for configuration filter type
-     *
-     */
-    private static class AttributeFilterConfigurationPanel extends AbstractFragment {
-
-        @FindBy(xpath = "//div[contains(@class, 's-Parent') and contains(@class,'s-enabled')]")
-        private WebElement parentFilterTab;
-        
-        @FindBy(xpath = "//button[contains(@class, 's-btn-add_parent_filter')]")
-        private WebElement addParentFilterButton;
-
-        @FindBy(xpath = "//button[contains(@class, 's-btn-apply')]")
-        private WebElement applyButton;
-
-        private static final String parentFilterLocator =
-                "div.picker-item-content:not(.yui3-overlay-hidden) div.yui3-widget-stdmod span[title='${parentFilter}']";
-
-        private void addParentsFilter(String... parentFilterNames) {
-            for (String parentFilterName : parentFilterNames) {
-                waitForElementVisible(parentFilterTab).click();
-                waitForElementVisible(addParentFilterButton).click();
-                By parentFilter = By.cssSelector(parentFilterLocator.replace("${parentFilter}",
-                                                               WordUtils.capitalizeFully(parentFilterName)));
-                waitForElementVisible(parentFilter, browser).click();
-                waitForElementVisible(applyButton).click();
-            }
-        }
     }
 }
