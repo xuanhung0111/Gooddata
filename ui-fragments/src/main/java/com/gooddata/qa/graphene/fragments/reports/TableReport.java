@@ -6,7 +6,6 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -15,8 +14,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.collections.Sets;
 
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.DrillingConfigPanel;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -224,31 +221,5 @@ public class TableReport extends AbstractReport {
     public boolean isNotComputed() {
         return waitForElementVisible(reportMessage.findElement(By.tagName("p"))).getText()
                                                                .contains(REPORT_NOT_COMPUTABLE);
-    }
-
-    public void addDrilling(Pair<List<String>, String> pairs, String group) {
-        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
-        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING,
-                DrillingConfigPanel.class).addDrilling(pairs, group);
-        configPanel.saveConfiguration();
-    }
-
-    public void addDrilling(Pair<List<String>, String> pairs) {
-        addDrilling(pairs, "Attributes");
-    }
-
-    public void editDrilling(Pair<List<String>, String> oldDrilling,
-            Pair<List<String>, String> newDrilling, String group) {
-        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
-        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING,
-                DrillingConfigPanel.class).editDrilling(oldDrilling, newDrilling, group);
-        configPanel.saveConfiguration();
-    }
-
-    public void deleteDrilling(List<String> drillSourceName) {
-        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
-        configPanel.getTab(WidgetConfigPanel.Tab.DRILLING,
-                DrillingConfigPanel.class).deleteDrilling(drillSourceName);
-        configPanel.saveConfiguration();
     }
 }
