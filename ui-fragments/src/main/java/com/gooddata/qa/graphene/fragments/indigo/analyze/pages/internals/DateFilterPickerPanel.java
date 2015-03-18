@@ -20,6 +20,9 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     // presets and date range sections are just small parts. No need to separate more fragments now.
 
+    @FindBy(className = "s-tab-presets")
+    private WebElement presetsSection;
+
     @FindBy(css = ".adi-tab-presets .filter-picker-text")
     private List<WebElement> periods;
 
@@ -103,6 +106,10 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     public String getToDate() {
         return waitForElementVisible(toDate).getAttribute("value");
+    }
+
+    public void changeToPresetsSection() {
+        waitForElementVisible(presetsSection).click();
     }
 
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {

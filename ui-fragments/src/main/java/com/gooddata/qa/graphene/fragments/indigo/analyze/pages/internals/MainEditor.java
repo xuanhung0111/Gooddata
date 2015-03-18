@@ -31,6 +31,7 @@ public class MainEditor extends AbstractFragment {
     private static final String CSS_REPORT = ".adi-chart-container:not(.invisible)";
     private static final By BY_TABLE_REPORT = By.cssSelector(".dda-table-component");
     private static final By BY_CHART_REPORT = By.cssSelector(".switchable-visualization-component");
+    private static final By BY_REPORT_COMPUTING = By.cssSelector(".adi-computing");
 
     public void addFilter(WebElement filter) {
         waitForFragmentVisible(bucketsFilter);
@@ -103,12 +104,16 @@ public class MainEditor extends AbstractFragment {
 
     public void waitForReportComputing() {
         try {
-            WebElement computingElement = waitForElementVisible(By.cssSelector(".adi-computing"), browser);
+            WebElement computingElement = waitForElementVisible(BY_REPORT_COMPUTING, browser);
             waitForElementNotVisible(computingElement);
         } catch(Exception e) {
             // in case report is rendered so fast, computing label is not shown.
             // Ignore the exception.
         }
+    }
+
+    public boolean isReportComputing() {
+        return !browser.findElements(BY_REPORT_COMPUTING).isEmpty();
     }
 
     /**
