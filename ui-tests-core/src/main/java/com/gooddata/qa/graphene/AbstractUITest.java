@@ -2,9 +2,7 @@ package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -400,89 +398,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         Screenshots.takeScreenshot(browser, screenshotName + "-dashboard", this.getClass());
     }
 
-    private void goToCurrentProject() {
-        String currentUrl = browser.getCurrentUrl();
-
-        if (currentUrl.contains(PAGE_PROJECTS)) {
-            waitForProjectsPageLoaded(browser);
-            waitForFragmentVisible(projectsPage);
-            projectsPage.goToProject(testParams.getProjectId());
-            waitForDashboardPage();
-        }
-
-        currentUrl = browser.getCurrentUrl();
-        if (currentUrl.contains(PAGE_UI_PROJECT_PREFIX)) {
-            if (currentUrl.contains(testParams.getProjectId()))
-                return;
-            ApplicationHeaderBar.selectProject(testParams.getProjectId(), browser);
-        } else {
-            openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
-        }
-        waitForDashboardPage();
-    }
-
     private void waitForDashboardPage() {
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(dashboardsPage.getRoot());
-    }
-
-    public void initDashboardsPage() {
-        goToCurrentProject();
-        if (browser.getCurrentUrl().contains(DASHBOARD_PAGE_SUFFIX)) {
-            // already in dashboard page
-            return;
-        }
-        ApplicationHeaderBar.goToDashboardsPage(browser);
-        waitForDashboardPage();
-    }
-
-    public void initReportsPage() {
-        goToCurrentProject();
-        ApplicationHeaderBar.goToReportsPage(browser);
-        waitForReportsPageLoaded(browser);
-        waitForElementVisible(reportsPage.getRoot());
-    }
-
-    public void initAttributePage() {
-        initManagePage();
-        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.ATTRIBUTE)).click();
-        waitForDataPageLoaded(browser);
-    }
-
-    public void initModelPage() {
-        initManagePage();
-        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.MODEL)).click();
-        waitForDataPageLoaded(browser);
-    }
-
-    public void initMetricPage() {
-        initManagePage();
-        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.METRIC)).click();
-        waitForDataPageLoaded(browser);
-    }
-
-    public void initAnalysePage() {
-        goToCurrentProject();
-        ApplicationHeaderBar.goToAnalysisPage(browser);
-        waitForFragmentVisible(analysisPage);
-    }
-
-    public void initVariablePage() {
-        initManagePage();
-        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.VARIABLE)).click();
-        waitForDataPageLoaded(browser);
-    }
-
-    public void initFactPage() {
-        initManagePage();
-        waitForElementVisible(dataPage.getMenuItem(ObjectTypes.FACT)).click();
-        waitForDataPageLoaded(browser);
-    }
-
-    public void initManagePage() {
-        goToCurrentProject();
-        ApplicationHeaderBar.goToManagePage(browser);
-        waitForDataPageLoaded(browser);
     }
 
     public void initProjectsPage() {
@@ -496,40 +414,50 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementVisible(upload.getRoot());
     }
 
-    public void initDashboardsPageByUrl() {
+    public void initDashboardsPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
         waitForDashboardPage();
     }
 
-    public void initReportsPageByUrl() {
+    public void initReportsPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage");
         waitForReportsPageLoaded(browser);
         waitForElementVisible(reportsPage.getRoot());
     }
 
-    public void initAttributePageByUrl() {
+    public void initAttributePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         waitForDataPageLoaded(browser);
     }
 
-    public void initModelPageByUrl() {
+    public void initModelPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|ldmModel");
         waitForDataPageLoaded(browser);
     }
 
-    public void initMetricPageByUrl() {
+    public void initMetricPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         waitForDataPageLoaded(browser);
     }
 
-    public void initAnalysePageByUrl() {
+    public void initAnalysePage() {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
         waitForFragmentVisible(analysisPage);
     }
     
 
-    public void initVariablePageByUrl() {
+    public void initVariablePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
+        waitForDataPageLoaded(browser);
+    }
+
+    public void initFactPage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|facts");
+        waitForDataPageLoaded(browser);
+    }
+
+    public void initManagePage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|");
         waitForDataPageLoaded(browser);
     }
 }
