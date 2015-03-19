@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
@@ -41,6 +42,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_UPLOAD = "upload.html";
     protected static final String PAGE_LOGIN = "account.html#/login";
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
+    protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
 
     /**
      * ----- UI fragmnets -----
@@ -159,6 +161,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = ".adi-editor")
     protected AnalysisPage analysisPage;
+
+    @FindBy(css = "#root.ember-application")
+    protected UserManagementPage userManagementPage;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
@@ -459,5 +464,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initManagePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|");
         waitForDataPageLoaded(browser);
+    }
+
+    public void initUserManagementPage() {
+        openUrl(PAGE_USER_MANAGEMENT);
+        waitForFragmentVisible(userManagementPage);
     }
 }
