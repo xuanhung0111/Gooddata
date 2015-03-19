@@ -455,11 +455,14 @@ public class MetricEditorDialog extends AbstractFragment {
     }
 
     public void verifyMetric(String metricName, String expectedMaql, String expectedFormat) {
-        waitForElementVisible(metricsTable.getRoot());
-        waitForDataPageLoaded(browser);
-        metricsTable.selectObject(metricName);
-        waitForObjectPageLoaded(browser);
+        openMetricDetailPage(metricName);
         metricDetailPage.checkCreatedMetric(metricName, expectedMaql, expectedFormat);
     }
 
+    public void openMetricDetailPage(String metric) {
+        waitForElementVisible(metricsTable.getRoot());
+        waitForDataPageLoaded(browser);
+        metricsTable.selectObject(metric);
+        waitForObjectPageLoaded(browser);
+    }
 }

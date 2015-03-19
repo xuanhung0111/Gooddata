@@ -25,7 +25,7 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
 
-    @FindBy(css = "div.highcharts-legend-item")
+    @FindBy(css = "g.highcharts-legend-item")
     private List<WebElement> legends;
 
     @FindBy(css = "div.highcharts-tooltip")
@@ -111,7 +111,7 @@ public class ChartReport extends AbstractFragment {
                 new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
-                return input.findElement(By.cssSelector("span")).getCssValue("fill");
+                return input.findElement(By.cssSelector("path")).getCssValue("fill");
             }
         }));
     }

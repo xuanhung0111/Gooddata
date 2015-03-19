@@ -38,6 +38,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Trending
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.google.common.collect.Lists;
 
 public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProjectTest {
 
@@ -55,10 +56,12 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
     protected static final String CHART_REPORT_GROUP = "chart_report";
     protected static final String TABLE_REPORT_GROUP = "table_report";
     protected static final String UNDO_REDO_GROUP = "undo_redo";
+    protected static final String DATA_COMBINATION = "data_combination";
 
     protected String metric1;
     protected String metric2;
     protected String metric3;
+    protected String metric4;
     protected String attribute1;
     protected String attribute2;
     protected String attribute3;
@@ -365,17 +368,17 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withType(ReportType.TABLE)
-                .withMetrics(metric3).withCategories(attribute3));
+                .withMetrics(metric1).withCategories(attribute3));
         assertTrue(analysisPage.isExportToReportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
         analysisPage.exportReport();
-        String currentWindowHandel = browser.getWindowHandle();
-        for (String handel : browser.getWindowHandles()) {
-            if (!handel.equals(currentWindowHandel))
-                browser.switchTo().window(handel);
+        String currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
         }
 
         com.gooddata.qa.graphene.fragments.reports.TableReport tableReport =
@@ -404,7 +407,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         }
 
         browser.close();
-        browser.switchTo().window(currentWindowHandel);
+        browser.switchTo().window(currentWindowHandle);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPORT_GROUP})
@@ -581,25 +584,25 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 3);
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
         analysisPage.configTimeFilterByRangeButNotApply("01/12/2014", "01/12/2015").exportReport();
-        String currentWindowHandel = browser.getWindowHandle();
-        for (String handel : browser.getWindowHandles()) {
-            if (!handel.equals(currentWindowHandel))
-                browser.switchTo().window(handel);
+        String currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
         }
         waitForFragmentVisible(reportPage);
         Screenshots.takeScreenshot(browser, "allowDateFilterByRange-emptyFilters", getClass());
         assertTrue(reportPage.getFilters().isEmpty());
         browser.close();
-        browser.switchTo().window(currentWindowHandel);
+        browser.switchTo().window(currentWindowHandle);
 
         analysisPage.configTimeFilterByRange("01/12/2014", "01/12/2015");
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 3);
         analysisPage.exportReport();
-        currentWindowHandel = browser.getWindowHandle();
-        for (String handel : browser.getWindowHandles()) {
-            if (!handel.equals(currentWindowHandel))
-                browser.switchTo().window(handel);
+        currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
         }
         waitForFragmentVisible(reportPage);
         List<String> filters = reportPage.getFilters();
@@ -607,7 +610,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(filters.size(), 1);
         assertEquals(filters.get(0), "Date (Date) is between 01/12/2014 and 01/12/2015");
         browser.close();
-        browser.switchTo().window(currentWindowHandel);
+        browser.switchTo().window(currentWindowHandle);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
@@ -688,6 +691,9 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         checkUndoRedoForEmptyState(true);
         checkUndoRedoForReport(baseState, false);
+
+        analysisPage.addMetric(metric2);
+        checkUndoRedoForReport(baseState, true);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {UNDO_REDO_GROUP})
@@ -803,6 +809,108 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         checkUndoRedoForReport(baseState, true);
     }
 
+    @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
+    public void checkSeriesStateTransitions() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(DATE));
+        ChartReport report = analysisPage.getChartReport();
+        assertEquals(report.getTrackersCount(), 3);
+        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
+        assertTrue(analysisPage.isShowPercentConfigEnabled());
+        assertEquals(report.getLegends(), Arrays.asList(metric1));
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+
+        analysisPage.addMetric(metric2);
+        assertEquals(report.getTrackersCount(), 6);
+        assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
+        assertFalse(analysisPage.isShowPercentConfigEnabled());
+        assertEquals(report.getLegends(), Arrays.asList(metric1, metric2));
+        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
+        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric1, metric2));
+
+        analysisPage.addMetric(metric3);
+        assertTrue(report.getTrackersCount() > 0);
+        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric1, metric2, metric3));
+
+        analysisPage.addMetric(metric4);
+        assertTrue(report.getTrackersCount() > 0);
+        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric2, metric3, metric4));
+
+        analysisPage.addMetric(metric4);
+        assertTrue(report.getTrackersCount() > 0);
+        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric2, metric3, metric4));
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
+    public void checkMetricFormating() {
+        initMetricPage();
+
+        waitForFragmentVisible(metricEditorPage).openMetricDetailPage(metric1);
+        String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
+        metricDetailPage.changeMetricFormat(oldFormat + "[red]");
+
+        try {
+            initAnalysePage();
+
+            analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
+            ChartReport report = analysisPage.getChartReport();
+            assertEquals(report.getTrackersCount(), 1);
+            List<String> dataLabels = report.getDataLabels();
+            assertEquals(dataLabels.size(), 1);
+
+            TableReport tableReport = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
+            assertEquals(tableReport.getFormatFromValue(dataLabels.get(0)), "color:#FF0000");
+        } finally {
+            initMetricPage();
+            waitForFragmentVisible(metricEditorPage).openMetricDetailPage(metric1);
+            waitForFragmentVisible(metricDetailPage).changeMetricFormat(oldFormat);
+        }
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
+    public void checkReportContentWhenAdd3Metrics1Attribute() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1, metric2, metric3)
+                .withCategories(attribute1).withType(ReportType.TABLE));
+        TableReport report = analysisPage.getTableReport();
+        List<List<String>> analysisContent = report.getContent();
+
+        analysisPage.exportReport();
+        String currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
+        }
+
+        assertEquals(analysisContent, getTableContentFromReportPage(Graphene.createPageFragment(
+                        com.gooddata.qa.graphene.fragments.reports.TableReport.class,
+                        waitForElementVisible(By.id("gridContainerTab"), browser))));
+
+        browser.close();
+        browser.switchTo().window(currentWindowHandle);
+    }
+
+    @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
+    public void checkShowPercentAndLegendColor() {
+        initAnalysePage();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(attribute1));
+        analysisPage.turnOnShowInPercents();
+        ChartReport report = analysisPage.getChartReport();
+        assertTrue(report.getDataLabels().get(0).endsWith("%"));
+
+        analysisPage.addMetric(metric2);
+        assertFalse(analysisPage.isShowPercentConfigEnabled());
+        assertFalse(analysisPage.isShowPercentConfigSelected());
+
+        assertEquals(report.getLegendColors(), Arrays.asList("rgb(13, 103, 178)", "rgb(76, 178, 72)"));
+    }
+
     protected void filterOnAttribute(String filterText, String... filterValues) {
         initAnalysePage();
 
@@ -854,8 +962,8 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0), tooltip);
         assertEquals(chartReport.getLegends(), reportDefinition.getMetrics());
-        assertEquals(chartReport.getLegendColors(), Arrays.asList("rgb(109, 118, 128)"));
-        assertEquals(chartReport.getLegendColorByName(reportDefinition.getMetrics().get(0)), "rgb(109, 118, 128)");
+        assertEquals(chartReport.getLegendColors(), Arrays.asList("rgb(13,103,178)"));
+        assertEquals(chartReport.getLegendColorByName(reportDefinition.getMetrics().get(0)), "rgb(13, 103, 178)");
     }
 
     protected void verifyTableReportContent(ReportDefinition reportDefinition, List<String> headers, List<List<String>> content) {
@@ -894,6 +1002,25 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         timeBuilder.append(String.format("%02d", date.get(Calendar.DAY_OF_MONTH))).append("/");
         timeBuilder.append(date.get(Calendar.YEAR));
         return timeBuilder.toString();
+    }
+
+    private List<List<String>> getTableContentFromReportPage(
+            com.gooddata.qa.graphene.fragments.reports.TableReport tableReport) {
+        List<List<String>> content = Lists.newArrayList();
+        List<String> attributes = tableReport.getAttributeElements();
+        List<String> metrics = tableReport.getRawMetricElements();
+        int totalAttributes = attributes.size();
+        int i = 0;
+        for (String attr: attributes) {
+            List<String> row = Lists.newArrayList(attr);
+            for (int k = i; k < metrics.size(); k += totalAttributes) {
+                row.add(metrics.get(k));
+            }
+            content.add(row);
+            i++;
+        }
+
+        return content;
     }
 
     private static class ReportState {

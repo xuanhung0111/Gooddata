@@ -14,6 +14,8 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
 
     private static final String EMAIL_OPEN = "% Email Open";
     private static final String EMAIL_SENT = "% Emails Sent";
+    private static final String NUMBER_OF_EMAILS = "# of Emails";
+    private static final String NUMBER_OF_VISITS = "# of Visits";
     private static final String CHANNEL = "Channel";
     private static final String CAMPAIGNS = "Campaigns";
     private static final String CLICKTHROUGHS_ID = "ClickthroughsID";
@@ -25,7 +27,8 @@ public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDes
 
         metric1 = EMAIL_OPEN;
         metric2 = EMAIL_SENT;
-        metric3 = EMAIL_OPEN;
+        metric3 = NUMBER_OF_EMAILS;
+        metric4 = NUMBER_OF_VISITS;
         attribute1 = CAMPAIGNS;
         attribute2 = CHANNEL;
         attribute3 = CLICKTHROUGHS_ID;

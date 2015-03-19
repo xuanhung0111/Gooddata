@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -16,16 +17,28 @@ public class MetricDetailsPage extends AbstractFragment {
     @FindBy(xpath = "//span[contains(@class,'metric_format')]")
     private WebElement metricFormat;
 
+    private static final By inputEditor = By.className("ipeEditor");
+
     public String getMAQL(String metricName) {
         return waitForElementVisible(maql).getText();
     }
 
-    public String getMetricFormat(String metricName) {
+    public String getMetricFormat() {
         return waitForElementVisible(metricFormat).getText();
     }
 
     public void checkCreatedMetric(String metricName, String expectedMaql, String expectedFormat) {
         assertEquals(getMAQL(metricName), expectedMaql, "Metric is not created properly");
-        assertEquals(getMetricFormat(metricName), expectedFormat, "Metric format is not set properly");
+        assertEquals(getMetricFormat(), expectedFormat, "Metric format is not set properly");
+    }
+
+    public void changeMetricFormat(String newFormat) {
+        waitForElementVisible(metricFormat).click();
+        WebElement input = waitForElementVisible(inputEditor, browser);
+        input.clear();
+        input.sendKeys(newFormat);
+        waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
+        waitForElementNotVisible(input);
+        assertEquals(getMetricFormat(), newFormat, "New format is not applied!");
     }
 }
