@@ -1,35 +1,24 @@
 package com.gooddata.qa.graphene.aqe;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
 
 import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.HowItem;
+import com.gooddata.qa.graphene.entity.HowItem.Position;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
-import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -37,24 +26,15 @@ import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.mail.ImapClient;
-import com.google.common.base.Predicate;
-
-import static com.google.common.base.Strings.nullToEmpty;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
 
 @Test(groups = {"GoodSalesValidElements"}, description = "Tests for GoodSales project relates to ValidElements resource")
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
-    private static final String ERROR_SIGNATURE = "ERROR:";
-
-    private static final String FROM = "noreply@gooddata.com";
-    
     private String departmentAttr;
     private String productAttr;
     private String MonthYearCreatedAttr;
@@ -85,7 +65,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      */
     @Test(dependsOnMethods = {"initialize"})
     public void checkForFilteredVariable() throws InterruptedException {
-        initAttributePage();
+        initVariablePage();
         variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
             .withAttribute(MonthYearCreatedAttr)
             .withAttributeElements("Jan 2010", "Feb 2010", "Mar 2010"));
@@ -122,6 +102,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                                 "List of filter elements is not properly.");
             
             dashboardsPage.editDashboard();
+            Thread.sleep(5000);
             dashboardEditBar.setParentsFilter(productAttr, departmentAttr);// parentFilteName is Department
             dashboardEditBar.saveDashboard();
             
@@ -131,7 +112,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                                 filteredValuesProduct,
                                 "Cascading filters are not applied correcly");
         } finally {
-            deleteCurrentTab();
+            dashboardsPage.deleteDashboardTab(dashboardsPage.getTabs().getSelectedTabIndex());
         }
     }
     
@@ -181,7 +162,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
                 testParams.getUser(), testParams.getPassword(), testParams.getEditorProfileUri(),
                 UserRoles.ADMIN);
-        
+
         initDashboardsPage();
         dashboardsPage.selectDashboard("Pipeline Analysis");
         dashboardsPage.getTabs().openTab(1);
@@ -217,16 +198,18 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         createReport(new ReportDefinition().withType(ReportTypes.TABLE)
                                                       .withName("CheckListElementsReport")
                                                       .withWhats("Amount")
-                                                      .withHows("Product", "Department"), "CheckListElementsInReport");
+                                                      .withHows(new HowItem(productAttr, Position.LEFT))
+                                                      .withHows(new HowItem(departmentAttr, Position.TOP)),
+                                                      "CheckListElementsInReport");
 
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter(productAttr,
                                                 "CompuSci", "Educationly", "Explorer", "WonderKid"));
         checkRedBar(browser);
-        
+
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter(departmentAttr, "Direct Sales"));
         Screenshots.takeScreenshot(browser, "AQE-Check list elements in report filter", this.getClass());
         checkRedBar(browser);
-        
+
         assertEquals(reportPage.getTableReport().getAttributeElements(),
                             Arrays.asList("Direct Sales", "CompuSci", "Educationly", "Explorer", "WonderKid"),
                             "Attribute values in report are not properly.");
@@ -247,36 +230,13 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                                                       .withName("CheckListElementsInChartReport")
                                                       .withWhats("Amount")
                                                       .withHows("Department"), "CheckListElementsInChartReport");
-        
+
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter(productAttr, "CompuSci",
                 "Educationly", "Explorer", "WonderKid"));
         Screenshots.takeScreenshot(browser, "AQE-Check list elements in chart report filter",
                 this.getClass());
         reportPage.saveReport();
         checkRedBar(browser);
-    }
-
-    /*
-     *  This test is to cover the bug
-     *  "VIZ-512 - Staging2: Get error when exporting some reports to 'html' format"
-     */
-    @Test(dependsOnMethods = {"initialize"})
-    public void checkScheduleReportEmail() throws IOException, MessagingException{
-        String scheduleName =
-                "Title" + testParams.getHost() + " - " + testParams.getTestIdentification();
-        
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
-        waitForSchedulesPageLoaded(browser);
-        waitForElementNotVisible(By.cssSelector(".loader"));
-        waitForElementVisible(emailSchedulesPage.getRoot());
-        
-        // Schedule email is sent to Domain user
-        emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), scheduleName,
-                "Scheduled email test - report.", "Activities by Type", ExportFormat.PDF);
-        checkRedBar(browser);
-        Screenshots.takeScreenshot(browser, "Goodsales-schedules-report", this.getClass());
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        checkErrorInScheduleMailbox(imapClient, scheduleName);
     }
 
     // This test is to cover the bug "VIZ-502 - Server side image rendering is broken"
@@ -287,7 +247,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         waitForDashboardPageLoaded(browser);
         browser.navigate().refresh();
         getFilterWidget("Activity Date").changeTimeFilterByEnterFromAndToDate("01/01/2008", "12/30/2014");
-        
+
         List<String> reportsToCheck =
                 Arrays.asList("Activities by Type", "Activity Level", "Activity by Sales Rep");
         for(Iterator<String> list = reportsToCheck.iterator(); list.hasNext(); ) {
@@ -296,75 +256,6 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                                                      testParams.getPassword(), reportImg),
                                                      "Image reports are not loaded properly");
         }
-    }
-
-    private void checkErrorInScheduleMailbox(final ImapClient imapClient, final String mailTitle)
-            throws IOException, MessagingException {
-        final List<Message> messages = new ArrayList<Message>();
-        Graphene.waitGui().withTimeout(10, TimeUnit.MINUTES)
-                          .pollingEvery(10, TimeUnit.SECONDS)
-                          .withMessage("Waiting for messages ...")
-                          .until(new Predicate<WebDriver>() {
-                    @Override
-                    public boolean apply(WebDriver input) {
-                        messages.addAll(Arrays.asList(imapClient.getMessagesFromInbox(FROM,
-                                mailTitle)));
-                        return emailsArrived(messages);
-                    }
-                });
-        System.out.println("The message arrived");
-        
-        String content = null;
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            Object msgContent = messages.get(0).getContent();
-            System.out.println("content type : " + messages.get(0).getContentType());
-            if (msgContent instanceof Multipart) {
-                Multipart mp = (Multipart) msgContent;
-                BodyPart bp = mp.getBodyPart(0);
-                getTextOfEmailContent(bp, stringBuilder);
-                content = stringBuilder.toString();
-            } else {
-                content = msgContent.toString();
-            }
-        }
-        
-        assertFalse(content.contains(ERROR_SIGNATURE), "Get error in schedule mail.");
-    }
-
-    private boolean emailsArrived(Collection<Message> messages) {
-        return messages.size() > 0;
-    }
-    
-    private void getTextOfEmailContent(Part bodyPart, StringBuilder result)
-            throws MessagingException, IOException {
-        if (isPlainTextOrHtmlMimeType(bodyPart)) {
-            result.append(nullToEmpty(bodyPart.getContent().toString()))
-                  .append("\n");
-        }
-        
-        if (bodyPart.isMimeType("multipart/alternative")) {
-            Multipart multiPart = (Multipart) bodyPart.getContent();
-            Part bp      = null;
-            
-            for (int i = 0, n = multiPart.getCount(); i < n; i++) {
-                bp = multiPart.getBodyPart(i);
-                if (isPlainTextOrHtmlMimeType(bp)){
-                    result.append(nullToEmpty(bp.getContent().toString()))
-                          .append("\n");
-                    continue;
-                }
-                
-                getTextOfEmailContent(bp, result);
-            }
-        }
-    }
-    
-    private boolean isPlainTextOrHtmlMimeType(Part part) throws MessagingException {
-        for (String type : Arrays.asList("text/plain", "text/html")) {
-            if (part.isMimeType(type)) return true;
-        }
-        return false;
     }
 
     private FilterWidget getFilterWidget(String filterName) {
@@ -377,12 +268,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             return filter;
         }
         return null;
-    }  
-
-    private void deleteCurrentTab() throws InterruptedException {
-        dashboardsPage.deleteDashboardTab(dashboardsPage.getTabs().getSelectedTabIndex());
     }
-
 
     private void openDashboardTab(int tabindex) throws InterruptedException {
         initDashboardsPage();
