@@ -15,9 +15,11 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.joda.time.DateTime;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
@@ -32,6 +34,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoad
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.*;
 
+@SuppressWarnings("serial")
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
 public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
@@ -42,18 +45,53 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private boolean useApiProxy;
 
     private static final By TABLE_REPORT_CONTAINER_LOCATION = By.id("gridContainer");
-    private static final By BY_ONE_NUMBER_REPORT = By.id("oneNumberContainer");
     private static final String EMPTY_VALUE = "(empty value)";
-    private static Map<String, FieldChange> AFTER_TICKET_CREATE_EVENTS = new HashMap<String, FieldChange>();
-    private static Map<String, FieldChange> AFTER_TICKET_UPDATE_EVENTS = new HashMap<String, FieldChange>();
-    private static Map<String, FieldChange> AFTER_TICKET_DELETE_EVENTS = new HashMap<String, FieldChange>();
-    private static FieldChange TAGS_AFTER_FULL_LOAD;
 
-    private static final String JSON_USER_CREATE = "{\"user\": {\"name\": \"GD test user\", \"email\": " +
-            "\"qa+zendesk-test%s@gooddata.com\"}}";
+    private static Map<String, FieldChange> AFTER_TICKET_CREATE_EVENTS = new HashMap<String, FieldChange>() {{
+        put("type", new FieldChange("Ticket Type", "question", EMPTY_VALUE));
+        put("priority", new FieldChange("Priority", "high", EMPTY_VALUE));
+        put("tags", new FieldChange("Tags", "first, second, to-be-deleted", "N/A", false));
+        put("status", new FieldChange("Status", "new", EMPTY_VALUE));
+    }};
 
-    private static final String JSON_ORGANIZATION_CREATE =
-            "{\"organization\": {\"name\": \"GD test organization - %s\"}}";
+    private static Map<String, FieldChange> AFTER_TICKET_UPDATE_EVENTS = new HashMap<String, FieldChange>() {{
+        put("type", new FieldChange("Ticket Type", "incident", "question"));
+        put("tags", new FieldChange("Tags", "first, second", "first, second, to-be-deleted", false));
+        put("status", new FieldChange("Status", "open", "new"));
+    }};
+
+    private static Map<String, FieldChange> AFTER_TICKET_DELETE_EVENTS = new HashMap<String, FieldChange>() {{
+        put("status", new FieldChange("Status", "deleted", "open"));
+    }};
+
+    private static FieldChange TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false);;
+
+    private static final String JSON_USER_CREATE;
+    static {
+        try {
+            JSON_USER_CREATE = new JSONObject() {{
+                put("user", new JSONObject() {{
+                    put("name", "GD test user");
+                    put("email", "qa+zendesk-test%s@gooddata.com");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exeception during json object initialization!", e);
+        }
+    }
+
+    private static final String JSON_ORGANIZATION_CREATE;
+    static {
+        try {
+            JSON_ORGANIZATION_CREATE = new JSONObject() {{
+                put("organization", new JSONObject() {{
+                    put("name", "GD test organization - %s");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exeception during json object initialization!", e);
+        }
+    }
 
     private static final String TICKETS_REPORT_NAME = "Tickets count";
     private static final String USERS_REPORT_NAME = "Users count";
@@ -74,21 +112,6 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     private MetadataService mdService = null;
     private Project project = null;
-
-    static {
-        AFTER_TICKET_CREATE_EVENTS.put("type", new FieldChange("Ticket Type", "question", EMPTY_VALUE));
-        AFTER_TICKET_CREATE_EVENTS.put("priority", new FieldChange("Priority", "high", EMPTY_VALUE));
-        AFTER_TICKET_CREATE_EVENTS.put("tags", new FieldChange("Tags", "first, second, to-be-deleted", "N/A", false));
-        AFTER_TICKET_CREATE_EVENTS.put("status", new FieldChange("Status", "new", EMPTY_VALUE));
-
-        AFTER_TICKET_UPDATE_EVENTS.put("type", new FieldChange("Ticket Type", "incident", "question"));
-        AFTER_TICKET_UPDATE_EVENTS.put("tags", new FieldChange("Tags", "first, second", "first, second, to-be-deleted", false));
-        AFTER_TICKET_UPDATE_EVENTS.put("status", new FieldChange("Status", "open", "new"));
-
-        AFTER_TICKET_DELETE_EVENTS.put("status", new FieldChange("Status", "deleted", "open"));
-
-        TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false);
-    }
 
     @BeforeClass
     public void loadRequiredProperties() {
@@ -161,7 +184,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     public void testTicketsCount() throws IOException, JSONException, InterruptedException {
         int gdTicketsCount = getNumberFromGDReport(TICKETS_REPORT_NAME);
         reportMetricsResults.put(TICKETS_REPORT_NAME, gdTicketsCount);
-        compareObjectsCount(gdTicketsCount, zendeskHelper.getNumberOfTickets(), ZendeskHelper.ZendeskObject.TICKET);
+        compareObjectsCount(gdTicketsCount, zendeskHelper.getNumberOfTickets(),
+                ZendeskHelper.ZendeskObject.TICKET);
     }
 
     @Test(dependsOnMethods = {"initZendeskApiClient", "createZendeskUsersReport"}, groups = {"zendeskApiTests",
@@ -200,7 +224,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             "connectorWalkthrough"})
     public void testAddNewTicket() throws IOException, JSONException {
         createdZendeskTicketId = zendeskHelper.createNewTicket(
-                String.format(createTicketJson(AFTER_TICKET_CREATE_EVENTS), ZendeskHelper.getCurrentTimeIdentifier()));
+                String.format(createTicketJson(AFTER_TICKET_CREATE_EVENTS),
+                        ZendeskHelper.getCurrentTimeIdentifier()));
     }
 
     @Test(dependsOnMethods = {"testUsersCount"}, groups = {"zendeskApiTests", "newZendeskObjects",
@@ -244,21 +269,25 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnMethods = {"testIncrementalSynchronization"}, groups = {"zendeskApiTests",
             "zendeskAfterCreateTests", "connectorWalkthrough"})
-    public void testOrganizationsCountAfterIncrementalSync() throws IOException, JSONException, InterruptedException {
+    public void testOrganizationsCountAfterIncrementalSync()
+            throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME);
-        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization
+        compareObjectsCount(gdOrganizationsCount,
+                zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
         assertEquals(gdOrganizationsCount, reportMetricsResults.get(ORGANIZATIONS_REPORT_NAME) + 1,
                 "Organizations count doesn't match after incremental sync");
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronization"}, groups = {"zendeskApiTests",
-            "zendeskAfterCreateTests", "connectorWalkthrough"}, enabled = false)
-    public void testTicketEventsCountAfterIncrementalSync() throws IOException, JSONException, InterruptedException {
+            "zendeskAfterCreateTests", "connectorWalkthrough"})
+    public void testTicketEventsCountAfterIncrementalSync()
+            throws IOException, JSONException, InterruptedException {
         createTicketTagsReport(createdZendeskTicketId);
         createTicketEventsReport(createdZendeskTicketId);
 
-        afterTicketCreateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId, DateTime.now().minusMinutes(10));
+        afterTicketCreateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
+                DateTime.now().minusMinutes(10));
         checkTicketEventsReport(createdZendeskTicketId, afterTicketCreateEventId, AFTER_TICKET_CREATE_EVENTS);
         Screenshots.takeScreenshot(browser, "ticket-events-after-create-ticket-report", this.getClass());
         checkTicketTagsReport(createdZendeskTicketId, AFTER_TICKET_CREATE_EVENTS.get("tags"));
@@ -293,7 +322,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnMethods = {"testIncrementalSynchronization"}, groups = {"zendeskApiTests",
             "zendeskAfterCreateTests", "connectorWalkthrough"})
-    public void testReportMetricsCountAfterIncrementalSync() throws IOException, JSONException, InterruptedException {
+    public void testReportMetricsCountAfterIncrementalSync()
+            throws IOException, JSONException, InterruptedException {
         assertEquals(getNumberFromGDReport(BACKLOG_TICKETS_REPORT_NAME),
                 reportMetricsResults.get(BACKLOG_TICKETS_REPORT_NAME).intValue(),
                 "Backlog tickets count doesn't match after incremental sync");
@@ -311,16 +341,17 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsUpdate"}, groups = {"zendeskApiTests",
-            "zendeskAfterUpdateTests", "connectorWalkthrough"}, enabled = false)
+            "zendeskAfterUpdateTests", "connectorWalkthrough"})
     public void testTicketEventsCountAfterTicketUpdate() throws IOException, JSONException, InterruptedException {
-        afterTicketUpdateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId, DateTime.now().minusMinutes(10));
+        afterTicketUpdateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
+                DateTime.now().minusMinutes(10));
         checkTicketEventsReport(createdZendeskTicketId, afterTicketUpdateEventId, AFTER_TICKET_UPDATE_EVENTS);
         Screenshots.takeScreenshot(browser, "ticket-events-after-update-ticket-report", this.getClass());
         checkTicketTagsReport(createdZendeskTicketId, AFTER_TICKET_UPDATE_EVENTS.get("tags"));
         Screenshots.takeScreenshot(browser, "ticket-tags-after-update-ticket-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsUpdate"},
+    @Test(dependsOnMethods = {"testTicketEventsCountAfterTicketUpdate"},
             groups = {"zendeskApiTests", "connectorWalkthrough", "deleteZendeskObjects"})
     public void deleteZendeskTicket() throws IOException {
         zendeskHelper.deleteTicket(createdZendeskTicketId);
@@ -347,7 +378,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testTicketsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         int gdTicketsCount = getNumberFromGDReport(TICKETS_REPORT_NAME);
-        compareObjectsCount(gdTicketsCount, zendeskHelper.getNumberOfTickets(), ZendeskHelper.ZendeskObject.TICKET);
+        compareObjectsCount(gdTicketsCount, zendeskHelper.getNumberOfTickets(),
+                ZendeskHelper.ZendeskObject.TICKET);
         assertEquals(gdTicketsCount, reportMetricsResults.get(TICKETS_REPORT_NAME).intValue(),
                 "Tickets count doesn't match after incremental sync");
     }
@@ -365,7 +397,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testOrganizationsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME);
-        compareObjectsCount(gdOrganizationsCount, zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization,
+        compareObjectsCount(gdOrganizationsCount,
+                zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization,
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
         assertEquals(gdOrganizationsCount, reportMetricsResults.get(ORGANIZATIONS_REPORT_NAME).intValue(),
                 "Organizations count doesn't match after incremental sync");
@@ -373,14 +406,16 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @SuppressWarnings("unchecked")
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
-            "zendeskAfterDeletionTests", "connectorWalkthrough"}, enabled = false)
+            "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testTicketEventsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
-        afterTicketDeleteEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId, DateTime.now().minusMinutes(10));
+        afterTicketDeleteEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
+                DateTime.now().minusMinutes(10));
         checkTicketEventsReport(createdZendeskTicketId, afterTicketDeleteEventId, AFTER_TICKET_DELETE_EVENTS);
         Screenshots.takeScreenshot(browser, "ticket-events-after-delete-ticket-report", this.getClass());
 
         assertEquals(getNumberFromGDReport(TICKET_EVENTS_COUNT_REPORT_NAME),
-                totalEventsBaseCount + ticketEventChangesCount(AFTER_TICKET_CREATE_EVENTS, AFTER_TICKET_UPDATE_EVENTS, AFTER_TICKET_DELETE_EVENTS),
+                totalEventsBaseCount + ticketEventChangesCount(AFTER_TICKET_CREATE_EVENTS,
+                        AFTER_TICKET_UPDATE_EVENTS, AFTER_TICKET_DELETE_EVENTS),
                 "Total count of TicketEvents after tests is different than expected.");
     }
 
@@ -392,13 +427,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 "Backlog tickets count doesn't match after ticket deleted");
     }
 
-    @Test(dependsOnGroups = {"zendeskAfterDeletionTests"}, groups = {"zendeskApiTests", "connectorWalkthrough"}, enabled = false)
+    @Test(dependsOnGroups = {"zendeskAfterDeletionTests"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testFullLoad() throws IOException, JSONException, InterruptedException {
         runConnectorProjectFullLoad();
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods = {"testFullLoad"}, groups = {"zendeskApiTests", "connectorWalkthrough"}, enabled = false)
+    @Test(dependsOnMethods = {"testFullLoad"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testReportMetricsCountAfterFullLoad() throws IOException, JSONException, InterruptedException {
         assertEquals(getNumberFromGDReport(TICKETS_REPORT_NAME),
                 reportMetricsResults.get(TICKETS_REPORT_NAME).intValue(),
@@ -419,7 +454,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         Screenshots.takeScreenshot(browser, "ticket-events-after-full-load-report", this.getClass());
 
         assertEquals(getNumberFromGDReport(TICKET_EVENTS_COUNT_REPORT_NAME),
-                totalEventsBaseCount + ticketEventChangesCount(AFTER_TICKET_CREATE_EVENTS, AFTER_TICKET_UPDATE_EVENTS, AFTER_TICKET_DELETE_EVENTS),
+                totalEventsBaseCount + ticketEventChangesCount(AFTER_TICKET_CREATE_EVENTS,
+                        AFTER_TICKET_UPDATE_EVENTS, AFTER_TICKET_DELETE_EVENTS),
                 "Total count of TicketEvents after tests is different than expected.");
 
         checkTicketTagsReport(createdZendeskTicketId, TAGS_AFTER_FULL_LOAD);
@@ -432,8 +468,10 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     private void createOneNumberReportDefinition(String reportName, Metric metric) {
         if (mdService.find(project, ReportDefinition.class, Restriction.title(reportName)).isEmpty()) {
-            ReportDefinition definition = OneNumberReportDefinitionContent.create(reportName, Arrays.asList("metricGroup"),
-                                    Collections.EMPTY_LIST, Arrays.asList(new GridElement(metric.getUri(), "")));
+            ReportDefinition definition = 
+                    OneNumberReportDefinitionContent.create(reportName, Arrays.asList("metricGroup"),
+                            Collections.<AttributeInGrid>emptyList(),
+                            Arrays.asList(new GridElement(metric.getUri(), "")));
             mdService.createObj(project, definition);
         } else {
             System.out.println("Required report definition already exists: " + reportName);
@@ -472,34 +510,41 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         return browser.getCurrentUrl();
     }
 
-    private String createTicketJson(Map<String, FieldChange> expectedEvents) {
-        StringBuilder json = new StringBuilder();
-        json.append("{\"ticket\": {");
-        json.append("\"subject\": \"GD test ticket - %s\", ");
-        json.append("\"comment\": { \"body\": \"Description of automatically created ticket\"}");
-        for (String fieldName : expectedEvents.keySet()) {
-            json.append(", \"").append(fieldName).append("\": \"").append(expectedEvents.get(fieldName).newValue).append("\" ");
+    private String createTicketJson(final Map<String, FieldChange> expectedEvents) {
+        try {
+            return new JSONObject() {{
+                put("ticket", new JSONObject() {{
+                    put("subject", "GD test ticket - %s");
+                    put("comment", new JSONObject() {{
+                        put("body", "Description of automatically created ticket");
+                    }});
+                    for (String fieldName : expectedEvents.keySet()) {
+                        put(fieldName, expectedEvents.get(fieldName).newValue);
+                    }
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exeception during json object initialization!", e);
         }
-        json.append("}}");
-
-        return json.toString();
     }
 
-    private String updateTicketJson(Map<String, FieldChange> expectedEvents) {
-        String comma = "";
-        StringBuilder json = new StringBuilder();
-        json.append("{\"ticket\": {");
-        for (String fieldName : expectedEvents.keySet()) {
-            json.append(comma).append("\"").append(fieldName).append("\": \"").append(expectedEvents.get(fieldName).newValue).append("\" ");
-            comma = ",";
+    private String updateTicketJson(final Map<String, FieldChange> expectedEvents) {
+        try {
+            return new JSONObject() {{
+                put("ticket", new JSONObject() {{
+                    for (String fieldName : expectedEvents.keySet()) {
+                        put(fieldName, expectedEvents.get(fieldName).newValue);
+                    }
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exeception during json object initialization!", e);
         }
-        json.append("}}");
-
-        return json.toString();
     }
 
     private int ticketEventChangesCount(Map<String, FieldChange>... ticketEvents) {
-        int changesCount = 1; // Everytime there is "Organization" field change, TODO: what if some new field to ticket form is added?
+        // Everytime there is "Organization" field change, TODO: what if some new field to ticket form is added?
+        int changesCount = 1;
 
         for (Map<String, FieldChange> changes : ticketEvents) {
             for (String fieldName : changes.keySet()) {
@@ -512,8 +557,10 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         return changesCount;
     }
 
-    private void checkTicketEventsReport(int ticketId, int ticketEventId, Map<String, FieldChange> expectedValues) {
-        Map<String, FieldChange> reportValues = parseTicketEventFromReport(String.valueOf(ticketId), String.valueOf(ticketEventId));
+    private void checkTicketEventsReport(int ticketId, int ticketEventId,
+            Map<String, FieldChange> expectedValues) throws InterruptedException {
+        Map<String, FieldChange> reportValues = parseTicketEventFromReport(String.valueOf(ticketId),
+                String.valueOf(ticketEventId));
 
         for (String zendeskFieldName : expectedValues.keySet()) {
             FieldChange expectedReportField = expectedValues.get(zendeskFieldName);
@@ -521,20 +568,24 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             if (expectedReportField.toBeChecked) {
                 FieldChange reportField = reportValues.get(expectedReportField.fieldAlias);
                 assertNotNull(reportField, "Report does not contain changed field \"" + zendeskFieldName + "\"");
-                assertEquals(reportField.newValue, expectedReportField.newValue, "Report has incorrect NEW value for field \"" + zendeskFieldName + "\"");
-                assertEquals(reportField.oldValue, expectedReportField.oldValue, "Report has incorrect OLD value for field \"" + zendeskFieldName + "\"");
+                assertEquals(reportField.newValue, expectedReportField.newValue,
+                        "Report has incorrect NEW value for field \"" + zendeskFieldName + "\"");
+                assertEquals(reportField.oldValue, expectedReportField.oldValue,
+                        "Report has incorrect OLD value for field \"" + zendeskFieldName + "\"");
             }
         }
     }
 
-    private Map<String, FieldChange> parseTicketEventFromReport(String ticketIdString, String ticketEventIdString) {
+    private Map<String, FieldChange> parseTicketEventFromReport(String ticketIdString,
+            String ticketEventIdString) throws InterruptedException {
+        Thread.sleep(5000);
         initReportsPage();
         reportsPage.getReportsList().openReport(TICKET_EVENTS_REPORT_NAME);
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
-        TableReport report = Graphene.createPageFragment(TableReport.class, browser.findElement(TABLE_REPORT_CONTAINER_LOCATION));
+        TableReport report = Graphene.createPageFragment(TableReport.class,
+                browser.findElement(TABLE_REPORT_CONTAINER_LOCATION));
 
-        List<String> cellValues = report.getAttributeElements();
         int i = 0;
         Map<String, FieldChange> actualValues = new HashMap<String, FieldChange>();
         String reportTicketEventId;
@@ -543,28 +594,31 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         String newValue;
         String oldValue;
 
+        List<List<String>> rowValues = report.getAttributeElementsByRow();
         try {
-            while (i < cellValues.size()) { // format of report: "Status", "[Status] open", "[Status] new", "reportTicketEventId", "reportTicketId"
-                fieldNameAlias = cellValues.get(i); // not same as Zendesk field name!
+            // format of report: "Status", "[Status] open", "[Status] new", "reportTicketEventId", "reportTicketId"
+            for (List<String> row: rowValues) {
+                fieldNameAlias = row.get(i);
                 i++;
-                newValue = cellValues.get(i);
+                newValue = row.get(i);
                 newValue = newValue.substring(newValue.indexOf("]") + 2); // format: [Status] open
                 i++;
-                oldValue = cellValues.get(i);
+                oldValue = row.get(i);
                 if (oldValue.contains("] ")) {
                     oldValue = oldValue.substring(oldValue.indexOf("]") + 2); // format: [Status] new
                 }
                 i++;
-                reportTicketEventId = cellValues.get(i);
+                reportTicketEventId = row.get(i);
                 i++;
-                reportTicketId = cellValues.get(i);
-                i++;
-
+                reportTicketId = row.get(i);
+                i = 0;
+    
                 if (reportTicketId.equals(ticketIdString) && reportTicketEventId.equals(ticketEventIdString)) {
                     actualValues.put(fieldNameAlias, new FieldChange(fieldNameAlias, newValue, oldValue));
                 }
             }
         } catch (IndexOutOfBoundsException exception) {
+            exception.printStackTrace();
             fail("Ticket Event report has incorrect count of cells.");
         }
 
@@ -597,7 +651,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         reportsPage.getReportsList().openReport(TICKET_TAGS_REPORT_NAME);
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
-        TableReport report = Graphene.createPageFragment(TableReport.class, browser.findElement(TABLE_REPORT_CONTAINER_LOCATION));
+        TableReport report = Graphene.createPageFragment(TableReport.class,
+                browser.findElement(TABLE_REPORT_CONTAINER_LOCATION));
 
         List<String> cellValues = report.getAttributeElements();
         int i = 0;
@@ -611,6 +666,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 i += 3;
             }
         } catch (IndexOutOfBoundsException exception) {
+            exception.printStackTrace();
             fail("Tags report has incorrect count of cells.");
         }
 
@@ -634,5 +690,4 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             this.toBeChecked = toBeChecked;
         }
     }
-
 }

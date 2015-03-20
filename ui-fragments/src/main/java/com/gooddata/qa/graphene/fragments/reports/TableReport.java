@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -83,6 +84,36 @@ public class TableReport extends AbstractReport {
                 return input.getText().trim();
             }
         }));
+    }
+
+    public List<List<String>> getAttributeElementsByRow() {
+        waitForReportLoading();
+        List<List<String>> result = Lists.newArrayList();
+        List<String> row = null;
+        Pair<Integer, Integer> possition = null;
+        String text = null;
+        int lastRowIndex = 0;
+
+        for (WebElement element: attributeElementInGrid) {
+            possition = getPossitionFromRegion(element.findElement(BY_PARENT).getAttribute("gdc:region"));
+            if (possition.getLeft() == lastRowIndex + 1) {
+                if (row != null) {
+                    result.add(row);
+                    text = row.get(0);
+                }
+                lastRowIndex++;
+                row = Lists.newArrayList();
+                if (possition.getRight() > 0) {
+                    row.add(text);
+                }
+            }
+            row.add(element.getText().trim());
+        }
+        if (row != null) {
+            result.add(row);
+        }
+
+        return result;
     }
 
     public List<Float> getMetricElements() {
@@ -208,7 +239,7 @@ public class TableReport extends AbstractReport {
                             .getAttribute("class").contains("reloading");
                 } catch(NoSuchElementException e) {
                     // in Report Page
-                    return !metricElementInGrid.isEmpty();
+                    return !metricElementInGrid.isEmpty() || !attributeElementInGrid.isEmpty();
                 }
             }
         });
@@ -221,5 +252,10 @@ public class TableReport extends AbstractReport {
     public boolean isNotComputed() {
         return waitForElementVisible(reportMessage.findElement(By.tagName("p"))).getText()
                                                                .contains(REPORT_NOT_COMPUTABLE);
+    }
+
+    private Pair<Integer, Integer> getPossitionFromRegion(String region) {
+        String[] parts = region.split(",");
+        return Pair.of(Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()));
     }
 }

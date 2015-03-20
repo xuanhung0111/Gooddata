@@ -113,11 +113,13 @@ public class ZendeskHelper {
         }
     }
 
-    private int getZendeskEntityCount(String url, ZendeskObject objectType) throws JSONException, IOException, InterruptedException {
+    private int getZendeskEntityCount(String url, ZendeskObject objectType)
+            throws JSONException, IOException, InterruptedException {
         return getSetOfActiveZendeskEntities(url, objectType, 1).size();
     }
 
-    public Integer loadLastTicketEventId(int ticketId, DateTime startDateTime) throws JSONException, IOException, InterruptedException {
+    public Integer loadLastTicketEventId(int ticketId, DateTime startDateTime)
+            throws JSONException, IOException, InterruptedException {
         JSONObject ticketsEventsPageJson;
         JSONArray ticketEventsJson;
         long startTimestampInUTC = startDateTime.toDateTime(DateTimeZone.UTC).getMillis() / 1000L;
@@ -142,7 +144,8 @@ public class ZendeskHelper {
         return lastTicketEventId == 0 ? null : lastTicketEventId;
     }
 
-    private JSONObject retrieveEntitiesJsonFromUrl(String url) throws InterruptedException, IOException, JSONException {
+    private JSONObject retrieveEntitiesJsonFromUrl(String url)
+            throws InterruptedException, IOException, JSONException {
         HttpRequestBase getRequest = apiClient.newGetMethod(url);
         try {
             HttpResponse getResponse = apiClient.execute(getRequest);
@@ -165,7 +168,8 @@ public class ZendeskHelper {
         }
     }
 
-    private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber) throws JSONException, IOException, InterruptedException {
+    private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber)
+            throws JSONException, IOException, InterruptedException {
             JSONObject json = retrieveEntitiesJsonFromUrl(url);
             Set<Integer> nonDeletedObjects = new HashSet<Integer>();
             int count = json.getInt("count");
@@ -190,7 +194,8 @@ public class ZendeskHelper {
                         }
                         break;
                     case ORGANIZATION:
-                        if (!object.getString("deleted_at").isEmpty() && !object.getString("deleted_at").equals("null")) {
+                        if (!object.getString("deleted_at").isEmpty() &&
+                                !object.getString("deleted_at").equals("null")) {
                             deletedObjects++;
                         } else {
                             nonDeletedObjects.add(object.getInt("id"));
@@ -208,9 +213,11 @@ public class ZendeskHelper {
             System.out.println("Found " + deletedObjects + " deleted " + objectType.getPluralName());
             if (count == 1000 && json.getString("next_page") != null) {
                 System.out.println("Next page found...");
-                nonDeletedObjects.addAll(getSetOfActiveZendeskEntities(json.getString("next_page"), objectType, pageNumber + 1));
+                nonDeletedObjects.addAll(getSetOfActiveZendeskEntities(json.getString("next_page"),
+                        objectType, pageNumber + 1));
             }
-            System.out.println("Returning " + nonDeletedObjects.size() + " " + objectType.getPluralName() + " after iteration on page " + pageNumber);
+            System.out.println("Returning " + nonDeletedObjects.size() + " " + objectType.getPluralName() +
+                    " after iteration on page " + pageNumber);
 
             return nonDeletedObjects;
     }
@@ -240,36 +247,6 @@ public class ZendeskHelper {
         } finally {
             putRequest.releaseConnection();
         }
-    }
-
-    public static void main(String[] args) throws IOException, JSONException, InterruptedException {
-        ZendeskHelper helper = new ZendeskHelper(new RestApiClient("gooddataqa3.zd-staging.com",
-                "qa@gooddata.com", "12345", false, false));
-        //System.out.println("last id:" + helper.loadLastTicketEventId(2240, DateTime.now().minusMonths(25)));
-        //System.out.println(helper.getNumberOfTickets());
-        //System.out.println(helper.getNumberOfTicketEvents());
-        //System.out.println(helper.getNumberOfOrganizations());
-        //System.out.println(helper.getNumberOfUsers());
-        /**
-         helper.updateZendeskObject("https://gooddataqa3.zendesk-staging.com/api/v2/tickets/2199.json",
-         "{\"ticket\":{\"type\":\"question\"}}",
-         ZendeskObject.TICKET);
-         final String JSON_TICKET_CREATE = "{\"ticket\":{\"subject\":\"GD test ticket - %s\", " +
-         "\"comment\": { \"body\": \"Description of automatically created ticket\" }, \"requester_id\":20037877,\"submitter_id\":20037877,\"assignee_id\":20012506}}";
-         final String JSON_USER_CREATE = "{\"user\": {\"name\": \"GD test user\", \"email\": " +
-         "\"qa+zendesk-test%s@gooddata.com\"}}";
-
-         final String JSON_ORGANIZATION_CREATE = "{\"organization\": {\"name\": \"GD test organization - %s\"}}";
-         int ticket = helper.createNewTicket(String.format(JSON_TICKET_CREATE, getCurrentTimeIdentifier()));
-         int organization = helper.createNewOrganization(String.format(JSON_ORGANIZATION_CREATE, getCurrentTimeIdentifier()));
-         int user = helper.createNewUser(String.format(JSON_USER_CREATE, getCurrentTimeIdentifier()));
-         System.out.println(helper.getNumberOfTickets());
-         System.out.println(helper.getNumberOfOrganizations());
-         System.out.println(helper.getNumberOfUsers());
-         helper.deleteTicket(ticket);
-         helper.deleteOrganization(organization);
-         helper.deleteUser(user);
-         */
     }
 
     public static String getCurrentTimeIdentifier() {
