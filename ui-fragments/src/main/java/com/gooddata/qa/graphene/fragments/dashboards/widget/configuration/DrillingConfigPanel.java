@@ -34,7 +34,7 @@ public class DrillingConfigPanel extends AbstractFragment {
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
         waitForElementVisible(isAddDrillingButtonVisible() ? drillingButton : addMoreButton).click();
 
-        waitForElementVisible(selectAttributeReportButton).click();
+        waitForElementVisible(selectMetricAttributeButton).click();
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
