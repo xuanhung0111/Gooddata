@@ -1,8 +1,12 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.enums.DWHDriver;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
+
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -67,6 +71,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
 
         if (addUsersWithOtherRoles) addUsersWithOtherRolesToProject();
+
+        // disable feedback panel in dashboard page
+        RestUtils.setFeatureFlags(getRestApiClient(),
+                FeatureFlagOption.createFeatureClassOption(ProjectFeatureFlags.NPS_STATUS.getFlagName(), false));
     }
 
     @AfterClass()

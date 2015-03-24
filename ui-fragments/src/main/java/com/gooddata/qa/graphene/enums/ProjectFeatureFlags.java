@@ -5,7 +5,8 @@ public enum ProjectFeatureFlags {
     ENABLE_DATA_EXPLORER("enableDataExplorer"),
     DASHBOARD_SCHEDULE("dashboardSchedule"),
     DASHBOARD_SCHEDULE_RECIPIENTS("dashboardScheduleRecipients"),
-    DISPLAY_USER_MANAGEMENT("displayUserManagement");
+    DISPLAY_USER_MANAGEMENT("displayUserManagement"),
+    NPS_STATUS("npsStatus");
 
     private String featureFlag;
 
