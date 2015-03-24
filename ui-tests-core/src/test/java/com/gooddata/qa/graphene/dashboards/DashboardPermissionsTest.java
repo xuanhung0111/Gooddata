@@ -6,7 +6,6 @@ import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
@@ -77,7 +76,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     }
 
     /**
-     * change visibility to specific user can access, unlock and hit cancel button to forget changes
+     * when a dashboard is created, its default settings are "visibility:specific user" + editing unlocked
+     * change visibility to everyone can access, editing locked and hit cancel button to forget changes
      * @throws InterruptedException 
      */
     @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
@@ -85,7 +85,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         createDashboard("Unchanged dashboard");
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
-        permissionsDialog.publish(PublishType.SPECIFIC_USERS_CAN_ACCESS);
+        permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
         permissionsDialog.lock();
         permissionsDialog.cancel();
         
@@ -281,11 +281,11 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         
         By nameSelector = By.cssSelector(".grantee-name");
         By loginSelector = By.cssSelector(".grantee-email");
-        
+
         assertEquals(candidates.get(0).findElement(nameSelector).getText().trim(), "Alcoholics anonymous");
         assertEquals(candidates.get(1).findElement(nameSelector).getText().trim(), "Xenofobes & xylophones");
         assertEquals(candidates.get(2).findElement(loginSelector).getText().trim(), editorLogin);
-        assertEquals(candidates.get(2).findElement(loginSelector).getText().trim(), viewerLogin);
+        assertEquals(candidates.get(3).findElement(loginSelector).getText().trim(), viewerLogin);
     }
     
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
@@ -345,7 +345,19 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
         assertEquals(addGranteesDialog.getGranteesCount("dsdhjak", false), 0);
     }
-    
+
+    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
+    public void shouldShowCorrectResultIfSearchQueryContainsSpecialCharacters() throws JSONException, InterruptedException {
+        selectDashboard("Unchanged dashboard");
+        
+        final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+        final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
+
+        assertEquals(addGranteesDialog.getGranteesCount("?!#&", false), 0);
+        assertEquals(addGranteesDialog.getGranteesCount("null", false), 0);
+        assertEquals(addGranteesDialog.getGranteesCount("<button>abc</button>", false), 0);
+    }
+
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldNotShowGranteesInCandidatesDialog() throws JSONException, InterruptedException {
         createDashboard("No duplicate grantees dashboard");
@@ -358,7 +370,6 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         addGranteesDialog.share();
         Thread.sleep(500);
         
-        permissionsDialog = dashboardsPage.openPermissionsDialog();
         addGranteesDialog = permissionsDialog.openAddGranteePanel();
         
         assertEquals(addGranteesDialog.getGranteesCount(editorLogin, false), 0);
@@ -369,10 +380,20 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      */
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldShowHidingFromYourselfNotificationToEditor() throws InterruptedException, JSONException {
-        createDashboard("Ordinary dashboard");
-        
-        final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
-        waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
-        permissionsDialog.cancel();
+        try {
+            createDashboard("Ordinary dashboard");
+            publishDashboard(true);
+            
+            logout();
+            signInAtUI(testParams.getEditorUser(), testParams.getPassword());
+            selectDashboard("Ordinary dashboard");
+            final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+            permissionsDialog.publish(PublishType.SPECIFIC_USERS_CAN_ACCESS);
+            waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
+            permissionsDialog.cancel();    
+        } finally {
+            logout();
+            signInAtUI(testParams.getUser(), testParams.getPassword());
+        }
     }
 }
