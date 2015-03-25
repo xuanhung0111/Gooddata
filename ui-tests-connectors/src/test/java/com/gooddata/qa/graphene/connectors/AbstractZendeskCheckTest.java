@@ -28,8 +28,10 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
         // go to page with integration settings (differs for Zendesk3/4)
         String settingsUrl = openZendeskSettingsUrl();
         JSONObject json = loadJSON();
-        if (!testParams.isReuseProject()) assertEquals(json.getJSONObject("settings").getString("apiUrl"), "null",
-                String.format("%s API URL was not set to expected value", connectorType.getName()));
+        if (!testParams.isReuseProject()) {
+            assertEquals(json.getJSONObject("settings").getString("apiUrl"), "null",
+                    String.format("%s API URL was not set to expected value", connectorType.getName()));
+        }
 
         // zendesk specific configuration of API Url (with specific upload user)
         signInAtGreyPages(zendeskUploadUser, zendeskUploadUserPassword);

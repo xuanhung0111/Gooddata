@@ -1,15 +1,16 @@
 package com.gooddata.qa.graphene.fragments.greypages.connectors;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class ConnectorFragment extends AbstractGreyPagesFragment {
 
@@ -19,7 +20,7 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement active;
 
-    @FindBy(xpath = "div[@class='submit']/input")
+    @FindBy(css = "div.submit > input")
     private WebElement submitIntegrationButton;
 
     @FindBy(xpath = "//div[@class='submit']/input[@value='delete this integration']")
@@ -28,9 +29,9 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
     public void createIntegration(String template) throws JSONException {
         waitForElementVisible(projectTemplateUri).sendKeys(template);
         Graphene.guardHttp(submitIntegrationButton).click();
-        Assert.assertTrue(browser.getCurrentUrl().endsWith("integration"), "Integration was created");
+        assertTrue(browser.getCurrentUrl().endsWith("integration"), "Integration was created");
         JSONObject json = loadJSON();
-        Assert.assertTrue(json.getJSONObject("integration").getBoolean("active"));
+        assertTrue(json.getJSONObject("integration").getBoolean("active"));
         System.out.println("Integration created...");
     }
 
@@ -40,7 +41,7 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
         Graphene.waitGui().until().element(active).is().not().selected();
         Graphene.guardHttp(submitIntegrationButton).click();
         JSONObject json = loadJSON();
-        Assert.assertFalse(json.getJSONObject("integration").getBoolean("active"), "Integration wasn't disabled");
+        assertFalse(json.getJSONObject("integration").getBoolean("active"), "Integration wasn't disabled");
         System.out.println("Integration disabled...");
     }
 
@@ -48,9 +49,9 @@ public class ConnectorFragment extends AbstractGreyPagesFragment {
         waitForElementVisible(deleteIntegrationButton);
         Graphene.guardHttp(deleteIntegrationButton).click();
 
-        Assert.assertFalse(browser.getCurrentUrl().contains("integration"), "Integration wasn't deleted");
+        assertFalse(browser.getCurrentUrl().contains("integration"), "Integration wasn't deleted");
         JSONObject json = loadJSON();
-        Assert.assertTrue(json.getJSONObject("connector").has("connectorId"));
+        assertTrue(json.getJSONObject("connector").has("connectorId"));
 
         System.out.println("Integration deleted...");
     }
