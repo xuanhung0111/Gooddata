@@ -306,6 +306,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         dashboardEditBar.addReportToDashboard(reportName);
+        // Need to sleep, if run too fast, saved dashboard will not contain the added report
+        Thread.sleep(3000);
         dashboardEditBar.saveDashboard();
         checkRedBar(browser);
     }

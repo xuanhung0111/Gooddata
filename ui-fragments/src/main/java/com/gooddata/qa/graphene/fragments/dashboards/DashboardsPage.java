@@ -170,7 +170,10 @@ public class DashboardsPage extends AbstractFragment {
 
     public void editDashboard() {
         waitForDashboardPageLoaded(browser);
-        openEditExportEmbedMenu().select("Edit");
+        SimpleMenu menu = openEditExportEmbedMenu();
+        if (menu == null)
+            return;
+        menu.select("Edit");
         waitForElementPresent(editDashboardBar.getRoot());
     }
 
@@ -321,7 +324,10 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     private SimpleMenu openEditExportEmbedMenu() {
-        waitForElementVisible(editExportEmbedButton).click();
+        if (waitForElementPresent(editExportEmbedButton).getAttribute("class").contains("gdc-hidden")) {
+            return null;
+        }
+        editExportEmbedButton.click();
         SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
                 waitForElementVisible(SimpleMenu.LOCATOR, browser));
         waitForElementVisible(menu.getRoot());
