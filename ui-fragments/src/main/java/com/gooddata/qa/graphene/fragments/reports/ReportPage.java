@@ -23,6 +23,7 @@ import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -89,6 +90,10 @@ public class ReportPage extends AbstractFragment {
 
     private String confirmSaveDialogLocator = "//div[contains(@class,'c-dashboardUsageWarningDialog')]";
 
+    private static final By visibilityCheckboxLocator = By.id("settings-visibility");
+    
+    private static final By reportSettingsSaveBtnLocator = By.cssSelector(".s-btn-save:not(.gdc-hidden)");
+    
     @FindBy(xpath = "//span[2]/button[3]")
     private WebElement confirmSaveButton;
 
@@ -100,6 +105,12 @@ public class ReportPage extends AbstractFragment {
 
     @FindBy(id = "p-analysisPage")
     private TableReport tableReport;
+    
+    @FindBy(css = ".s-unlistedIcon")
+    private WebElement unlistedIcon;
+
+    @FindBy(css = ".s-btn-options")
+    private WebElement optionsButton;
 
     public TableReport getTableReport() {
         return tableReport;
@@ -287,5 +298,31 @@ public class ReportPage extends AbstractFragment {
                 return element.getText().trim();
             }
         }));
+    }
+
+    public void setReportVisible() {
+        setReportVisibleSettings(true);
+    }
+
+    public void setReportInvisible() {
+        setReportVisibleSettings(false);
+    }
+
+    private void setReportVisibleSettings(boolean isVisible) {
+        waitForAnalysisPageLoaded(browser);
+        openOptionsMenu().select("Settings");
+        WebElement visibleCheckbox = waitForElementVisible(visibilityCheckboxLocator, browser);
+        if (isVisible != visibleCheckbox.isSelected()) {
+            visibleCheckbox.click();
+        }
+        waitForElementVisible(reportSettingsSaveBtnLocator, browser).click();
+        waitForElementNotVisible(visibleCheckbox);
+    }
+
+    private SimpleMenu openOptionsMenu() {
+        waitForElementVisible(optionsButton).click();
+        SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
+                waitForElementVisible(SimpleMenu.LOCATOR, browser));
+        return menu;
     }
 }

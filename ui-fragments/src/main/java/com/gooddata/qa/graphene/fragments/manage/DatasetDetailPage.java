@@ -1,7 +1,9 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
@@ -11,13 +13,11 @@ public class DatasetDetailPage extends AbstractFragment {
     @FindBy(css = "button.s-btn-delete")
     private WebElement datasetDeleteButton;
 
-    @FindBy(xpath = "//div[contains(@class,'c-modalDialog') and contains(@class,'t-confirmDelete')]//button[contains(@class,'s-btn-delete')]")
-    private WebElement confirmDeleteButton;
+    private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
     public void deleteDataset() throws InterruptedException {
         waitForElementVisible(datasetDeleteButton).click();
-        Thread.sleep(3000);
-        waitForElementVisible(confirmDeleteButton).click();
+        waitForElementVisible(confirmDeleteButtonLocator, browser).click();
         waitForDataPageLoaded(browser);
     }
 }

@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.assertEquals;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -38,14 +36,16 @@ public class AttributeDetailPage extends AbstractFragment {
     @FindBy(css = "button.s-btn-clear")
     private WebElement clearExternalPageButton;
 
-    @FindBy(css = ".specialButton .s-btn-delete")
-    private WebElement deleteButton;
-
     @FindBy(css = ".specialAction .info")
     private WebElement deleteButtonInfo;
 
     @FindBy(css = "button.pickAttribute")
     private WebElement selectDrillAttributeButton;
+    
+    @FindBy(css = "#p-objectPage .s-btn-delete")
+    private WebElement deleteButton;
+
+    private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
     private static final By BY_EXTERNAL_PAGE_LINK = By.cssSelector("button.s-btn-external_page");
 
@@ -126,6 +126,12 @@ public class AttributeDetailPage extends AbstractFragment {
         waitForElementNotVisible(By.cssSelector(".t-confirmDelete"));
 
         return deleteButton.getAttribute("class").contains("disabled");
+    }
+    
+    public void deleteAttribute() throws InterruptedException {
+        waitForElementVisible(deleteButton).click();
+        waitForElementVisible(confirmDeleteButtonLocator, browser).click();
+        waitForDataPageLoaded(browser);
     }
 
     public String getDeleteButtonDescription() {

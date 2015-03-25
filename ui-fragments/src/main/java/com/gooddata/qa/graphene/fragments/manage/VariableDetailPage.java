@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -92,6 +91,11 @@ public class VariableDetailPage extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class, 'attributeElements')]//input[contains(@class, 'gdc-input')]")
     private WebElement searchAttributeElement;
+    
+    @FindBy(css = "#p-objectPage .s-btn-delete")
+    private WebElement deleteButton;
+
+    private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectPropertiesPage;
@@ -194,6 +198,12 @@ public class VariableDetailPage extends AbstractFragment {
             assertEquals(actualDefaultList, elements,
                     "Default value of attribute variable is NOT set properly");
         }
+    }
+    
+    public void deleteVariable() throws InterruptedException {
+        waitForElementVisible(deleteButton).click();
+        waitForElementVisible(confirmDeleteButtonLocator, browser).click();
+        waitForDataPageLoaded(browser);
     }
 
 }
