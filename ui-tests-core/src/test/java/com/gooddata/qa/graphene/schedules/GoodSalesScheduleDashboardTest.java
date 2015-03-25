@@ -25,6 +25,11 @@ import java.util.List;
 import java.util.Set;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import com.gooddata.qa.utils.http.RestApiClient;
+import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -34,9 +39,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private final String CUSTOM_SUBJECT = "Extremely useful subject";
     private final String CUSTOM_MESSAGE = "Extremely useful message";
     private final List<String> CUSTOM_RECIPIENTS = Arrays.asList("bear+1@gooddata.com", "bear+2@gooddata.com");
-    private final List<String> SCHEDULED_DASHBOARDS = Arrays.asList("Waterfall Analysis", "What's Changed");
+    private final List<String> SCHEDULED_TABS = Arrays.asList("Waterfall Analysis", "What's Changed");
     private final String SCHEDULE_INFO = "This dashboard will be sent daily at 12:30 AM %s to %s and 2 other recipients as a PDF attachment.";
-    private final String SCHEDULE_TIME_MANAGE_PAGE = "Daily at 12:30 AM PT";
     private DateTimeZone tz = DateTimeZone.getDefault();
 
     @BeforeClass
@@ -104,46 +108,51 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         dashboardScheduleDialog.schedule();
     }
 
-    // login and test as admin
     @Test(dependsOnGroups = {"schedules"})
-    public void verifyDashboardSchedule() throws JSONException {
+    public void verifyRecipientsOfSchedule() throws JSONException, InterruptedException, ParseException, IOException {
         loginAs(UserRoles.ADMIN);
         initEmailSchedulesPage();
-        emailSchedulesPage.openSchedule(CUSTOM_SUBJECT);
-        assertEquals(emailSchedulesPage.getToFromInput(), testParams.getViewerUser(), "Current user is in 'To' input.");
-        assertEquals(emailSchedulesPage.getSubjectFromInput(), CUSTOM_SUBJECT, "Custom subject is in 'Subject' input field.");
-        assertEquals(emailSchedulesPage.getMessageFromInput(), CUSTOM_MESSAGE, "Custom message is in 'Message' input field.");
-        assertEquals(emailSchedulesPage.getAttachedDashboards(), SCHEDULED_DASHBOARDS, "The selected dashboards are attached to scheduled e-mail.");
-        String timeDescription = emailSchedulesPage.getTimeDescription();
-        assertTrue(
-                timeDescription.contains(SCHEDULE_TIME_MANAGE_PAGE),
-                "Time description contains the given time. Expected '" + SCHEDULE_TIME_MANAGE_PAGE + "', found '" + timeDescription + "'."
-        );
-        Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard", this.getClass());
-    }
 
-    @Test(dependsOnGroups = {"schedules"})
-    public void verifyRecipientsOfSchedule() throws JSONException, InterruptedException {
-        loginAs(UserRoles.ADMIN);
-        initEmailSchedulesPage();
-        // get object
-        String uri = emailSchedulesPage.getScheduleMailUriByName(CUSTOM_SUBJECT);
+        // get schedules via api, dashboard-based are not visible on manage page
+        String uri = getScheduleUri(CUSTOM_SUBJECT);
+
         String[] parts = uri.split("/");
         int id = Integer.parseInt(parts[parts.length - 1]);
         JSONObject schedule = getObjectByID(id);
-        JSONArray recipientsJson = schedule.getJSONObject("scheduledMail").getJSONObject("content").getJSONArray("bcc");
+        JSONObject scheduledMailContent = schedule.getJSONObject("scheduledMail").getJSONObject("content");
+
+        JSONArray toJson = scheduledMailContent.getJSONArray("to");
+        Set<String> to = new HashSet<String>();
+        for (int i = 0; i < toJson.length(); i++) {
+            to.add(toJson.getString(i));
+        }
+
+        String subject = scheduledMailContent.getString("subject");
+        String body = scheduledMailContent.getString("body");
+
+        JSONArray attachmentsJson = scheduledMailContent.getJSONArray("attachments");
+        JSONObject attachment = attachmentsJson.getJSONObject(0);
+        JSONArray tabs = attachment.getJSONObject("dashboardAttachment").getJSONArray("tabs");
+
+        JSONArray recipientsJson = scheduledMailContent.getJSONArray("bcc");
         Set<String> recipients = new HashSet<String>();
         for (int i = 0; i < recipientsJson.length(); i++) {
             recipients.add(recipientsJson.getString(i));
         }
-        String timeZoneId = schedule.getJSONObject("scheduledMail")
-                .getJSONObject("content")
+
+        String timeZoneId = scheduledMailContent
                 .getJSONObject("when")
                 .getString("timeZone");
         DateTimeZone tzFromObj = DateTimeZone.forID(timeZoneId);
 
         // verify bcc
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-mdObject", this.getClass());
+
+        assertEquals(to, new HashSet<String>(Arrays.asList(testParams.getViewerUser())), "Current user is in 'To' field");
+        assertEquals(subject, CUSTOM_SUBJECT, "Custom subject is in 'Subject' input field.");
+        assertEquals(body, CUSTOM_MESSAGE, "Custom message is in 'Message' input field.");
+        assertEquals(tabs.length(), SCHEDULED_TABS.size(), "Expecting two tabs to be attached to the scheduled mail");
+
         assertEquals(recipients, new HashSet<String>(CUSTOM_RECIPIENTS), "Recipients do not match.");
         assertEquals(tz.getStandardOffset(System.currentTimeMillis()), tzFromObj.getStandardOffset(System.currentTimeMillis()), "Timezones do not match");
     }
@@ -169,4 +178,26 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         loginAs(UserRoles.ADMIN);
         Screenshots.takeScreenshot(browser, "Goodsales-schedules-embedded-dashboard", this.getClass());
     }
+
+    private String getScheduleUri(String scheduleTitle) throws JSONException, IOException {
+        String schedulesUri = "/gdc/md/" + testParams.getProjectId() + "/query/scheduledmails";
+
+        // re-initialize of the rest client is necessary to prevent execution freeze
+        restApiClient = null;
+        final RestApiClient rac = getRestApiClient();
+        final HttpGet getRequest = rac.newGetMethod(schedulesUri);
+        final HttpResponse getResponse = rac.execute(getRequest);
+        JSONArray schedules = new JSONObject(EntityUtils.toString(getResponse.getEntity())).getJSONObject("query").getJSONArray("entries");
+
+        String uri = null;
+        for (int i = 0; i < schedules.length(); i++) {
+            JSONObject schedule = schedules.getJSONObject(i);
+            if (schedule.getString("title").equals(scheduleTitle)) {
+                uri = schedule.getString("link");
+                break;
+            }
+        }
+        return uri;
+    }
+
 }
