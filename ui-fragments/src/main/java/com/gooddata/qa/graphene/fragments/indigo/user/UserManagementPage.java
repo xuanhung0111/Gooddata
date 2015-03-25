@@ -16,16 +16,16 @@ import com.gooddata.qa.graphene.fragments.common.DropDown;
 
 public class UserManagementPage extends AbstractFragment {
 
-    @FindBy(className = "s-btn-invite_users")
+    @FindBy(className = "s-btn-invite_people")
     private WebElement inviteUsersButton;
 
     @FindBy(className = "users-filter-state")
     private WebElement usersFilterButton;
 
-    @FindBy(css = ".list.users")
+    @FindBy(css = ".list.users-list")
     private UsersTable usersTable;
 
-    private static final By BY_SELECTED_USERS = By.className("users-selection-label");
+    private static final By BY_SELECTED_USERS = By.className("users-selected-count");
     private static final By BY_CHANGE_ROLE_BUTTON = By.className("users-change-role");
     private static final By BY_USER_DEACTIVATE_BUTTON = By.className("users-deactivate");
 
@@ -59,13 +59,13 @@ public class UserManagementPage extends AbstractFragment {
     }
 
     public int getUsersCount() {
-        return Integer.parseInt(waitForElementVisible(By.className("users-count-number"), browser).getText());
+        return Integer.parseInt(waitForElementVisible(By.className("users-count"), browser).getText());
     }
 
     public UserManagementPage selectUsers(String... emails) {
         waitForFragmentVisible(usersTable).selectUsers(emails);
         assertEquals(waitForElementVisible(BY_SELECTED_USERS, browser).getText().trim(),
-                emails.length + " selected users");
+                emails.length + " selected user" + (emails.length > 1 ? "s" : ""));
         return this;
     }
 }
