@@ -9,11 +9,11 @@ public enum UserRoles {
     UNVERIFIED_ADMIN("1");
 
     private final String id;
-    private final String text;
+    private final String name;
 
-    private UserRoles(String id, String text) {
+    private UserRoles(String id, String name) {
         this.id = id;
-        this.text = text;
+        this.name = name;
     }
 
     private UserRoles(String id) {
@@ -24,7 +24,7 @@ public enum UserRoles {
         return id;
     }
 
-    public String getText() {
-        return text;
+    public String getName() {
+        return name;
     }
 }

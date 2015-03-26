@@ -477,4 +477,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(PAGE_USER_MANAGEMENT);
         waitForFragmentVisible(userManagementPage);
     }
+
+    public void initUngroupedUsersPage() {
+        openUrl(PAGE_USER_MANAGEMENT + "?groupId=GROUP_UNGROUPED");
+        waitForFragmentVisible(userManagementPage);
+    }
 }

@@ -2,17 +2,17 @@ package com.gooddata.qa.graphene.enums;
 
 public enum UserStates {
 
-    ACTIVE("Active"),
-    INACTIVE("Inactive"),
-    PENDING("Pending");
+    ACTIVE("users-filter-active"),
+    DEACTIVATED("users-filter-inactive"),
+    INVITED("users-filter-pending");
 
-    private String text;
+    private String className;
 
-    private UserStates(String text) {
-        this.text = text + " users";
+    private UserStates(String className) {
+        this.className = className;
     }
 
-    public String getText() {
-        return text;
+    public String getClassName() {
+        return className;
     }
 }

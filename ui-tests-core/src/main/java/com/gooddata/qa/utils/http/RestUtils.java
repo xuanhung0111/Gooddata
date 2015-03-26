@@ -150,10 +150,11 @@ public class RestUtils {
         assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"), "User isn't assigned properly into the project");
         System.out.println(String.format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId, domainUser));
     }
-    
-    public static void addUserGroup(RestApiClient restApiClient, String projectId, final String name) {
+
+    public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
+            throws JSONException, IOException {
         final String projectUri = "/gdc/projects/" + projectId;
-        
+
         @SuppressWarnings("serial")
         JSONObject payload = new JSONObject(new HashMap<String, Object>() {{
             put("userGroup", new HashMap<String, Object>() {{
@@ -166,11 +167,25 @@ public class RestUtils {
 
         HttpRequestBase request = restApiClient.newPostMethod(GROUPS_URI, payload.toString());
         HttpResponse response = restApiClient.execute(request);
-        
+
         int statusCode = response.getStatusLine().getStatusCode();
         boolean successful = statusCode == CREATED.value() || statusCode == CONFLICT.value();
-        
+
         assertTrue(successful, "User group could not be created, got HTTP " + statusCode);
+        String userGroupUri =
+                new JSONObject(EntityUtils.toString(response.getEntity())).getString("uri");
+        System.out.println("New user group uri: " + userGroupUri);
+
+        return userGroupUri;
+    }
+
+    public static void deleteUserGroup(RestApiClient restApiClient, String groupUri) {
+        HttpRequestBase request = restApiClient.newDeleteMethod(groupUri);
+        HttpResponse response = restApiClient.execute(request);
+
+        int statusCode = response.getStatusLine().getStatusCode();
+        assertEquals(statusCode, HttpStatus.NO_CONTENT.value(),
+                     "User group could not be deleted, got " + statusCode);
     }
 
     public static String getLDMImageURI(String host, String projectId, String user, String password) throws ParseException, IOException, JSONException {
