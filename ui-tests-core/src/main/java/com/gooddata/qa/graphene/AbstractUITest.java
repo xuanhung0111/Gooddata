@@ -331,14 +331,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void publishDashboard(boolean publish) {
+        By okayBtnLocator = By.cssSelector(".s-btn-ok__got_it");
         initDashboardsPage();
         dashboardsPage.publishDashboard(publish);
         waitForElementVisible(dashboardsPage.getRoot());
+        if (publish && browser.findElements(okayBtnLocator).size() != 0) {
+            waitForElementVisible(okayBtnLocator,browser).click();
+        }
     }
 
     public void selectDashboard(String name) throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.selectDashboard(name);
+        waitForDashboardPage();
     }
 
     public void createReport(ReportDefinition reportDefinition, String screenshotName) throws InterruptedException {
