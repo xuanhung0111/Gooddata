@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
@@ -13,13 +12,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -68,6 +68,33 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
     protected String notAvailableAttribute;
 
+    @SuppressWarnings("serial")
+    private static final Map<String, String> walkmeContents = new HashMap<String, String>() {{
+        put("Welcome to the Analytical Designer", "This interactive environment allows you to explore your data "
+                + "and create visualizations quickly and easily. Intelligent on-screen recommendations help you "
+                + "discover new and surprising insights. Let's get started!");
+
+        put("Begin by exploring your data", "Metrics represent quantitative data (measures):\n\n\n"
+                + "Attributes represent qualitative data (categories):");
+
+        put("Create a new visualization", "Drag data from the list onto the canvas and watch as your "
+                + "visualization takes shape!");
+
+        put("Remove data", "Drag data items from these zones back to the list to remove them from your "
+                + "visualization.");
+
+        put("Change visualization type", "Choose how to visualize your data.");
+
+        put("Filter your visualization", "Drag the Date field or any attribute here.");
+
+        put("Save your visualization as a report", "When ready, open your visualization in the Report Editor. "
+                + "From there you can save it and add it to a dashboard.");
+
+        put("Clear your canvas", "Restart your exploration at any time.");
+
+        put("You're ready.", "Go ahead. Start discovering what insights await in your data!");
+    }};
+
     @BeforeClass
     public void initStartPage() {
         startPage = "projects.html";
@@ -75,16 +102,32 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
-    public void turnOffWalkme() {
+    public void testWalkme() {
         initAnalysePage();
 
-        try {
-            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-close"), browser);
-            walkmeCloseElement.click();
-            waitForElementNotPresent(walkmeCloseElement);
-        } catch (TimeoutException e) {
-            System.out.println("Walkme dialog is not appeared!");
+        final By title = By.className("walkme-custom-balloon-title");
+        final By content = By.cssSelector(".walkme-custom-balloon-content span");
+        final By nextBtn = By.className("walkme-action-next");
+        final By backBtn = By.className("walkme-action-back");
+        final By doneBtn = By.className("walkme-action-done");
+
+        waitForElementVisible(title, browser);
+        while (true) {
+            assertEquals(waitForElementVisible(content, browser).getText(),
+                    walkmeContents.get(waitForElementVisible(title, browser).getText()));
+
+            waitForElementVisible(nextBtn, browser).click();
+
+            if (!browser.findElements(doneBtn).isEmpty()) {
+                break;
+            }
+
+            waitForElementVisible(backBtn, browser).click();
+            assertEquals(waitForElementVisible(content, browser).getText(),
+                    walkmeContents.get(waitForElementVisible(title, browser).getText()));
+            waitForElementVisible(nextBtn, browser).click();
         }
+        waitForElementVisible(doneBtn, browser).click();
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
