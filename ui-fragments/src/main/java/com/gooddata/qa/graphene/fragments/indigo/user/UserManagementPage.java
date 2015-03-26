@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.user;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,17 @@ public class UserManagementPage extends AbstractFragment {
     @FindBy(className = "s-btn-invite_people")
     private WebElement inviteUsersButton;
 
+    @FindBy(className = "s-btn-create_group")
+    private WebElement createGroupButton;
+
     @FindBy(css = ".users-check-all input")
     private WebElement checkAllUserEmailCheckbox;
 
     @FindBy(css = ".list.users-list")
     private UsersTable usersTable;
+
+    @FindBy(css = ".sidebar-column a.active")
+    private List<WebElement> sidebarActiveLinks;
 
     @FindBy(css = ".sidebar-groups .user-filter")
     private List<WebElement> userGroupFilters;
@@ -49,6 +56,15 @@ public class UserManagementPage extends AbstractFragment {
     @FindBy(className = "users-deactivate")
     private WebElement deactivateUserButton;
 
+    @FindBy(className = "s-btn-start_adding_users")
+    private WebElement startAddingUserButton;
+
+    @FindBy(css = ".gd-state-text h2")
+    private WebElement stateMessage;
+
+    @FindBy(className = "users-content-column")
+    private WebElement userContentColumn;
+
     private static final By BY_CHANGE_ROLE_BUTTON = By.className("users-change-role");
     private static final By BY_MESSAGE_TEXT = By.className("gd-message-text");
     private static final By BY_EMPTY_GROUP = By.className("list-state");
@@ -61,6 +77,12 @@ public class UserManagementPage extends AbstractFragment {
         waitForElementVisible(inviteUsersButton).click();
         return Graphene.createPageFragment(UserInvitationDialog.class,
                 waitForElementVisible(By.className("invitationDialog"), browser));
+    }
+
+    public GroupDialog openGroupDialog() {
+        waitForElementVisible(createGroupButton).click();
+        return Graphene.createPageFragment(GroupDialog.class,
+                waitForElementVisible(By.className("group-dialog"), browser));
     }
 
     public UserManagementPage changeRoleOfUsers(UserRoles role, String... emails) {
@@ -112,7 +134,9 @@ public class UserManagementPage extends AbstractFragment {
 
     public UserManagementPage openSpecificGroupPage(String groupName) {
         waitForElementVisible(By.xpath(GROUP_LINK_XPATH.replace("${groupName}", groupName)), browser).click();
-        waitForFragmentVisible(usersTable);
+        waitForElementVisible(userContentColumn);
+        browser.navigate().refresh();
+        waitForElementVisible(this.getRoot());
         return this;
     }
 
@@ -132,6 +156,15 @@ public class UserManagementPage extends AbstractFragment {
         return allUserEmails;
     }
 
+    public List<String> getAllUserGroups() {
+        List<String> userGroups = new ArrayList<String>();
+        waitForCollectionIsNotEmpty(userGroupFilters);
+        for (WebElement e : userGroupFilters) {
+            userGroups.add(e.findElement(By.className("menu-item-title")).getText().trim());
+        }
+        return userGroups;
+    }
+
     public int getUserGroupsCount() {
         waitForElementVisible(By.className("sidebar-groups"), browser);
         return userGroupFilters.size();
@@ -145,8 +178,25 @@ public class UserManagementPage extends AbstractFragment {
         waitForElementVisible(BY_EMPTY_GROUP, browser);
     }
 
+    public String getStateGroupMessage() {
+        return waitForElementVisible(stateMessage).getText().trim();
+    }
+
+    public void startAddingUser() {
+        waitForElementVisible(startAddingUserButton).click();
+    }
+
     public String getUserRole(String email) {
         return waitForFragmentVisible(usersTable).getUserRole(email);
+    }
+
+    public List<String> getAllSidebarActiveLinks() {
+        List<String> activeLinks = new ArrayList<String>();
+        waitForCollectionIsNotEmpty(sidebarActiveLinks);
+        for (WebElement e : sidebarActiveLinks) {
+            activeLinks.add(e.getText().trim());
+        }
+        return activeLinks;
     }
 
     private UserManagementPage changeGroupOfUsers(boolean isSelect, String group, String... emails) {
