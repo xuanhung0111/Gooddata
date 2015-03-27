@@ -8,13 +8,12 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
-public class UserManagementGeneralTest extends AbstractUITest {
+public class UserManagementGeneralTest extends AbstractProjectTest {
 
     private boolean canAccessUserManagementByDefault;
 
@@ -22,18 +21,20 @@ public class UserManagementGeneralTest extends AbstractUITest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = "projects.html";
+        projectTitle = "User-management-general";
     }
 
-    @Test(groups = {"projectInit"})
-    public void init() throws JSONException, IOException {
-        signIn(false, UserRoles.ADMIN);
+    @Test(dependsOnMethods = {"createProject"})
+    public void initialize() throws JSONException, IOException {
         enableUserManagementFeature();
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnMethods = {"initialize"})
     public void verifyUserManagementUI() throws IOException, JSONException {
         try {
+            // Go to Dashboard page of new created project to use User management page of that project
+            initProjectsPage();
+            initDashboardsPage();
             initUserManagementPage();
             userManagementPage.openInviteUserDialog().cancelInvitation();
             assertEquals(userManagementPage.getUsersCount(), 1);

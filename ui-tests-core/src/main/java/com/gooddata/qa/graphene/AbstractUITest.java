@@ -162,7 +162,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".adi-editor")
     protected AnalysisPage analysisPage;
 
-    @FindBy(css = "#root.ember-application")
+    @FindBy(css = ".ember-application")
     protected UserManagementPage userManagementPage;
 
     /**
