@@ -2,18 +2,30 @@ package com.gooddata.qa.graphene.fragments.dashboards.widget;
 
 import java.util.List;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.SelectionConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 public class FilterWidget extends AbstractFragment {
 
     @FindBy(tagName = "button")
     private WebElement button;
+
+    @FindBy(className = "titleContainer")
+    private WebElement titleContainer;
+
+    private static final By BY_TITLE_LABEL = By.cssSelector(".titleLabel span");
+    private static final By BY_INPUT_LABEL = By.cssSelector("input");
 
     public void openPanel() {
         if (!isOpen()) {
@@ -61,5 +73,31 @@ public class FilterWidget extends AbstractFragment {
 
     public String getCurrentValue() {
         return getRoot().getText().split("\n")[1];
+    }
+
+    public void changeSelectionToOneValue() {
+        WidgetConfigPanel configPanel = WidgetConfigPanel.
+                openConfigurationPanelFor(this.getRoot(), browser);
+
+        configPanel.getTab(WidgetConfigPanel.Tab.SELECTION,
+                SelectionConfigPanel.class).changeSelectionToOneValue();
+
+        configPanel.saveConfiguration();
+    }
+
+    public String getTitle() {
+        return waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).getText();
+    }
+
+    public void changeTitle(String title) {
+        if (!getRoot().getAttribute("class").contains("yui3-c-filterdashboardwidget-selected")) {
+            getRoot().click();
+        }
+
+        waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).click();
+        WebElement inputElement = waitForElementVisible(BY_INPUT_LABEL, titleContainer);
+        inputElement.clear();
+        inputElement.sendKeys(title);
+        inputElement.sendKeys(Keys.ENTER);
     }
 }

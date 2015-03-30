@@ -31,6 +31,9 @@ public class AttributeFilterPanel extends FilterPanel {
     @FindBy(css = "div.yui3-c-simpleColumn-underlay label.ellipsisEnabled")
     private List<WebElement> listAttrValues;
 
+    private static final String CLEAR_VISIBLE = ":not(.gdc-hidden)>.clearVisible";
+    private static final String SELECT_VISIBLE = ":not(.gdc-hidden)>.selectVisible";
+
     public List<String> getAllAtributeValues() {
         List<String> actualFilterElements = new ArrayList<String>();
         waitForCollectionIsNotEmpty(listAttrValues);
@@ -76,6 +79,13 @@ public class AttributeFilterPanel extends FilterPanel {
     public AttributeFilterPanel search(String text) {
         waitForElementVisible(search).sendKeys(text);
         return this;
+    }
+
+    public boolean verifyPanelInOneValueMode() {
+        return getRoot().findElements(By.cssSelector(SELECT_VISIBLE)).size() +
+                getRoot().findElements(By.cssSelector(CLEAR_VISIBLE)).size() +
+                getRoot().findElements(By.cssSelector(".s-btn-cancel:not(.gdc-hidden)")).size() +
+                getRoot().findElements(By.cssSelector(".s-btn-apply:not(.gdc-hidden)")).size() == 0;
     }
 
     private void selectOneValue(String value) {
