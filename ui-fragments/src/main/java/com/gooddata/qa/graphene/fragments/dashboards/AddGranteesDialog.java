@@ -1,18 +1,19 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public class AddGranteesDialog extends AbstractFragment {
 
