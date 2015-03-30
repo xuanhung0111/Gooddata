@@ -198,7 +198,7 @@ public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {
             assertEquals(interactiveReport.getTotalTableRowsFromTableFooter(),
                          String.format("%d total", 8));
 
-            dashboardsPage.getFilters().get(0).changeAttributeFilterValue("Interest");
+            dashboardsPage.getFirstFilter().changeAttributeFilterValue("Interest");
 
             assertEquals(interactiveReport.getTotalTableRows(), 1);
             assertEquals(interactiveReport.getTotalTableRowsFromTableFooter(),

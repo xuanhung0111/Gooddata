@@ -4,6 +4,8 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.*;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
@@ -115,7 +117,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         assertTrue(viewPopupMenu.isNoSavedViewPresent(),
                           "'No Saved Views' is not shown in saved view menu!");
 
-        FilterWidget timeFilter = getFilterWidget("date_dimension");
+        FilterWidget timeFilter = dashboardsPage.getFilterWidget("date_dimension");
         timeFilter.changeTimeFilterValueByClickInTimeLine(LAST_YEAR);
         assertTrue(savedViewWidget.isUnsavedViewButtonPresent(),
                           "Saved filter view does not show as 'Unsaved View'!");
@@ -153,7 +155,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"createSavedFilterViewTest"})
     public void renameSavedFilterViewTest() throws InterruptedException {
         // change filter value so Selenium can loads all saved views
-        getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
+        dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
 
         // try to rename a saved view but canceling at the end.
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
@@ -193,7 +195,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"renameSavedFilterViewTest"})
     public void filterViewNamingUniquenessTest() throws InterruptedException {
         // change filter value so Selenium can loads all saved views
-        getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
+        dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu();
@@ -221,7 +223,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"filterViewNamingUniquenessTest"})
     public void deleteSavedFilterViewTest() throws InterruptedException {
         // change filter value so Selenium can loads all saved views
-        FilterWidget filter = getFilterWidget("date_dimension");
+        FilterWidget filter = dashboardsPage.getFilterWidget("date_dimension");
         filter.changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 4));
 
         // verify things in delete dialog and canceling at the end
@@ -263,7 +265,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     public void savedFilterAfterSwitchBetweenDashboardsAndPagesTest() throws InterruptedException {
         // Add more saved view for first dashboard
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
-        getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
+        dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu();
         savedViewWidget.saveCurrentView(PENULTIMATE_YEAR);
@@ -278,12 +280,12 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
         // Create saved view 1 "Abundant Foodz"
         Thread.sleep(1000);
-        FilterWidget departmentFilter = getFilterWidget("department");
+        FilterWidget departmentFilter = dashboardsPage.getFilterWidget("department");
         departmentFilter.changeAttributeFilterValue("Abundant Foodz");
         savedViewWidget.openSavedViewMenu();
         savedViewWidget.saveCurrentView("Abundant Foodz");
 
-        assertEquals(getFilterWidget("county").getCurrentValue(), "All",
+        assertEquals(dashboardsPage.getFilterWidget("county").getCurrentValue(), "All",
                             "Value of 'County' is not 'All'!");
         Thread.sleep(1000);
         assertEquals(departmentFilter.getCurrentValue(), "Abundant Foodz",
@@ -374,9 +376,9 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Firstname");
         dashboardEditBar.saveDashboard();
 
-        getFilterWidget("firstname").changeAttributeFilterValue("Adam");
+        dashboardsPage.getFilterWidget("firstname").changeAttributeFilterValue("Adam");
         dashboardsPage.getTabs().openTab(0);
-        getFilterWidget("county").changeAttributeFilterValue("Austin");
+        dashboardsPage.getFilterWidget("county").changeAttributeFilterValue("Austin");
         Thread.sleep(1000);
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
@@ -414,18 +416,6 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         dashboardEditBar.turnSavedViewOption(true);
         dashboardEditBar.saveDashboard();
 
-    }
-
-    private FilterWidget getFilterWidget(String condition) {
-        // need to refresh page so filter widget can load its root element when accessing
-        browser.navigate().refresh();
-        waitForDashboardPageLoaded(browser);
-
-        for(FilterWidget filter : dashboardsPage.getFilters()) {
-            if(!filter.getRoot().getAttribute("class").contains("s-" + condition)) continue;
-            return filter;
-        }
-        return null;
     }
 
     private void checkSavedViewisDisableByNotification(WebElement notification) {

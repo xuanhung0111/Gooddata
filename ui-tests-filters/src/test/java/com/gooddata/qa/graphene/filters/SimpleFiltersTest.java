@@ -1,34 +1,36 @@
 package com.gooddata.qa.graphene.filters;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
 import java.util.List;
 
-import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.enums.UserRoles;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
-import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanelRow;
 
 public class SimpleFiltersTest extends AbstractUITest {
 
-    DashboardsPage dashboards;
-
-    FilterWidget filter;
-
-    FilterWidget.FilterPanel panel;
-
-    List<FilterWidget.FilterPanel.FilterPanelRow> rows;
+    private DashboardsPage dashboards;
+    private FilterWidget filter;
+    private AttributeFilterPanel panel;
+    private List<FilterPanelRow> rows;
 
     @BeforeClass
     public void initStartPage() {
@@ -44,7 +46,7 @@ public class SimpleFiltersTest extends AbstractUITest {
 
         filter.openPanel();
 
-        panel = filter.getPanel();
+        panel = filter.getPanel(AttributeFilterPanel.class);
         panel.waitForValuesToLoad();
 
         rows = panel.getRows();
@@ -73,13 +75,13 @@ public class SimpleFiltersTest extends AbstractUITest {
         waitForDashboardPageLoaded(browser);
         dashboards = Graphene.createPageFragment(DashboardsPage.class,
                 browser.findElement(BY_PANEL_ROOT));
-        Assert.assertNotNull(dashboards, "Dashboard page not initialized!");
+        assertNotNull(dashboards, "Dashboard page not initialized!");
 
         DashboardTabs tabs = dashboards.getTabs();
         tabs.getTab(0).open();
 
         List<FilterWidget> filters = dashboards.getFilters();
-        Assert.assertNotEquals(filters.size(), 0, "No filter on tab!");
+        assertNotEquals(filters.size(), 0, "No filter on tab!");
 
         filter = dashboards.getFilters().get(0);
     }
@@ -87,7 +89,7 @@ public class SimpleFiltersTest extends AbstractUITest {
     @Test(dependsOnGroups = {"filterInit"})
     public void testDoesNotDisplayOnlyAnchor() throws InterruptedException {
         for (int i = 0; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
             // Scroll row into view
             ((JavascriptExecutor) browser).executeScript("arguments[0].scrollTop = $(arguments[1]).position().top",
@@ -97,14 +99,14 @@ public class SimpleFiltersTest extends AbstractUITest {
             Actions actions = new Actions(browser);
             actions.moveByOffset(-50, -50).build().perform();
 
-            Assert.assertFalse(row.getSelectOnly().isDisplayed(), "'Select only' link is displayed");
+            assertFalse(row.getSelectOnly().isDisplayed(), "'Select only' link is displayed");
         }
     }
 
     @Test(dependsOnGroups = {"filterInit"})
     public void testDisplaysOnlyAnchorOnHover() throws InterruptedException {
         for (int i = 0; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
             // Scroll row into view
             ((JavascriptExecutor) browser).executeScript("arguments[0].scrollTop = $(arguments[1]).position().top",
@@ -114,13 +116,13 @@ public class SimpleFiltersTest extends AbstractUITest {
             Actions actions = new Actions(browser);
             actions.moveToElement(row.getRoot()).build().perform();
 
-            Assert.assertTrue(row.getSelectOnly().isDisplayed(), "'Select only' link is displayed on hover");
+            assertTrue(row.getSelectOnly().isDisplayed(), "'Select only' link is displayed on hover");
         }
     }
 
     @Test(dependsOnGroups = {"filterInit"})
     public void testSelectOneValueOnSelectOnlyClick() throws InterruptedException {
-        FilterWidget.FilterPanel.FilterPanelRow selectedRow = rows.get(0);
+        FilterPanelRow selectedRow = rows.get(0);
 
         // Hover over selected row
         Actions actions = new Actions(browser);
@@ -131,81 +133,75 @@ public class SimpleFiltersTest extends AbstractUITest {
         rows.get(0).getSelectOnly().sendKeys("something");
         rows.get(0).getSelectOnly().click();
 
-        Assert.assertTrue(selectedRow.isSelected(), "Row is selected after click on 'Select only' link");
+        assertTrue(selectedRow.isSelected(), "Row is selected after click on 'Select only' link");
 
         for (int i = 1; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
-            Assert.assertFalse(row.isSelected(), "Only one row is selected after click on 'Select only' link");
+            assertFalse(row.isSelected(), "Only one row is selected after click on 'Select only' link");
         }
     }
 
     @Test(dependsOnGroups = {"filterInit"})
     public void testAllValuesAreSelectedByDefault() throws InterruptedException {
         for (int i = 1; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
-            Assert.assertTrue(row.isSelected(), "Row is selected by default");
+            assertTrue(row.isSelected(), "Row is selected by default");
         }
     }
 
     @Test(dependsOnGroups = {"filterInit"})
     public void testDeselectAllValues() throws InterruptedException {
-        panel.getDeselectAll().click();
+        panel.deselectAll();
 
         for (int i = 1; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
-            Assert.assertFalse(row.isSelected(), "Row is not selected");
+            assertFalse(row.isSelected(), "Row is not selected");
         }
     }
 
     @Test(dependsOnGroups = {"filterInit"})
     public void testSelectAllValues() throws InterruptedException {
-        panel.getDeselectAll().click();
-        panel.getSelectAll().click();
+        panel.deselectAll().selectAll();
 
         for (int i = 1; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
-            Assert.assertTrue(row.isSelected(), "Row is selected");
+            assertTrue(row.isSelected(), "Row is selected");
         }
     }
 
     @Test(dependsOnGroups = {"filterInit"})
     public void testValuesAreFileteredCorrectly() throws InterruptedException {
-        panel.getSearch().sendKeys("jon");
-        panel.waitForValuesToLoad();
-        rows = panel.getRows();
+        rows = panel.search("jon")
+                .waitForValuesToLoad()
+                .getRows();
 
         for (int i = 1; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
-            Assert.assertTrue(!row.getLabel().isDisplayed() || row.getLabel().getText().toLowerCase().contains("jon"),
+            assertTrue(!row.getLabel().isDisplayed() || row.getLabel().getText().toLowerCase().contains("jon"),
                     "Row is displayed whan matches search criteria");
         }
     }
 
     @Test(dependsOnGroups = {"filterInit"})
     public void testSelectAllFiltered() throws InterruptedException {
-        panel.getDeselectAll().click();
+        panel.deselectAll().search("jon").waitForValuesToLoad();
 
-        panel.getSearch().sendKeys("jon");
-        panel.waitForValuesToLoad();
+        panel.selectAll();
 
-        panel.getSelectAll().click();
-
-        panel.getSearch().sendKeys("\u0008\u0008\u0008");
-        panel.waitForValuesToLoad();
-
-        rows = panel.getRows();
+        rows = panel.search("\u0008\u0008\u0008")
+            .waitForValuesToLoad()
+            .getRows();
 
         for (int i = 1; i < rows.size(); i++) {
-            FilterWidget.FilterPanel.FilterPanelRow row = rows.get(i);
+            FilterPanelRow row = rows.get(i);
 
-            Assert.assertTrue(!row.getLabel().isSelected() || row.getLabel().getText().toLowerCase().contains("jon"),
+            assertTrue(!row.getLabel().isSelected() || row.getLabel().getText().toLowerCase().contains("jon"),
                     "Row is displayed whan matches search criteria");
         }
     }
-
 }

@@ -4,6 +4,8 @@ import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -56,9 +58,6 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class, 'c-confirmDeleteDialog')]//button[text()='Delete']")
     private WebElement dashboardTabDeleteConfirmButton;
 
-    @FindBy(className = "yui3-c-filterdashboardwidget")
-    private List<FilterWidget> filters;
-
     @FindBy(className = "yui3-c-projectdashboard-content")
     private DashboardContent content;
 
@@ -95,7 +94,7 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public List<FilterWidget> getFilters() {
-        return filters;
+        return content.getFilters();
     }
 
     public DashboardContent getContent() {
@@ -285,15 +284,11 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public FilterWidget getFilterWidget(String condition) {
-        // need to refresh page so filter widget can load its root element when accessing
-        browser.navigate().refresh();
-        waitForDashboardPageLoaded(browser);
+        return content.getFilterWidget(condition);
+    }
 
-        for (FilterWidget filter : getFilters()) {
-            if (!filter.getRoot().getAttribute("class").contains("s-" + condition)) continue;
-            return filter;
-        }
-        return null;
+    public FilterWidget getFirstFilter() {
+        return content.getFirstFilter();
     }
 
     public boolean isLocked() {

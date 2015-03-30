@@ -3,16 +3,18 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import java.util.List;
 
 import com.gooddata.qa.CssUtils;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 
 import org.jboss.arquillian.graphene.Graphene;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
@@ -23,6 +25,9 @@ public class DashboardContent extends AbstractFragment {
 
     @FindBy(css = ".geo-content-wrapper")
     private List<DashboardGeoChart> geoCharts;
+
+    @FindBy(className = "yui3-c-filterdashboardwidget")
+    private List<FilterWidget> filters;
 
     public int getNumberOfReports() {
         return reports.size();
@@ -55,5 +60,26 @@ public class DashboardContent extends AbstractFragment {
         return Graphene.createPageFragment(TableReport.class,
                 waitForElementVisible(this.getRoot().findElement(
                         By.cssSelector(".s-" + CssUtils.simplifyText(reportName)))));
+    }
+
+    public List<FilterWidget> getFilters() {
+        return filters;
+    }
+
+    public FilterWidget getFirstFilter() {
+        return filters.get(0);
+    }
+
+    public FilterWidget getFilterWidget(final String condition) {
+        // need to refresh page so filter widget can load its root element when accessing
+        browser.navigate().refresh();
+        waitForDashboardPageLoaded(browser);
+
+        return Iterables.find(filters, new Predicate<FilterWidget>() {
+            @Override
+            public boolean apply(FilterWidget input) {
+                return input.getRoot().getAttribute("class").contains("s-" + condition);
+            }
+        }, null);
     }
 }

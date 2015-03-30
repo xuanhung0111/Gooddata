@@ -18,8 +18,9 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
-import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget.FilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanelRow;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
@@ -426,9 +427,9 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
             }
         }
         filter.openPanel();
-        FilterPanel panel = filter.getPanel();
+        AttributeFilterPanel panel = filter.getPanel(AttributeFilterPanel.class);
         panel.waitForValuesToLoad();
-        List<FilterWidget.FilterPanel.FilterPanelRow> rows = panel.getRows();
+        List<FilterPanelRow> rows = panel.getRows();
         Actions actions = new Actions(browser);
         actions.moveToElement(rows.get(0).getRoot()).build().perform();
         Thread.sleep(1000);
@@ -438,7 +439,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         assertEquals("only", selectedOnly.getText());
         selectedOnly.sendKeys("something");
         selectedOnly.click();
-        waitForElementVisible(panel.getApply()).click();
+        panel.submit();
         Thread.sleep(4000);
         Screenshots.takeScreenshot(browser, "scatter-explorer-applied-filter", this.getClass());
         waitForElementVisible(BY_IFRAME_SCATTER, browser);
