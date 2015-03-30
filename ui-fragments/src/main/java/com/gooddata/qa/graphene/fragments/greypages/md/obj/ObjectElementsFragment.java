@@ -1,7 +1,10 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.obj;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
-import net.minidev.json.JSONObject;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+
+import java.util.ArrayList;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
@@ -9,11 +12,7 @@ import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.ArrayList;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ObjectElementsFragment extends AbstractGreyPagesFragment {
 

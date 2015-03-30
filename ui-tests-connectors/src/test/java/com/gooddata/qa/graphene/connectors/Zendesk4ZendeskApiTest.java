@@ -3,16 +3,16 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.qa.graphene.AbstractGreyPageTest;
-import com.gooddata.qa.graphene.AbstractTest;
-import com.gooddata.qa.utils.http.RestApiClient;
+import static org.testng.Assert.fail;
+
+import java.io.IOException;
+
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
-import static org.testng.Assert.fail;
+import com.gooddata.qa.graphene.AbstractGreyPageTest;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 @Test(groups = {"connectors", "zendesk4", "apiTests"}, description = "Checklist tests for Zendesk Helper")
 public class Zendesk4ZendeskApiTest extends AbstractGreyPageTest {

@@ -1,16 +1,11 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.query.attributes;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+
+import org.json.JSONException;
+import org.openqa.selenium.By;
+
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class QueryAttributesFragment extends AbstractGreyPagesFragment {
 
