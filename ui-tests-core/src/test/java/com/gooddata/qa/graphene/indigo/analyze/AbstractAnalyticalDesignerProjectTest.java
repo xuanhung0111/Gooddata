@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -20,6 +21,7 @@ import java.util.TimeZone;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -67,6 +69,8 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
     protected String attribute3;
 
     protected String notAvailableAttribute;
+
+    private boolean isWalkmeTurnOff = false;
 
     @SuppressWarnings("serial")
     private static final Map<String, String> walkmeContents = new HashMap<String, String>() {{
@@ -128,6 +132,25 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
             waitForElementVisible(nextBtn, browser).click();
         }
         waitForElementVisible(doneBtn, browser).click();
+        isWalkmeTurnOff = true;
+    }
+
+    // This method makes sure to turn off walkme for another test
+    @Test(dependsOnMethods = {"testWalkme"}, groups = {"init"})
+    public void turnOffWalkme() {
+        if (isWalkmeTurnOff) {
+            return;
+        }
+
+        initAnalysePage();
+
+        try {
+            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-close"), browser);
+            walkmeCloseElement.click();
+            waitForElementNotPresent(walkmeCloseElement);
+        } catch (TimeoutException e) {
+            System.out.println("Walkme dialog is not appeared!");
+        }
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
