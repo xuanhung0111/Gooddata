@@ -282,6 +282,6 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     }
 
     private TableReport getDashboardTableReport(String reportName) {
-        return dashboardsPage.getContent().getTableReport(reportName);
+        return dashboardsPage.getContent().getReport(reportName, TableReport.class);
     }
 }

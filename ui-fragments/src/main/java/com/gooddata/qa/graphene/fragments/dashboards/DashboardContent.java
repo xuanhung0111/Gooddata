@@ -5,7 +5,6 @@ import java.util.List;
 import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -39,6 +38,17 @@ public class DashboardContent extends AbstractFragment {
         return Graphene.createPageFragment(clazz, reports.get(reportIndex));
     }
 
+    public <T extends AbstractReport> T getReport(final String name, Class<T> clazz) {
+        return Graphene.createPageFragment(clazz, Iterables.find(reports, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return name.equals(waitForElementVisible(
+                        By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle a"), input)
+                        .getAttribute("title"));
+            }
+        }));
+    }
+
     public <T extends AbstractReport> T getLatestReport(Class<T> clazz) {
         return getReport(reports.size() - 1, clazz);
     }
@@ -55,12 +65,6 @@ public class DashboardContent extends AbstractFragment {
         By eleBy =  By.xpath(REPORT_IMAGE_LOCATOR.replace("${reportName}", CssUtils.simplifyText(reportName)));
         return waitForElementVisible(eleBy, browser);
      }
-
-    public TableReport getTableReport(String reportName) {
-        return Graphene.createPageFragment(TableReport.class,
-                waitForElementVisible(this.getRoot().findElement(
-                        By.cssSelector(".s-" + CssUtils.simplifyText(reportName)))));
-    }
 
     public List<FilterWidget> getFilters() {
         return filters;
