@@ -79,7 +79,9 @@ public class WidgetConfigPanel extends AbstractFragment {
 
     public enum Tab {
         DRILLING("Drilling", "s-Drilling"),
-        PARENT_FILTERS("Parent Filters", "s-Parent");
+        PARENT_FILTERS("Parent Filters", "s-Parent"),
+        SELECTION("Selection", "s-Selection"),
+        FILTERS("Filters", "filterTab");
 
         private final String tabName;
         private final String panelClassName;
