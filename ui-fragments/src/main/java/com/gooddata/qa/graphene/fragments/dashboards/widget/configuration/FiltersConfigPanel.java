@@ -18,6 +18,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class FiltersConfigPanel extends AbstractFragment {
@@ -44,10 +45,15 @@ public class FiltersConfigPanel extends AbstractFragment {
 
     public boolean areAllFiltersDisabled() {
         waitForCollectionIsNotEmpty(filters);
-        return filters.get(0).getAttribute("class").contains(DISABLED);
+        return Iterables.all(filters, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement filter) {
+                return filter.getAttribute("class").contains(DISABLED);
+            }
+        });
     }
 
-    public List<String> getAllAffectedFilters() {
+    public List<String> getAllSelectedFilters() {
         waitForCollectionIsNotEmpty(filters);
         return Lists.newArrayList(FluentIterable.from(filters).filter(new Predicate<WebElement>() {
             @Override
@@ -62,7 +68,7 @@ public class FiltersConfigPanel extends AbstractFragment {
         }));
     }
 
-    public void removeFiltersFromAffectedList(String... filterNames) {
+    public void removeFiltersFromSelectedList(String... filterNames) {
         waitForCollectionIsNotEmpty(filters);
         Collection<WebElement> affectedELements = Collections2.filter(filters, new Predicate<WebElement>() {
             @Override

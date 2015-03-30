@@ -34,6 +34,8 @@ public class AttributeFilterPanel extends FilterPanel {
     private static final String CLEAR_VISIBLE = ":not(.gdc-hidden)>.clearVisible";
     private static final String SELECT_VISIBLE = ":not(.gdc-hidden)>.selectVisible";
 
+    private static final By ATTRIBUTE_LOADED_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loaded");
+
     public List<String> getAllAtributeValues() {
         List<String> actualFilterElements = new ArrayList<String>();
         waitForCollectionIsNotEmpty(listAttrValues);
@@ -53,7 +55,7 @@ public class AttributeFilterPanel extends FilterPanel {
     }
 
     public AttributeFilterPanel waitForValuesToLoad() {
-        waitForElementPresent(By.cssSelector(".yui3-c-simpleColumn-window.loaded"), browser);
+        waitForElementPresent(ATTRIBUTE_LOADED_LOCATOR, browser);
         return this;
     }
 
