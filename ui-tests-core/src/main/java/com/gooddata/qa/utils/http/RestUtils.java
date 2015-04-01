@@ -301,25 +301,38 @@ public class RestUtils {
     
     private static void setDrillReportTarget(final RestApiClient restApiClient, String projectID,
             String dashboardID, String target, String exportFormat) throws JSONException, IOException {
-        String dashboardEditModeURI = String.format(DASHBOARD_EDIT_MODE_LINK, projectID, dashboardID);
-        HttpRequestBase getRequest = restApiClient.newGetMethod(dashboardEditModeURI);
-        HttpResponse response = restApiClient.execute(getRequest);
-        assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
-        JSONObject json = new JSONObject(EntityUtils.toString(response.getEntity()));
-        JSONObject drills = json.getJSONObject("projectDashboard").getJSONObject("content").getJSONArray("tabs").
-                getJSONObject(0).getJSONArray("items").getJSONObject(0).getJSONObject("reportItem").
-                getJSONArray("drills").getJSONObject(0);
-        drills.put("target", target);
-        if (TARGET_POPUP.equals(target)) {
-            drills.remove("export");
-        } else if (TARGET_EXPORT.equals(target)) {
-            JSONObject exportOptions = new JSONObject();
-            exportOptions.put("format", exportFormat);
-            drills.put("export", exportOptions );
+        HttpRequestBase getRequest = null;
+        HttpRequestBase postRequest = null;
+        try {
+            String dashboardEditModeURI = String.format(DASHBOARD_EDIT_MODE_LINK, projectID, dashboardID);
+            getRequest = restApiClient.newGetMethod(dashboardEditModeURI);
+            HttpResponse response = restApiClient.execute(getRequest);
+            assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
+            JSONObject json = new JSONObject(EntityUtils.toString(response.getEntity()));
+            JSONObject drills = json.getJSONObject("projectDashboard").getJSONObject("content").getJSONArray("tabs").
+                    getJSONObject(0).getJSONArray("items").getJSONObject(0).getJSONObject("reportItem").
+                    getJSONArray("drills").getJSONObject(0);
+            drills.put("target", target);
+            if (TARGET_POPUP.equals(target)) {
+                drills.remove("export");
+            } else if (TARGET_EXPORT.equals(target)) {
+                JSONObject exportOptions = new JSONObject();
+                exportOptions.put("format", exportFormat);
+                drills.put("export", exportOptions );
+            }
+            postRequest = restApiClient.newPostMethod(dashboardEditModeURI, json.toString());
+            response = restApiClient.execute(postRequest);
+            assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
+        } finally {
+            if (getRequest != null) {
+                getRequest.releaseConnection();
+            }
+            if (postRequest !=null) {
+                postRequest.releaseConnection();
+            }
+           
         }
-        HttpRequestBase postRequest = restApiClient.newPostMethod(dashboardEditModeURI, json.toString());
-        response = restApiClient.execute(postRequest);
-        assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
+        
     }
 
     public static void enableFeatureFlagInProject(RestApiClient restApiClient, String projectId,

@@ -222,7 +222,7 @@ public class TableReport extends AbstractReport {
             if (!value.equals(e.getText()))
                 continue;
             e.click();
-            break;
+            return;
         }
         throw new IllegalArgumentException(String.format("No attribute value %s to drill on", value));
     }
