@@ -52,7 +52,7 @@ public class DataloadProcessTest extends AbstractDLUITest{
                 .withAuthorizationToken(testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
 
-        setDefaultSchemaForOutputStage(adsInstance.getId());
+        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
         assertEquals(RestUtils.getProcessesList(getRestApiClient(), projectId).getDataloadProcessCount(), 1);
         assertEquals(getDataloadProcessId(), dataloadProcessId);
     }
@@ -62,7 +62,7 @@ public class DataloadProcessTest extends AbstractDLUITest{
         createDataLoadProcess();
         RestUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(), projectId);
         assertEquals(RestUtils.getProcessesList(getRestApiClient(), projectId).getDataloadProcessCount(), 0);
-        setDefaultSchemaForOutputStage(adsInstance.getId());
+        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
         Processes dataloadProcessList = RestUtils.getProcessesList(getRestApiClient(), projectId);
         assertEquals(dataloadProcessList.getDataloadProcessCount(), 1);
         assertEquals(dataloadProcessList.getDataloadProcess().getName(), DEFAULT_DATAlOAD_PROCESS_NAME);

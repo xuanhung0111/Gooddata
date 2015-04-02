@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static java.lang.String.format;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.testng.Assert.*;
 
@@ -39,6 +40,7 @@ import com.gooddata.qa.graphene.enums.DLUIProcessParameters;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import com.google.common.collect.Lists;
@@ -49,7 +51,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
             "DLUI/graph/CreateAndCopyDataToADS.grf";
 
-    private static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
+    protected static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     private static final String PROCESS_EXECUTION_URI = DATALOAD_PROCESS_URI + "%s/executions";
     private static final String ADS_INSTANCES_URI = "gdc/datawarehouse/instances/";
     private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
@@ -58,6 +60,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String OUTPUT_STAGE_METADATA_URI =
             "/gdc/dataload/projects/%s/outputStage/metadata";
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
+
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String FROM = "no-reply@gooddata.com";
 
@@ -76,6 +79,9 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     protected String sqlFilePath;
     protected String zipFilePath;
     protected String INITIAL_LDM_MAQL_FILE = "create-ldm.txt";
+    protected String technicalUser;
+    protected String technicalUserPassword;
+    protected String technicalUserUri;
 
     protected static final String ADS_URL =
             "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
@@ -101,7 +107,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                         testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
 
-        setDefaultSchemaForOutputStage(adsInstance.getId());
+        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
         assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
 
         cloudconnectProcess =
@@ -152,9 +158,10 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected void dropAddedFieldsInLDM(String maqlFile) {
         String pollingUri = sendRequestToUpdateModel(maqlFile);
-        if (!"OK".equals(RestUtils.getPollingState(getRestApiClient(), pollingUri))) {
-            HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
-            HttpResponse getResponse = restApiClient.execute(getRequest);
+        String pollingState = RestUtils.getPollingState(getRestApiClient(), pollingUri);
+        if (!"OK".equals(pollingState)) {
+            HttpRequestBase getRequest = getRestApiClient().newGetMethod(pollingUri);
+            HttpResponse getResponse = getRestApiClient().execute(getRequest);
             String errorMessage = "";
             try {
                 errorMessage =
@@ -165,6 +172,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 throw new IllegalStateException("There is an exeption when getting error message!",
                         e);
             }
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
 
             System.out.println("LDM update is failed with error message: " + errorMessage);
             assertEquals(errorMessage, "The object (%s) doesn't exist.");
@@ -187,6 +196,21 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
         adsInstance.withId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
         System.out.println("adsId: " + adsInstance.getId());
+    }
+
+    protected void addUserToAdsInstance(ADSInstance adsInstance, String userUri, String user,
+            String userRole) {
+        openUrl(ADS_INSTANCES_URI + adsInstance.getId() + "/users");
+        storageUsersForm.verifyValidAddUserForm();
+        try {
+            storageUsersForm.fillAddUserToStorageForm(userRole, null, user, true);
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "There is an exeception when adding user to ads instance!", e);
+        }
+        takeScreenshot(browser, "datawarehouse-add-user-filled-form", this.getClass());
+        assertTrue(browser.getCurrentUrl().contains(userUri.replace("/gdc/account/profile/", "")),
+                "The user is not added to ads instance successfully!");
     }
 
     protected void deleteADSInstance(ADSInstance adsInstance) {
@@ -234,6 +258,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                     FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
             prepareProcessExecutionBody(adsUrl, createTableSql, copyTableSql);
             String postBody = processExecution.toString();
+
             String pollingUri = executeProcessRequest(processExecutionUri, postBody);
 
             pollingExecutionStatus(pollingUri);
@@ -243,7 +268,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         }
     }
 
-    protected void setDefaultSchemaForOutputStage(String adsId) {
+    protected void setDefaultSchemaForOutputStage(RestApiClient restApiClient, String adsId) {
         String schemaUri = String.format(ADS_INSTANCE_SCHEMA_URI, adsId);
         JSONObject outputStageObj = new JSONObject();
         try {
@@ -256,10 +281,10 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
         String putUri = String.format(OUTPUTSTAGE_URI, getWorkingProject().getProjectId());
         String putBody = outputStageObj.toString();
-        HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
+        HttpRequestBase putRequest = restApiClient.newPutMethod(putUri, putBody);
         putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
 
-        HttpResponse putResponse = getRestApiClient().execute(putRequest);
+        HttpResponse putResponse = restApiClient.execute(putRequest);
         int responseStatusCode = putResponse.getStatusLine().getStatusCode();
 
         System.out.println(putResponse.toString());
@@ -419,11 +444,13 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                     new JSONObject(EntityUtils.toString(postResponse.getEntity()))
                             .getJSONObject("executionTask").getJSONObject("links")
                             .getString("detail");
+
+            EntityUtils.consumeQuietly(postResponse.getEntity());
         } catch (Exception e) {
             throw new IllegalStateException("There is an exeception during running process! ", e);
+        } finally {
+            postRequest.releaseConnection();
         }
-
-        EntityUtils.consumeQuietly(postResponse.getEntity());
 
         return pollingUri;
     }
@@ -439,15 +466,18 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                         new JSONObject(EntityUtils.toString(getResponse.getEntity()))
                                 .getJSONObject("executionDetail").get("status").toString();
                 System.out.println("Current execution state is: " + state);
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             } while ("QUEUED".equals(state) || "RUNNING".equals(state));
+
+            assertEquals(state, "OK", "Invalid execution status: " + state);
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
         } catch (Exception e) {
             throw new IllegalStateException(
                     "There is an exception during polling execution status!", e);
+        } finally {
+            getRequest.releaseConnection();
         }
-        EntityUtils.consumeQuietly(getResponse.getEntity());
-
-        assertEquals(state, "OK", "Invalid execution status: " + state);
     }
 
     private void prepareCCProcessCreationBody(ProcessInfo processInfo, String uploadFilePath) {
