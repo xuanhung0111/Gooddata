@@ -4,31 +4,29 @@ import static org.testng.Assert.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.openqa.selenium.WebDriver;
-import com.beust.jcommander.internal.Lists;
+
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTest {
 
-    private static final String FAILED_DATA_ADDING_NOTIFICATION_SUBJECT =
+    protected static final String FAILED_DATA_ADDING_NOTIFICATION_SUBJECT =
             "Error adding new data to %s project";
-    private static final String SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT =
+    protected static final String SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT =
             "New data is ready to use in the %s project";
-
-    private static final String FROM = "no-reply@gooddata.com";
 
     private static final String GD_PROJECT_LINK = "https://%s/#s=/gdc/projects/%s";
     private static final String GD_SUPPORT_LINK = "https://support.gooddata.com";
@@ -36,49 +34,44 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
     protected String imapEditorUser;
     protected String imapEditorPassword;
 
-    protected void checkSuccessfulDataAddingEmail(long requestTime, String... fieldNames) {
-        String subject =
-                String.format(SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT, getWorkingProject()
-                        .getProjectName());
-        assertSuccessDataAddingEmailContent(getEmailOfAdminUser(subject, requestTime), fieldNames);
-    }
-
-    protected void checkSuccessfulDataAddingEmailForEditor(long requestTime, String... fieldNames) {
-        String subject =
-                String.format(SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT, getWorkingProject()
-                        .getProjectName());
-        assertSuccessDataAddingEmailContent(getEmailOfEditorUser(subject, requestTime), fieldNames);
-    }
-
-    protected void checkFailedDataAddingEmail(long requestTime, String... fieldNames) {
-        String subject =
-                String.format(FAILED_DATA_ADDING_NOTIFICATION_SUBJECT, getWorkingProject()
-                        .getProjectName());
-        assertFailedDataAddingEmailContent(getEmailOfAdminUser(subject, requestTime), fieldNames);
-    }
-
-    protected void checkFailedDataAddingEmailForEditor(long requestTime, String... fieldNames) {
-        String subject =
-                String.format(FAILED_DATA_ADDING_NOTIFICATION_SUBJECT, getWorkingProject()
-                        .getProjectName());
-        assertFailedDataAddingEmailContentForEditor(getEmailOfEditorUser(subject, requestTime),
+    protected void checkSuccessfulDataAddingEmail(long receivedTime, String... fieldNames) {
+        assertSuccessDataAddingEmailContent(
+                getEmailOfAdminUser(SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
                 fieldNames);
     }
 
-    private Document getEmailOfEditorUser(String subject, long requestTime) {
+    protected void checkSuccessfulDataAddingEmailForEditor(long receivedTime, String... fieldNames) {
+        assertSuccessDataAddingEmailContent(
+                getEmailOfEditorUser(SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
+                fieldNames);
+    }
+
+    protected void checkFailedDataAddingEmail(long receivedTime, String... fieldNames) {
+        assertFailedDataAddingEmailContent(
+                getEmailOfAdminUser(FAILED_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
+                fieldNames);
+    }
+
+    protected void checkFailedDataAddingEmailForEditor(long receivedTime, String... fieldNames) {
+        assertFailedDataAddingEmailContentForEditor(
+                getEmailOfEditorUser(FAILED_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
+                fieldNames);
+    }
+
+    private Document getEmailOfEditorUser(String subject, long receivedTime) {
         ImapClient imapClient = new ImapClient(imapHost, imapEditorUser, imapEditorPassword);
-        return getEmailContent(subject, requestTime, imapClient);
+        return getEmailContent(subject, receivedTime, imapClient);
     }
 
-    private Document getEmailOfAdminUser(String subject, long requestTime) {
+    private Document getEmailOfAdminUser(String subject, long receivedTime) {
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        return getEmailContent(subject, requestTime, imapClient);
+        return getEmailContent(subject, receivedTime, imapClient);
     }
 
-    private Document getEmailContent(String subject, long requestTime, ImapClient imapClient) {
+    private Document getEmailContent(String subject, long receivedTime, ImapClient imapClient) {
         try {
             System.out.println("Waiting for notification...");
-            Message notification = getNotification(imapClient, subject, requestTime);
+            Message notification = getNotification(imapClient, subject, receivedTime);
             Document message = Jsoup.parse(ImapClient.getEmailBody(notification));
             System.out.println("Time request: " + notification.getReceivedDate().getTime());
             return message;
@@ -91,7 +84,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
 
     private void assertSuccessDataAddingEmailContent(Document message, String... fieldNames) {
         String exploreNewData = "Explore the newly added data.";
-        String requestTimeText = "You requested the fields at ";
+        String receivedTimeText = "You requested the fields at ";
         String expectedExploreNewDataLink =
                 String.format(GD_PROJECT_LINK + "|analysisPage|empty-report|empty-report",
                         testParams.getHost(), getWorkingProject().getProjectId());
@@ -100,9 +93,9 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
                 expectedExploreNewDataLink, "Incorrect empty report link in email content!");
         assertEquals(message.getElementsContainingOwnText(getWorkingProject().getProjectName())
                 .attr("href"), getWorkingProjectLink(), "Incorrect project link in email content!");
-        String requestTimeMessage = message.getElementsContainingOwnText(requestTimeText).text();
-        assertTrue(isThisDateValid(requestTimeMessage.replace(requestTimeText, "")),
-                "Invalid time format: " + requestTimeMessage);
+        String receivedTimeMessage = message.getElementsContainingOwnText(receivedTimeText).text();
+        assertTrue(isThisDateValid(receivedTimeMessage.replace(receivedTimeText, "")),
+                "Invalid time format: " + receivedTimeMessage);
         assertEquals(message.getElementsContainingOwnText(GD_SUPPORT_LINK).attr("href"),
                 GD_SUPPORT_LINK, "Incorrect support link in email content!");
 
@@ -129,13 +122,11 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
     }
 
     private void assertFailedDataAddingEmailContentForEditor(Document message, String... fieldNames) {
-        String GDSupportLink = "https://support.gooddata.com";
-
         assertEquals(message.getElementsContainingOwnText(getWorkingProject().getProjectName())
                 .attr("href"), getWorkingProjectLink(), "Incorrect project link in email content!");
         assertTrue(message.getElementsContainingOwnText("execution log").isEmpty());
-        assertEquals(message.getElementsContainingOwnText(GDSupportLink).attr("href"),
-                "https://support.gooddata.com");
+        assertEquals(message.getElementsContainingOwnText(GD_SUPPORT_LINK).attr("href"),
+                GD_SUPPORT_LINK);
 
         List<Element> fieldNameElements = message.getElementsByTag("li");
         assertEquals(fieldNameElements.size(), fieldNames.length, "Incorrect number of fields");
@@ -154,30 +145,16 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
         }
     }
 
-    private static Message getNotification(final ImapClient imapClient, final String subject,
-            long requestTime) throws MessagingException {
-        Message[] notifications = new Message[0];
+    private Message getNotification(final ImapClient imapClient, final String subject,
+            long receivedTime) throws MessagingException {
+        Collection<Message> notifications =
+                ImapUtils.waitForMessageWithExpectedReceivedTime(imapClient, GDEmails.FROM_NO_REPLY,
+                        String.format(subject, getWorkingProject().getProjectName()), receivedTime);
 
-        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(5, TimeUnit.SECONDS)
-                .withMessage("Notification is not sent!").until(new Predicate<WebDriver>() {
+        assertTrue(notifications.size() > 0, "The notification was not sent!");
+        assertEquals(notifications.size(), 1, "More than one notification were sent!");
 
-                    @Override
-                    public boolean apply(WebDriver browser) {
-                        System.out.println("Waiting for notification...");
-                        return imapClient.getMessagesFromInbox(FROM, subject).length > 0;
-                    }
-                });
-        notifications = imapClient.getMessagesFromInbox(FROM, subject);
-
-        List<Message> expectedNotification = Lists.newArrayList();
-        for (Message notification : notifications) {
-            if (notification.getReceivedDate().getTime() > requestTime)
-                expectedNotification.add(notification);
-        }
-        assertTrue(expectedNotification.size() > 0, "The notification was not sent!");
-        assertEquals(1, expectedNotification.size(), "More than one notification were sent!");
-
-        return expectedNotification.get(0);
+        return Iterables.getLast(notifications);
     }
 
     private boolean isThisDateValid(String time) {

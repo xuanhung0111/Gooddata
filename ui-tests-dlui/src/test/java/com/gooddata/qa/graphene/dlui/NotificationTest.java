@@ -27,10 +27,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
-        maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
-        sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
-        projectTitle = "Dlui-annie-dialog-test";
+        projectTitle = "Dlui-notification-test-" + System.currentTimeMillis();
 
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
@@ -43,21 +40,21 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         technicalUserUri = testParams.loadProperty("technicalUserUri");
     }
 
-    // Domain user will add george and annie to project
-    @Test(dependsOnMethods = "createProject")
+    /*
+     * The tests need 2 imap users which are also GoodData accounts (as George and Annie) to add new
+     * data and check mail. Domain user will add George and Annie to project.
+     */
+    @Test(dependsOnMethods = "createProject", groups = {"initialDataForDLUI"})
     public void addGeorgeAndAnnieUserToProject() throws ParseException, JSONException, IOException {
         addUserToProject(technicalUserUri, UserRoles.ADMIN);
         addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
     }
 
-    @Test(dependsOnMethods = "addGeorgeAndAnnieUserToProject")
-    public void initialData() {
-        try {
-            RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
-        } catch (JSONException e) {
-            throw new IllegalStateException("There is a problem when enable data explorer! ", e);
-        }
+    @Override
+    @Test(dependsOnMethods = {"addGeorgeAndAnnieUserToProject"}, groups = {"initialDataForDLUI"})
+    public void prepareLDMAndADSInstance() throws JSONException {
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
 
         updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
 
@@ -77,7 +74,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         createCloudConnectProcess(cloudconnectProcess);
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "george")
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "george")
     public void signInWithGeorge() {
         logout();
         signInAtUI(technicalUser, technicalUserPassword);

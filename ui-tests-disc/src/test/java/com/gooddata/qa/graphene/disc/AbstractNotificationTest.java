@@ -8,30 +8,31 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.apache.commons.lang.SystemUtils;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.disc.ExecutionDetails;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
 import com.gooddata.qa.graphene.entity.disc.NotificationParameters;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.google.common.base.Predicate;
+import com.gooddata.qa.utils.mail.ImapUtils;
+import com.google.common.collect.Iterables;
 
 public class AbstractNotificationTest extends AbstractDISCTest {
 
@@ -71,7 +72,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                     + "<a href=\"http://support.gooddata.com/entries/23541617-Automatic-Disabling-of-Failed-Schedules\">GoodData Support Portal</a>.</p>";
     protected static final String NOTIFICATION_RULES_EMPTY_STATE_MESSAGE =
             "No event (eg. schedule start, finish, fail, etc.) will trigger a notification email.";
-    protected static final String FROM = "no-reply@gooddata.com";
+
     protected String successNotificationSubject = "Success Notification_"
             + Calendar.getInstance().getTime();
     protected String successNotificationMessage = "params.PROJECT=${params.PROJECT}" + "*"
@@ -311,20 +312,11 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     protected static Message getNotification(final ImapClient imapClient, final String subject) {
-        Message[] notifications = new Message[0];
+        Collection<Message> notifications =
+                ImapUtils.waitForMessage(imapClient, GDEmails.FROM_NO_REPLY, subject);
+        assertTrue(notifications.size() == 1, "More than 1 notification!");
 
-        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(5, TimeUnit.SECONDS)
-                .withMessage("Notification is not sent!").until(new Predicate<WebDriver>() {
-
-                    @Override
-                    public boolean apply(WebDriver arg0) {
-                        System.out.println("Waiting for notification...");
-                        return imapClient.getMessagesFromInbox(FROM, subject).length > 0;
-                    }
-                });
-        notifications = imapClient.getMessagesFromInbox(FROM, subject);
-        assertTrue(notifications.length == 1, "More than 1 notification!");
-        return notifications[0];
+        return Iterables.getLast(notifications);
     }
 
     private void checkRepeatFailureEmail(ImapClient imapClient, ScheduleBuilder scheduleBuilder) {
