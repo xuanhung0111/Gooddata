@@ -2,20 +2,28 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class PermissionsDialog extends AbstractFragment {
 
     private static final By GRANTEE_EMAIL_CSS_SELECTOR = By.cssSelector(".grantee-email");
+    private static final By GRANTEE_NAME_CSS_SELECTOR = By.cssSelector(".grantee-name");
+    private static final By ADDED_GRANTEE_INFO_CSS_SELECTOR = By.cssSelector(".grantee-info");
     private static final By ADDED_GRANTEE_DELETE_CSS_SELECTOR = By.cssSelector(".ss-delete");
+    private static final By ADDED_GRANTEE_UNDO_CSS_SELECTOR = By.cssSelector(".grantee-revoke>a");
     private static final By GRANTEE_LIST_CONTAINER_SELECTOR = By.cssSelector(".ember-list-container .grantee");
+    private static final By LOCK_OPTIONS_SELECTOR = By.cssSelector("input[name=settings-lock-radio]");
     public static final By GRANTEES_PANEL = By.cssSelector(".grantees");
     public static final By ALERT_INFOBOX_CSS_SELECTOR = By.cssSelector(".ss-alert");
 
@@ -59,6 +67,10 @@ public class PermissionsDialog extends AbstractFragment {
     public WebElement getLockAllRadio() {
         return lockAllRadio;
     }
+    
+    public boolean isLockOptionDisplayed() {
+        return browser.findElements(LOCK_OPTIONS_SELECTOR).size() == 2;
+    }
 
     public WebElement getVisibilityButton() {
         return visibilityButton;
@@ -79,7 +91,8 @@ public class PermissionsDialog extends AbstractFragment {
 
     /**
      * @param publishType  {@link com.gooddata.qa.graphene.enums.PublishType#EVERYONE_CAN_ACCESS} - publish to everyone,
-     * {@link com.gooddata.qa.graphene.enums.PublishType#SPECIFIC_USERS_CAN_ACCESS}  - publish to specific user (by default owner + others can be added in different dialog)
+     * {@link com.gooddata.qa.graphene.enums.PublishType#SPECIFIC_USERS_CAN_ACCESS}  - 
+     * publish to specific user (by default owner + others can be added in different dialog)
      */
     public void publish(PublishType publishType) {
         openVisibilityPanel();
@@ -95,15 +108,62 @@ public class PermissionsDialog extends AbstractFragment {
         }
     }
 
-    public AddGranteesDialog openAddGranteePanel() {
-        waitForElementVisible(addGranteesButton).click();
+    public AddGranteesDialog openAddGranteePanel() throws InterruptedException {
+        waitForElementVisible(addGranteesButton);
+        Graphene.waitGui().withTimeout(2000, TimeUnit.SECONDS).pollingEvery(500, TimeUnit.MILLISECONDS).
+                    until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver arg0) {
+                return addGranteesButton.isEnabled();
+            }
+        });
+        addGranteesButton.click();
         return  waitForFragmentVisible(addGranteesDialog);
     }
 
     public void removeUser(final String login) {
         for (WebElement element : getAddedGrantees()) {
-            if (login.equals(element.findElement(GRANTEE_EMAIL_CSS_SELECTOR).getText().trim())) {
+            if (element.findElements(GRANTEE_EMAIL_CSS_SELECTOR).size() != 0 && 
+                    login.equals(element.findElement(GRANTEE_EMAIL_CSS_SELECTOR).getText().trim())) {
                 element.findElement(ADDED_GRANTEE_DELETE_CSS_SELECTOR).click();
+                return;
+            }
+        }
+    }
+
+    public void removeGroup(final String groupName) {
+        for (WebElement element : getAddedGrantees()) {
+            if (groupName.equals(element.findElement(GRANTEE_NAME_CSS_SELECTOR).getText().trim())) {
+                element.findElement(ADDED_GRANTEE_DELETE_CSS_SELECTOR).click();
+                return;
+            }
+        }
+    }
+
+    public boolean checkCannotRemoveOwner() {
+        for (WebElement element : getAddedGrantees()) {
+            if ("Owner".equals(element.findElement(ADDED_GRANTEE_INFO_CSS_SELECTOR).getText().trim())) {
+                return element.findElements(ADDED_GRANTEE_DELETE_CSS_SELECTOR).size() == 0;
+            }
+        }
+        return true;
+    }
+
+    public void undoRemoveUser(final String login) {
+        for (WebElement element : getAddedGrantees()) {
+            if (element.findElements(GRANTEE_EMAIL_CSS_SELECTOR).size() != 0 && 
+                    login.equals(element.findElement(GRANTEE_EMAIL_CSS_SELECTOR).getText().trim())) {
+                element.findElement(ADDED_GRANTEE_UNDO_CSS_SELECTOR).click();
+                return;
+            }
+        }
+    }
+
+    public void undoRemoveGroup(final String groupName) {
+        for (WebElement element : getAddedGrantees()) {
+            if (groupName.equals(element.findElement(GRANTEE_NAME_CSS_SELECTOR).getText().trim())) {
+                element.findElement(ADDED_GRANTEE_UNDO_CSS_SELECTOR).click();
+                return;
             }
         }
     }
@@ -122,11 +182,11 @@ public class PermissionsDialog extends AbstractFragment {
         return waitForElementVisible(root.findElement(GRANTEES_PANEL));
     }
 
-    public void submitEveryOneCanAccess() {
+    private void submitEveryOneCanAccess() {
         waitForElementVisible(everyOneCanAccessChoose).click();
     }
 
-    public void submitSpecificUsersAccess() {
+    private void submitSpecificUsersAccess() {
         waitForElementVisible(specificUsersAccessChoose).click();
     }
 
@@ -141,5 +201,9 @@ public class PermissionsDialog extends AbstractFragment {
 
     public void cancel() {
         waitForElementVisible(cancel).click();
+    }
+
+    public String getTitleOfSubmitButton() {
+        return waitForElementVisible(submitButton).getText();
     }
 }
