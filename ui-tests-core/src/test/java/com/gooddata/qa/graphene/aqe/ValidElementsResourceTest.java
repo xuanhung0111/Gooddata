@@ -22,13 +22,12 @@ import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -283,6 +282,6 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     }
 
     private TableReport getDashboardTableReport(String reportName) {
-        return dashboardsPage.getContent().getTableReport(reportName);
+        return dashboardsPage.getContent().getReport(reportName, TableReport.class);
     }
 }

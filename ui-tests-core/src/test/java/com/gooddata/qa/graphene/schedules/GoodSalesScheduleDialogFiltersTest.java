@@ -5,11 +5,12 @@ package com.gooddata.qa.graphene.schedules;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectExecutionContext;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;

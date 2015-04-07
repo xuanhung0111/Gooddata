@@ -358,7 +358,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
 
-            dashboardsPage.getFilters().get(0).changeAttributeFilterValue("Email with Bulbs.com on Aug-06-10");
+            dashboardsPage.getFirstFilter().changeAttributeFilterValue("Email with Bulbs.com on Aug-06-10");
 
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.waitForReportLoading();

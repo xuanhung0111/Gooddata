@@ -94,6 +94,11 @@ public class SelectItemPopupPanel extends AbstractFragment {
         });
     }
 
+    public void submitPanel() {
+        waitForElementVisible(addButton).click();
+        waitForPanelNotVisible();
+    }
+
     private void selectCheckboxItem(String item) {
         By label = By.cssSelector("label");
         for (WebElement e : items) {
@@ -146,8 +151,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
         }
 
         if (isNotEmbed) {
-            waitForElementVisible(addButton).click();
-            waitForPanelNotVisible();
+            submitPanel();
         }
     }
 }

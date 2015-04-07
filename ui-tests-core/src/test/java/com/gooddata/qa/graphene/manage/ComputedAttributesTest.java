@@ -231,11 +231,11 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, VARIABLE_NAME);
             dashboardEditBar.saveDashboard();
-            
+
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
-            
-            dashboardsPage.getFilters().get(0).changeAttributeFilterValue("Closed Won");
+
+            dashboardsPage.getFirstFilter().changeAttributeFilterValue("Closed Won");
             Thread.sleep(2000);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             List<String> attributeHeaders = tableReport.getAttributesHeader();
@@ -259,11 +259,11 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, COMPUTED_ATTRIBUTE_NAME);
             dashboardEditBar.saveDashboard();
-            
+
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
-            
-            dashboardsPage.getFilters().get(0).changeAttributeFilterValue("Best", "Great");
+
+            dashboardsPage.getFirstFilter().changeAttributeFilterValue("Best", "Great");
             Thread.sleep(2000);
             TableReport tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             List<String> attributeHeaders = tableReport.getAttributesHeader();
