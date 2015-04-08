@@ -30,6 +30,9 @@ public class ApplicationHeaderBar extends AbstractFragment {
     @FindBy(className = "users-link")
     private WebElement usersLink;
 
+    @FindBy(className = "search-link")
+    private WebElement searchLink;
+
     private static ApplicationHeaderBar getInstance(WebDriver browser) {
         return Graphene.createPageFragment(ApplicationHeaderBar.class,
                 waitForElementVisible(By.className("appHeader"), browser));
@@ -61,6 +64,19 @@ public class ApplicationHeaderBar extends AbstractFragment {
 
     public static void goToUserManagementPage(WebDriver browser) {
         waitForElementVisible(getInstance(browser).usersLink).click();
+    }
+
+    public static void goToSearchPage(WebDriver browser) {
+        waitForElementVisible(getInstance(browser).searchLink).click();
+    }
+
+    public static String getSearchLinkText(WebDriver browser) {
+        return waitForElementVisible(getInstance(browser).searchLink).getText();
+    }
+
+    public static boolean isSearchIconPresent(WebDriver browser) {
+        return waitForElementVisible(getInstance(browser).searchLink).findElements(
+              By.className("search-icon")).size() > 0;
     }
 
     public static void selectProject(String idOrName, WebDriver browser) {

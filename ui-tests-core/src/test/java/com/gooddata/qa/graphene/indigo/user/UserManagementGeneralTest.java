@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.user;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -10,8 +11,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 
 public class UserManagementGeneralTest extends AbstractProjectTest {
 
@@ -27,6 +31,18 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"})
     public void initialize() throws JSONException, IOException {
         enableUserManagementFeature();
+    }
+
+    @Test(dependsOnMethods = {"initialize"}) 
+    public void accessToUserManagementFromHeader() {
+        initDashboardsPage();
+
+        assertTrue(ApplicationHeaderBar.isSearchIconPresent(browser));
+        assertTrue(ApplicationHeaderBar.getSearchLinkText(browser).isEmpty());
+        ApplicationHeaderBar.goToSearchPage(browser);
+
+        ApplicationHeaderBar.goToUserManagementPage(browser);
+        waitForFragmentVisible(userManagementPage);
     }
 
     @Test(dependsOnMethods = {"initialize"})
