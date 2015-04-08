@@ -16,8 +16,6 @@
         <module>ui-tests-dashboards</module>
         <module>ui-tests-tools</module>
         <module>ui-fragments</module>
-        <module>ui-tests-upload</module>
-        <module>ui-tests-filters</module>
         <module>ui-tests-disc</module>
         <module>ui-tests-dlui</module>
     </modules>
