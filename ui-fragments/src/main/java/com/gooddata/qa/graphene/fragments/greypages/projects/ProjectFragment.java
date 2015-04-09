@@ -47,7 +47,6 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         switch (dwhDriver) {
             case PG: this.pg.click(); break;
             case VERTICA: this.vertica.click(); break;
-            case MYSQL: this.mysql.click(); break;
             default: this.pg.click();
         }
 

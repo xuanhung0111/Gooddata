@@ -3,9 +3,7 @@ package com.gooddata.qa.graphene.enums;
 public enum DWHDriver {
 
     PG,
-    VERTICA,
-    @Deprecated
-    MYSQL;
+    VERTICA;
 
     public static DWHDriver getDriverByName(String dwhDriver) {
         if (dwhDriver != null && dwhDriver.length() > 0) {
