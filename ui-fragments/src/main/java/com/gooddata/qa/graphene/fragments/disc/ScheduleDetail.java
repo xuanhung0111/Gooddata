@@ -391,7 +391,6 @@ public class ScheduleDetail extends ScheduleForm {
         waitForElementVisible(manualRunDialog);
         waitForElementVisible(confirmRunButton).click();
         waitForElementVisible(manualStopButton);
-        System.out.println("Schedule is executed manually!");
     }
 
     public void manualStop() {

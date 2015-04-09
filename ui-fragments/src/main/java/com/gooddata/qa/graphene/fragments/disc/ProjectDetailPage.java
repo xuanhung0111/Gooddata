@@ -410,12 +410,12 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     private void clickOnDeleteProcessButton(String processName) {
-        findProcess(processName).findElement(BY_PROCESS_DELETE_BUTTON).click();
+        waitForElementVisible(BY_PROCESS_DELETE_BUTTON, findProcess(processName)).click();
         waitForElementVisible(processDeleteDialog);
     }
 
     private void clickOnDownloadProcessButton(String processName) {
-        findProcess(processName).findElement(BY_PROCESS_DOWNLOAD_BUTTON).click();
+        waitForElementVisible(BY_PROCESS_DOWNLOAD_BUTTON, findProcess(processName)).click();
     }
 
     private String getProcessID(String processName) {
@@ -425,15 +425,15 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     private String getProcessTitle(WebElement process) {
-        return process.findElement(BY_PROCESS_TITLE).getText();
+        return waitForElementVisible(BY_PROCESS_TITLE, process).getText();
     }
 
     private WebElement getMetadataTabByProcessName(String processName) {
-        return findProcess(processName).findElement(BY_PROCESS_METADATA_TAB);
+        return waitForElementVisible(BY_PROCESS_METADATA_TAB, findProcess(processName));
     }
 
     private WebElement getElementFromSpecificProcess(String processName, By elementLocator) {
-        return findProcess(processName).findElement(elementLocator);
+        return waitForElementVisible(elementLocator, findProcess(processName));
     }
 
     private Optional<WebElement> tryToFindProcess(final String processName) {
@@ -453,7 +453,7 @@ public class ProjectDetailPage extends AbstractFragment {
 
             @Override
             public boolean apply(WebElement process) {
-                return process.findElement(BY_PROCESS_TITLE).getText().equals(processName);
+                return waitForElementVisible(BY_PROCESS_TITLE, process).getText().equals(processName);
             }
         });
     }

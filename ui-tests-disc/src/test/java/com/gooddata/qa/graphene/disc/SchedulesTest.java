@@ -175,7 +175,7 @@ public class SchedulesTest extends AbstractSchedulesTests {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkStopManualExecution() {
+    public void checkStopManualExecution() throws InterruptedException {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
 
@@ -188,7 +188,14 @@ public class SchedulesTest extends AbstractSchedulesTests {
 
             scheduleDetail.manualRun();
             assertTrue(scheduleDetail.isInRunningState());
+            /*
+             * Wait for schedule execution is in running state for a few seconds to make sure that
+             * the runtime field will be shown well
+             */
+            Thread.sleep(5000);
             scheduleDetail.manualStop();
+            browser.navigate().refresh();
+            waitForElementVisible(scheduleDetail.getRoot());
             scheduleDetail.assertManualStoppedExecution();
         } finally {
             cleanProcessesInWorkingProject();
