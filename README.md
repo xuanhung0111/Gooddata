@@ -58,3 +58,6 @@ Currently there are following modules available (use them for tests of specific 
  * ui-tests-dss - for running DSS tests
  * ui-tests-tools - for running extra tools tests (specific usage, no tests by default)
  * ui-tests-upload - for running csv upload tests (experimental)
+
+## Git workflow
+Create pull request to `develop` branch only. This repository will be migrated to standard gitflow model later, for now the `master` branch (used for prod and stg1) is being maintained manually.
