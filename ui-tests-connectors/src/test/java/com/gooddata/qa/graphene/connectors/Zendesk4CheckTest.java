@@ -3,11 +3,15 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.md.*;
-import com.gooddata.md.report.*;
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.md.Restriction;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
+import com.gooddata.md.report.OneNumberReportDefinitionContent;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
-import com.gooddata.qa.graphene.entity.*;
+import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
@@ -15,7 +19,6 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.report.ReportService;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.joda.time.DateTime;
 import org.json.JSONException;
@@ -27,12 +30,27 @@ import org.supercsv.prefs.CsvPreference;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.*;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 @SuppressWarnings("serial")
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
@@ -66,32 +84,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     private static FieldChange TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false);;
 
-    private static final String JSON_USER_CREATE;
-    static {
-        try {
-            JSON_USER_CREATE = new JSONObject() {{
-                put("user", new JSONObject() {{
-                    put("name", "GD test user");
-                    put("email", "qa+zendesk-test%s@gooddata.com");
-                }});
-            }}.toString();
-        } catch (JSONException e) {
-            throw new IllegalStateException("There is an exeception during json object initialization!", e);
-        }
-    }
+    private static final String JSON_USER_CREATE = getResourceAsString("/zendesk-api/user-create.json");
 
-    private static final String JSON_ORGANIZATION_CREATE;
-    static {
-        try {
-            JSON_ORGANIZATION_CREATE = new JSONObject() {{
-                put("organization", new JSONObject() {{
-                    put("name", "GD test organization - %s");
-                }});
-            }}.toString();
-        } catch (JSONException e) {
-            throw new IllegalStateException("There is an exeception during json object initialization!", e);
-        }
-    }
+    private static final String JSON_ORGANIZATION_CREATE = getResourceAsString("/zendesk-api/organization-create.json");
 
     private static final String TICKETS_REPORT_NAME = "Tickets count";
     private static final String USERS_REPORT_NAME = "Users count";
@@ -224,22 +219,21 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             "connectorWalkthrough"})
     public void testAddNewTicket() throws IOException, JSONException {
         createdZendeskTicketId = zendeskHelper.createNewTicket(
-                String.format(createTicketJson(AFTER_TICKET_CREATE_EVENTS),
-                        ZendeskHelper.getCurrentTimeIdentifier()));
+                format(createTicketJson(AFTER_TICKET_CREATE_EVENTS), ZendeskHelper.getCurrentTimeIdentifier()));
     }
 
     @Test(dependsOnMethods = {"testUsersCount"}, groups = {"zendeskApiTests", "newZendeskObjects",
             "connectorWalkthrough"})
     public void testAddNewUser() throws IOException, JSONException {
         createdZendeskUserId = zendeskHelper.createNewUser(
-                String.format(JSON_USER_CREATE, ZendeskHelper.getCurrentTimeIdentifier()));
+                format(JSON_USER_CREATE, ZendeskHelper.getCurrentTimeIdentifier()));
     }
 
     @Test(dependsOnMethods = {"testUsersCount"}, groups = {"zendeskApiTests", "newZendeskObjects",
             "connectorWalkthrough"})
     public void testAddNewOrganization() throws IOException, JSONException {
         createdZendeskOrganizationId = zendeskHelper.createNewOrganization(
-                String.format(JSON_ORGANIZATION_CREATE, ZendeskHelper.getCurrentTimeIdentifier()));
+                format(JSON_ORGANIZATION_CREATE, ZendeskHelper.getCurrentTimeIdentifier()));
     }
 
     @Test(dependsOnGroups = {"newZendeskObjects"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
@@ -273,7 +267,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
             throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME);
         compareObjectsCount(gdOrganizationsCount,
-                zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization
+                zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization - ATP-2954
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
         assertEquals(gdOrganizationsCount, reportMetricsResults.get(ORGANIZATIONS_REPORT_NAME) + 1,
                 "Organizations count doesn't match after incremental sync");
@@ -398,7 +392,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     public void testOrganizationsCountAfterDeletion() throws IOException, JSONException, InterruptedException {
         int gdOrganizationsCount = getNumberFromGDReport(ORGANIZATIONS_REPORT_NAME);
         compareObjectsCount(gdOrganizationsCount,
-                zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization,
+                zendeskHelper.getNumberOfOrganizations() + 1, // + 1 dummy organization - ATP-2954
                 ZendeskHelper.ZendeskObject.ORGANIZATION);
         assertEquals(gdOrganizationsCount, reportMetricsResults.get(ORGANIZATIONS_REPORT_NAME).intValue(),
                 "Organizations count doesn't match after incremental sync");
@@ -469,9 +463,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private void createOneNumberReportDefinition(String reportName, Metric metric) {
         if (mdService.find(project, ReportDefinition.class, Restriction.title(reportName)).isEmpty()) {
             ReportDefinition definition = 
-                    OneNumberReportDefinitionContent.create(reportName, Arrays.asList("metricGroup"),
+                    OneNumberReportDefinitionContent.create(reportName, singletonList("metricGroup"),
                             Collections.<AttributeInGrid>emptyList(),
-                            Arrays.asList(new GridElement(metric.getUri(), "")));
+                            singletonList(new GridElement(metric.getUri(), "")));
             mdService.createObj(project, definition);
         } else {
             System.out.println("Required report definition already exists: " + reportName);
@@ -483,6 +477,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         ReportService reportService = goodDataClient.getReportService();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         reportService.exportReport(rd, ReportExportFormat.CSV, output).get();
+
         System.out.println("Going to read a csv file with following content: \n" + output.toString());
         ICsvListReader listReader = null;
         try {
@@ -524,7 +519,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 }});
             }}.toString();
         } catch (JSONException e) {
-            throw new IllegalStateException("There is an exeception during json object initialization!", e);
+            throw new IllegalStateException("There is an exception during json object initialization!", e);
         }
     }
 
@@ -538,12 +533,13 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 }});
             }}.toString();
         } catch (JSONException e) {
-            throw new IllegalStateException("There is an exeception during json object initialization!", e);
+            throw new IllegalStateException("There is an exception during json object initialization!", e);
         }
     }
 
     private int ticketEventChangesCount(Map<String, FieldChange>... ticketEvents) {
-        // Everytime there is "Organization" field change, TODO: what if some new field to ticket form is added?
+        // Everytime there is "Organization" field change
+        // TODO: what if some new field to ticket form is added?
         int changesCount = 1;
 
         for (Map<String, FieldChange> changes : ticketEvents) {
