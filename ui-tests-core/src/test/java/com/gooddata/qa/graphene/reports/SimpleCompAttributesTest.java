@@ -92,7 +92,6 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
     public void alterAndCompute(String attributeTitle, String attrIdentifier, String relation, String relationAs) throws JSONException, InterruptedException {
         // get attribute
         int attributeID = attributeMapping.get(attrIdentifier);
-        JSONObject attribute = getObjectByID(attributeID);
 
         // get attribute elements
         JSONArray attrDisplayForms = getObjectByID(attributeID).getJSONObject("attribute").getJSONObject("content").getJSONArray("displayForms");
