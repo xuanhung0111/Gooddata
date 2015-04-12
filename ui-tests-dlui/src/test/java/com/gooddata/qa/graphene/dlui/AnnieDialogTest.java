@@ -54,7 +54,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
                         testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
 
-        setDefaultSchemaForOutputStage(testParams.getProjectId(), adsInstance.getId());
+        setDefaultSchemaForOutputStage(adsInstance.getId());
         assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
 
         cloudconnectProcess =

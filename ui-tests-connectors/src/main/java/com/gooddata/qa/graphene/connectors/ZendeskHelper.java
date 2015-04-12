@@ -20,7 +20,7 @@ import static org.testng.Assert.assertEquals;
 
 public class ZendeskHelper {
 
-    public static enum ZendeskObject {
+    public enum ZendeskObject {
         TICKET,
         USER,
         ORGANIZATION,
