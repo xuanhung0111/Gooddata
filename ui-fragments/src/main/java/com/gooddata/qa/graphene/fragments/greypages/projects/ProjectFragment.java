@@ -1,10 +1,13 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
 import com.gooddata.qa.graphene.enums.DWHDriver;
+import com.gooddata.qa.graphene.enums.ProjectEnvironment;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+
 import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -39,7 +42,8 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement submit;
 
-    public String createProject(String title, String summary, String template, String authorizationToken, DWHDriver dwhDriver, int checkIterations) throws JSONException, InterruptedException {
+    public String createProject(String title, String summary, String template, String authorizationToken,
+            DWHDriver dwhDriver, ProjectEnvironment enviroment, int checkIterations) throws JSONException, InterruptedException {
         waitForElementVisible(this.title).sendKeys(title);
         if (summary != null && summary.length() > 0) this.summary.sendKeys(summary);
         if (template != null && template.length() > 0) this.projectTemplate.sendKeys(template);
@@ -50,6 +54,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
             default: this.pg.click();
         }
 
+        selectEnviroment(enviroment);
         this.authorizationToken.sendKeys(authorizationToken);
         Graphene.guardHttp(submit).click();
         waitForElementNotVisible(this.title);
@@ -63,6 +68,10 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         System.out.println("Waiting for project enabled: " + projectUrl);
         waitForPollState("ENABLED", checkIterations);
         return projectUrl.substring(projectUrl.lastIndexOf("/") + 1);
+    }
+
+    private void selectEnviroment(ProjectEnvironment enviroment) {
+        waitForElementVisible(By.id(enviroment.toString()), getRoot()).click();
     }
 
     @Override
