@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 
-public class AnalyticalDesignerMarketingFunnelTest extends AbstractAnalyticalDesignerProjectTest {
+public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest {
 
     private static final String EMAIL_OPEN = "% Email Open";
     private static final String EMAIL_SENT = "% Emails Sent";

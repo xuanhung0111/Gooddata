@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -21,12 +20,9 @@ import java.util.TimeZone;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -42,9 +38,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.collect.Lists;
 
-public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProjectTest {
-
-    protected static final String DATE = "Date";
+public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTest {
 
     protected static final String CUSTOM_DISCOVERY_GROUP = "custom_discovery";
     protected static final String CONTRIBUTION_GROUP = "contribution";
@@ -69,8 +63,6 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
     protected String attribute3;
 
     protected String notAvailableAttribute;
-
-    private boolean isWalkmeTurnOff = false;
 
     @SuppressWarnings("serial")
     private static final Map<String, String> walkmeContents = new HashMap<String, String>() {{
@@ -99,13 +91,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         put("You're ready.", "Go ahead. Start discovering what insights await in your data!");
     }};
 
-    @BeforeClass
-    public void initStartPage() {
-        startPage = "projects.html";
-        projectCreateCheckIterations = 60; // 5 minutes
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"init"}, priority = 0)
     public void testWalkme() {
         initAnalysePage();
 
@@ -133,24 +119,6 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         }
         waitForElementVisible(doneBtn, browser).click();
         isWalkmeTurnOff = true;
-    }
-
-    // This method makes sure to turn off walkme for another test
-    @Test(dependsOnMethods = {"testWalkme"}, groups = {"init"})
-    public void turnOffWalkme() {
-        if (isWalkmeTurnOff) {
-            return;
-        }
-
-        initAnalysePage();
-
-        try {
-            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-close"), browser);
-            walkmeCloseElement.click();
-            waitForElementNotPresent(walkmeCloseElement);
-        } catch (TimeoutException e) {
-            System.out.println("Walkme dialog is not appeared!");
-        }
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
@@ -495,7 +463,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         assertEquals(report.getTrackersCount(), 6);
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
 
-        analysisPage.configTimeFilter("This year");
+        analysisPage.configTimeFilter(DATE, "This year");
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": This year");
         assertEquals(report.getTrackersCount(), 6);
     }
@@ -517,7 +485,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withFilters(DATE));
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
-        analysisPage.configTimeFilter("This month");
+        analysisPage.configTimeFilter(DATE, "This month");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
@@ -569,7 +537,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1)
                 .withCategories(attribute2).withFilters(DATE));
-        analysisPage.configTimeFilter("Last year");
+        analysisPage.configTimeFilter(DATE, "Last year");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 6);
         RecommendationContainer recommendationContainer =

@@ -45,11 +45,10 @@ public class FiltersBucket extends AbstractFragment {
         assertEquals(filters.size(), oldFiltersCount + 1, "Filter is not added successfully");
 
         final WebElement newFilter = filters.get(filters.size() - 1);
-        final String expectedText =
-                filter.getText() + ": All" + (isDateFilter(newFilter) ? " time" : "");
+        final String expectedText = ": All" + (isDateFilter(newFilter) ? " time" : "");
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             public boolean apply(WebDriver input) {
-                return expectedText.equals(getFilterTextHelper(newFilter));
+                return getFilterTextHelper(newFilter).endsWith(expectedText);
             };
         });
     }
@@ -70,12 +69,12 @@ public class FiltersBucket extends AbstractFragment {
         return filters.size() == 0;
     }
 
-    public void configTimeFilter(String period) {
-        WebElement filter = getFilter("Date");
+    public void configTimeFilter(String relatedDate, String period) {
+        WebElement filter = getFilter(relatedDate);
         filter.click();
         Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser)).select(period);
-        assertEquals(getFilterTextHelper(filter), "Date: " + period);
+        assertEquals(getFilterTextHelper(filter), relatedDate + ": " + period);
     }
 
     public void configAttributeFilter(String attribute, String... values) {
@@ -92,6 +91,10 @@ public class FiltersBucket extends AbstractFragment {
     }
 
     public boolean isFilterVisible(String dateOrAttribute) {
+        if (filters.isEmpty()) {
+            return false;
+        }
+
         try {
             getFilter(dateOrAttribute);
             return true;
@@ -173,5 +176,10 @@ public class FiltersBucket extends AbstractFragment {
         filter.click();
         return Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
+    }
+
+    public void changeDimensionSwitchInFilter(String currentRelatedDate, String dimensionSwitch) {
+        WebElement filter = getFilter(currentRelatedDate);
+        openDatePanelOfFilter(filter).changeDimensionSwitchInFilter(dimensionSwitch);
     }
 }

@@ -90,4 +90,16 @@ public class BucketsPanel extends AbstractFragment {
     public boolean isCategoryBucketEmpty() {
         return waitForFragmentVisible(categoriesBucket).isEmpty();
     }
+
+    public String getSelectedDimensionSwitch() {
+        return waitForFragmentVisible(categoriesBucket).getSelectedDimensionSwitch();
+    }
+
+    public void changeDimensionSwitchInBucket(String dimensionSwitch) {
+        waitForFragmentVisible(categoriesBucket).changeDimensionSwitchInBucket(dimensionSwitch);
+    }
+
+    public void compareToSamePeriodOfYearBefore() {
+        waitForFragmentVisible(metricsBucket).compareToSamePeriodOfYearBefore();
+    }
 }
