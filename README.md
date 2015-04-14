@@ -60,4 +60,15 @@ Currently there are following modules available (use them for tests of specific 
  * ui-tests-upload - for running csv upload tests (experimental)
 
 ## Git workflow
-Create pull request to `develop` branch only. This repository will be migrated to standard gitflow model later, for now the `master` branch (used for prod and stg1) is being maintained manually.
+This repository is switched to the standard gitflow model (as you are used to on other component repositories).
+
+Summary:
+ * happy path: open PR to `develop` branch (for new features/tests or bugfixes related to `develop` stage)
+ * open PR to `release/xxx` branch in case of fixing any test at the `release` stage
+  * following merge from `release` to `develop` branch should be done (auto-merging is missing at the time of writing)
+ * open PR to `master` branch in case of hotfixing tests on production
+  * following merge from the `master` to `release` and `develop` should be done (auto-merging is missing at the time of writing)
+ * `release/xxx` branch is created automatically from `develop` during the Code Drop
+ * merge of `release` branch to `master` happens automatically before the production release
+
+More details about the [GitFlow](https://confluence.intgdc.com/display/plat/Gitflow).
