@@ -183,8 +183,7 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
             try {
                 project.setProjectId(gpProject.createProject(project.getProjectName(),
                         project.getProjectName(), null, testParams.getAuthorizationToken(),
-                        testParams.getDwhDriver(), testParams.getProjectEnvironment(),
-                        projectCreateCheckIterations));
+                        testParams.getDwhDriver(), projectCreateCheckIterations));
             } catch (JSONException e) {
                 fail("There is problem when creating new project: " + e);
             } catch (InterruptedException e) {

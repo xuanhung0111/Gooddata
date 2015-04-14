@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.graphene.enums.DWHDriver;
 import com.gooddata.qa.graphene.enums.DeleteMode;
-import com.gooddata.qa.graphene.enums.ProjectEnvironment;
 
 import java.util.Properties;
 import java.util.UUID;
@@ -25,7 +24,6 @@ public class TestParameters {
     private String authorizationToken2;
     private DWHDriver dwhDriver = DWHDriver.PG;
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
-    private ProjectEnvironment projectEnvironment = ProjectEnvironment.TESTING;
     private String testIdentification;
     private String downloadFolder;
     private String folderSeparator;
@@ -46,7 +44,6 @@ public class TestParameters {
         authorizationToken = loadProperty("project.authorizationToken");
         authorizationToken2 = loadProperty("project.authorizationToken2");
         deleteMode = DeleteMode.getModeByName(loadProperty("deleteMode"));
-        projectEnvironment = ProjectEnvironment.getEnvironmentByName(loadProperty("project.environment"));
         downloadFolder = loadProperty("browserDownloadFolder");
         testIdentification = loadProperty("testIdentification");
         if (testIdentification == null) {
@@ -135,10 +132,6 @@ public class TestParameters {
 
     public DWHDriver getDwhDriver() {
         return dwhDriver;
-    }
-
-    public ProjectEnvironment getProjectEnvironment() {
-        return projectEnvironment;
     }
 
     public DeleteMode getDeleteMode() {
