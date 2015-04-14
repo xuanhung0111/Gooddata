@@ -54,9 +54,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
         projectTitle += "-" + testParams.getDwhDriver().name();
         if (projectTemplate.isEmpty()) {
-            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken(), testParams.getDwhDriver(), projectCreateCheckIterations));
+            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
+                    testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                    testParams.getProjectEnvironment(), projectCreateCheckIterations));
         } else {
-            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG, projectCreateCheckIterations));
+            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
+                    testParams.getAuthorizationToken(), DWHDriver.PG, testParams.getProjectEnvironment(),
+                    projectCreateCheckIterations));
 
             if (testParams.getDwhDriver().equals(DWHDriver.VERTICA)) {
                 String exportToken = exportProject(true, true, projectCreateCheckIterations * 5);
@@ -64,7 +68,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
                 openUrl(PAGE_GDC_PROJECTS);
                 waitForElementVisible(gpProject.getRoot());
-                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null, testParams.getAuthorizationToken2(), testParams.getDwhDriver(), projectCreateCheckIterations));
+                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
+                        testParams.getAuthorizationToken2(), testParams.getDwhDriver(),
+                        testParams.getProjectEnvironment(), projectCreateCheckIterations));
                 importProject(exportToken, projectCreateCheckIterations * 5);
             }
         }
