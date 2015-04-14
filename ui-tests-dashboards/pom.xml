@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.gooddata.qa</groupId>
         <artifactId>ui-tests-graphene</artifactId>
-        <version>1.0-develop-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>ui-tests-dashboards</artifactId>
 

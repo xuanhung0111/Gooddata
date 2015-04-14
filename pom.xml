@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gooddata.qa</groupId>
     <artifactId>ui-tests-graphene</artifactId>
-    <version>1.0-develop-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GoodData UI tests with Graphene (using TestNG)</name>
