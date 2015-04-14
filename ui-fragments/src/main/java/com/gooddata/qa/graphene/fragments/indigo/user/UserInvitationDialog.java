@@ -41,6 +41,7 @@ public class UserInvitationDialog extends AbstractFragment {
     }
 
     public String getErrorMessage() {
+        waitForElementVisible(invitationEmails).click();
         return waitForElementVisible(By.className("content"), browser).getText().trim();
     }
 
@@ -57,8 +58,8 @@ public class UserInvitationDialog extends AbstractFragment {
     private UserInvitationDialog selectRoles(UserRoles role) {
         waitForElementVisible(roles).click();
         Graphene.createPageFragment(DropDown.class,
-                waitForElementVisible(By.className("users-roles-dropdown"), browser))
-                    .selectItem(role.getText());
+                waitForElementVisible(By.className("ember-list-container"), browser))
+                    .selectItem(role.getName());
         return this;
     }
 
