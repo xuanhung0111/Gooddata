@@ -146,6 +146,7 @@ public class ReportVisualizer extends AbstractFragment {
 
         Thread.sleep(500);
         WebElement attributeElement = findAttribute(attributeName);
+        Thread.sleep(2000);
         WebElement attributePositionElement = waitForElementVisible(attributeElement.findElement(By.cssSelector("div")));
         String attributeClass =  attributePositionElement.getAttribute("class");
 
