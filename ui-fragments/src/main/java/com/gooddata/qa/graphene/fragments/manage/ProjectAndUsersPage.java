@@ -16,6 +16,9 @@ public class ProjectAndUsersPage extends AbstractFragment {
     @FindBy(xpath = "//form/div/span/button[text()='Delete']")
     private WebElement deleteProjectDialogButton;
 
+    @FindBy(className = "project-page-manage-link")
+    private WebElement userManagementLink;
+
     private static final By BY_PROJECTS_LIST = By.className("userProjects");
 
     public void deteleProject() {
@@ -26,4 +29,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
         System.out.println("Project deleted...");
     }
 
+    public void openUserManagemtPage() {
+        waitForElementVisible(userManagementLink).click();
+    }
 }
