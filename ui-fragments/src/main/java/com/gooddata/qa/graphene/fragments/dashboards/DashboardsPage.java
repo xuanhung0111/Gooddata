@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 
@@ -19,7 +20,7 @@ import java.util.List;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class DashboardsPage extends AbstractFragment {
-
+    private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 
     private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
     private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
     private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
@@ -281,6 +282,34 @@ public class DashboardsPage extends AbstractFragment {
     public PermissionsDialog unlistedIconClick() {
         waitForElementVisible(unlistedIcon).click();
         return getPermissionsDialog();
+    }
+
+    public void saveAsDashboard(String dashboardName, PermissionType permissionType) throws InterruptedException {
+        saveAsDashboard(dashboardName, false, permissionType);
+    }
+    
+    public void saveAsDashboardAndEnableSavedViews(String dashboardName, PermissionType permissionType) 
+            throws InterruptedException {
+        saveAsDashboard(dashboardName, true, permissionType);
+    }
+    
+    private void saveAsDashboard(String dashboardName, boolean isSavedViews, PermissionType permissionType) 
+            throws InterruptedException{
+        SaveAsDialog saveAsDialog = openSaveAsDialog();
+        
+        saveAsDialog.saveAs(dashboardName, isSavedViews, permissionType);
+        waitForFragmentNotVisible(saveAsDialog);
+        
+        editDashboardBar.saveDashboard();
+        waitForElementNotPresent(editDashboardBar.getRoot());
+        waitForDashboardPageLoaded(browser);
+    }
+    
+    private SaveAsDialog openSaveAsDialog() {
+        waitForDashboardPageLoaded(browser);
+        openEditExportEmbedMenu().select("Save as...");
+        return Graphene.createPageFragment(SaveAsDialog.class, 
+                waitForElementVisible(SAVE_AS_DIALOG_LOCATOR, browser));
     }
 
     public FilterWidget getFilterWidget(String condition) {

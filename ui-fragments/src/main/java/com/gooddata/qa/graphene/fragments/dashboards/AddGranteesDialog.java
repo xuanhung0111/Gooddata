@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 import java.util.List;
 
@@ -28,8 +26,7 @@ public class AddGranteesDialog extends AbstractFragment {
     @FindBy(css = ".s-btn-cancel")
     private WebElement cancelButton;
 
-    @FindBy(css = ".gd-list-view-noResults")
-    private WebElement noResultsOutput;
+    private final String NO_RESULTS_OUTPUT_LOCATOR = ".gd-list-view-noResults";
 
     private static final By GRANTEES = By.cssSelector(".grantee-candidate");
 
@@ -45,9 +42,19 @@ public class AddGranteesDialog extends AbstractFragment {
         if (expectResult) {
             return getNumberOfGrantees();
         } else {
-            waitForElementVisible(noResultsOutput);
+            String mesage = waitForElementVisible(By.cssSelector(NO_RESULTS_OUTPUT_LOCATOR),browser).getText();
+            if (isSearchFieldContainString()) {
+                assertEquals(mesage, "No matching user name or email address exists in this project.");    
+            } else {
+                assertEquals(mesage, "This dashboard is already shared with all users.");
+            }
             return 0;
         }
+    }
+    
+    private boolean isSearchFieldContainString() {
+        waitForElementVisible(searchForGranteeInput);
+        return searchForGranteeInput.findElement(BY_PARENT).findElements(By.cssSelector("span")).size() == 2;
     }
 
     public int getNumberOfGrantees() {
