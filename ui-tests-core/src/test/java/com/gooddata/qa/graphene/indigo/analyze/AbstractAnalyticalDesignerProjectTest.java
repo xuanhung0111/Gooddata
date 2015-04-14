@@ -78,8 +78,8 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
                 + "and create visualizations quickly and easily. Intelligent on-screen recommendations help you "
                 + "discover new and surprising insights. Let's get started!");
 
-        put("Begin by exploring your data", "Metrics represent quantitative data (measures):\n\n\n"
-                + "Attributes represent qualitative data (categories):");
+        put("Begin by exploring your data", "Metrics represent quantitative data (measures).\n\n"
+                + "Attributes represent qualitative data (categories).");
 
         put("Create a new visualization", "Drag data from the list onto the canvas and watch as your "
                 + "visualization takes shape!");
@@ -110,7 +110,7 @@ public abstract class AbstractAnalyticalDesignerProjectTest extends AbstractProj
         initAnalysePage();
 
         final By title = By.className("walkme-custom-balloon-title");
-        final By content = By.cssSelector(".walkme-custom-balloon-content span");
+        final By content = By.className("walkme-custom-balloon-content");
         final By nextBtn = By.className("walkme-action-next");
         final By backBtn = By.className("walkme-action-back");
         final By doneBtn = By.className("walkme-action-done");
