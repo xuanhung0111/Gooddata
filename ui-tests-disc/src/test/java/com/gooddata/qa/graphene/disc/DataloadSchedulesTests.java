@@ -21,12 +21,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static java.lang.String.format;
+
 public class DataloadSchedulesTests extends AbstractSchedulesTests {
 
-    private final String PROCESS_NAME = "Dataload process";
-    private final ObjectMapper mapper = new ObjectMapper();
+    private static final String PROCESS_NAME = "Dataload process";
+    private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
 
-    private final int STATUS_POLLING_CHECK_ITERATIONS = 60;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeClass
     public void initProperties() {
@@ -169,7 +171,9 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
             } catch (IOException e) {
                 error = "unknown error :/";
             }
-            throw new IllegalStateException(String.format("Unknown response from backend when fetching dataload process for project %s (%s)", getWorkingProject().getProjectId(), error));
+            throw new IllegalStateException(
+                    format("Unknown response from backend when fetching dataload process for project %s (%s)",
+                            getWorkingProject().getProjectId(), error));
         }
     }
 
@@ -191,7 +195,7 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
     }
 
     private String getProcessesUri() {
-        return String.format("/gdc/projects/%s/dataload/processes", getWorkingProject().getProjectId());
+        return format("/gdc/projects/%s/dataload/processes", getWorkingProject().getProjectId());
     }
 
 }

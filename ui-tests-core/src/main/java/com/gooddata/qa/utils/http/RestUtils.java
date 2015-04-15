@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.testng.Assert.*;
@@ -67,7 +68,7 @@ public class RestUtils {
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is an exeception during json object initialization! ", e);
+                    "There is an exception during json object initialization! ", e);
         }
     }
 
@@ -86,7 +87,7 @@ public class RestUtils {
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is an exeception during json object initialization! ", e);
+                    "There is an exception during json object initialization! ", e);
         }
     }
     
@@ -106,7 +107,7 @@ public class RestUtils {
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is an exeception during json object initialization! ", e);
+                    "There is an exception during json object initialization! ", e);
         }
     }
 
@@ -137,7 +138,8 @@ public class RestUtils {
     }
 
     public static void addUserToProject(String host, String projectId, String domainUser,
-                                        String domainPassword, String inviteeProfile, UserRoles role) throws ParseException, IOException, JSONException {
+                                        String domainPassword, String inviteeProfile,
+                                        UserRoles role) throws ParseException, IOException, JSONException {
 
         RestApiClient restApiClient = new RestApiClient(host, domainUser, domainPassword, true, false);
         String usersUri = String.format(USERS_LINK, projectId);
@@ -147,8 +149,11 @@ public class RestUtils {
         HttpResponse postResponse = restApiClient.execute(postRequest);
         assertEquals(postResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
         JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
-        assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"), "User isn't assigned properly into the project");
-        System.out.println(String.format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId, domainUser));
+        assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"),
+                "User isn't assigned properly into the project");
+        System.out.println(
+                format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId,
+                        domainUser));
     }
 
     public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
@@ -259,7 +264,7 @@ public class RestUtils {
 
     public static String createMUFObj(final RestApiClient restApiClient, String projectID, String mufTitle, 
             Map<String, List<String>> conditions) throws IOException, JSONException {
-        String mdObjURI = String.format(OBJ_LINK,projectID);
+        String mdObjURI = format(OBJ_LINK, projectID);
         String MUFExpressions = buildExpression(projectID, conditions);
         System.out.println(MUFExpressions);
         String contentBody = MUF_OBJ.replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
@@ -279,25 +284,24 @@ public class RestUtils {
         final String elementURI = "[/gdc/md/%s/obj/%s/elements?id=%s]";
         String expression = "(%s IN (%s))";
         for (final String attributeID : conditions.keySet()) {
-            expressions.add(String.format(expression, 
-                    String.format(attributeURI, projectID, attributeID),
-                    Joiner.on(",").join(Collections2.transform(conditions.get(attributeID), 
+            expressions.add(format(expression,
+                    format(attributeURI, projectID, attributeID),
+                    Joiner.on(",").join(Collections2.transform(conditions.get(attributeID),
                             new Function<String, String>() {
-                        @Override
-                        public String apply(String input) {
-                            return String.format(elementURI, projectID, attributeID, input);
-                        }
-                    }))
-                    ));
+                                @Override
+                                public String apply(String input) {
+                                    return format(elementURI, projectID, attributeID, input);
+                                }
+                            }))
+            ));
         }
         return Joiner.on(" AND ").join(expressions);
     }
     
     public static void addMUFToUser(final RestApiClient restApiClient, String projectURI, String userProfileURI, 
             String mufURI) {
-        String urserFilter = String.format(MUF_LINK, projectURI);
-        String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression", 
-                mufURI);
+        String urserFilter = format(MUF_LINK, projectURI);
+        String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression", mufURI);
         System.out.println(contentBody);
         HttpRequestBase postRequest = restApiClient.newPostMethod(urserFilter, contentBody);
         HttpResponse postReponse = restApiClient.execute(postRequest);

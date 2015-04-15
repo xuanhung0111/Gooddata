@@ -32,16 +32,14 @@ import com.gooddata.qa.utils.webdav.WebDavClient;
 public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     private static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
-    private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
-            "DLUI/graph/CreateAndCopyDataToADS.grf";
+    private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS = "DLUI/graph/CreateAndCopyDataToADS.grf";
 
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
 
     private static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     private static final String PROCESS_EXECUTION_URI = DATALOAD_PROCESS_URI + "%s/executions";
     private static final String ADS_INSTANCES_URI = "gdc/datawarehouse/instances/";
-    private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
-            + "%s/schemas/default";
+    private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI + "%s/schemas/default";
     private static final String OUTPUTSTAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
 
     private static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
@@ -96,16 +94,13 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     }
 
     protected void createModelForGDProject(String maqlFile) {
-        String maql = "";
         try {
-            maql = FileUtils.readFileToString(new File(maqlFile));
+            String maql = FileUtils.readFileToString(new File(maqlFile));
             postMAQL(maql, STATUS_POLLING_CHECK_ITERATIONS);
         } catch (IOException e) {
-            throw new IllegalStateException(
-                    "There is an exeception during reading file to string!", e);
+            throw new IllegalStateException("There is an exception during reading file to string!", e);
         } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an exeception during creating model for GD project! ", e);
+            throw new IllegalStateException("There is an exception during creating model for GD project! ", e);
         }
     }
 
@@ -113,16 +108,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         openUrl(ADS_INSTANCES_URI);
         waitForElementVisible(storageForm.getRoot());
         assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
-        String adsUrl = "";
+        String adsUrl;
         try {
-            adsUrl =
-                    storageForm
-                            .createStorage(adsInstance.getName(),
-                                    adsInstance.getDescription(),
-                                    adsInstance.getAuthorizationToken());
+            adsUrl = storageForm.createStorage(adsInstance.getName(), adsInstance.getDescription(),
+                    adsInstance.getAuthorizationToken());
         } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an exeception during creating new ads instance! ", e);
+            throw new IllegalStateException("There is an exception during creating new ads instance! ", e);
         }
 
         adsInstance.withId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
@@ -131,9 +122,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected void deleteADSInstance(ADSInstance adsInstance) {
         openUrl(ADS_INSTANCES_URI + adsInstance.getId());
-        InstanceFragment storage =
-                createPageFragment(InstanceFragment.class,
-                        waitForElementVisible(BY_GP_FORM_SECOND, browser));
+        InstanceFragment storage = createPageFragment(InstanceFragment.class,
+                waitForElementVisible(BY_GP_FORM_SECOND, browser));
         assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
         storage.deleteStorageSuccess();
     }
@@ -166,14 +156,9 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             String copyTableSqlFile) {
         String processExecutionUri =
                 String.format(PROCESS_EXECUTION_URI, testParams.getProjectId(), processId);
-        String createTableSql = "";
-        String copyTableSql = "";
         try {
-            createTableSql =
-                    FileUtils
-                            .readFileToString(new File(createTableSqlFile), StandardCharsets.UTF_8);
-            copyTableSql =
-                    FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
+            String createTableSql = FileUtils.readFileToString(new File(createTableSqlFile), StandardCharsets.UTF_8);
+            String copyTableSql = FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
             prepareProcessExecutionBody(adsUrl, createTableSql, copyTableSql);
             String postBody = processExecution.toString();
             System.out.println("postBody: " + postBody);
@@ -189,20 +174,18 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             return responseStatusCode;
 
         } catch (IOException e) {
-            throw new IllegalStateException(
-                    "There is an exeception during reading file to string! ", e);
+            throw new IllegalStateException("There is an exception during reading file to string! ", e);
         }
     }
 
-    protected int setDefaultSchemaForOutputStage(String projectId, String adsId) {
+    protected int setDefaultSchemaForOutputStage(String adsId) {
         String schemaUri = String.format(ADS_INSTANCE_SCHEMA_URI, adsId);
         JSONObject outputStageObj = new JSONObject();
         try {
             outputStageObj.put("outputStage", new JSONObject().put("schema", schemaUri));
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is a problem with JSON object when set default schema for outputStage! ",
-                    e);
+                    "There is a problem with JSON object when set default schema for outputStage! ", e);
         }
 
         String putUri = String.format(OUTPUTSTAGE_URI, getWorkingProject().getProjectId());
@@ -258,8 +241,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         try {
             processExecution.put("execution", objMap);
         } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is a problem with JSON object when executing an process! ", e);
+            throw new IllegalStateException("There is a problem with JSON object when executing an process! ", e);
         }
     }
 
@@ -273,8 +255,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             cloudConnectProcess.put("process", objMap);
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is a problem when create JSON object for creating CloudConnect process! ",
-                    e);
+                    "There is a problem when create JSON object for creating CloudConnect process! ", e);
         }
     }
 }

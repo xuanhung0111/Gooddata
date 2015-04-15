@@ -32,8 +32,7 @@ import org.testng.annotations.Test;
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     protected static final int MAILBOX_TIMEOUT_MINUTES = 6;
-    // mailbox polling interval in miliseconds
-    protected static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 30000;
+    protected static final int MAILBOX_POLL_INTERVAL_MILLIS = 30000;
 
     protected static final String FROM = "noreply@gooddata.com";
 
@@ -81,10 +80,12 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         setSchedule(scheduleUri, schedule);
     }
 
+    /**
+     * Get scheduledMail
+     */
     private InputStream getScheduleInputStream(String scheduleUri) throws IOException {
         RestApiClient apiClient = getRestApiClient();
 
-        // get scheduledMail
         System.out.println("Get scheduledMail: " + scheduleUri);
         HttpRequestBase getRequest = apiClient.newGetMethod(scheduleUri);
         HttpResponse getResponse = apiClient.execute(getRequest);
@@ -92,8 +93,10 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         return getResponse.getEntity().getContent();
     }
 
+    /**
+     * Update scheduledMail
+     */
     private void setSchedule(String scheduleUri, String schedule) {
-        // update scheduledMail
         System.out.println("Update scheduledMail: " + scheduleUri);
         HttpRequestBase postRequest = restApiClient.newPostMethod(scheduleUri, schedule);
         HttpResponse postResponse = restApiClient.execute(postRequest);
@@ -137,7 +140,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
     }
 
     protected int getMailboxMaxPollingLoops() {
-        return 60000 / MAILBOX_POLL_INTERVAL_MILISECONDS * MAILBOX_TIMEOUT_MINUTES;
+        return 60000 / MAILBOX_POLL_INTERVAL_MILLIS * MAILBOX_TIMEOUT_MINUTES;
     }
 
 }

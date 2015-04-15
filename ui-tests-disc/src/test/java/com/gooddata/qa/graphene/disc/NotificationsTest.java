@@ -482,8 +482,7 @@ public class NotificationsTest extends AbstractNotificationTest {
             scheduleBuilder.setEnabled(false);
             waitForRepeatedFailuresEmail(scheduleBuilder);
         } catch (Exception e) {
-            throw new IllegalStateException("There is an exeception when adding user to project!",
-                    e);
+            throw new IllegalStateException("There is an exception when adding user to project!", e);
         } finally {
             cleanProcessesInWorkingProject();
             logout();

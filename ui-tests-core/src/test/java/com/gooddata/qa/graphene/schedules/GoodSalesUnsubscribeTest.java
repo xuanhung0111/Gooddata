@@ -146,7 +146,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
                 break;
             }
 
-            Thread.sleep(MAILBOX_POLL_INTERVAL_MILISECONDS);
+            Thread.sleep(MAILBOX_POLL_INTERVAL_MILLIS);
         }
 
         return reportMessages;
