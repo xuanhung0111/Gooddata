@@ -5,17 +5,21 @@ package com.gooddata.qa.graphene.schedules;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.http.RestApiClient;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.openqa.selenium.By;
+
 import javax.mail.MessagingException;
 import javax.mail.Part;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -23,9 +27,12 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -107,12 +114,13 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
     private String getResetRecurrencySchedule(InputStream stream) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-        Map rootNode = mapper.readValue(stream, Map.class);
-        Map scheduledMail = (Map) rootNode.get("scheduledMail");
-        Map content = (Map) scheduledMail.get("content");
-        Map when = (Map) content.get("when");
+        Map<String, Map<String, Map<String, Map<String, String>>>> rootNode = mapper.readValue(stream,
+                new TypeReference<Map<String, Map<String, Map<String, Map<String, String>>>>>() {});
+        Map<String, Map<String, Map<String, String>>> scheduledMail = rootNode.get("scheduledMail");
+        Map<String, Map<String, String>> content = scheduledMail.get("content");
+        Map<String, String> when = content.get("when");
 
-        String timeZone = (String) when.get("timeZone");
+        String timeZone = when.get("timeZone");
         content.remove("lastSuccessfull");
         DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZone)));
         DateTimeFormatter fmt = DateTimeFormat.forPattern("*Y:M:0:d:H:m:s");
@@ -126,9 +134,10 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
     private String getBccSchedule(InputStream scheduleStream, String[] bccEmails) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-        Map rootNode = mapper.readValue(scheduleStream, Map.class);
-        Map scheduledMail = (Map) rootNode.get("scheduledMail");
-        Map content = (Map) scheduledMail.get("content");
+        Map<String, Map<String, Map<String, List<String>>>> rootNode = mapper.readValue(scheduleStream,
+                new TypeReference<Map<String, Map<String, Map<String, List<String>>>>>() {});
+        Map<String, Map<String, List<String>>> scheduledMail = rootNode.get("scheduledMail");
+        Map<String, List<String>> content = scheduledMail.get("content");
 
         List<String> bccEmailsList = asList(bccEmails);
         if (bccEmails != null) {
