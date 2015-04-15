@@ -1,0 +1,1 @@
+ALTER ATTRIBUTE {attr.person.unmappingfield} DROP KEYS {d_person_unmappingfield.id}, {f_person.unmappingfield_id};ALTER DATASET {dataset.person} DROP {attr.person.unmappingfield};DROP {attr.person.unmappingfield};SYNCHRONIZE {dataset.person} PRESERVE DATA;

@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.entity;
 
+import org.apache.commons.lang.WordUtils;
+import org.openqa.selenium.By;
+
 public class Field {
 
     private String name;
@@ -25,7 +28,7 @@ public class Field {
         ATTRIBUTE("attributes"),
         FACT("facts"),
         DATE("dates"),
-        LABLE_HYPERLINK("labels & hyperlinks");
+        LABEL_HYPERLINK("labels & hyperlinks");
 
         private String filterName;
 
@@ -33,8 +36,15 @@ public class Field {
             this.filterName = filterName;
         }
 
-        public String getFilterName() {
-            return this.filterName;
+        public By getFilterBy() {
+            return By.xpath(String.format("//a[text()='%s']", this.filterName));
+        }
+
+        public String getEmptyStateMessage() {
+            return String.format(
+                    "No sources with %s",
+                    this == LABEL_HYPERLINK ? "Label or Hyperlink" : WordUtils
+                            .capitalizeFully(filterName));
         }
     }
 }

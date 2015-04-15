@@ -15,11 +15,11 @@ public enum AdditionalDatasets {
             FieldTypes.ATTRIBUTE), new Field("Date", FieldTypes.DATE)),
     OPPORTUNITY_WITH_NEW_FIELDS("opportunity", new Field("Title2",
             FieldTypes.ATTRIBUTE), new Field("Label",
-            FieldTypes.LABLE_HYPERLINK), new Field("Totalprice2",
+            FieldTypes.LABEL_HYPERLINK), new Field("Totalprice2",
             FieldTypes.FACT)),
     OPPORTUNITY_WITH_NEW_DATE_FIELD("opportunity", new Field("Title2",
             FieldTypes.ATTRIBUTE), new Field("Label",
-            FieldTypes.LABLE_HYPERLINK), new Field("Totalprice2",
+            FieldTypes.LABEL_HYPERLINK), new Field("Totalprice2",
             FieldTypes.FACT), new Field("Date", FieldTypes.DATE));
 
     private String name;
