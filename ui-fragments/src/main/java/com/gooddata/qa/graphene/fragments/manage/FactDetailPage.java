@@ -39,7 +39,7 @@ public class FactDetailPage extends AbstractFragment {
     @FindBy(id = "p-objectPage")
     private MetricDetailsPage metricDetailPage;
 
-    public void createSimpleMetric(SimpleMetricTypes metricType, String factName) {
+    public String createSimpleMetric(SimpleMetricTypes metricType, String factName) {
         waitForObjectPageLoaded(browser);
         String operation = metricType.getLabel();
         By metricButton = By.xpath(metricButtonLocator.replace("${metricType}", operation));
@@ -54,6 +54,8 @@ public class FactDetailPage extends AbstractFragment {
                 "Metric is not created properly");
         verifyUsedInMetric(metricType, factName, expectedMetricName);
         waitForElementVisible(factLink).click();
+
+        return expectedMetricName;
     }
 
     public void verifyUsedInMetric(SimpleMetricTypes metricType, String factName, String metricName) {

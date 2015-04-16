@@ -12,7 +12,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedulesTest {
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void createDashboardSchedule() {
+    public void createDashboardSchedule() throws InterruptedException {
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), "UI-Graphene-core-Dashboard: " + testParams.getHost(),
                 "Scheduled email test - dashboard.", "Outlook");
@@ -21,7 +21,7 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void createReportSchedule() {
+    public void createReportSchedule() throws InterruptedException {
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), "UI-Graphene-core-Report: " + testParams.getHost(),
                 "Scheduled email test - report.", "Activities by Type", ExportFormat.ALL);

@@ -205,5 +205,4 @@ public class VariableDetailPage extends AbstractFragment {
         waitForElementVisible(confirmDeleteButtonLocator, browser).click();
         waitForDataPageLoaded(browser);
     }
-
 }

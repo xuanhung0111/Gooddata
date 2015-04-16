@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -35,6 +35,9 @@ public class ReportsPage extends AbstractFragment {
     @FindBy(xpath = "//button[text()='Create Report']")
     private WebElement createReportButton;
 
+    @FindBy(className = "s-btn-move___")
+    private WebElement moveReportButton;
+
     public ReportsFolders getDefaultFolders() {
         return defaultFolders;
     }
@@ -51,13 +54,14 @@ public class ReportsPage extends AbstractFragment {
         waitForElementVisible(createReportButton).click();
     }
 
-    public void addNewFolder(String folderName) {
+    public void addNewFolder(String folderName) throws InterruptedException {
         int currentFoldersCount = customFolders.getNumberOfFolders();
 
         waitForElementVisible(addFolderButton).click();
         WebElement folderInput = waitForElementVisible(BY_ADD_FOLDER_INPUT, browser);
         folderInput.sendKeys(folderName);
         waitForElementVisible(BY_ADD_FOLDER_SUBMIT_BUTTON, browser).click();
+        Thread.sleep(2000);
 
         Assert.assertEquals(customFolders.getNumberOfFolders(), currentFoldersCount + 1, "Number of folders is not increased");
         Assert.assertTrue(customFolders.getAllFolderNames().contains(folderName), "New folder name is not present in list");
@@ -69,5 +73,17 @@ public class ReportsPage extends AbstractFragment {
 
     public String getSelectedFolderDescription() {
         return waitForElementVisible(selectedFolderDescription).getText().trim();
+    }
+
+    public boolean isReportVisible(String reportName) {
+        return waitForFragmentVisible(reportsList).getAllReportLabels().contains(reportName);
+    }
+
+    public void moveReportsToFolder(String folder, String... reports) {
+        waitForFragmentVisible(reportsList).selectReports(reports);
+        waitForElementVisible(moveReportButton).click();
+        waitForElementVisible(By.className("ipeEditor"), browser).sendKeys(folder);
+        waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
+        checkGreenBar(browser);
     }
 }

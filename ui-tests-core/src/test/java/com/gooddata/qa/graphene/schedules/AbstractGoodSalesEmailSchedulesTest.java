@@ -14,7 +14,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.openqa.selenium.By;
 
 import javax.mail.MessagingException;
 import javax.mail.Part;
@@ -24,8 +23,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import com.gooddata.qa.utils.graphene.Screenshots;
 
@@ -42,8 +39,6 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     protected static final String FROM = "noreply@gooddata.com";
 
-    private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
-
     @BeforeClass
     public void setUpImap() throws Exception {
         imapHost = testParams.loadProperty("imap.host");
@@ -56,13 +51,6 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         initEmailSchedulesPage();
         assertEquals(emailSchedulesPage.getNumberOfSchedules(), 0, "There is no schedule.");
         Screenshots.takeScreenshot(browser, "Goodsales-no-schedules", this.getClass());
-    }
-
-    protected void initEmailSchedulesPage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
-        waitForSchedulesPageLoaded(browser);
-        waitForElementNotVisible(BY_SCHEDULES_LOADING);
-        waitForElementVisible(emailSchedulesPage.getRoot());
     }
 
     protected Part findPartByContentType(List<Part> parts, String contentType) throws MessagingException {

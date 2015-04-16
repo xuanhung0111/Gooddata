@@ -474,4 +474,10 @@ public class MetricEditorDialog extends AbstractFragment {
         metricsTable.selectObject(metric);
         waitForObjectPageLoaded(browser);
     }
+
+    public boolean isMetricVisible(String metric) {
+        waitForElementVisible(metricsTable.getRoot());
+        waitForDataPageLoaded(browser);
+        return metricsTable.getAllItems().contains(metric);
+    }
 }

@@ -30,7 +30,7 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class, 'c-geoConfiguration')]//span[@class='attr-inside']")
     private List<WebElement> listGeoLayer;
 
-    @FindBy(xpath = "//div[contains(@class, 'c-geoConfiguration')]//input[@type='checkbox']")
+    @FindBy(css = ".c-geoConfiguration input")
     private List<WebElement> listGeoLayerCheckbox;
 
     private static final String widgetLocator =
@@ -88,16 +88,20 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
     public void addGeoChart(String metricLabel, String attributeLayer) throws InterruptedException {
         initWidget(WidgetTypes.GEO_CHART, metricLabel);
         waitForElementVisible(layers);
-        int i = 0;
-        listGeoLayerCheckbox.get(0).click();
-        Thread.sleep(3000);
-        for (WebElement element : listGeoLayerCheckbox) {
-            if (listGeoLayer.get(i).getText().equalsIgnoreCase(attributeLayer)) {
-                element.click();
-                break;
+
+        if (!listGeoLayerCheckbox.isEmpty()) {
+            int i = 0;
+            listGeoLayerCheckbox.get(0).click();
+            Thread.sleep(3000);
+            for (WebElement element : listGeoLayerCheckbox) {
+                if (listGeoLayer.get(i).getText().equalsIgnoreCase(attributeLayer)) {
+                    element.click();
+                    break;
+                }
+                i++;
             }
-            i++;
         }
+
         waitForElementVisible(widgetConfigApplyButton).click();
         waitForElementNotVisible(widgetConfigPanel);
     }

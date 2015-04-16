@@ -16,7 +16,7 @@ public class MetricDetailsPage extends AbstractFragment {
 
     @FindBy(xpath = "//span[contains(@class,'metric_format')]")
     private WebElement metricFormat;
-    
+
     @FindBy(css = "#p-objectPage .s-btn-delete")
     private WebElement deleteButton;
 

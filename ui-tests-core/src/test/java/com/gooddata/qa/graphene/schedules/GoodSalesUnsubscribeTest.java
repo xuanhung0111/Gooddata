@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -14,6 +15,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.mail.Message;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +47,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void createReportSchedule() {
+    public void createReportSchedule() throws InterruptedException {
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportTitle, "Unsubscribe bcc test - report.",
                 "Activities by Type", ExportFormat.CSV);

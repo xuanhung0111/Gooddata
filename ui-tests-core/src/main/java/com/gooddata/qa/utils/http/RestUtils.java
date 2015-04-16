@@ -11,6 +11,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
@@ -26,6 +27,7 @@ import org.springframework.web.util.UriTemplate;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import static org.testng.Assert.*;
 
 public class RestUtils {
 
+    private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
     private static final String USERS_LINK = "/gdc/projects/%s/users";
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
     private static final String LDM_LINK = "/gdc/projects/%s/ldm";
@@ -56,13 +59,14 @@ public class RestUtils {
     private static final String PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER = "featureFlag";
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
     private static final String CREATE_USER_CONTENT_BODY;
-    private static final String UPDATE_LDM_BODY;
+    private static final String MAQL_EXECUTION_BODY;
     private static final String MUF_OBJ;
     private static final String USER_FILTER;
     private static final String EXECUTION_DATALOAD_PROCESS_BODY;
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     private static final String ERROR_KEY = "error";
     private static final String PROJECT_MODEL_VIEW_LINK = "/gdc/projects/%s/model/view";
+    private static final String CREATE_COMMENT_CONTENT_BODY;
 
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
@@ -81,8 +85,25 @@ public class RestUtils {
                 }});
             }}.toString();
         } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is an exception during json object initialization! ", e);
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    }
+
+    static {
+        try {
+            CREATE_COMMENT_CONTENT_BODY = new JSONObject() {{
+                put("comment", new JSONObject() {{
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                    }});
+                    put("content", new JSONObject() {{
+                        put("related", "#{related}");
+                        put("content", "${title}");
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
     }
 
@@ -106,7 +127,7 @@ public class RestUtils {
 
     static {
         try {
-            UPDATE_LDM_BODY = new JSONObject() {{
+            MAQL_EXECUTION_BODY = new JSONObject() {{
                 put("manage", new JSONObject() {{
                     put("maql", "${maql}");
                 }});
@@ -310,8 +331,13 @@ public class RestUtils {
         return response.getStatusLine().getStatusCode() == 200;
     }
 
-    private static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri)
+    public static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri)
             throws IOException, JSONException {
+        return getJSONObjectFrom(restApiClient, uri, 200);
+    }
+
+    public static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri,
+            int expectedStatusCode) throws IOException, JSONException {
         HttpRequestBase getRequest = restApiClient.newGetMethod(uri);
         HttpResponse getResponse = restApiClient.execute(getRequest, HttpStatus.OK, "Invalid status code");
         String result = EntityUtils.toString(getResponse.getEntity());
@@ -358,7 +384,7 @@ public class RestUtils {
     }
 
     public static String createMUFObj(final RestApiClient restApiClient, String projectID, String mufTitle, 
-            Map<String, List<String>> conditions) throws IOException, JSONException {
+            Map<String, Collection<String>> conditions) throws IOException, JSONException {
         String mdObjURI = format(OBJ_LINK, projectID);
         String MUFExpressions = buildFilterExpression(projectID, conditions);
         System.out.println(MUFExpressions);
@@ -370,7 +396,8 @@ public class RestUtils {
         return json.getString("uri");
     }
 
-    private static String buildFilterExpression(final String projectID, Map<String, List<String>> conditions) {
+    private static String buildFilterExpression(final String projectID, Map<String,
+            Collection<String>> conditions) {
       //syntax: "([<Attribute_URI_1>] IN ([<element_URI_1>], [element_URI_2], [...] )) AND 
       //([<Attribute_URI_2>] IN ([<element_URI_1>], [element_URI_2], [...]))";
         List<String> expressions = Lists.newArrayList();
@@ -444,29 +471,24 @@ public class RestUtils {
         }
     }
 
-    public static String updateLDM(RestApiClient restApiClient, String projectId, String maql) {
-        String contentBody = UPDATE_LDM_BODY.replace("${maql}", maql);
-        String pollingUri = "";
+    public static String executeMAQL(RestApiClient restApiClient, String projectId, String maql)
+            throws ParseException, JSONException, IOException {
+        String contentBody = MAQL_EXECUTION_BODY.replace("${maql}", maql);
         HttpRequestBase postRequest =
                 restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody);
         HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK,
                 "LDM is not updated successful!");
 
         try {
-            JSONObject responseBody =
-                    new JSONObject(EntityUtils.toString(postResponse.getEntity()));
-            pollingUri =
-                    responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
+            JSONObject responseBody = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+            String pollingUri = responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
 
             EntityUtils.consumeQuietly(postResponse.getEntity());
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an excetion when getting polling uri of LDM update!", e);
+
+            return pollingUri;
         } finally {
             postRequest.releaseConnection();
         }
-
-        return pollingUri;
     }
 
     public static String getCurrentExecutionPollingState(RestApiClient restApiClient, String uri) {
@@ -505,6 +527,29 @@ public class RestUtils {
             EntityUtils.consumeQuietly(getResponse.getEntity());
         } finally {
             getRequest.releaseConnection();
+        }
+    }
+
+    public static String addComment(RestApiClient restApiClient, String projectId, String comment,
+            String objectId) throws ParseException, JSONException, IOException {
+        String objectUri = format(OBJ_LINK, projectId) + objectId;
+
+        System.out.println("Verify object id: " + objectUri);
+        getJSONObjectFrom(restApiClient, objectUri);
+
+        String content = CREATE_COMMENT_CONTENT_BODY.replace("${title}", comment).replace("#{related}", objectUri);
+        HttpRequestBase postRequest = restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId),
+                content);
+
+        try {
+            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
+            HttpEntity entity = postResponse.getEntity();
+            String uri =  new JSONObject(EntityUtils.toString(entity)).getJSONObject("comment")
+                    .getJSONObject("meta").getString("uri");
+            EntityUtils.consumeQuietly(entity);
+            return uri;
+        } finally {
+            postRequest.releaseConnection();
         }
     }
 
