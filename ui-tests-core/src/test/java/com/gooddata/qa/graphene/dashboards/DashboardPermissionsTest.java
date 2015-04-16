@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog.ALERT_INFOBOX_CSS_SELECTOR;
 import static org.testng.Assert.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +32,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     private static final String ALCOHOLICS_ANONYMOUS = "Alcoholics anonymous";
     private String viewerLogin;
     private String editorLogin;
-
+    private String userGroup1Id; 
+    private String userGroup2Id;
+    
     @BeforeClass
     public void before() throws InterruptedException {
         addUsersWithOtherRoles = true;
@@ -48,7 +51,6 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             
             logout();
             signIn(false, UserRoles.EDITOR);
-            initDashboardsPage();
             createDashboard("Only one dashboard of Editor");
             Thread.sleep(1000);
             
@@ -305,8 +307,12 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.ADMIN);
         
-        RestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(), ALCOHOLICS_ANONYMOUS);
-        RestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(), XENOFOBES_XYLOPHONES);
+        String userGroup1Uri = RestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(), 
+                ALCOHOLICS_ANONYMOUS);
+        String userGroup2Uri = RestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(), 
+                XENOFOBES_XYLOPHONES);
+        userGroup1Id = getUserGroupID(userGroup1Uri);
+        userGroup2Id = getUserGroupID(userGroup2Uri);
     }
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
@@ -340,7 +346,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
         
-        selectCandidatesAndCancel(addGranteesDialog, viewerLogin, editorLogin);
+        selectCandidatesAndCancel(addGranteesDialog, viewerLogin, editorLogin,
+                ALCOHOLICS_ANONYMOUS, XENOFOBES_XYLOPHONES);
         assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
     }
     
@@ -390,6 +397,17 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertEquals(addGranteesDialog.getGranteesCount("null", false), 0);
         assertEquals(addGranteesDialog.getGranteesCount("<button>abc</button>", false), 0);
     }
+    
+    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
+    public void shouldShowNoResultIfSearchGroup() throws JSONException, InterruptedException {
+        selectDashboard("Unchanged dashboard");
+        
+        final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+        final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
+
+        assertEquals(addGranteesDialog.getGranteesCount(ALCOHOLICS_ANONYMOUS, false), 0);
+        assertEquals(addGranteesDialog.getGranteesCount(XENOFOBES_XYLOPHONES, false), 0);
+    }
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldNotShowGranteesInCandidatesDialog() throws JSONException, InterruptedException {
@@ -423,48 +441,6 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         
         assertEquals(addGranteesDialog.getGranteesCount("", false), 0);
     }
-
-    /**
-     * CL-6045 test case - user (nor owner or grantee) can see warn message before kick himself from grantees
-     */
-    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
-    public void shouldShowHidingFromYourselfNotificationToEditor() throws InterruptedException, JSONException {
-        try {
-            createDashboard("Ordinary dashboard");
-            publishDashboard(true);
-            
-            logout();
-            signIn(false, UserRoles.EDITOR);
-            selectDashboard("Ordinary dashboard");
-            final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
-            permissionsDialog.publish(PublishType.SPECIFIC_USERS_CAN_ACCESS);
-            waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
-            
-            final AddGranteesDialog addGranteesDialog  = permissionsDialog.openAddGranteePanel();
-            selectCandidatesAndShare(addGranteesDialog, editorLogin);
-            assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
-            
-            permissionsDialog.removeUser(editorLogin);
-            waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
-            
-            permissionsDialog.undoRemoveUser(editorLogin);
-            assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
-            
-            permissionsDialog.removeUser(editorLogin);
-            permissionsDialog.submit();
-            
-            selectDashboard("Published dashboard");
-            browser.navigate().refresh();
-            waitForDashboardPageLoaded(browser);
-            
-            List<String> dashboards = dashboardsPage.getDashboardsNames();
-            assertFalse(dashboards.contains("Ordinary dashboard"));
-        } finally {
-            logout();
-            signIn(false, UserRoles.ADMIN);
-        }
-    }
-    
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldCacheSpecificUsersWhenSwitchFromEveryoneToSpecificUsers() 
@@ -565,6 +541,143 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         
         assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
     }
+    
+    @Test(dependsOnGroups = {"acl-tests"}, groups = {"acl-tests-usergroups"})
+    public void prepareUsergroupTests() throws IOException, JSONException {
+        initDashboardsPage();
+        
+        logout();
+        signIn(false, UserRoles.ADMIN);
+        
+        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup1Id, testParams.getEditorProfileUri());
+        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup2Id, testParams.getViewerProfileUri());
+    }
+    
+    @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups"})
+    public void shouldVisibleToUserInGroup() throws InterruptedException, JSONException {
+        createDashboard("Dashboard shared to user group");
+        
+        final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+        final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
+        
+        selectCandidatesAndShare(addGranteesDialog, viewerLogin, ALCOHOLICS_ANONYMOUS);
+        assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
+        
+        permissionsDialog.submit();
+        assertTrue(checkDashboardVisible("Dashboard shared to user group"));
+    }
+    
+    @Test(dependsOnMethods = {"shouldVisibleToUserInGroup"}, groups = {"acl-tests-usergroups"})
+    public void shouldInvisibleToUserIfRelatedGroupIsRemoved() throws InterruptedException, JSONException {
+        selectDashboard("Dashboard shared to user group");
+        
+        final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+        
+        permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
+        permissionsDialog.submit();
+        
+        assertFalse(checkDashboardVisible("Dashboard shared to user group"));
+    }
+    
+    @Test(dependsOnMethods = {"shouldInvisibleToUserIfRelatedGroupIsRemoved"}, groups = {"acl-tests-usergroups"})
+    public void shouldVisibleToUserIfRelatedGroupIsRemovedButUserIsKept() 
+            throws InterruptedException, JSONException {
+        selectDashboard("Dashboard shared to user group");
+        
+        final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+        assertEquals(permissionsDialog.getAddedGrantees().size(), 2);
+        
+        final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
+        selectCandidatesAndShare(addGranteesDialog, editorLogin);
+        assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
+        
+        permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
+        
+        permissionsDialog.submit();
+        assertTrue(checkDashboardVisible("Dashboard shared to user group"));
+    }
+    
+    @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups"})
+    public void shouldNotRemoveUserGroupWhenDialogDismissed() throws InterruptedException, JSONException {
+        selectDashboard("Dashboard shared to all users and groups");
+        
+        final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+
+        permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
+        permissionsDialog.cancel();
+        
+        dashboardsPage.openPermissionsDialog();
+        assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
+    }
+
+    /**
+     * CL-6045 test case - user (nor owner or grantee) can see warn message before kick himself from grantees
+     */
+    @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups"})
+    public void shouldShowHidingFromYourselfNotificationToEditor() throws InterruptedException, JSONException {
+        try {
+            createDashboard("Hide yourself test dashboard");
+            publishDashboard(true);
+            
+            logout();
+            signIn(false, UserRoles.EDITOR);
+            selectDashboard("Hide yourself test dashboard");
+            final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
+            permissionsDialog.publish(PublishType.SPECIFIC_USERS_CAN_ACCESS);
+            waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
+            
+            AddGranteesDialog addGranteesDialog  = permissionsDialog.openAddGranteePanel();
+            selectCandidatesAndShare(addGranteesDialog, ALCOHOLICS_ANONYMOUS);
+            assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
+            
+            permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
+            waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
+            
+            permissionsDialog.undoRemoveGroup(ALCOHOLICS_ANONYMOUS);
+            assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
+            
+            permissionsDialog.removeGroup(ALCOHOLICS_ANONYMOUS);
+            waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
+            
+            addGranteesDialog  = permissionsDialog.openAddGranteePanel();
+            selectCandidatesAndShare(addGranteesDialog, editorLogin);
+            assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
+            
+            permissionsDialog.removeUser(editorLogin);
+            waitForElementPresent(permissionsDialog.getRoot().findElement(ALERT_INFOBOX_CSS_SELECTOR));
+            
+            permissionsDialog.undoRemoveUser(editorLogin);
+            assertEquals(permissionsDialog.getRoot().findElements(ALERT_INFOBOX_CSS_SELECTOR).size(), 0);
+            
+            permissionsDialog.removeUser(editorLogin);
+            permissionsDialog.submit();
+            
+            selectDashboard("Published dashboard");
+            browser.navigate().refresh();
+            waitForDashboardPageLoaded(browser);
+            
+            List<String> dashboards = dashboardsPage.getDashboardsNames();
+            assertFalse(dashboards.contains("Hide yourself test dashboard"));
+        } finally {
+            logout();
+            signIn(false, UserRoles.ADMIN);
+        }
+    }
+    
+    private boolean checkDashboardVisible(String dashboardName) throws JSONException {
+        try {
+            logout();
+            signIn(false, UserRoles.EDITOR);
+            
+            initDashboardsPage();
+            List<String> dashboards = dashboardsPage.getDashboardsNames();
+            
+            return dashboards.contains(dashboardName);
+        } finally {
+            logout();
+            signIn(false, UserRoles.ADMIN);
+        }
+    }
 
     private void setDashboardPublish() {
         dashboardsPage.editDashboard();
@@ -592,5 +705,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         for (String candidate : candidates) {
             addGranteesDialog.selectItem(candidate);    
         }
+    }
+
+    private String getUserGroupID(String userGroupUri) {
+        String[] parts = userGroupUri.split("/");
+        return parts[parts.length -1];
     }
 }

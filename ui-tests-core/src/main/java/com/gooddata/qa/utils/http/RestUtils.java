@@ -52,6 +52,7 @@ public class RestUtils {
     private static final String UPDATE_LDM_BODY;
     private static final String MUF_OBJ;
     private static final String USER_FILTER;
+    private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
@@ -207,7 +208,49 @@ public class RestUtils {
                      "User group could not be deleted, got " + statusCode);
     }
 
-    public static String getLDMImageURI(String host, String projectId, String user, String password) throws ParseException, IOException, JSONException {
+    public static void addUsersToUserGroup(RestApiClient restApiClient, String userGroupId, String... userURIs)
+            throws JSONException {
+        modifyUsersInUserGroup(restApiClient, userGroupId, "ADD", userURIs);
+    }
+
+    public static void removeUsersFromUserGroup(RestApiClient restApiClient, String userGroupId,
+            String... userURIs) throws JSONException {
+        modifyUsersInUserGroup(restApiClient, userGroupId, "REMOVE", userURIs);
+    }
+
+    public static void setUsersInUserGroup(RestApiClient restApiClient, String userGroupId, String... userURIs)
+            throws JSONException {
+        modifyUsersInUserGroup(restApiClient, userGroupId, "SET", userURIs);
+    }
+
+    private static void modifyUsersInUserGroup(RestApiClient restApiClient, String userGroupId, 
+            String operation, String... userURIs) throws JSONException {
+        HttpRequestBase postRequest = null;
+        try {
+            String modifyMemberUri = String.format(USER_GROUP_MODIFY_MEMBERS_LINK, userGroupId);
+            postRequest = restApiClient.newPostMethod(modifyMemberUri, 
+                    buildModifyMembersContent(operation, userURIs));
+            HttpResponse postResponse = restApiClient.execute(postRequest);
+            assertEquals(postResponse.getStatusLine().getStatusCode(), 204, "Modify Users on User Group failed");
+        } finally {
+            if (postRequest != null) {
+                postRequest.releaseConnection();
+            }
+        }
+    }
+
+    private static String buildModifyMembersContent(final String operation, final String... userURIs) 
+            throws JSONException {
+        return new JSONObject() {{
+            put("modifyMembers", new JSONObject() {{
+                put("operation", operation);
+                put("items", new JSONArray(userURIs));
+            }});
+        }}.toString();
+    }
+
+    public static String getLDMImageURI(String host, String projectId, String user, String password) 
+            throws ParseException, IOException, JSONException {
         RestApiClient restApiClient = new RestApiClient(host, user, password, true, false);
         String ldmUri = String.format(LDM_LINK, projectId);
         HttpRequestBase getRequest = restApiClient.newGetMethod(ldmUri);
@@ -279,7 +322,7 @@ public class RestUtils {
     public static String createMUFObj(final RestApiClient restApiClient, String projectID, String mufTitle, 
             Map<String, List<String>> conditions) throws IOException, JSONException {
         String mdObjURI = format(OBJ_LINK, projectID);
-        String MUFExpressions = buildExpression(projectID, conditions);
+        String MUFExpressions = buildFilterExpression(projectID, conditions);
         System.out.println(MUFExpressions);
         String contentBody = MUF_OBJ.replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
         HttpRequestBase postRequest = restApiClient.newPostMethod(mdObjURI, contentBody);
@@ -290,7 +333,7 @@ public class RestUtils {
         return json.getString("uri");
     }
 
-    private static String buildExpression(final String projectID, Map<String, List<String>> conditions) {
+    private static String buildFilterExpression(final String projectID, Map<String, List<String>> conditions) {
       //syntax: "([<Attribute_URI_1>] IN ([<element_URI_1>], [element_URI_2], [...] )) AND 
       //([<Attribute_URI_2>] IN ([<element_URI_1>], [element_URI_2], [...]))";
         List<String> expressions = Lists.newArrayList();
