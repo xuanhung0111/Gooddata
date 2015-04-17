@@ -10,7 +10,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -111,16 +110,16 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         EntityUtils.consumeQuietly(postResponse.getEntity());
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private String getResetRecurrencySchedule(InputStream stream) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-        Map<String, Map<String, Map<String, Map<String, String>>>> rootNode = mapper.readValue(stream,
-                new TypeReference<Map<String, Map<String, Map<String, Map<String, String>>>>>() {});
-        Map<String, Map<String, Map<String, String>>> scheduledMail = rootNode.get("scheduledMail");
-        Map<String, Map<String, String>> content = scheduledMail.get("content");
-        Map<String, String> when = content.get("when");
+        Map rootNode = mapper.readValue(stream, Map.class);
+        Map scheduledMail = (Map) rootNode.get("scheduledMail");
+        Map content = (Map) scheduledMail.get("content");
+        Map when = (Map) content.get("when");
 
-        String timeZone = when.get("timeZone");
+        String timeZone = (String) when.get("timeZone");
         content.remove("lastSuccessfull");
         DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZone)));
         DateTimeFormatter fmt = DateTimeFormat.forPattern("*Y:M:0:d:H:m:s");
@@ -131,13 +130,13 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         return mapper.writeValueAsString(rootNode);
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private String getBccSchedule(InputStream scheduleStream, String[] bccEmails) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
-        Map<String, Map<String, Map<String, List<String>>>> rootNode = mapper.readValue(scheduleStream,
-                new TypeReference<Map<String, Map<String, Map<String, List<String>>>>>() {});
-        Map<String, Map<String, List<String>>> scheduledMail = rootNode.get("scheduledMail");
-        Map<String, List<String>> content = scheduledMail.get("content");
+        Map rootNode = mapper.readValue(scheduleStream, Map.class);
+        Map scheduledMail = (Map) rootNode.get("scheduledMail");
+        Map content = (Map) scheduledMail.get("content");
 
         List<String> bccEmailsList = asList(bccEmails);
         if (bccEmails != null) {
