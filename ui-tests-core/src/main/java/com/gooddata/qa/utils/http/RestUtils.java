@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.http;
 
+import com.gooddata.qa.graphene.dto.Processes;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.google.common.base.Function;
@@ -7,11 +8,14 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,7 +57,9 @@ public class RestUtils {
     private static final String UPDATE_LDM_BODY;
     private static final String MUF_OBJ;
     private static final String USER_FILTER;
+    private static final String EXECUTION_DATALOAD_PROCESS_BODY;
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
+    private static final String ERROR_KEY = "error";
 
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
@@ -144,6 +150,21 @@ public class RestUtils {
         } catch (JSONException e) {
             throw new IllegalStateException(
                     "There is an exception during json object initialization! ", e);
+        }
+    }
+
+    static {
+        try {
+            EXECUTION_DATALOAD_PROCESS_BODY = new JSONObject() {{
+                put("execution", new JSONObject() {{
+                    put("params", new JSONObject() {{
+                        put("GDC_DE_SYNCHRONIZE_ALL", true);
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exeception during json object initialization! ", e);
         }
     }
 
@@ -491,6 +512,60 @@ public class RestUtils {
 
         public static FeatureFlagOption createFeatureClassOption(final String featureFlagName, final boolean on) {
             return new FeatureFlagOption(featureFlagName, on);
+        }
+    }
+
+    public static void deleteDataloadProcess(RestApiClient restApiClient, String dataloadProcessUri,
+            String projectId) {
+        if (StringUtils.isEmpty(dataloadProcessUri)) {
+            return;
+        }
+
+        System.out.println("Deleting dataload process for project: " + projectId);
+        HttpRequestBase deleteRequest = restApiClient.newDeleteMethod(dataloadProcessUri);
+        try {
+              HttpResponse deleteResponse = restApiClient.execute(deleteRequest, HttpStatus.NO_CONTENT,
+                      "Could not delete dataload process!");
+              EntityUtils.consumeQuietly(deleteResponse.getEntity());
+        } finally {
+            deleteRequest.releaseConnection();
+        }
+    }
+
+    public static Pair<Integer, String> executeDataloadProcess(RestApiClient restApiClient,
+            String dataloadProcessUri) throws JSONException, ParseException, IOException {
+        System.out.println("Execute dataload process with GDC_DE_SYNCHRONIZE_ALL");
+
+        String errorMessage = "";
+        int responseStatusCode ;
+        HttpRequestBase postRequest =
+                restApiClient.newPostMethod(dataloadProcessUri + "/executions/", EXECUTION_DATALOAD_PROCESS_BODY);
+        try {
+            HttpResponse response = restApiClient.execute(postRequest);
+            JSONObject jsonObject = new JSONObject(EntityUtils.toString(response.getEntity()));
+            if (jsonObject.has(ERROR_KEY)) {
+                errorMessage = new JSONObject(jsonObject.get(ERROR_KEY).toString()).get("message").toString();
+            }
+            EntityUtils.consumeQuietly(response.getEntity());
+            responseStatusCode = response.getStatusLine().getStatusCode();
+            System.out.println(" - status: " + responseStatusCode);
+        } finally {
+            postRequest.releaseConnection();
+        }
+
+        return  Pair.of(responseStatusCode, errorMessage);
+    }
+
+    public static Processes getProcessesList(RestApiClient restApiClient, String projectId)
+            throws IOException, JSONException {
+        String processesUri = format("/gdc/projects/%s/dataload/processes", projectId);
+        ObjectMapper mapper = new ObjectMapper();
+
+        JSONObject json = RestUtils.getJSONObjectFrom(restApiClient, processesUri);
+        try {
+            return mapper.readValue(json.toString(), Processes.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to parse processes from response.");
         }
     }
 }

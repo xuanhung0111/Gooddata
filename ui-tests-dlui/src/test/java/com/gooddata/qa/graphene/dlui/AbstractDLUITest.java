@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static java.lang.String.format;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.testng.Assert.*;
 
@@ -21,6 +22,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.ADSInstance;
@@ -31,6 +34,7 @@ import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.DLUIProcessParameters;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -50,8 +54,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             + "%s/schemas/default";
     private static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
-
-    private static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
+    protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String FROM = "no-reply@gooddata.com";
 
     private JSONObject cloudConnectProcess = new JSONObject();
@@ -68,12 +71,38 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     protected String maqlFilePath;
     protected String sqlFilePath;
     protected String zipFilePath;
+    protected String INITIAL_LDM_MAQL_FILE = "create-ldm.txt";
 
     protected static final String ADS_URL =
             "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
 
     protected ProcessInfo cloudconnectProcess;
     protected ADSInstance adsInstance;
+
+    @BeforeClass
+    public void initialProperties() {
+        maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
+        sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
+        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
+    public void prepareLDMAndADSInstance() throws JSONException {
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
+        updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
+
+        adsInstance = new ADSInstance().withName("ADS Instance for DLUI test")
+                .withAuthorizationToken(testParams.loadProperty("dss.authorizationToken"));
+        createADSInstance(adsInstance);
+
+        setDefaultSchemaForOutputStage(adsInstance.getId());
+        assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
+
+        cloudconnectProcess = new ProcessInfo().withProjectId(testParams.getProjectId())
+                .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
+        createCloudConnectProcess(cloudconnectProcess);
+    }
 
     protected ProjectInfo getWorkingProject() {
         if (workingProject == null)
@@ -450,5 +479,13 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             }
             return datasets;
         }
+    }
+
+    protected String getDataloadProcessUri() throws IOException, JSONException {
+        return format(DATALOAD_PROCESS_URI, testParams.getProjectId()) + getDataloadProcessId();
+    }
+
+    protected String getDataloadProcessId() throws IOException, JSONException {
+        return RestUtils.getProcessesList(getRestApiClient(), testParams.getProjectId()).getDataloadProcess().getProcessId();
     }
 }
