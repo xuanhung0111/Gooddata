@@ -7,7 +7,9 @@ import static org.testng.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -22,24 +24,31 @@ import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.ADSInstance;
+import com.gooddata.qa.graphene.entity.DataSource;
+import com.gooddata.qa.graphene.entity.Dataset;
+import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
+import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.DLUIProcessParameters;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import com.google.common.collect.Lists;
 
 public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     private static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
-    private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS = "DLUI/graph/CreateAndCopyDataToADS.grf";
+    private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
+            "DLUI/graph/CreateAndCopyDataToADS.grf";
 
     private static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     private static final String PROCESS_EXECUTION_URI = DATALOAD_PROCESS_URI + "%s/executions";
     private static final String ADS_INSTANCES_URI = "gdc/datawarehouse/instances/";
-    private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI + "%s/schemas/default";
-    private static final String OUTPUTSTAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
+    private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
+            + "%s/schemas/default";
+    private static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
 
     private static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String FROM = "no-reply@gooddata.com";
@@ -58,6 +67,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     protected String maqlFilePath;
     protected String sqlFilePath;
     protected String zipFilePath;
+
+    protected static final String ADS_URL =
+            "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
+
+    protected ProcessInfo cloudconnectProcess;
+    protected ADSInstance adsInstance;
 
     protected ProjectInfo getWorkingProject() {
         if (workingProject == null)
@@ -130,7 +145,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                     storageForm.createStorage(adsInstance.getName(), adsInstance.getDescription(),
                             adsInstance.getAuthorizationToken());
         } catch (Exception e) {
-            throw new IllegalStateException("There is an exception during creating new ads instance! ", e);
+            throw new IllegalStateException(
+                    "There is an exception during creating new ads instance! ", e);
         }
 
         adsInstance.withId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
@@ -139,8 +155,9 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected void deleteADSInstance(ADSInstance adsInstance) {
         openUrl(ADS_INSTANCES_URI + adsInstance.getId());
-        InstanceFragment storage = createPageFragment(InstanceFragment.class,
-                waitForElementVisible(BY_GP_FORM_SECOND, browser));
+        InstanceFragment storage =
+                createPageFragment(InstanceFragment.class,
+                        waitForElementVisible(BY_GP_FORM_SECOND, browser));
         assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
         storage.deleteStorageSuccess();
     }
@@ -174,26 +191,31 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         String processExecutionUri =
                 String.format(PROCESS_EXECUTION_URI, testParams.getProjectId(), processId);
         try {
-            String createTableSql = FileUtils.readFileToString(new File(createTableSqlFile), StandardCharsets.UTF_8);
-            String copyTableSql = FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
+            String createTableSql =
+                    FileUtils
+                            .readFileToString(new File(createTableSqlFile), StandardCharsets.UTF_8);
+            String copyTableSql =
+                    FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
             prepareProcessExecutionBody(adsUrl, createTableSql, copyTableSql);
             String postBody = processExecution.toString();
             String pollingUri = executeProcessRequest(processExecutionUri, postBody);
 
             pollingExecutionStatus(pollingUri);
         } catch (IOException e) {
-            throw new IllegalStateException("There is an exception during reading file to string! ", e);
+            throw new IllegalStateException(
+                    "There is an exception during reading file to string! ", e);
         }
     }
 
-    protected int setDefaultSchemaForOutputStage(String adsId) {
+    protected void setDefaultSchemaForOutputStage(String adsId) {
         String schemaUri = String.format(ADS_INSTANCE_SCHEMA_URI, adsId);
         JSONObject outputStageObj = new JSONObject();
         try {
             outputStageObj.put("outputStage", new JSONObject().put("schema", schemaUri));
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is a problem with JSON object when set default schema for outputStage! ", e);
+                    "There is a problem with JSON object when set default schema for outputStage! ",
+                    e);
         }
 
         String putUri = String.format(OUTPUTSTAGE_URI, getWorkingProject().getProjectId());
@@ -205,8 +227,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         System.out.println(putResponse.toString());
         EntityUtils.consumeQuietly(putResponse.getEntity());
         System.out.println("Response status: " + responseStatusCode);
-
-        return responseStatusCode;
+        assertEquals(responseStatusCode, HttpStatus.OK.value(),
+                "Default schema is not set successfully!");
     }
 
     protected String uploadZipFileToWebDav(String zipFile, String webContainer) {
@@ -232,6 +254,27 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         browser.switchTo().frame(
                 waitForElementVisible(By.xpath("//iframe[contains(@src,'dlui-annie')]"), browser));
         waitForElementVisible(annieUIDialog.getRoot());
+    }
+
+    protected DataSource prepareADSTable(ADSTables adsTable) {
+        createUpdateADSTable(adsTable);
+        DataSource dataSource =
+                new DataSource().withName(adsTable.datasourceName).withDatasets(
+                        adsTable.getDatasets());
+
+        return dataSource;
+    }
+
+    protected Dataset prepareDataset(AdditionalDatasets additionalDataset) {
+        return additionalDataset.getDataset();
+    }
+
+    protected void createUpdateADSTable(ADSTables adsTable) {
+        executeProcess(
+                cloudconnectProcess.getProcessId(),
+                ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
+                        adsInstance.getId()), sqlFilePath + adsTable.createTableSqlFile,
+                sqlFilePath + adsTable.copyTableSqlFile);
     }
 
     private String sendRequestToUpdateModel(String maqlFile) {
@@ -265,7 +308,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         try {
             processExecution.put("execution", objMap);
         } catch (JSONException e) {
-            throw new IllegalStateException("There is a problem with JSON object when executing an process! ", e);
+            throw new IllegalStateException(
+                    "There is a problem with JSON object when executing an process! ", e);
         }
     }
 
@@ -321,7 +365,87 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             cloudConnectProcess.put("process", objMap);
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is a problem when create JSON object for creating CloudConnect process! ", e);
+                    "There is a problem when create JSON object for creating CloudConnect process! ",
+                    e);
+        }
+    }
+
+    protected enum AdditionalDatasets {
+
+        PERSON_WITH_NEW_FIELDS("person", new Field("Position", FieldTypes.ATTRIBUTE)),
+        PERSON_WITH_NEW_DATE_FIELD(
+                "person",
+                new Field("Position", FieldTypes.ATTRIBUTE),
+                new Field("Date", FieldTypes.DATE)),
+        OPPORTUNITY_WITH_NEW_FIELDS(
+                "opportunity",
+                new Field("Title2", FieldTypes.ATTRIBUTE),
+                new Field("Label", FieldTypes.LABEL_HYPERLINK),
+                new Field("Totalprice2", FieldTypes.FACT)),
+        OPPORTUNITY_WITH_NEW_DATE_FIELD(
+                "opportunity",
+                new Field("Title2", FieldTypes.ATTRIBUTE),
+                new Field("Label", FieldTypes.LABEL_HYPERLINK),
+                new Field("Totalprice2", FieldTypes.FACT),
+                new Field("Date", FieldTypes.DATE));
+
+        private String name;
+        private List<Field> additionalFields;
+
+        private AdditionalDatasets(String name, Field... additionalFields) {
+            this.name = name;
+            this.additionalFields = Lists.newArrayList(additionalFields);
+        }
+
+        public Dataset getDataset() {
+            List<Field> fields = Lists.newArrayList();
+            for (Field additionalField : additionalFields) {
+                fields.add(additionalField.clone());
+            }
+            return new Dataset().withName(name).withFields(fields);
+        }
+    }
+
+    protected enum ADSTables {
+
+        WITHOUT_ADDITIONAL_FIELDS("createTable.txt", "copyTable.txt", "Unknown data source"),
+        WITH_ADDITIONAL_FIELDS(
+                "createTableWithAdditionalFields.txt",
+                "copyTableWithAdditionalFields.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
+        WITH_ADDITIONAL_DATE(
+                "createTableWithAdditionalDate.txt",
+                "copyTableWithAdditionalDate.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
+        WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt");
+
+        private String createTableSqlFile;
+        private String copyTableSqlFile;
+        private String datasourceName;
+        private List<AdditionalDatasets> additionalDatasets = Lists.newArrayList();
+
+        private ADSTables(String createTableSqlFile, String copyTableSqlFile) {
+            this(createTableSqlFile, copyTableSqlFile, "");
+        }
+
+        private ADSTables(String createTableSqlFile, String copyTableSqlFile,
+                String datasourceName, AdditionalDatasets... datasets) {
+            this.createTableSqlFile = createTableSqlFile;
+            this.copyTableSqlFile = copyTableSqlFile;
+            this.datasourceName = datasourceName;
+            this.additionalDatasets = Arrays.asList(datasets);
+        }
+
+        public List<Dataset> getDatasets() {
+            List<Dataset> datasets = Lists.newArrayList();
+            for (AdditionalDatasets additionalDataset : this.additionalDatasets) {
+                datasets.add(additionalDataset.getDataset());
+            }
+            return datasets;
         }
     }
 }

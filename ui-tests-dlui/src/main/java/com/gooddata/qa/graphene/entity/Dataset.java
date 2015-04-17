@@ -1,28 +1,22 @@
 package com.gooddata.qa.graphene.entity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.enums.AdditionalDatasets;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import static org.testng.Assert.*;
 
 public class Dataset {
 
     private String name;
     private List<Field> fields = Lists.newArrayList();
-    private List<Field> selectedFields = Lists.newArrayList();
 
     public Dataset() {}
-
-    public Dataset(AdditionalDatasets dataset) {
-        this.name = dataset.getName();
-        this.fields.addAll(dataset.getFields());
-    }
 
     public String getName() {
         return name;
@@ -37,12 +31,20 @@ public class Dataset {
         return Lists.newArrayList(fields);
     }
 
+    public Collection<Field> getAvailableFields() {
+        return getFieldsWithStatus(FieldStatus.AVAILABLE);
+    }
+
+    public Collection<Field> getSelectedFields() {
+        return getFieldsWithStatus(FieldStatus.SELECTED);
+    }
+
     public List<Field> getFieldsInSpecificFilter(FieldTypes fieldType) {
         if (fieldType == FieldTypes.ALL)
-            return Lists.newArrayList(fields);
+            return Lists.newArrayList(getAvailableFields());
 
         List<Field> filteredFields = Lists.newArrayList();
-        for (Field field : this.fields) {
+        for (Field field : getAvailableFields()) {
             if (field.getType() == fieldType)
                 filteredFields.add(field);
         }
@@ -50,48 +52,65 @@ public class Dataset {
     }
 
     public Dataset withFields(Field... fields) {
-        this.fields = Lists.newArrayList(fields);
+        return withFields(Lists.newArrayList(fields));
+    }
+
+    public Dataset withFields(List<Field> fields) {
+        this.fields.addAll(fields);
         return this;
     }
 
-    public Dataset withSelectedFields(Field... fields) {
-        checkValidSelectedFileds(fields);
+    public Dataset updateFieldStatus(List<Field> customStatusFields) {
+        checkValidFields(customStatusFields);
 
-        this.selectedFields = Lists.newArrayList(fields);
-
-        return this;
-    }
-
-    public List<Field> getSelectedFields() {
-        return Lists.newArrayList(selectedFields);
-    }
-
-    public void removeAddedField(List<Field> addedfields) {
-        for (final Field addedField : addedfields) {
-            assertTrue(Iterables.removeIf(fields, new Predicate<Field>() {
+        for (final Field customStatusField : customStatusFields) {
+            Iterables.find(this.fields, new Predicate<Field>() {
 
                 @Override
                 public boolean apply(Field field) {
-                    return field.getName().equals(addedField.getName());
+                    return customStatusField.getName().equals(field.getName());
                 }
-            }));
+            }).setStatus(customStatusField.getStatus());
+        }
+
+        return this;
+    }
+
+    public void addSelectedFields(boolean confirmed) {
+        for (Field field : fields) {
+            if (field.getStatus() != FieldStatus.SELECTED)
+                continue;
+            if (confirmed)
+                field.setStatus(FieldStatus.ADDED);
+            else
+                field.setStatus(FieldStatus.AVAILABLE);
         }
     }
 
-    private void checkValidSelectedFileds(Field... selectedfields) {
-        for (final Field selectedField : selectedfields) {
+    private void checkValidFields(List<Field> validatedFields) {
+        for (final Field validatedField : validatedFields) {
             try {
                 Iterables.find(getAllFields(), new Predicate<Field>() {
 
                     @Override
                     public boolean apply(Field field) {
-                        return field.getName().equals(selectedField.getName());
+                        return field.getName().equals(validatedField.getName());
                     }
                 });
             } catch (NoSuchElementException e) {
                 throw new IllegalStateException("Dataset '" + this.name
-                        + "' doesn't contain field '" + selectedField.getName() + "'", e);
+                        + "' doesn't contain field '" + validatedField.getName() + "'", e);
             }
         }
+    }
+
+    private Collection<Field> getFieldsWithStatus(final FieldStatus status) {
+        return Collections2.filter(getAllFields(), new Predicate<Field>() {
+
+            @Override
+            public boolean apply(Field field) {
+                return field.getStatus() == status;
+            }
+        });
     }
 }
