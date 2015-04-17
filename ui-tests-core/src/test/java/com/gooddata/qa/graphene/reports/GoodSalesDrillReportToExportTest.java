@@ -85,7 +85,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Discovery");
             Thread.sleep(6000);
-            verifyReportExport(ExportFormat.EXCEL_XLSX, "Discovery", 5513);
+            verifyReportExport(ExportFormat.EXCEL_XLSX, "Discovery", 5512);
             checkRedBar(browser);
             
             setDrillReportTargetAsExport(ExportFormat.CSV.getName());
