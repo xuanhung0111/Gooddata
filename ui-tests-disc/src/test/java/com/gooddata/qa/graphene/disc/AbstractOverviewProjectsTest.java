@@ -230,6 +230,8 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         waitForElementVisible(discOverviewProjects.getRoot());
         discOverviewProjects.checkOnSelectedProjects(overviewProject);
         discOverviewProjects.disableAction();
+        browser.navigate().refresh();
+        waitForElementVisible(discOverviewProjects.getRoot());
         checkFilteredOutOverviewProject(projectState, getWorkingProject());
         checkOtherOverviewStates(projectState, getWorkingProject());
 
@@ -325,7 +327,10 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
                 assertTrue(scheduleDetail.isStarted());
                 scheduleDetail.waitForExecutionFinish();
             } catch (NoSuchElementException ex) {
-                assertEquals(scheduleDetail.getExecutionItemsNumber(), 2);
+                if (projectState == OverviewProjectStates.FAILED)
+                    assertEquals(scheduleDetail.getExecutionItemsNumber(), 2);
+                else if (projectState == OverviewProjectStates.SUCCESSFUL)
+                    scheduleDetail.checkOkExecutionGroup(2, 0);
             }
         } else {
             scheduleDetail.assertManualStoppedExecution();

@@ -54,7 +54,7 @@ public class ScheduleDetail extends ScheduleForm {
     private static final String BROKEN_SCHEDULE_MESSAGE =
             "The graph %s doesn't exist because it has been changed (renamed or deleted). "
                     + "It isn't possible to execute this schedule because there is no graph to execute.";
-    private static final String OK_GROUP_DESCRIPTION_FORMAT = "OK %dx";
+    private static final String OK_GROUP_DESCRIPTION_FORMAT = "OK %d×";
 
     private static final By BY_EXECUTION_STATUS = By.cssSelector(".execution-status");
     private static final By BY_EXECUTION_DESCRIPTION = By
@@ -391,7 +391,6 @@ public class ScheduleDetail extends ScheduleForm {
         waitForElementVisible(manualRunDialog);
         waitForElementVisible(confirmRunButton).click();
         waitForElementVisible(manualStopButton);
-        System.out.println("Schedule is executed manually!");
     }
 
     public void manualStop() {
