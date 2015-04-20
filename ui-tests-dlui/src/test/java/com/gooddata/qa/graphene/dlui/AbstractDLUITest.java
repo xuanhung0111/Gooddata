@@ -49,6 +49,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
             + "%s/schemas/default";
     private static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
+    private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
 
     private static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String FROM = "no-reply@gooddata.com";
@@ -221,6 +222,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         String putUri = String.format(OUTPUTSTAGE_URI, getWorkingProject().getProjectId());
         String putBody = outputStageObj.toString();
         HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
+        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
+
         HttpResponse putResponse = getRestApiClient().execute(putRequest);
         int responseStatusCode = putResponse.getStatusLine().getStatusCode();
 
