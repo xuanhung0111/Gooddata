@@ -18,8 +18,12 @@ public class ProjectAndUsersPage extends AbstractFragment {
 
     @FindBy(className = "project-page-manage-link")
     private WebElement userManagementLink;
+    
+    @FindBy(css = ".leaveProject .s-btn-leave")
+    private WebElement leaveProjectButton;
 
     private static final By BY_PROJECTS_LIST = By.className("userProjects");
+    private static final By BY_LEAVE_PROJECT_DIALOG_BUTTON = By.cssSelector("form .s-btn-leave");
 
     public void deteleProject() {
         waitForElementVisible(deleteProjectButton).click();
@@ -31,5 +35,10 @@ public class ProjectAndUsersPage extends AbstractFragment {
 
     public void openUserManagemtPage() {
         waitForElementVisible(userManagementLink).click();
+    }
+    
+    public void leaveProject() {
+        waitForElementVisible(leaveProjectButton).click();
+        waitForElementVisible(BY_LEAVE_PROJECT_DIALOG_BUTTON, browser).click();
     }
 }
