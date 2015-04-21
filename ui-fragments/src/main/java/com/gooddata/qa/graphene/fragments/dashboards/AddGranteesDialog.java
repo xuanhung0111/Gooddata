@@ -39,6 +39,7 @@ public class AddGranteesDialog extends AbstractFragment {
 
         searchForGranteeInput.clear();
         searchForGranteeInput.sendKeys(searchText);
+        Thread.sleep(1000);
         if (expectResult) {
             return getNumberOfGrantees();
         } else {
