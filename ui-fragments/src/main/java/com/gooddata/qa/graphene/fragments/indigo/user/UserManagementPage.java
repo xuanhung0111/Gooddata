@@ -20,6 +20,12 @@ import com.gooddata.qa.graphene.fragments.common.DropDown;
 
 public class UserManagementPage extends AbstractFragment {
 
+    @FindBy(css = ".users-titlebar-title > h2")
+    private WebElement userTitleBar;
+
+    @FindBy(className = "rename-group-link")
+    private WebElement renameGroupLink;
+
     @FindBy(className = "s-btn-invite_people")
     private WebElement inviteUsersButton;
 
@@ -79,10 +85,26 @@ public class UserManagementPage extends AbstractFragment {
                 waitForElementVisible(By.className("invitationDialog"), browser));
     }
 
-    public GroupDialog openGroupDialog() {
-        waitForElementVisible(createGroupButton).click();
+    public GroupDialog openGroupDialog(GroupDialog.State state) {
+        waitForElementVisible(state == GroupDialog.State.CREATE ? createGroupButton : renameGroupLink).click();
         return Graphene.createPageFragment(GroupDialog.class,
                 waitForElementVisible(By.className("group-dialog"), browser));
+    }
+
+    public void createNewGroup(String name) {
+        openGroupDialog(GroupDialog.State.CREATE).submitDialogGroup(name);
+    }
+
+    public void renameUserGroup(String newName) {
+        openGroupDialog(GroupDialog.State.EDIT).submitDialogGroup(newName);
+    }
+
+    public void cancelCreatingNewGroup(String name) {
+        openGroupDialog(GroupDialog.State.CREATE).cancelSubmitDialogGroup(name);
+    }
+
+    public void cancelRenamingUserGroup(String newName) {
+        openGroupDialog(GroupDialog.State.EDIT).cancelSubmitDialogGroup(newName);
     }
 
     public UserManagementPage changeRoleOfUsers(UserRoles role, String... emails) {
@@ -90,8 +112,7 @@ public class UserManagementPage extends AbstractFragment {
         selectUsers(emails);
         waitForElementVisible(BY_CHANGE_ROLE_BUTTON, browser).click();
         Graphene.createPageFragment(DropDown.class,
-                waitForElementVisible(By.className("ember-list-container"), browser))
-                    .selectItem(role.getName());
+                waitForElementVisible(By.className("ember-list-container"), browser)).selectItem(role.getName());
         return this;
     }
 
@@ -143,6 +164,10 @@ public class UserManagementPage extends AbstractFragment {
     public UserManagementPage filterUserState(UserStates state) {
         waitForElementVisible(By.className(state.getClassName()), browser).click();
         return this;
+    }
+
+    public String getUserPageTitle() {
+        return waitForElementVisible(userTitleBar).getText().trim();
     }
 
     public List<String> getAllUserEmails() {
