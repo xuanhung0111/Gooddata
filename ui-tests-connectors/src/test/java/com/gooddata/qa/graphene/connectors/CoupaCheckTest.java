@@ -89,4 +89,10 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         // process schedule
         scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
     }
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testCoupaIntegration"})
+    public void testIncrementalSynchronization() throws JSONException, InterruptedException {
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
+    }
 }

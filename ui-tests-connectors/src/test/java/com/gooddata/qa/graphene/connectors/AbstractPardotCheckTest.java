@@ -67,4 +67,10 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
         scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
     }
 
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testPardotIntegration"})
+    public void testIncrementalSynchronization() throws JSONException, InterruptedException {
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
+    }
+
 }
