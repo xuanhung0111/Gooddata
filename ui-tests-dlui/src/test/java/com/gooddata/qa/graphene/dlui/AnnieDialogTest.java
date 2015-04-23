@@ -10,10 +10,9 @@ import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
+import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
-import com.gooddata.qa.graphene.enums.ADSTables;
-import com.gooddata.qa.graphene.enums.AdditionalDatasets;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -25,12 +24,6 @@ public class AnnieDialogTest extends AbstractDLUITest {
     private static final String INITIAL_LDM_MAQL_FILE = "create-ldm.txt";
 
     private static final String DEFAULT_DATA_SOURCE_NAME = "Unknown data source";
-
-    private static final String ADS_URL =
-            "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
-
-    private ProcessInfo cloudconnectProcess;
-    private ADSInstance adsInstance;
 
     @BeforeClass
     public void initProperties() {
@@ -131,9 +124,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         Field field = new Field("Position", FieldTypes.ATTRIBUTE);
-        Dataset dataset =
-                new Dataset().withName(AdditionalDatasets.PERSON_WITH_NEW_FIELDS.getName())
-                        .withFields(field);
+        Dataset dataset = new Dataset().withName("person").withFields(field);
         DataSource dataSource =
                 new DataSource().withName(DEFAULT_DATA_SOURCE_NAME).withDatasets(dataset);
 
@@ -153,23 +144,20 @@ public class AnnieDialogTest extends AbstractDLUITest {
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
     public void selectAndDeselectFields() {
-        Field field1 = new Field("Position", FieldTypes.ATTRIBUTE);
-        Field field2 = new Field("Title2", FieldTypes.ATTRIBUTE);
+        Field selectedField1 = new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED);
+        Field selectedField2 = new Field("Title2", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED);
 
-        Dataset dataset1 =
-                new Dataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS).withSelectedFields(field1);
-        Dataset dataset2 =
-                new Dataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS)
-                        .withSelectedFields(field2);
+        Dataset selectedDataset1 = new Dataset().withName("person").withFields(selectedField1);
+        Dataset selectedDataset2 = new Dataset().withName("opportunity").withFields(selectedField2);
 
         DataSource dataSource =
-                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).withSelectedDatasets(dataset1,
-                        dataset2);
+                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                        selectedDataset1, selectedDataset2);
 
         openAnnieDialog();
         annieUIDialog.assertNoDataSelectedState();
         annieUIDialog.selectFields(dataSource);
-        annieUIDialog.checkSelectionArea(Lists.newArrayList(field2, field1));
+        annieUIDialog.checkSelectionArea(Lists.newArrayList(selectedField2, selectedField1));
         annieUIDialog.assertSelectedFieldNumber(dataSource);
         annieUIDialog.deselectFields(dataSource);
         annieUIDialog.assertNoDataSelectedState();
@@ -177,16 +165,19 @@ public class AnnieDialogTest extends AbstractDLUITest {
 
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
     public void checkCancelAddNewFieldFromADSToLDM() {
-        Dataset dataset =
-                new Dataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS)
-                        .withSelectedFields(new Field("Position", FieldTypes.ATTRIBUTE));
+        Dataset selectedDataset =
+                new Dataset().withName("person").withFields(
+                        new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
 
         DataSource dataSource =
-                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).withSelectedDatasets(dataset);
+                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                        selectedDataset);
 
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnDismissButton();
+
+        dataSource.cancelAddSelectedFields();
 
         openAnnieDialog();
         annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
@@ -196,12 +187,13 @@ public class AnnieDialogTest extends AbstractDLUITest {
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
     public void addNewAttributeFromADSToLDM() {
         try {
-            Dataset dataset =
-                    new Dataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS)
-                            .withSelectedFields(new Field("Position", FieldTypes.ATTRIBUTE));
+            Dataset selectedDataset =
+                    new Dataset().withName("person").withFields(
+                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).withSelectedDatasets(dataset);
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                            selectedDataset);
 
             checkSuccessfulAddingData(dataSource, "add-new-attribute");
         } finally {
@@ -212,12 +204,13 @@ public class AnnieDialogTest extends AbstractDLUITest {
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
     public void addNewFactFromADSToLDM() {
         try {
-            Dataset dataset =
-                    new Dataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS)
-                            .withSelectedFields(new Field("Totalprice2", FieldTypes.FACT));
+            Dataset selectedDataset =
+                    new Dataset().withName("opportunity").withFields(
+                            new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).withSelectedDatasets(dataset);
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                            selectedDataset);
 
             checkSuccessfulAddingData(dataSource, "add-new-fact");
         } finally {
@@ -228,12 +221,14 @@ public class AnnieDialogTest extends AbstractDLUITest {
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
     public void addNewLabelFromADSToLDM() {
         try {
-            Dataset dataset =
-                    new Dataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS)
-                            .withSelectedFields(new Field("Label", FieldTypes.LABEL_HYPERLINK));
+            Dataset selectedDataset =
+                    new Dataset().withName("opportunity").withFields(
+                            new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).withSelectedDatasets(dataset);
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                            selectedDataset);
+
 
             checkSuccessfulAddingData(dataSource, "add-new-label");
         } finally {
@@ -244,12 +239,13 @@ public class AnnieDialogTest extends AbstractDLUITest {
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
     public void addNewDateFieldFromADSToLDM() {
         try {
-            Dataset dataset =
-                    new Dataset(AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD)
-                            .withSelectedFields(new Field("Date", FieldTypes.DATE));
+            Dataset selectedDataset =
+                    new Dataset().withName("person").withFields(
+                            new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).withSelectedDatasets(dataset);
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
+                            selectedDataset);
 
             checkSuccessfulAddingData(dataSource, "add-new-date");
         } finally {
@@ -263,16 +259,16 @@ public class AnnieDialogTest extends AbstractDLUITest {
     public void addMultiFieldsFromADSToLDM() {
         try {
             Dataset personDataset =
-                    new Dataset(AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD).withSelectedFields(
-                            new Field("Date", FieldTypes.DATE), new Field("Position",
-                                    FieldTypes.ATTRIBUTE));
+                    new Dataset().withName("person").withFields(
+                            new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED),
+                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
             Dataset opportunityDataset =
-                    new Dataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS).withSelectedFields(
-                            new Field("Totalprice2", FieldTypes.FACT), new Field("Label",
-                                    FieldTypes.LABEL_HYPERLINK));
+                    new Dataset().withName("opportunity").withFields(
+                            new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED),
+                            new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).withSelectedDatasets(
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
                             personDataset, opportunityDataset);
 
             checkSuccessfulAddingData(dataSource, "add-new-multi-fields");
@@ -284,12 +280,13 @@ public class AnnieDialogTest extends AbstractDLUITest {
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
     public void checkFailToAddNewField() {
         try {
-            Dataset dataset =
-                    new Dataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS)
-                            .withSelectedFields(new Field("Position", FieldTypes.ATTRIBUTE));
+            Dataset selectedDataset =
+                    new Dataset().withName("person").withFields(
+                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).withSelectedDatasets(dataset);
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                            selectedDataset);
 
             openAnnieDialog();
             annieUIDialog.selectFields(dataSource);
@@ -300,6 +297,10 @@ public class AnnieDialogTest extends AbstractDLUITest {
             annieUIDialog.checkDataAddingProgress();
             annieUIDialog.checkFailedDataAddingResult();
             Screenshots.takeScreenshot(browser, "add-new-field-failed", getClass());
+            annieUIDialog.clickOnCloseButton();
+
+            openAnnieDialog();
+            annieUIDialog.assertErrorMessage();
         } finally {
             dropAddedFieldsInLDM(maqlFilePath + "deleteUnmappingField.txt");
         }
@@ -308,12 +309,13 @@ public class AnnieDialogTest extends AbstractDLUITest {
     @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
     public void addNewFieldsToLDMWithEditorRole() {
         try {
-            Dataset dataset =
-                    new Dataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS)
-                            .withSelectedFields(new Field("Position", FieldTypes.ATTRIBUTE));
+            Dataset selectedDataset =
+                    new Dataset().withName("person").withFields(
+                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).withSelectedDatasets(dataset);
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                            selectedDataset);
 
             try {
                 addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
@@ -340,6 +342,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         }
     }
 
+
     @Test(dependsOnGroups = "annieDialogTest", alwaysRun = true)
     public void cleanUp() {
         deleteADSInstance(adsInstance);
@@ -356,24 +359,9 @@ public class AnnieDialogTest extends AbstractDLUITest {
         Screenshots.takeScreenshot(browser, "sucessful-" + screenshotName, getClass());
         annieUIDialog.clickOnCloseButton();
 
-        dataSource.removeAddedDataset();
+        dataSource.applyAddSelectedFields();
 
         openAnnieDialog();
         annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
-    }
-
-    private DataSource prepareADSTable(ADSTables adsTable) {
-        createUpdateADSTable(adsTable);
-        DataSource dataSource = new DataSource(adsTable);
-
-        return dataSource;
-    }
-
-    private void createUpdateADSTable(ADSTables adsTable) {
-        executeProcess(
-                cloudconnectProcess.getProcessId(),
-                ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
-                        adsInstance.getId()), sqlFilePath + adsTable.getCreateTableSqlFile(),
-                sqlFilePath + adsTable.getCopyTableSqlFile());
     }
 }

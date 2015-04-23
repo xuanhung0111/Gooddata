@@ -125,7 +125,7 @@ public class AnnieUIDialogFragment extends AbstractFragment {
 
     public void checkAvailableAdditionalFields(DataSource datasource, FieldTypes fieldType) {
         selectFieldFilter(fieldType);
-        List<Dataset> datasetInSpecificFilter = datasource.getDatasetInSpecificFilter(fieldType);
+        List<Dataset> datasetInSpecificFilter = datasource.getAvailableDatasets(fieldType);
         if (datasetInSpecificFilter.isEmpty()) {
             assertEquals(waitForElementVisible(emptyState).getText(),
                     fieldType.getEmptyStateMessage(), "Incorrect empty state message: "

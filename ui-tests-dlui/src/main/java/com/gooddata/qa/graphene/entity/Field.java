@@ -7,12 +7,18 @@ public class Field {
 
     private String name;
     private FieldTypes type;
+    private FieldStatus status;
 
     public Field() {}
 
     public Field(String name, FieldTypes type) {
+        this(name, type, FieldStatus.AVAILABLE);
+    }
+
+    public Field(String name, FieldTypes type, FieldStatus status) {
         this.name = name;
         this.type = type;
+        this.status = status;
     }
 
     public String getName() {
@@ -21,6 +27,19 @@ public class Field {
 
     public FieldTypes getType() {
         return type;
+    }
+
+    public FieldStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FieldStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public Field clone() {
+        return new Field(name, type, status);
     }
 
     public enum FieldTypes {
@@ -46,5 +65,11 @@ public class Field {
                     this == LABEL_HYPERLINK ? "Label or Hyperlink" : WordUtils
                             .capitalizeFully(filterName));
         }
+    }
+
+    public enum FieldStatus {
+        AVAILABLE,
+        SELECTED,
+        ADDED;
     }
 }
