@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.google.common.collect.Lists;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
@@ -285,5 +286,38 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForElementVisible(discProjectsPage.getRoot());
         discProjectsPage.checkDeleteSearchKey("no search result");
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkProjectListAfterLeaveAProject() {
+        List<ProjectInfo> additionalProjects = Lists.newArrayList();
+        String secondAdmin = testParams.getEditorUser();
+        String secondAdminPassword = testParams.getEditorPassword();
+        String secondAdminUri = testParams.getEditorProfileUri();
+        try {
+            addUserToProject(secondAdminUri, UserRoles.ADMIN);
+            logout();
+            signInAtUI(secondAdmin, secondAdminPassword);
+
+            additionalProjects.add(new ProjectInfo().setProjectName("Additional Project"));
+            createMultipleProjects(additionalProjects);
+
+            initProjectsAndUsersPage();
+            projectAndUsersPage.leaveProject();
+            waitForProjectsPageLoaded(browser);
+
+            openUrl(DISC_PROJECTS_PAGE_URL);
+            waitForElementVisible(discProjectsList.getRoot());
+            for (ProjectInfo project : additionalProjects) {
+                assertNotNull(discProjectsList.selectProjectWithAdminRole(project));
+            }
+            assertNull(discProjectsList.selectProjectWithAdminRole(getWorkingProject()));
+        } catch (Exception e) {
+            throw new IllegalStateException("There is exeception when adding user to project!", e);
+        } finally {
+            deleteProjects(additionalProjects);
+            logout();
+            signInAtUI(testParams.getUser(), testParams.getPassword());
+        }
     }
 }
