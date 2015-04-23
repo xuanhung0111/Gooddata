@@ -17,7 +17,7 @@ import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups= { "uploadTests" }, description = "Overall tests for upload.html page in GD platform")
-public class UploadTests extends AbstractUploadTest {
+public class UploadTest extends AbstractUploadTest {
 
     @Test(dependsOnMethods = { "createProject" }, groups = {
 			"upload-delimiter", "valid-delimiter" })
