@@ -60,11 +60,25 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testPardotIntegrationConfiguration"})
+    public void testPardotIntegrationWithUploadUser() throws JSONException {
+        // pardot specific configuration of API Url (with specific upload user)
+        signInAtGreyPages(pardotUploadUser, pardotUploadUserPassword);
+        testConnectorIntegrationResource();
+    }
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testPardotIntegrationWithUploadUser"})
     public void testPardotIntegration() throws InterruptedException, JSONException {
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
         // process schedule
         scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
+    }
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testPardotIntegration"})
+    public void testIncrementalSynchronization() throws JSONException, InterruptedException {
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
     }
 
 }

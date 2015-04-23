@@ -47,6 +47,14 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testZendeskIntegrationConfiguration"})
+    public void testZendeskIntegrationWithUploadUser() throws JSONException {
+        // zendesk specific configuration of API Url (with specific upload user)
+        signInAtGreyPages(zendeskUploadUser, zendeskUploadUserPassword);
+        testConnectorIntegrationResource();
+    }
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testZendeskIntegrationWithUploadUser"})
     public void testZendeskIntegration() throws InterruptedException, JSONException {
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
