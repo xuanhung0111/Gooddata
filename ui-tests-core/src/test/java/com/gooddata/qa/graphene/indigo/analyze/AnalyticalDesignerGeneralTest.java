@@ -548,7 +548,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(report.getTrackersCount() >= 1);
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
 
-        analysisPage.configTimeFilter("This year");
+        analysisPage.configTimeFilter(DATE, "This year");
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": This year");
     }
 
@@ -587,7 +587,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(String.format("Try with time period [%s]", period));
-            analysisPage.configTimeFilter(period);
+            analysisPage.configTimeFilter(DATE, period);
             report = analysisPage.getChartReport();
             try {
                 int count = report.getTrackersCount();
@@ -764,7 +764,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(String.format("Try with time period [%s]", period));
-            analysisPage.configTimeFilter(period);
+            analysisPage.configTimeFilter(DATE, period);
             report = analysisPage.getChartReport();
             try {
                 int count = report.getTrackersCount();

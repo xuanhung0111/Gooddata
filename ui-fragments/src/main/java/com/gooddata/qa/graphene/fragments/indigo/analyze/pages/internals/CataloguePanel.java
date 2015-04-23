@@ -123,6 +123,17 @@ public class CataloguePanel extends AbstractFragment {
         return false;
     }
 
+    public boolean isInapplicableAttributeMetricInViewPort() {
+        waitForElementVisible(searchInput).clear();
+        waitForCollectionIsNotEmpty(items);
+        return Iterables.any(items, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return input.findElement(BY_PARENT).getAttribute("class").contains("not-available");
+            }
+        });
+    }
+
     private void waitForItemLoaded() {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             public boolean apply(WebDriver input) {

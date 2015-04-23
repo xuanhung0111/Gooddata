@@ -17,6 +17,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -25,7 +26,7 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
 
-    @FindBy(css = "g.highcharts-legend-item")
+    @FindBy(css = ".highcharts-legend-item")
     private List<WebElement> legends;
 
     @FindBy(css = "div.highcharts-tooltip")
@@ -96,8 +97,12 @@ public class ChartReport extends AbstractFragment {
 
     public List<String> getLegends() {
         waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(Collections2.transform(legends,
-                new Function<WebElement, String>() {
+        return Lists.newArrayList(FluentIterable.from(legends).filter(new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return "div".equals(input.getTagName());
+            }
+        }).transform(new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
                 return input.findElement(By.cssSelector("span")).getText();
@@ -107,8 +112,12 @@ public class ChartReport extends AbstractFragment {
 
     public List<String> getLegendColors() {
         waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(Collections2.transform(legends,
-                new Function<WebElement, String>() {
+        return Lists.newArrayList(FluentIterable.from(legends).filter(new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return "g".equals(input.getTagName());
+            }
+        }).transform(new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
                 return input.findElement(By.cssSelector("path")).getCssValue("fill");

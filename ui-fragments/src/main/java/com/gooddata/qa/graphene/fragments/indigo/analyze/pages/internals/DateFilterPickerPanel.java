@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
@@ -17,6 +18,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class DateFilterPickerPanel extends AbstractFragment {
+
+    @FindBy(css = DIMENSION_SWITCH_LOCATOR)
+    private Select dimensionSwitch;
 
     // presets and date range sections are just small parts. No need to separate more fragments now.
 
@@ -44,6 +48,8 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
     public static final By LOCATOR = By.cssSelector(".adi-date-filter-picker");
 
+    private static final String DIMENSION_SWITCH_LOCATOR = ".adi-dimension-select> select"; 
+
     public void select(final String period) {
         waitForCollectionIsNotEmpty(periods);
         Iterables.find(periods, new Predicate<WebElement>() {
@@ -58,6 +64,17 @@ public class DateFilterPickerPanel extends AbstractFragment {
     public List<String> getAllPeriods() {
         waitForCollectionIsNotEmpty(periods);
         return Lists.newArrayList(Collections2.transform(periods,
+                new Function<WebElement, String>() {
+            @Override
+            public String apply(WebElement input) {
+                return input.getText();
+            }
+        }));
+    }
+
+    public List<String> getAllDimensionSwitchs() {
+        waitForElementVisible(dimensionSwitch);
+        return Lists.newArrayList(Collections2.transform(dimensionSwitch.getOptions(),
                 new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
@@ -122,5 +139,17 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    public void changeDimensionSwitchInFilter(String dimensionSwitch) {
+        waitForElementVisible(this.dimensionSwitch).selectByVisibleText(dimensionSwitch);
+    }
+
+    public boolean isDimensionSwitcherEnabled() {
+        return waitForElementVisible(By.cssSelector(DIMENSION_SWITCH_LOCATOR), getRoot()).isEnabled();
+    }
+
+    public String getSelectedDimensionSwitch() {
+        return waitForElementVisible(dimensionSwitch).getFirstSelectedOption().getText();
     }
 }

@@ -30,6 +30,9 @@ public class CategoriesBucket extends AbstractFragment {
     @FindBy(css = ".s-date-granularity-switch")
     private Select granularity;
 
+    @FindBy(className = "s-date-dimension-switch")
+    private Select dimensionSwitch;
+
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
     private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
     private static final String EMPTY = "s-bucket-empty";
@@ -85,6 +88,16 @@ public class CategoriesBucket extends AbstractFragment {
                 return input.getText();
             }
         }));
+    }
+
+    public String getSelectedDimensionSwitch() {
+        waitForElementVisible(dimensionSwitch);
+        return dimensionSwitch.getFirstSelectedOption().getText();
+    }
+
+    public void changeDimensionSwitchInBucket(String dimensionSwitch) {
+        waitForElementVisible(this.dimensionSwitch);
+        this.dimensionSwitch.selectByVisibleText(dimensionSwitch);
     }
 
 }
