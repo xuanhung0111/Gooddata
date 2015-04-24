@@ -71,6 +71,7 @@ public class UserManagementPage extends AbstractFragment {
     @FindBy(className = "users-content-column")
     private WebElement userContentColumn;
 
+    private static final By DELETE_GROUP_LINK = By.className("s-btn-delete_group");
     private static final By BY_CHANGE_ROLE_BUTTON = By.className("users-change-role");
     private static final By BY_MESSAGE_TEXT = By.className("gd-message-text");
     private static final By BY_EMPTY_GROUP = By.className("list-state");
@@ -78,17 +79,20 @@ public class UserManagementPage extends AbstractFragment {
     private static final String GROUP_NAME_CHECKBOX_CSS = ".s-${groupName} .input-checkbox";
     private static final String GROUP_LINK_XPATH =
             "//span[contains(@class, 'menu-item-title') and (text() = '${groupName}')]";
+    
+    public static final String ALL_ACTIVE_USERS_GROUP = "All active users";
+    public static final String UNGROUPED_USERS = "Ungrouped users";
 
     public UserInvitationDialog openInviteUserDialog() {
         waitForElementVisible(inviteUsersButton).click();
         return Graphene.createPageFragment(UserInvitationDialog.class,
-                waitForElementVisible(By.className("invitationDialog"), browser));
+                waitForElementVisible(UserInvitationDialog.LOCATOR, browser));
     }
 
     public GroupDialog openGroupDialog(GroupDialog.State state) {
         waitForElementVisible(state == GroupDialog.State.CREATE ? createGroupButton : renameGroupLink).click();
         return Graphene.createPageFragment(GroupDialog.class,
-                waitForElementVisible(By.className("group-dialog"), browser));
+                waitForElementVisible(GroupDialog.LOCATOR, browser));
     }
 
     public void createNewGroup(String name) {
@@ -97,6 +101,25 @@ public class UserManagementPage extends AbstractFragment {
 
     public void renameUserGroup(String newName) {
         openGroupDialog(GroupDialog.State.EDIT).submitDialogGroup(newName);
+    }
+
+    public void deleteUserGroup() {
+        openDeleteGroupDialog().submit();
+    }
+
+    public void cancelDeleteUserGroup() {
+        openDeleteGroupDialog().cancel();
+    }
+    
+    public boolean isDeleteGroupLinkPresent() {
+        waitForElementVisible(userTitleBar);
+        return browser.findElements(DELETE_GROUP_LINK).size() > 0;
+    }
+
+    public DeleteGroupDialog openDeleteGroupDialog() {
+        waitForElementVisible(DELETE_GROUP_LINK, browser).click();
+        return Graphene.createPageFragment(DeleteGroupDialog.class,
+                waitForElementVisible(DeleteGroupDialog.LOCATOR, browser));
     }
 
     public void cancelCreatingNewGroup(String name) {
@@ -161,6 +184,14 @@ public class UserManagementPage extends AbstractFragment {
         return this;
     }
 
+    public boolean isDefaultGroupsPresent() {
+        waitForElementVisible(By.className("sidebar-subtitle"),browser);
+        return browser.findElements(
+                By.xpath(GROUP_LINK_XPATH.replace("${groupName}", ALL_ACTIVE_USERS_GROUP))).size() > 0 ||
+                browser.findElements(
+                        By.xpath(GROUP_LINK_XPATH.replace("${groupName}", UNGROUPED_USERS))).size() > 0;
+    }
+
     public UserManagementPage filterUserState(UserStates state) {
         waitForElementVisible(By.className(state.getClassName()), browser).click();
         return this;
@@ -191,6 +222,9 @@ public class UserManagementPage extends AbstractFragment {
     }
 
     public int getUserGroupsCount() {
+        if (!isDefaultGroupsPresent()) {
+            return 0;
+        }
         waitForElementVisible(By.className("sidebar-groups"), browser);
         return userGroupFilters.size();
     }

@@ -18,6 +18,8 @@ import static org.testng.Assert.assertEquals;
 
 public class GroupDialog extends AbstractFragment {
 
+    public static final By LOCATOR = By.className("group-dialog");
+
     @FindBy(css = ".gd-dialog-header > h2")
     private WebElement title;
 
