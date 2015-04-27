@@ -1,0 +1,292 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="contribution">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="comparison">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="explore_project_data">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="reset">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="chart_report">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="table_report">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="custom_discovery">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="trending">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="export">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="filter">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="PoP">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+    <test name="data_combination">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
+
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="PoP"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="undo_redo"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerMarketingFunnelTest"/>
+        </classes>
+    </test>
+
+</suite>
