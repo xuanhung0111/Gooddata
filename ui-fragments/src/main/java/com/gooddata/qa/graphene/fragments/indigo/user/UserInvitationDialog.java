@@ -16,6 +16,8 @@ import com.google.common.base.Joiner;
 
 public class UserInvitationDialog extends AbstractFragment {
 
+    public static final By LOCATOR = By.className("invitationDialog");
+
     @FindBy(id = "invitationDialog-emailsInput")
     private WebElement invitationEmails;
 

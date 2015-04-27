@@ -23,7 +23,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
+import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.UserStates;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -36,6 +38,8 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 
 public class UserManagementGeneralTest extends AbstractProjectTest {
 
+    private static final String DELETE_GROUP_DIALOG_CONTENT = "The group with associated permissions will be "
+            + "removed. Users will remain.\nThis action cannot be undone.";
     private boolean canAccessUserManagementByDefault;
     private String group1;
     private String group2;
@@ -416,22 +420,23 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = "verifyUI")
     public void renameUserGroup() throws JSONException, IOException {
-        String group = "Rename group test";
-        String renamedGroup = group + " renamed";
-        String groupUri = RestUtils.addUserGroup(restApiClient, testParams.getProjectId(), group);
+        String groupName = "Rename group test";
+        String newGroupName = groupName + " renamed";
+        String groupUri = RestUtils.addUserGroup(restApiClient, testParams.getProjectId(), groupName);
 
         try {
             initDashboardsPage();
             initUserManagementPage();
-            userManagementPage.openSpecificGroupPage(group);
+            refreshPage();
+            userManagementPage.openSpecificGroupPage(groupName);
 
             GroupDialog editGroupDialog = userManagementPage.openGroupDialog(GroupDialog.State.EDIT);
             editGroupDialog.verifyStateOfDialog(GroupDialog.State.EDIT);
-            assertEquals(editGroupDialog.getGroupNameText(), group);
+            assertEquals(editGroupDialog.getGroupNameText(), groupName);
 
-            userManagementPage.renameUserGroup(renamedGroup);
-            assertTrue(userManagementPage.getAllSidebarActiveLinks().contains(renamedGroup));
-            assertEquals(userManagementPage.getUserPageTitle(), renamedGroup);
+            userManagementPage.renameUserGroup(newGroupName);
+            assertTrue(userManagementPage.getAllSidebarActiveLinks().contains(newGroupName));
+            assertEquals(userManagementPage.getUserPageTitle(), newGroupName);
         } finally {
             RestUtils.deleteUserGroup(restApiClient, groupUri);
         }
@@ -463,9 +468,77 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         assertFalse(userManagementPage.getAllUserGroups().contains(group));
     }
 
-    @Test(dependsOnGroups = { "activeUser" }, alwaysRun = true)
+    @Test(dependsOnGroups = { "activeUser" }, groups = { "deleteGroup" })
+    public void checkDeleteGroupLinkNotShownInBuiltInGroup() {
+        initDashboardsPage();
+        initUserManagementPage();
+        
+        userManagementPage.openSpecificGroupPage(UserManagementPage.ALL_ACTIVE_USERS_GROUP);
+        assertFalse(userManagementPage.isDeleteGroupLinkPresent(), "Delete group link is shown in default group");
+        
+        userManagementPage.openSpecificGroupPage(UserManagementPage.UNGROUPED_USERS);
+        assertFalse(userManagementPage.isDeleteGroupLinkPresent(), "Delete group link is shown in default group");
+    }
+
+    @Test(dependsOnMethods = { "checkDeleteGroupLinkNotShownInBuiltInGroup" }, groups = { "deleteGroup" })
+    public void checkDeleteUserGroup() {
+        initDashboardsPage();
+        initUserManagementPage();
+        
+        int customGroupCount = userManagementPage.getUserGroupsCount(); 
+        userManagementPage.openSpecificGroupPage(group1);
+        
+        assertTrue(userManagementPage.isDeleteGroupLinkPresent(), "Delete group link does not show");
+        DeleteGroupDialog dialog = userManagementPage.openDeleteGroupDialog();
+        assertEquals(dialog.getTitle(), "Delete group " + group1, "Title of delete group dialog is wrong");
+        assertEquals(dialog.getBodyContent(), DELETE_GROUP_DIALOG_CONTENT, 
+                "Content of delete group dialog is wrong");
+        dialog.cancel();
+        
+        userManagementPage.cancelDeleteUserGroup();
+        assertEquals(userManagementPage.getUserGroupsCount(), customGroupCount);
+
+        List<String> emailsList = asList(adminUser, editorUser, viewerUser, imapUser);
+        userManagementPage.openSpecificGroupPage(group1);
+        userManagementPage.deleteUserGroup();
+        assertEquals(userManagementPage.getUserGroupsCount(), customGroupCount-1);
+        checkUserEmailsStillAvailableAfterDeletingGroup(emailsList);
+    }
+
+    @Test(dependsOnMethods = { "checkDeleteUserGroup" }, groups = { "deleteGroup" })
+    public void checkDeleteAllGroups() {
+        initDashboardsPage();
+        initUserManagementPage();
+        
+        List<String> emailsList = asList(adminUser, editorUser, viewerUser, imapUser);
+        while (userManagementPage.getUserGroupsCount() > 0) {
+            userManagementPage.openSpecificGroupPage(userManagementPage.getAllUserGroups().get(0));
+            userManagementPage.deleteUserGroup();
+        }
+        
+        assertFalse(userManagementPage.isDefaultGroupsPresent(), "default groups are still shown");
+        checkUserEmailsStillAvailableAfterDeletingGroup(emailsList);
+    }
+
+    @Test(dependsOnMethods = { "checkDeleteAllGroups" }, groups = { "deleteGroup" })
+    public void checkCreateANewGroupAfterRemovalOfAllGroups() {
+        initDashboardsPage();
+        initUserManagementPage();
+        
+        userManagementPage.createNewGroup(group1);
+        assertEquals(userManagementPage.getAllUserGroups(), asList(group1));
+        assertTrue(userManagementPage.isDefaultGroupsPresent(), "default groups are not shown");
+    }
+
+    @Test(dependsOnGroups = { "activeUser", "userManagement", "verifyUI", "initialize", "deleteGroup" }, 
+            alwaysRun = true)
     public void turnOffUserManagementFeature() throws InterruptedException, IOException, JSONException {
         disableUserManagementFeature();
+    }
+
+    private void checkUserEmailsStillAvailableAfterDeletingGroup(List<String> emailsList) {
+        userManagementPage.filterUserState(UserStates.ACTIVE);
+        assertTrue(compareCollections(userManagementPage.getAllUserEmails(), emailsList), "missing user email");
     }
 
     private void enableUserManagementFeature() throws IOException, JSONException {
@@ -556,8 +629,9 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         initDashboardsPage();
         initUserManagementPage();
 
-        userManagementPage.openGroupDialog(GroupDialog.State.CREATE)
-            .verifyStateOfDialog(GroupDialog.State.CREATE);
+        GroupDialog createDialog = userManagementPage.openGroupDialog(GroupDialog.State.CREATE);
+        createDialog.verifyStateOfDialog(GroupDialog.State.CREATE);
+        createDialog.closeDialog();
         userManagementPage.createNewGroup(group);
 
         userManagementPage.waitForEmptyGroup();
