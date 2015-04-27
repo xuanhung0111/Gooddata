@@ -51,7 +51,7 @@ public class AnalysisPage extends AbstractFragment {
         bucketsPanel.setReportType(reportDefinition.getType());
 
         for (String metric : reportDefinition.getMetrics()) {
-            bucketsPanel.addMetric(cataloguePanel.getMetric(metric));
+            addMetric(metric);
         }
 
         for (String category : reportDefinition.getCategories()) {

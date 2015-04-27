@@ -73,7 +73,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP}, enabled = false)
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)
@@ -86,7 +86,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
+    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP}, enabled = false)
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)

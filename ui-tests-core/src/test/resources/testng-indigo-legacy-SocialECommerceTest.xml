@@ -1,6 +1,30 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests">
+<!--
+    <test name="undo_redo">
+        <groups>
+            <run>
+                <exclude name="brokenTest"/>
 
+                <exclude name="custom_discovery"/>
+                <exclude name="contribution"/>
+                <exclude name="comparison"/>
+                <exclude name="trending"/>
+                <exclude name="explore_project_data"/>
+                <exclude name="export"/>
+                <exclude name="filter"/>
+                <exclude name="reset"/>
+                <exclude name="chart_report"/>
+                <exclude name="table_report"/>
+                <exclude name="PoP"/>
+                <exclude name="data_combination"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerSocialECommerceTest"/>
+        </classes>
+    </test>
+-->
     <test name="contribution">
         <groups>
             <run>

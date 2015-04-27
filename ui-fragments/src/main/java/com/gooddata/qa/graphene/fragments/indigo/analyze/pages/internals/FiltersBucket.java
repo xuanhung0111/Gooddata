@@ -42,6 +42,9 @@ public class FiltersBucket extends AbstractFragment {
     public void addFilter(WebElement filter) {
         int oldFiltersCount = filters.size();
         new Actions(browser).dragAndDrop(filter, waitForElementVisible(addFilterBucket)).perform();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {}
         assertEquals(filters.size(), oldFiltersCount + 1, "Filter is not added successfully");
 
         final WebElement newFilter = filters.get(filters.size() - 1);
