@@ -17,13 +17,12 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
 import static java.lang.String.format;
 
-public class DataloadSchedulesTests extends AbstractSchedulesTests {
+public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     private static final String PROCESS_NAME = "Dataload process";
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
@@ -95,7 +94,7 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
     }
 
     private void createDatasets() {
-        HttpRequestBase getRequest = getRestApiClient().newGetMethod(String.format("/gdc/md/%s/ldm/singleloadinterface/dataset.salesforce", getWorkingProject().getProjectId()));
+        HttpRequestBase getRequest = getRestApiClient().newGetMethod(format("/gdc/md/%s/ldm/singleloadinterface/dataset.salesforce", getWorkingProject().getProjectId()));
         HttpResponse getResponse = getRestApiClient().execute(getRequest);
 
         // dataset already exists
