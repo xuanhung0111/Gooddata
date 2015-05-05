@@ -24,11 +24,12 @@ public class AnnieDialogTest extends AbstractDLUITest {
     private static final String DEFAULT_DATA_SOURCE_NAME = "Unknown data source";
     private static final String DATA_CAN_NOT_ADD_HEADLINE = "Data cannot be added right now";
     private static final String ADDING_DATA_HEADLINE = "Adding data...";
-    private static final String DIALOG_STATE_FIRST_MESSAGE = 
-            "We’re sorry, but it’s not possible to add new data at the moment." +
-            " Other data is currently being uploaded into the project " +
-            "and due to technical limitations it is not possible to add new data at the same time.";
-    private static final String DIALOG_STATE_SECOND_MESSAGE = "It can take a while so please come later.";
+    private static final String DIALOG_STATE_FIRST_MESSAGE =
+            "We’re sorry, but it’s not possible to add new data at the moment."
+                    + " Other data is currently being uploaded into the project "
+                    + "and due to technical limitations it is not possible to add new data at the same time.";
+    private static final String DIALOG_STATE_SECOND_MESSAGE =
+            "It can take a while so please come later.";
 
     @BeforeClass
     public void initProperties() {
@@ -321,9 +322,11 @@ public class AnnieDialogTest extends AbstractDLUITest {
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest")
     public void checkConcurrentDataLoadWithAnnieDialog() throws InterruptedException {
-        Dataset dataset = new Dataset().withName("person").withFields(
-                new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
-        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(dataset);
+        Dataset dataset =
+                new Dataset().withName("person").withFields(
+                        new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
+        DataSource dataSource =
+                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(dataset);
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
@@ -351,6 +354,192 @@ public class AnnieDialogTest extends AbstractDLUITest {
             Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Annie-Dialog", getClass());
         } finally {
             dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+        }
+    }
+
+    @Test(dependsOnMethods = "initialData", priority = 0)
+    public void checkCustomDataSourceName() {
+        try {
+            createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+            Dataset personDataset = prepareDataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS);
+            DataSource fbDataSource = new DataSource().withName("fb").withDatasets(personDataset);
+
+            Dataset opportunityDataset =
+                    prepareDataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+            DataSource gaDataSource =
+                    new DataSource().withName("ga").withDatasets(personDataset, opportunityDataset);
+
+            customOutputStageMetadata(fbDataSource, gaDataSource);
+
+            openAnnieDialog();
+            annieUIDialog.checkAvailableAdditionalFields(fbDataSource, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-custom-data-source-name-1", getClass());
+            annieUIDialog.checkAvailableAdditionalFields(gaDataSource, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-custom-data-source-name-2", getClass());
+        } finally {
+            deleteOutputStageMetadata();
+        }
+    }
+
+    @Test(dependsOnMethods = "initialData", priority = 0)
+    public void checkDataSourceNameCaseSensitive() {
+        try {
+            createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+            Dataset personDataset = prepareDataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS);
+            Dataset opportunityDataset =
+                    prepareDataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+
+            DataSource gaDataSource =
+                    new DataSource().withName("ga").withDatasets(personDataset, opportunityDataset);
+            DataSource GADataSource =
+                    new DataSource().withName("GA").withDatasets(personDataset, opportunityDataset);
+            DataSource GoogleAnalyticsDataSource =
+                    new DataSource().withName("Google Analytics").withDatasets(personDataset,
+                            opportunityDataset);
+            DataSource GoogleanalyticsDataSource =
+                    new DataSource().withName("Google analytics").withDatasets(personDataset,
+                            opportunityDataset);
+
+            customOutputStageMetadata(gaDataSource, GADataSource, GoogleAnalyticsDataSource,
+                    GoogleanalyticsDataSource);
+
+            openAnnieDialog();
+            annieUIDialog.checkAvailableAdditionalFields(gaDataSource, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-custom-data-source-name-ga", getClass());
+            annieUIDialog.checkAvailableAdditionalFields(GADataSource, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-custom-data-source-name-GA", getClass());
+            annieUIDialog.checkAvailableAdditionalFields(GoogleAnalyticsDataSource, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-custom-data-source-name-GoogleAnalytics",
+                    getClass());
+            annieUIDialog.checkAvailableAdditionalFields(GoogleanalyticsDataSource, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-custom-data-source-name-Googleanalytics",
+                    getClass());
+        } finally {
+            deleteOutputStageMetadata();
+        }
+    }
+
+    @Test(dependsOnMethods = "initialData", priority = 0)
+    public void checkUnicodeDataSourceName() {
+        try {
+            createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+            Dataset personDataset = prepareDataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS);
+            Dataset opportunityDataset =
+                    prepareDataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+
+            DataSource unicodeSourceName1 =
+                    new DataSource().withName("řeč")
+                            .withDatasets(personDataset, opportunityDataset);
+            DataSource unicodeSourceName2 =
+                    new DataSource().withName("ພາສາລາວ").withDatasets(personDataset,
+                            opportunityDataset);
+            DataSource unicodeSourceName3 =
+                    new DataSource().withName("résumé").withDatasets(personDataset,
+                            opportunityDataset);
+            DataSource unicodeSourceName4 =
+                    new DataSource().withName("Tiếng Việt").withDatasets(personDataset,
+                            opportunityDataset);
+
+            customOutputStageMetadata(unicodeSourceName1, unicodeSourceName2, unicodeSourceName3,
+                    unicodeSourceName4);
+
+            openAnnieDialog();
+            annieUIDialog.checkAvailableAdditionalFields(unicodeSourceName1, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-unicode-data-source-name-1", getClass());
+            annieUIDialog.checkAvailableAdditionalFields(unicodeSourceName2, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-unicode-data-source-name-2", getClass());
+            annieUIDialog.checkAvailableAdditionalFields(unicodeSourceName3, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-unicode-data-source-name-3", getClass());
+            annieUIDialog.checkAvailableAdditionalFields(unicodeSourceName4, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-unicode-data-source-name-4", getClass());
+        } finally {
+            deleteOutputStageMetadata();
+        }
+    }
+
+    @Test(dependsOnMethods = "initialData", priority = 0)
+    public void checkEmptyDataSourceName() {
+        try {
+            createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+            Dataset personDataset = prepareDataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS);
+            Dataset opportunityDataset =
+                    prepareDataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+
+            DataSource emptyDataSourceName =
+                    new DataSource().withName("").withDatasets(personDataset, opportunityDataset);
+
+            customOutputStageMetadata(emptyDataSourceName);
+
+            openAnnieDialog();
+            annieUIDialog.checkAvailableAdditionalFields(
+                    emptyDataSourceName.withName(DEFAULT_DATA_SOURCE_NAME), FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "check-empty-data-source-name", getClass());
+        } finally {
+            deleteOutputStageMetadata();
+        }
+    }
+
+    @Test(dependsOnMethods = "initialData", priority = 0)
+    public void deleteDataSourceName() {
+        try {
+            createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+            Dataset personDataset = prepareDataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS);
+            DataSource fbDataSource = new DataSource().withName("fb").withDatasets(personDataset);
+
+            Dataset opportunityDataset =
+                    prepareDataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+            DataSource gaDataSource =
+                    new DataSource().withName("ga").withDatasets(personDataset, opportunityDataset);
+
+            customOutputStageMetadata(fbDataSource, gaDataSource);
+
+            openAnnieDialog();
+            annieUIDialog.checkAvailableAdditionalFields(fbDataSource, FieldTypes.ALL);
+            annieUIDialog.checkAvailableAdditionalFields(gaDataSource, FieldTypes.ALL);
+            annieUIDialog.clickOnDismissButton();
+
+            deleteOutputStageMetadata();
+
+            DataSource unknownDataSource =
+                    new DataSource().withName(DEFAULT_DATA_SOURCE_NAME).withDatasets(personDataset,
+                            opportunityDataset);
+
+            openAnnieDialog();
+            annieUIDialog.checkAvailableAdditionalFields(unknownDataSource, FieldTypes.ALL);
+            Screenshots.takeScreenshot(browser, "delete-data-source-name", getClass());
+        } finally {
+            deleteOutputStageMetadata();
+        }
+    }
+
+    @Test(dependsOnMethods = "initialData", priority = 1)
+    public void addNewDataWithCustomDataSourceName() {
+        try {
+            createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
+            Dataset personDataset = prepareDataset(AdditionalDatasets.PERSON_WITH_NEW_FIELDS);
+            DataSource fbDataSource = new DataSource().withName("fb").withDatasets(personDataset);
+
+            Dataset opportunityDataset =
+                    prepareDataset(AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
+            DataSource gaDataSource =
+                    new DataSource().withName("ga").withDatasets(personDataset, opportunityDataset);
+
+            customOutputStageMetadata(fbDataSource, gaDataSource);
+
+            Dataset selectedDataset =
+                    new Dataset().withName("person").withFields(
+                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
+            fbDataSource.updateDatasetStatus(selectedDataset);
+
+            checkSuccessfulAddingData(fbDataSource, "add-data-with-custom-dataSource-name");
+        } finally {
+            deleteOutputStageMetadata();
         }
     }
 

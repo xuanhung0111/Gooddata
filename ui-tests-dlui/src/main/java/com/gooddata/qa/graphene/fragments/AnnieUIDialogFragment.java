@@ -141,9 +141,13 @@ public class AnnieUIDialogFragment extends AbstractFragment {
         selectFieldFilter(fieldType);
         List<Dataset> datasetInSpecificFilter = datasource.getAvailableDatasets(fieldType);
         if (datasetInSpecificFilter.isEmpty()) {
-            assertEquals(waitForElementVisible(emptyState).getText(),
-                    fieldType.getEmptyStateMessage(), "Incorrect empty state message: "
-                            + emptyState.getText());
+            if (getDataSourceList().getAvailableDataSourceNumber() == 0) {
+                assertEquals(waitForElementVisible(emptyState).getText(),
+                        fieldType.getEmptyStateMessage(), "Incorrect empty state message: "
+                                + emptyState.getText());
+            } else {
+                assertFalse(getDataSourceList().isAvailable(datasource));
+            }
             return;
         }
         getDataSourceList()

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
@@ -53,12 +55,33 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
             + "%s/schemas/default";
     private static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
+    private static final String OUTPUT_STAGE_METADATA_URI =
+            "/gdc/dataload/projects/%s/outputStage/metadata";
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String FROM = "no-reply@gooddata.com";
 
     private JSONObject cloudConnectProcess = new JSONObject();
     private JSONObject processExecution = new JSONObject();
+
+    private static final JSONObject OUTPUT_STAGE_METADATA;
+
+    static {
+        try {
+            OUTPUT_STAGE_METADATA = new JSONObject() {
+                {
+                    put("outputStageMetadata", new JSONObject() {
+                        {
+                            put("tableMeta", new JSONArray());
+                        }
+                    });
+                }
+            };
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exception during json object initialization! ", e);
+        }
+    }
 
     @FindBy(css = ".s-btn-add_data")
     private WebElement addDataButton;
@@ -307,6 +330,80 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
                         adsInstance.getId()), sqlFilePath + adsTable.createTableSqlFile,
                 sqlFilePath + adsTable.copyTableSqlFile);
+    }
+
+    protected void deleteOutputStageMetadata() {
+        String metadata = "{\"outputStageMetadata\" : {\"tableMeta\" : []}}";
+
+        String putUri =
+                String.format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
+        String putBody = metadata;
+        HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
+        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
+
+        HttpResponse putResponse = getRestApiClient().execute(putRequest);
+        int responseStatusCode = putResponse.getStatusLine().getStatusCode();
+
+        System.out.println(putResponse.toString());
+        EntityUtils.consumeQuietly(putResponse.getEntity());
+        System.out.println("Response status: " + responseStatusCode);
+        assertEquals(responseStatusCode, HttpStatus.OK.value(),
+                "Metadata is not updated successfully!");
+    }
+
+    protected void customOutputStageMetadata(DataSource... dataSources) {
+        String putBody = prepareOutputStageMetadata(dataSources);
+
+        System.out.println("Metadata: " + putBody);
+
+        String putUri =
+                String.format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
+
+        HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
+        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
+
+        HttpResponse putResponse = getRestApiClient().execute(putRequest);
+        int responseStatusCode = putResponse.getStatusLine().getStatusCode();
+
+        EntityUtils.consumeQuietly(putResponse.getEntity());
+        System.out.println("Response status: " + responseStatusCode);
+        assertEquals(responseStatusCode, HttpStatus.OK.value(),
+                "Metadata is not updated successfully!");
+    }
+
+    private String prepareOutputStageMetadata(DataSource... dataSources) {
+        JSONObject metaObject = OUTPUT_STAGE_METADATA;
+        Collection<JSONObject> metadataObjects = Lists.newArrayList();
+        for (DataSource dataSource : dataSources) {
+            for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
+                metadataObjects.add(prepareMetadataObject(dataset.getName(), dataSource.getName()));
+            }
+        }
+
+        try {
+            metaObject.getJSONObject("outputStageMetadata").put("tableMeta", metadataObjects);
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is JSONExcetion during prepareOutputStageMetadata!", e);
+        }
+
+        return metaObject.toString();
+    }
+
+    private JSONObject prepareMetadataObject(String tableName, String dataSourceName,
+            String... metaColumns) {
+        JSONObject metadataObject = new JSONObject();
+        try {
+            metadataObject.put("tableMetadata",
+                    new JSONObject().put("table", tableName).put("defaultSource", dataSourceName)
+                            .put("columnMeta", metaColumns));
+        } catch (JSONException e) {
+            throw new IllegalStateException("JSONExeception", e);
+        }
+
+        System.out.println("metadata: " + metadataObject.toString());
+
+        return metadataObject;
     }
 
     private String sendRequestToUpdateModel(String maqlFile) {
