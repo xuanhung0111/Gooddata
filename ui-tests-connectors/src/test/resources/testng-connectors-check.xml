@@ -34,17 +34,6 @@
         </classes>
     </test>
 
-    <test name="BrightideaConnectorCheck">
-        <groups>
-            <run>
-                <exclude name="brokenTest"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.gooddata.qa.graphene.connectors.BrightideaCheckTest"/>
-        </classes>
-    </test>
-
     <test name="CoupaConnectorCheck">
         <groups>
             <run>
