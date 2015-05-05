@@ -206,6 +206,8 @@ public class RestUtils {
         System.out.println(
                 format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId,
                         domainUser));
+        
+        EntityUtils.consumeQuietly(postResponse.getEntity());
     }
 
     public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
