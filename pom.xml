@@ -26,7 +26,10 @@
 
         <browser>firefox</browser>
         <chromeDriverBinaryPath>/usr/bin/chromium-browser</chromeDriverBinaryPath>
-        <timeout>90</timeout><!-- (seconds) -->
+        <!-- (seconds) -->
+        <timeout>90</timeout>
+        <!-- can be used to multiply the timeout on a specific test places (currently the only place is the validation on vertica DM) -->
+        <extendedTimeoutMultiple>10</extendedTimeoutMultiple>
         <file.separator>/</file.separator>
         <browserDownloadFolder>${project.build.directory}${file.separator}downloads</browserDownloadFolder>
         <video.recording>false</video.recording>
@@ -230,6 +233,10 @@
                                             <property>
                                                 <name>timeout</name>
                                                 <value>${timeout}</value>
+                                            </property>
+                                            <property>
+                                                <name>extendedTimeoutMultiple</name>
+                                                <value>${extendedTimeoutMultiple}</value>
                                             </property>
                                             <property>
                                                 <name>propertiesPath</name>
