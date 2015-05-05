@@ -1,17 +1,15 @@
 package com.gooddata.qa.graphene.fragments;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
@@ -21,20 +19,22 @@ import com.google.common.collect.Iterables;
 
 public class DataSourceList extends AbstractFragment {
 
-    private By BY_DATASET = By
-            .xpath("//.[contains(@class, 'dataset')]/../.[not(contains(@class, 'is-none'))]");
-    private By BY_DROPRIGHT_ICON = By.cssSelector(".icon-dropright");
-    private By BY_DROPDOWN_ICON = By.cssSelector(".icon-dropdown");
+    private static final By BY_SOURCE_ITEM = By.cssSelector(".source-item:not(.is-none)");
+    private static final By BY_DATASET = By.cssSelector("li:not(.is-none):not(.checkbox-item)");
+    private static final By BY_FIELD = By.cssSelector(".checkbox-item:not(.is-none)");
 
-    private String XPATH_SOURCE = "//.[@class='source-title' and text()='${datasource}']/../.";
-    private String XPATH_DATASET =
-            "//.[contains(@class, 'dataset')]//label[text()='${dataset}']/../../.";
-    private String XPATH_FIELD = "//.[text()='${fieldName}']";
-    private String XPATH_FIELDS =
-            "//.[contains(@class, 'dataset')]//label[text()='${dataset}']//../..//li[not(contains(@class, 'is-none'))]";
+    private static final By BY_DATASOURCE_TITLE = By.cssSelector(".source-title");
+    private static final By BY_DATASET_TITLE = By.cssSelector("label");
+    private static final By BY_FIELD_TITLE = By.cssSelector(".column-title");
 
-    private By BY_SOURCE_ITEM_SELECTION_HINT = By.cssSelector(".source-item-selection-hint");
-    private By BY_DATASET_ITEM_SELECTION_HINT = By.cssSelector(".category-item-section-hint");
+    private static final By BY_DROPRIGHT_ICON = By.cssSelector(".icon-dropright");
+    private static final By BY_DROPDOWN_ICON = By.cssSelector(".icon-dropdown");
+    private static final By BY_FIELD_CHECKBOX = By.cssSelector(".ember-checkbox");
+
+    private static final By BY_SOURCE_ITEM_SELECTION_HINT = By
+            .cssSelector(".source-item-selection-hint");
+    private static final By BY_DATASET_ITEM_SELECTION_HINT = By
+            .cssSelector(".category-item-section-hint");
 
     public void checkSelectedFieldNumber(DataSource selectedDataSource) {
         WebElement dataSourceElement = selectDataSource(selectedDataSource);
@@ -68,18 +68,35 @@ public class DataSourceList extends AbstractFragment {
         checkAvailableDatasets(datasourceElement, datasetInSpecificFilter, fieldType);
     }
 
-    private void clickOnField(WebElement datasetElement, Field field, final boolean isChecked) {
-        final WebElement fieldElement =
-                waitForElementVisible(
-                        By.xpath(XPATH_FIELD.replace("${fieldName}", field.getName())),
-                        datasetElement);
-        fieldElement.click();
+    public int getAvailableDataSourceNumber() {
+        return getRoot().findElements(BY_SOURCE_ITEM).size();
+    }
+
+    public boolean isAvailable(final DataSource dataSource) {
+        List<WebElement> dataSourceElements = getRoot().findElements(BY_SOURCE_ITEM);
+        return Iterables.any(dataSourceElements, findDataSourcePredicate(dataSource));
+    }
+
+    private void clickOnField(WebElement datasetElement, final Field field, final boolean isChecked) {
+        final WebElement selectedFieldElement =
+                Iterables.find(datasetElement.findElements(BY_FIELD), new Predicate<WebElement>() {
+
+                    @Override
+                    public boolean apply(WebElement fieldElement) {
+                        return field.getName().equals(
+                                waitForElementVisible(BY_FIELD_TITLE, fieldElement).getText());
+                    }
+                });
+
+        waitForElementVisible(BY_FIELD_CHECKBOX, selectedFieldElement).click();
 
         Graphene.waitGui().until(new Predicate<WebDriver>() {
 
             @Override
             public boolean apply(WebDriver browser) {
-                boolean result = fieldElement.getAttribute("class").contains("is-strong");
+                boolean result =
+                        waitForElementVisible(BY_FIELD_TITLE, selectedFieldElement).getAttribute(
+                                "class").contains("is-strong");
                 return isChecked ? result : !result;
             }
         });
@@ -91,9 +108,7 @@ public class DataSourceList extends AbstractFragment {
         for (Dataset dataset : datasetInSpecificFilter) {
             WebElement datasetElement = selectDataset(dataSourceElement, dataset);
             List<Field> fieldsInSpecificFilter = dataset.getFieldsInSpecificFilter(fieldType);
-            assertEquals(
-                    datasetElement.findElements(
-                            By.xpath(XPATH_FIELDS.replace("${dataset}", dataset.getName()))).size(),
+            assertEquals(datasetElement.findElements(BY_FIELD).size(),
                     fieldsInSpecificFilter.size(), "Incorrect number of fields in dataset: "
                             + dataset.getName());
             checkAvailableFieldsOfDataset(datasetElement, fieldsInSpecificFilter);
@@ -102,31 +117,40 @@ public class DataSourceList extends AbstractFragment {
 
     private void checkAvailableFieldsOfDataset(final WebElement datasetElement,
             Collection<Field> fields) {
-        assertTrue(Iterables.all(fields, new Predicate<Field>() {
+        List<WebElement> fieldElements = datasetElement.findElements(BY_FIELD);
+        for (final Field field : fields) {
+            assertNotNull(Iterables.find(fieldElements, new Predicate<WebElement>() {
 
-            @Override
-            public boolean apply(Field field) {
-                return datasetElement.findElements(
-                        By.xpath(XPATH_FIELD.replace("${fieldName}", field.getName()))).size() == 1;
-            }
-        }));
+                @Override
+                public boolean apply(WebElement fieldElement) {
+                    return field.getName().equals(fieldElement.getText());
+                }
+            }));
+        }
     }
 
-    private WebElement selectDataSource(DataSource dataSource) {
+    private WebElement selectDataSource(final DataSource dataSource) {
+        final List<WebElement> dataSourceElements = getRoot().findElements(BY_SOURCE_ITEM);
         WebElement dataSourceElement =
-                waitForElementVisible(
-                        By.xpath(XPATH_SOURCE.replace("${datasource}", dataSource.getName())),
-                        browser);
+                Iterables.find(dataSourceElements, findDataSourcePredicate(dataSource));
+
         expandElement(dataSourceElement);
 
         return dataSourceElement;
     }
 
-    private WebElement selectDataset(WebElement dataSourceElement, Dataset dataset) {
+    private WebElement selectDataset(WebElement dataSourceElement, final Dataset dataset) {
         WebElement datasetElement =
-                waitForElementVisible(
-                        By.xpath(XPATH_DATASET.replace("${dataset}", dataset.getName())),
-                        dataSourceElement);
+                Iterables.find(dataSourceElement.findElements(BY_DATASET),
+                        new Predicate<WebElement>() {
+
+                            @Override
+                            public boolean apply(WebElement datasetElement) {
+                                return dataset.getName().equals(
+                                        datasetElement.findElement(BY_DATASET_TITLE).getText());
+                            }
+                        });
+
         expandElement(datasetElement);
 
         return datasetElement;
@@ -136,5 +160,18 @@ public class DataSourceList extends AbstractFragment {
         if (!element.findElements(BY_DROPRIGHT_ICON).isEmpty())
             waitForElementPresent(BY_DROPRIGHT_ICON, element).click();;
         waitForElementVisible(BY_DROPDOWN_ICON, element);
+    }
+
+    private Predicate<WebElement> findDataSourcePredicate(final DataSource dataSource) {
+        return new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement dataSourceElement) {
+                return !dataSourceElement.getAttribute("class").contains("is-none")
+                        && dataSource.getName().equals(
+                                waitForElementPresent(BY_DATASOURCE_TITLE, dataSourceElement)
+                                        .getText());
+            }
+        };
     }
 }
