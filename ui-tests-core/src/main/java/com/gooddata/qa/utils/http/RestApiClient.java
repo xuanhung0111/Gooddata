@@ -7,6 +7,7 @@ package com.gooddata.qa.utils.http;
 import com.gooddata.http.client.GoodDataHttpClient;
 import com.gooddata.http.client.LoginSSTRetrievalStrategy;
 import com.gooddata.http.client.SSTRetrievalStrategy;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -23,6 +24,7 @@ import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.*;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -64,13 +66,17 @@ public class RestApiClient {
         }
     }
 
-    public HttpResponse execute(HttpRequestBase request, int expectedStatusCode) {
+    public HttpResponse execute(HttpRequestBase request, int expectedStatusCode, String unexpectedMessage) {
         HttpResponse response = execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode != expectedStatusCode) {
-            throw new InvalidStatusCodeException("Unexpected status code", statusCode);
+            throw new InvalidStatusCodeException(unexpectedMessage, statusCode);
         }
         return response;
+    }
+
+    public HttpResponse execute(HttpRequestBase request, HttpStatus expectedStatus, String unexpectedMessage) {
+        return execute(request, expectedStatus.value(), unexpectedMessage);
     }
 
     public HttpGet newGetMethod(String uri) {
@@ -113,12 +119,14 @@ public class RestApiClient {
         requestBase.addHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
     }
 
-    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password, boolean useSST, boolean useApiProxy) {
+    protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password,
+            boolean useSST, boolean useApiProxy) {
         final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         if (useSST) {
             HttpClient httpClient = httpClientBuilder.build();
-            SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(httpClient, hostGoodData, user, password);
+            SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(httpClient, hostGoodData, user,
+                    password);
             return new GoodDataHttpClient(httpClient, sstStrategy);
         } else {
             final CredentialsProvider provider = new BasicCredentialsProvider();
