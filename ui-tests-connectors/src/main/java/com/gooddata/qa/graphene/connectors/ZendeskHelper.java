@@ -20,7 +20,7 @@ import static org.testng.Assert.assertEquals;
 
 public class ZendeskHelper {
 
-    public static enum ZendeskObject {
+    public enum ZendeskObject {
         TICKET,
         USER,
         ORGANIZATION,
@@ -254,6 +254,9 @@ public class ZendeskHelper {
     }
 
     private void checkStatusCode(HttpResponse response, int expectedStatus) {
+        if (response.getStatusLine().getStatusCode() != expectedStatus) {
+            System.out.println("Response status reason phrase: " + response.getStatusLine().getReasonPhrase());
+        }
         assertEquals(response.getStatusLine().getStatusCode(), expectedStatus, "Invalid status code");
     }
 }

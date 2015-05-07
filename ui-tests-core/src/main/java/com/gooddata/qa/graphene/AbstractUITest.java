@@ -473,6 +473,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForDataPageLoaded(browser);
     }
 
+    public void initProjectsAndUsersPage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectPage|");
+        waitForProjectPageLoaded(browser);
+    }
+
     public void initUserManagementPage() {
         openUrl(PAGE_USER_MANAGEMENT);
         waitForFragmentVisible(userManagementPage);

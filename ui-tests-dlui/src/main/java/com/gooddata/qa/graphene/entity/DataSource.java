@@ -1,25 +1,19 @@
 package com.gooddata.qa.graphene.entity;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.enums.ADSTables;
-import com.gooddata.qa.graphene.enums.AdditionalDatasets;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class DataSource {
 
     private String name;
     private List<Dataset> datasets = Lists.newArrayList();
-    
+
     public DataSource() {}
-    
-    public DataSource(ADSTables ADSTable) {
-        this.name = ADSTable.getDatasourceName();
-        for(AdditionalDatasets additionalDataset : ADSTable.getAdditionalDatasets()) {
-            this.datasets.add(new Dataset(additionalDataset));
-        }
-    }
 
     public String getName() {
         return name;
@@ -30,10 +24,7 @@ public class DataSource {
         return this;
     }
 
-    public List<Dataset> getDatasetInSpecificFilter(FieldTypes fieldType) {
-        if (fieldType == FieldTypes.ALL)
-            return Lists.newArrayList(datasets);
-        
+    public List<Dataset> getAvailableDatasets(FieldTypes fieldType) {
         List<Dataset> filteredDataset = Lists.newArrayList();
         for (Dataset dataset : datasets) {
             if (!dataset.getFieldsInSpecificFilter(fieldType).isEmpty())
@@ -44,7 +35,71 @@ public class DataSource {
     }
 
     public DataSource withDatasets(Dataset... datasets) {
-        this.datasets = Lists.newArrayList(datasets);
+        return withDatasets(Lists.newArrayList(datasets));
+    }
+
+    public DataSource withDatasets(List<Dataset> datasets) {
+        this.datasets.addAll(datasets);
         return this;
+    }
+
+    public DataSource updateDatasetStatus(Dataset... customDatasets) {
+        checkValidDatasets(customDatasets);
+
+        for (final Dataset customDataset : customDatasets) {
+            Iterables.find(Lists.newArrayList(datasets), new Predicate<Dataset>() {
+
+                @Override
+                public boolean apply(Dataset dataset) {
+                    return customDataset.getName().equals(dataset.getName());
+                }
+            }).updateFieldStatus(customDataset.getAllFields());
+        }
+
+        return this;
+    }
+
+    public List<Dataset> getSelectedDataSets() {
+        List<Dataset> selectedDatasets = Lists.newArrayList();
+        for (Dataset dataset : datasets) {
+            if (dataset.getSelectedFields().size() > 0)
+                selectedDatasets.add(dataset);
+        }
+
+        return selectedDatasets;
+    }
+
+    public void applyAddSelectedFields() {
+        addSelectedField(true);
+    }
+
+    public void cancelAddSelectedFields() {
+        addSelectedField(false);
+    }
+
+    private void addSelectedField(boolean confirmed) {
+        for (Dataset dataset : datasets) {
+            if (dataset.getSelectedFields().size() > 0) {
+                dataset.addSelectedFields(confirmed);
+            }
+        }
+    }
+
+    private void checkValidDatasets(Dataset... validatedDatasets) {
+        for (final Dataset validatedDataset : validatedDatasets) {
+            try {
+                Iterables.find(getAvailableDatasets(FieldTypes.ALL),
+                        new Predicate<Dataset>() {
+
+                            @Override
+                            public boolean apply(Dataset dataset) {
+                                return dataset.getName().equals(validatedDataset.getName());
+                            }
+                        });
+            } catch (NoSuchElementException e) {
+                throw new IllegalStateException("Data source '" + this.name
+                        + "' doesn't contain dataset '" + validatedDataset.getName() + "'", e);
+            }
+        }
     }
 }

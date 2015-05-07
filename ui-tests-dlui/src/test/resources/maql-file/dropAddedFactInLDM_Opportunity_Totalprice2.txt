@@ -1,0 +1,1 @@
+ALTER DATASET {dataset.opportunity} DROP {fact.opportunity.totalprice2};DROP {fact.opportunity.totalprice2};SYNCHRONIZE {dataset.opportunity} PRESERVE DATA;

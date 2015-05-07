@@ -5,6 +5,8 @@ import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class SchedulesTable extends AbstractTable {
 
     private final static By BY_SCHEDULE_TITLE = By
@@ -21,7 +23,7 @@ public class SchedulesTable extends AbstractTable {
 
     public WebElement getSchedule(String executableName) {
         for (int i = 0; i < this.getNumberOfRows(); i++) {
-            if (getRow(i).findElement(BY_SCHEDULE_TITLE).getText().equals(executableName))
+            if (waitForElementVisible(BY_SCHEDULE_TITLE, getRow(i)).getText().equals(executableName))
                 return getRow(i);
         }
         return null;
@@ -29,8 +31,8 @@ public class SchedulesTable extends AbstractTable {
 
     private WebElement getScheduleElement(String executableName, By selector) {
         for (int i = 0; i < this.getNumberOfRows(); i++) {
-            if (getRow(i).findElement(BY_SCHEDULE_TITLE).getText().equals(executableName))
-                return getRow(i).findElement(selector);
+            if (waitForElementVisible(BY_SCHEDULE_TITLE, getRow(i)).getText().equals(executableName))
+                return waitForElementVisible(selector, getRow(i));
         }
         return null;
     }

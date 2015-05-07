@@ -7,6 +7,7 @@ package com.gooddata.qa.utils.http;
  * Exception indicating that we received status code other than expected.
  * You can get returned status code using {@link #getStatusCode()}
  */
+@SuppressWarnings("serial")
 public class InvalidStatusCodeException extends RuntimeException {
 
     private int statusCode;

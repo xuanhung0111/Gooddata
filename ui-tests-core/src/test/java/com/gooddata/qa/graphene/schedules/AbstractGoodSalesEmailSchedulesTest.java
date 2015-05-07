@@ -5,6 +5,7 @@ package com.gooddata.qa.graphene.schedules;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.http.RestApiClient;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
@@ -14,8 +15,10 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.openqa.selenium.By;
+
 import javax.mail.MessagingException;
 import javax.mail.Part;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -23,17 +26,19 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     protected static final int MAILBOX_TIMEOUT_MINUTES = 6;
-    // mailbox polling interval in miliseconds
-    protected static final int MAILBOX_POLL_INTERVAL_MILISECONDS = 30000;
+    protected static final int MAILBOX_POLL_INTERVAL_MILLIS = 30000;
 
     protected static final String FROM = "noreply@gooddata.com";
 
@@ -81,10 +86,12 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         setSchedule(scheduleUri, schedule);
     }
 
+    /**
+     * Get scheduledMail
+     */
     private InputStream getScheduleInputStream(String scheduleUri) throws IOException {
         RestApiClient apiClient = getRestApiClient();
 
-        // get scheduledMail
         System.out.println("Get scheduledMail: " + scheduleUri);
         HttpRequestBase getRequest = apiClient.newGetMethod(scheduleUri);
         HttpResponse getResponse = apiClient.execute(getRequest);
@@ -92,8 +99,10 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         return getResponse.getEntity().getContent();
     }
 
+    /**
+     * Update scheduledMail
+     */
     private void setSchedule(String scheduleUri, String schedule) {
-        // update scheduledMail
         System.out.println("Update scheduledMail: " + scheduleUri);
         HttpRequestBase postRequest = restApiClient.newPostMethod(scheduleUri, schedule);
         HttpResponse postResponse = restApiClient.execute(postRequest);
@@ -101,6 +110,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         EntityUtils.consumeQuietly(postResponse.getEntity());
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private String getResetRecurrencySchedule(InputStream stream) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -120,6 +130,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
         return mapper.writeValueAsString(rootNode);
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private String getBccSchedule(InputStream scheduleStream, String[] bccEmails) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -137,7 +148,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
     }
 
     protected int getMailboxMaxPollingLoops() {
-        return 60000 / MAILBOX_POLL_INTERVAL_MILISECONDS * MAILBOX_TIMEOUT_MINUTES;
+        return 60000 / MAILBOX_POLL_INTERVAL_MILLIS * MAILBOX_TIMEOUT_MINUTES;
     }
 
 }

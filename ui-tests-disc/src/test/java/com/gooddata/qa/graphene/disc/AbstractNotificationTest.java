@@ -146,6 +146,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     protected String failureProcessUri;
     protected String successfulScheduleId;
     protected String failedScheduleId;
+    protected String imapUserUri;
 
     @FindBy(tagName = "pre")
     protected ObjectFragment objectFragment;
@@ -184,11 +185,9 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected String createGdcUserWithImapUser(String imapUser, String imapPassword) {
         try {
-            String imapUserUri =
-                    RestUtils.createNewUser(getRestApiClient(), imapUser, imapPassword);
-            return imapUserUri;
+            return RestUtils.createNewUser(getRestApiClient(), imapUser, imapPassword);
         } catch (Exception e) {
-            throw new IllegalStateException("There is an exeception when creating a new user!", e);
+            throw new IllegalStateException("There is an exception when creating a new user!", e);
         }
     }
 

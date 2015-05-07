@@ -7,7 +7,9 @@ import static org.testng.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -22,12 +24,18 @@ import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.ADSInstance;
+import com.gooddata.qa.graphene.entity.DataSource;
+import com.gooddata.qa.graphene.entity.Dataset;
+import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
+import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.DLUIProcessParameters;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import com.google.common.collect.Lists;
 
 public abstract class AbstractDLUITest extends AbstractProjectTest {
 
@@ -35,16 +43,16 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
             "DLUI/graph/CreateAndCopyDataToADS.grf";
 
-    private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
-
     private static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     private static final String PROCESS_EXECUTION_URI = DATALOAD_PROCESS_URI + "%s/executions";
     private static final String ADS_INSTANCES_URI = "gdc/datawarehouse/instances/";
     private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
             + "%s/schemas/default";
-    private static final String OUTPUTSTAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
+    private static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
+    private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
 
     private static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
+    protected static final String FROM = "no-reply@gooddata.com";
 
     private JSONObject cloudConnectProcess = new JSONObject();
     private JSONObject processExecution = new JSONObject();
@@ -60,6 +68,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     protected String maqlFilePath;
     protected String sqlFilePath;
     protected String zipFilePath;
+
+    protected static final String ADS_URL =
+            "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
+
+    protected ProcessInfo cloudconnectProcess;
+    protected ADSInstance adsInstance;
 
     protected ProjectInfo getWorkingProject() {
         if (workingProject == null)
@@ -95,17 +109,30 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         return createDataLoadProcess() == HttpStatus.CONFLICT.value();
     }
 
-    protected void createModelForGDProject(String maqlFile) {
-        String maql = "";
-        try {
-            maql = FileUtils.readFileToString(new File(maqlFile));
-            postMAQL(maql, STATUS_POLLING_CHECK_ITERATIONS);
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "There is an exeception during reading file to string!", e);
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an exeception during creating model for GD project! ", e);
+    protected void updateModelOfGDProject(String maqlFile) {
+        assertEquals(
+                RestUtils.getPollingState(getRestApiClient(), sendRequestToUpdateModel(maqlFile)),
+                "OK", "Model is not updated successfully!");
+    }
+
+    protected void dropAddedFieldsInLDM(String maqlFile) {
+        String pollingUri = sendRequestToUpdateModel(maqlFile);
+        if (!"OK".equals(RestUtils.getPollingState(getRestApiClient(), pollingUri))) {
+            HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
+            HttpResponse getResponse = restApiClient.execute(getRequest);
+            String errorMessage = "";
+            try {
+                errorMessage =
+                        new JSONObject(EntityUtils.toString(getResponse.getEntity()))
+                                .getJSONObject("wTaskStatus").getJSONArray("messages")
+                                .getJSONObject(0).getJSONObject("error").get("message").toString();
+            } catch (Exception e) {
+                throw new IllegalStateException("There is an exeption when getting error message!",
+                        e);
+            }
+
+            System.out.println("LDM update is failed with error message: " + errorMessage);
+            assertEquals(errorMessage, "The object (%s) doesn't exist.");
         }
     }
 
@@ -113,16 +140,14 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         openUrl(ADS_INSTANCES_URI);
         waitForElementVisible(storageForm.getRoot());
         assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
-        String adsUrl = "";
+        String adsUrl;
         try {
             adsUrl =
-                    storageForm
-                            .createStorage(adsInstance.getName(),
-                                    adsInstance.getDescription(),
-                                    adsInstance.getAuthorizationToken());
+                    storageForm.createStorage(adsInstance.getName(), adsInstance.getDescription(),
+                            adsInstance.getAuthorizationToken());
         } catch (Exception e) {
             throw new IllegalStateException(
-                    "There is an exeception during creating new ads instance! ", e);
+                    "There is an exception during creating new ads instance! ", e);
         }
 
         adsInstance.withId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
@@ -162,39 +187,28 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         return responseStatusCode;
     }
 
-    protected int executeProcess(String processId, String adsUrl, String createTableSqlFile,
+    protected void executeProcess(String processId, String adsUrl, String createTableSqlFile,
             String copyTableSqlFile) {
         String processExecutionUri =
                 String.format(PROCESS_EXECUTION_URI, testParams.getProjectId(), processId);
-        String createTableSql = "";
-        String copyTableSql = "";
         try {
-            createTableSql =
+            String createTableSql =
                     FileUtils
                             .readFileToString(new File(createTableSqlFile), StandardCharsets.UTF_8);
-            copyTableSql =
+            String copyTableSql =
                     FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
             prepareProcessExecutionBody(adsUrl, createTableSql, copyTableSql);
             String postBody = processExecution.toString();
-            System.out.println("postBody: " + postBody);
-            HttpRequestBase postRequest =
-                    getRestApiClient().newPostMethod(processExecutionUri, postBody);
-            HttpResponse postResponse = getRestApiClient().execute(postRequest);
-            int responseStatusCode = postResponse.getStatusLine().getStatusCode();
+            String pollingUri = executeProcessRequest(processExecutionUri, postBody);
 
-            System.out.println(postResponse.toString());
-            EntityUtils.consumeQuietly(postResponse.getEntity());
-            System.out.println("Response status: " + responseStatusCode);
-
-            return responseStatusCode;
-
+            pollingExecutionStatus(pollingUri);
         } catch (IOException e) {
             throw new IllegalStateException(
-                    "There is an exeception during reading file to string! ", e);
+                    "There is an exception during reading file to string! ", e);
         }
     }
 
-    protected int setDefaultSchemaForOutputStage(String projectId, String adsId) {
+    protected void setDefaultSchemaForOutputStage(String adsId) {
         String schemaUri = String.format(ADS_INSTANCE_SCHEMA_URI, adsId);
         JSONObject outputStageObj = new JSONObject();
         try {
@@ -208,14 +222,16 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         String putUri = String.format(OUTPUTSTAGE_URI, getWorkingProject().getProjectId());
         String putBody = outputStageObj.toString();
         HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
+        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
+
         HttpResponse putResponse = getRestApiClient().execute(putRequest);
         int responseStatusCode = putResponse.getStatusLine().getStatusCode();
 
         System.out.println(putResponse.toString());
         EntityUtils.consumeQuietly(putResponse.getEntity());
         System.out.println("Response status: " + responseStatusCode);
-
-        return responseStatusCode;
+        assertEquals(responseStatusCode, HttpStatus.OK.value(),
+                "Default schema is not set successfully!");
     }
 
     protected String uploadZipFileToWebDav(String zipFile, String webContainer) {
@@ -243,6 +259,43 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         waitForElementVisible(annieUIDialog.getRoot());
     }
 
+    protected DataSource prepareADSTable(ADSTables adsTable) {
+        createUpdateADSTable(adsTable);
+        DataSource dataSource =
+                new DataSource().withName(adsTable.datasourceName).withDatasets(
+                        adsTable.getDatasets());
+
+        return dataSource;
+    }
+
+    protected Dataset prepareDataset(AdditionalDatasets additionalDataset) {
+        return additionalDataset.getDataset();
+    }
+
+    protected void createUpdateADSTable(ADSTables adsTable) {
+        executeProcess(
+                cloudconnectProcess.getProcessId(),
+                ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
+                        adsInstance.getId()), sqlFilePath + adsTable.createTableSqlFile,
+                sqlFilePath + adsTable.copyTableSqlFile);
+    }
+
+    private String sendRequestToUpdateModel(String maqlFile) {
+        String maql = "";
+        String pollingUri = "";
+        try {
+            maql = FileUtils.readFileToString(new File(maqlFile));
+            pollingUri =
+                    RestUtils.updateLDM(getRestApiClient(), getWorkingProject().getProjectId(),
+                            maql);
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "There is an exeception during reading file to string!", e);
+        }
+
+        return pollingUri;
+    }
+
     private void prepareProcessExecutionBody(String adsUrl, String createTableSql,
             String copyTableSql) {
         LinkedHashMap<String, Object> objMap = new LinkedHashMap<String, Object>();
@@ -263,6 +316,48 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         }
     }
 
+    private String executeProcessRequest(String processExecutionUri, String postBody) {
+        HttpRequestBase postRequest =
+                getRestApiClient().newPostMethod(processExecutionUri, postBody);
+        HttpResponse postResponse = getRestApiClient().execute(postRequest);
+        assertEquals(postResponse.getStatusLine().getStatusCode(), HttpStatus.CREATED.value(),
+                "Invalid status code!");
+        String pollingUri = "";
+        try {
+            pollingUri =
+                    new JSONObject(EntityUtils.toString(postResponse.getEntity()))
+                            .getJSONObject("executionTask").getJSONObject("links")
+                            .getString("detail");
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeception during running process! ", e);
+        }
+        EntityUtils.consumeQuietly(postResponse.getEntity());
+
+        return pollingUri;
+    }
+
+    private void pollingExecutionStatus(String pollingUri) {
+        HttpRequestBase getRequest = getRestApiClient().newGetMethod(pollingUri);
+        HttpResponse getResponse;
+        String state = "";
+        try {
+            do {
+                getResponse = getRestApiClient().execute(getRequest);
+                state =
+                        new JSONObject(EntityUtils.toString(getResponse.getEntity()))
+                                .getJSONObject("executionDetail").get("status").toString();
+                System.out.println("Current execution state is: " + state);
+                Thread.sleep(2000);
+            } while ("QUEUED".equals(state) || "RUNNING".equals(state));
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "There is an exception during polling execution status!", e);
+        }
+        EntityUtils.consumeQuietly(getResponse.getEntity());
+
+        assertEquals(state, "OK", "Invalid execution status: " + state);
+    }
+
     private void prepareCCProcessCreationBody(ProcessInfo processInfo, String uploadFilePath) {
         try {
             LinkedHashMap<String, String> objMap = new LinkedHashMap<String, String>();
@@ -275,6 +370,85 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
             throw new IllegalStateException(
                     "There is a problem when create JSON object for creating CloudConnect process! ",
                     e);
+        }
+    }
+
+    protected enum AdditionalDatasets {
+
+        PERSON_WITH_NEW_FIELDS("person", new Field("Position", FieldTypes.ATTRIBUTE)),
+        PERSON_WITH_NEW_DATE_FIELD(
+                "person",
+                new Field("Position", FieldTypes.ATTRIBUTE),
+                new Field("Date", FieldTypes.DATE)),
+        OPPORTUNITY_WITH_NEW_FIELDS(
+                "opportunity",
+                new Field("Title2", FieldTypes.ATTRIBUTE),
+                new Field("Label", FieldTypes.LABEL_HYPERLINK),
+                new Field("Totalprice2", FieldTypes.FACT)),
+        OPPORTUNITY_WITH_NEW_DATE_FIELD(
+                "opportunity",
+                new Field("Title2", FieldTypes.ATTRIBUTE),
+                new Field("Label", FieldTypes.LABEL_HYPERLINK),
+                new Field("Totalprice2", FieldTypes.FACT),
+                new Field("Date", FieldTypes.DATE));
+
+        private String name;
+        private List<Field> additionalFields;
+
+        private AdditionalDatasets(String name, Field... additionalFields) {
+            this.name = name;
+            this.additionalFields = Lists.newArrayList(additionalFields);
+        }
+
+        public Dataset getDataset() {
+            List<Field> fields = Lists.newArrayList();
+            for (Field additionalField : additionalFields) {
+                fields.add(additionalField.clone());
+            }
+            return new Dataset().withName(name).withFields(fields);
+        }
+    }
+
+    protected enum ADSTables {
+
+        WITHOUT_ADDITIONAL_FIELDS("createTable.txt", "copyTable.txt", "Unknown data source"),
+        WITH_ADDITIONAL_FIELDS(
+                "createTableWithAdditionalFields.txt",
+                "copyTableWithAdditionalFields.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
+        WITH_ADDITIONAL_DATE(
+                "createTableWithAdditionalDate.txt",
+                "copyTableWithAdditionalDate.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
+        WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt");
+
+        private String createTableSqlFile;
+        private String copyTableSqlFile;
+        private String datasourceName;
+        private List<AdditionalDatasets> additionalDatasets = Lists.newArrayList();
+
+        private ADSTables(String createTableSqlFile, String copyTableSqlFile) {
+            this(createTableSqlFile, copyTableSqlFile, "");
+        }
+
+        private ADSTables(String createTableSqlFile, String copyTableSqlFile,
+                String datasourceName, AdditionalDatasets... datasets) {
+            this.createTableSqlFile = createTableSqlFile;
+            this.copyTableSqlFile = copyTableSqlFile;
+            this.datasourceName = datasourceName;
+            this.additionalDatasets = Arrays.asList(datasets);
+        }
+
+        public List<Dataset> getDatasets() {
+            List<Dataset> datasets = Lists.newArrayList();
+            for (AdditionalDatasets additionalDataset : this.additionalDatasets) {
+                datasets.add(additionalDataset.getDataset());
+            }
+            return datasets;
         }
     }
 }

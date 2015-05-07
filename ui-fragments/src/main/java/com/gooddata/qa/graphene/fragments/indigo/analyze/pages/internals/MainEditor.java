@@ -49,9 +49,9 @@ public class MainEditor extends AbstractFragment {
                 && bucketsFilter.isBlankState();
     }
 
-    public void configTimeFilter(String period) {
+    public void configTimeFilter(String relatedDate, String period) {
         waitForFragmentVisible(bucketsFilter);
-        bucketsFilter.configTimeFilter(period);
+        bucketsFilter.configTimeFilter(relatedDate, period);
     }
 
     public void configAttributeFilter(String attribute, String... values) {
@@ -131,5 +131,9 @@ public class MainEditor extends AbstractFragment {
      */
     public void configTimeFilterByRange(String from, String to) throws ParseException {
         waitForFragmentVisible(bucketsFilter).configTimeFilterByRange(from, to);
+    }
+
+    public void changeDimensionSwitchInFilter(String currentRelatedDate, String dimensionSwitch) {
+        waitForFragmentVisible(bucketsFilter).changeDimensionSwitchInFilter(currentRelatedDate, dimensionSwitch);
     }
 }

@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 
-public class AnalyticalDesignerSocialECommerceTest extends AbstractAnalyticalDesignerProjectTest {
+public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest {
 
     private static final String ORDERS = "% Orders";
     private static final String CHECKOUTS = "% Checkouts";

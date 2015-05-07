@@ -27,6 +27,7 @@ public class NotificationsTest extends AbstractNotificationTest {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
+        imapUserUri = testParams.loadProperty("imap.userUri");
         userProfileId =
                 testParams.loadProperty("userProfileUri").substring(
                         testParams.loadProperty("userProfileUri").lastIndexOf("/") + 1);
@@ -453,9 +454,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkRepeatedDataLoadingFailureNotification() {
-        String imapUserUri = "";
         try {
-            imapUserUri = createGdcUserWithImapUser(imapUser, imapPassword);
             addUserToProject(imapUserUri, UserRoles.ADMIN);
             logout();
 
@@ -482,13 +481,11 @@ public class NotificationsTest extends AbstractNotificationTest {
             scheduleBuilder.setEnabled(false);
             waitForRepeatedFailuresEmail(scheduleBuilder);
         } catch (Exception e) {
-            throw new IllegalStateException("There is an exeception when adding user to project!",
-                    e);
+            throw new IllegalStateException("There is an exception when adding user to project!", e);
         } finally {
             cleanProcessesInWorkingProject();
             logout();
             signInAtUI(testParams.getUser(), testParams.getPassword());
-            deleteImapUser(imapUserUri);
         }
     }
 

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.testng.Assert.*;
@@ -34,6 +35,7 @@ public class RestUtils {
     private static final String USERS_LINK = "/gdc/projects/%s/users";
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
     private static final String LDM_LINK = "/gdc/projects/%s/ldm";
+    private static final String LDM_MANAGE_LINK = "/gdc/md/%s/ldm/manage2";
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";
     private static final String OBJ_LINK = "/gdc/md/%s/obj/";
     private static final String MUF_LINK = "/gdc/md/%s/userfilters";
@@ -47,8 +49,10 @@ public class RestUtils {
     private static final String PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER = "featureFlag";
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
     private static final String CREATE_USER_CONTENT_BODY;
+    private static final String UPDATE_LDM_BODY;
     private static final String MUF_OBJ;
     private static final String USER_FILTER;
+    private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
@@ -63,6 +67,18 @@ public class RestUtils {
                     put("verifyPassword", "${userPassword}");
                     put("firstName", "FirstName");
                     put("lastName", "LastName");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exception during json object initialization! ", e);
+        }
+    }
+    static {
+        try {
+            UPDATE_LDM_BODY = new JSONObject() {{
+                put("manage", new JSONObject() {{
+                    put("maql", "${maql}");
                 }});
             }}.toString();
         } catch (JSONException e) {
@@ -86,7 +102,7 @@ public class RestUtils {
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is an exeception during json object initialization! ", e);
+                    "There is an exception during json object initialization! ", e);
         }
     }
     
@@ -106,7 +122,7 @@ public class RestUtils {
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException(
-                    "There is an exeception during json object initialization! ", e);
+                    "There is an exception during json object initialization! ", e);
         }
     }
 
@@ -137,7 +153,8 @@ public class RestUtils {
     }
 
     public static void addUserToProject(String host, String projectId, String domainUser,
-                                        String domainPassword, String inviteeProfile, UserRoles role) throws ParseException, IOException, JSONException {
+                                        String domainPassword, String inviteeProfile,
+                                        UserRoles role) throws ParseException, IOException, JSONException {
 
         RestApiClient restApiClient = new RestApiClient(host, domainUser, domainPassword, true, false);
         String usersUri = String.format(USERS_LINK, projectId);
@@ -147,8 +164,11 @@ public class RestUtils {
         HttpResponse postResponse = restApiClient.execute(postRequest);
         assertEquals(postResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
         JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
-        assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"), "User isn't assigned properly into the project");
-        System.out.println(String.format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId, domainUser));
+        assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"),
+                "User isn't assigned properly into the project");
+        System.out.println(
+                format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId,
+                        domainUser));
     }
 
     public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
@@ -188,7 +208,49 @@ public class RestUtils {
                      "User group could not be deleted, got " + statusCode);
     }
 
-    public static String getLDMImageURI(String host, String projectId, String user, String password) throws ParseException, IOException, JSONException {
+    public static void addUsersToUserGroup(RestApiClient restApiClient, String userGroupId, String... userURIs)
+            throws JSONException {
+        modifyUsersInUserGroup(restApiClient, userGroupId, "ADD", userURIs);
+    }
+
+    public static void removeUsersFromUserGroup(RestApiClient restApiClient, String userGroupId,
+            String... userURIs) throws JSONException {
+        modifyUsersInUserGroup(restApiClient, userGroupId, "REMOVE", userURIs);
+    }
+
+    public static void setUsersInUserGroup(RestApiClient restApiClient, String userGroupId, String... userURIs)
+            throws JSONException {
+        modifyUsersInUserGroup(restApiClient, userGroupId, "SET", userURIs);
+    }
+
+    private static void modifyUsersInUserGroup(RestApiClient restApiClient, String userGroupId, 
+            String operation, String... userURIs) throws JSONException {
+        HttpRequestBase postRequest = null;
+        try {
+            String modifyMemberUri = String.format(USER_GROUP_MODIFY_MEMBERS_LINK, userGroupId);
+            postRequest = restApiClient.newPostMethod(modifyMemberUri, 
+                    buildModifyMembersContent(operation, userURIs));
+            HttpResponse postResponse = restApiClient.execute(postRequest);
+            assertEquals(postResponse.getStatusLine().getStatusCode(), 204, "Modify Users on User Group failed");
+        } finally {
+            if (postRequest != null) {
+                postRequest.releaseConnection();
+            }
+        }
+    }
+
+    private static String buildModifyMembersContent(final String operation, final String... userURIs) 
+            throws JSONException {
+        return new JSONObject() {{
+            put("modifyMembers", new JSONObject() {{
+                put("operation", operation);
+                put("items", new JSONArray(userURIs));
+            }});
+        }}.toString();
+    }
+
+    public static String getLDMImageURI(String host, String projectId, String user, String password) 
+            throws ParseException, IOException, JSONException {
         RestApiClient restApiClient = new RestApiClient(host, user, password, true, false);
         String ldmUri = String.format(LDM_LINK, projectId);
         HttpRequestBase getRequest = restApiClient.newGetMethod(ldmUri);
@@ -259,8 +321,8 @@ public class RestUtils {
 
     public static String createMUFObj(final RestApiClient restApiClient, String projectID, String mufTitle, 
             Map<String, List<String>> conditions) throws IOException, JSONException {
-        String mdObjURI = String.format(OBJ_LINK,projectID);
-        String MUFExpressions = buildExpression(projectID, conditions);
+        String mdObjURI = format(OBJ_LINK, projectID);
+        String MUFExpressions = buildFilterExpression(projectID, conditions);
         System.out.println(MUFExpressions);
         String contentBody = MUF_OBJ.replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
         HttpRequestBase postRequest = restApiClient.newPostMethod(mdObjURI, contentBody);
@@ -271,7 +333,7 @@ public class RestUtils {
         return json.getString("uri");
     }
 
-    private static String buildExpression(final String projectID, Map<String, List<String>> conditions) {
+    private static String buildFilterExpression(final String projectID, Map<String, List<String>> conditions) {
       //syntax: "([<Attribute_URI_1>] IN ([<element_URI_1>], [element_URI_2], [...] )) AND 
       //([<Attribute_URI_2>] IN ([<element_URI_1>], [element_URI_2], [...]))";
         List<String> expressions = Lists.newArrayList();
@@ -279,25 +341,24 @@ public class RestUtils {
         final String elementURI = "[/gdc/md/%s/obj/%s/elements?id=%s]";
         String expression = "(%s IN (%s))";
         for (final String attributeID : conditions.keySet()) {
-            expressions.add(String.format(expression, 
-                    String.format(attributeURI, projectID, attributeID),
-                    Joiner.on(",").join(Collections2.transform(conditions.get(attributeID), 
+            expressions.add(format(expression,
+                    format(attributeURI, projectID, attributeID),
+                    Joiner.on(",").join(Collections2.transform(conditions.get(attributeID),
                             new Function<String, String>() {
-                        @Override
-                        public String apply(String input) {
-                            return String.format(elementURI, projectID, attributeID, input);
-                        }
-                    }))
-                    ));
+                                @Override
+                                public String apply(String input) {
+                                    return format(elementURI, projectID, attributeID, input);
+                                }
+                            }))
+            ));
         }
         return Joiner.on(" AND ").join(expressions);
     }
     
     public static void addMUFToUser(final RestApiClient restApiClient, String projectURI, String userProfileURI, 
             String mufURI) {
-        String urserFilter = String.format(MUF_LINK, projectURI);
-        String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression", 
-                mufURI);
+        String urserFilter = format(MUF_LINK, projectURI);
+        String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression", mufURI);
         System.out.println(contentBody);
         HttpRequestBase postRequest = restApiClient.newPostMethod(urserFilter, contentBody);
         HttpResponse postReponse = restApiClient.execute(postRequest);
@@ -348,6 +409,52 @@ public class RestUtils {
            
         }
         
+    }
+
+    public static String updateLDM(RestApiClient restApiClient, String projectId, String maql) {
+        String contentBody = UPDATE_LDM_BODY.replace("${maql}", maql);
+        HttpRequestBase postRequest =
+                restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody);
+        HttpResponse postResponse = restApiClient.execute(postRequest);
+        assertEquals(postResponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
+                "LDM is not updated successful!");
+
+        String pollingUri = "";
+        try {
+            JSONObject responseBody =
+                    new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+            pollingUri =
+                    responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "There is an excetion when getting polling uri of LDM update!", e);
+        }
+
+        EntityUtils.consumeQuietly(postResponse.getEntity());
+
+        return pollingUri;
+    }
+
+    public static String getPollingState(RestApiClient restApiClient, String pollingUri) {
+        HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
+        HttpResponse getResponse;
+        String state = "";
+        try {
+            do {
+                getResponse = restApiClient.execute(getRequest);
+                state =
+                        new JSONObject(EntityUtils.toString(getResponse.getEntity()))
+                                .getJSONObject("wTaskStatus").get("status").toString();
+                System.out.println("Current polling state is: " + state);
+                Thread.sleep(2000);
+            } while ("RUNNING".equals(state));
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeption when polling state!", e);
+        }
+
+        EntityUtils.consumeQuietly(getResponse.getEntity());
+
+        return state;
     }
 
     public static void enableFeatureFlagInProject(RestApiClient restApiClient, String projectId,

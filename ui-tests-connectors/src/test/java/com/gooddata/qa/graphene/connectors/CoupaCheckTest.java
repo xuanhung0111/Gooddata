@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.connectors;
 
+import com.gooddata.qa.graphene.enums.UserRoles;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +30,8 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
     private String coupaInstanceApiUrl;
     private String coupaInstanceApiKey;
+    private String coupaUploadUser;
+    private String coupaUploadUserPassword;
 
     @FindBy(tagName = "form")
     private CoupaInstanceFragment coupaInstance;
@@ -37,6 +40,8 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
     public void loadRequiredProperties() {
         coupaInstanceApiUrl = testParams.loadProperty("connectors.coupa.instance.apiUrl");
         coupaInstanceApiKey = testParams.loadProperty("connectors.coupa.instance.apiKey");
+        coupaUploadUser = testParams.loadProperty("connectors.coupa.uploadUser");
+        coupaUploadUserPassword = testParams.loadProperty("connectors.coupa.uploadUserPassword");
 
         connectorType = Connectors.COUPA;
         expectedDashboardsAndTabs = new HashMap<String, String[]>();
@@ -85,8 +90,24 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testCoupaIntegrationConfiguration"})
+    public void testCoupaIntegrationWithUploadUser() throws JSONException {
+        // pardot specific configuration of API Url (with specific upload user)
+        signInAtGreyPages(coupaUploadUser, coupaUploadUserPassword);
+        testConnectorIntegrationResource();
+    }
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testCoupaIntegrationWithUploadUser"})
     public void testCoupaIntegration() throws InterruptedException, JSONException {
+        // sign in back with demo user
+        signIn(true, UserRoles.ADMIN);
         // process schedule
         scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
+    }
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testCoupaIntegration"})
+    public void testIncrementalSynchronization() throws JSONException, InterruptedException {
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
     }
 }

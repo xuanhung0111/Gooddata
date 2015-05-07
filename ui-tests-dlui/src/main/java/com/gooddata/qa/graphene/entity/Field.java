@@ -1,15 +1,24 @@
 package com.gooddata.qa.graphene.entity;
 
+import org.apache.commons.lang.WordUtils;
+import org.openqa.selenium.By;
+
 public class Field {
 
     private String name;
     private FieldTypes type;
+    private FieldStatus status;
 
     public Field() {}
 
     public Field(String name, FieldTypes type) {
+        this(name, type, FieldStatus.AVAILABLE);
+    }
+
+    public Field(String name, FieldTypes type, FieldStatus status) {
         this.name = name;
         this.type = type;
+        this.status = status;
     }
 
     public String getName() {
@@ -20,12 +29,25 @@ public class Field {
         return type;
     }
 
+    public FieldStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FieldStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public Field clone() {
+        return new Field(name, type, status);
+    }
+
     public enum FieldTypes {
         ALL("all data"),
         ATTRIBUTE("attributes"),
         FACT("facts"),
         DATE("dates"),
-        LABLE_HYPERLINK("labels & hyperlinks");
+        LABEL_HYPERLINK("labels & hyperlinks");
 
         private String filterName;
 
@@ -33,8 +55,21 @@ public class Field {
             this.filterName = filterName;
         }
 
-        public String getFilterName() {
-            return this.filterName;
+        public By getFilterBy() {
+            return By.xpath(String.format("//a[text()='%s']", this.filterName));
         }
+
+        public String getEmptyStateMessage() {
+            return String.format(
+                    "No sources with %s",
+                    this == LABEL_HYPERLINK ? "Label or Hyperlink" : WordUtils
+                            .capitalizeFully(filterName));
+        }
+    }
+
+    public enum FieldStatus {
+        AVAILABLE,
+        SELECTED,
+        ADDED;
     }
 }

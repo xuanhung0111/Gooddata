@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.connectors;
 
 import com.gooddata.qa.graphene.enums.Connectors;
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -27,6 +28,12 @@ public class Zendesk3CheckTest extends AbstractZendeskCheckTest {
         expectedDashboardsAndTabs.put("Release 3 New Dashboards", new String[]{
                 "Overview w/ Business Hours", "Staffing and Volume Heat Maps"
         });
+    }
+
+    @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
+            dependsOnMethods = {"testZendeskIntegration"})
+    public void testIncrementalSynchronization() throws JSONException, InterruptedException {
+        scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
     }
 
     @Override

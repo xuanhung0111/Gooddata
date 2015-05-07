@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,7 +20,6 @@ import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
 import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
@@ -97,29 +97,52 @@ public class ReportFilter extends AbstractFragment {
     private String listOfElementLocator = 
             "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
 
-    public void addFilterSelectList(SelectFromListValuesFilterItem filterItem) {
+    public void addFilterSelectList(SelectFromListValuesFilterItem filterItem) throws InterruptedException {
         System.out.println("Adding attribute filter ......");
         WebElement addFilterButton = waitForElementVisible(BY_ADD_FILTER_BUTTON, browser);
-        
+
         if (!addFilterButton.getAttribute("class").contains("disabled")) {
             addFilterButton.click();
         }
         waitForElementVisible(filterPicker);
         waitForElementVisible(attributeFilterLink).click();
-        
-        Graphene.createPageFragment(SelectItemPopupPanel.class,
-                waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser))
-                .searchAndSelectItem(filterItem.getAttribute());
 
-        SelectItemPopupPanel panel =
-                Graphene.createPageFragment(SelectItemPopupPanel.class,
-                        waitForElementVisible(By.cssSelector(".listContainer"), browser));
-        for (String e : filterItem.getValues()) {
-            panel.searchAndSelectEmbedItem(e);
-        }
+        // These 2 methods is a special way to work around because of Selenium cannot locate element using
+        // ByChained or @FindBys in SelectItemPopupPanel fragment. At this moment, it's just happened in donkeys.
+        // Please do not refactor it or make sure Zendesk4CheckTest is passed.
+        searchAndSelectAttribute(filterItem.getAttribute());
+        searchAndSelectAttributeValues(filterItem.getValues());
+
         waitForElementVisible(confirmApplyButton).click();
         waitForElementNotVisible(confirmApplyButton);
         waitForElementVisible(hideFiltersButton).click();
+    }
+
+    /* 
+     * Please do not refactor it or make sure Zendesk4CheckTest is passed.
+     */
+    private void searchAndSelectAttribute(String attribute) throws InterruptedException {
+        String panelLocator = ".gdc-overlay-simple:not(.hidden):not(.yui3-overlay-hidden)";
+        waitForElementVisible(By.cssSelector(panelLocator + " input.gdc-input"), browser).sendKeys(attribute);
+        Thread.sleep(2000);
+        waitForElementVisible(By.cssSelector(panelLocator + " div.es_body:not(.hidden):not(.gdc-hidden)"),
+                browser).click();
+        waitForElementVisible(By.cssSelector(panelLocator + " .s-btn-select"), browser).click();
+    }
+
+    /* 
+     * Please do not refactor it or make sure Zendesk4CheckTest is passed.
+     */
+    private void searchAndSelectAttributeValues(Collection<String> values) throws InterruptedException {
+        String panelLocator = ".listContainer";
+        WebElement input = waitForElementVisible(By.cssSelector(panelLocator + " input.gdc-input"), browser);
+        for (String val: values) {
+            input.clear();
+            input.sendKeys(val);
+            Thread.sleep(3000);
+            waitForElementVisible(By.cssSelector(panelLocator +
+                    " div.es_body:not(.hidden):not(.gdc-hidden) > input"), browser).click();
+        }
     }
 
     private String createAttributeXPath(String locator, String placeHolder, String attributeName) {

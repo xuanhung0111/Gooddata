@@ -100,7 +100,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 break;
             }
 
-            Thread.sleep(MAILBOX_POLL_INTERVAL_MILISECONDS);
+            Thread.sleep(MAILBOX_POLL_INTERVAL_MILLIS);
         }
 
         System.out.println("Saving dashboard message ...");
