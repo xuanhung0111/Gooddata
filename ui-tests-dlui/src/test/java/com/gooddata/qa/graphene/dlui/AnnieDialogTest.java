@@ -1,64 +1,41 @@
 package com.gooddata.qa.graphene.dlui;
 
-import org.json.JSONException;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-
-import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.ProcessInfo;
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 public class AnnieDialogTest extends AbstractDLUITest {
 
-    private static final String INITIAL_LDM_MAQL_FILE = "create-ldm.txt";
-
     private static final String DEFAULT_DATA_SOURCE_NAME = "Unknown data source";
+    private static final String DATA_CAN_NOT_ADD_HEADLINE = "Data cannot be added right now";
+    private static final String ADDING_DATA_HEADLINE = "Adding data...";
+    private static final String DIALOG_STATE_FIRST_MESSAGE = 
+            "We’re sorry, but it’s not possible to add new data at the moment." +
+            " Other data is currently being uploaded into the project " +
+            "and due to technical limitations it is not possible to add new data at the same time.";
+    private static final String DIALOG_STATE_SECOND_MESSAGE = "It can take a while so please come later.";
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
-        maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
-        sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
         projectTitle = "Dlui-annie-dialog-test";
     }
 
-    @Test(dependsOnMethods = "createProject")
-    public void initialData() {
-        try {
-            RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
-        } catch (JSONException e) {
-            throw new IllegalStateException("There is a problem when enable data explorer! ", e);
-        }
-
-        updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
-
-        adsInstance =
-                new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
-                        testParams.loadProperty("dss.authorizationToken"));
-        createADSInstance(adsInstance);
-
-        setDefaultSchemaForOutputStage(adsInstance.getId());
-        assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
-
-        cloudconnectProcess =
-                new ProcessInfo().withProjectId(testParams.getProjectId())
-                        .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
-        createCloudConnectProcess(cloudconnectProcess);
-    }
-
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkEmptyStateInAnnieDialog() {
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
 
@@ -66,7 +43,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         annieUIDialog.checkEmptyAnnieDialog();
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkAvailableAdditionalFields() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -75,7 +52,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         Screenshots.takeScreenshot(browser, "available-additional-fields", getClass());
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkAvailableAdditionalAttributes() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -84,7 +61,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         Screenshots.takeScreenshot(browser, "available-additional-attributes", getClass());
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkAvailableAdditionalFacts() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -93,7 +70,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         Screenshots.takeScreenshot(browser, "available-additional-facts", getClass());
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkAvailableAdditionalLabelHyperlink() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -102,7 +79,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         Screenshots.takeScreenshot(browser, "available-additional-label-hyperlinks", getClass());
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkAdditionalDateField() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE);
 
@@ -111,7 +88,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         Screenshots.takeScreenshot(browser, "available-additional-date", getClass());
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkEmptyStateWithDateFilter() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -119,7 +96,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.DATE);
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkSearchAllFields() {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -133,7 +110,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         annieUIDialog.checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkErrorMappingOnAnnieDialog() {
         // Prepare an ADS which doesn't contain some fields in LDM
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
@@ -142,7 +119,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         annieUIDialog.assertErrorMessage();
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void selectAndDeselectFields() {
         Field selectedField1 = new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED);
         Field selectedField2 = new Field("Title2", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED);
@@ -163,7 +140,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         annieUIDialog.assertNoDataSelectedState();
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
     public void checkCancelAddNewFieldFromADSToLDM() {
         Dataset selectedDataset =
                 new Dataset().withName("person").withFields(
@@ -184,7 +161,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         Screenshots.takeScreenshot(browser, "cancel-add-new-field", getClass());
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
     public void addNewAttributeFromADSToLDM() {
         try {
             Dataset selectedDataset =
@@ -201,7 +178,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         }
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
     public void addNewFactFromADSToLDM() {
         try {
             Dataset selectedDataset =
@@ -218,7 +195,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         }
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
     public void addNewLabelFromADSToLDM() {
         try {
             Dataset selectedDataset =
@@ -236,7 +213,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         }
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
     public void addNewDateFieldFromADSToLDM() {
         try {
             Dataset selectedDataset =
@@ -277,7 +254,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         }
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
     public void checkFailToAddNewField() {
         try {
             Dataset selectedDataset =
@@ -306,7 +283,7 @@ public class AnnieDialogTest extends AbstractDLUITest {
         }
     }
 
-    @Test(dependsOnMethods = "initialData", groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
     public void addNewFieldsToLDMWithEditorRole() {
         try {
             Dataset selectedDataset =
@@ -342,6 +319,40 @@ public class AnnieDialogTest extends AbstractDLUITest {
         }
     }
 
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest")
+    public void checkConcurrentDataLoadWithAnnieDialog() throws InterruptedException {
+        Dataset dataset = new Dataset().withName("person").withFields(
+                new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
+        DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(dataset);
+        openAnnieDialog();
+        annieUIDialog.selectFields(dataSource);
+        annieUIDialog.clickOnApplyButton();
+        try {
+            waitForFragmentVisible(annieUIDialog);
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+                @Override
+                public boolean apply(WebDriver input) {
+                    return ADDING_DATA_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline());
+                }
+            });
+            Thread.sleep(500);
+            annieUIDialog.clickOnCloseButton();
+            openAnnieDialog();
+            Graphene.waitGui().until(new Predicate<WebDriver>() {
+                @Override
+                public boolean apply(WebDriver input) {
+                    return DATA_CAN_NOT_ADD_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline());
+                }
+            });
+
+            assertEquals(annieUIDialog.getIntegrationFirstMessage(), DIALOG_STATE_FIRST_MESSAGE);
+            assertEquals(annieUIDialog.getIntegrationSecondMessage(), DIALOG_STATE_SECOND_MESSAGE);
+            assertFalse(annieUIDialog.isPositiveButtonPresent());
+            Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Annie-Dialog", getClass());
+        } finally {
+            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+        }
+    }
 
     @Test(dependsOnGroups = "annieDialogTest", alwaysRun = true)
     public void cleanUp() {

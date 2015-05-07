@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.disc.dto;
+package com.gooddata.qa.graphene.dto;
 
 
 import com.google.common.base.Objects;
@@ -14,6 +14,7 @@ import org.springframework.web.util.UriTemplate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * ETL Processes
@@ -83,5 +84,22 @@ public class Processes {
                 Objects.equal(other.links, this.links);
     }
 
+    public Process getDataloadProcess() {
+        for (Process process : getItems()) {
+            if ("DATALOAD".equals(process.getType())) {
+                return process;
+            }
+        }
+        throw new NoSuchElementException("No dataload process in the project!");
+    }
 
+    public int getDataloadProcessCount() {
+        int count = 0;
+        for (Process process : getItems()) {
+            if ("DATALOAD".equals(process.getType())) {
+                count++;
+            }
+        }
+        return count;
+    }
 }

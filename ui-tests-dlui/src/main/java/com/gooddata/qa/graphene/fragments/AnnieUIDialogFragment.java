@@ -75,13 +75,27 @@ public class AnnieUIDialogFragment extends AbstractFragment {
         return waitForElementVisible(BY_EMPTY_STATE_MESSAGE, browser).getText();
     }
 
+    public String getIntegrationFirstMessage() {
+        return waitForElementVisible(BY_INTEGRATION_STATUS, getRoot())
+                .findElement(By.xpath("//p[1]")).getText().trim();
+    }
+
+    public String getIntegrationSecondMessage() {
+        return waitForElementVisible(BY_INTEGRATION_STATUS, getRoot())
+                .findElement(By.xpath("//p[2]")).getText().trim();
+    }
+
+    public boolean isPositiveButtonPresent() {
+        return browser.findElements(By.className("button-positive")).size() > 0;
+    }
+
     public void assertErrorMessage() {
         WebElement integrationStatus = waitForElementVisible(BY_INTEGRATION_STATUS, getRoot());
         assertEquals(getAnnieDialogHeadline(), ERROR_ANNIE_DIALOG_HEADLINE);
-        assertEquals(integrationStatus.findElement(By.xpath("//p[1]")).getText(),
-                ERROR_ANNIE_DIALOG_MESSAGE_1, "Incorrect error message on Annie dialog!");
-        assertEquals(integrationStatus.findElement(By.xpath("//p[2]")).getText(),
-                ERROR_ANNIE_DIALOG_MESSAGE_2, "Incorrect error message on Annie dialog!");
+        assertEquals(getIntegrationFirstMessage(), ERROR_ANNIE_DIALOG_MESSAGE_1,
+                "Incorrect error message on Annie dialog!");
+        assertEquals(getIntegrationSecondMessage(), ERROR_ANNIE_DIALOG_MESSAGE_2,
+                "Incorrect error message on Annie dialog!");
         assertEquals(integrationStatus.findElement(By.xpath("//p[2]/a")).getAttribute("href"),
                 GOODDATA_SUPPORT_LINK, "Incorrect support link in error message of Annie dialog!");
         clickOnCloseButton();

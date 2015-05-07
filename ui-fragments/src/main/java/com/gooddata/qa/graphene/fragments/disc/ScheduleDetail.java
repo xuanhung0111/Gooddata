@@ -59,12 +59,15 @@ public class ScheduleDetail extends ScheduleForm {
     private static final By BY_EXECUTION_STATUS = By.cssSelector(".execution-status");
     private static final By BY_EXECUTION_DESCRIPTION = By
             .cssSelector(".ait-execution-history-item-description");
+    private static final By BY_EXECUTION_ERROR_DESCRIPTION = By
+            .cssSelector(".ait-execution-history-item-description.is-error");
     private static final By BY_EXECUTION_LOG = By.cssSelector(".ait-execution-history-item-log");
     private static final By BY_EXECUTION_RUNTIME = By.cssSelector(".execution-runtime");
     private static final By BY_EXECUTION_DATE = By.cssSelector(".execution-date");
     private static final By BY_EXECUTION_TIMES = By.cssSelector(".execution-times");
     private static final By BY_OK_STATUS_ICON = By.cssSelector(".status-icon-ok");
     private static final By BY_ERROR_STATUS_ICON = By.cssSelector(".status-icon-error");
+    private static final By BY_SCHEDULER_ERROR_STATUS_ICON = By.cssSelector(".status-icon-scheduler-error");
     private static final By BY_OK_LAST_RUN = By.cssSelector(".last-run");
     private static final By BY_MANUAL_ICON = By.cssSelector(".icon-manual");
     private static final By BY_CONFIRM_STOP_EXECUTION = By.cssSelector(".button-negative");
@@ -387,10 +390,15 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void manualRun() {
+        tryToRun();
+        waitForElementVisible(manualStopButton);
+        System.out.println("Schedule is executed manually!");
+    }
+
+    public void tryToRun() {
         waitForElementVisible(manualRunButton).click();
         waitForElementVisible(manualRunDialog);
         waitForElementVisible(confirmRunButton).click();
-        waitForElementVisible(manualStopButton);
     }
 
     public void manualStop() {
@@ -587,6 +595,11 @@ public class ScheduleDetail extends ScheduleForm {
         return lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText();
     }
 
+    public String getExecutionErrorDescription() {
+        waitForElementVisible(lastExecutionItem);
+        return waitForElementVisible(lastExecutionItem.findElement(BY_EXECUTION_ERROR_DESCRIPTION)).getText();
+    }
+
     public boolean isStarted() {
         return waitForElementVisible(manualStopButton).isDisplayed();
     }
@@ -618,6 +631,14 @@ public class ScheduleDetail extends ScheduleForm {
 
     public String getLastExecutionLogLink() {
         return lastExecutionItem.findElement(BY_EXECUTION_LOG).getAttribute("href");
+    }
+
+    public String getLastExecutionLogTitle() {
+        return lastExecutionItem.findElement(BY_EXECUTION_LOG).getAttribute("title").trim();
+    }
+
+    public boolean isLastSchedulerErrorIconVisible() {
+        return waitForElementVisible(lastExecutionItem).findElements(BY_SCHEDULER_ERROR_STATUS_ICON).size() > 0 ;
     }
 
     public void changeValidScheduleName(String newScheduleName, Confirmation saveChange) {
