@@ -70,7 +70,7 @@ public class RestApiClient {
         HttpResponse response = execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode != expectedStatusCode) {
-            throw new InvalidStatusCodeException(unexpectedMessage, statusCode);
+            throw new InvalidStatusCodeException(String.format("%s [%d]", unexpectedMessage, statusCode), statusCode);
         }
         return response;
     }

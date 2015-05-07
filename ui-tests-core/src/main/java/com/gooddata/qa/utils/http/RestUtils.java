@@ -63,11 +63,11 @@ public class RestUtils {
             ADD_USER_CONTENT_BODY = new JSONObject() {{
                 put("user", new JSONObject() {{
                     put("content", new JSONObject() {{
-                        put("userRoles", new JSONArray().put("%s"));
+                        put("userRoles", new JSONArray().put("${userRoles}"));
                         put("status", "ENABLED");
                     }});
                     put("links", new JSONObject() {{
-                        put("self", "%s");
+                        put("self", "${self}");
                     }});
                 }});
             }}.toString();
@@ -175,7 +175,8 @@ public class RestUtils {
         RestApiClient restApiClient = new RestApiClient(host, domainUser, domainPassword, true, false);
         String usersUri = String.format(USERS_LINK, projectId);
         String roleUri = String.format(ROLE_LINK, projectId, role.getRoleId());
-        String contentBody = String.format(ADD_USER_CONTENT_BODY, roleUri, inviteeProfile);
+        String contentBody = ADD_USER_CONTENT_BODY.replace("${userRoles}", roleUri)
+                .replace("${self}", inviteeProfile);
         HttpRequestBase postRequest = restApiClient.newPostMethod(usersUri, contentBody);
         HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
         JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
