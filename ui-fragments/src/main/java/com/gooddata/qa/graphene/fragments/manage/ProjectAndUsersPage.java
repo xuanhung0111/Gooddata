@@ -33,7 +33,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
         System.out.println("Project deleted...");
     }
 
-    public void openUserManagemtPage() {
+    public void openUserManagementPage() {
         waitForElementVisible(userManagementLink).click();
     }
     

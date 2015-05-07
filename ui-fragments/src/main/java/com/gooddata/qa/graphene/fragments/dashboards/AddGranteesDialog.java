@@ -25,6 +25,9 @@ public class AddGranteesDialog extends AbstractFragment {
 
     @FindBy(css = ".s-btn-cancel")
     private WebElement cancelButton;
+    
+    @FindBy(css = ".grantee-footer a")
+    private WebElement userManagementLink;
 
     private final String NO_RESULTS_OUTPUT_LOCATOR = ".gd-list-view-noResults";
 
@@ -91,4 +94,12 @@ public class AddGranteesDialog extends AbstractFragment {
         waitForElementVisible(cancelButton).click();
     }
 
+    public void openUserManagementPage() {
+        waitForElementVisible(userManagementLink).click();
+    }
+
+    public boolean isUserGroupLinkShown() {
+        return waitForElementVisible(By.className("grantee-footer"), browser).
+                findElements(By.cssSelector("a")).size() > 0;
+    }
 }
