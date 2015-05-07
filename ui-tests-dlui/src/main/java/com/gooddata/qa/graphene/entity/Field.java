@@ -1,7 +1,13 @@
 package com.gooddata.qa.graphene.entity;
 
+import java.util.Collection;
+
 import org.apache.commons.lang.WordUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public class Field {
 
@@ -40,6 +46,24 @@ public class Field {
     @Override
     public Field clone() {
         return new Field(name, type, status);
+    }
+
+    public boolean hasCorrespondingWebElement(Collection<WebElement> elements) {
+        return Iterables.any(elements, findWebElementPredicate());
+    }
+
+    public WebElement getCorrespondingWebElement(Collection<WebElement> elements) {
+        return Iterables.find(elements, findWebElementPredicate());
+    }
+
+    private Predicate<WebElement> findWebElementPredicate() {
+        return new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement field) {
+                return name.equals(field.getText());
+            }
+        };
     }
 
     public enum FieldTypes {

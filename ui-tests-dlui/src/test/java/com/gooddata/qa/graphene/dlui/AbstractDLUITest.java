@@ -64,25 +64,6 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private JSONObject cloudConnectProcess = new JSONObject();
     private JSONObject processExecution = new JSONObject();
 
-    private static final JSONObject OUTPUT_STAGE_METADATA;
-
-    static {
-        try {
-            OUTPUT_STAGE_METADATA = new JSONObject() {
-                {
-                    put("outputStageMetadata", new JSONObject() {
-                        {
-                            put("tableMeta", new JSONArray());
-                        }
-                    });
-                }
-            };
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is an exception during json object initialization! ", e);
-        }
-    }
-
     @FindBy(css = ".s-btn-add_data")
     private WebElement addDataButton;
 
@@ -115,15 +96,17 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
         updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
 
-        adsInstance = new ADSInstance().withName("ADS Instance for DLUI test")
-                .withAuthorizationToken(testParams.loadProperty("dss.authorizationToken"));
+        adsInstance =
+                new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
+                        testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
 
         setDefaultSchemaForOutputStage(adsInstance.getId());
         assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
 
-        cloudconnectProcess = new ProcessInfo().withProjectId(testParams.getProjectId())
-                .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
+        cloudconnectProcess =
+                new ProcessInfo().withProjectId(testParams.getProjectId())
+                        .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
         createCloudConnectProcess(cloudconnectProcess);
     }
 
@@ -333,55 +316,38 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     }
 
     protected void deleteOutputStageMetadata() {
-        String metadata = "{\"outputStageMetadata\" : {\"tableMeta\" : []}}";
-
-        String putUri =
-                String.format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
-        String putBody = metadata;
-        HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
-        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
-
-        HttpResponse putResponse = getRestApiClient().execute(putRequest);
-        int responseStatusCode = putResponse.getStatusLine().getStatusCode();
-
-        System.out.println(putResponse.toString());
-        EntityUtils.consumeQuietly(putResponse.getEntity());
-        System.out.println("Response status: " + responseStatusCode);
-        assertEquals(responseStatusCode, HttpStatus.OK.value(),
-                "Metadata is not updated successfully!");
+        customOutputStageMetadata();
     }
 
     protected void customOutputStageMetadata(DataSource... dataSources) {
         String putBody = prepareOutputStageMetadata(dataSources);
 
-        System.out.println("Metadata: " + putBody);
-
         String putUri =
                 String.format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
 
         HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
         putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
 
-        HttpResponse putResponse = getRestApiClient().execute(putRequest);
-        int responseStatusCode = putResponse.getStatusLine().getStatusCode();
+        HttpResponse putResponse =
+                getRestApiClient().execute(putRequest, HttpStatus.OK,
+                        "Metadata is not updated successfully! Put body: " + putBody);
 
         EntityUtils.consumeQuietly(putResponse.getEntity());
-        System.out.println("Response status: " + responseStatusCode);
-        assertEquals(responseStatusCode, HttpStatus.OK.value(),
-                "Metadata is not updated successfully!");
     }
 
     private String prepareOutputStageMetadata(DataSource... dataSources) {
-        JSONObject metaObject = OUTPUT_STAGE_METADATA;
-        Collection<JSONObject> metadataObjects = Lists.newArrayList();
-        for (DataSource dataSource : dataSources) {
-            for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
-                metadataObjects.add(prepareMetadataObject(dataset.getName(), dataSource.getName()));
-            }
-        }
+        JSONObject metaObject = new JSONObject();
 
         try {
-            metaObject.getJSONObject("outputStageMetadata").put("tableMeta", metadataObjects);
+            Collection<JSONObject> metadataObjects = Lists.newArrayList();
+            for (DataSource dataSource : dataSources) {
+                for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
+                    metadataObjects.add(prepareMetadataObject(dataset.getName(),
+                            dataSource.getName(), new JSONArray()));
+                }
+            }
+            metaObject.put("outputStageMetadata",
+                    new JSONObject().put("tableMeta", metadataObjects));
         } catch (JSONException e) {
             throw new IllegalStateException(
                     "There is JSONExcetion during prepareOutputStageMetadata!", e);
@@ -391,7 +357,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     }
 
     private JSONObject prepareMetadataObject(String tableName, String dataSourceName,
-            String... metaColumns) {
+            JSONArray metaColumns) {
         JSONObject metadataObject = new JSONObject();
         try {
             metadataObject.put("tableMetadata",
@@ -400,8 +366,6 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         } catch (JSONException e) {
             throw new IllegalStateException("JSONExeception", e);
         }
-
-        System.out.println("metadata: " + metadataObject.toString());
 
         return metadataObject;
     }
@@ -443,11 +407,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     }
 
     private String executeProcessRequest(String processExecutionUri, String postBody) {
+
         HttpRequestBase postRequest =
                 getRestApiClient().newPostMethod(processExecutionUri, postBody);
-        HttpResponse postResponse = getRestApiClient().execute(postRequest);
-        assertEquals(postResponse.getStatusLine().getStatusCode(), HttpStatus.CREATED.value(),
-                "Invalid status code!");
+        HttpResponse postResponse =
+                getRestApiClient().execute(postRequest, HttpStatus.CREATED,
+                        "Execution is not created!");
         String pollingUri = "";
         try {
             pollingUri =
@@ -457,6 +422,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         } catch (Exception e) {
             throw new IllegalStateException("There is an exeception during running process! ", e);
         }
+
         EntityUtils.consumeQuietly(postResponse.getEntity());
 
         return pollingUri;
@@ -583,6 +549,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     }
 
     protected String getDataloadProcessId() throws IOException, JSONException {
-        return RestUtils.getProcessesList(getRestApiClient(), testParams.getProjectId()).getDataloadProcess().getProcessId();
+        return RestUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
+                .getDataloadProcess().getProcessId();
     }
 }
