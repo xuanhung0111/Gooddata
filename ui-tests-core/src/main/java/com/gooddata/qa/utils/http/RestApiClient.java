@@ -27,7 +27,6 @@ import org.apache.http.impl.client.*;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Wrapper for Gooddata REST API client which simplifies its usage
@@ -106,13 +105,8 @@ public class RestApiClient {
     }
 
     protected AbstractHttpEntity getEntity(String content) {
-        try {
-            StringEntity entity = new StringEntity(content);
-            entity.setContentType("application/json");
-            return entity;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        StringEntity entity = new StringEntity(content, ContentType.APPLICATION_JSON);
+        return entity;
     }
 
     protected void setAcceptHeader(HttpRequestBase requestBase) {

@@ -3,10 +3,6 @@ package com.gooddata.qa.graphene.fragments;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
-import java.util.Collection;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -14,10 +10,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.Field;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 
 public class SelectionArea extends AbstractFragment {
 
@@ -40,22 +32,8 @@ public class SelectionArea extends AbstractFragment {
         }
     }
 
-    public void checkSelectedFields(Collection<Field> expectedFields) {
+    public List<WebElement> getSelectedFields() {
         waitForCollectionIsNotEmpty(selectedFields);
-        assertEquals(selectedFields.size(), expectedFields.size(),
-                "The number of selected fields is incorrect!");
-        List<String> selectedFieldTitles = Lists.newArrayList();
-        for (final WebElement selectedField : selectedFields) {
-            assertTrue(Iterables.any(expectedFields, new Predicate<Field>() {
-
-                @Override
-                public boolean apply(Field field) {
-                    return field.getName().equals(selectedField.getText());
-                }
-            }), "The field " + selectedField.getText() + "is not selected!");
-            selectedFieldTitles.add(selectedField.getText());
-        }
-        assertTrue(Ordering.natural().isOrdered(selectedFieldTitles),
-                "Selected fields are not sorted!");
+        return selectedFields;
     }
 }
