@@ -19,7 +19,6 @@ import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -60,12 +59,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     private Project project;
     private MetadataService mdService;
 
-    @BeforeClass
-    public void initStartPage() {
-        startPage = "projects.html";
-    }
-
-    @Test(groups = {"projectInit"})
+    @Test(groups = {PROJECT_INIT_GROUP})
     public void init() throws JSONException {
         signIn(false, UserRoles.ADMIN);
         GoodData goodDataClient = getGoodDataClient();
@@ -73,7 +67,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         mdService = goodDataClient.getMetadataService();
     }
 
-    @Test(dependsOnMethods = {"init"}, groups = {"projectInit"})
+    @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void loadAttributes() {
         attributes = Lists.newArrayList(FluentIterable.from(mdService.find(project, Attribute.class))
                 .transform(new Function<Entry, String>() {
@@ -89,7 +83,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         }));
     }
 
-    @Test(dependsOnMethods = {"init"}, groups = {"projectInit"})
+    @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void loadMetrics() {
         metrics = Lists.newArrayList(Collections2.transform(mdService.find(project, Metric.class),
                 new Function<Entry, String>() {
@@ -100,7 +94,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         }));
     }
 
-    @Test(dependsOnMethods = {"init"}, groups = {"projectInit"})
+    @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void turnOffWalkme() {
         initAnalysePage();
 
@@ -113,7 +107,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         }
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testCustomDiscovery() {
         initAnalysePage();
 
@@ -146,7 +140,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testWithAttribute() {
         String attribute = getRandomAttribute();
         initAnalysePage();
@@ -164,7 +158,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(report.getHeaders(), Arrays.asList(attribute.toUpperCase()));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void dragMetricToColumnChartShortcutPanel() {
         initAnalysePage();
 
@@ -202,7 +196,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(report.getTrackersCount() >= 1);
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void dragMetricToTrendShortcutPanel() {
         initAnalysePage();
 
@@ -224,7 +218,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testSimpleContribution() {
         initAnalysePage();
 
@@ -268,7 +262,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(analysisPage.isShowPercentConfigSelected());
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testAnotherApproachToShowContribution() {
         initAnalysePage();
 
@@ -304,7 +298,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testSimpleComparison() {
         initAnalysePage();
 
@@ -355,7 +349,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void supportParameter() {
         initAnalysePage();
 
@@ -387,7 +381,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(report.getTrackersCount() >= 1);
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void displayInColumnChartWithOnlyMetric() {
         initAnalysePage();
 
@@ -430,7 +424,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
 
@@ -448,7 +442,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void exportCustomDiscovery() throws InterruptedException {
         initAnalysePage();
 
@@ -516,7 +510,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         browser.switchTo().window(currentWindowHandel);
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
@@ -525,7 +519,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void filterOnDateAttribute() {
         initAnalysePage();
 
@@ -552,7 +546,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": This year");
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testDateInCategoryAndDateInFilter() {
         initAnalysePage();
 
@@ -569,7 +563,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
 
@@ -607,7 +601,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void dragAndDropAttributeToFilterBucket() {
         initAnalysePage();
 
@@ -639,7 +633,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void addFilterDoesNotHideRecommendation() {
         initAnalysePage();
 
@@ -676,7 +670,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testSimplePoP() {
         initAnalysePage();
 
@@ -716,7 +710,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testAnotherApproachToShowPoP() {
         initAnalysePage();
 
@@ -741,7 +735,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void compararisonRecommendationOverrideDateFilter() {
         initAnalysePage();
 
@@ -790,7 +784,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(legends, Arrays.asList(metric + " - previous year", metric));
     }
 
-  @Test(dependsOnGroups = {"projectInit"})
+  @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
   public void testUndoRedo() {
       int baseTrackerCount1;
       int baseTrackerCount2;

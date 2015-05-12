@@ -12,8 +12,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
     protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
 
     @BeforeClass
-    public void initStartPage() {
-        startPage = "projects.html";
+    public void initProperties() {
         projectTitle = "GoodSales-test";
         projectTemplate = GOODSALES_TEMPLATE;
         projectCreateCheckIterations = 60; // 5 minutes
