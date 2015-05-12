@@ -1,12 +1,16 @@
 package com.gooddata.qa.graphene.performance.dashboards;
 
 import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.common.CheckUtils;
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ClearCaches;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -31,8 +35,19 @@ public class ProjectPerfWalkthrough extends AbstractUITest {
     public static final String SEPARATOR = ",";
 
     @BeforeClass
-    public void initStartPage() {
-        startPage = "gdc";
+    public void initProperties() {
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                CheckUtils.waitForElementVisible(By.className("param"), browser);
+            }
+            
+            @Override
+            public String getStartPage() {
+                return "gdc";
+            }
+        };
 
         testParams.setProjectId(testParams.loadProperty("projectId"));
         startDashboardIndex = Integer.valueOf(testParams.loadProperty("startDashboardIndex"));

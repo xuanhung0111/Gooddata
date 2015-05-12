@@ -17,8 +17,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
     protected boolean isWalkmeTurnOff = false;
 
     @BeforeClass
-    public void initStartPage() {
-        startPage = "projects.html";
+    public void initProperties() {
         projectCreateCheckIterations = 60; // 5 minutes
     }
 

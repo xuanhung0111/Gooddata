@@ -35,7 +35,6 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @BeforeClass
     public void initProjectTitle() {
-        startPage = "";
         projectTitle = "SimpleProject-test-dashboard-saved-filters";
     }
 
