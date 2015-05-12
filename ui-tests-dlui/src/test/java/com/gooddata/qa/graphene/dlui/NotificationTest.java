@@ -7,23 +7,15 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-
-import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.ProcessInfo;
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class NotificationTest extends AbstractDLUINotificationTest {
-
-    private static final String INITIAL_LDM_MAQL_FILE = "create-ldm.txt";
 
     @BeforeClass
     public void initProperties() {
@@ -38,40 +30,6 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         technicalUser = testParams.loadProperty("technicalUser");
         technicalUserPassword = testParams.loadProperty("technicalUserPassword");
         technicalUserUri = testParams.loadProperty("technicalUserUri");
-    }
-
-    /*
-     * The tests need 2 imap users which are also GoodData accounts (as George and Annie) to add new
-     * data and check mail. Domain user will add George and Annie to project.
-     */
-    @Test(dependsOnMethods = "createProject", groups = {"initialDataForDLUI"})
-    public void addGeorgeAndAnnieUserToProject() throws ParseException, JSONException, IOException {
-        addUserToProject(technicalUserUri, UserRoles.ADMIN);
-        addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
-    }
-
-    @Override
-    @Test(dependsOnMethods = {"addGeorgeAndAnnieUserToProject"}, groups = {"initialDataForDLUI"})
-    public void prepareLDMAndADSInstance() throws JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
-
-        updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
-
-        adsInstance =
-                new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
-                        testParams.loadProperty("dss.authorizationToken"));
-        createADSInstance(adsInstance);
-        addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
-
-        setDefaultSchemaForOutputStage(getRestApiClient(technicalUser, technicalUserPassword),
-                adsInstance.getId());
-        assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
-
-        cloudconnectProcess =
-                new ProcessInfo().withProjectId(testParams.getProjectId())
-                        .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
-        createCloudConnectProcess(cloudconnectProcess);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "george")
@@ -299,6 +257,28 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         logout();
         signInAtUI(testParams.getUser(), testParams.getPassword());
         deleteADSInstance(adsInstance);
+    }
+
+    @Override
+    protected void setDefaultSchemaForOutputStage() {
+        setDefaultSchemaForOutputStage(getRestApiClient(technicalUser, technicalUserPassword),
+                adsInstance.getId());
+    }
+
+    @Override
+    protected void addUsersToProject() {
+        try {
+            addUserToProject(technicalUserUri, UserRoles.ADMIN);
+            addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exception when adding users to project!",
+                    e);
+        }
+    }
+
+    @Override
+    protected void addUsersToAdsInstance() {
+        addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
     }
 
     private void checkSuccessfulAddingData(DataSource dataSource, String screenshotName) {

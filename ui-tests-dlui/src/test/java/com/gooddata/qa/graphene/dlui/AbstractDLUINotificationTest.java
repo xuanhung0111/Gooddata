@@ -6,7 +6,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -89,51 +88,52 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
                 String.format(GD_PROJECT_LINK + "|analysisPage|empty-report|empty-report",
                         testParams.getHost(), getWorkingProject().getProjectId());
 
-        assertEquals(message.getElementsContainingOwnText(exploreNewData).attr("href"),
-                expectedExploreNewDataLink, "Incorrect empty report link in email content!");
-        assertEquals(message.getElementsContainingOwnText(getWorkingProject().getProjectName())
-                .attr("href"), getWorkingProjectLink(), "Incorrect project link in email content!");
+        assertEquals(getElementLink(message, exploreNewData), expectedExploreNewDataLink,
+                "Incorrect empty report link in email content!");
+        assertEquals(getElementLink(message, getWorkingProject().getProjectName()),
+                getWorkingProjectLink(), "Incorrect project link in email content!");
+
         String receivedTimeMessage = message.getElementsContainingOwnText(receivedTimeText).text();
         assertTrue(isThisDateValid(receivedTimeMessage.replace(receivedTimeText, "")),
                 "Invalid time format: " + receivedTimeMessage);
-        assertEquals(message.getElementsContainingOwnText(GD_SUPPORT_LINK).attr("href"),
-                GD_SUPPORT_LINK, "Incorrect support link in email content!");
 
-        List<Element> fieldNameElements = message.getElementsByTag("li");
-        assertEquals(fieldNameElements.size(), fieldNames.length, "Incorrect number of fields");
-        checkFieldListInEmail(fieldNameElements, fieldNames);
+        assertEquals(getElementLink(message, GD_SUPPORT_LINK), GD_SUPPORT_LINK,
+                "Incorrect support link in email content!");
+
+        checkFieldListInEmail(message, fieldNames);
     }
 
     private void assertFailedDataAddingEmailContent(Document message, String... fieldNames) {
-        String emailUser = testParams.getUser();
         String gdSupportLinkTitle = "GoodData Customer Support";
 
-        assertNotNull(message.getElementsContainingOwnText(emailUser));
-        assertEquals(message.getElementsContainingOwnText(getWorkingProject().getProjectName())
-                .attr("href"), getWorkingProjectLink(), "Incorrect project link in email content!");
-        RestUtils.verifyValidLink(getRestApiClient(),
-                message.getElementsContainingOwnText("execution log").attr("href"));
-        assertEquals(message.getElementsContainingOwnText(gdSupportLinkTitle).attr("href"),
-                GD_SUPPORT_LINK);
+        assertEquals(getElementLink(message, getWorkingProject().getProjectName()),
+                getWorkingProjectLink(), "Incorrect project link in email content!");
+        RestUtils.verifyValidLink(getRestApiClient(), getElementLink(message, "execution log"));
+        assertEquals(getElementLink(message, gdSupportLinkTitle), GD_SUPPORT_LINK,
+                "Incorrect support link in email content!");
 
-        List<Element> fieldNameElements = message.getElementsByTag("li");
-        assertEquals(fieldNameElements.size(), fieldNames.length, "Incorrect number of fields");
-        checkFieldListInEmail(fieldNameElements, fieldNames);
+        checkFieldListInEmail(message, fieldNames);
     }
 
     private void assertFailedDataAddingEmailContentForEditor(Document message, String... fieldNames) {
-        assertEquals(message.getElementsContainingOwnText(getWorkingProject().getProjectName())
-                .attr("href"), getWorkingProjectLink(), "Incorrect project link in email content!");
+        assertEquals(getElementLink(message, getWorkingProject().getProjectName()),
+                getWorkingProjectLink(), "Incorrect project link in email content!");
         assertTrue(message.getElementsContainingOwnText("execution log").isEmpty());
-        assertEquals(message.getElementsContainingOwnText(GD_SUPPORT_LINK).attr("href"),
-                GD_SUPPORT_LINK);
+        assertEquals(getElementLink(message, GD_SUPPORT_LINK), GD_SUPPORT_LINK,
+                "Incorrect support link in email content!");
 
-        List<Element> fieldNameElements = message.getElementsByTag("li");
-        assertEquals(fieldNameElements.size(), fieldNames.length, "Incorrect number of fields");
-        checkFieldListInEmail(fieldNameElements, fieldNames);
+        checkFieldListInEmail(message, fieldNames);
     }
 
-    private void checkFieldListInEmail(Iterable<Element> fieldNameElements, String... fieldNames) {
+    private String getElementLink(Document message, String key) {
+        if (message.getElementsContainingOwnText(key).isEmpty())
+            throw new IllegalStateException("Cannot find element with the key: " + key);
+        return message.getElementsContainingOwnText(key).attr("href");
+    }
+
+    private void checkFieldListInEmail(Document message, String... fieldNames) {
+        List<Element> fieldNameElements = message.getElementsByTag("li");
+        assertEquals(fieldNameElements.size(), fieldNames.length, "Incorrect number of fields");
         for (final String fieldName : fieldNames) {
             assertTrue(Iterables.any(fieldNameElements, new Predicate<Element>() {
 
@@ -148,7 +148,8 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
     private Message getNotification(final ImapClient imapClient, final String subject,
             long receivedTime) throws MessagingException {
         Collection<Message> notifications =
-                ImapUtils.waitForMessageWithExpectedReceivedTime(imapClient, GDEmails.FROM_NO_REPLY,
+                ImapUtils.waitForMessageWithExpectedReceivedTime(imapClient,
+                        GDEmails.FROM_NO_REPLY,
                         String.format(subject, getWorkingProject().getProjectName()), receivedTime);
 
         assertTrue(notifications.size() > 0, "The notification was not sent!");

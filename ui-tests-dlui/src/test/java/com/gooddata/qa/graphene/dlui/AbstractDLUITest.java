@@ -98,6 +98,9 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
     public void prepareLDMAndADSInstance() throws JSONException {
+        // Override this method in test class if it's necessary to add more users to project
+        addUsersToProject();
+
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
         updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
@@ -106,14 +109,26 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
                         testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
+        // Override this method in test class if it's necessary to add more users to ads instance
+        addUsersToAdsInstance();
 
-        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
+        // Override this method in test class if using other user to set default schema for output
+        // stage
+        setDefaultSchemaForOutputStage();
         assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
 
         cloudconnectProcess =
                 new ProcessInfo().withProjectId(testParams.getProjectId())
                         .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
         createCloudConnectProcess(cloudconnectProcess);
+    }
+
+    protected void addUsersToProject() {}
+
+    protected void addUsersToAdsInstance() {}
+
+    protected void setDefaultSchemaForOutputStage() {
+        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
     }
 
     protected ProjectInfo getWorkingProject() {
