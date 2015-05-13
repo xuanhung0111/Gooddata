@@ -443,23 +443,25 @@ public class RestUtils {
 
     public static String updateLDM(RestApiClient restApiClient, String projectId, String maql) {
         String contentBody = UPDATE_LDM_BODY.replace("${maql}", maql);
+        String pollingUri = "";
         HttpRequestBase postRequest =
                 restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody);
         HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK,
                 "LDM is not updated successful!");
 
-        String pollingUri = "";
         try {
             JSONObject responseBody =
                     new JSONObject(EntityUtils.toString(postResponse.getEntity()));
             pollingUri =
                     responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
+
+            EntityUtils.consumeQuietly(postResponse.getEntity());
         } catch (Exception e) {
             throw new IllegalStateException(
                     "There is an excetion when getting polling uri of LDM update!", e);
+        } finally {
+            postRequest.releaseConnection();
         }
-
-        EntityUtils.consumeQuietly(postResponse.getEntity());
 
         return pollingUri;
     }
@@ -477,11 +479,13 @@ public class RestUtils {
                 System.out.println("Current polling state is: " + state);
                 Thread.sleep(2000);
             } while ("RUNNING".equals(state));
+            
+            EntityUtils.consumeQuietly(getResponse.getEntity());
         } catch (Exception e) {
             throw new IllegalStateException("There is an exeption when polling state!", e);
+        } finally {
+            getRequest.releaseConnection();
         }
-
-        EntityUtils.consumeQuietly(getResponse.getEntity());
 
         return state;
     }
@@ -490,6 +494,19 @@ public class RestUtils {
             ProjectFeatureFlags featureFlag) throws JSONException {
         setFeatureFlagsToProject(restApiClient, projectId,
                 new FeatureFlagOption(featureFlag.getFlagName(), true));
+    }
+    
+    public static void verifyValidLink(RestApiClient restApiClient, String link) {
+        HttpRequestBase getRequest = restApiClient.newGetMethod(link);
+        try {
+            HttpResponse getResponse = restApiClient.execute(getRequest);
+            assertEquals(getResponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
+                    "Invalid link!");
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
+        } finally {
+            getRequest.releaseConnection();
+        }
     }
 
     /**
