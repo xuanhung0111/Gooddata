@@ -114,7 +114,7 @@ public class DataSource {
     private void checkValidDatasets(Dataset... validatedDatasets) {
         for (final Dataset validatedDataset : validatedDatasets) {
             try {
-                Iterables.find(getAvailableDatasets(FieldTypes.ALL), new Predicate<Dataset>() {
+                Iterables.find(this.datasets, new Predicate<Dataset>() {
 
                     @Override
                     public boolean apply(Dataset dataset) {

@@ -1,6 +1,8 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.qa.graphene.dto.Processes;
+import com.gooddata.qa.graphene.entity.disc.ExecutionTask;
+import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.google.common.base.Function;
@@ -9,7 +11,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
@@ -28,6 +29,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -60,6 +62,7 @@ public class RestUtils {
     private static final String EXECUTION_DATALOAD_PROCESS_BODY;
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     private static final String ERROR_KEY = "error";
+    private static final String PROJECT_MODEL_VIEW_LINK = "/gdc/projects/%s/model/view";
 
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
@@ -466,27 +469,23 @@ public class RestUtils {
         return pollingUri;
     }
 
-    public static String getPollingState(RestApiClient restApiClient, String pollingUri) {
-        HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
-        HttpResponse getResponse;
-        String state = "";
-        try {
-            do {
-                getResponse = restApiClient.execute(getRequest);
-                state =
-                        new JSONObject(EntityUtils.toString(getResponse.getEntity()))
-                                .getJSONObject("wTaskStatus").get("status").toString();
-                System.out.println("Current polling state is: " + state);
-                Thread.sleep(2000);
-            } while ("RUNNING".equals(state));
-            
-            EntityUtils.consumeQuietly(getResponse.getEntity());
-        } catch (Exception e) {
-            throw new IllegalStateException("There is an exeption when polling state!", e);
-        } finally {
-            getRequest.releaseConnection();
-        }
+    public static String getCurrentExecutionPollingState(RestApiClient restApiClient, String uri) {
+        return getCurrentPollingState(restApiClient, uri, "executionDetail");
+    }
 
+    public static String getLastTaskPollingState(RestApiClient restApiClient, String uri) {
+        String state = "";
+        do {
+            state = getCurrentPollingState(restApiClient, uri, "wTaskStatus");
+        } while ("RUNNING".equals(state) || "QUEUED".equals(state));
+        return state;
+    }
+
+    public static String getLastExecutionPollingState(RestApiClient restApiClient, String uri) {
+        String state = "";
+        do {
+            state = getCurrentPollingState(restApiClient, uri, "executionDetail");
+        } while ("RUNNING".equals(state) || "QUEUED".equals(state));
         return state;
     }
 
@@ -552,28 +551,28 @@ public class RestUtils {
         }
     }
 
-    public static Pair<Integer, String> executeDataloadProcess(RestApiClient restApiClient,
-            String dataloadProcessUri) throws JSONException, ParseException, IOException {
-        System.out.println("Execute dataload process with GDC_DE_SYNCHRONIZE_ALL");
-
-        String errorMessage = "";
-        int responseStatusCode ;
+    public static ExecutionTask createDataloadProcessExecution(RestApiClient restApiClient,
+            String dataloadProcessUri) throws ParseException, JSONException, IOException {
+        ExecutionTask result = new ExecutionTask();
+        System.out.println(format("Execute dataload process %s ...", dataloadProcessUri));
         HttpRequestBase postRequest =
                 restApiClient.newPostMethod(dataloadProcessUri + "/executions/", EXECUTION_DATALOAD_PROCESS_BODY);
         try {
             HttpResponse response = restApiClient.execute(postRequest);
             JSONObject jsonObject = new JSONObject(EntityUtils.toString(response.getEntity()));
             if (jsonObject.has(ERROR_KEY)) {
-                errorMessage = new JSONObject(jsonObject.get(ERROR_KEY).toString()).get("message").toString();
+                result.setError(jsonObject.getJSONObject(ERROR_KEY).get("message").toString());
+            } else {
+                result.setDetailLink(jsonObject.getJSONObject("executionTask")
+                        .getJSONObject("links").getString("detail"));
             }
             EntityUtils.consumeQuietly(response.getEntity());
-            responseStatusCode = response.getStatusLine().getStatusCode();
-            System.out.println(" - status: " + responseStatusCode);
+            result.setStatusCode(response.getStatusLine().getStatusCode());
         } finally {
             postRequest.releaseConnection();
         }
 
-        return  Pair.of(responseStatusCode, errorMessage);
+        return result;
     }
 
     public static Processes getProcessesList(RestApiClient restApiClient, String projectId)
@@ -587,5 +586,100 @@ public class RestUtils {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to parse processes from response.");
         }
+    }
+
+    public static JSONObject getProjectModelView(RestApiClient restApiClient, String projectId) 
+            throws ParseException, JSONException, IOException {
+        JSONObject modelViewObject = null;
+        String pollingUri =
+                getPollingUriFrom(restApiClient, projectId, format(PROJECT_MODEL_VIEW_LINK, projectId));
+        HttpRequestBase request = restApiClient.newGetMethod(pollingUri);
+        try {
+            int status;
+            HttpResponse getResponse;
+            do {
+                getResponse = restApiClient.execute(request);
+                status = getResponse.getStatusLine().getStatusCode();
+                System.out.println("Current polling status: " + status);
+                if (HttpStatus.valueOf(status) == HttpStatus.OK) {
+                    modelViewObject = new JSONObject(EntityUtils.toString(getResponse.getEntity()));
+                    break;
+                }
+                EntityUtils.consumeQuietly(getResponse.getEntity());
+            } while(status == HttpStatus.ACCEPTED.value());
+            
+        } finally {
+            request.releaseConnection();
+        }
+        return modelViewObject;
+    }
+
+    public static JSONObject getDatasetModelView(RestApiClient restApiClient, String projectId, String dataset)
+            throws ParseException, JSONException, IOException {
+        JSONObject projectModelView = getProjectModelView(restApiClient, projectId);
+
+        System.out.println("Get dataset model view...");
+        JSONArray datasets = projectModelView.getJSONObject("projectModelView").getJSONObject("model")
+                .getJSONObject("projectModel").getJSONArray("datasets");
+
+        for (int i = 0; i < datasets.length(); i++) {
+            JSONObject object = datasets.getJSONObject(i).getJSONObject("dataset");
+            if (!dataset.equals(object.getString("title")))
+                continue;
+            return object;
+        }
+        throw new NoSuchElementException("Dataset json object not found!");
+    }
+
+    public static <T> T getDatasetElementFromModelView(RestApiClient restApiClient, String projectId,
+            String dataset, DatasetElements element, Class<T> returnType) throws ParseException, JSONException,
+            IOException {
+        Object object = 
+                getDatasetModelView(restApiClient, projectId, dataset).get(element.toString().toLowerCase());
+        System.out.println(format("Get %s of dataset %s...", element, dataset));
+        if(returnType.isInstance(object)) {
+            return returnType.cast(object);
+        }
+        throw new NoSuchElementException("Dataset element not found!");
+    }
+
+    private static String getPollingUriFrom(RestApiClient restApiClient, String projectId, String uri)
+            throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newGetMethod(uri);
+        String pollUri = "";
+        try {
+            HttpResponse response = restApiClient.execute(request); 
+            pollUri =  new JSONObject(EntityUtils.toString(response.getEntity()))
+                .getJSONObject("asyncTask").getJSONObject("link").getString("poll");
+
+            EntityUtils.consumeQuietly(response.getEntity());
+            System.out.println("Poll link: " + pollUri);
+        } finally {
+            request.releaseConnection();
+        }
+        return pollUri;
+    }
+
+    private static String getCurrentPollingState(RestApiClient restApiClient, String pollingUri, String key) {
+        HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
+        HttpResponse getResponse;
+        String state = "";
+        try {
+            getResponse = restApiClient.execute(getRequest);
+            String responseEntity = EntityUtils.toString(getResponse.getEntity());
+            if (!responseEntity.isEmpty()) {
+                state = new JSONObject(responseEntity).getJSONObject(key).get("status").toString();
+            }
+            System.out.println("Current polling state is: " + state);
+            Thread.sleep(2000);
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeption when polling state!", e);
+        } finally {
+            getRequest.releaseConnection();
+        }
+
+        return state;
     }
 }
