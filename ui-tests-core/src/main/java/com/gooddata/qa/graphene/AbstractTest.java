@@ -1,19 +1,25 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.GoodData;
+import com.gooddata.qa.graphene.common.CheckUtils;
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
+
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Properties;
 
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class})
@@ -34,7 +40,11 @@ public abstract class AbstractTest extends Arquillian {
     protected GoodData goodDataClient = null;
     protected RestApiClient restApiClient = null;
 
-    protected String startPage;
+    protected StartPageContext startPageContext = null;
+    protected static final String PAGE_PROJECTS = "projects.html";
+    
+    //the projectInit group which will be skipped for loadPlatformPageBeforeTestMethod 
+    protected static final String PROJECT_INIT_GROUP = "projectInit";
 
     @BeforeClass
     public void loadProperties() {
@@ -52,11 +62,28 @@ public abstract class AbstractTest extends Arquillian {
         }
 
         testParams = new TestParameters(testVariables);
+        
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                CheckUtils.waitForProjectsPageLoaded(browser);
+            }
+            
+            @Override
+            public String getStartPage() {
+                return PAGE_PROJECTS;
+            }
+        };
     }
 
     @BeforeMethod
-    public void loadPlatformPageBeforeTestMethod() {
-        openUrl(startPage != null ? startPage : "");
+    public void loadPlatformPageBeforeTestMethod(Method m) {
+        if (Arrays.asList(m.getAnnotation(Test.class).groups()).contains(PROJECT_INIT_GROUP)){
+            return;
+        }
+        openUrl(startPageContext.getStartPage());
+        startPageContext.waitForStartPageLoaded();
     }
 
     public void openUrl(String url) {

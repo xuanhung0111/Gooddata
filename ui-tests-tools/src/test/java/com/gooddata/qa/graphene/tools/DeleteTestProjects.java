@@ -3,7 +3,9 @@ package com.gooddata.qa.graphene.tools;
 import java.util.List;
 
 import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.UserRoles;
+
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -20,7 +22,18 @@ public class DeleteTestProjects extends AbstractUITest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = PAGE_LOGIN;
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForElementVisible(loginFragment.getRoot());
+            }
+            
+            @Override
+            public String getStartPage() {
+                return PAGE_LOGIN;
+            }
+        };
     }
 
     @Test(groups = "deleteProjectsInit")

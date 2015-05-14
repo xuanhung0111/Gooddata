@@ -10,7 +10,6 @@ import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -28,18 +27,13 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected boolean addUsersWithOtherRoles = false;
 
-    @BeforeClass
-    public void initStartPage() {
-        startPage = "projects.html";
-    }
-
-    @Test(groups = {"projectInit"})
+    @Test(groups = {PROJECT_INIT_GROUP})
     public void init() throws JSONException {
         // sign in with admin user
         signIn(false, UserRoles.ADMIN);
     }
 
-    @Test(dependsOnGroups = {"projectInit"})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void createProject() throws JSONException, InterruptedException, IOException {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {

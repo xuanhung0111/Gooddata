@@ -9,8 +9,7 @@ import org.testng.annotations.Test;
 public class ProjectWalktroughTest extends AbstractUITest {
 
     @BeforeClass
-    public void initStartPage() {
-        startPage = "projects.html";
+    public void initProperties() {
         testParams.setProjectId(testParams.loadProperty("projectId"));
     }
 
