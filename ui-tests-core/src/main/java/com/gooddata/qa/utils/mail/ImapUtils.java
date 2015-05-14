@@ -37,7 +37,7 @@ public class ImapUtils {
     private static Collection<Message> waitForMessageWithExpectedReceivedTimeAndCount(
             final ImapClient imapClient, final GDEmails from, final String subject,
             final long receivedTime, final int expectedMessageCount) {
-        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(15, TimeUnit.SECONDS)
+        Graphene.waitGui().withTimeout(from.getMaxWaitingTimeInMinute(), TimeUnit.MINUTES).pollingEvery(15, TimeUnit.SECONDS)
                 .withMessage("Notification is not sent!").until(new Predicate<WebDriver>() {
 
                     @Override

@@ -149,7 +149,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
             long receivedTime) throws MessagingException {
         Collection<Message> notifications =
                 ImapUtils.waitForMessageWithExpectedReceivedTime(imapClient,
-                        GDEmails.FROM_NO_REPLY,
+                        GDEmails.NO_REPLY,
                         String.format(subject, getWorkingProject().getProjectName()), receivedTime);
 
         assertTrue(notifications.size() > 0, "The notification was not sent!");
