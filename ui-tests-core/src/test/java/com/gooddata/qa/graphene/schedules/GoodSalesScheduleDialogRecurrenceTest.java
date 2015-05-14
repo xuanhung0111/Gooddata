@@ -75,11 +75,11 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
     public void setFeatureFlags() throws JSONException, IOException, InterruptedException {
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
-        logout();
     }
 
     @Test(dependsOnGroups = {"schedules"})
     public void testRecurrences() throws IllegalArgumentException, JSONException {
+        logout();
         signIn(true, UserRoles.ADMIN); // login with gray pages to reload application and have feature flag set
         initDashboardsPage();
         dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
