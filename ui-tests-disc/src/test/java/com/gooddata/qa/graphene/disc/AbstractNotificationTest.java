@@ -157,19 +157,23 @@ public class AbstractNotificationTest extends AbstractDISCTest {
             .setStatus(ScheduleStatus.ERROR);
 
     enum RepeatedDataLoadingFailureNumber {
-        TO_SEND_MAIL(2, 5),
-        TO_DISABLE_SCHEDULE(3, 30);
+        TO_SEND_MAIL(2, 5, 5),
+        TO_DISABLE_SCHEDULE(3, 30, 30);
 
         private int piNumber;
         private int stagingNumber;
+        private int euNumber;
 
-        private RepeatedDataLoadingFailureNumber(int pi, int staging) {
+        private RepeatedDataLoadingFailureNumber(int pi, int staging, int eu) {
             this.piNumber = pi;
             this.stagingNumber = staging;
+            this.euNumber = eu;
         }
 
         public int getNumber(String host) {
-            if (host.contains("staging"))
+            if ("gdctest.eu.gooddata.com".equals(host))
+                return euNumber;
+            else if (host.contains("staging"))
                 return stagingNumber;
             else
                 return piNumber;

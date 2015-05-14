@@ -332,6 +332,7 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void assertManualStoppedExecution() {
+        waitForExecutionFinish();
         waitForElementVisible(BY_ERROR_STATUS_ICON, browser);
         assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
                 .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
