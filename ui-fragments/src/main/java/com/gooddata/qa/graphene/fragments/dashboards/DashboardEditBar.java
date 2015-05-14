@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -66,9 +63,7 @@ public class DashboardEditBar extends AbstractFragment {
     @FindBy(xpath = "//button[contains(@class,'s-btn-text')]")
     private WebElement addText;
 
-    private String textLabelLocator = "//div[contains(@class,'gdc-menu-simple')]//span[@title='${textLabel}']";
-
-    @FindBy(xpath = "//div[contains(@class,'gdc-overlay-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
+    @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple') and not(contains(@class,'yui3-overlay-hidden'))]")
     private DashboardTextObject dashboardTextObject;
 
     @FindBy(xpath = "//span[text()='Line']")
@@ -212,9 +207,6 @@ public class DashboardEditBar extends AbstractFragment {
                                    String link) throws InterruptedException {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addText).click();
-        By textLabel = By.xpath(textLabelLocator.replace(
-               "${textLabel}", textObject.getName()));
-        waitForElementVisible(textLabel, browser).click();
         waitForElementVisible(dashboardTextObject.getRoot());
         dashboardTextObject.addText(textObject, text, link);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
@@ -248,9 +240,9 @@ public class DashboardEditBar extends AbstractFragment {
     public void deleteDashboard() throws InterruptedException {
         waitForElementVisible(actionsMenu).click();
         waitForElementVisible(deleteButton).click();
-        Thread.sleep(3000);
         waitForElementVisible(deleteDashboardDialogButton).click();
         waitForElementNotPresent(this.getRoot());
+        Thread.sleep(3000); // take sometime for saving current dashboard into user profile settings
     }
 
     public void moveWidget(WebElement widget, int x, int y) {
