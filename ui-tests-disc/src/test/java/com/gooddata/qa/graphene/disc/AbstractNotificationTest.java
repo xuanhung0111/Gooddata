@@ -313,7 +313,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected static Message getNotification(final ImapClient imapClient, final String subject) {
         Collection<Message> notifications =
-                ImapUtils.waitForMessage(imapClient, GDEmails.FROM_NO_REPLY, subject);
+                ImapUtils.waitForMessage(imapClient, GDEmails.NO_REPLY, subject);
         assertTrue(notifications.size() == 1, "More than 1 notification!");
 
         return Iterables.getLast(notifications);
