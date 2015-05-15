@@ -31,6 +31,7 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
     private static final By BY_INPUT = By.cssSelector("input");
 
     public void select(String... values) {
+        waitForCollectionIsNotEmpty(items);
         if (values.length == 1 && "All".equals(values[0])) {
             selectAll();
             return;

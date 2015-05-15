@@ -38,10 +38,15 @@ public class MetricsBucket extends AbstractFragment {
     private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
     private static final By BY_BUCKET_INVITATION = By.cssSelector(".adi-bucket-invitation");
+    private static final By BY_STACK_WARNING = By.className("adi-stack-warn");
 
     public void addMetric(WebElement metric) {
-        new Actions(browser).dragAndDrop(metric, waitForElementVisible(getRoot())).perform();
+        new Actions(browser).dragAndDrop(metric, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
         assertTrue(getItemNames().contains(metric.getText().trim()));
+    }
+
+    public boolean isWarningMessageShown() {
+        return false;
     }
 
     public List<String> getItemNames() {
@@ -98,5 +103,9 @@ public class MetricsBucket extends AbstractFragment {
     public void compareToSamePeriodOfYearBefore() {
         waitForElementVisible(compareToSamePeriod).click();
         assertTrue(compareToSamePeriod.isSelected());
+    }
+
+    public String getStackByMessage() {
+        return waitForElementVisible(BY_STACK_WARNING, getRoot()).getText().trim();
     }
 }

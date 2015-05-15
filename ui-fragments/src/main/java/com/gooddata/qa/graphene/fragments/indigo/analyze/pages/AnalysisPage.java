@@ -326,4 +326,41 @@ public class AnalysisPage extends AbstractFragment {
     public boolean isInapplicableAttributeMetricInViewPort() {
         return waitForFragmentVisible(cataloguePanel).isInapplicableAttributeMetricInViewPort();
     }
+
+    public AnalysisPage addStackBy(String category) {
+        waitForFragmentVisible(cataloguePanel);
+        waitForFragmentVisible(bucketsPanel).addStackBy(cataloguePanel.getCategory(category));
+        return this;
+    }
+
+    public AnalysisPage replaceCategory(String category) {
+        waitForFragmentVisible(cataloguePanel);
+        waitForFragmentVisible(bucketsPanel).replaceCategory(cataloguePanel.getCategory(category));
+        return this;
+    }
+
+    public void replaceStackBy(String category) {
+        waitForFragmentVisible(cataloguePanel);
+        waitForFragmentVisible(bucketsPanel).replaceStackBy(cataloguePanel.getCategory(category));
+    }
+
+    public boolean isStackByDisabled() {
+        return waitForFragmentVisible(bucketsPanel).isStackByDisabled();
+    }
+
+    public String getStackByMessage() {
+        return waitForFragmentVisible(bucketsPanel).getStackByMessage();
+    }
+
+    public String getMetricMessage() {
+        return waitForFragmentVisible(bucketsPanel).getMetricMessage();
+    }
+
+    public String getAddedStackByName() {
+        return waitForFragmentVisible(bucketsPanel).getAddedStackByName();
+    }
+
+    public boolean isStackByBucketEmpty() {
+        return waitForFragmentVisible(bucketsPanel).isStackByBucketEmpty();
+    }
 }

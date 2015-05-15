@@ -36,7 +36,7 @@ public class CategoriesBucket extends AbstractFragment {
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
     private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
     private static final String EMPTY = "s-bucket-empty";
-    private static final By BY_BUCKET_INVITATION = By.cssSelector(".adi-bucket-invitation");
+    private static final By BY_BUCKET_INVITATION = By.className("adi-bucket-invitation");
 
     public void addCategory(WebElement category) {
         new Actions(browser).dragAndDrop(category, waitForElementVisible(getRoot()))
@@ -55,12 +55,16 @@ public class CategoriesBucket extends AbstractFragment {
 
         Actions action = new Actions(browser);
         action.clickAndHold(element)
-              .moveToElement(waitForElementVisible(BY_BUCKET_INVITATION, browser))
+              .moveToElement(waitForElementPresent(BY_BUCKET_INVITATION, browser))
               .perform();
         action.moveToElement(waitForElementPresent(BY_TRASH_PANEL, browser)).perform();
         action.release().perform();
 
         assertEquals(items.size(), oldItemsCount - 1, "Category is not removed yet!");
+    }
+
+    public void replaceCategory(WebElement category) {
+        addCategory(category);
     }
 
     public boolean isEmpty() {
@@ -99,5 +103,4 @@ public class CategoriesBucket extends AbstractFragment {
         waitForElementVisible(this.dimensionSwitch);
         this.dimensionSwitch.selectByVisibleText(dimensionSwitch);
     }
-
 }
