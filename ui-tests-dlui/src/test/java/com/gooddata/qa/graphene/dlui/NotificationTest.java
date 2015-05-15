@@ -1,9 +1,5 @@
 package com.gooddata.qa.graphene.dlui;
 
-import java.io.IOException;
-
-import org.apache.http.ParseException;
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -191,7 +187,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnMethods = "signInWithAnnie", groups = "annie")
-    public void addDataWithEditorRole() throws ParseException, JSONException, IOException {
+    public void addDataWithEditorRole() {
         long requestTime = System.currentTimeMillis();
         try {
             Dataset selectedDataset =

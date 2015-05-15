@@ -37,7 +37,12 @@ public class Dataset {
     }
 
     public Collection<Field> getAvailableFields() {
-        return getFieldsWithStatus(FieldStatus.AVAILABLE);
+        return Collections2.filter(fields, new Predicate<Field>() {
+            @Override
+            public boolean apply(Field field) {
+                return field.getStatus() != FieldStatus.ADDED;
+            }
+        });
     }
 
     public Collection<Field> getSelectedFields() {

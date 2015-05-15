@@ -4,7 +4,6 @@ import static org.testng.Assert.*;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.dto.Processes;
 import com.gooddata.qa.graphene.entity.ADSInstance;
+import com.gooddata.qa.graphene.entity.disc.ExecutionTask;
 import com.gooddata.qa.utils.http.RestUtils;
 
 public class DataloadProcessTest extends AbstractDLUITest{
@@ -39,8 +39,8 @@ public class DataloadProcessTest extends AbstractDLUITest{
         assertEquals(dataloadProcessList.getDataloadProcess().getName(), DEFAULT_DATAlOAD_PROCESS_NAME);
         assertEquals(dataloadProcessList.getDataloadProcessCount(), 1);
         assertEquals(createDataLoadProcess(), HttpStatus.CONFLICT.value());
-        int executionResult = 
-                RestUtils.executeDataloadProcess(getRestApiClient(), getDataloadProcessUri()).getLeft();
+        int executionResult = RestUtils.createDataloadProcessExecution(getRestApiClient(),
+                getDataloadProcessUri()).getStatusCode();
         assertEquals(executionResult, HttpStatus.CREATED.value());
     }
 
@@ -75,12 +75,24 @@ public class DataloadProcessTest extends AbstractDLUITest{
         }
         createDataLoadProcess();
         assertFalse(getDataloadProcessId().isEmpty());
-        assertEquals(RestUtils.executeDataloadProcess(getRestApiClient(), getDataloadProcessUri()).getLeft(), 
-                Integer.valueOf(201));
+        ExecutionTask execution1 = 
+                RestUtils.createDataloadProcessExecution(getRestApiClient(), getDataloadProcessUri());
+        assertEquals(execution1.getStatusCode(), HttpStatus.CREATED.value());
+        waitForExecutionRunning(execution1.getDetailLink());
         // Check that the second execution will be failed because the first execution is running
-        Pair<Integer, String> executionResult = 
-                RestUtils.executeDataloadProcess(getRestApiClient(), getDataloadProcessUri()); 
-        assertEquals(executionResult.getLeft(), Integer.valueOf(409));
-        assertEquals(executionResult.getRight(), CONCURRENT_DATA_LOAD_MESSAGE);
+        ExecutionTask execution2 = 
+                RestUtils.createDataloadProcessExecution(getRestApiClient(), getDataloadProcessUri()); 
+        assertEquals(execution2.getStatusCode(), HttpStatus.CONFLICT.value());
+        assertEquals(execution2.getError(), CONCURRENT_DATA_LOAD_MESSAGE);
+    }
+
+    private void waitForExecutionRunning(String executionDetailLink) 
+            throws ParseException, IOException, JSONException {
+        String state = "";
+        do {
+            state = RestUtils.getCurrentExecutionPollingState(restApiClient, executionDetailLink);
+            if ("RUNNING".equals(state))
+                break;
+        } while (!"ERROR".equals(state) && !"OK".equals(state));
     }
 }

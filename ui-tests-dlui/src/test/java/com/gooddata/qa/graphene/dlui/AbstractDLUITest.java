@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -97,7 +98,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
-    public void prepareLDMAndADSInstance() throws JSONException {
+    public void prepareLDMAndADSInstance()
+            throws JSONException, ParseException, IOException, InterruptedException {
         // Override this method in test class if it's necessary to add more users to project
         addUsersToProject();
 
@@ -167,13 +169,13 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected void updateModelOfGDProject(String maqlFile) {
         assertEquals(
-                RestUtils.getPollingState(getRestApiClient(), sendRequestToUpdateModel(maqlFile)),
+                RestUtils.getLastTaskPollingState(getRestApiClient(), sendRequestToUpdateModel(maqlFile)),
                 "OK", "Model is not updated successfully!");
     }
 
     protected void dropAddedFieldsInLDM(String maqlFile) {
         String pollingUri = sendRequestToUpdateModel(maqlFile);
-        String pollingState = RestUtils.getPollingState(getRestApiClient(), pollingUri);
+        String pollingState = RestUtils.getLastTaskPollingState(getRestApiClient(), pollingUri);
         if (!"OK".equals(pollingState)) {
             HttpRequestBase getRequest = getRestApiClient().newGetMethod(pollingUri);
             HttpResponse getResponse = getRestApiClient().execute(getRequest);
@@ -527,7 +529,16 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 new Field("Title2", FieldTypes.ATTRIBUTE),
                 new Field("Label", FieldTypes.LABEL_HYPERLINK),
                 new Field("Totalprice2", FieldTypes.FACT),
-                new Field("Date", FieldTypes.DATE));
+                new Field("Date", FieldTypes.DATE)),
+        ARTIST_WITH_NEW_FIELD(
+                "artist",
+                new Field("Artisttitle", FieldTypes.ATTRIBUTE)),
+        AUTHOR_WITH_NEW_FIELD(
+                "author",
+                new Field("Authorname", FieldTypes.ATTRIBUTE)),
+        TRACK_WITH_NEW_FIELD(
+                "track",
+                new Field("Trackname", FieldTypes.ATTRIBUTE));
 
         private String name;
         private List<Field> additionalFields;
@@ -561,7 +572,20 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 "Unknown data source",
                 AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD,
                 AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
-        WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt");
+        WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt"),
+        WITH_ADDITIONAL_FIELDS_AND_REFERECES(
+                "createTableWithReferences.txt",
+                "copyTableWithReferences.txt",
+                "Unknown data source",
+                AdditionalDatasets.ARTIST_WITH_NEW_FIELD,
+                AdditionalDatasets.TRACK_WITH_NEW_FIELD),
+       WITH_ADDITIONAL_FIELDS_AND_MULTI_REFERECES(
+                "createTableWithMultiReferences.txt",
+                "copyTableWithMultiReferences.txt",
+                "Unknown data source",
+                AdditionalDatasets.TRACK_WITH_NEW_FIELD,
+                AdditionalDatasets.ARTIST_WITH_NEW_FIELD,
+                AdditionalDatasets.AUTHOR_WITH_NEW_FIELD);
 
         private String createTableSqlFile;
         private String copyTableSqlFile;
