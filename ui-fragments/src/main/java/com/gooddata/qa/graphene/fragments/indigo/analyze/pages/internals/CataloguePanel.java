@@ -119,7 +119,7 @@ public class CataloguePanel extends AbstractFragment {
             waitForCollectionIsNotEmpty(items);
             return true;
         }
-        assertEquals(noItems.get(0).getText().trim(), "No fields matching\n\"" + item + "\"");
+        assertEquals(noItems.get(0).getText().trim(), "No data matching\n\"" + item + "\"");
         return false;
     }
 
