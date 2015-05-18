@@ -1,7 +1,10 @@
 package com.gooddata.qa.graphene.disc;
 
+import java.io.IOException;
 import java.util.Calendar;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -15,6 +18,7 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
@@ -453,7 +457,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkRepeatedDataLoadingFailureNotification() {
+    public void checkRepeatedDataLoadingFailureNotification() throws ParseException, IOException, JSONException {
         try {
             addUserToProject(imapUserUri, UserRoles.ADMIN);
             logout();
@@ -480,8 +484,6 @@ public class NotificationsTest extends AbstractNotificationTest {
                     - getNumberOfFailuresToSendMail(), scheduleBuilder.getExecutable());
             scheduleBuilder.setEnabled(false);
             waitForRepeatedFailuresEmail(scheduleBuilder);
-        } catch (Exception e) {
-            throw new IllegalStateException("There is an exception when adding user to project!", e);
         } finally {
             cleanProcessesInWorkingProject();
             logout();

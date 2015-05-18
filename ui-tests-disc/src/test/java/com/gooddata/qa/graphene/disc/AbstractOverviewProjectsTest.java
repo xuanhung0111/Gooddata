@@ -26,10 +26,11 @@ import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 
 public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
-    private static final int NUMBER_OF_ADDITIONAL_SCHEDULES = 10;
+    private static final int NUMBER_OF_ADDITIONAL_SCHEDULES = 30;
 
     protected void checkFilteredOutOverviewProject(OverviewProjectStates state,
             final ProjectInfo projectInfo) {
@@ -431,11 +432,18 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     }
 
     private void prepareAdditionalSchedulesForScheduledState(String additionalProcessName) {
+        List<String> scheduleUrls = Lists.newArrayList();
         for (int i = 1; i < NUMBER_OF_ADDITIONAL_SCHEDULES; i++) {
             createSchedule(new ScheduleBuilder().setProcessName(additionalProcessName)
                     .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
                     .setScheduleName("Schedule " + i).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
                     .setHourInDay("23").setMinuteInHour("59"));
+            scheduleUrls.add(browser.getCurrentUrl());
+            scheduleDetail.clickOnCloseScheduleButton();
+        }
+        
+        for (String scheduleUrl : scheduleUrls) {
+            openScheduleViaUrl(scheduleUrl);
             scheduleDetail.manualRun();
             scheduleDetail.clickOnCloseScheduleButton();
         }
