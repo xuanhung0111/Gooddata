@@ -20,7 +20,7 @@ import static org.testng.Assert.*;
 public class AnnieUIDialogFragment extends AbstractFragment {
 
     private static final By BY_SELECTION_AREA = By.cssSelector(".selection-area");
-    private static final By BY_DATASOURCES = By.cssSelector(".annie-dialog-list-container");
+    public static final By BY_DATASOURCES = By.cssSelector(".annie-dialog-list-container");
 
     @FindBy(css = ".gd-dialog-headline")
     private WebElement annieDialogHeadline;
@@ -50,7 +50,7 @@ public class AnnieUIDialogFragment extends AbstractFragment {
     }
 
     public String getAnnieDialogHeadline() {
-        return waitForElementVisible(annieDialogHeadline).getText();
+        return waitForElementVisible(annieDialogHeadline).getText().trim();
     }
 
     public String getEmptyStateHeading() {

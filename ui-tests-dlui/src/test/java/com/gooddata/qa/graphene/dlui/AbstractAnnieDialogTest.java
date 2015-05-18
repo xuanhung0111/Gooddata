@@ -21,7 +21,7 @@ import com.google.common.collect.Ordering;
 import static org.testng.Assert.*;
 
 public abstract class AbstractAnnieDialogTest extends AbstractDLUITest {
-    private static final String ANNIE_DIALOG_HEADLINE = "Add data";
+    protected static final String ANNIE_DIALOG_HEADLINE = "Add data";
 
     private static final String ANNIE_DIALOG_EMPTY_STATE_HEADING = "No additional data available.";
     private static final String ANNIE_DIALOG_EMPTY_STATE_MESSAGE =
