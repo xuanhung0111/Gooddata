@@ -2,16 +2,12 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
