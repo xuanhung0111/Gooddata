@@ -28,6 +28,8 @@ public class TestParameters {
     private ProjectEnvironment projectEnvironment = ProjectEnvironment.TESTING;
     private String testIdentification;
     private String downloadFolder;
+    private int defaultTimeout;
+    private int extendedTimeoutMultiple;
     private String folderSeparator;
     private boolean reuseProject = false;
 
@@ -48,6 +50,8 @@ public class TestParameters {
         deleteMode = DeleteMode.getModeByName(loadProperty("deleteMode"));
         projectEnvironment = ProjectEnvironment.getEnvironmentByName(loadProperty("project.environment"));
         downloadFolder = loadProperty("browserDownloadFolder");
+        defaultTimeout = Integer.parseInt(loadProperty("timeout"));
+        extendedTimeoutMultiple = Integer.parseInt(loadProperty("extendedTimeoutMultiple"));
         testIdentification = loadProperty("testIdentification");
         if (testIdentification == null) {
             testIdentification = UUID.randomUUID().toString();
@@ -151,6 +155,14 @@ public class TestParameters {
 
     public String getDownloadFolder() {
         return downloadFolder;
+    }
+
+    public int getDefaultTimeout() {
+        return defaultTimeout;
+    }
+
+    public int getExtendedTimeout() {
+        return defaultTimeout * extendedTimeoutMultiple;
     }
 
     public String getFolderSeparator() {

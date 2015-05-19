@@ -38,17 +38,17 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement submit;
 
-    public String validate() {
+    public String validate(int timeout) {
         waitForElementVisible(submit);
         Graphene.guardHttp(submit).click();
-        waitForElementNotVisible(submit);
-        waitForElementVisible(BY_GP_LINK, browser);
+        waitForElementNotVisible(submit, timeout);
+        waitForElementVisible(BY_GP_LINK, browser, timeout);
         Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
-        waitForElementNotPresent(BY_GP_PRE_JSON);
-        return waitForElementVisible(By.xpath(LOCATOR_SPAN_STATUS), browser).getText();
+        waitForElementNotPresent(BY_GP_PRE_JSON, timeout);
+        return waitForElementVisible(By.xpath(LOCATOR_SPAN_STATUS), browser, timeout).getText();
     }
 
-    public String validateOnly(Validation... data) {
+    public String validateOnly(int timeout, Validation... data) {
         uncheckAll();
         for (Validation validation : data) {
             switch (validation) {
@@ -76,7 +76,7 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
                 default:
             }
         }
-        return validate();
+        return validate(timeout);
     }
 
     /**

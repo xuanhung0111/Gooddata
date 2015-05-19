@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.fail;
 
@@ -95,8 +96,18 @@ public final class CheckUtils {
         return searchContext.findElement(byElement);
     }
 
+    public static WebElement waitForElementVisible(By byElement, SearchContext searchContext, int timeout) {
+        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(byElement).is().visible();
+        return searchContext.findElement(byElement);
+    }
+
     public static WebElement waitForElementVisible(WebElement element) {
         Graphene.waitGui().until().element(element).is().visible();
+        return element;
+    }
+
+    public static WebElement waitForElementVisible(WebElement element, int timeout) {
+        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(element).is().visible();
         return element;
     }
 
@@ -112,6 +123,10 @@ public final class CheckUtils {
 
     public static void waitForElementNotVisible(WebElement element) {
         Graphene.waitGui().until().element(element).is().not().visible();
+    }
+
+    public static void waitForElementNotVisible(WebElement element, int timeout) {
+        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(element).is().not().visible();
     }
 
     public static void waitForElementNotVisible(By byElement) {
@@ -143,6 +158,10 @@ public final class CheckUtils {
 
     public static void waitForElementNotPresent(By byElement) {
         Graphene.waitGui().until().element(byElement).is().not().present();
+    }
+
+    public static void waitForElementNotPresent(By byElement, int timeout) {
+        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(byElement).is().not().present();
     }
 
     public static void waitForElementNotPresent(WebElement element) {
