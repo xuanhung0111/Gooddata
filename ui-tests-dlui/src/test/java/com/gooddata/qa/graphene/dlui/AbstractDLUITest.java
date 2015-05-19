@@ -573,6 +573,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD,
                 AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
         WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt"),
+        WITH_ADDITIONAL_FIELDS_LARGE_DATA(
+                "createTableWithAdditionalFields.txt",
+                "copyTableWithAdditionalFieldsLargeData.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
         WITH_ADDITIONAL_FIELDS_AND_REFERECES(
                 "createTableWithReferences.txt",
                 "copyTableWithReferences.txt",

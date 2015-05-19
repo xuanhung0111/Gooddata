@@ -27,21 +27,22 @@ public class DataloadProcessTest extends AbstractDLUITest{
     }
 
     @Test(dependsOnMethods = {"prepareLDMAndADSInstance"}, groups = {"initialDataForDLUI"})
-    public void initialADSTable() throws JSONException {
+    public void initialProperties() {
         projectId = testParams.getProjectId();
-        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"})
     public void autoCreateDataloadProcess() throws IOException, JSONException {
+        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
         Processes dataloadProcessList = RestUtils.getProcessesList(getRestApiClient(), projectId);
         assertEquals(dataloadProcessList.getDataloadProcess().getName(), DEFAULT_DATAlOAD_PROCESS_NAME);
         assertEquals(dataloadProcessList.getDataloadProcessCount(), 1);
         assertEquals(createDataLoadProcess(), HttpStatus.CONFLICT.value());
-        int executionResult = RestUtils.createDataloadProcessExecution(getRestApiClient(),
-                getDataloadProcessUri()).getStatusCode();
-        assertEquals(executionResult, HttpStatus.CREATED.value());
+        ExecutionTask execution = RestUtils.createDataloadProcessExecution(getRestApiClient(),
+                getDataloadProcessUri());
+        assertEquals(execution.getStatusCode(), HttpStatus.CREATED.value());
+        assertEquals(RestUtils.getLastExecutionPollingState(restApiClient, execution.getDetailLink()), "OK");
     }
 
     @Test(dependsOnMethods = {"autoCreateDataloadProcess"})
@@ -70,6 +71,7 @@ public class DataloadProcessTest extends AbstractDLUITest{
 
     @Test(dependsOnMethods = {"autoCreateDataloadProcess"}, alwaysRun = true)
     public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException, IOException {
+        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
         if (!getDataloadProcessId().isEmpty()) {
             RestUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(), projectId);
         }
@@ -77,16 +79,19 @@ public class DataloadProcessTest extends AbstractDLUITest{
         assertFalse(getDataloadProcessId().isEmpty());
         ExecutionTask execution1 = 
                 RestUtils.createDataloadProcessExecution(getRestApiClient(), getDataloadProcessUri());
+        String execution1DetailLink = execution1.getDetailLink();
         assertEquals(execution1.getStatusCode(), HttpStatus.CREATED.value());
-        waitForExecutionRunning(execution1.getDetailLink());
+        waitForAddingDataTask(execution1DetailLink);
         // Check that the second execution will be failed because the first execution is running
         ExecutionTask execution2 = 
                 RestUtils.createDataloadProcessExecution(getRestApiClient(), getDataloadProcessUri()); 
         assertEquals(execution2.getStatusCode(), HttpStatus.CONFLICT.value());
         assertEquals(execution2.getError(), CONCURRENT_DATA_LOAD_MESSAGE);
+
+        assertEquals(RestUtils.getLastExecutionPollingState(restApiClient, execution1DetailLink), "OK");
     }
 
-    private void waitForExecutionRunning(String executionDetailLink) 
+    private void waitForAddingDataTask(String executionDetailLink) 
             throws ParseException, IOException, JSONException {
         String state = "";
         do {

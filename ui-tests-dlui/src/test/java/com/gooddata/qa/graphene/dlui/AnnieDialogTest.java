@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -15,6 +16,7 @@ import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -328,7 +330,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                 new Dataset().withName("person").withFields(
                         new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
         DataSource dataSource =
-                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(dataset);
+                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA).updateDatasetStatus(dataset);
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
@@ -354,6 +356,12 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             assertEquals(annieUIDialog.getIntegrationSecondMessage(), DIALOG_STATE_SECOND_MESSAGE);
             assertFalse(annieUIDialog.isPositiveButtonPresent());
             Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Annie-Dialog", getClass());
+            annieUIDialog.clickOnCloseButton();
+
+            waitForAddingDataTask();
+            dataSource.applyAddSelectedFields();
+            openAnnieDialog();
+            checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         } finally {
             dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
         }
@@ -566,5 +574,29 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
 
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
+    }
+
+    private void waitForAddingDataTask() throws InterruptedException {
+        while(true) {
+            openAnnieDialog();
+            if(!DATA_CAN_NOT_ADD_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline())
+                    && isDatasourceVisible()) {
+                annieUIDialog.clickOnDismissButton();
+                break;
+            }
+            annieUIDialog.clickOnCloseButton();
+            Thread.sleep(2000);
+        }
+    }
+
+    private boolean isDatasourceVisible() {
+        try {
+            Thread.sleep(1000);
+            waitForElementVisible(AnnieUIDialogFragment.BY_DATASOURCES, browser);
+            return true;
+        } catch(Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
