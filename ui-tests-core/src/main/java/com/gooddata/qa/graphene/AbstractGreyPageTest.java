@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.qa.graphene.enums.DWHDriver;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
@@ -56,7 +57,6 @@ public class AbstractGreyPageTest extends AbstractTest {
     protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
     protected static final String HOST_NAME = "%{HostName}";
     protected static final String PROJECT_ID = "%{ProjectID}";
-
     /**
      * ----- Grey pages fragments -----
      */
@@ -118,7 +118,9 @@ public class AbstractGreyPageTest extends AbstractTest {
     public String validateProject() throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
         waitForElementPresent(validateFragment.getRoot());
-        String statusReturning = validateFragment.validate();
+        int timeout = testParams.getDwhDriver() == DWHDriver.VERTICA ?
+                testParams.getExtendedTimeout() : testParams.getDefaultTimeout();
+        String statusReturning = validateFragment.validate(timeout);
         Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation", this.getClass());
         System.out.println("Validation result: " + statusReturning);
         return statusReturning;
