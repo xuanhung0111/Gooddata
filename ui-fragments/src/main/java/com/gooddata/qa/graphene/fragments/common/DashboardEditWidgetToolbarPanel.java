@@ -20,6 +20,9 @@ public class DashboardEditWidgetToolbarPanel extends AbstractFragment {
 
     @FindBy(className = "yui3-toolbar-icon-remove")
     private WebElement removeButton;
+    
+    @FindBy(className = "yui3-toolbar-icon-addLink")
+    private WebElement addLinkButton;
 
     public static final By LOCATOR = By.className("s-dashboardwidget-toolbar");
 
@@ -33,6 +36,10 @@ public class DashboardEditWidgetToolbarPanel extends AbstractFragment {
 
     public static void openConfigurationPanelFor(WebElement element, SearchContext searchContext) {
         waitForElementVisible(getInstanceFor(element, searchContext).configureButton).click();
+    }
+    
+    public static void openAddLinkPanelFor(WebElement element, SearchContext searchContext) {
+        waitForElementVisible(getInstanceFor(element, searchContext).addLinkButton).click();
     }
 
     private static DashboardEditWidgetToolbarPanel getInstanceFor(WebElement element,

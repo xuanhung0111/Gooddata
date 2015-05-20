@@ -5,6 +5,7 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
@@ -126,8 +127,9 @@ public class MetricEditorDialog extends AbstractFragment {
         waitForElementVisible(metricNameInput).clear();
         metricNameInput.sendKeys(metricName);
         waitForElementVisible(addButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
         String expectedMaql =
@@ -156,8 +158,9 @@ public class MetricEditorDialog extends AbstractFragment {
         waitForElementVisible(metricNameInput).clear();
         metricNameInput.sendKeys(metricName);
         waitForElementVisible(addButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
         String expectedMaql =
@@ -180,8 +183,9 @@ public class MetricEditorDialog extends AbstractFragment {
         waitForElementVisible(metricNameInput).clear();
         metricNameInput.sendKeys(metricName);
         waitForElementVisible(addButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
         String expectedMaql = "SELECT " + usedMetric1 + " / " + usedMetric2;
@@ -231,8 +235,9 @@ public class MetricEditorDialog extends AbstractFragment {
         }
         waitForElementVisible(customMetricNameInput).sendKeys(metricName);
         waitForElementVisible(customAddButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
     }
@@ -258,8 +263,9 @@ public class MetricEditorDialog extends AbstractFragment {
         }
         waitForElementVisible(customMetricNameInput).sendKeys(metricName);
         waitForElementVisible(customAddButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
     }
@@ -299,8 +305,9 @@ public class MetricEditorDialog extends AbstractFragment {
         }
         waitForElementVisible(customMetricNameInput).sendKeys(metricName);
         waitForElementVisible(customAddButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
     }
@@ -339,8 +346,9 @@ public class MetricEditorDialog extends AbstractFragment {
         }
         waitForElementVisible(customMetricNameInput).sendKeys(metricName);
         waitForElementVisible(customAddButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
     }
@@ -388,8 +396,9 @@ public class MetricEditorDialog extends AbstractFragment {
         }
         waitForElementVisible(customMetricNameInput).sendKeys(metricName);
         waitForElementVisible(customAddButton).click();
-        Thread.sleep(3000);
         browser.switchTo().window(parentWindowHandle);
+        waitForElementNotPresent(metricEditorPopup);
+        Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
     }
