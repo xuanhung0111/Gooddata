@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.enums.UserRoles;
+
 import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -17,7 +18,18 @@ public class LoginPageTest extends AbstractUITest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = PAGE_LOGIN;
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                // no need to wait projects page because it will be redirected to login page
+            }
+            
+            @Override
+            public String getStartPage() {
+                return PAGE_PROJECTS;
+            }
+        };
     }
 
     @Test(groups = {"loginInit"})

@@ -35,7 +35,6 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @BeforeClass
     public void initProjectTitle() {
-        startPage = "";
         projectTitle = "SimpleProject-test-dashboard-saved-filters";
     }
 
@@ -80,7 +79,8 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     public void checkDisableSavedFiltersFeatureFlagsTest() throws IOException, JSONException {
         try {
             disableSavedFilters(true);
-    
+
+            initDashboardsPage();
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
 
@@ -154,6 +154,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnMethods = {"createSavedFilterViewTest"})
     public void renameSavedFilterViewTest() throws InterruptedException {
+        initDashboardsPage();
         // change filter value so Selenium can loads all saved views
         dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
 
@@ -194,6 +195,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     
     @Test(dependsOnMethods = {"renameSavedFilterViewTest"})
     public void filterViewNamingUniquenessTest() throws InterruptedException {
+        initDashboardsPage();
         // change filter value so Selenium can loads all saved views
         dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
 
@@ -222,6 +224,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnMethods = {"filterViewNamingUniquenessTest"})
     public void deleteSavedFilterViewTest() throws InterruptedException {
+        initDashboardsPage();
         // change filter value so Selenium can loads all saved views
         FilterWidget filter = dashboardsPage.getFilterWidget("date_dimension");
         filter.changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 4));
@@ -263,6 +266,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnMethods = {"deleteSavedFilterViewTest"})
     public void savedFilterAfterSwitchBetweenDashboardsAndPagesTest() throws InterruptedException {
+        initDashboardsPage();
         // Add more saved view for first dashboard
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
@@ -337,6 +341,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnMethods = {"savedFilterAfterSwitchBetweenDashboardsAndPagesTest"})
     public void savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest() throws InterruptedException {
+        initDashboardsPage();
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
@@ -351,6 +356,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest"})
     public void savedViewFilterDoNotApplyOnFiltersAfterRemovingTest() throws InterruptedException {
         try {
+            initDashboardsPage();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
             DashboardEditFilter dashboardEditFilter = dashboardEditBar.getDashboardEditFilter();
@@ -369,6 +375,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnFiltersAfterRemovingTest"})
     public void dashboardHasManyFiltersInManyTabsTest() throws InterruptedException {
+        initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         dashboardsPage.addNewTab("second tab");

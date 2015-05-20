@@ -1,7 +1,9 @@
 package com.gooddata.qa.graphene.dss;
 
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
 import com.gooddata.qa.graphene.fragments.greypages.dss.StorageFragment;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,7 +46,18 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @BeforeClass
     public void initStartPage() {
-        startPage = PAGE_DSS_INSTANCES;
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForFragmentVisible(storageForm);
+            }
+            
+            @Override
+            public String getStartPage() {
+                return PAGE_DSS_INSTANCES;
+            }
+        };
         testUserId = testParams.loadProperty("dss.storage.test.user.id");
         testUserLogin = testParams.loadProperty("dss.storage.test.user.login");
         dssAuthorizationToken = testParams.loadProperty("dss.authorizationToken");
@@ -61,7 +74,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     public void resourceStoragesAvailable() throws JSONException {
         signInAtGreyPages(testParams.getUser(), testParams.getPassword());
 
-        loadPlatformPageBeforeTestMethod();
+        verifyStorageCreateFormPresentWithTrailingSlash();
         JSONObject json = loadJSON();
         assertTrue(json.getJSONObject("dssInstances").has("items"), "DSS instances with items array is not available");
         takeScreenshot(browser, "dss-base-resource", this.getClass());
