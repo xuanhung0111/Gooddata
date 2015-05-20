@@ -9,12 +9,11 @@ import org.testng.annotations.Test;
 public class ProjectWalktroughTest extends AbstractUITest {
 
     @BeforeClass
-    public void initStartPage() {
-        startPage = "projects.html";
+    public void initProperties() {
         testParams.setProjectId(testParams.loadProperty("projectId"));
     }
 
-    @Test(groups = {"projectWalkthroughInit"})
+    @Test(groups = {PROJECT_INIT_GROUP, "projectWalkthroughInit"})
     public void userLogin() throws JSONException {
         // sign in with demo user
         signInAtUI(testParams.getUser(), testParams.getPassword());

@@ -16,6 +16,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.Connectors;
 
 import java.io.IOException;
@@ -47,8 +48,19 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     protected ConnectorFragment connector;
 
     @BeforeClass(dependsOnMethods = {"loadRequiredProperties"})
-    public void initStartPage() {
-        startPage = "gdc";
+    public void initProperties() {
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForElementVisible(By.className("param"),browser);
+            }
+            
+            @Override
+            public String getStartPage() {
+                return "gdc";
+            }
+        };
         projectTitle = connectorType.getName() + "Connector-test";
         String projectTemplateOverride = System.getProperty("projectTemplate");
         if (projectTemplateOverride != null && !projectTemplateOverride.isEmpty()) {

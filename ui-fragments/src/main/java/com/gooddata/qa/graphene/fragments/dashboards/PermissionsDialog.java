@@ -51,7 +51,7 @@ public class PermissionsDialog extends AbstractFragment {
     @FindBy(xpath = "//div[@id='gd-overlays']//div[contains(@class,'s-specific_users_can_access')]/div")
     private WebElement specificUsersAccessChoose;
 
-    @FindBy(css = ".permissionDialog-addGranteesButton")
+    @FindBy(css = ".permissionDialog-addGranteesButton:not(.disabled)")
     private WebElement addGranteesButton;
 
     @FindBy(xpath = "//div[@id='gd-overlays']//div[contains(@class,'grantee-candidates-dialog')]")
@@ -109,15 +109,7 @@ public class PermissionsDialog extends AbstractFragment {
     }
 
     public AddGranteesDialog openAddGranteePanel() throws InterruptedException {
-        waitForElementVisible(addGranteesButton);
-        Graphene.waitGui().withTimeout(2000, TimeUnit.SECONDS).pollingEvery(500, TimeUnit.MILLISECONDS).
-                    until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return addGranteesButton.isEnabled();
-            }
-        });
-        addGranteesButton.click();
+        waitForElementVisible(addGranteesButton).click();
         return  waitForFragmentVisible(addGranteesDialog);
     }
 

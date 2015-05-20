@@ -25,8 +25,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
 
     @Test(dependsOnMethods = {"initialize"}, groups = { "object-tests" })
     public void factAggregationsTest() throws InterruptedException {
-        initFactPage();
-        factsTable.selectObject(name);
+        initObject(name);
         for (SimpleMetricTypes metricType : SimpleMetricTypes.values()) {
             factDetailPage.createSimpleMetric(metricType, name);
         }

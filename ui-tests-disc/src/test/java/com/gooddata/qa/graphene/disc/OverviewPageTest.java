@@ -9,6 +9,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
@@ -28,7 +29,18 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     public void initProperties() {
         zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-overview-page";
-        startPage = DISC_OVERVIEW_PAGE;
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForFragmentVisible(discOverview);
+            }
+            
+            @Override
+            public String getStartPage() {
+                return DISC_OVERVIEW_PAGE;
+            }
+        };
     }
 
     @AfterMethod

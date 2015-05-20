@@ -18,6 +18,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -33,11 +34,21 @@ public class SimpleFiltersTest extends AbstractUITest {
     private List<FilterPanelRow> rows;
 
     @BeforeClass
-    public void initStartPage() {
+    public void initProperties() {
         testParams.setProjectId(testParams.loadProperty("projectId"));
 
-        startPage = PAGE_UI_PROJECT_PREFIX + testParams.getProjectId()
-                + "|projectDashboardPage";
+        startPageContext = new StartPageContext() {
+            
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForDashboardPageLoaded(browser);
+            }
+            
+            @Override
+            public String getStartPage() {
+                return PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectDashboardPage"; 
+            }
+        };
     }
 
     @BeforeMethod
