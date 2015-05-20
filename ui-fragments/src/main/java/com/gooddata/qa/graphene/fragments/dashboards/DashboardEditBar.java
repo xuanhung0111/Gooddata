@@ -248,9 +248,9 @@ public class DashboardEditBar extends AbstractFragment {
     public void deleteDashboard() throws InterruptedException {
         waitForElementVisible(actionsMenu).click();
         waitForElementVisible(deleteButton).click();
-        Thread.sleep(3000);
         waitForElementVisible(deleteDashboardDialogButton).click();
         waitForElementNotPresent(this.getRoot());
+        Thread.sleep(3000); // take sometime for saving current dashboard into user profile settings
     }
 
     public void moveWidget(WebElement widget, int x, int y) {
