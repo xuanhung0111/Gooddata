@@ -19,6 +19,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class ChartReport extends AbstractFragment {
@@ -107,6 +108,44 @@ public class ChartReport extends AbstractFragment {
 
         waitForElementVisible(tooltip);
         return getTooltipText();
+    }
+
+    public boolean isLegendVisible() {
+        return !legends.isEmpty();
+    }
+
+    public boolean areLegendsHorizontal() {
+        List<String[]> values = getTransformValueFormLegend();
+        final String y = values.get(0)[1];
+
+        return Iterables.all(values, new Predicate<String[]>() {
+            @Override
+            public boolean apply(String[] input) {
+                return y.equals(input[1]);
+            }
+        });
+    }
+
+    public boolean areLegendsVertical() {
+        List<String[]> values = getTransformValueFormLegend();
+        final String x = values.get(0)[0];
+
+        return Iterables.all(values, new Predicate<String[]>() {
+            @Override
+            public boolean apply(String[] input) {
+                return x.equals(input[0]);
+            }
+        });
+    }
+
+    private List<String[]> getTransformValueFormLegend() {
+        waitForCollectionIsNotEmpty(legends);
+        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String[]>() {
+            @Override
+            public String[] apply(WebElement input) {
+                return input.getAttribute("transform").replace("translate(", "").replace(")", "").split(",");
+            }
+        }));
     }
 
     public List<String> getLegends() {
