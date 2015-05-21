@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static java.lang.String.format;
 
 public class MetricEditorDialog extends AbstractFragment {
 
@@ -110,6 +111,12 @@ public class MetricEditorDialog extends AbstractFragment {
 
     @FindBy(xpath = "//a[@href='#maqldoc_tab5']/em[text()='Logical']")
     private WebElement LogicalTab;
+
+    @FindBy(css = ".customEditor button.back")
+    private WebElement backButton;
+
+    private static final String variablesLocator = ".elementList li[title='Variables']";
+    private static final String selectedVariableLocator = ".elementList li[title='%s']";
 
     public void createShareMetric(String metricName, String usedMetric, String attrFolder,
             String attr) throws InterruptedException {
@@ -373,7 +380,11 @@ public class MetricEditorDialog extends AbstractFragment {
             case LESS_OR_EQUAL:
                 selectMetrics(data, 1);
                 selectAttributes(data, 1);
-                selectAttrElements(data, 1);
+                if (data.containsKey("attrValue0")) {
+                    selectAttrElements(data, 1);
+                } else {
+                    selectVariables(data, 1);
+                }
                 break;
             case BETWEEN:
             case NOT_BETWEEN:
@@ -401,6 +412,24 @@ public class MetricEditorDialog extends AbstractFragment {
         Thread.sleep(2000);
         waitForElementVisible(editButton);
         waitForElementVisible(dataLink).click();
+    }
+
+    private void selectVariables(Map<String, String> data, int count) throws InterruptedException {
+        // have to sleep or Selenium will throw exception:
+        //
+        // org.openqa.selenium.interactions.MoveTargetOutOfBoundsException:
+        // Element cannot be scrolled into view:[object XrayWrapper [object HTMLLIElement]]
+        for (int i = 0; i < count; i++) {
+            waitForElementVisible(placeHolderAttrElements).click();
+            Thread.sleep(1000);
+            waitForElementVisible(backButton).click();
+            Thread.sleep(1000);
+            waitForElementVisible(By.cssSelector(variablesLocator), browser).click();
+            Thread.sleep(1000);
+            waitForElementVisible(By.cssSelector(format(selectedVariableLocator,
+                    data.get("variable" + i))), browser).click();
+            waitForElementVisible(addSelectedButton).click();
+        }
     }
 
     public void selectAttributes(Map<String, String> data, int count) {

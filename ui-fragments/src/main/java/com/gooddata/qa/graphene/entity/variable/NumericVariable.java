@@ -7,6 +7,7 @@ public class NumericVariable extends AbstractVariable {
 
     public NumericVariable(String name) {
         super(name);
+        userNumber = Integer.MAX_VALUE;
     }
 
     public NumericVariable withDefaultNumber(int number) {

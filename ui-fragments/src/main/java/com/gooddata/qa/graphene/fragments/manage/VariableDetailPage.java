@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -10,9 +12,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class VariableDetailPage extends AbstractFragment {
@@ -91,11 +93,12 @@ public class VariableDetailPage extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class, 'attributeElements')]//input[contains(@class, 'gdc-input')]")
     private WebElement searchAttributeElement;
-    
+
     @FindBy(css = "#p-objectPage .s-btn-delete")
     private WebElement deleteButton;
 
-    private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
+    private static final By confirmDeleteButtonLocator = By
+            .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectPropertiesPage;
@@ -134,13 +137,16 @@ public class VariableDetailPage extends AbstractFragment {
         By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", attribute));
         waitForElementVisible(attributeToAdd, browser).click();
         waitForElementVisible(selectButton).click();
-        if (var.isUserSpecificValues()) {
-            waitForElementVisible(chooseButton).click();
-        } else {
-            waitForElementVisible(editButton).click();
-        }
 
-        selectAttrElement(var.getAttributeElements());
+        if (!var.getAttributeElements().isEmpty()) {
+            if (var.isUserSpecificValues()) {
+                waitForElementVisible(chooseButton).click();
+            } else {
+                waitForElementVisible(editButton).click();
+            }
+    
+            selectAttrElement(var.getAttributeElements());
+        }
         waitForElementVisible(saveChangeButton).click();
         waitForElementVisible(unSavedBarInactive);
         waitForElementVisible(userTable);
@@ -152,8 +158,7 @@ public class VariableDetailPage extends AbstractFragment {
         for (String ele : elements) {
             waitForElementVisible(searchAttributeElement).clear();
             searchAttributeElement.sendKeys(ele);
-            listOfElement =
-                    By.cssSelector(listOfElementLocator.replace("${label}", CssUtils.simplifyText(ele)));
+            listOfElement = By.cssSelector(listOfElementLocator.replace("${label}", CssUtils.simplifyText(ele)));
             waitForElementVisible(listOfElement, browser).click();
         }
         waitForElementVisible(setButton).click();
@@ -176,33 +181,55 @@ public class VariableDetailPage extends AbstractFragment {
     public void verifyNumericalVariable(NumericVariable var) {
         waitForElementVisible(userTable);
         String defValue = waitForElementVisible(scalarValueInput).getAttribute("value");
-        String userNumber = waitForElementVisible(userNumberValue).getText();
         assertEquals(defValue, String.valueOf(var.getDefaultNumber()),
                 "Default value of numeric variable is NOT set properly");
-        assertEquals(userNumber, String.valueOf(var.getUserNumber()),
-                "User specifc value of numeric variable is NOT set properly");
+
+        if (var.getUserNumber() != Integer.MAX_VALUE) {
+            String userNumber = waitForElementVisible(userNumberValue).getText();
+            assertEquals(userNumber, String.valueOf(var.getUserNumber()),
+                    "User specifc value of numeric variable is NOT set properly");
+        }
+
+        waitForElementVisible(dataLink).click();
     }
 
     public void verifyAttributeVariable(AttributeVariable var) {
-        waitForElementVisible(userTable);
         List<String> elements = var.getAttributeElements();
+        if (elements.isEmpty()) {
+            waitForElementVisible(dataLink).click();
+            return;
+        }
 
+        waitForElementVisible(userTable);
         if (var.isUserSpecificValues()) {
             String userValue = waitForElementVisible(userListValue).getAttribute("title");
             List<String> actualUserList = Arrays.asList(userValue.split(", "));
-            assertEquals(actualUserList, elements,
-                    "User value of attribute variable is NOT set properly");
+            assertEquals(actualUserList, elements, "User value of attribute variable is NOT set properly");
         } else {
             String defaultValue = waitForElementVisible(selectedValues).getAttribute("title");
             List<String> actualDefaultList = Arrays.asList(defaultValue.split(", "));
-            assertEquals(actualDefaultList, elements,
-                    "Default value of attribute variable is NOT set properly");
+            assertEquals(actualDefaultList, elements, "Default value of attribute variable is NOT set properly");
         }
+        waitForElementVisible(dataLink).click();
     }
-    
+
     public void deleteVariable() throws InterruptedException {
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(confirmDeleteButtonLocator, browser).click();
         waitForDataPageLoaded(browser);
+    }
+
+    public void setDefaultValue(int value) throws InterruptedException {
+        waitForElementVisible(scalarValueInput).click();
+        scalarValueInput.clear();
+        Thread.sleep(1000);
+        scalarValueInput.sendKeys(String.valueOf(value));
+        // do not focus on scalarValueInput
+        waitForElementVisible(numericalVariable).click();
+        assertEquals(scalarValueInput.getAttribute("value"), String.valueOf(value));
+        waitForElementVisible(saveChangeButton).click();
+        waitForElementVisible(unSavedBarInactive);
+        waitForElementVisible(userTable);
+        waitForElementVisible(dataLink).click();
     }
 }

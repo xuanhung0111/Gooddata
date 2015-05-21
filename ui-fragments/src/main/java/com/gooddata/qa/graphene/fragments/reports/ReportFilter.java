@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
+import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,13 +20,11 @@ import org.testng.Assert;
 
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
 import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
-import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class ReportFilter extends AbstractFragment {
 
@@ -255,8 +257,7 @@ public class ReportFilter extends AbstractFragment {
         }// displayed if at least one filter added.
         waitForElementVisible(promptFilterLink).click();
         waitForElementVisible(selectVariableButton).click();
-        By listOfPrompt = By.xpath(listOfElementLocator.replace("${label}",
-                variable.trim().toLowerCase().replaceAll(" ", "_")));
+        By listOfPrompt = By.xpath(listOfElementLocator.replace("${label}", simplifyText(variable)));
         waitForElementVisible(listOfPrompt, browser);
         selectElement(variable);
         waitForElementVisible(selectElementButtonDialog).click();

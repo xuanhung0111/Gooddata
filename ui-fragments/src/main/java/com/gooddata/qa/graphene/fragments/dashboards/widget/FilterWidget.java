@@ -89,13 +89,14 @@ public class FilterWidget extends AbstractFragment {
         return waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).getText();
     }
 
-    public void changeTitle(String title) {
+    public void changeTitle(String title) throws InterruptedException {
         if (!getRoot().getAttribute("class").contains("yui3-c-filterdashboardwidget-selected")) {
             getRoot().click();
         }
 
         waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).click();
-        WebElement inputElement = waitForElementVisible(BY_INPUT_LABEL, titleContainer);
+        Thread.sleep(2000);
+        WebElement inputElement = titleContainer.findElement(BY_INPUT_LABEL);
         inputElement.clear();
         inputElement.sendKeys(title);
         inputElement.sendKeys(Keys.ENTER);
