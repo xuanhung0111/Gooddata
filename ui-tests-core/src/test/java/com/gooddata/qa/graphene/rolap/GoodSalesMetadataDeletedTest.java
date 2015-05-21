@@ -468,7 +468,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         switch (place) {
             case GREY_PAGE:
                 JSONObject json = RestUtils.getJSONObjectFrom(getRestApiClient(), object,
-                        HttpStatus.NOT_FOUND.value());
+                        HttpStatus.NOT_FOUND);
                 if (!json.has("error"))
                     return false;
                 if (!object
@@ -543,7 +543,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             ParseException, IOException, InterruptedException {
         String pollingUri = RestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
                 strategy.getMaql(identifier));
-        assertEquals(RestUtils.getLastTaskPollingState(getRestApiClient(), pollingUri), "ERROR");
+        RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
+        assertEquals(RestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri), "ERROR");
         assertTrue(getErrorMessageFromPollingUri(pollingUri).startsWith(DROP_OBJECT_ERROR_MESSAGE));
     }
 

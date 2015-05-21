@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.*;
@@ -12,22 +11,19 @@ import java.util.List;
 
 import org.json.JSONException;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-public abstract class AbstractDISCTest extends AbstractProjectTest {
+public abstract class AbstractDISCTest extends AbstractMSFTest {
 
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
     protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
 
-    protected String zipFilePath;
-
     private List<ProjectInfo> projects;
-    private ProjectInfo workingProject;
 
     protected List<ProjectInfo> getProjects() {
         if (projects == null)
@@ -39,14 +35,6 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
         if (!m.getDeclaringClass().equals(this.getClass()))
             return;
         cleanProcessesInWorkingProject();
-    }
-
-    protected ProjectInfo getWorkingProject() {
-        if (workingProject == null)
-            workingProject =
-                    new ProjectInfo().setProjectName(projectTitle).setProjectId(
-                            testParams.getProjectId());
-        return workingProject;
     }
 
     protected void openProjectDetailPage(ProjectInfo project) {
