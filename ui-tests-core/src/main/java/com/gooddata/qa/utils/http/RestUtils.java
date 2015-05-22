@@ -1,5 +1,6 @@
 package com.gooddata.qa.utils.http;
 
+import com.gooddata.qa.graphene.dto.Processes;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.google.common.base.Function;
@@ -7,11 +8,14 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,10 +44,11 @@ public class RestUtils {
     private static final String OBJ_LINK = "/gdc/md/%s/obj/";
     private static final String MUF_LINK = "/gdc/md/%s/userfilters";
     private static final String DOMAIN_USER_LINK = "/gdc/account/domains/default/users";
-    private static final String addUserContentBody = "{\"user\":{\"content\":{\"userRoles\":[\"%s\"],\"status\":\"ENABLED\"},\"links\":{\"self\":\"%s\"}}}";
+    private static final String ADD_USER_CONTENT_BODY;
     private static final String FEATURE_FLAGS_URI = "/gdc/internal/account/profile/featureFlags";
     private static final String FEATURE_FLAGS = "featureFlags";
-    private static final UriTemplate FEATURE_FLAGS_PROJECT_URI_TEMPLATE = new UriTemplate("/gdc/projects/{projectId}/projectFeatureFlags");
+    private static final UriTemplate FEATURE_FLAGS_PROJECT_URI_TEMPLATE =
+            new UriTemplate("/gdc/projects/{projectId}/projectFeatureFlags");
     private static final String PROJECT_FEATURE_FLAG_VALUE_IDENTIFIER = "value";
     private static final String PROJECT_FEATURE_FLAG_KEY_IDENTIFIER = "key";
     private static final String PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER = "featureFlag";
@@ -52,11 +57,32 @@ public class RestUtils {
     private static final String UPDATE_LDM_BODY;
     private static final String MUF_OBJ;
     private static final String USER_FILTER;
+    private static final String EXECUTION_DATALOAD_PROCESS_BODY;
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
-    
+    private static final String ERROR_KEY = "error";
+
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
-    
+
+    static {
+        try {
+            ADD_USER_CONTENT_BODY = new JSONObject() {{
+                put("user", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("userRoles", new JSONArray().put("${userRoles}"));
+                        put("status", "ENABLED");
+                    }});
+                    put("links", new JSONObject() {{
+                        put("self", "${self}");
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exception during json object initialization! ", e);
+        }
+    }
+
     static {
         try {
             CREATE_USER_CONTENT_BODY = new JSONObject() {{
@@ -74,6 +100,7 @@ public class RestUtils {
                     "There is an exception during json object initialization! ", e);
         }
     }
+
     static {
         try {
             UPDATE_LDM_BODY = new JSONObject() {{
@@ -105,7 +132,7 @@ public class RestUtils {
                     "There is an exception during json object initialization! ", e);
         }
     }
-    
+
     static {
         try {
             USER_FILTER = new JSONObject() {{
@@ -126,20 +153,32 @@ public class RestUtils {
         }
     }
 
+    static {
+        try {
+            EXECUTION_DATALOAD_PROCESS_BODY = new JSONObject() {{
+                put("execution", new JSONObject() {{
+                    put("params", new JSONObject() {{
+                        put("GDC_DE_SYNCHRONIZE_ALL", true);
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exeception during json object initialization! ", e);
+        }
+    }
+
     private RestUtils() {
     }
 
     public static String createNewUser(RestApiClient restApiClient, String userEmail,
             String userPassword) throws ParseException, JSONException, IOException {
-        String contentBody =
-                CREATE_USER_CONTENT_BODY.replace("${userEmail}", userEmail).replace("${userPassword}",
-                        userPassword);
+        String contentBody = CREATE_USER_CONTENT_BODY.replace("${userEmail}", userEmail).replace("${userPassword}",
+                userPassword);
         HttpRequestBase postRequest = restApiClient.newPostMethod(DOMAIN_USER_LINK, contentBody);
-        HttpResponse postReponse = restApiClient.execute(postRequest);
-        assertEquals(postReponse.getStatusLine().getStatusCode(), HttpStatus.CREATED.value(),
+        HttpResponse postReponse = restApiClient.execute(postRequest, HttpStatus.CREATED,
                 "New user is not created!");
-        String userUri =
-                new JSONObject(EntityUtils.toString(postReponse.getEntity())).getString("uri");
+        String userUri = new JSONObject(EntityUtils.toString(postReponse.getEntity())).getString("uri");
         System.out.println("New user uri: " + userUri);
 
         return userUri;
@@ -147,9 +186,7 @@ public class RestUtils {
 
     public static void deleteUser(RestApiClient restApiClient, String deletetedUserUri) {
         HttpRequestBase deleteRequest = restApiClient.newDeleteMethod(deletetedUserUri);
-        HttpResponse deleteReponse = restApiClient.execute(deleteRequest);
-        assertEquals(deleteReponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
-                "User is not deleted!");
+        restApiClient.execute(deleteRequest, HttpStatus.OK, "User is not deleted!");
     }
 
     public static void addUserToProject(String host, String projectId, String domainUser,
@@ -159,16 +196,18 @@ public class RestUtils {
         RestApiClient restApiClient = new RestApiClient(host, domainUser, domainPassword, true, false);
         String usersUri = String.format(USERS_LINK, projectId);
         String roleUri = String.format(ROLE_LINK, projectId, role.getRoleId());
-        String contentBody = String.format(addUserContentBody, roleUri, inviteeProfile);
+        String contentBody = ADD_USER_CONTENT_BODY.replace("${userRoles}", roleUri)
+                .replace("${self}", inviteeProfile);
         HttpRequestBase postRequest = restApiClient.newPostMethod(usersUri, contentBody);
-        HttpResponse postResponse = restApiClient.execute(postRequest);
-        assertEquals(postResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
+        HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
         JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
         assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"),
                 "User isn't assigned properly into the project");
         System.out.println(
                 format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId,
                         domainUser));
+        
+        EntityUtils.consumeQuietly(postResponse.getEntity());
     }
 
     public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
@@ -201,11 +240,7 @@ public class RestUtils {
 
     public static void deleteUserGroup(RestApiClient restApiClient, String groupUri) {
         HttpRequestBase request = restApiClient.newDeleteMethod(groupUri);
-        HttpResponse response = restApiClient.execute(request);
-
-        int statusCode = response.getStatusLine().getStatusCode();
-        assertEquals(statusCode, HttpStatus.NO_CONTENT.value(),
-                     "User group could not be deleted, got " + statusCode);
+        restApiClient.execute(request, HttpStatus.NO_CONTENT, "User group could not be deleted");
     }
 
     public static void addUsersToUserGroup(RestApiClient restApiClient, String userGroupId, String... userURIs)
@@ -230,8 +265,7 @@ public class RestUtils {
             String modifyMemberUri = String.format(USER_GROUP_MODIFY_MEMBERS_LINK, userGroupId);
             postRequest = restApiClient.newPostMethod(modifyMemberUri, 
                     buildModifyMembersContent(operation, userURIs));
-            HttpResponse postResponse = restApiClient.execute(postRequest);
-            assertEquals(postResponse.getStatusLine().getStatusCode(), 204, "Modify Users on User Group failed");
+            restApiClient.execute(postRequest, HttpStatus.NO_CONTENT, "Modify Users on User Group failed");
         } finally {
             if (postRequest != null) {
                 postRequest.releaseConnection();
@@ -254,8 +288,7 @@ public class RestUtils {
         RestApiClient restApiClient = new RestApiClient(host, user, password, true, false);
         String ldmUri = String.format(LDM_LINK, projectId);
         HttpRequestBase getRequest = restApiClient.newGetMethod(ldmUri);
-        HttpResponse getResponse = restApiClient.execute(getRequest);
-        assertEquals(getResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
+        HttpResponse getResponse = restApiClient.execute(getRequest, HttpStatus.OK, "Invalid status code");
         JSONObject json = new JSONObject(EntityUtils.toString(getResponse.getEntity()));
         String uri = json.getString("uri");
         // TODO fix on resource rather then here
@@ -274,22 +307,23 @@ public class RestUtils {
         return response.getStatusLine().getStatusCode() == 200;
     }
 
-    private static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri) throws IOException, JSONException {
+    private static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri)
+            throws IOException, JSONException {
         HttpRequestBase getRequest = restApiClient.newGetMethod(uri);
-        HttpResponse getResponse = restApiClient.execute(getRequest);
-        assertEquals(getResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
+        HttpResponse getResponse = restApiClient.execute(getRequest, HttpStatus.OK, "Invalid status code");
         String result = EntityUtils.toString(getResponse.getEntity());
         return new JSONObject(result);
     }
 
-    public static void setFeatureFlags(final RestApiClient restApiClient, final FeatureFlagOption... featureFlagOptions) throws IOException, JSONException {
+    public static void setFeatureFlags(final RestApiClient restApiClient,
+            final FeatureFlagOption... featureFlagOptions) throws IOException, JSONException {
         JSONObject json = getJSONObjectFrom(restApiClient, FEATURE_FLAGS_URI);
         for (FeatureFlagOption featureFlagOption : featureFlagOptions) {
-            json.getJSONObject(FEATURE_FLAGS).put(featureFlagOption.getFeatureFlagName(), featureFlagOption.isOn());
+            json.getJSONObject(FEATURE_FLAGS).put(featureFlagOption.getFeatureFlagName(),
+                    featureFlagOption.isOn());
         }
         HttpRequestBase putRequest = restApiClient.newPutMethod(FEATURE_FLAGS_URI, json.toString());
-        HttpResponse putResponse = restApiClient.execute(putRequest);
-        assertEquals(putResponse.getStatusLine().getStatusCode(), 204, "Invalid status code");
+        restApiClient.execute(putRequest, HttpStatus.NO_CONTENT, "Invalid status code");
     }
 
     public static boolean isFeatureFlagEnabled(final RestApiClient restApiClient, final String featureFlagName)
@@ -300,7 +334,8 @@ public class RestUtils {
         return Boolean.getBoolean(flags.getString(featureFlagName));
     }
 
-    public static void setFeatureFlagsToProject(final RestApiClient restApiClient, final String projectId, final FeatureFlagOption... featureFlagOptions) throws JSONException {
+    public static void setFeatureFlagsToProject(final RestApiClient restApiClient, final String projectId,
+            final FeatureFlagOption... featureFlagOptions) throws JSONException {
         final URI projectFeatureFlagsUri = FEATURE_FLAGS_PROJECT_URI_TEMPLATE.expand(projectId);
         JSONObject featureFlagObject;
         JSONObject valuesJsonObject;
@@ -313,9 +348,9 @@ public class RestUtils {
             valuesJsonObject.put(PROJECT_FEATURE_FLAG_KEY_IDENTIFIER, featureFlagOption.getFeatureFlagName());
             featureFlagObject.put(PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER, valuesJsonObject);
 
-            final HttpPost postRequest = restApiClient.newPostMethod(projectFeatureFlagsUri.toString(), featureFlagObject.toString());
-            final HttpResponse postResponse = restApiClient.execute(postRequest);
-            assertEquals(postResponse.getStatusLine().getStatusCode(), 201, "Invalid status code");
+            final HttpPost postRequest = restApiClient.newPostMethod(projectFeatureFlagsUri.toString(),
+                    featureFlagObject.toString());
+            restApiClient.execute(postRequest, HttpStatus.CREATED, "Invalid status code");
         }
     }
 
@@ -326,8 +361,7 @@ public class RestUtils {
         System.out.println(MUFExpressions);
         String contentBody = MUF_OBJ.replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
         HttpRequestBase postRequest = restApiClient.newPostMethod(mdObjURI, contentBody);
-        HttpResponse postResponse = restApiClient.execute(postRequest);
-        assertEquals(postResponse.getStatusLine().getStatusCode(), 200, "New MUF is not created!");
+        HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "New MUF is not created!");
         String result = EntityUtils.toString(postResponse.getEntity());
         JSONObject json = new JSONObject(result);
         return json.getString("uri");
@@ -354,27 +388,27 @@ public class RestUtils {
         }
         return Joiner.on(" AND ").join(expressions);
     }
-    
-    public static void addMUFToUser(final RestApiClient restApiClient, String projectURI, String userProfileURI, 
+
+    public static void addMUFToUser(final RestApiClient restApiClient, String projectURI, String userProfileURI,
             String mufURI) {
         String urserFilter = format(MUF_LINK, projectURI);
-        String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression", mufURI);
+        String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression",
+                mufURI);
         System.out.println(contentBody);
         HttpRequestBase postRequest = restApiClient.newPostMethod(urserFilter, contentBody);
-        HttpResponse postReponse = restApiClient.execute(postRequest);
-        assertEquals(postReponse.getStatusLine().getStatusCode(), 200, "the MUF is not applied");
+        restApiClient.execute(postRequest, HttpStatus.OK, "the MUF is not applied");
     }
-    
+
     public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, String projectID, 
             String dashboardID) throws JSONException, IOException {
         setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_POPUP, null);
     }
-    
+
     public static void setDrillReportTargetAsExport(final RestApiClient restApiClient, String projectID,
             String dashboardID, String exportFormat) throws JSONException, IOException {
         setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_EXPORT, exportFormat);
     }
-    
+
     private static void setDrillReportTarget(final RestApiClient restApiClient, String projectID,
             String dashboardID, String target, String exportFormat) throws JSONException, IOException {
         HttpRequestBase getRequest = null;
@@ -382,12 +416,11 @@ public class RestUtils {
         try {
             String dashboardEditModeURI = String.format(DASHBOARD_EDIT_MODE_LINK, projectID, dashboardID);
             getRequest = restApiClient.newGetMethod(dashboardEditModeURI);
-            HttpResponse response = restApiClient.execute(getRequest);
-            assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
+            HttpResponse response = restApiClient.execute(getRequest, HttpStatus.OK, "Invalid status code");
             JSONObject json = new JSONObject(EntityUtils.toString(response.getEntity()));
-            JSONObject drills = json.getJSONObject("projectDashboard").getJSONObject("content").getJSONArray("tabs").
-                    getJSONObject(0).getJSONArray("items").getJSONObject(0).getJSONObject("reportItem").
-                    getJSONArray("drills").getJSONObject(0);
+            JSONObject drills = json.getJSONObject("projectDashboard").getJSONObject("content").
+                    getJSONArray("tabs").getJSONObject(0).getJSONArray("items").getJSONObject(0).
+                    getJSONObject("reportItem").getJSONArray("drills").getJSONObject(0);
             drills.put("target", target);
             if (TARGET_POPUP.equals(target)) {
                 drills.remove("export");
@@ -397,8 +430,7 @@ public class RestUtils {
                 drills.put("export", exportOptions );
             }
             postRequest = restApiClient.newPostMethod(dashboardEditModeURI, json.toString());
-            response = restApiClient.execute(postRequest);
-            assertEquals(response.getStatusLine().getStatusCode(), 200, "Invalid status code");
+            response = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
         } finally {
             if (getRequest != null) {
                 getRequest.releaseConnection();
@@ -406,17 +438,14 @@ public class RestUtils {
             if (postRequest !=null) {
                 postRequest.releaseConnection();
             }
-           
         }
-        
     }
 
     public static String updateLDM(RestApiClient restApiClient, String projectId, String maql) {
         String contentBody = UPDATE_LDM_BODY.replace("${maql}", maql);
         HttpRequestBase postRequest =
                 restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody);
-        HttpResponse postResponse = restApiClient.execute(postRequest);
-        assertEquals(postResponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
+        HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK,
                 "LDM is not updated successful!");
 
         String pollingUri = "";
@@ -486,6 +515,60 @@ public class RestUtils {
 
         public static FeatureFlagOption createFeatureClassOption(final String featureFlagName, final boolean on) {
             return new FeatureFlagOption(featureFlagName, on);
+        }
+    }
+
+    public static void deleteDataloadProcess(RestApiClient restApiClient, String dataloadProcessUri,
+            String projectId) {
+        if (StringUtils.isEmpty(dataloadProcessUri)) {
+            return;
+        }
+
+        System.out.println("Deleting dataload process for project: " + projectId);
+        HttpRequestBase deleteRequest = restApiClient.newDeleteMethod(dataloadProcessUri);
+        try {
+              HttpResponse deleteResponse = restApiClient.execute(deleteRequest, HttpStatus.NO_CONTENT,
+                      "Could not delete dataload process!");
+              EntityUtils.consumeQuietly(deleteResponse.getEntity());
+        } finally {
+            deleteRequest.releaseConnection();
+        }
+    }
+
+    public static Pair<Integer, String> executeDataloadProcess(RestApiClient restApiClient,
+            String dataloadProcessUri) throws JSONException, ParseException, IOException {
+        System.out.println("Execute dataload process with GDC_DE_SYNCHRONIZE_ALL");
+
+        String errorMessage = "";
+        int responseStatusCode ;
+        HttpRequestBase postRequest =
+                restApiClient.newPostMethod(dataloadProcessUri + "/executions/", EXECUTION_DATALOAD_PROCESS_BODY);
+        try {
+            HttpResponse response = restApiClient.execute(postRequest);
+            JSONObject jsonObject = new JSONObject(EntityUtils.toString(response.getEntity()));
+            if (jsonObject.has(ERROR_KEY)) {
+                errorMessage = new JSONObject(jsonObject.get(ERROR_KEY).toString()).get("message").toString();
+            }
+            EntityUtils.consumeQuietly(response.getEntity());
+            responseStatusCode = response.getStatusLine().getStatusCode();
+            System.out.println(" - status: " + responseStatusCode);
+        } finally {
+            postRequest.releaseConnection();
+        }
+
+        return  Pair.of(responseStatusCode, errorMessage);
+    }
+
+    public static Processes getProcessesList(RestApiClient restApiClient, String projectId)
+            throws IOException, JSONException {
+        String processesUri = format("/gdc/projects/%s/dataload/processes", projectId);
+        ObjectMapper mapper = new ObjectMapper();
+
+        JSONObject json = RestUtils.getJSONObjectFrom(restApiClient, processesUri);
+        try {
+            return mapper.readValue(json.toString(), Processes.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to parse processes from response.");
         }
     }
 }

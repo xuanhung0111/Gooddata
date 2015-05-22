@@ -51,7 +51,7 @@
         <version.org.apache.maven.surefire-plugin>2.17</version.org.apache.maven.surefire-plugin>
         <json-path.version>0.9.1</json-path.version>
         <gooddata-http-client.version>0.8.2</gooddata-http-client.version>
-        <gooddata-java.version>0.10.1-SNAPSHOT</gooddata-java.version>
+        <gooddata-java.version>0.14.0</gooddata-java.version>
     </properties>
 
     <dependencyManagement>

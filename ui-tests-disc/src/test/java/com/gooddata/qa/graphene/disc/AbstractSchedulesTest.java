@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public abstract class AbstractSchedulesTests extends AbstractDISCTest {
+public abstract class AbstractSchedulesTest extends AbstractDISCTest {
 
     protected void assertBrokenSchedule(ScheduleBuilder scheduleBuilder) {
         waitForElementVisible(brokenSchedulesTable.getRoot());

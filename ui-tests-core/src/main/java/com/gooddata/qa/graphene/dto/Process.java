@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.disc.dto;
+package com.gooddata.qa.graphene.dto;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;

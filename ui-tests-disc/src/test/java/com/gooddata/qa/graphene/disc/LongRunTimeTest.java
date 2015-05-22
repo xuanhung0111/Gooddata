@@ -10,7 +10,7 @@ import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 
 import static org.testng.Assert.*;
 
-public class LongRunTimeTest extends AbstractSchedulesTests {
+public class LongRunTimeTest extends AbstractSchedulesTest {
 
     @BeforeClass
     public void initProperties() {

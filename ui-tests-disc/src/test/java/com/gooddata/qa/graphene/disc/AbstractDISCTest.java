@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.disc;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.*;
 
 import java.lang.reflect.Method;
@@ -111,6 +112,14 @@ public abstract class AbstractDISCTest extends AbstractProjectTest {
         scheduleForm.createNewSchedule(scheduleBuilder);
         if (scheduleBuilder.isConfirmed())
             waitForElementVisible(scheduleDetail.getRoot());
+    }
+
+    protected void openScheduleViaUrl (String scheduleUrl) {
+        System.out.println("Loading schedule detail page ..." + scheduleUrl);
+        // Use this step instead of OpenURL function
+        // because schedule url contains many parts (project id, process id, schedule id) 
+        browser.get(scheduleUrl);
+        waitForFragmentVisible(scheduleDetail);
     }
 
     protected void assertSchedule(ScheduleBuilder scheduleBuilder) {

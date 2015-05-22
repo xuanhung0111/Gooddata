@@ -14,7 +14,7 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public class ProjectDetailTest extends AbstractSchedulesTests {
+public class ProjectDetailTest extends AbstractSchedulesTest {
 
     private String PROJECT_EMPTY_STATE_TITLE =
             "You don’t have any deployed data loading processes.";

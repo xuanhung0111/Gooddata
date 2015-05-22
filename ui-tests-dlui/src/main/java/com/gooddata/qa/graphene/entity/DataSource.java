@@ -1,16 +1,24 @@
 package com.gooddata.qa.graphene.entity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+
 public class DataSource {
 
-    private String name;
+    private static final By BY_DATASOURCE_TITLE = By.cssSelector(".source-title");
+
+    private String name = "";
     private List<Dataset> datasets = Lists.newArrayList();
 
     public DataSource() {}
@@ -77,6 +85,24 @@ public class DataSource {
         addSelectedField(false);
     }
 
+    public boolean hasCorrespondingWebElement(Collection<WebElement> elements) {
+        return Iterables.any(elements, findWebElementPredicate());
+    }
+
+    public WebElement getCorrespondingWebElement(Collection<WebElement> elements) {
+        return Iterables.find(elements, findWebElementPredicate());
+    }
+
+    private Predicate<WebElement> findWebElementPredicate() {
+        return new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement element) {
+                return name.equals(waitForElementVisible(BY_DATASOURCE_TITLE, element).getText());
+            }
+        };
+    }
+
     private void addSelectedField(boolean confirmed) {
         for (Dataset dataset : datasets) {
             if (dataset.getSelectedFields().size() > 0) {
@@ -88,14 +114,13 @@ public class DataSource {
     private void checkValidDatasets(Dataset... validatedDatasets) {
         for (final Dataset validatedDataset : validatedDatasets) {
             try {
-                Iterables.find(getAvailableDatasets(FieldTypes.ALL),
-                        new Predicate<Dataset>() {
+                Iterables.find(getAvailableDatasets(FieldTypes.ALL), new Predicate<Dataset>() {
 
-                            @Override
-                            public boolean apply(Dataset dataset) {
-                                return dataset.getName().equals(validatedDataset.getName());
-                            }
-                        });
+                    @Override
+                    public boolean apply(Dataset dataset) {
+                        return dataset.getName().equals(validatedDataset.getName());
+                    }
+                });
             } catch (NoSuchElementException e) {
                 throw new IllegalStateException("Data source '" + this.name
                         + "' doesn't contain dataset '" + validatedDataset.getName() + "'", e);
