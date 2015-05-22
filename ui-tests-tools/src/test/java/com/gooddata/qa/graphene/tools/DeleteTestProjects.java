@@ -3,11 +3,9 @@ package com.gooddata.qa.graphene.tools;
 import java.util.List;
 
 import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.UserRoles;
 
 import org.json.JSONException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
@@ -20,23 +18,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 @Test(groups = {"tools"}, description = "Tools tests")
 public class DeleteTestProjects extends AbstractUITest {
 
-    @BeforeClass
-    public void initStartPage() {
-        startPageContext = new StartPageContext() {
-            
-            @Override
-            public void waitForStartPageLoaded() {
-                waitForElementVisible(loginFragment.getRoot());
-            }
-            
-            @Override
-            public String getStartPage() {
-                return PAGE_LOGIN;
-            }
-        };
-    }
-
-    @Test(groups = "deleteProjectsInit")
+    @Test(groups = {"deleteProjectsInit", PROJECT_INIT_GROUP})
     public void initTest() throws JSONException {
         signIn(false, UserRoles.ADMIN);
     }
