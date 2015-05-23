@@ -1,8 +1,7 @@
 package com.gooddata.qa.graphene.indigo.user;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,9 +22,13 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
+import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.UserStates;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -34,10 +37,10 @@ import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
 import static java.util.Arrays.asList;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 
 public class UserManagementGeneralTest extends AbstractProjectTest {
 
+    private static final String DEFAULT_DASHBOARD = "Default dashboard";
     private static final String DELETE_GROUP_DIALOG_CONTENT = "The group with associated permissions will be "
             + "removed. Users will remain.\nThis action cannot be undone.";
     private boolean canAccessUserManagementByDefault;
@@ -117,8 +120,78 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void accessFromProjectsAndUsersPage() {
         initProjectsAndUsersPage();
-        projectAndUsersPage.openUserManagemtPage();
+        projectAndUsersPage.openUserManagementPage();
         waitForFragmentVisible(userManagementPage);
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void uploadDataTest() throws InterruptedException {
+        String csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
+        uploadCSV(csvFilePath + "payroll.csv", null, "access-usergroup-from-dashboard-page");
+    }
+
+    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
+            groups = { "userManagement" })
+    public void accessFromDashboardPage() throws InterruptedException {
+        initDashboardsPage();
+        selectDashboard(DEFAULT_DASHBOARD);
+        publishDashboard(false);
+        dashboardsPage.openPermissionsDialog().openAddGranteePanel().openUserManagementPage();
+        waitForFragmentVisible(userManagementPage);
+    }
+
+    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
+            groups = { "userManagement" })
+    public void accessFromEmbeddedDashboardPage() throws InterruptedException{
+        initDashboardsPage();
+        selectDashboard(DEFAULT_DASHBOARD);
+        publishDashboard(false);
+        DashboardEmbedDialog dialog = dashboardsPage.embedDashboard();
+        String uri = dialog.getPreviewURI();
+        browser.get(uri);
+        waitForElementVisible(dashboardsPage.getContent().getRoot());
+        Thread.sleep(2000);
+        dashboardsPage.unlistedIconClick().openAddGranteePanel().openUserManagementPage();
+        waitForFragmentVisible(userManagementPage);
+    }
+
+    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
+            groups = { "userManagement" })
+    public void checkEditorCannotAccessFromDashboardPage() throws InterruptedException, JSONException{
+        initDashboardsPage();
+        selectDashboard(DEFAULT_DASHBOARD);
+        publishDashboard(true);
+        try {
+            logout();
+            signIn(false, UserRoles.EDITOR);
+            initDashboardsPage();
+            selectDashboard(DEFAULT_DASHBOARD);
+            checkEditorCannotAccessUserGroupsLinkInDashboardPage(dashboardsPage.openPermissionsDialog());
+        } finally {
+            logout();
+            signIn(false, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
+            groups = { "userManagement" })
+    public void checkEditorCannotAccessFromEmbeddedDashboard() throws InterruptedException, JSONException{
+        initDashboardsPage();
+        selectDashboard(DEFAULT_DASHBOARD);
+        publishDashboard(false);
+        DashboardEmbedDialog dialog = dashboardsPage.embedDashboard();
+        String uri = dialog.getPreviewURI();
+        try {
+            logout();
+            signIn(false, UserRoles.EDITOR);
+            browser.get(uri);
+            waitForElementVisible(dashboardsPage.getContent().getRoot());
+            Thread.sleep(2000);
+            checkEditorCannotAccessUserGroupsLinkInDashboardPage(dashboardsPage.unlistedIconClick());
+        } finally {
+            logout();
+            signIn(false, UserRoles.ADMIN);
+        }
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI" })
@@ -534,6 +607,13 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
             alwaysRun = true)
     public void turnOffUserManagementFeature() throws InterruptedException, IOException, JSONException {
         disableUserManagementFeature();
+    }
+
+    private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) 
+            throws InterruptedException {
+        permissionsDialog.publish(PublishType.SPECIFIC_USERS_CAN_ACCESS);
+        AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
+        assertFalse(addGranteesDialog.isUserGroupLinkShown(), "Editor user could see user group link");
     }
 
     private void checkUserEmailsStillAvailableAfterDeletingGroup(List<String> emailsList) {

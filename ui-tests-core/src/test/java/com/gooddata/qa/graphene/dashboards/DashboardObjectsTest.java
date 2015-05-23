@@ -26,7 +26,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadDataTest() throws InterruptedException {
-        String csvFilePath = testParams.loadProperty("csvFilePath");
+        String csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
         uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
     }
 

@@ -14,7 +14,7 @@ import com.google.common.base.Predicate;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
-public abstract class AbstractDeployProcesses extends AbstractDISCTest {
+public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
 
     private static final String FAILED_REDEPLOY_MESSAGE =
             "Failed to re-deploy the \"%s\" process as \"%s\". Reason: Process contains no executables.";

@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.google.common.base.Predicate;
@@ -12,6 +15,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class Dataset {
+
+    private static final By BY_DATASET_TITLE = By.cssSelector("label");
 
     private String name;
     private List<Field> fields = Lists.newArrayList();
@@ -85,6 +90,16 @@ public class Dataset {
             else
                 field.setStatus(FieldStatus.AVAILABLE);
         }
+    }
+
+    public WebElement getCorrespondingWebElement(Collection<WebElement> elements) {
+        return Iterables.find(elements, new Predicate<WebElement>() {
+
+            @Override
+            public boolean apply(WebElement datasetElement) {
+                return name.equals(datasetElement.findElement(BY_DATASET_TITLE).getText());
+            }
+        });
     }
 
     private void checkValidFields(List<Field> validatedFields) {

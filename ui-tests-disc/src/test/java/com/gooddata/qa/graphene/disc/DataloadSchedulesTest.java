@@ -1,34 +1,35 @@
 package com.gooddata.qa.graphene.disc;
 
-import com.gooddata.qa.graphene.disc.dto.Processes;
-import com.gooddata.qa.graphene.disc.dto.Process;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
 import static java.lang.String.format;
+import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 
-public class DataloadSchedulesTests extends AbstractSchedulesTests {
+public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     private static final String PROCESS_NAME = "Dataload process";
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
-
-    private final ObjectMapper mapper = new ObjectMapper();
+    private static final String CONCURRENT_DATA_LOAD_MESSAGE = "The schedule did not run" 
+            +" because one or more of the datasets in this schedule is already synchronizing.";
+    private static final String NO_LOG_AVAILABLE_TITLE = 
+            "No log available. There was an error while executing the schedule.";
 
     @BeforeClass
     public void initProperties() {
@@ -36,12 +37,12 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
     }
 
     @AfterClass
-    public void tearDown() {
-        deleteDataloadProcess();
+    public void tearDown() throws IOException, JSONException {
+        RestUtils.deleteDataloadProcess(getRestApiClient() ,getDataloadProcessUri(), getWorkingProject().getProjectId());
     }
     
     @Test(dependsOnMethods = {"createProject"})
-    public void setUp() {
+    public void setUp() throws IOException, JSONException {
         createDataloadProcessIfDoesntExist();
         createDatasets();
     }
@@ -94,8 +95,55 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
         scheduleDetail.changeAndCheckDatasetDialog(scheduleBuilder);
     }
 
+    @Test(dependsOnMethods = {"setUp"})
+    public void checkConcurrentDataLoadSchedule() {
+        openProjectDetailPage(getWorkingProject());
+
+        ScheduleBuilder schedule1 = new ScheduleBuilder().setProcessName(PROCESS_NAME)
+                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                .setHasDataloadProcess(true)
+                .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
+                .setAllDatasets(Arrays.asList("Salesforce", "test"))
+                .setScheduleName("Salesforce data load 1");
+        createSchedule(schedule1);
+        schedule1.setScheduleUrl(browser.getCurrentUrl());
+
+        ScheduleBuilder schedule2 = new ScheduleBuilder().setProcessName(PROCESS_NAME)
+                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                .setHasDataloadProcess(true)
+                .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
+                .setAllDatasets(Arrays.asList("Salesforce", "test"))
+                .setScheduleName("Salesforce data load 2");
+        openProjectDetailByUrl(testParams.getProjectId());
+        createSchedule(schedule2);
+        browser.navigate().refresh();
+        waitForFragmentVisible(scheduleDetail);
+        schedule2.setScheduleUrl(browser.getCurrentUrl());
+
+        openScheduleViaUrl(schedule1.getScheduleUrl());
+        scheduleDetail.manualRun();
+        assertTrue(scheduleDetail.isInRunningState());
+        scheduleDetail.clickOnCloseScheduleButton();
+
+        openScheduleViaUrl(schedule2.getScheduleUrl());
+        scheduleDetail.tryToRun();
+        assertConcurrentDataloadScheduleFailed();
+        Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Schedule-DISC", getClass());
+    }
+
+    private void assertConcurrentDataloadScheduleFailed() {
+        scheduleDetail.waitForExecutionFinish();
+        assertTrue(scheduleDetail.isLastSchedulerErrorIconVisible());
+        assertEquals(scheduleDetail.getExecutionErrorDescription(), CONCURRENT_DATA_LOAD_MESSAGE);
+        assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE); 
+        assertTrue(scheduleDetail.getExecutionRuntime().isEmpty());
+        assertFalse(scheduleDetail.getLastExecutionTime().isEmpty());
+        assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE);
+        assertNull(scheduleDetail.getLastExecutionLogLink());
+    }
+
     private void createDatasets() {
-        HttpRequestBase getRequest = getRestApiClient().newGetMethod(String.format("/gdc/md/%s/ldm/singleloadinterface/dataset.salesforce", getWorkingProject().getProjectId()));
+        HttpRequestBase getRequest = getRestApiClient().newGetMethod(format("/gdc/md/%s/ldm/singleloadinterface/dataset.salesforce", getWorkingProject().getProjectId()));
         HttpResponse getResponse = getRestApiClient().execute(getRequest);
 
         // dataset already exists
@@ -113,9 +161,11 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
     }
 
 
-    private void createDataloadProcessIfDoesntExist() {
+    private void createDataloadProcessIfDoesntExist() throws IOException, JSONException {
         if (createDataloadProcess() == HttpStatus.CONFLICT.value()) {
-            deleteDataloadProcess();
+            String dataloadProcessUri = getDataloadProcessUri();
+            RestUtils.deleteDataloadProcess(getRestApiClient(),
+                    dataloadProcessUri, getWorkingProject().getProjectId());
         }
 
         createDataloadProcess();
@@ -135,63 +185,10 @@ public class DataloadSchedulesTests extends AbstractSchedulesTests {
         return responseStatusCode;
     }
 
-    private String getDataloadProcessUri() {
-        String processesUri = getProcessesUri();
-
-        System.out.println("Getting dataload process for project: " + getWorkingProject().getProjectId());
-
-        HttpRequestBase postRequest = getRestApiClient().newGetMethod(processesUri);
-        HttpResponse postResponse = getRestApiClient().execute(postRequest);
-
-        int responseStatusCode = postResponse.getStatusLine().getStatusCode();
-        System.out.println(" - status: " + responseStatusCode);
-
-        exitOnError(postResponse, responseStatusCode);
-
-        try {
-
-            Processes processes = mapper.readValue(EntityUtils.toString(postResponse.getEntity()), Processes.class);
-            for (Process process : processes.getItems()) {
-                if ("DATALOAD".equals(process.getType())) {
-                    return process.getLinks().getSelf();
-                }
-            }
-
-            return null;
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to parse processes from response.");
-        }
-    }
-
-    private void exitOnError(HttpResponse postResponse, int responseStatusCode) {
-        if (responseStatusCode != HttpStatus.OK.value()) {
-            String error;
-            try {
-                error = EntityUtils.toString(postResponse.getEntity());
-            } catch (IOException e) {
-                error = "unknown error :/";
-            }
-            throw new IllegalStateException(
-                    format("Unknown response from backend when fetching dataload process for project %s (%s)",
-                            getWorkingProject().getProjectId(), error));
-        }
-    }
-
-    private void deleteDataloadProcess() {
-        String dataloadProcessUri = getDataloadProcessUri();
-        if (StringUtils.isEmpty(dataloadProcessUri)) {
-            return;
-        }
-
-        System.out.println("Deleting dataload process for project: " + getWorkingProject().getProjectId());
-
-        HttpRequestBase deleteRequest = getRestApiClient().newDeleteMethod(dataloadProcessUri);
-        HttpResponse deleteResponse = getRestApiClient().execute(deleteRequest);
-
-        int responseStatusCode = deleteResponse.getStatusLine().getStatusCode();
-
-        EntityUtils.consumeQuietly(deleteResponse.getEntity());
-        System.out.println(" - status: " + responseStatusCode);
+    private String getDataloadProcessUri() throws IOException, JSONException {
+        return getProcessesUri() + "/" + 
+                RestUtils.getProcessesList(getRestApiClient(), getWorkingProject().getProjectId())
+                .getDataloadProcess().getProcessId();
     }
 
     private String getProcessesUri() {
