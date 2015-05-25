@@ -30,7 +30,7 @@ public class DashboardFilter extends AbstractFragment {
     private WebElement promptFilter;
 
     private String selectedAttributeLocator =
-            "div.attributes.sliding div.${attributeName}:not(.gdc-hidden):not(.hidden)";
+            "div.attributes.sliding div.${attributeName}.s-enabled:not(.gdc-hidden):not(.hidden)";
 
     private String selectedPromptLocator =
             ".filter_prompts .s-item-${promptName}:not(.gdc-hidden):not(.hidden)";
