@@ -91,9 +91,9 @@ public class ReportPage extends AbstractFragment {
     private String confirmSaveDialogLocator = "//div[contains(@class,'c-dashboardUsageWarningDialog')]";
 
     private static final By visibilityCheckboxLocator = By.id("settings-visibility");
-    
+
     private static final By reportSettingsSaveBtnLocator = By.cssSelector(".s-btn-save:not(.gdc-hidden)");
-    
+
     @FindBy(xpath = "//span[2]/button[3]")
     private WebElement confirmSaveButton;
 
@@ -105,7 +105,7 @@ public class ReportPage extends AbstractFragment {
 
     @FindBy(id = "p-analysisPage")
     private TableReport tableReport;
-    
+
     @FindBy(css = ".s-unlistedIcon")
     private WebElement unlistedIcon;
 

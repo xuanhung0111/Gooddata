@@ -418,13 +418,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         try {
             maql = FileUtils.readFileToString(new File(maqlFile));
             pollingUri =
-                    RestUtils.updateLDM(getRestApiClient(), getWorkingProject().getProjectId(),
+                    RestUtils.executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(),
                             maql);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new IllegalStateException(
                     "There is an exeception during reading file to string!", e);
         }
-
         return pollingUri;
     }
 

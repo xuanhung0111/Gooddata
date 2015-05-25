@@ -41,7 +41,7 @@ public class AttributeDetailPage extends AbstractFragment {
 
     @FindBy(css = "button.pickAttribute")
     private WebElement selectDrillAttributeButton;
-    
+
     @FindBy(css = "#p-objectPage .s-btn-delete")
     private WebElement deleteButton;
 

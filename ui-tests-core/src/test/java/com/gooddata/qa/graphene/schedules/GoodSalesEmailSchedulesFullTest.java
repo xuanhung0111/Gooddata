@@ -7,11 +7,13 @@ import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.mail.Message;
 import javax.mail.Part;
+
 import java.io.File;
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void createDashboardSchedule() {
+    public void createDashboardSchedule() throws InterruptedException {
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), dashboardTitle, "Scheduled email test - dashboard.",
                 "Outlook");
@@ -45,7 +47,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void createReportSchedule() {
+    public void createReportSchedule() throws InterruptedException {
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), reportTitle, "Scheduled email test - report.",
                 "Activities by Type", ExportFormat.ALL);

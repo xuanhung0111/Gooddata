@@ -54,7 +54,7 @@ public class AttributePage extends AbstractFragment {
     public void initAttribute(String attributeName) {
         waitForElementVisible(attributesTable.getRoot());
         waitForDataPageLoaded(browser);
-        attributesTable.selectObject(attributeName);
+        assertTrue(attributesTable.selectObject(attributeName));
         waitForObjectPageLoaded(browser);
         String variableDetailsWindowHandle = browser.getWindowHandle();
         browser.switchTo().window(variableDetailsWindowHandle);
@@ -79,5 +79,9 @@ public class AttributePage extends AbstractFragment {
 
     public List<String> getAllAttributes() {
         return waitForFragmentVisible(attributesTable).getAllItems();
+    }
+
+    public boolean isAttributeVisible(String attribute) {
+        return getAllAttributes().contains(attribute);
     }
 }

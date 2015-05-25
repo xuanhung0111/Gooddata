@@ -38,9 +38,12 @@ public class ObjectsTable extends AbstractTable {
     private WebElement tableHeaderAuthor;
 
     public boolean selectObject(String objectName) {
+        System.out.println(objectName);
+        System.out.println("getNumberOfRows() = " + getNumberOfRows());
         for (int i = 0; i < getNumberOfRows(); i++) {
             WebElement row = waitForElementVisible(rows.get(i));
             WebElement link = row.findElement(BY_OBJECT_LINK);
+            System.out.println(link.getText());
             if (link.getText().equals(objectName)) {
                 link.click();
                 waitForElementVisible(BY_OBJECT_DETAIL_PAGE, browser);
