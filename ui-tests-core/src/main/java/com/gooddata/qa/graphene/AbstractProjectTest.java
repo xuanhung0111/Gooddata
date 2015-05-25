@@ -71,10 +71,6 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
 
         if (addUsersWithOtherRoles) addUsersWithOtherRolesToProject();
-
-        // disable feedback panel in dashboard page
-        RestUtils.setFeatureFlags(getRestApiClient(),
-                FeatureFlagOption.createFeatureClassOption(ProjectFeatureFlags.NPS_STATUS.getFlagName(), false));
     }
 
     @AfterClass()
