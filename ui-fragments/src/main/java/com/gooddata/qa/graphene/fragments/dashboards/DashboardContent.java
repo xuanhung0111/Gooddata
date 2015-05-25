@@ -28,7 +28,7 @@ public class DashboardContent extends AbstractFragment {
     @FindBy(className = "yui3-c-filterdashboardwidget")
     private List<FilterWidget> filters;
 
-    private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle a");
+    private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
 
     public int getNumberOfReports() {
         return reports.size();
@@ -44,7 +44,11 @@ public class DashboardContent extends AbstractFragment {
         return Graphene.createPageFragment(clazz, Iterables.find(reports, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
-                return name.equals(waitForElementVisible(REPORT_TITLE_LOCATOR, input).getAttribute("title"));
+                WebElement title = waitForElementVisible(REPORT_TITLE_LOCATOR, input).findElement(BY_LINK);
+                if ("none".equals(title.getCssValue("display").trim())) {
+                    return false;
+                }
+                return name.equals(title.getAttribute("title"));
             }
         }));
     }
