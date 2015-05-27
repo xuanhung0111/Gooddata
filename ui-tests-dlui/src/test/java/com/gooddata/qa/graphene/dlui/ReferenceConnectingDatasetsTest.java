@@ -40,7 +40,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     @BeforeClass
     public void initProperties() {
         projectTitle = "Reference-Connecting-Dataset-Test";
-        INITIAL_LDM_MAQL_FILE = "create-ldm-references.txt";
+        initialLdmMaqlFile = "create-ldm-references.txt";
         addUsersWithOtherRoles = true;
     }
 
@@ -109,11 +109,11 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
   public void autoCreationMultiConnectingDatasets() 
           throws InterruptedException, ParseException, JSONException, IOException {
       updateModelOfGDProject(maqlFilePath + "dropAllDatasetsOfReference.txt");
-      INITIAL_LDM_MAQL_FILE = "create-ldm-multi-references.txt";
+      initialLdmMaqlFile = "create-ldm-multi-references.txt";
       try {
           dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_MULTI_REFERECES)
                   .updateDatasetStatus(selectedDataset);
-          updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
+          updateModelOfGDProject(maqlFilePath + initialLdmMaqlFile);
           updateFieldToSelected();
           addNewFieldWithAnnieDialog(dataSource);
 

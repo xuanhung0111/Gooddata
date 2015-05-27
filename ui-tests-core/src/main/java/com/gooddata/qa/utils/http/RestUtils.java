@@ -608,8 +608,9 @@ public class RestUtils {
             if (jsonObject.has(ERROR_KEY)) {
                 result.setError(jsonObject.getJSONObject(ERROR_KEY).get("message").toString());
             } else {
-                result.setDetailLink(jsonObject.getJSONObject("executionTask")
-                        .getJSONObject("links").getString("detail"));
+                JSONObject linksObject = jsonObject.getJSONObject("executionTask").getJSONObject("links");
+                result.setDetailLink(linksObject.getString("detail"));
+                result.setPollLink(linksObject.getString("poll"));
             }
             EntityUtils.consumeQuietly(response.getEntity());
             result.setStatusCode(response.getStatusLine().getStatusCode());

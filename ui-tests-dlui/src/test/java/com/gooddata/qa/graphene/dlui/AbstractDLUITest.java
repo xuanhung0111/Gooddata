@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -57,10 +58,10 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String ADS_INSTANCES_URI = "gdc/datawarehouse/instances/";
     private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
             + "%s/schemas/default";
-    private static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
     private static final String OUTPUT_STAGE_METADATA_URI =
             "/gdc/dataload/projects/%s/outputStage/metadata";
-    private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
+    protected static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
+    protected static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
 
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String FROM = "no-reply@gooddata.com";
@@ -76,13 +77,13 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     private ProjectInfo workingProject;
 
-    protected String maqlFilePath;
-    protected String sqlFilePath;
-    protected String zipFilePath;
-    protected String INITIAL_LDM_MAQL_FILE = "create-ldm.txt";
     protected String technicalUser;
     protected String technicalUserPassword;
     protected String technicalUserUri;
+    protected String maqlFilePath;
+    protected String sqlFilePath;
+    protected String zipFilePath;
+    protected String initialLdmMaqlFile = "create-ldm.txt";
 
     protected static final String ADS_URL =
             "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
@@ -95,6 +96,9 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
         sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
         zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
+        technicalUser = testParams.loadProperty("technicalUser");
+        technicalUserPassword = testParams.loadProperty("technicalUserPassword");
+        technicalUserUri = testParams.loadProperty("technicalUserUri");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
@@ -105,7 +109,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
-        updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
+        updateModelOfGDProject(maqlFilePath + initialLdmMaqlFile);
 
         adsInstance =
                 new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
@@ -141,26 +145,33 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected int createDataLoadProcess() {
         String processUri = String.format(DATALOAD_PROCESS_URI, getWorkingProject().getProjectId());
-        LinkedHashMap<String, String> objMap = new LinkedHashMap<String, String>();
+        HttpRequestBase postRequest = getRestApiClient().newPostMethod(processUri, 
+                createJSONObjectForDataloadProcess().toString());
+        HttpResponse postResponse;
+        int responseStatusCode;
+        try {
+            postResponse = getRestApiClient().execute(postRequest);
+            responseStatusCode = postResponse.getStatusLine().getStatusCode();
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+            System.out.println("Response status: " + responseStatusCode);
+        } finally {
+            postRequest.releaseConnection();
+        }
+
+        return responseStatusCode;
+    }
+
+    protected JSONObject createJSONObjectForDataloadProcess() {
+        Map<String, String> objMap = new LinkedHashMap<String, String>();
         objMap.put("type", "DATALOAD");
         objMap.put("name", DEFAULT_DATAlOAD_PROCESS_NAME);
         JSONObject dataloadProcessObj = new JSONObject();
         try {
-            dataloadProcessObj.put("process", objMap);
+            return dataloadProcessObj.put("process", objMap);
         } catch (JSONException e) {
             throw new IllegalStateException(
                     "There is a problem with JSON object when creating dataload process! ", e);
         }
-        HttpRequestBase postRequest =
-                getRestApiClient().newPostMethod(processUri, dataloadProcessObj.toString());
-        HttpResponse postResponse = getRestApiClient().execute(postRequest);
-
-        int responseStatusCode = postResponse.getStatusLine().getStatusCode();
-
-        EntityUtils.consumeQuietly(postResponse.getEntity());
-        System.out.println("Response status: " + responseStatusCode);
-
-        return responseStatusCode;
     }
 
     protected boolean dataloadProcessIsCreated() {
