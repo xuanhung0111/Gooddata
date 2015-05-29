@@ -1,0 +1,114 @@
+Output stage to LDM replication started, user:
+Synchronization mode: all datasets
+=============== Mapping ===============
+
+---- Table opportunity -> Dataset dataset.opportunity ----
+cp__name -> label.opportunity.name
+f__totalprice -> fact.opportunity.totalprice
+f__price -> fact.opportunity.price
+a__title -> label.opportunity.title
+a__title2 -> Title2 [NEW label]
+l__title__label -> Label [NEW label]
+f__totalprice2 -> Totalprice2 [NEW fact]
+
+
+---- Table person -> Dataset dataset.person ----
+l__person__firstname -> label.person.person.firstname
+f__age -> fact.person.age
+a__person -> label.person.person
+l__person__personid -> label.person.person.personid
+l__person__lastname -> label.person.person.lastname
+a__position -> Position [NEW label]
+
+
+=============== End of Mapping ===============
+
+=============== Validation Problems ===============
+=============== End of Validation Problems ===============
+
+Selected datasets: dataset.opportunity,dataset.person
+=============== Effective Mapping ===============
+
+---- Table opportunity -> Dataset dataset.opportunity ----
+cp__name -> label.opportunity.name
+f__totalprice -> fact.opportunity.totalprice
+f__price -> fact.opportunity.price
+a__title -> label.opportunity.title
+a__title2 -> Title2 [NEW label]
+l__title__label -> Label [NEW label]
+f__totalprice2 -> Totalprice2 [NEW fact]
+
+
+---- Table person -> Dataset dataset.person ----
+l__person__firstname -> label.person.person.firstname
+f__age -> fact.person.age
+a__person -> label.person.person
+l__person__personid -> label.person.person.personid
+l__person__lastname -> label.person.person.lastname
+a__position -> Position [NEW label]
+
+=============== End of Effective Mapping ===============
+
+Retrieving data from ADS output stage
+SQL query: SELECT a__title,cp__name,f__price,f__totalprice
+Rows retrieved: 54657
+End of retrieving data from ADS output stage
+Retrieving data from ADS output stage
+SQL query: SELECT a__person,f__age,l__person__firstname,l__person__lastname,l__person__personid FROM
+Rows retrieved: 1440615
+End of retrieving data from ADS output stage
+====================== SLI Manifest ======================
+
+---- Table opportunity -> dataset dataset.opportunity ----
+a__title -> label.opportunity.title
+cp__name -> label.opportunity.name
+f__price -> fact.opportunity.price
+f__totalprice -> fact.opportunity.totalprice
+
+---- Table person -> dataset dataset.person ----
+a__person -> label.person.person
+f__age -> fact.person.age
+l__person__firstname -> label.person.person.firstname
+l__person__lastname -> label.person.person.lastname
+l__person__personid -> label.person.person.personid
+
+====================== End of SLI Manifest ======================
+ETL pull triggered, params:
+======== upload_info.json ========
+{"dataSetSLIManifestList":[{"dataSetSLIManifest":{"parts":[{"columnName":"a__title","mode":"FULL","populates":["label.opportunity.title"],"referenceKey":"1"},{"columnName":"cp__name","mode":"FULL","populates":["label.opportunity.name"],"referenceKey":"1"},{"columnName":"f__price","mode":"FULL","populates":["fact.opportunity.price"]},{"columnName":"f__totalprice","mode":"FULL","populates":["fact.opportunity.totalprice"]}],"dataSet":"dataset.opportunity","file":"dataset.opportunity.csv"}},{"dataSetSLIManifest":{"parts":[{"columnName":"a__person","mode":"FULL","populates":["label.person.person"],"referenceKey":"1"},{"columnName":"f__age","mode":"FULL","populates":["fact.person.age"]},{"columnName":"l__person__firstname","mode":"FULL","populates":["label.person.person.firstname"]},{"columnName":"l__person__lastname","mode":"FULL","populates":["label.person.person.lastname"]},{"columnName":"l__person__personid","mode":"FULL","populates":["label.person.person.personid"]}],"dataSet":"dataset.person","file":"dataset.person.csv"}}]}
+==============================
+
+======== upload_status.json ========
+{
+   "uploads" : [
+      {
+         "date" :
+         "status" : "ERROR",
+         "error" : {
+            "parameters" : [
+            ],
+            "component" : "GDC::SliToDli",
+            "errorClass" : "GDC::Exception::Base",
+            "message" : "Internal error [%s, %s]."
+         }
+      },
+      {
+         "date" :
+         "status" : "ERROR",
+         "error" : {
+            "parameters" : [
+            ],
+            "component" : "GDC::SliToDli",
+            "errorClass" : "GDC::Exception::Base",
+            "message" : "Internal error [%s, %s]."
+         }
+      }
+   ],
+   "messages" : [],
+   "status" : "ERROR",
+   "date" :
+}
+
+==============================
+
+Data loading failed, reason: unknown cause, see execution log
