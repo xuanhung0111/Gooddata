@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
@@ -17,7 +18,6 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
-
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
@@ -31,8 +31,8 @@ import static org.testng.Assert.*;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 
-    protected By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu");
-    protected By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
+    protected static By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu");
+    protected static By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
     protected static final By BY_PANEL_ROOT = By.id("root");
     protected static final By BY_IFRAME = By.tagName("iframe");
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
@@ -43,7 +43,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_LOGIN = "account.html#/login";
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
-
+    protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards";
+    
     /**
      * ----- UI fragmnets -----
      */
@@ -164,6 +165,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = ".ember-application")
     protected UserManagementPage userManagementPage;
+
+    @FindBy(css = "#app-dashboards")
+    protected IndigoDashboardsPage indigoDashboardsPage;
 
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
@@ -299,7 +303,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
         Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
     }
-    
+
     public void addReportToNewDashboard(String reportName, String dashboardName) throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(dashboardName);
@@ -336,7 +340,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         dashboardsPage.publishDashboard(publish);
         waitForElementVisible(dashboardsPage.getRoot());
         if (publish && browser.findElements(okayBtnLocator).size() != 0) {
-            waitForElementVisible(okayBtnLocator,browser).click();
+            waitForElementVisible(okayBtnLocator, browser).click();
         }
     }
 
@@ -389,7 +393,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType,
-            String screenshotName) throws InterruptedException {
+                          String screenshotName) throws InterruptedException {
         initProjectsPage();
         initDashboardsPage();
         initUploadPage();
@@ -456,7 +460,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
         waitForFragmentVisible(analysisPage);
     }
-    
+
 
     public void initVariablePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
@@ -486,6 +490,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initUngroupedUsersPage() {
         openUrl(PAGE_USER_MANAGEMENT + "?groupId=GROUP_UNGROUPED");
         waitForFragmentVisible(userManagementPage);
+    }
+
+    public void initIndigoDashboardsPage() {
+        openUrl(PAGE_INDIGO_DASHBOARDS);
+        waitForFragmentVisible(indigoDashboardsPage);
     }
 
     public void initEmailSchedulesPage() {
