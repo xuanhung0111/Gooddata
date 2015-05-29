@@ -4,7 +4,6 @@ public enum Connectors {
 
     PARDOT_BASE("Pardot-Base", "/projectTemplates/PardotAnalytics/3", "pardot"),
     PARDOT_PREMIUM("Pardot-Premium", "/projectTemplates/PardotAnalytics/6", "pardot"),
-    ZENDESK3("Zendesk3", "/projectTemplates/ZendeskAnalytics/9", "zendesk3"),
     COUPA("Coupa", "/projectTemplates/CoupaAnalytics/8", "coupa"),
     ZENDESK4("Zendesk4", "/projectTemplates/ZendeskAnalytics/11", "zendesk4");
 

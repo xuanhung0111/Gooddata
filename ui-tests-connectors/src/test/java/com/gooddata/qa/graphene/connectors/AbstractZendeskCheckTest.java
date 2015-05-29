@@ -25,7 +25,6 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
             dependsOnMethods = {"testConnectorIntegrationResource"})
     public void testZendeskIntegrationConfiguration() throws InterruptedException, JSONException {
         openUrl(getIntegrationUri());
-        // go to page with integration settings (differs for Zendesk3/4)
         String settingsUrl = openZendeskSettingsUrl();
         JSONObject json = loadJSON();
         if (!testParams.isReuseProject()) {
