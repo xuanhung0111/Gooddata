@@ -1,14 +1,13 @@
 package com.gooddata.qa.graphene.disc;
 
+import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.AfterClass;
@@ -26,9 +25,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     private static final String PROCESS_NAME = "Dataload process";
     private static final int STATUS_POLLING_CHECK_ITERATIONS = 60;
-    private static final String CONCURRENT_DATA_LOAD_MESSAGE = "The schedule did not run" 
-            +" because one or more of the datasets in this schedule is already synchronizing.";
-    private static final String NO_LOG_AVAILABLE_TITLE = 
+    private static final String CONCURRENT_DATA_LOAD_MESSAGE = "The schedule did not run"
+            + " because one or more of the datasets in this schedule is already synchronizing.";
+    private static final String NO_LOG_AVAILABLE_TITLE =
             "No log available. There was an error while executing the schedule.";
 
     @BeforeClass
@@ -38,9 +37,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     @AfterClass
     public void tearDown() throws IOException, JSONException {
-        RestUtils.deleteDataloadProcess(getRestApiClient() ,getDataloadProcessUri(), getWorkingProject().getProjectId());
+        ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
+                getWorkingProject().getProjectId());
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void setUp() throws IOException, JSONException {
         createDataloadProcessIfDoesntExist();
@@ -51,43 +51,43 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     public void createDataloadScheduleWithAllDatasets() throws JSONException, InterruptedException {
         openProjectDetailPage(getWorkingProject());
 
-        ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(PROCESS_NAME)
-                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                .setConfirmed(true)
-                .setHasDataloadProcess(true)
-                .setSynchronizeAllDatasets(true)
-                .setScheduleName("All datasets");
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true)
+                        .setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
+                        .setScheduleName("All datasets");
         createAndAssertSchedule(scheduleBuilder);
     }
 
-    @Test(dependsOnMethods = {"setUp", "createDataloadScheduleWithAllDatasets"}, groups = {"schedule", "tests"})
-    public void createDataloadScheduleWithCustomDatasets() throws JSONException, InterruptedException {
+    @Test(dependsOnMethods = {"setUp", "createDataloadScheduleWithAllDatasets"}, groups = {
+        "schedule", "tests"})
+    public void createDataloadScheduleWithCustomDatasets() throws JSONException,
+            InterruptedException {
         openProjectDetailPage(getWorkingProject());
 
-        ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(PROCESS_NAME)
-                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                .setConfirmed(true)
-                .setHasDataloadProcess(true)
-                .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
-                .setAllDatasets(Arrays.asList("Salesforce", "test"))
-                .setScheduleName("1 dataset")
-                .setDataloadDatasetsOverlap(true);
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true)
+                        .setHasDataloadProcess(true)
+                        .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
+                        .setAllDatasets(Arrays.asList("Salesforce", "test"))
+                        .setScheduleName("1 dataset").setDataloadDatasetsOverlap(true);
         createAndAssertSchedule(scheduleBuilder);
     }
 
-    @Test(dependsOnMethods = {"createDataloadScheduleWithCustomDatasets"}, groups = {"schedule", "tests"})
+    @Test(dependsOnMethods = {"createDataloadScheduleWithCustomDatasets"}, groups = {"schedule",
+        "tests"})
     public void editDataloadScheduleWithCustomDatasets() throws JSONException, InterruptedException {
 
         openProjectDetailPage(getWorkingProject());
 
-        ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(PROCESS_NAME)
-                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                .setConfirmed(true)
-                .setHasDataloadProcess(true)
-                .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
-                .setAllDatasets(Arrays.asList("Salesforce", "test"))
-                .setScheduleName("1 dataset (1)")
-                .setDataloadDatasetsOverlap(true);
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true)
+                        .setHasDataloadProcess(true)
+                        .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
+                        .setAllDatasets(Arrays.asList("Salesforce", "test"))
+                        .setScheduleName("1 dataset (1)").setDataloadDatasetsOverlap(true);
         createAndAssertSchedule(scheduleBuilder);
 
         scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
@@ -99,21 +99,21 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     public void checkConcurrentDataLoadSchedule() {
         openProjectDetailPage(getWorkingProject());
 
-        ScheduleBuilder schedule1 = new ScheduleBuilder().setProcessName(PROCESS_NAME)
-                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                .setHasDataloadProcess(true)
-                .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
-                .setAllDatasets(Arrays.asList("Salesforce", "test"))
-                .setScheduleName("Salesforce data load 1");
+        ScheduleBuilder schedule1 =
+                new ScheduleBuilder().setProcessName(PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
+                        .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
+                        .setAllDatasets(Arrays.asList("Salesforce", "test"))
+                        .setScheduleName("Salesforce data load 1");
         createSchedule(schedule1);
         schedule1.setScheduleUrl(browser.getCurrentUrl());
 
-        ScheduleBuilder schedule2 = new ScheduleBuilder().setProcessName(PROCESS_NAME)
-                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
-                .setHasDataloadProcess(true)
-                .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
-                .setAllDatasets(Arrays.asList("Salesforce", "test"))
-                .setScheduleName("Salesforce data load 2");
+        ScheduleBuilder schedule2 =
+                new ScheduleBuilder().setProcessName(PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
+                        .setDatasetsToSynchronize(Arrays.asList("Salesforce"))
+                        .setAllDatasets(Arrays.asList("Salesforce", "test"))
+                        .setScheduleName("Salesforce data load 2");
         openProjectDetailByUrl(testParams.getProjectId());
         createSchedule(schedule2);
         browser.navigate().refresh();
@@ -135,7 +135,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         scheduleDetail.waitForExecutionFinish();
         assertTrue(scheduleDetail.isLastSchedulerErrorIconVisible());
         assertEquals(scheduleDetail.getExecutionErrorDescription(), CONCURRENT_DATA_LOAD_MESSAGE);
-        assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE); 
+        assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE);
         assertTrue(scheduleDetail.getExecutionRuntime().isEmpty());
         assertFalse(scheduleDetail.getLastExecutionTime().isEmpty());
         assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE);
@@ -143,12 +143,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     private void createDatasets() {
-        HttpRequestBase getRequest = getRestApiClient().newGetMethod(format("/gdc/md/%s/ldm/singleloadinterface/dataset.salesforce", getWorkingProject().getProjectId()));
-        HttpResponse getResponse = getRestApiClient().execute(getRequest);
-
-        // dataset already exists
-        if (getResponse.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-            EntityUtils.consumeQuietly(getResponse.getEntity());
+        if (testParams.isReuseProject()) {
+            RestUtils.getResource(getRestApiClient(), format("/gdc/md/%s/ldm/singleloadinterface/dataset.salesforce",
+                                    getWorkingProject().getProjectId()), HttpStatus.OK);
             return;
         }
 
@@ -160,35 +157,33 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-
+    /*
+     * New project is created in the most of tests, dataload process should be created. In case
+     * reusing project, the existing dataload process will be deleted and the new one will be
+     * created.
+     */
     private void createDataloadProcessIfDoesntExist() throws IOException, JSONException {
-        if (createDataloadProcess() == HttpStatus.CONFLICT.value()) {
+        ProcessInfo dataloadProcess =
+                new ProcessInfo().withProcessName(PROCESS_NAME).withProjectId(
+                        getWorkingProject().getProjectId());
+        int statusCode = ProcessUtils.createDataloadProcess(getRestApiClient(), dataloadProcess);
+        if (statusCode == HttpStatus.CONFLICT.value()) {
             String dataloadProcessUri = getDataloadProcessUri();
-            RestUtils.deleteDataloadProcess(getRestApiClient(),
-                    dataloadProcessUri, getWorkingProject().getProjectId());
+            ProcessUtils.deleteDataloadProcess(getRestApiClient(), dataloadProcessUri,
+                    getWorkingProject().getProjectId());
+            assertEquals(ProcessUtils.createDataloadProcess(getRestApiClient(), dataloadProcess),
+                    HttpStatus.CREATED.value());
+        } else {
+            assertEquals(statusCode, HttpStatus.CREATED.value());
         }
-
-        createDataloadProcess();
-    }
-
-    private int createDataloadProcess() {
-        System.out.println("Creating dataload process for project: " + getWorkingProject().getProjectId());
-
-        HttpRequestBase postRequest = getRestApiClient().newPostMethod(getProcessesUri(), "{\"process\": {\"type\":\"DATALOAD\",\"name\":\"" + PROCESS_NAME + "\"}}");
-        HttpResponse postResponse = getRestApiClient().execute(postRequest);
-
-        int responseStatusCode = postResponse.getStatusLine().getStatusCode();
-
-        EntityUtils.consumeQuietly(postResponse.getEntity());
-        System.out.println(" - status: " + responseStatusCode);
-
-        return responseStatusCode;
     }
 
     private String getDataloadProcessUri() throws IOException, JSONException {
-        return getProcessesUri() + "/" + 
-                RestUtils.getProcessesList(getRestApiClient(), getWorkingProject().getProjectId())
-                .getDataloadProcess().getProcessId();
+        return getProcessesUri()
+                + "/"
+                + ProcessUtils
+                        .getProcessesList(getRestApiClient(), getWorkingProject().getProjectId())
+                        .getDataloadProcess().getProcessId();
     }
 
     private String getProcessesUri() {

@@ -2,11 +2,11 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.*;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -261,7 +261,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                 new Dataset().withName("person").withFields(
                         new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
         DataSource dataSource =
-                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA).updateDatasetStatus(dataset);
+                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA).updateDatasetStatus(
+                        dataset);
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
@@ -508,9 +509,9 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     private void waitForAddingDataTask() throws InterruptedException {
-        while(true) {
+        while (true) {
             openAnnieDialog();
-            if(!DATA_CAN_NOT_ADD_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline())
+            if (!DATA_CAN_NOT_ADD_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline())
                     && isDatasourceVisible()) {
                 annieUIDialog.clickOnDismissButton();
                 break;
@@ -520,13 +521,12 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         }
     }
 
-    private boolean isDatasourceVisible() {
+    private boolean isDatasourceVisible() throws InterruptedException {
         try {
             Thread.sleep(1000);
             waitForElementVisible(AnnieUIDialogFragment.BY_DATASOURCES, browser);
             return true;
-        } catch(Exception e) {
-            e.printStackTrace();
+        } catch (TimeoutException e) {
             return false;
         }
     }
