@@ -188,11 +188,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
         projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
                 ScheduleStatus.UNSCHEDULED);
-
         scheduleDetail.manualRun();
-        scheduleDetail.isInScheduledState();
-        projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
-                ScheduleStatus.SCHEDULED);
 
         scheduleDetail.isInRunningState();
         projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),

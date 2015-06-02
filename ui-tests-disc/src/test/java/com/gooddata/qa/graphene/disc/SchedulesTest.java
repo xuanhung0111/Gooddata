@@ -656,7 +656,6 @@ public class SchedulesTest extends AbstractSchedulesTest {
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.manualRun();
-            assertTrue(scheduleDetail.isInScheduledState());
             assertTrue(scheduleDetail.isInRunningState());
             scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
 
