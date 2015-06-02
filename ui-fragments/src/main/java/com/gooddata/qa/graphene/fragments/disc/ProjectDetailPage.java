@@ -247,12 +247,11 @@ public class ProjectDetailPage extends AbstractFragment {
                 activeProcess.findElement(BY_BROKEN_SCHEDULE_MESSAGE).getText());
     }
 
-    public void checkDownloadProcess(String processName, String downloadFolder, String projectID,
-            final long minimumDownloadedFileSize) {
+    public void checkDownloadProcess(String processName, String downloadFolder, final long minimumDownloadedFileSize) {
         String processID = getProcessID(processName);
         clickOnDownloadProcessButton(processName);
         final File zipDownload =
-                new File(downloadFolder + projectID + "_" + processID + "-decrypted.zip");
+                new File(downloadFolder + processID + "-decrypted.zip");
         Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
                 .until(new Predicate<WebDriver>() {
 
