@@ -96,7 +96,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
         System.out.println("Download folder: " + downloadFolder);
         projectDetailPage.checkDownloadProcess(processName, downloadFolder,
-                testParams.getProjectId(), expectedDownloadedProcessSize);
+                expectedDownloadedProcessSize);
     }
 
     @Test(dependsOnMethods = {"createProject"})
