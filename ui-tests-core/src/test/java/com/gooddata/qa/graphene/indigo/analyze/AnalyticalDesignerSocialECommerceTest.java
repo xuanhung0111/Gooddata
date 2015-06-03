@@ -65,11 +65,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
         filterOnAttribute(DEVICE + ": Mobile, Tablet", "Mobile", "Tablet");
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
-    public void attributeFilterIsRemovedWhenRemoveAttributeInCatalogue() {
-        attributeFilterIsRemovedWhenRemoveAttributeInCatalogue(DEVICE + ": Mobile, Tablet", "Mobile", "Tablet");
-    }
-
     @SuppressWarnings("unchecked")
     @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP}, enabled = false)
     public void verifyChartReport() {

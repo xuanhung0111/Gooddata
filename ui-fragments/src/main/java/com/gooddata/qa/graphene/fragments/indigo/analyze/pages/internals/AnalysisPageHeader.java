@@ -12,7 +12,7 @@ public class AnalysisPageHeader extends AbstractFragment {
     @FindBy(css = ".s-btn-reset")
     private WebElement resetButton;
 
-    @FindBy(css = ".s-btn-open_as_report")
+    @FindBy(css = ".s-export-to-report")
     private WebElement exportToReportButton;
 
     @FindBy(css = ".s-undo")
