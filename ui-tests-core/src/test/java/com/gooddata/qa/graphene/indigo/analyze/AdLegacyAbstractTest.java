@@ -968,26 +968,6 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(analysisPage.getFilterText(attribute1), filterText);
     }
 
-    protected void attributeFilterIsRemovedWhenRemoveAttributeInCatalogue(String filterText, String... filterValues) {
-        initAnalysePage();
-
-        analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(attribute1));
-        ChartReport report = analysisPage.getChartReport();
-        assertEquals(report.getTrackersCount(), 3);
-        assertEquals(analysisPage.getFilterText(attribute1), attribute1 + ": All");
-
-        analysisPage.configAttributeFilter(attribute1, filterValues);
-        assertEquals(report.getTrackersCount(), 2);
-        assertEquals(analysisPage.getFilterText(attribute1), filterText);
-
-        analysisPage.configAttributeFilter(attribute1, "All");
-        assertEquals(report.getTrackersCount(), 3);
-        assertEquals(analysisPage.getFilterText(attribute1), attribute1 + ": All");
-
-        analysisPage.addCategory(attribute2);
-        assertFalse(analysisPage.isFilterVisible(attribute1));
-    }
-
     protected void verifyChartReport(ReportDefinition reportDefinition, List<List<String>> tooltip) {
         initAnalysePage();
 

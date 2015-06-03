@@ -66,12 +66,6 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
                 "Email Promotions", "Top Sellers Blog Series");
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
-    public void attributeFilterIsRemovedWhenRemoveAttributeInCatalogue() {
-        attributeFilterIsRemovedWhenRemoveAttributeInCatalogue(CAMPAIGNS + ": Email Promot..., Top Sellers ...",
-                "Email Promotions", "Top Sellers Blog Series");
-    }
-
     @SuppressWarnings("unchecked")
     @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP}, enabled = false)
     public void verifyChartReport() {
