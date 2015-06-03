@@ -21,7 +21,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         projectCreateCheckIterations = 60; // 5 minutes
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"init"}, priority = 1)
+    @Test(dependsOnMethods = {"createProject"}, groups = {"turnOfWalkme"}, priority = 1)
     public void turnOffWalkme() {
         if (isWalkmeTurnOff) {
             return;
@@ -36,5 +36,9 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         } catch (TimeoutException e) {
             System.out.println("Walkme dialog is not appeared!");
         }
+    }
+
+    @Test(dependsOnGroups = {"turnOfWalkme"}, alwaysRun = true, groups = {"init"})
+    public void prepareToTestAdAfterTurnOffWalkme() {
     }
 }
