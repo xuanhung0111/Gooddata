@@ -363,4 +363,8 @@ public class AnalysisPage extends AbstractFragment {
     public boolean isStackByBucketEmpty() {
         return waitForFragmentVisible(bucketsPanel).isStackByBucketEmpty();
     }
+
+    public String getExportToReportButtonTooltipText() {
+        return waitForFragmentVisible(pageHeader).getExportToReportButtonTooltipText();
+    }
 }
