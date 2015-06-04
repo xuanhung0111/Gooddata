@@ -150,27 +150,17 @@ public class ChartReport extends AbstractFragment {
 
     public List<String> getLegends() {
         waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(FluentIterable.from(legends).filter(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return "div".equals(input.getTagName());
-            }
-        }).transform(new Function<WebElement, String>() {
+        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
-                return input.findElement(By.cssSelector("span")).getText();
+                return input.findElement(By.cssSelector("tspan")).getText();
             }
         }));
     }
 
     public List<String> getLegendColors() {
         waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(FluentIterable.from(legends).filter(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return "g".equals(input.getTagName());
-            }
-        }).transform(new Function<WebElement, String>() {
+        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
                 return input.findElement(By.cssSelector("path")).getCssValue("fill");
