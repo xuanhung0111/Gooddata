@@ -91,7 +91,7 @@ public class AbstractGreyPageTest extends AbstractTest {
     @FindBy(tagName = "pre")
     protected ObjectFragment objectFragment;
 
-    @FindBy(tagName = "form")
+    @FindBy(tagName = "pre")
     protected ObjectElementsFragment objectElementsFragment;
 
     @FindBy(tagName = "form")
