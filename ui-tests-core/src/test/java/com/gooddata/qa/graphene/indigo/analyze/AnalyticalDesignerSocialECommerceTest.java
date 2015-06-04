@@ -33,6 +33,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
         attribute3 = DEVICE;
 
         notAvailableAttribute = "Company";
+        relatedDate = DATE;
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
@@ -66,7 +67,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(ORDERS)
@@ -79,7 +80,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics("Engagement")

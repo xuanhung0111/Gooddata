@@ -98,8 +98,8 @@ public class MainEditor extends AbstractFragment {
         return browser.findElements(By.cssSelector(CSS_EXPLORER_MESSAGE)).size() > 0;
     }
 
-    public List<String> getAllTimeFilterOptions() {
-        return waitForFragmentVisible(bucketsFilter).getAllTimeFilterOptions();
+    public List<String> getAllTimeFilterOptions(String dateFilter) {
+        return waitForFragmentVisible(bucketsFilter).getAllTimeFilterOptions(dateFilter);
     }
 
     public void waitForReportComputing() {
@@ -120,8 +120,8 @@ public class MainEditor extends AbstractFragment {
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
      */
-    public void configTimeFilterByRangeButNotApply(String from, String to) {
-        waitForFragmentVisible(bucketsFilter).configTimeFilterByRangeButNotApply(from, to);
+    public void configTimeFilterByRangeButNotApply(String dateFilter, String from, String to) {
+        waitForFragmentVisible(bucketsFilter).configTimeFilterByRangeButNotApply(dateFilter, from, to);
     }
 
     /**
@@ -129,8 +129,8 @@ public class MainEditor extends AbstractFragment {
      * @param to   format MM/DD/YYYY
      * @throws ParseException 
      */
-    public void configTimeFilterByRange(String from, String to) throws ParseException {
-        waitForFragmentVisible(bucketsFilter).configTimeFilterByRange(from, to);
+    public void configTimeFilterByRange(String dateFilter, String from, String to) throws ParseException {
+        waitForFragmentVisible(bucketsFilter).configTimeFilterByRange(dateFilter, from, to);
     }
 
     public void changeDimensionSwitchInFilter(String currentRelatedDate, String dimensionSwitch) {

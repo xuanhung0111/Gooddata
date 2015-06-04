@@ -34,6 +34,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
         attribute3 = CLICKTHROUGHS_ID;
 
         notAvailableAttribute = "OpportunityID";
+        relatedDate = "Closed Date";
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
@@ -67,7 +68,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)
@@ -80,7 +81,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)

@@ -160,8 +160,8 @@ public class AnalysisPage extends AbstractFragment {
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
      */
-    public AnalysisPage configTimeFilterByRangeButNotApply(String from, String to) {
-        waitForFragmentVisible(mainEditor).configTimeFilterByRangeButNotApply(from, to);
+    public AnalysisPage configTimeFilterByRangeButNotApply(String dateFilter, String from, String to) {
+        waitForFragmentVisible(mainEditor).configTimeFilterByRangeButNotApply(dateFilter, from, to);
         return this;
     }
 
@@ -170,8 +170,8 @@ public class AnalysisPage extends AbstractFragment {
      * @param to   format MM/DD/YYYY
      * @throws ParseException 
      */
-    public AnalysisPage configTimeFilterByRange(String from, String to) throws ParseException {
-        waitForFragmentVisible(mainEditor).configTimeFilterByRange(from, to);
+    public AnalysisPage configTimeFilterByRange(String dateFilter, String from, String to) throws ParseException {
+        waitForFragmentVisible(mainEditor).configTimeFilterByRange(dateFilter, from, to);
         return this;
     }
 
@@ -262,8 +262,8 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(mainEditor).isExplorerMessageVisible();
     }
 
-    public List<String> getAllTimeFilterOptions() {
-        return waitForFragmentVisible(mainEditor).getAllTimeFilterOptions();
+    public List<String> getAllTimeFilterOptions(String dateFilter) {
+        return waitForFragmentVisible(mainEditor).getAllTimeFilterOptions(dateFilter);
     }
 
     public AnalysisPage waitForReportComputing() {

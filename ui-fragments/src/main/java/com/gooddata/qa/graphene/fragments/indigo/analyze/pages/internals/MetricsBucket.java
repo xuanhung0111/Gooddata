@@ -8,6 +8,8 @@ import static org.testng.Assert.assertEquals;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -20,9 +22,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class MetricsBucket extends AbstractFragment {
-
-//    @FindBy(css = ".adi-bucket-invitation")
-//    private WebElement addMetricBucket;
 
     @FindBy(css = ".s-show-in-percent")
     private WebElement showInPercents;
@@ -68,9 +67,11 @@ public class MetricsBucket extends AbstractFragment {
         });
     
         Actions action = new Actions(browser);
-        action.clickAndHold(element)
-              .moveToElement(waitForElementVisible(BY_BUCKET_INVITATION, browser))
-              .perform();
+        WebElement catalogue = browser.findElement(By.className("s-catalogue"));
+        Point location = catalogue.getLocation();
+        Dimension dimension = catalogue.getSize();
+        action.clickAndHold(element).moveByOffset(location.x + dimension.width/2, location.y + dimension.height/2)
+            .perform();
         action.moveToElement(waitForElementPresent(BY_TRASH_PANEL, browser)).perform();
         action.release().perform();
     

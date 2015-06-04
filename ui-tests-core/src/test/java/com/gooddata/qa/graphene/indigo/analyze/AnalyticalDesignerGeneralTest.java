@@ -578,7 +578,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: All time");
 
         ChartReport report = null;
-        for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions(DATE))) {
             if ("All time".equals(period)) continue;
             System.out.println(String.format("Try with time period [%s]", period));
             analysisPage.configTimeFilter(DATE, period);
@@ -755,7 +755,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         }, "compararisonRecommendationOverrideDateFilter");
 
         ChartReport report = null;
-        for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions(DATE))) {
             if ("All time".equals(period)) continue;
             System.out.println(String.format("Try with time period [%s]", period));
             analysisPage.configTimeFilter("Closed Date", period);

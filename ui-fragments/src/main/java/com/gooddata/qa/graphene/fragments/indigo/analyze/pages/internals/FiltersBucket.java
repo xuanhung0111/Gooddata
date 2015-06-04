@@ -137,8 +137,8 @@ public class FiltersBucket extends AbstractFragment {
         return filter;
     }
 
-    public List<String> getAllTimeFilterOptions() {
-        WebElement filter = getFilter("Date");
+    public List<String> getAllTimeFilterOptions(String dateFilter) {
+        WebElement filter = getFilter(dateFilter);
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
@@ -152,8 +152,8 @@ public class FiltersBucket extends AbstractFragment {
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
      */
-    public void configTimeFilterByRangeButNotApply(String from, String to) {
-        WebElement filter = getFilter("Date");
+    public void configTimeFilterByRangeButNotApply(String dateFilter, String from, String to) {
+        WebElement filter = getFilter(dateFilter);
         String oldFilterText = getFilterTextHelper(filter);
         openDatePanelOfFilter(filter).configTimeFilterByRangeButNotApply(from, to);
         assertEquals(getFilterTextHelper(filter), oldFilterText);
@@ -164,8 +164,8 @@ public class FiltersBucket extends AbstractFragment {
      * @param to   format MM/DD/YYYY
      * @throws ParseException 
      */
-    public void configTimeFilterByRange(String from, String to) throws ParseException {
-        WebElement filter = getFilter("Date");
+    public void configTimeFilterByRange(String dateFilter, String from, String to) throws ParseException {
+        WebElement filter = getFilter(dateFilter);
         openDatePanelOfFilter(filter).configTimeFilterByRange(from, to);
         assertEquals(getFilterTextHelper(filter),
                 "Date: " + getAnotherTimeFormat(from) + " – " + getAnotherTimeFormat(to));
