@@ -1,6 +1,8 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.qa.graphene.dto.Processes;
+import com.gooddata.qa.graphene.entity.disc.ExecutionTask;
+import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.google.common.base.Function;
@@ -9,7 +11,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
@@ -25,9 +27,11 @@ import org.springframework.web.util.UriTemplate;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -36,6 +40,7 @@ import static org.testng.Assert.*;
 
 public class RestUtils {
 
+    private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
     private static final String USERS_LINK = "/gdc/projects/%s/users";
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
     private static final String LDM_LINK = "/gdc/projects/%s/ldm";
@@ -54,12 +59,14 @@ public class RestUtils {
     private static final String PROJECT_FEATURE_FLAG_CONTAINER_IDENTIFIER = "featureFlag";
     private static final String GROUPS_URI = "/gdc/internal/usergroups";
     private static final String CREATE_USER_CONTENT_BODY;
-    private static final String UPDATE_LDM_BODY;
+    private static final String MAQL_EXECUTION_BODY;
     private static final String MUF_OBJ;
     private static final String USER_FILTER;
     private static final String EXECUTION_DATALOAD_PROCESS_BODY;
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     private static final String ERROR_KEY = "error";
+    private static final String PROJECT_MODEL_VIEW_LINK = "/gdc/projects/%s/model/view";
+    private static final String CREATE_COMMENT_CONTENT_BODY;
 
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
@@ -78,8 +85,25 @@ public class RestUtils {
                 }});
             }}.toString();
         } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is an exception during json object initialization! ", e);
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    }
+
+    static {
+        try {
+            CREATE_COMMENT_CONTENT_BODY = new JSONObject() {{
+                put("comment", new JSONObject() {{
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                    }});
+                    put("content", new JSONObject() {{
+                        put("related", "#{related}");
+                        put("content", "${title}");
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
     }
 
@@ -103,7 +127,7 @@ public class RestUtils {
 
     static {
         try {
-            UPDATE_LDM_BODY = new JSONObject() {{
+            MAQL_EXECUTION_BODY = new JSONObject() {{
                 put("manage", new JSONObject() {{
                     put("maql", "${maql}");
                 }});
@@ -307,8 +331,13 @@ public class RestUtils {
         return response.getStatusLine().getStatusCode() == 200;
     }
 
-    private static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri)
+    public static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri)
             throws IOException, JSONException {
+        return getJSONObjectFrom(restApiClient, uri, 200);
+    }
+
+    public static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri,
+            int expectedStatusCode) throws IOException, JSONException {
         HttpRequestBase getRequest = restApiClient.newGetMethod(uri);
         HttpResponse getResponse = restApiClient.execute(getRequest, HttpStatus.OK, "Invalid status code");
         String result = EntityUtils.toString(getResponse.getEntity());
@@ -355,7 +384,7 @@ public class RestUtils {
     }
 
     public static String createMUFObj(final RestApiClient restApiClient, String projectID, String mufTitle, 
-            Map<String, List<String>> conditions) throws IOException, JSONException {
+            Map<String, Collection<String>> conditions) throws IOException, JSONException {
         String mdObjURI = format(OBJ_LINK, projectID);
         String MUFExpressions = buildFilterExpression(projectID, conditions);
         System.out.println(MUFExpressions);
@@ -367,7 +396,8 @@ public class RestUtils {
         return json.getString("uri");
     }
 
-    private static String buildFilterExpression(final String projectID, Map<String, List<String>> conditions) {
+    private static String buildFilterExpression(final String projectID, Map<String,
+            Collection<String>> conditions) {
       //syntax: "([<Attribute_URI_1>] IN ([<element_URI_1>], [element_URI_2], [...] )) AND 
       //([<Attribute_URI_2>] IN ([<element_URI_1>], [element_URI_2], [...]))";
         List<String> expressions = Lists.newArrayList();
@@ -441,48 +471,43 @@ public class RestUtils {
         }
     }
 
-    public static String updateLDM(RestApiClient restApiClient, String projectId, String maql) {
-        String contentBody = UPDATE_LDM_BODY.replace("${maql}", maql);
+    public static String executeMAQL(RestApiClient restApiClient, String projectId, String maql)
+            throws ParseException, JSONException, IOException {
+        String contentBody = MAQL_EXECUTION_BODY.replace("${maql}", maql);
         HttpRequestBase postRequest =
                 restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody);
         HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK,
                 "LDM is not updated successful!");
 
-        String pollingUri = "";
         try {
-            JSONObject responseBody =
-                    new JSONObject(EntityUtils.toString(postResponse.getEntity()));
-            pollingUri =
-                    responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an excetion when getting polling uri of LDM update!", e);
+            JSONObject responseBody = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+            String pollingUri = responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
+
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+
+            return pollingUri;
+        } finally {
+            postRequest.releaseConnection();
         }
-
-        EntityUtils.consumeQuietly(postResponse.getEntity());
-
-        return pollingUri;
     }
 
-    public static String getPollingState(RestApiClient restApiClient, String pollingUri) {
-        HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
-        HttpResponse getResponse;
+    public static String getCurrentExecutionPollingState(RestApiClient restApiClient, String uri) {
+        return getCurrentPollingState(restApiClient, uri, "executionDetail");
+    }
+
+    public static String getLastTaskPollingState(RestApiClient restApiClient, String uri) {
         String state = "";
-        try {
-            do {
-                getResponse = restApiClient.execute(getRequest);
-                state =
-                        new JSONObject(EntityUtils.toString(getResponse.getEntity()))
-                                .getJSONObject("wTaskStatus").get("status").toString();
-                System.out.println("Current polling state is: " + state);
-                Thread.sleep(2000);
-            } while ("RUNNING".equals(state));
-        } catch (Exception e) {
-            throw new IllegalStateException("There is an exeption when polling state!", e);
-        }
+        do {
+            state = getCurrentPollingState(restApiClient, uri, "wTaskStatus");
+        } while ("RUNNING".equals(state) || "QUEUED".equals(state));
+        return state;
+    }
 
-        EntityUtils.consumeQuietly(getResponse.getEntity());
-
+    public static String getLastExecutionPollingState(RestApiClient restApiClient, String uri) {
+        String state = "";
+        do {
+            state = getCurrentPollingState(restApiClient, uri, "executionDetail");
+        } while ("RUNNING".equals(state) || "QUEUED".equals(state));
         return state;
     }
 
@@ -490,6 +515,42 @@ public class RestUtils {
             ProjectFeatureFlags featureFlag) throws JSONException {
         setFeatureFlagsToProject(restApiClient, projectId,
                 new FeatureFlagOption(featureFlag.getFlagName(), true));
+    }
+    
+    public static void verifyValidLink(RestApiClient restApiClient, String link) {
+        HttpRequestBase getRequest = restApiClient.newGetMethod(link);
+        try {
+            HttpResponse getResponse = restApiClient.execute(getRequest);
+            assertEquals(getResponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
+                    "Invalid link!");
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
+        } finally {
+            getRequest.releaseConnection();
+        }
+    }
+
+    public static String addComment(RestApiClient restApiClient, String projectId, String comment,
+            String objectId) throws ParseException, JSONException, IOException {
+        String objectUri = format(OBJ_LINK, projectId) + objectId;
+
+        System.out.println("Verify object id: " + objectUri);
+        getJSONObjectFrom(restApiClient, objectUri);
+
+        String content = CREATE_COMMENT_CONTENT_BODY.replace("${title}", comment).replace("#{related}", objectUri);
+        HttpRequestBase postRequest = restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId),
+                content);
+
+        try {
+            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
+            HttpEntity entity = postResponse.getEntity();
+            String uri =  new JSONObject(EntityUtils.toString(entity)).getJSONObject("comment")
+                    .getJSONObject("meta").getString("uri");
+            EntityUtils.consumeQuietly(entity);
+            return uri;
+        } finally {
+            postRequest.releaseConnection();
+        }
     }
 
     /**
@@ -535,28 +596,28 @@ public class RestUtils {
         }
     }
 
-    public static Pair<Integer, String> executeDataloadProcess(RestApiClient restApiClient,
-            String dataloadProcessUri) throws JSONException, ParseException, IOException {
-        System.out.println("Execute dataload process with GDC_DE_SYNCHRONIZE_ALL");
-
-        String errorMessage = "";
-        int responseStatusCode ;
+    public static ExecutionTask createDataloadProcessExecution(RestApiClient restApiClient,
+            String dataloadProcessUri) throws ParseException, JSONException, IOException {
+        ExecutionTask result = new ExecutionTask();
+        System.out.println(format("Execute dataload process %s ...", dataloadProcessUri));
         HttpRequestBase postRequest =
                 restApiClient.newPostMethod(dataloadProcessUri + "/executions/", EXECUTION_DATALOAD_PROCESS_BODY);
         try {
             HttpResponse response = restApiClient.execute(postRequest);
             JSONObject jsonObject = new JSONObject(EntityUtils.toString(response.getEntity()));
             if (jsonObject.has(ERROR_KEY)) {
-                errorMessage = new JSONObject(jsonObject.get(ERROR_KEY).toString()).get("message").toString();
+                result.setError(jsonObject.getJSONObject(ERROR_KEY).get("message").toString());
+            } else {
+                result.setDetailLink(jsonObject.getJSONObject("executionTask")
+                        .getJSONObject("links").getString("detail"));
             }
             EntityUtils.consumeQuietly(response.getEntity());
-            responseStatusCode = response.getStatusLine().getStatusCode();
-            System.out.println(" - status: " + responseStatusCode);
+            result.setStatusCode(response.getStatusLine().getStatusCode());
         } finally {
             postRequest.releaseConnection();
         }
 
-        return  Pair.of(responseStatusCode, errorMessage);
+        return result;
     }
 
     public static Processes getProcessesList(RestApiClient restApiClient, String projectId)
@@ -570,5 +631,100 @@ public class RestUtils {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to parse processes from response.");
         }
+    }
+
+    public static JSONObject getProjectModelView(RestApiClient restApiClient, String projectId) 
+            throws ParseException, JSONException, IOException {
+        JSONObject modelViewObject = null;
+        String pollingUri =
+                getPollingUriFrom(restApiClient, projectId, format(PROJECT_MODEL_VIEW_LINK, projectId));
+        HttpRequestBase request = restApiClient.newGetMethod(pollingUri);
+        try {
+            int status;
+            HttpResponse getResponse;
+            do {
+                getResponse = restApiClient.execute(request);
+                status = getResponse.getStatusLine().getStatusCode();
+                System.out.println("Current polling status: " + status);
+                if (HttpStatus.valueOf(status) == HttpStatus.OK) {
+                    modelViewObject = new JSONObject(EntityUtils.toString(getResponse.getEntity()));
+                    break;
+                }
+                EntityUtils.consumeQuietly(getResponse.getEntity());
+            } while(status == HttpStatus.ACCEPTED.value());
+            
+        } finally {
+            request.releaseConnection();
+        }
+        return modelViewObject;
+    }
+
+    public static JSONObject getDatasetModelView(RestApiClient restApiClient, String projectId, String dataset)
+            throws ParseException, JSONException, IOException {
+        JSONObject projectModelView = getProjectModelView(restApiClient, projectId);
+
+        System.out.println("Get dataset model view...");
+        JSONArray datasets = projectModelView.getJSONObject("projectModelView").getJSONObject("model")
+                .getJSONObject("projectModel").getJSONArray("datasets");
+
+        for (int i = 0; i < datasets.length(); i++) {
+            JSONObject object = datasets.getJSONObject(i).getJSONObject("dataset");
+            if (!dataset.equals(object.getString("title")))
+                continue;
+            return object;
+        }
+        throw new NoSuchElementException("Dataset json object not found!");
+    }
+
+    public static <T> T getDatasetElementFromModelView(RestApiClient restApiClient, String projectId,
+            String dataset, DatasetElements element, Class<T> returnType) throws ParseException, JSONException,
+            IOException {
+        Object object = 
+                getDatasetModelView(restApiClient, projectId, dataset).get(element.toString().toLowerCase());
+        System.out.println(format("Get %s of dataset %s...", element, dataset));
+        if(returnType.isInstance(object)) {
+            return returnType.cast(object);
+        }
+        throw new NoSuchElementException("Dataset element not found!");
+    }
+
+    private static String getPollingUriFrom(RestApiClient restApiClient, String projectId, String uri)
+            throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newGetMethod(uri);
+        String pollUri = "";
+        try {
+            HttpResponse response = restApiClient.execute(request); 
+            pollUri =  new JSONObject(EntityUtils.toString(response.getEntity()))
+                .getJSONObject("asyncTask").getJSONObject("link").getString("poll");
+
+            EntityUtils.consumeQuietly(response.getEntity());
+            System.out.println("Poll link: " + pollUri);
+        } finally {
+            request.releaseConnection();
+        }
+        return pollUri;
+    }
+
+    private static String getCurrentPollingState(RestApiClient restApiClient, String pollingUri, String key) {
+        HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
+        HttpResponse getResponse;
+        String state = "";
+        try {
+            getResponse = restApiClient.execute(getRequest);
+            String responseEntity = EntityUtils.toString(getResponse.getEntity());
+            if (!responseEntity.isEmpty()) {
+                state = new JSONObject(responseEntity).getJSONObject(key).get("status").toString();
+            }
+            System.out.println("Current polling state is: " + state);
+            Thread.sleep(2000);
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeption when polling state!", e);
+        } finally {
+            getRequest.releaseConnection();
+        }
+
+        return state;
     }
 }

@@ -35,6 +35,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
     protected static final By BY_PANEL_ROOT = By.id("root");
     protected static final By BY_IFRAME = By.tagName("iframe");
+    private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 
     protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
@@ -485,5 +486,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initUngroupedUsersPage() {
         openUrl(PAGE_USER_MANAGEMENT + "?groupId=GROUP_UNGROUPED");
         waitForFragmentVisible(userManagementPage);
+    }
+
+    public void initEmailSchedulesPage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|emailSchedulePage");
+        waitForSchedulesPageLoaded(browser);
+        waitForElementNotVisible(BY_SCHEDULES_LOADING);
+        waitForElementVisible(emailSchedulesPage.getRoot());
     }
 }

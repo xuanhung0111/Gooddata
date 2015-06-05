@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 
 import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.addlink.AddLinkDialog;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
@@ -30,7 +31,7 @@ public class DashboardTextObject extends AbstractFragment {
         waitForElementVisible(By.xpath(addLinkTitleLocator), browser).sendKeys(text);
         waitForElementVisible(By.xpath(addLinkAddressLocator), browser).sendKeys(link);
         waitForElementVisible(By.xpath(addButtonLocator), browser).click();
-        waitForElementVisible(By.xpath(textWidgetLocator.replace("${textWidgetType}", textObject.getLabel())), 
+        waitForElementVisible(By.xpath(textWidgetLocator.replace("${textWidgetType}", textObject.getLabel())),
                 browser);
         Thread.sleep(2000);
     }

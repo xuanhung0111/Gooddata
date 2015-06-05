@@ -18,7 +18,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class ChartReport extends AbstractFragment {
@@ -161,12 +160,18 @@ public class ChartReport extends AbstractFragment {
 
     private WebElement findLegendByName(final String name) {
         waitForCollectionIsNotEmpty(legends);
-        return Iterables.find(legends, new Predicate<WebElement>() {
+
+        return FluentIterable.from(legends).filter(new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return "div".equals(input.getTagName());
+            }
+        }).firstMatch(new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
                 return name.equals(input.findElement(By.cssSelector("span")).getText());
             }
-        });
+        }).get();
     }
 
     private void checkIndex(int index) {

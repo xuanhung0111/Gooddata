@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static java.lang.String.format;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.testng.Assert.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -39,6 +41,7 @@ import com.gooddata.qa.graphene.enums.DLUIProcessParameters;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import com.google.common.collect.Lists;
@@ -49,7 +52,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
             "DLUI/graph/CreateAndCopyDataToADS.grf";
 
-    private static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
+    protected static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     private static final String PROCESS_EXECUTION_URI = DATALOAD_PROCESS_URI + "%s/executions";
     private static final String ADS_INSTANCES_URI = "gdc/datawarehouse/instances/";
     private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
@@ -58,6 +61,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     private static final String OUTPUT_STAGE_METADATA_URI =
             "/gdc/dataload/projects/%s/outputStage/metadata";
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
+
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String FROM = "no-reply@gooddata.com";
 
@@ -76,6 +80,9 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     protected String sqlFilePath;
     protected String zipFilePath;
     protected String INITIAL_LDM_MAQL_FILE = "create-ldm.txt";
+    protected String technicalUser;
+    protected String technicalUserPassword;
+    protected String technicalUserUri;
 
     protected static final String ADS_URL =
             "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
@@ -91,7 +98,11 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
-    public void prepareLDMAndADSInstance() throws JSONException {
+    public void prepareLDMAndADSInstance()
+            throws JSONException, ParseException, IOException, InterruptedException {
+        // Override this method in test class if it's necessary to add more users to project
+        addUsersToProject();
+
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
         updateModelOfGDProject(maqlFilePath + INITIAL_LDM_MAQL_FILE);
@@ -100,14 +111,26 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
                         testParams.loadProperty("dss.authorizationToken"));
         createADSInstance(adsInstance);
+        // Override this method in test class if it's necessary to add more users to ads instance
+        addUsersToAdsInstance();
 
-        setDefaultSchemaForOutputStage(adsInstance.getId());
+        // Override this method in test class if using other user to set default schema for output
+        // stage
+        setDefaultSchemaForOutputStage();
         assertTrue(dataloadProcessIsCreated(), "DATALOAD process is not created!");
 
         cloudconnectProcess =
                 new ProcessInfo().withProjectId(testParams.getProjectId())
                         .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
         createCloudConnectProcess(cloudconnectProcess);
+    }
+
+    protected void addUsersToProject() {}
+
+    protected void addUsersToAdsInstance() {}
+
+    protected void setDefaultSchemaForOutputStage() {
+        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
     }
 
     protected ProjectInfo getWorkingProject() {
@@ -146,15 +169,16 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
     protected void updateModelOfGDProject(String maqlFile) {
         assertEquals(
-                RestUtils.getPollingState(getRestApiClient(), sendRequestToUpdateModel(maqlFile)),
+                RestUtils.getLastTaskPollingState(getRestApiClient(), sendRequestToUpdateModel(maqlFile)),
                 "OK", "Model is not updated successfully!");
     }
 
     protected void dropAddedFieldsInLDM(String maqlFile) {
         String pollingUri = sendRequestToUpdateModel(maqlFile);
-        if (!"OK".equals(RestUtils.getPollingState(getRestApiClient(), pollingUri))) {
-            HttpRequestBase getRequest = restApiClient.newGetMethod(pollingUri);
-            HttpResponse getResponse = restApiClient.execute(getRequest);
+        String pollingState = RestUtils.getLastTaskPollingState(getRestApiClient(), pollingUri);
+        if (!"OK".equals(pollingState)) {
+            HttpRequestBase getRequest = getRestApiClient().newGetMethod(pollingUri);
+            HttpResponse getResponse = getRestApiClient().execute(getRequest);
             String errorMessage = "";
             try {
                 errorMessage =
@@ -165,6 +189,8 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 throw new IllegalStateException("There is an exeption when getting error message!",
                         e);
             }
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
 
             System.out.println("LDM update is failed with error message: " + errorMessage);
             assertEquals(errorMessage, "The object (%s) doesn't exist.");
@@ -187,6 +213,21 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
         adsInstance.withId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
         System.out.println("adsId: " + adsInstance.getId());
+    }
+
+    protected void addUserToAdsInstance(ADSInstance adsInstance, String userUri, String user,
+            String userRole) {
+        openUrl(ADS_INSTANCES_URI + adsInstance.getId() + "/users");
+        storageUsersForm.verifyValidAddUserForm();
+        try {
+            storageUsersForm.fillAddUserToStorageForm(userRole, null, user, true);
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "There is an exeception when adding user to ads instance!", e);
+        }
+        takeScreenshot(browser, "datawarehouse-add-user-filled-form", this.getClass());
+        assertTrue(browser.getCurrentUrl().contains(userUri.replace("/gdc/account/profile/", "")),
+                "The user is not added to ads instance successfully!");
     }
 
     protected void deleteADSInstance(ADSInstance adsInstance) {
@@ -234,6 +275,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                     FileUtils.readFileToString(new File(copyTableSqlFile), StandardCharsets.UTF_8);
             prepareProcessExecutionBody(adsUrl, createTableSql, copyTableSql);
             String postBody = processExecution.toString();
+
             String pollingUri = executeProcessRequest(processExecutionUri, postBody);
 
             pollingExecutionStatus(pollingUri);
@@ -243,7 +285,7 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         }
     }
 
-    protected void setDefaultSchemaForOutputStage(String adsId) {
+    protected void setDefaultSchemaForOutputStage(RestApiClient restApiClient, String adsId) {
         String schemaUri = String.format(ADS_INSTANCE_SCHEMA_URI, adsId);
         JSONObject outputStageObj = new JSONObject();
         try {
@@ -256,10 +298,10 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
 
         String putUri = String.format(OUTPUTSTAGE_URI, getWorkingProject().getProjectId());
         String putBody = outputStageObj.toString();
-        HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
+        HttpRequestBase putRequest = restApiClient.newPutMethod(putUri, putBody);
         putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
 
-        HttpResponse putResponse = getRestApiClient().execute(putRequest);
+        HttpResponse putResponse = restApiClient.execute(putRequest);
         int responseStatusCode = putResponse.getStatusLine().getStatusCode();
 
         System.out.println(putResponse.toString());
@@ -376,13 +418,12 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
         try {
             maql = FileUtils.readFileToString(new File(maqlFile));
             pollingUri =
-                    RestUtils.updateLDM(getRestApiClient(), getWorkingProject().getProjectId(),
+                    RestUtils.executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(),
                             maql);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new IllegalStateException(
                     "There is an exeception during reading file to string!", e);
         }
-
         return pollingUri;
     }
 
@@ -419,11 +460,13 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                     new JSONObject(EntityUtils.toString(postResponse.getEntity()))
                             .getJSONObject("executionTask").getJSONObject("links")
                             .getString("detail");
+
+            EntityUtils.consumeQuietly(postResponse.getEntity());
         } catch (Exception e) {
             throw new IllegalStateException("There is an exeception during running process! ", e);
+        } finally {
+            postRequest.releaseConnection();
         }
-
-        EntityUtils.consumeQuietly(postResponse.getEntity());
 
         return pollingUri;
     }
@@ -439,15 +482,18 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                         new JSONObject(EntityUtils.toString(getResponse.getEntity()))
                                 .getJSONObject("executionDetail").get("status").toString();
                 System.out.println("Current execution state is: " + state);
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             } while ("QUEUED".equals(state) || "RUNNING".equals(state));
+
+            assertEquals(state, "OK", "Invalid execution status: " + state);
+
+            EntityUtils.consumeQuietly(getResponse.getEntity());
         } catch (Exception e) {
             throw new IllegalStateException(
                     "There is an exception during polling execution status!", e);
+        } finally {
+            getRequest.releaseConnection();
         }
-        EntityUtils.consumeQuietly(getResponse.getEntity());
-
-        assertEquals(state, "OK", "Invalid execution status: " + state);
     }
 
     private void prepareCCProcessCreationBody(ProcessInfo processInfo, String uploadFilePath) {
@@ -482,7 +528,16 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 new Field("Title2", FieldTypes.ATTRIBUTE),
                 new Field("Label", FieldTypes.LABEL_HYPERLINK),
                 new Field("Totalprice2", FieldTypes.FACT),
-                new Field("Date", FieldTypes.DATE));
+                new Field("Date", FieldTypes.DATE)),
+        ARTIST_WITH_NEW_FIELD(
+                "artist",
+                new Field("Artisttitle", FieldTypes.ATTRIBUTE)),
+        AUTHOR_WITH_NEW_FIELD(
+                "author",
+                new Field("Authorname", FieldTypes.ATTRIBUTE)),
+        TRACK_WITH_NEW_FIELD(
+                "track",
+                new Field("Trackname", FieldTypes.ATTRIBUTE));
 
         private String name;
         private List<Field> additionalFields;
@@ -516,7 +571,26 @@ public abstract class AbstractDLUITest extends AbstractProjectTest {
                 "Unknown data source",
                 AdditionalDatasets.PERSON_WITH_NEW_DATE_FIELD,
                 AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
-        WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt");
+        WITH_ERROR_MAPPING("createTableWithErrorMapping.txt", "copyTableWithErrorMapping.txt"),
+        WITH_ADDITIONAL_FIELDS_LARGE_DATA(
+                "createTableWithAdditionalFields.txt",
+                "copyTableWithAdditionalFieldsLargeData.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
+        WITH_ADDITIONAL_FIELDS_AND_REFERECES(
+                "createTableWithReferences.txt",
+                "copyTableWithReferences.txt",
+                "Unknown data source",
+                AdditionalDatasets.ARTIST_WITH_NEW_FIELD,
+                AdditionalDatasets.TRACK_WITH_NEW_FIELD),
+       WITH_ADDITIONAL_FIELDS_AND_MULTI_REFERECES(
+                "createTableWithMultiReferences.txt",
+                "copyTableWithMultiReferences.txt",
+                "Unknown data source",
+                AdditionalDatasets.TRACK_WITH_NEW_FIELD,
+                AdditionalDatasets.ARTIST_WITH_NEW_FIELD,
+                AdditionalDatasets.AUTHOR_WITH_NEW_FIELD);
 
         private String createTableSqlFile;
         private String copyTableSqlFile;

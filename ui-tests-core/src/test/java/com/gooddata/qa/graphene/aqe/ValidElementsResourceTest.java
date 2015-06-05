@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.aqe;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,17 +25,18 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static java.util.Arrays.asList;
 
 @Test(groups = {"GoodSalesValidElements"}, description = "Tests for GoodSales project relates to ValidElements resource")
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     private String departmentAttr;
     private String productAttr;
-    private String MonthYearCreatedAttr;
+    private String monthYearCreatedAttr;
     private List<String> allDepartmentValues;
     private List<String> allProductValues;
 
@@ -47,15 +47,12 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void initialize() throws InterruptedException, JSONException {
-        imapHost = testParams.loadProperty("imap.host");
-        imapUser = testParams.loadProperty("imap.user");
-        imapPassword = testParams.loadProperty("imap.password");
-        MonthYearCreatedAttr = "Month/Year (Created)";
+        monthYearCreatedAttr = "Month/Year (Created)";
         departmentAttr = "Department";
         productAttr = "Product";
-        allDepartmentValues = Arrays.asList("Direct Sales", "Inside Sales");
-        allProductValues = Arrays.asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft",
-                                         "TouchAll", "WonderKid");
+        allDepartmentValues = asList("Direct Sales", "Inside Sales");
+        allProductValues = asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft",
+                "TouchAll", "WonderKid");
     }
 
     /*
@@ -66,7 +63,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     public void checkForFilteredVariable() throws InterruptedException {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
-            .withAttribute(MonthYearCreatedAttr)
+            .withAttribute(monthYearCreatedAttr)
             .withAttributeElements("Jan 2010", "Feb 2010", "Mar 2010"));
     }
     
@@ -77,44 +74,38 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"initialize"})
     public void checkForCascadingFilter() throws InterruptedException {
         List<String> filteredValuesProduct =
-                Arrays.asList("CompuSci", "Educationly", "Explorer",
-                        "Grammar Plus", "PhoenixSoft", "WonderKid");
+                asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
         try {
             initDashboardsPage();
-            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+            dashboardsPage.addNewDashboard("Dashboard Test");
             dashboardsPage.editDashboard();
-            dashboardsPage.addNewTab("test");
-            
+            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+
             dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, departmentAttr);
             dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, productAttr);
-            
             dashboardEditBar.saveDashboard();
-            
+
             FilterWidget departmentFilter = getFilterWidget(departmentAttr);
             FilterWidget productFilter    = getFilterWidget(productAttr);
-            
-            assertEquals(departmentFilter.getAllAttributeValues(),
-                                allDepartmentValues,
-                                "List of filter elements is not properly.");
-            assertEquals(productFilter.getAllAttributeValues(),
-                                allProductValues,
-                                "List of filter elements is not properly.");
-            
+
+            assertTrue(CollectionUtils.isEqualCollection(allDepartmentValues,
+                    departmentFilter.getAllAttributeValues()), "List of filter elements is not properly.");
+            assertTrue(CollectionUtils.isEqualCollection(allProductValues,
+                    productFilter.getAllAttributeValues()), "List of filter elements is not properly.");
+
             dashboardsPage.editDashboard();
             Thread.sleep(5000);
             dashboardEditBar.setParentsFilter(productAttr, departmentAttr);// parentFilteName is Department
             dashboardEditBar.saveDashboard();
-            
+
             departmentFilter.changeAttributeFilterValue("Direct Sales");
-            
-            assertEquals(productFilter.getAllAttributeValues(),
-                                filteredValuesProduct,
-                                "Cascading filters are not applied correcly");
+            assertTrue(CollectionUtils.isEqualCollection(filteredValuesProduct,
+                    productFilter.getAllAttributeValues()), "Cascading filters are not applied correcly");
         } finally {
-            dashboardsPage.deleteDashboardTab(dashboardsPage.getTabs().getSelectedTabIndex());
+            dashboardsPage.deleteDashboard();
         }
     }
-    
+
     /*
      * This test is to cover the following bug:
      * "AQE-1030 - Get 400 bad request when filtering by Date"
@@ -124,10 +115,10 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         String top5OpenByMoneyReport = "Top 5 Open (by $)";
         String top5WonByMoneyReport = "Top 5 Won (by $)";
         String top5LostByMoneyReport = "Top 5 Lost (by $)";
-        List<String> reportAttributeValues = Arrays.asList("Paramore-Redd Online Marketing > Explorer",
+        List<String> reportAttributeValues = asList("Paramore-Redd Online Marketing > Explorer",
                         "Medical Transaction Billing > Explorer", "AccountNow > Explorer",
                         "Mortgagebot > Educationly", "Dennis Corporation > WonderKid");
-        List<Float> reportMetricValues = Arrays.asList(13.1f, 820.7f, 693.5f, 484.9f,
+        List<Float> reportMetricValues = asList(13.1f, 820.7f, 693.5f, 484.9f,
                         483.1f, 36.7f, 2.3f, 1.9f, 1.4f, 1.3f);
         System.out.println("Verifying element resource of time filter ...");
         openDashboardTab(1);
@@ -138,11 +129,11 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
         
         TableReport dashboardTableReport = getDashboardTableReport(top5OpenByMoneyReport);
-        assertEquals(dashboardTableReport.getAttributeElements(),
-                            reportAttributeValues,
+        assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getAttributeElements(),
+                            reportAttributeValues),
                             "Attribute values in report 'Top 5 Open (by $)' are not properly");
-        assertEquals(dashboardTableReport.getMetricElements(),
-                            reportMetricValues,
+        assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getMetricElements(),
+                            reportMetricValues),
                             "Metric values in report 'Top 5 Open (by $)' are not properly");
 
         assertTrue(getDashboardTableReport(top5WonByMoneyReport).isNoData(), 
@@ -165,28 +156,29 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         initDashboardsPage();
         dashboardsPage.selectDashboard("Pipeline Analysis");
         dashboardsPage.getTabs().openTab(1);
-        
+
         dashboardsPage.editDashboard();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, "Status");
         dashboardEditBar.saveDashboard();
-        
+
         signInAsDifferentUser(UserRoles.EDITOR);
         openDashboardTab(1);
-        assertEquals(getFilterWidget("Status").getAllAttributeValues(), Arrays.asList("Open"),
+        assertTrue(CollectionUtils.isEqualCollection(getFilterWidget("Status").getAllAttributeValues(),
+                asList("Open")),
                 "Variable filter is applied incorrecly");
         getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("10/01/2014", "12/31/2014");
         Thread.sleep(5000);
-        
+
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "AQE-Check variable filter at dashboard", this.getClass());
-        assertEquals(getDashboardTableReport(top5OpenByMoney).getAttributeElements(),
-                            Arrays.asList("Brighton Cromwell > WonderKid"),
-                            "Attribute values in report 'Top 5 Open (by $)' are not properly");
-        assertEquals(getDashboardTableReport(top5OpenByMoney).getMetricElements(),
-                            Arrays.asList(8.6f, 100.0f),
-                            "Metric values in report 'Top 5 Open (by $)' are not properly");
-        
+        assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(top5OpenByMoney)
+                .getAttributeElements(), asList("Brighton Cromwell > WonderKid")),
+                "Attribute values in report 'Top 5 Open (by $)' are not properly");
+        assertTrue(CollectionUtils.isEqualCollection(getDashboardTableReport(top5OpenByMoney)
+                .getMetricElements(), asList(8.6f, 100.0f)),
+                "Metric values in report 'Top 5 Open (by $)' are not properly");
+
        signInAsDifferentUser(UserRoles.ADMIN);
     }
 
@@ -195,27 +187,27 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     public void checkListElementsInReportFilter() throws InterruptedException{
         initReportsPage();
         createReport(new ReportDefinition().withType(ReportTypes.TABLE)
-                                                      .withName("CheckListElementsReport")
-                                                      .withWhats("Amount")
-                                                      .withHows(new HowItem(productAttr, Position.LEFT))
-                                                      .withHows(new HowItem(departmentAttr, Position.TOP)),
-                                                      "CheckListElementsInReport");
+                                           .withName("CheckListElementsReport")
+                                           .withWhats("Amount")
+                                           .withHows(new HowItem(productAttr, Position.LEFT))
+                                           .withHows(new HowItem(departmentAttr, Position.TOP)),
+                                           "CheckListElementsInReport");
 
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter(productAttr,
-                                                "CompuSci", "Educationly", "Explorer", "WonderKid"));
+                "CompuSci", "Educationly", "Explorer", "WonderKid"));
         checkRedBar(browser);
 
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter(departmentAttr, "Direct Sales"));
         Screenshots.takeScreenshot(browser, "AQE-Check list elements in report filter", this.getClass());
         checkRedBar(browser);
 
-        assertEquals(reportPage.getTableReport().getAttributeElements(),
-                            Arrays.asList("Direct Sales", "CompuSci", "Educationly", "Explorer", "WonderKid"),
-                            "Attribute values in report are not properly.");
-        System.out.println("metric list: " + reportPage.getTableReport().getMetricElements());
-        assertEquals(reportPage.getTableReport().getMetricElements(),
-                            Arrays.asList(15582695.69f, 16188138.24f, 30029658.14f, 6978618.41f),
-                            "Metric values in report are not properly.");
+        TableReport report = reportPage.getTableReport();
+        assertTrue(CollectionUtils.isEqualCollection(report.getAttributeElements(),
+                asList("Direct Sales", "CompuSci", "Educationly", "Explorer", "WonderKid")),
+                "Attribute values in report are not properly.");
+        assertTrue(CollectionUtils.isEqualCollection(report.getMetricElements(),
+                asList(15582695.69f, 16188138.24f, 30029658.14f, 6978618.41f)),
+                "Metric values in report are not properly.");
     }
 
     /*
@@ -226,9 +218,9 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     public void checkListElementsInChartReportFilter() throws InterruptedException {
         initReportsPage();
         createReport(new ReportDefinition().withType(ReportTypes.FUNNEL)
-                                                      .withName("CheckListElementsInChartReport")
-                                                      .withWhats("Amount")
-                                                      .withHows("Department"), "CheckListElementsInChartReport");
+                                           .withName("CheckListElementsInChartReport")
+                                           .withWhats("Amount")
+                                           .withHows("Department"), "CheckListElementsInChartReport");
 
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter(productAttr, "CompuSci",
                 "Educationly", "Explorer", "WonderKid"));
@@ -248,12 +240,12 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         getFilterWidget("Activity Date").changeTimeFilterByEnterFromAndToDate("01/01/2008", "12/30/2014");
 
         List<String> reportsToCheck =
-                Arrays.asList("Activities by Type", "Activity Level", "Activity by Sales Rep");
+                asList("Activities by Type", "Activity Level", "Activity by Sales Rep");
         for(Iterator<String> list = reportsToCheck.iterator(); list.hasNext(); ) {
             WebElement reportImg = dashboardsPage.getContent().getImageFromReport(list.next());
             assertTrue(RestUtils.isValidImage(testParams.getHost(), testParams.getUser(),
-                                                     testParams.getPassword(), reportImg),
-                                                     "Image reports are not loaded properly");
+                    testParams.getPassword(), reportImg),
+                    "Image reports are not loaded properly");
         }
     }
 

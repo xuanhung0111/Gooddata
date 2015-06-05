@@ -7,6 +7,7 @@ import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -412,8 +413,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         assertEquals(attributeDetailPage.getDeleteButtonDescription(), EXPECTED_DELETE_DESCRIPTION);
     }
 
-    private Map<String, List<String>> buildConditions() {
-        Map<String, List<String>> conditions = new HashMap<String, List<String>>();
+    private Map<String, Collection<String>> buildConditions() {
+        Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
         conditions.put(ATTRIBUTE_STATUS_ID, Arrays.asList(STATUS_WON_ID, STATUS_LOST_ID));
         return conditions;
     }

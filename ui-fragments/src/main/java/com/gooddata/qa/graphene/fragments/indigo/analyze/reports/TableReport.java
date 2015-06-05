@@ -41,7 +41,9 @@ public class TableReport extends AbstractFragment {
 
         for (WebElement row: rows) {
             List<String> content = Lists.newArrayList();
-            content.add(row.findElement(LEFT_CONTENT).getText().trim());
+            if (!row.findElements(LEFT_CONTENT).isEmpty()) {
+                content.add(row.findElement(LEFT_CONTENT).getText().trim());
+            }
 
             for (WebElement col: row.findElements(RIGHT_CONTENT)) {
                 content.add(col.findElement(By.tagName("span")).getText().trim());
@@ -61,6 +63,7 @@ public class TableReport extends AbstractFragment {
                 return ele.getAttribute("style");
             }
         }
+        System.out.println("Cannot find value: " + value);
         return "";
     }
 }

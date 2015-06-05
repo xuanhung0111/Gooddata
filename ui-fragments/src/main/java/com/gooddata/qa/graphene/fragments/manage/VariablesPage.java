@@ -58,4 +58,9 @@ public class VariablesPage extends AbstractFragment {
         waitForObjectPageLoaded(browser);
     }
 
+    public boolean isVariableVisible(String variableName) {
+        waitForDataPageLoaded(browser);
+        waitForFragmentVisible(variablesTable);
+        return variablesTable.getAllItems().contains(variableName);
+    }
 }

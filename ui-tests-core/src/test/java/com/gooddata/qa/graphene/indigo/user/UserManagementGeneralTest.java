@@ -4,11 +4,8 @@ import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -20,7 +17,7 @@ import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
@@ -28,19 +25,22 @@ import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.UserStates;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 import static java.util.Arrays.asList;
 
-public class UserManagementGeneralTest extends AbstractProjectTest {
+public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
-    private static final String DEFAULT_DASHBOARD = "Default dashboard";
+    private static final String DEFAULT_DASHBOARD = "Pipeline Analysis";
     private static final String DELETE_GROUP_DIALOG_CONTENT = "The group with associated permissions will be "
             + "removed. Users will remain.\nThis action cannot be undone.";
     private boolean canAccessUserManagementByDefault;
@@ -71,7 +71,6 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
     private static final String EXISTING_USER_GROUP_MESSAGE = 
             "Choose a different name for your group. %s already exists.";
 
-    private static final String INVITATION_FROM_EMAIL = "invitation@gooddata.com";
     private static final String INVITED_EMAIL = "abc@mail.com";
 
     @BeforeClass
@@ -124,14 +123,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         waitForFragmentVisible(userManagementPage);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
-    public void uploadDataTest() throws InterruptedException {
-        String csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
-        uploadCSV(csvFilePath + "payroll.csv", null, "access-usergroup-from-dashboard-page");
-    }
-
-    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
-            groups = { "userManagement" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void accessFromDashboardPage() throws InterruptedException {
         initDashboardsPage();
         selectDashboard(DEFAULT_DASHBOARD);
@@ -140,8 +132,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         waitForFragmentVisible(userManagementPage);
     }
 
-    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
-            groups = { "userManagement" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void accessFromEmbeddedDashboardPage() throws InterruptedException{
         initDashboardsPage();
         selectDashboard(DEFAULT_DASHBOARD);
@@ -155,8 +146,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         waitForFragmentVisible(userManagementPage);
     }
 
-    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
-            groups = { "userManagement" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void checkEditorCannotAccessFromDashboardPage() throws InterruptedException, JSONException{
         initDashboardsPage();
         selectDashboard(DEFAULT_DASHBOARD);
@@ -173,8 +163,7 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnGroups = { "initialize" }, dependsOnMethods = { "uploadDataTest" }, 
-            groups = { "userManagement" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void checkEditorCannotAccessFromEmbeddedDashboard() throws InterruptedException, JSONException{
         initDashboardsPage();
         selectDashboard(DEFAULT_DASHBOARD);
@@ -666,26 +655,13 @@ public class UserManagementGeneralTest extends AbstractProjectTest {
 
     private String getEmailContent(final ImapClient imapClient, final String mailTitle) throws IOException,
             MessagingException {
-        final List<Message> messages = new ArrayList<Message>();
-        // Add all current messages with the same title before waiting new message from inbox
-        messages.addAll(Arrays.asList(imapClient.getMessagesFromInbox(INVITATION_FROM_EMAIL, mailTitle)));
         // Save begin size of message list
-        final int currentSize = messages.size();
+        int currentSize = imapClient.getMessagesFromInbox(GDEmails.INVITATION.getEmailAddress(), mailTitle).length;
 
-        Graphene.waitGui().withTimeout(10, TimeUnit.MINUTES)
-                          .pollingEvery(10, TimeUnit.SECONDS)
-                          .withMessage("Waiting for messages ..." + mailTitle)
-                          .until(new Predicate<WebDriver>() {
-                    @Override
-                    public boolean apply(WebDriver input) {
-                        messages.addAll(Arrays.asList(imapClient.getMessagesFromInbox(INVITATION_FROM_EMAIL,
-                                mailTitle)));
-                        // New message arrived when new size of message list > begin size
-                        return messages.size() > currentSize;
-                    }
-                });
+        Collection<Message> messages = ImapUtils.waitForMessageWithExpectedCount(imapClient, GDEmails.INVITATION, mailTitle,
+                currentSize);
         System.out.println("The message arrived");
-        return messages.get(messages.size() - 1).getContent().toString().trim();
+        return Iterables.getLast(messages).getContent().toString().trim();
     }
 
     private void createUserGroups(String... groupNames) throws JSONException, IOException {
