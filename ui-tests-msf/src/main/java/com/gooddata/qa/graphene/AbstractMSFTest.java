@@ -7,6 +7,10 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -15,14 +19,20 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.ADSInstance;
+import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
+import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import com.gooddata.qa.graphene.entity.ExecutionParameter;
+import com.google.common.collect.Lists;
 
 public class AbstractMSFTest extends AbstractProjectTest {
 
@@ -34,16 +44,137 @@ public class AbstractMSFTest extends AbstractProjectTest {
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
 
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
+    protected static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
+    protected static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
+            "DLUI/graph/CreateAndCopyDataToADS.grf";
+    protected static final String ADS_URL =
+            "jdbc:gdc:datawarehouse://${host}/gdc/datawarehouse/instances/${adsId}";
 
     protected ProjectInfo workingProject;
     protected String maqlFilePath;
     protected String sqlFilePath;
     protected String zipFilePath;
+    protected String dssAuthorizationToken;
+    protected String initialLdmMaqlFile = "create-ldm.txt";
+    protected static final String ADS_USER_PARAM = "ADS_USER";
+    protected static final String ADS_PASSWORD_PARAM = "ADS_PASSWORD";
+    protected static final String ADS_URL_PARAM = "ADS_URL";
+    protected static final String CREATE_ADS_TABLE_PARAM = "CREATE_TABLE";
+    protected static final String COPY_ADS_TABLE_PARAM = "COPY_TABLE";
+
+    protected ProcessInfo cloudconnectProcess;
+    protected ProcessInfo dataloadProcess;
+    protected ADSInstance adsInstance;
+
+    @BeforeClass
+    public void initialProperties() {
+        maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
+        sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
+        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
+        dssAuthorizationToken = testParams.loadProperty("dss.authorizationToken");
+    }
 
     protected ProjectInfo getWorkingProject() {
         if (workingProject == null)
             workingProject = new ProjectInfo(projectTitle, testParams.getProjectId());
         return workingProject;
+    }
+
+    protected void prepareLDMAndADSInstance() throws JSONException {
+        // Override this method in test class if it's necessary to add more users to project
+        addUsersToProject();
+
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
+        updateModelOfGDProject(maqlFilePath + initialLdmMaqlFile);
+
+        adsInstance = new ADSInstance().withName("ADS Instance for DLUI test")
+                .withAuthorizationToken(dssAuthorizationToken);
+        createADSInstance(adsInstance);
+        // Override this method in test class if it's necessary to add more users to ads instance
+        addUsersToAdsInstance();
+    }
+
+    protected void setUpOutputStageAndCreateCloudConnectProcess() {
+        // Override this method in test class if using other user to set default schema for output stage
+        setDefaultSchemaForOutputStage();
+        assertTrue(isDataloadProcessCreated(), "DATALOAD process is not created!");
+
+        cloudconnectProcess = new ProcessInfo().withProjectId(testParams.getProjectId())
+                        .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
+        assertEquals(createCloudConnectProcess(cloudconnectProcess), HttpStatus.CREATED.value());
+    }
+
+    protected boolean isDataloadProcessCreated() {
+        int dataloadProcessNumber = 0;
+        try {
+            dataloadProcessNumber =
+                    ProcessUtils.getProcessesList(getRestApiClient(),
+                            getWorkingProject().getProjectId()).getDataloadProcessCount();
+        } catch (Exception e) {
+            throw new IllegalStateException("There is an exeception when getting process list!", e);
+        }
+
+        return dataloadProcessNumber > 0;
+    }
+
+    protected void addUsersToProject() {}
+
+    protected void addUsersToAdsInstance() {}
+
+    protected void setDefaultSchemaForOutputStage() {
+        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
+    }
+
+    protected void createUpdateADSTableBySQLFiles(String createTableFile, String copyTableFile, 
+            ADSInstance instance){
+        Collection<ExecutionParameter> params =
+                prepareParamsToUpdateADS(createTableFile, copyTableFile, instance);
+
+        String executionUri =
+                executeCloudConnectProcess(cloudconnectProcess,
+                        DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params);
+        assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
+    }
+
+    protected Collection<ExecutionParameter> prepareParamsToUpdateADS(String createTableSqlFile,
+            String copyTableSqlFile, ADSInstance instance) {
+        List<ExecutionParameter> params = Lists.newArrayList();
+
+        params.add(new ExecutionParameter(ADS_USER_PARAM, testParams.getUser()));
+        params.add(new ExecutionParameter(ADS_PASSWORD_PARAM, testParams.getPassword()));
+        params.add(new ExecutionParameter(ADS_URL_PARAM, ADS_URL.replace("${host}",
+                testParams.getHost()).replace("${adsId}", instance.getId())));
+        try {
+            String createTableSql =
+                    FileUtils.readFileToString(new File(sqlFilePath + createTableSqlFile),
+                            StandardCharsets.UTF_8);
+            String copyTableSql =
+                    FileUtils.readFileToString(new File(sqlFilePath + copyTableSqlFile),
+                            StandardCharsets.UTF_8);
+            params.add(new ExecutionParameter(CREATE_ADS_TABLE_PARAM, createTableSql));
+            params.add(new ExecutionParameter(COPY_ADS_TABLE_PARAM, copyTableSql));
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "There is an exception during reading file to string! ", e);
+        }
+        return params;
+    }
+
+    protected String executeCloudConnectProcess(ProcessInfo processInfo, String executable,
+            Collection<ExecutionParameter> params) {
+        String executionUri =
+                ProcessUtils.executeProcess(getRestApiClient(), processInfo, executable, params);
+
+        return executionUri;
+    }
+
+    protected int createCloudConnectProcess(ProcessInfo processInfo) {
+        String uploadFilePath =
+                uploadZipFileToWebDavWithoutWebContainer(zipFilePath + CLOUDCONNECT_PROCESS_PACKAGE);
+        return ProcessUtils.createCloudConnectProcess(getRestApiClient(), processInfo,
+                uploadFilePath.substring(uploadFilePath.indexOf("/uploads")) + "/"
+                        + CLOUDCONNECT_PROCESS_PACKAGE);
     }
 
     protected void updateModelOfGDProject(String maqlFile) {
