@@ -45,7 +45,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = {"prepareLDMAndADSInstance"}, groups = {"initialDataForDLUI"})
+    @Test(dependsOnGroups = {"setup"}, groups = {"initialDataForDLUI"})
     public void initialData() throws InterruptedException {
         projectId = testParams.getProjectId();
         selectedField = new Field("Trackname", FieldTypes.ATTRIBUTE);

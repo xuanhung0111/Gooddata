@@ -193,16 +193,16 @@ public class DataloadProcessTest extends AbstractDLUITest {
                     getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
             RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
                     String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.OK,
-                    ACCEPT_HEADER_VALUE_WITH_VERSION);
+                    ACCEPT_APPLICATION_JSON_WITH_VERSION);
             RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
                     String.format(OUTPUT_STATE_MODEL_RESOURCE, testParams.getProjectId()),
-                    HttpStatus.OK, ACCEPT_HEADER_VALUE_WITH_VERSION);
+                    HttpStatus.OK, ACCEPT_APPLICATION_JSON_WITH_VERSION);
             RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
                     String.format(OUTPUTSTAGE_URI, testParams.getProjectId()), HttpStatus.OK,
-                    ACCEPT_HEADER_VALUE_WITH_VERSION);
+                    ACCEPT_APPLICATION_JSON_WITH_VERSION);
             RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
                     String.format(OUTPUT_STATE_METADATA_RESOURCE, testParams.getProjectId()),
-                    HttpStatus.OK, ACCEPT_HEADER_VALUE_WITH_VERSION);
+                    HttpStatus.OK, ACCEPT_APPLICATION_JSON_WITH_VERSION);
             RestUtils.getResource(editorRestApi, executeDataloadProcessSuccessfully(editorRestApi),
                     HttpStatus.NO_CONTENT);
         } finally {
