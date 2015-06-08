@@ -15,7 +15,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
     private static final String ORDERS = "% Orders";
     private static final String CHECKOUTS = "% Checkouts";
     private static final String ENGAGEMENT = "Engagement";
-    private static final String FOLLOWERS = "Followers";
     private static final String DEVICE = "Device";
     private static final String CHANNEL = "Channel";
 
@@ -27,7 +26,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
         metric1 = ORDERS;
         metric2 = CHECKOUTS;
         metric3 = ENGAGEMENT;
-        metric4 = FOLLOWERS;
         attribute1 = DEVICE;
         attribute2 = CHANNEL;
         attribute3 = DEVICE;

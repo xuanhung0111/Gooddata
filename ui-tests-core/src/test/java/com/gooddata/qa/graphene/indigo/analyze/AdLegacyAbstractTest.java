@@ -57,7 +57,6 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     protected String metric1;
     protected String metric2;
     protected String metric3;
-    protected String metric4;
     protected String attribute1;
     protected String attribute2;
     protected String attribute3;
@@ -869,14 +868,6 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         analysisPage.addMetric(metric3);
         assertTrue(report.getTrackersCount() > 0);
         assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric1, metric2, metric3));
-
-        analysisPage.addMetric(metric4);
-        assertTrue(report.getTrackersCount() > 0);
-        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric2, metric3, metric4));
-
-        analysisPage.addMetric(metric4);
-        assertTrue(report.getTrackersCount() > 0);
-        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric2, metric3, metric4));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
