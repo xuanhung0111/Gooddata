@@ -61,7 +61,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeGranularity("Month");
         analysisPage.waitForReportComputing();
 
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days");
+        analysisPage.configTimeFilter("Last 90 days");
         analysisPage.waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
     }
@@ -102,7 +102,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days")
+        analysisPage.configTimeFilter("Last 90 days")
                     .turnOnShowInPercents()
                     .waitForReportComputing();
         // wait for data labels rendered
@@ -122,7 +122,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days")
+        analysisPage.configTimeFilter("Last 90 days")
                     .compareToSamePeriodOfYearBefore()
                     .waitForReportComputing();
 
@@ -137,7 +137,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days");
+        analysisPage.configTimeFilter("Last 90 days");
         analysisPage.waitForReportComputing();
 
         WebElement dateFilter = analysisPage.getFilter(ACTIVITY);

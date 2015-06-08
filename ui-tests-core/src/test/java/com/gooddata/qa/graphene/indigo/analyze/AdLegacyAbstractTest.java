@@ -465,7 +465,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(report.getTrackersCount(), 6);
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
 
-        analysisPage.configTimeFilter(relatedDate, "This year");
+        analysisPage.configTimeFilter("This year");
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": This year");
         assertEquals(report.getTrackersCount(), 6);
     }
@@ -487,7 +487,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withFilters(DATE));
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
-        analysisPage.configTimeFilter(relatedDate, "This month");
+        analysisPage.configTimeFilter("This month");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
@@ -537,7 +537,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1)
                 .withCategories(attribute2).withFilters(DATE));
-        analysisPage.configTimeFilter(relatedDate, "Last year");
+        analysisPage.configTimeFilter("Last year");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 6);
         RecommendationContainer recommendationContainer =

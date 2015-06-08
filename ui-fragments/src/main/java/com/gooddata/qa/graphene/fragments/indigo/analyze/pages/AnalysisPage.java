@@ -151,8 +151,8 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPage configTimeFilter(String relatedDate, String period) {
-        waitForFragmentVisible(mainEditor).configTimeFilter(relatedDate, period);
+    public AnalysisPage configTimeFilter(String period) {
+        waitForFragmentVisible(mainEditor).configTimeFilter(period);
         return this;
     }
 
@@ -228,8 +228,16 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(mainEditor).getFilterText(dateOrAttribute);
     }
 
+    public String getDateFilterText() {
+        return waitForFragmentVisible(mainEditor).getDateFilterText();
+    }
+
     public boolean isFilterVisible(String dateOrAttribute) {
         return waitForFragmentVisible(mainEditor).isFilterVisible(dateOrAttribute);
+    }
+
+    public boolean isDateFilterVisible() {
+        return waitForFragmentVisible(mainEditor).isDateFilterVisible();
     }
 
     public AnalysisPage exportReport() {
@@ -262,8 +270,8 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(mainEditor).isExplorerMessageVisible();
     }
 
-    public List<String> getAllTimeFilterOptions(String dateFilter) {
-        return waitForFragmentVisible(mainEditor).getAllTimeFilterOptions(dateFilter);
+    public List<String> getAllTimeFilterOptions() {
+        return waitForFragmentVisible(mainEditor).getAllTimeFilterOptions();
     }
 
     public AnalysisPage waitForReportComputing() {

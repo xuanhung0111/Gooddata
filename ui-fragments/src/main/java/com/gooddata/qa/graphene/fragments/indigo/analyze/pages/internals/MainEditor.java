@@ -49,9 +49,9 @@ public class MainEditor extends AbstractFragment {
                 && bucketsFilter.isBlankState();
     }
 
-    public void configTimeFilter(String relatedDate, String period) {
+    public void configTimeFilter(String period) {
         waitForFragmentVisible(bucketsFilter);
-        bucketsFilter.configTimeFilter(relatedDate, period);
+        bucketsFilter.configTimeFilter(period);
     }
 
     public void configAttributeFilter(String attribute, String... values) {
@@ -98,14 +98,17 @@ public class MainEditor extends AbstractFragment {
         return browser.findElements(By.cssSelector(CSS_EXPLORER_MESSAGE)).size() > 0;
     }
 
-    public List<String> getAllTimeFilterOptions(String dateFilter) {
-        return waitForFragmentVisible(bucketsFilter).getAllTimeFilterOptions(dateFilter);
+    public List<String> getAllTimeFilterOptions() {
+        return waitForFragmentVisible(bucketsFilter).getAllTimeFilterOptions();
     }
 
     public void waitForReportComputing() {
         try {
-            WebElement computingElement = waitForElementVisible(BY_REPORT_COMPUTING, browser);
-            waitForElementNotVisible(computingElement);
+            Thread.sleep(1000);
+            if (isReportComputing()) {
+                WebElement computingElement = browser.findElement(BY_REPORT_COMPUTING);
+                waitForElementNotVisible(computingElement);
+            }
         } catch(Exception e) {
             // in case report is rendered so fast, computing label is not shown.
             // Ignore the exception.
@@ -135,5 +138,13 @@ public class MainEditor extends AbstractFragment {
 
     public void changeDimensionSwitchInFilter(String currentRelatedDate, String dimensionSwitch) {
         waitForFragmentVisible(bucketsFilter).changeDimensionSwitchInFilter(currentRelatedDate, dimensionSwitch);
+    }
+
+    public boolean isDateFilterVisible() {
+        return waitForFragmentVisible(bucketsFilter).isDateFilterVisible();
+    }
+
+    public String getDateFilterText() {
+        return waitForFragmentVisible(bucketsFilter).getDateFilterText();
     }
 }
