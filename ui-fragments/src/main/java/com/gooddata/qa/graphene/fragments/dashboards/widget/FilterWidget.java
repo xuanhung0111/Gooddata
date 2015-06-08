@@ -27,10 +27,11 @@ public class FilterWidget extends AbstractFragment {
     private static final By BY_TITLE_LABEL = By.cssSelector(".titleLabel span");
     private static final By BY_INPUT_LABEL = By.cssSelector("input");
 
-    public void openPanel() {
+    public FilterWidget openPanel() {
         if (!isOpen()) {
             button.click();
         }
+        return this;
     }
 
     public void closePanel() {
@@ -51,7 +52,7 @@ public class FilterWidget extends AbstractFragment {
         return null;
     }
 
-    public List<String> getAllAttributeValues() {
+    public List<String> getAllAttributeValues() throws InterruptedException {
         openPanel();
         return getPanel(AttributeFilterPanel.class).getAllAtributeValues();
     }    

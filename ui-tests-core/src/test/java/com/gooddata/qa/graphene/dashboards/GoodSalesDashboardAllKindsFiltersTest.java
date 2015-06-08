@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -31,6 +30,7 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -68,7 +68,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createTestingReport"})
     public void testSingleOptionAttributeFilter() throws InterruptedException {
         try {
-            addReportToDashboard(TESTING_REPORT, Direction.LEFT);
+            addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
             addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -93,7 +93,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createTestingReport"})
     public void verifyFilterConnectedWithReport() throws InterruptedException {
         try {
-            addReportToDashboard(TESTING_REPORT, Direction.LEFT);
+            addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
             addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -131,7 +131,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createTestingReport"})
     public void timeFilter() throws InterruptedException {
         try {
-            addReportToDashboard(TESTING_REPORT, Direction.LEFT);
+            addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
@@ -239,10 +239,10 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createReportsWithVariableFilter"})
     public void testVariableFilters() throws InterruptedException {
         try {
-            addReportToDashboard(REPORT_1, Direction.LEFT);
-            addReportToCurrentDashboard(REPORT_2, Direction.RIGHT);
-            addAttributeFilterToDashboard("FQuarter/Year", DashFilterTypes.PROMPT, Direction.UP);
-            addAttributeFilterToDashboard("FStageName", DashFilterTypes.PROMPT, Direction.DOWN);
+            addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
+            addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
+            addAttributeFilterToDashboard("FQuarter/Year", DashFilterTypes.PROMPT, DashboardWidgetDirection.UP);
+            addAttributeFilterToDashboard("FStageName", DashFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
@@ -264,10 +264,10 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createReportsWithVariableFilter"})
     public void testSingleOptionVariableFilter() throws InterruptedException {
         try {
-            addReportToDashboard(REPORT_1, Direction.LEFT);
-            addReportToCurrentDashboard(REPORT_2, Direction.RIGHT);
-            addAttributeFilterToDashboard("FQuarter/Year", DashFilterTypes.PROMPT, Direction.UP);
-            addAttributeFilterToDashboard("FStageName", DashFilterTypes.PROMPT, Direction.DOWN);
+            addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
+            addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
+            addAttributeFilterToDashboard("FQuarter/Year", DashFilterTypes.PROMPT, DashboardWidgetDirection.UP);
+            addAttributeFilterToDashboard("FStageName", DashFilterTypes.PROMPT, DashboardWidgetDirection.DOWN);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
@@ -338,7 +338,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         checkRedBar(browser);
 
         try {
-            addReportToDashboard("Report 3", Direction.LEFT);
+            addReportToDashboard("Report 3", DashboardWidgetDirection.LEFT);
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertTrue(getRowElementsFrom(report).size() == 1);
             addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
@@ -349,16 +349,17 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     private void addReportToDashboard(String name) throws InterruptedException {
-        addReportToDashboard(name, Direction.NONE);
+        addReportToDashboard(name, DashboardWidgetDirection.NONE);
     }
 
-    private void addReportToDashboard(String name, Direction direction) throws InterruptedException {
+    private void addReportToDashboard(String name, DashboardWidgetDirection direction)
+            throws InterruptedException {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(TEST_DASHBOAD_FILTERS);
         addReportToCurrentDashboard(name, direction);
     }
 
-    private void addReportToCurrentDashboard(String name, Direction direction) {
+    private void addReportToCurrentDashboard(String name, DashboardWidgetDirection direction) {
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         dashboardEditBar.addReportToDashboard(name);
@@ -369,8 +370,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         checkRedBar(browser);
     }
 
-    private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type, Direction direction)
-            throws InterruptedException {
+    private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type,
+            DashboardWidgetDirection direction) throws InterruptedException {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
@@ -378,7 +379,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         dashboardEditBar.saveDashboard();
         checkRedBar(browser);
 
-        if (direction == Direction.NONE)
+        if (direction == DashboardWidgetDirection.NONE)
             return;
 
         dashboardsPage.editDashboard();
@@ -391,7 +392,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type) throws InterruptedException {
-        addAttributeFilterToDashboard(attribute, type, Direction.NONE);
+        addAttributeFilterToDashboard(attribute, type, DashboardWidgetDirection.NONE);
     }
 
     private Collection<WebElement> getRowElementsFrom(TableReport report) throws InterruptedException {
@@ -406,33 +407,5 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     private <T extends AbstractReport> T getReport(String name, Class<T> clazz) throws InterruptedException {
         Thread.sleep(1000);
         return dashboardsPage.getContent().getReport(name, clazz);
-    }
-
-    private enum Direction {
-        NONE,
-        LEFT("left: 0px", Keys.LEFT),
-        RIGHT("left: 630px", Keys.RIGHT),
-        UP("top: 0px", Keys.UP),
-        DOWN("top: 60px", Keys.DOWN);
-
-        private String direction;
-        private Keys key;
-
-        private Direction(String direction, Keys key) {
-            this.direction = direction;
-            this.key = key;
-        }
-
-        private Direction() {}
-
-        public void moveElementToRightPlace(WebElement element) {
-            if (direction == null) {
-                return;
-            }
-
-            while (!element.getAttribute("style").contains(direction)) {
-                element.sendKeys(Keys.SHIFT, key);
-            }
-        }
     }
 }

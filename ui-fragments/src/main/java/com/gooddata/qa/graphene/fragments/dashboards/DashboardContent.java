@@ -1,32 +1,34 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
+
 import java.util.List;
 
-import com.gooddata.qa.CssUtils;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
-
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.google.common.collect.Lists;
 
 public class DashboardContent extends AbstractFragment {
 
-    @FindBy(css = ".c-projectdashboard-items .yui3-c-reportdashboardwidget")
+    @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-reportdashboardwidget")
     private List<WebElement> reports;
 
     @FindBy(css = ".geo-content-wrapper")
     private List<DashboardGeoChart> geoCharts;
 
-    @FindBy(className = "yui3-c-filterdashboardwidget")
-    private List<FilterWidget> filters;
+    @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-filterdashboardwidget")
+    private List<WebElement> filters;
 
     private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
 
@@ -37,17 +39,14 @@ public class DashboardContent extends AbstractFragment {
     private static String REPORT_IMAGE_LOCATOR = "//div[contains(@class, '${reportName}')]//img";
 
     public <T extends AbstractReport> T getReport(int reportIndex, Class<T> clazz) {
-        return Graphene.createPageFragment(clazz, reports.get(reportIndex));
+        return createPageFragment(clazz, reports.get(reportIndex));
     }
 
     public <T extends AbstractReport> T getReport(final String name, Class<T> clazz) {
-        return Graphene.createPageFragment(clazz, Iterables.find(reports, new Predicate<WebElement>() {
+        return createPageFragment(clazz, Iterables.find(reports, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
-                WebElement title = waitForElementVisible(REPORT_TITLE_LOCATOR, input).findElement(BY_LINK);
-                if ("none".equals(title.getCssValue("display").trim())) {
-                    return false;
-                }
+                WebElement title = input.findElement(REPORT_TITLE_LOCATOR).findElement(BY_LINK);
                 return name.equals(title.getAttribute("title"));
             }
         }));
@@ -66,28 +65,35 @@ public class DashboardContent extends AbstractFragment {
     }
 
     public WebElement getImageFromReport(String reportName){
-        By eleBy =  By.xpath(REPORT_IMAGE_LOCATOR.replace("${reportName}", CssUtils.simplifyText(reportName)));
+        By eleBy =  By.xpath(REPORT_IMAGE_LOCATOR.replace("${reportName}", simplifyText(reportName)));
         return waitForElementVisible(eleBy, browser);
      }
 
     public List<FilterWidget> getFilters() {
-        return filters;
+        return Lists.newArrayList(Collections2.transform(filters, new Function<WebElement, FilterWidget>() {
+            @Override
+            public FilterWidget apply(WebElement input) {
+                return createPageFragment(FilterWidget.class, input);
+            }
+        }));
     }
 
     public FilterWidget getFirstFilter() {
-        return filters.get(0);
+        return createPageFragment(FilterWidget.class, filters.get(0));
     }
 
     public FilterWidget getFilterWidget(final String condition) {
-        // need to refresh page so filter widget can load its root element when accessing
-        browser.navigate().refresh();
-        waitForDashboardPageLoaded(browser);
-
-        return Iterables.find(filters, new Predicate<FilterWidget>() {
+        WebElement filter = Iterables.find(filters, new Predicate<WebElement>() {
             @Override
-            public boolean apply(FilterWidget input) {
-                return input.getRoot().getAttribute("class").contains("s-" + condition);
+            public boolean apply(WebElement input) {
+                return input.getAttribute("class").contains("s-" + condition);
             }
         }, null);
+
+        if (filter == null) {
+            return null;
+        }
+
+        return createPageFragment(FilterWidget.class, filter);
     }
 }

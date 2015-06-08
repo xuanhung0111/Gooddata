@@ -310,6 +310,16 @@ public class RestUtils {
         return response.getStatusLine().getStatusCode() == 200;
     }
 
+    public static void executePostRequest(final RestApiClient restApiClient, final String uri, String content) {
+        HttpRequestBase request = restApiClient.newPostMethod(uri, content);
+        try {
+            HttpResponse response = restApiClient.execute(request, HttpStatus.OK, "Invalid status code");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            request.releaseConnection();
+        }
+    }
+
     public static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri)
             throws IOException, JSONException {
         return getJSONObjectFrom(restApiClient, uri, HttpStatus.OK);
@@ -363,13 +373,18 @@ public class RestUtils {
             Map<String, Collection<String>> conditions) throws IOException, JSONException {
         String mdObjURI = format(OBJ_LINK, projectID);
         String MUFExpressions = buildFilterExpression(projectID, conditions);
-        System.out.println(MUFExpressions);
         String contentBody = MUF_OBJ.replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
         HttpRequestBase postRequest = restApiClient.newPostMethod(mdObjURI, contentBody);
-        HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "New MUF is not created!");
-        String result = EntityUtils.toString(postResponse.getEntity());
-        JSONObject json = new JSONObject(result);
-        return json.getString("uri");
+
+        try {
+            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "New MUF is not created!");
+            String result = EntityUtils.toString(postResponse.getEntity());
+            JSONObject json = new JSONObject(result);
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+            return json.getString("uri");
+        } finally {
+            postRequest.releaseConnection();
+        }
     }
 
     private static String buildFilterExpression(final String projectID, Map<String,
@@ -400,9 +415,14 @@ public class RestUtils {
         String urserFilter = format(MUF_LINK, projectURI);
         String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression",
                 mufURI);
-        System.out.println(contentBody);
         HttpRequestBase postRequest = restApiClient.newPostMethod(urserFilter, contentBody);
-        restApiClient.execute(postRequest, HttpStatus.OK, "the MUF is not applied");
+
+        try {
+            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "the MUF is not applied");
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+        } finally {
+            postRequest.releaseConnection();
+        }
     }
 
     public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, String projectID, 
