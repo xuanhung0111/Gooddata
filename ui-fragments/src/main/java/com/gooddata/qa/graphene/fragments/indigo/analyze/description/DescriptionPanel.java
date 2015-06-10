@@ -28,6 +28,9 @@ public class DescriptionPanel extends AbstractFragment {
     @FindBy(css = ".adi-item-type~p")
     private List<WebElement> values;
 
+    @FindBy(css = ".s-dataset-name")
+    private WebElement dataset;
+
     public static final By LOCATOR = By.cssSelector(".adi-catalogue-item-details");
     
     private static final String NEW_LINE = "\n";
@@ -57,6 +60,15 @@ public class DescriptionPanel extends AbstractFragment {
         waitForCollectionIsNotEmpty(values);
         waitForDataLoaded();
         builder.append(values.get(0).getText()).append(NEW_LINE);
+
+        return builder.toString();
+    }
+
+    public String getFactDescription() {
+        StringBuilder builder = getPrefix(false);
+
+        builder.append("Dataset").append(NEW_LINE);
+        builder.append(waitForElementVisible(dataset).getText()).append(NEW_LINE);
 
         return builder.toString();
     }
