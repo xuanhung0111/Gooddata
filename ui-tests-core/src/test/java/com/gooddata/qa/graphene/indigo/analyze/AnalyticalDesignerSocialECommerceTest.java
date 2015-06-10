@@ -15,7 +15,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
     private static final String ORDERS = "% Orders";
     private static final String CHECKOUTS = "% Checkouts";
     private static final String ENGAGEMENT = "Engagement";
-    private static final String FOLLOWERS = "Followers";
     private static final String DEVICE = "Device";
     private static final String CHANNEL = "Channel";
 
@@ -27,12 +26,12 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
         metric1 = ORDERS;
         metric2 = CHECKOUTS;
         metric3 = ENGAGEMENT;
-        metric4 = FOLLOWERS;
         attribute1 = DEVICE;
         attribute2 = CHANNEL;
         attribute3 = DEVICE;
 
         notAvailableAttribute = "Company";
+        relatedDate = DATE;
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
@@ -66,7 +65,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(ORDERS)
@@ -79,7 +78,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics("Engagement")

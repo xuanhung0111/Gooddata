@@ -3,12 +3,15 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -17,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -55,6 +59,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     private Random random = new Random();
     private List<String> brokenMetrics = Lists.newArrayList();
     private List<Pair<String, String>> cache = Lists.newArrayList();
+    private List<String> remainedAttributes;
 
     private Project project;
     private MetadataService mdService;
@@ -69,18 +74,45 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void loadAttributes() {
-        attributes = Lists.newArrayList(FluentIterable.from(mdService.find(project, Attribute.class))
-                .transform(new Function<Entry, String>() {
+        Collection<String> allAttributes = Collections2.transform(mdService.find(project, Attribute.class),
+                new Function<Entry, String>() {
             @Override
             public String apply(Entry input) {
                 return input.getTitle();
             }
-        }).filter(new Predicate<String>() {
+        });
+
+        final Collection<String> dates = Lists.newArrayList(FluentIterable.from(allAttributes)
+                .filter(new Predicate<String>() {
             @Override
             public boolean apply(String input) {
-                return !input.contains(DATE) && !input.contains("Records of");
+                return input.startsWith(DATE);
+            }
+        }).transform(new Function<String, String>() {
+            @Override
+            public String apply(String input) {
+                return input.replaceFirst(DATE, "").trim();
             }
         }));
+
+        attributes = Lists.newArrayList(Collections2.filter(allAttributes, new Predicate<String>() {
+            @Override
+            public boolean apply(String input) {
+                if (input.startsWith("Records of")) {
+                    return false;
+                }
+
+                for (String date: dates) {
+                    if (input.endsWith(date)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }));
+
+        remainedAttributes = Lists.newArrayList(attributes);
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
@@ -115,6 +147,11 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             @Override
             public void action(String metric) {
                 analysisPage.createReport(new ReportDefinition().withMetrics(metric));
+            }
+
+            @Override
+            public void actionWhenFailed(String data) {
+                analysisPage.resetToBlankState();
             }
         }, "testCustomDiscovery");
 
@@ -154,8 +191,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART).getExplorerMessage(),
                 "Now select a metric to display");
 
-        TableReport report = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
-        assertEquals(report.getHeaders(), Arrays.asList(attribute.toUpperCase()));
+        analysisPage.changeReportType(ReportType.TABLE).getTableReport();
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
@@ -196,22 +232,21 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(report.getTrackersCount() >= 1);
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void dragMetricToTrendShortcutPanel() {
         initAnalysePage();
 
         doSafetyMetricAction(new SafetyActionAdapter() {
             @Override
             public void action(String metric) {
-                analysisPage.dragAndDropMetricToShortcutPanel(metric,
-                        ShortcutPanel.TRENDED_OVER_TIME);
+                analysisPage.dragAndDropMetricToShortcutPanel(metric, ShortcutPanel.TRENDED_OVER_TIME);
             }
         }, "dragMetricToTrendShortcutPanel");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: Last 4 quarters");
+        assertTrue(analysisPage.isDateFilterVisible());
+        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -282,18 +317,24 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        doSafetyAttributeAction(metric, new SafetyAction() {
-            @Override
-            public void action(String attribute) {
-                waitForFragmentVisible(comparisonRecommendation);
-                comparisonRecommendation.select(attribute).apply();
-            }
 
-            @Override
-            public void actionWhenFailed(String attribute) {
-                analysisPage.removeCategory(attribute);
+        String attribute;
+        while (true) {
+            attribute = getRandomeAttributeFromMetric(metric);
+            analysisPage.addCategory(attribute).waitForReportComputing();
+            if (analysisPage.isExplorerMessageVisible()) {
+                System.out.println(format("Report with metric [%s] and attribute [%s] shows message: %s",
+                        metric, attribute, analysisPage.getExplorerMessage()));
+                System.out.println("Try another attribute");
+            } else {
+                analysisPage.removeCategory(attribute).waitForReportComputing();
+                System.out.println(format("Good pair to test: metric [%s] and attribute [%s]", metric, attribute));
+                break;
             }
-        }, "testAnotherApproachToShowContribution");
+        }
+
+        waitForFragmentVisible(comparisonRecommendation);
+        comparisonRecommendation.select(attribute).apply();
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
@@ -326,11 +367,13 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
             @Override
             public void action(String attribute) {
-                waitForFragmentVisible(comparisonRecommendation);
-                comparisonRecommendation.select(attribute).apply();
+                analysisPage.addCategory(attribute);
             }
         }, "testSimpleComparison");
 
+        analysisPage.resetToBlankState().addMetric(metric);
+        waitForFragmentVisible(comparisonRecommendation);
+        comparisonRecommendation.select(attribute).apply();
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
         assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
@@ -349,36 +392,62 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void supportParameter() {
+        List<String> badMetrics = Lists.newArrayList();
+        String metric;
+
         initAnalysePage();
 
-        doSafetyMetricAction(new SafetyActionAdapter() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
+        while (true) {
+            if (badMetrics.size() >= 3) {
+                System.out.println("Tried with 3 metrics. Skip this test.");
+                break;
             }
-        }, "supportParameter");
 
-        ChartReport report = analysisPage.getChartReport();
-        assertEquals(report.getTrackersCount(), 1);
-        RecommendationContainer recommendationContainer =
-                Graphene.createPageFragment(RecommendationContainer.class,
-                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+            while (true) {
+                metric = doSafetyMetricAction(new SafetyActionAdapter() {
+                    @Override
+                    public void action(String metric) {
+                        analysisPage.createReport(new ReportDefinition().withMetrics(metric));
+                    }
+                }, "supportParameter");
 
-        TrendingRecommendation trendingRecommendation =
-                recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
-        trendingRecommendation.select("Month").apply();
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: Last 4 quarters");
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
-        assertTrue(report.getTrackersCount() >= 1);
+                if (!badMetrics.contains(metric)) {
+                    break;
+                }
+            }
+    
+            ChartReport report = analysisPage.getChartReport();
+            assertEquals(report.getTrackersCount(), 1);
+            RecommendationContainer recommendationContainer =
+                    Graphene.createPageFragment(RecommendationContainer.class,
+                            waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+    
+            TrendingRecommendation trendingRecommendation =
+                    recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
+            trendingRecommendation.select("Month").apply();
+            analysisPage.waitForReportComputing();
+            assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
+            assertTrue(analysisPage.isDateFilterVisible());
+            assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
+            assertTrue(analysisPage.isShowPercentConfigEnabled());
+            assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
+    
+            if (!browser.findElements(RecommendationContainer.LOCATOR).isEmpty()) {
+                assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+                assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+                assertTrue(report.getTrackersCount() >= 1);
+                return;
+            }
+            System.out.println(format("Report with metric [%s] shows message when comparing "
+                    + "last 4 quarters: %s", metric, analysisPage.getExplorerMessage()));
+            System.out.println("trying with another metric");
+            badMetrics.add(metric);
+            analysisPage.resetToBlankState();
+        }
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
@@ -424,7 +493,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
 
@@ -437,8 +506,8 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         }, "displayWhenDraggingFirstMetric");
 
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: Last 4 quarters");
+        assertTrue(analysisPage.isDateFilterVisible());
+        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
@@ -464,7 +533,6 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(analysisPage.isExportToReportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
-        Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
 
         analysisPage.exportReport();
         String currentWindowHandel = browser.getWindowHandle();
@@ -480,12 +548,12 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
         Iterator<String> attributes = tableReport.getAttributeElements().iterator();
 
-        Thread.sleep(3000); // wait for metric values is calculated and loaded
+        Thread.sleep(2000); // wait for metric values is calculated and loaded
         Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
 
         List<List<String>> content = new ArrayList<List<String>>();
         while (attributes.hasNext() && metrics.hasNext()) {
-            content.add(Arrays.asList(attributes.next(), metrics.next()));
+            content.add(asList(attributes.next(), metrics.next()));
         }
 
         // Just compare the first 10 lines if table data is big
@@ -497,20 +565,11 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         }
         assertEquals(content, analysisContent, "Content is not correct");
 
-        List<String> headers = tableReport.getAttributesHeader();
-        headers.addAll(tableReport.getMetricsHeader());
-        Iterator<String> reportheaders = headers.iterator();
-
-        while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
-            assertEquals(reportheaders.next().toLowerCase(), analysisHeaders.next().toLowerCase(),
-                    "Headers are not correct");
-        }
-
         browser.close();
         browser.switchTo().window(currentWindowHandel);
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
@@ -519,15 +578,19 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void filterOnDateAttribute() {
         initAnalysePage();
 
         String metric = doSafetyMetricAction(new SafetyActionAdapter() {
             @Override
             public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(
-                        DATE));
+                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(DATE));
+            }
+
+            @Override
+            public void actionWhenFailed(String data) {
+                analysisPage.resetToBlankState();
             }
         }, "filterOnDateAttribute");
 
@@ -540,13 +603,13 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: All time");
+        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
 
-        analysisPage.configTimeFilter("Closed Date", "This year");
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: This year");
+        analysisPage.configTimeFilter("This year");
+        assertTrue(analysisPage.getDateFilterText().endsWith(": This year"));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testDateInCategoryAndDateInFilter() {
         initAnalysePage();
 
@@ -558,47 +621,48 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         }, "testDateInCategoryAndDateInFilter");
 
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: All time");
-        assertEquals(analysisPage.getAllGranularities(),
-                Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
+        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
+        assertTrue(isEqualCollection(analysisPage.getAllGranularities(),
+                asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year")));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
 
         String metric = doSafetyMetricAction(new SafetyActionAdapter() {
             @Override
             public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(
-                        DATE));
+                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(DATE));
             }
         }, "trendingRecommendationOverrideDateFilter");
 
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: All time");
+        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
 
-        ChartReport report = null;
+        boolean timeFilterOk = false;
         for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
             if ("All time".equals(period)) continue;
-            System.out.println(String.format("Try with time period [%s]", period));
-            analysisPage.configTimeFilter(DATE, period);
-            report = analysisPage.getChartReport();
-            try {
-                int count = report.getTrackersCount();
-                assertEquals(count, 1);
-                System.out.println(String.format("Time period [%s] is ok with metric [%s]",
-                        period, metric));
+            System.out.println(format("Try with time period [%s]", period));
+            analysisPage.configTimeFilter(period).waitForReportComputing();
+            if (analysisPage.isExplorerMessageVisible()) {
+                System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
+            } else {
+                System.out.println(format("Time period [%s] is ok with metric [%s]", period, metric));
+                timeFilterOk = true;
                 break;
-            } catch(Exception e) {
-                // ignore
             }
+        }
+
+        if (!timeFilterOk) {
+            System.out.println(format("Report with metric [%s] has no data with all time filter!", metric));
+            return;
         }
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();;
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
+        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
@@ -674,16 +738,20 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void testSimplePoP() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new SafetyActionAdapter() {
+        String metric1 = doSafetyMetricAction(new SafetyActionAdapter() {
             @Override
             public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric)
-                        .withCategories(DATE));
+                analysisPage.addMetric(metric).addCategory(DATE);
+            }
+
+            @Override
+            public void actionWhenFailed(String data) {
+                analysisPage.resetToBlankState();
             }
         }, "testSimplePoP");
 
-        assertTrue(analysisPage.isFilterVisible(DATE));
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
+        assertTrue(analysisPage.isDateFilterVisible());
+        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
@@ -694,9 +762,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, Arrays.asList(metric + " - previous year", metric));
+        assertTrue(isEqualCollection(legends, asList(metric1 + " - previous year", metric1)));
 
-        doSafetyMetricAction(new SafetyActionAdapter() {
+        String metric2 = doSafetyMetricAction(new SafetyActionAdapter() {
             @Override
             public void action(String metric) {
                 analysisPage.addMetric(metric);
@@ -705,9 +773,8 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
-        assertEquals(legends.size(), 1);
-        assertEquals(legends, Arrays.asList("Series 1"));
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        assertEquals(legends.size(), 2);
+        assertTrue(isEqualCollection(legends, asList(metric1, metric2)));
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
@@ -730,20 +797,25 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible(DATE));
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
+        assertTrue(analysisPage.isDateFilterVisible());
+        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
+
+        if (analysisPage.isExplorerMessageVisible()) {
+            System.out.println(format("After applying 'see trend', report shows message: %s",
+                    analysisPage.getExplorerMessage()));
+            return;
+        }
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void compararisonRecommendationOverrideDateFilter() {
         initAnalysePage();
 
         String metric = doSafetyMetricAction(new SafetyActionAdapter() {
             @Override
             public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(
-                        DATE));
+                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(DATE));
             }
         }, "compararisonRecommendationOverrideDateFilter");
 
@@ -754,21 +826,25 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             }
         }, "compararisonRecommendationOverrideDateFilter");
 
-        ChartReport report = null;
+        boolean timeFilterOk = false;
         for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
             if ("All time".equals(period)) continue;
-            System.out.println(String.format("Try with time period [%s]", period));
-            analysisPage.configTimeFilter("Closed Date", period);
-            report = analysisPage.getChartReport();
-            try {
-                int count = report.getTrackersCount();
-                assertTrue(count >= 1);
-                System.out.println(String.format("Time period [%s] is ok with metric [%s] and attribute [%s]",
+            System.out.println(format("Try with time period [%s]", period));
+            analysisPage.configTimeFilter(period).waitForReportComputing();
+            if (analysisPage.isExplorerMessageVisible()) {
+                System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
+            } else {
+                System.out.println(format("Time period [%s] is ok with metric [%s] and attribute [%s]",
                         period, metric, attribute));
+                timeFilterOk = true;
                 break;
-            } catch(Exception e) {
-                // ignore
             }
+        }
+
+        if (!timeFilterOk) {
+            System.out.println(format("Report with metric [%s] and attribute [%s] has no data"
+                    + " with all time filter!", metric, attribute));
+            return;
         }
 
         RecommendationContainer recommendationContainer =
@@ -777,67 +853,19 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: This month");
+        assertTrue(analysisPage.getDateFilterText().endsWith(": This month"));
+        if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
+            System.out.println(format("After comparing 'This month', report shows message: %s",
+                    analysisPage.getExplorerMessage()));
+            return;
+        }
+
+        ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
-        assertEquals(legends, Arrays.asList(metric + " - previous year", metric));
+        assertTrue(isEqualCollection(legends, asList(metric + " - previous year", metric)));
     }
-
-  @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, enabled = false)
-  public void testUndoRedo() {
-      int baseTrackerCount1;
-      int baseTrackerCount2;
-      initAnalysePage();
-
-      String metric = doSafetyMetricAction(new SafetyActionAdapter() {
-          @Override
-          public void action(String metric) {
-              analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-          }
-      }, "testUndoRedo");
-      ChartReport report = analysisPage.getChartReport();
-      baseTrackerCount1 = report.getTrackersCount();
-
-      analysisPage.undo();
-      analysisPage.waitForReportComputing();
-      assertFalse(analysisPage.getAllAddedMetricNames().contains(metric));
-      assertTrue(analysisPage.isBucketBlankState(), "Metric is not removed after using 'Undo'");
-      assertTrue(analysisPage.isMainEditorBlankState(), "Report is not loaded correctly after using 'Undo'");
-
-      analysisPage.redo();
-      analysisPage.waitForReportComputing();
-      assertTrue(analysisPage.getAllAddedMetricNames().contains(metric));
-      assertEquals(report.getTrackersCount(), baseTrackerCount1);
-
-      String attribute = doSafetyAttributeAction(metric, new SafetyActionAdapter() {
-          @Override
-          public void action(String attribute) {
-              analysisPage.addCategory(attribute);
-          }
-      }, "testUndoRedo");
-      baseTrackerCount2 = report.getTrackersCount();
-
-      analysisPage.undo();
-      analysisPage.waitForReportComputing();
-      assertFalse(analysisPage.getAllAddedCategoryNames().contains(attribute));
-      assertEquals(report.getTrackersCount(),baseTrackerCount1);
-
-      analysisPage.redo();
-      analysisPage.waitForReportComputing();
-      assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
-      assertEquals(report.getTrackersCount(), baseTrackerCount2);
-      
-      // change report type
-      analysisPage.changeReportType(ReportType.TABLE);
-      assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
-
-      analysisPage.undo();
-      assertTrue(analysisPage.isReportTypeSelected(ReportType.COLUMN_CHART));
-
-      analysisPage.redo();
-      assertTrue(analysisPage.isReportTypeSelected(ReportType.TABLE));
-  }
 
     private String getRandomMetric() {
         String metric;
@@ -849,7 +877,12 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     }
 
     private String getRandomAttribute() {
-        return attributes.get(random.nextInt(attributes.size()));
+        if (remainedAttributes.isEmpty()) {
+            throw new NoSuchElementException("Could not find any attributes to test this case!");
+        }
+        String attribute =  remainedAttributes.get(random.nextInt(remainedAttributes.size()));
+        remainedAttributes.remove(attribute);
+        return attribute;
     }
 
     private String getRandomeAttributeFromMetric(String metric) {
@@ -858,6 +891,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             attribute = getRandomAttribute();
         }
         cache.add(Pair.of(metric, attribute));
+        remainedAttributes = Lists.newArrayList(attributes);
         return attribute;
     }
 
@@ -881,13 +915,13 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
             Screenshots.takeScreenshot(browser, screenshot + System.currentTimeMillis(),
                     this.getClass());
-            System.out.println(String.format("Report with metric [%s] shows message: %s", metric,
+            System.out.println(format("Report with metric [%s] shows message: %s", metric,
                     analysisPage.getExplorerMessage()));
             brokenMetrics.add(metric);
             metricAction.actionWhenFailed(metric);
             continue;
         }
-        System.out.println(String.format("Good metric [%s] to test", metric));
+        System.out.println(format("Good metric [%s] to test", metric));
         return metric;
     }
 
@@ -903,14 +937,14 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
             Screenshots.takeScreenshot(browser, screenshot + System.currentTimeMillis(),
                     this.getClass());
-            System.out.println(String.format(
+            System.out.println(format(
                     "Report with metric [%s] and attribute [%s] shows message: %s", metric,
                     attribute, analysisPage.getExplorerMessage()));
             attributeAction.actionWhenFailed(attribute);
             System.out.println("Try another pair to test");
             continue;
         }
-        System.out.println(String.format("Good pair to test: metric [%s] and attribute [%s]", metric, attribute));
+        System.out.println(format("Good pair to test: metric [%s] and attribute [%s]", metric, attribute));
         return attribute;
     }
 

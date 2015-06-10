@@ -49,9 +49,9 @@ public class MainEditor extends AbstractFragment {
                 && bucketsFilter.isBlankState();
     }
 
-    public void configTimeFilter(String relatedDate, String period) {
+    public void configTimeFilter(String period) {
         waitForFragmentVisible(bucketsFilter);
-        bucketsFilter.configTimeFilter(relatedDate, period);
+        bucketsFilter.configTimeFilter(period);
     }
 
     public void configAttributeFilter(String attribute, String... values) {
@@ -104,8 +104,11 @@ public class MainEditor extends AbstractFragment {
 
     public void waitForReportComputing() {
         try {
-            WebElement computingElement = waitForElementVisible(BY_REPORT_COMPUTING, browser);
-            waitForElementNotVisible(computingElement);
+            Thread.sleep(1000);
+            if (isReportComputing()) {
+                WebElement computingElement = browser.findElement(BY_REPORT_COMPUTING);
+                waitForElementNotVisible(computingElement);
+            }
         } catch(Exception e) {
             // in case report is rendered so fast, computing label is not shown.
             // Ignore the exception.
@@ -120,8 +123,8 @@ public class MainEditor extends AbstractFragment {
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
      */
-    public void configTimeFilterByRangeButNotApply(String from, String to) {
-        waitForFragmentVisible(bucketsFilter).configTimeFilterByRangeButNotApply(from, to);
+    public void configTimeFilterByRangeButNotApply(String dateFilter, String from, String to) {
+        waitForFragmentVisible(bucketsFilter).configTimeFilterByRangeButNotApply(dateFilter, from, to);
     }
 
     /**
@@ -129,11 +132,19 @@ public class MainEditor extends AbstractFragment {
      * @param to   format MM/DD/YYYY
      * @throws ParseException 
      */
-    public void configTimeFilterByRange(String from, String to) throws ParseException {
-        waitForFragmentVisible(bucketsFilter).configTimeFilterByRange(from, to);
+    public void configTimeFilterByRange(String dateFilter, String from, String to) throws ParseException {
+        waitForFragmentVisible(bucketsFilter).configTimeFilterByRange(dateFilter, from, to);
     }
 
     public void changeDimensionSwitchInFilter(String currentRelatedDate, String dimensionSwitch) {
         waitForFragmentVisible(bucketsFilter).changeDimensionSwitchInFilter(currentRelatedDate, dimensionSwitch);
+    }
+
+    public boolean isDateFilterVisible() {
+        return waitForFragmentVisible(bucketsFilter).isDateFilterVisible();
+    }
+
+    public String getDateFilterText() {
+        return waitForFragmentVisible(bucketsFilter).getDateFilterText();
     }
 }

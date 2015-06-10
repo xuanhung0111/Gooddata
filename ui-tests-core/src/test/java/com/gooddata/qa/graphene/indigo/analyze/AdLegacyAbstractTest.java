@@ -57,12 +57,12 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     protected String metric1;
     protected String metric2;
     protected String metric3;
-    protected String metric4;
     protected String attribute1;
     protected String attribute2;
     protected String attribute3;
 
     protected String notAvailableAttribute;
+    protected String relatedDate;
 
     @SuppressWarnings("serial")
     private static final Map<String, String> walkmeContents = new HashMap<String, String>() {{
@@ -180,15 +180,15 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(report.getTrackersCount(), 3);
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
     public void dragMetricToTrendShortcutPanel() {
         initAnalysePage();
 
         analysisPage.dragAndDropMetricToShortcutPanel(metric1, ShortcutPanel.TRENDED_OVER_TIME);
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: Last 4 quarters");
+        assertTrue(analysisPage.isFilterVisible(relatedDate));
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -287,7 +287,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
     public void testComparisonAndPoPAttribute() {
         initAnalysePage();
 
@@ -312,7 +312,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
         analysisPage.waitForReportComputing();
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: This month");
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": This month");
         assertTrue(report.getTrackersCount() >= 3);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -326,7 +326,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
     public void supportParameter() {
         initAnalysePage();
 
@@ -344,8 +344,8 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         trendingRecommendation.select("Month").apply();
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: Last 4 quarters");
+        assertTrue(analysisPage.isFilterVisible(relatedDate));
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
@@ -378,14 +378,14 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
 
         analysisPage.dragAndDropMetricToShortcutPanel(metric1, ShortcutPanel.TRENDED_OVER_TIME);
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: Last 4 quarters");
+        assertTrue(analysisPage.isFilterVisible(relatedDate));
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
@@ -446,7 +446,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         browser.switchTo().window(currentWindowHandle);
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {EXPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {EXPORT_GROUP})
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
@@ -455,7 +455,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void filterOnDateAttribute() {
         initAnalysePage();
 
@@ -463,31 +463,31 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 .withCategories(attribute2).withFilters(DATE));
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 6);
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
 
-        analysisPage.configTimeFilter(DATE, "This year");
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": This year");
+        analysisPage.configTimeFilter("This year");
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": This year");
         assertEquals(report.getTrackersCount(), 6);
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void testDateInCategoryAndDateInFilter() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(DATE));
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 3);
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: All time");
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
         assertEquals(analysisPage.getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withFilters(DATE));
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
-        analysisPage.configTimeFilter(DATE, "This month");
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
+        analysisPage.configTimeFilter("This month");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
@@ -495,7 +495,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();;
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": Last 4 quarters");
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         assertEquals(report.getTrackersCount(), 4);
     }
 
@@ -531,13 +531,13 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void compararisonRecommendationOverrideDateFilter() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1)
                 .withCategories(attribute2).withFilters(DATE));
-        analysisPage.configTimeFilter(DATE, "Last year");
+        analysisPage.configTimeFilter("Last year");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 6);
         RecommendationContainer recommendationContainer =
@@ -546,19 +546,20 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": This month");
-        assertEquals(report.getTrackersCount(), 12);
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": This month");
+        analysisPage.waitForReportComputing();
+        assertTrue(report.getTrackersCount() >= 1);
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void checkTooltipDateFilterPreset() {
         initAnalysePage();
 
         analysisPage.addFilter(DATE);
-        analysisPage.getFilter(DATE).click();
+        analysisPage.getFilter(relatedDate).click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         panel.hoverOnPeriod("This month");
@@ -568,12 +569,12 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(panel.getTooltipFromPeriod().startsWith(currentMonthYear));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void checkDefaultValueInDateRange() {
         initAnalysePage();
 
         analysisPage.addFilter(DATE);
-        analysisPage.getFilter(DATE).click();
+        analysisPage.getFilter(relatedDate).click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
 
@@ -586,7 +587,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(panel.getFromDate(), getTimeString(date));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void switchingDateRangeNotComputeReport() {
         initAnalysePage();
 
@@ -594,9 +595,9 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 .withFilters(DATE));
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 3);
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
 
-        WebElement dateFilter = analysisPage.getFilter(DATE);
+        WebElement dateFilter = analysisPage.getFilter(relatedDate);
         dateFilter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
@@ -608,7 +609,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         waitForFragmentNotVisible(panel);
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void allowDateFilterByRange() throws ParseException, InterruptedException {
         initAnalysePage();
 
@@ -616,8 +617,8 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 .withFilters(DATE));
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 3);
-        assertEquals(analysisPage.getFilterText(DATE), DATE + ": All time");
-        analysisPage.configTimeFilterByRangeButNotApply("01/12/2014", "01/12/2015").exportReport();
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
+        analysisPage.configTimeFilterByRangeButNotApply(relatedDate, "01/12/2014", "01/12/2015").exportReport();
         String currentWindowHandle = browser.getWindowHandle();
         for (String handle : browser.getWindowHandles()) {
             if (!handle.equals(currentWindowHandle))
@@ -629,7 +630,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         browser.close();
         browser.switchTo().window(currentWindowHandle);
 
-        analysisPage.configTimeFilterByRange("01/12/2014", "01/12/2015");
+        analysisPage.configTimeFilterByRange(relatedDate, "01/12/2014", "01/12/2015");
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 3);
         analysisPage.exportReport();
@@ -642,18 +643,18 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         List<String> filters = reportPage.getFilters();
         Screenshots.takeScreenshot(browser, "allowDateFilterByRange-dateFilters", getClass());
         assertEquals(filters.size(), 1);
-        assertEquals(filters.get(0), "Date (Date) is between 01/12/2014 and 01/12/2015");
+        assertEquals(filters.get(0), "Date (" + relatedDate + ") is between 01/12/2014 and 01/12/2015");
         browser.close();
         browser.switchTo().window(currentWindowHandle);
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
     public void testSimplePoP() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(DATE));
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: All time");
+        assertTrue(analysisPage.isFilterVisible(relatedDate));
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 3);
         RecommendationContainer recommendationContainer =
@@ -674,7 +675,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(legends, Arrays.asList(metric1, metric2));
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
     public void testAnotherApproachToShowPoP() {
         initAnalysePage();
 
@@ -688,8 +689,8 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Closed Date"));
-        assertEquals(analysisPage.getFilterText("Closed Date"), "Closed Date: Last 4 quarters");
+        assertTrue(analysisPage.isFilterVisible(relatedDate));
+        assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
@@ -841,7 +842,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         checkUndoRedoForReport(baseState, true);
     }
 
-    @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
     public void checkSeriesStateTransitions() throws InterruptedException {
         initAnalysePage();
 
@@ -850,7 +851,6 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(report.getTrackersCount(), 3);
         assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertEquals(report.getLegends(), Arrays.asList(metric1));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -868,14 +868,6 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         analysisPage.addMetric(metric3);
         assertTrue(report.getTrackersCount() > 0);
         assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric1, metric2, metric3));
-
-        analysisPage.addMetric(metric4);
-        assertTrue(report.getTrackersCount() > 0);
-        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric2, metric3, metric4));
-
-        analysisPage.addMetric(metric4);
-        assertTrue(report.getTrackersCount() > 0);
-        assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric2, metric3, metric4));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
@@ -975,9 +967,6 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         ChartReport chartReport = analysisPage.getChartReport();
         assertEquals(chartReport.getTooltipTextOnTrackerByIndex(0), tooltip);
-        assertEquals(chartReport.getLegends(), reportDefinition.getMetrics());
-        assertEquals(chartReport.getLegendColors(), Arrays.asList("rgb(13, 103, 178)"));
-        assertEquals(chartReport.getLegendColorByName(reportDefinition.getMetrics().get(0)), "rgb(109, 118, 128)");
     }
 
     protected void verifyTableReportContent(ReportDefinition reportDefinition, List<String> headers, List<List<String>> content) {
