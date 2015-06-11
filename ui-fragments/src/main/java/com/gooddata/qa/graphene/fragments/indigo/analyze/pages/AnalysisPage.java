@@ -345,6 +345,12 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage replaceMetric(String oldMetric, String newMetric) {
+        waitForFragmentVisible(cataloguePanel);
+        waitForFragmentVisible(bucketsPanel).replaceMetric(oldMetric, cataloguePanel.getMetric(newMetric));
+        return this;
+    }
+
     public AnalysisPage replaceCategory(String category) {
         waitForFragmentVisible(cataloguePanel);
         waitForFragmentVisible(bucketsPanel).replaceCategory(cataloguePanel.getCategory(category));
@@ -378,5 +384,10 @@ public class AnalysisPage extends AbstractFragment {
 
     public String getExportToReportButtonTooltipText() {
         return waitForFragmentVisible(pageHeader).getExportToReportButtonTooltipText();
+    }
+
+    public AnalysisPage switchAxisAndStackBy() {
+        waitForFragmentVisible(bucketsPanel).switchAxisAndStackBy();
+        return this;
     }
 }

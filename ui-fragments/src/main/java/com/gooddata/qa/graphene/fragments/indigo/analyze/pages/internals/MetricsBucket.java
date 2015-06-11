@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
@@ -16,8 +16,8 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -42,6 +42,20 @@ public class MetricsBucket extends AbstractFragment {
     public void addMetric(WebElement metric) {
         new Actions(browser).dragAndDrop(metric, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
         assertTrue(getItemNames().contains(metric.getText().trim()));
+    }
+
+    private WebElement getMetric(final String name) {
+        return Iterables.find(items, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return name.equals(input.findElement(BY_TEXT).getText());
+            }
+        });
+    }
+
+    public void replaceMetric(String oldMetric, WebElement newMetric) {
+        new Actions(browser).dragAndDrop(newMetric, getMetric(oldMetric)).perform();
+        assertTrue(getItemNames().contains(newMetric.getText().trim()));
     }
 
     public boolean isWarningMessageShown() {
