@@ -1,6 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -13,7 +17,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
     private static final String AMOUNT = "Amount";
     private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
+    private static final String NUMBER_OF_WON_OPPS = "# of Won Opps.";
     private static final String STAGE_NAME = "Stage Name";
+    private static final String ACCOUNT = "Account";
     private static final String ACTIVITY_TYPE = "Activity Type";
     private static final String DEPARTMENT = "Department";
 
@@ -84,5 +90,43 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeReportType(ReportType.LINE_CHART).waitForReportComputing();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsVertical());
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void showLegendForStackedChartWithOneSeries() {
+        initAnalysePage();
+        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_WON_OPPS)).addStackBy(STAGE_NAME);
+        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        assertTrue(report.isLegendVisible());
+        List<String> legends = report.getLegends();
+        assertEquals(legends.size(), 1);
+        assertEquals(legends.get(0), "Closed Won");
+
+        analysisPage.changeReportType(ReportType.BAR_CHART).waitForReportComputing();
+        report = analysisPage.getChartReport();
+        assertTrue(report.isLegendVisible());
+        legends = report.getLegends();
+        assertEquals(legends.size(), 1);
+        assertEquals(legends.get(0), "Closed Won");
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void resetSpecialReports() {
+        initAnalysePage();
+        analysisPage.resetToBlankState();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
+                .withCategories(ACCOUNT));
+        analysisPage.waitForReportComputing();
+        assertTrue(analysisPage.isExplorerMessageVisible());
+        assertEquals(analysisPage.getExplorerMessage(), "Too many data points to display");
+        analysisPage.resetToBlankState();
+
+        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
+                .withCategories(STAGE_NAME));
+        analysisPage.waitForReportComputing();
+        assertTrue(analysisPage.isExplorerMessageVisible());
+        assertEquals(analysisPage.getExplorerMessage(), "Visualization cannot be displayed");
+        analysisPage.resetToBlankState();
     }
 }
