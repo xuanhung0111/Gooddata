@@ -103,4 +103,8 @@ public class CategoriesBucket extends AbstractFragment {
         waitForElementVisible(this.dimensionSwitch);
         this.dimensionSwitch.selectByVisibleText(dimensionSwitch);
     }
+
+    public WebElement getFirstItem() {
+        return items.get(0);
+    }
 }
