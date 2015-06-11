@@ -39,6 +39,7 @@ public class CataloguePanel extends AbstractFragment {
     private static final String METRIC_TYPE = "type-metric";
     private static final String ATTRIBUTE_TYPE = "type-attribute";
     private static final String DATE_TYPE = "type-date";
+    private static final String FACT_TYPE = "type-fact";
 
     public WebElement getMetric(String metric) {
         return searchAndGetItem(metric, METRIC_TYPE);
@@ -46,6 +47,10 @@ public class CataloguePanel extends AbstractFragment {
 
     public WebElement getCategory(String category) {
         return searchAndGetItem(category, ATTRIBUTE_TYPE);
+    }
+
+    private WebElement getFact(String fact) {
+        return searchAndGetItem(fact, FACT_TYPE);
     }
 
     public WebElement getInapplicableCategory(String category) {
@@ -85,6 +90,17 @@ public class CataloguePanel extends AbstractFragment {
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getMetricDescription();
+    }
+
+    public String getFactDescription(String fact) {
+        WebElement field = getFact(fact);
+
+        Actions actions = getActions();
+        actions.moveToElement(field).perform();
+        actions.moveToElement(field.findElement(BY_INLINE_HELP)).perform();
+
+        return Graphene.createPageFragment(DescriptionPanel.class,
+                waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getFactDescription();
     }
 
     public List<String> getAllCatalogueItemsInViewPort() {

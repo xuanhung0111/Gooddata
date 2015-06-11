@@ -200,6 +200,10 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(cataloguePanel).getMetricDescription(metric);
     }
 
+    public String getFactDescription(String fact) {
+        return waitForFragmentVisible(cataloguePanel).getFactDescription(fact);
+    }
+
     public List<String> getAllAddedCategoryNames() {
         return waitForFragmentVisible(bucketsPanel).getAllAddedCategoryNames();
     }

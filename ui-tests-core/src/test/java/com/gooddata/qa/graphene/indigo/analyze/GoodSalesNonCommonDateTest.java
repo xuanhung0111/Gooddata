@@ -22,6 +22,8 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";
     private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
+    private static final String ACTIVITY_DATE = "Activity (Date)";
+    private static final String OPP_SNAPSHOT = "Opp. Snapshot";
 
     @BeforeClass
     public void initialize() {
@@ -191,5 +193,26 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         filter.click();
         waitForElementVisible(panel.getRoot());
         assertEquals(panel.getSelectedDimensionSwitch(), CREATED);
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void exploreFact() {
+        initAnalysePage();
+        StringBuilder expected = new StringBuilder(ACTIVITY_DATE).append("\n")
+                .append("Field Type\n")
+                .append("Fact\n")
+                .append("Dataset\n")
+                .append("Activity\n");
+        assertEquals(analysisPage.getFactDescription(ACTIVITY_DATE), expected.toString());
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testUnusableFactGreyOut() throws InterruptedException {
+        initAnalysePage();
+        analysisPage.addCategory(OPP_SNAPSHOT);
+        // AD needs time to calculate not available attributes/metrics/facts
+        Thread.sleep(3000);
+        analysisPage.searchBucketItem(ACTIVITY_DATE);
+        analysisPage.isInapplicableAttributeMetricInViewPort();
     }
 }
