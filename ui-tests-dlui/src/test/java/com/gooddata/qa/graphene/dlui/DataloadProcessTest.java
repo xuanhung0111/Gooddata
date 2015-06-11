@@ -144,8 +144,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
         String executionUri = executeDataloadProcessSuccessfully(getRestApiClient());
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri),
-                "execution_log_successful.txt");
+        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_successful.txt");
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
@@ -159,8 +158,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         waitForExecutionInRunningState(executionUri);
         assertEquals(ProcessUtils.waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE);
 
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri),
-                "execution_log_error_mapping.txt");
+        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_mapping.txt");
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
@@ -181,8 +179,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertEquals(ProcessUtils.waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE,
                 "Execution is not failed because of ETL pull error!");
 
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri),
-                "execution_log_error_etl.txt");
+        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_etl.txt");
     }
 
     @Test(dependsOnMethods = {"addUsersToProjects"}, groups = {"dataloadProcessTest"}, priority = 2)
@@ -264,12 +261,12 @@ public class DataloadProcessTest extends AbstractDLUITest {
 
         long timeOut = System.currentTimeMillis() + 5 * 60 * 1000; // 5 minutes
         while (true) {
-            logContent = getLogContent(restApiClient, executionUri);
+            logContent = getLogContent(getRestApiClient(), executionUri);
             Pattern myPattern = Pattern.compile("ETL pull triggered, params: (.*)");
             Matcher m = myPattern.matcher(logContent);
 
             if (m.find()) {
-                state = ProcessUtils.getExecutionStatus(restApiClient, executionUri);
+                state = ProcessUtils.getExecutionStatus(getRestApiClient(), executionUri);
                 assertEquals(state, RUNNING_STATE);
                 return m.group(1);
             }
@@ -326,7 +323,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
     }
 
     private String getLogContent(RestApiClient restApiClient, String executionUri) {
-        return RestUtils.getResource(getRestApiClient(), executionUri + "/log", HttpStatus.OK);
+        return RestUtils.getResource(restApiClient, executionUri + "/log", HttpStatus.OK);
     }
 
     private String getWebDavUrl() {
@@ -366,11 +363,16 @@ public class DataloadProcessTest extends AbstractDLUITest {
     private void assertContentLogFile(String logContent, String expectedLogFile) throws IOException {
         List<String> allLines = FileUtils.readLines(new File(getLogFilePath(expectedLogFile)));
         for (String line : allLines) {
-            if (!logContent.contains(line)) {
+            boolean containsLine = logContent.contains(line.trim()); 
+            if (!containsLine) {
                 System.out.println("Different line: " + line);
             }
-            assertTrue(logContent.contains(line), "Log content is not correct!");
+            assertTrue(containsLine, "Log content is not correct!");
         }
+
+        Pattern myPattern = Pattern.compile("Selected datasets: dataset.opportunity,\\s?dataset.person");
+        Matcher m = myPattern.matcher(logContent);
+        assertTrue(m.find(), "Log content is not correct!");
     }
 
     private String getLogFilePath(String fileName) {
