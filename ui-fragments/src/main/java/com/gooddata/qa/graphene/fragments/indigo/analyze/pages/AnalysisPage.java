@@ -224,6 +224,10 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(bucketsPanel).isShowPercentConfigSelected();
     }
 
+    public boolean isCompareSamePeriodConfigSelected() {
+        return waitForFragmentVisible(bucketsPanel).isCompareSamePeriodConfigSelected();
+    }
+
     public boolean isCompareSamePeriodConfigEnabled() {
         return waitForFragmentVisible(bucketsPanel).isCompareSamePeriodConfigEnabled();
     }
