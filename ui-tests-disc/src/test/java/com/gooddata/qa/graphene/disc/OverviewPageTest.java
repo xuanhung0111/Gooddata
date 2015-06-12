@@ -1,5 +1,11 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -11,23 +17,19 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
-import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess.OverviewSchedule;
-import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
+import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.*;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 
 public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-overview-page";
         startPageContext = new StartPageContext() {
             

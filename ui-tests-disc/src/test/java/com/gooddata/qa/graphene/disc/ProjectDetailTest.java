@@ -1,5 +1,10 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
 import java.lang.reflect.Method;
 
 import org.testng.annotations.AfterMethod;
@@ -8,11 +13,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
-import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.*;
+import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 
 public class ProjectDetailTest extends AbstractSchedulesTest {
 
@@ -25,7 +27,6 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         downloadFolder =
                 testParams.loadProperty("browserDownloadFolder") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-project-detail";

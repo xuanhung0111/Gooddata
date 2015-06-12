@@ -27,10 +27,10 @@
                     <testResource>
                         <directory>src/test/resources</directory>
                         <filtering>false</filtering>
-                        <includes>
-                            <include>**/*.xml</include>
-                            <include>**/*.properties</include>
-                        </includes>
+                    </testResource>
+                    <testResource>
+                        <directory>src/main/resources</directory>
+                        <filtering>false</filtering>
                     </testResource>
                 </testResources>
             </build>

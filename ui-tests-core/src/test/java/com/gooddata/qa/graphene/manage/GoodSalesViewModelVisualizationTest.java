@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.manage;
 
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.IMAGES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,9 +36,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
         File tmpImage = getLDMImageFromGrayPage();
         replaceContentInSVGFile(tmpImage, Pair.of(testParams.getHost(), HOST_NAME), 
                 Pair.of(testParams.getProjectId(), PROJECT_ID));
-        assertTrue(compareTwoFile(new File(testParams.loadProperty("imageFilePath"), MODEL_IMAGE_FILE),
-                    tmpImage));
-        
+        assertTrue(compareTwoFile(getResourceAsFile("/" + IMAGES + "/" + MODEL_IMAGE_FILE), tmpImage));
     }
 
     @SuppressWarnings("unchecked")
@@ -46,8 +47,8 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
         replaceContentInSVGFile(tmpImage, Pair.of(testParams.getHost(), HOST_NAME), 
                 Pair.of(testParams.getProjectId(), PROJECT_ID));
         try {
-            assertTrue(compareTwoFile(new File(testParams.loadProperty("imageFilePath"),
-                    MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE), tmpImage));
+            assertTrue(compareTwoFile(getResourceAsFile("/" + IMAGES + "/"
+                    + MODEL_IMAGE_WITH_ATTRIBUTE_ACCOUNT_CHANGED_FILE), tmpImage));
         } finally {
             changeAttributeName("Acsount", "Account");
         }

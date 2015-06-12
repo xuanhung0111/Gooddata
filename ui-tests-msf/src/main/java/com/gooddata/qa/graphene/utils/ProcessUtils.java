@@ -36,7 +36,6 @@ public class ProcessUtils {
         String postBody =
                 prepareProcessCreationBody("GRAPH", processInfo.getProcessName(), uploadFile)
                         .toString();
-
         return createProcess(restApiClient, processInfo, postBody);
     }
 

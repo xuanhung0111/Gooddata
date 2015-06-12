@@ -1,0 +1,1 @@
+ALTER ATTRIBUTE {attr.artist.artistid} DROP KEYS {f_track.artist_id};ALTER ATTRIBUTE {attr.author.authorid} DROP KEYS {f_track.author_id};ALTER ATTRIBUTE {attr.track.trackname} DROP KEYS {d_track_trackname.id}, {f_track.trackname_id};ALTER DATASET {dataset.track} DROP {attr.track.trackname};DROP {attr.track.trackname};SYNCHRONIZE {dataset.track} PRESERVE DATA;

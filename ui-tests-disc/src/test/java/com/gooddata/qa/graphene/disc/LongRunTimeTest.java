@@ -1,20 +1,20 @@
 package com.gooddata.qa.graphene.disc;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
-
-import static org.testng.Assert.*;
 
 public class LongRunTimeTest extends AbstractSchedulesTest {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-long-time-running-schedule";
     }
 

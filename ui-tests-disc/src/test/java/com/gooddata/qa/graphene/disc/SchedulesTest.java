@@ -1,5 +1,11 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,15 +16,12 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.CronTimeBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
-import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.*;
 
 public class SchedulesTest extends AbstractSchedulesTest {
 
@@ -28,7 +31,6 @@ public class SchedulesTest extends AbstractSchedulesTest {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-schedule";
     }
 

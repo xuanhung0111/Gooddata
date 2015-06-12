@@ -1,6 +1,11 @@
 package com.gooddata.qa.graphene.project;
 
-import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -8,25 +13,20 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.OneNumberReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
-
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups = {"projectSimpleWS"}, description = "Tests for simple workshop test in GD platform")
 public class SimpleWorkshopTest extends AbstractProjectTest {
 
-    private String csvFilePath;
-
     @BeforeClass
     public void initProperties() {
-        csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
         projectTitle = "SimpleProject-test-ws";
     }
 
     @Test(dependsOnMethods = {"createSimpleProject"})
-    public void uploadData() throws InterruptedException {
-        uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
+    public void uploadData() {
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"), null, "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadData"})

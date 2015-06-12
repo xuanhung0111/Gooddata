@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.Calendar;
 
@@ -13,20 +17,16 @@ import com.gooddata.qa.graphene.entity.disc.NotificationBuilder;
 import com.gooddata.qa.graphene.entity.disc.NotificationParameters;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
-import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.*;
+import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 
 public class NotificationsTest extends AbstractNotificationTest {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-notification";
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");

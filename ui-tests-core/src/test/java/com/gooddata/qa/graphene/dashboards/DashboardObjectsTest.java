@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -13,7 +15,8 @@ import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
-@Test(groups = {"dashboardObjects"}, description = "Tests for simple project and dashboard objects functionality in GD platform")
+@Test(groups = {"dashboardObjects"},
+      description = "Tests for simple project and dashboard objects functionality in GD platform")
 public class DashboardObjectsTest extends AbstractProjectTest {
 
     private final String variableName = "FVariable";
@@ -25,9 +28,8 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void uploadDataTest() throws InterruptedException {
-        String csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
-        uploadCSV(csvFilePath + "payroll.csv", null, "simple-ws");
+    public void uploadDataTest() {
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"), null, "simple-ws");
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"})

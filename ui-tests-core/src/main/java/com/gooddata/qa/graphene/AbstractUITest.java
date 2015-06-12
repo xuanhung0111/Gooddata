@@ -396,7 +396,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType,
-                          String screenshotName) throws InterruptedException {
+                          String screenshotName) {
         initProjectsPage();
         initDashboardsPage();
         initUploadPage();

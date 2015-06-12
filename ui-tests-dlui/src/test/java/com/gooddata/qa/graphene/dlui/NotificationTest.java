@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.dlui;
 
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
 
@@ -54,7 +56,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             checkSuccessfulAddingData(dataSource, "george-add-new-attribute");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
 
         checkSuccessfulDataAddingEmail(requestTime, "Position");
@@ -74,7 +77,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             checkSuccessfulAddingData(dataSource, "george-add-new-fact");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedFactInLDM_Opportunity_Totalprice2.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedFactInLDM_Opportunity_Totalprice2.txt"));
         }
 
         checkSuccessfulDataAddingEmail(requestTime, "Totalprice2");
@@ -94,7 +98,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             checkSuccessfulAddingData(dataSource, "george-add-new-label");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedLabelInLDM_Opportunity_Label.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedLabelInLDM_Opportunity_Label.txt"));
         }
 
         checkSuccessfulDataAddingEmail(requestTime, "Label");
@@ -114,7 +119,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             checkSuccessfulAddingData(dataSource, "george-add-new-date");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedDateInLDM_Person_Date.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedDateInLDM_Person_Date.txt"));
         }
 
         checkSuccessfulDataAddingEmail(requestTime, "Date");
@@ -139,7 +145,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             checkSuccessfulAddingData(dataSource, "add-new-multi-fields");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropMultiAddedFieldsInLDM.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/dropMultiAddedFieldsInLDM.txt"));
         }
 
         checkSuccessfulDataAddingEmail(requestTime, "Date", "Label", "Position", "Totalprice2");
@@ -159,7 +165,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             failToAddData(dataSource, "george-fail-to-add-new-field");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "deleteUnmappingField.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/deleteUnmappingField.txt"));
         }
 
         checkFailedDataAddingEmail(requestTime, "Position");
@@ -180,7 +186,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             failToLoadData(dataSource, "george-fail-to-load-data");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
 
         checkFailedDataAddingEmail(requestTime, "Position");
@@ -206,7 +213,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             checkSuccessfulAddingData(dataSource, "annie-add-new-fields");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
 
         checkSuccessfulDataAddingEmailForEditor(requestTime, "Position");
@@ -226,7 +234,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             failToAddData(dataSource, "annie-fail-to-add-new-field");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "deleteUnmappingField.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/deleteUnmappingField.txt"));
         }
 
         checkFailedDataAddingEmail(requestTime, "Position");
@@ -247,7 +255,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             failToLoadData(dataSource, "annie-fail-to-load-data");
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
 
         checkFailedDataAddingEmail(requestTime, "Position");
@@ -287,7 +296,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
 
-        updateModelOfGDProject(maqlFilePath + "addUnmappingFieldToLDM.txt");
+        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/addUnmappingFieldToLDM.txt"));
 
         annieUIDialog.clickOnApplyButton();
         checkDataAddingProgress();

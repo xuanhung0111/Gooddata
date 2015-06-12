@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -318,7 +320,8 @@ public class DataloadProcessTest extends AbstractMSFTest {
     }
 
     private void assertContentLogFile(String logContent, String expectedLogFile) throws IOException {
-        List<String> allLines = FileUtils.readLines(new File(getLogFilePath(expectedLogFile)));
+        File logFile = getResourceAsFile("/" + API_RESOURCES + "/" + expectedLogFile);
+        List<String> allLines = FileUtils.readLines(logFile);
         for (String line : allLines) {
             boolean containsLine = logContent.contains(line.trim()); 
             if (!containsLine) {
@@ -330,9 +333,5 @@ public class DataloadProcessTest extends AbstractMSFTest {
         Pattern myPattern = Pattern.compile("Selected datasets: dataset.opportunity,\\s?dataset.person");
         Matcher m = myPattern.matcher(logContent);
         assertTrue(m.find(), "Log content is not correct!");
-    }
-
-    private String getLogFilePath(String fileName) {
-        return apiResourcesPath + fileName;
     }
 }

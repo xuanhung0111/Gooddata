@@ -1,5 +1,26 @@
 package com.gooddata.qa.graphene.upload;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.testng.annotations.BeforeClass;
+
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
@@ -8,19 +29,7 @@ import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.BeforeClass;
-
-import java.util.*;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.*;
-
 public abstract class AbstractUploadTest extends AbstractProjectTest {
-
-	protected String csvFilePath;
 
 	protected Map<String, String[]> expectedDashboardsAndTabs;
 	protected Map<String, String[]> emptyDashboardsAndTabs;
@@ -48,7 +57,6 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	@BeforeClass
 	public void initProperties() {
-		csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
 		projectTitle = "SimpleProject-test-upload";
 
 		expectedDashboardsAndTabs = new HashMap<String, String[]>();
@@ -101,11 +109,10 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 		assertTrue(attributesTable.selectObject(attributeName));
 	}
 
-	protected void selectFileToUpload(String fileName)
-			throws InterruptedException {
+	protected void selectFileToUpload(String fileName) {
 		initDashboardsPage();
 		initUploadPage();
-        upload.uploadFile(csvFilePath + fileName + ".csv");
+        upload.uploadFile(getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv"));
 	}
 	
 	protected void checkErrorColumn(UploadColumns uploadColumns, int columnIndex, boolean hasBubble, String bubbleMessage){
@@ -123,7 +130,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	protected void uploadInvalidCSVFile(String fileName, String errorTitle, String errorMessage, String errorSupport) throws InterruptedException{
 		initDashboardsPage();
 		initUploadPage();
-		String filePath = csvFilePath + fileName + ".csv";
+		String filePath = getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv");
 		System.out.println("Going to upload file: " + filePath);
 		waitForElementPresent(uploadFile).sendKeys(filePath);
 		if (!waitForElementVisible(errorMessageElement).isDisplayed()){
@@ -173,7 +180,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 
 	public void uploadFileAndClean(String fileName) throws InterruptedException {
 		try {
-            uploadCSV(csvFilePath + fileName + ".csv", null, "simple-upload-"
+            uploadCSV(getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv"), null, "simple-upload-"
 							+ fileName);
             verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, false);
 		} finally {

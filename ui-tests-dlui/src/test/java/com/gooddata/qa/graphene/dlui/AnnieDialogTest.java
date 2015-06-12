@@ -1,8 +1,11 @@
 package com.gooddata.qa.graphene.dlui;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 import java.util.List;
 
@@ -218,7 +221,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             openAnnieDialog();
             annieUIDialog.selectFields(dataSource);
 
-            updateModelOfGDProject(maqlFilePath + "addUnmappingFieldToLDM.txt");
+            updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/addUnmappingFieldToLDM.txt"));
 
             annieUIDialog.clickOnApplyButton();
             checkDataAddingProgress();
@@ -229,7 +232,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             openAnnieDialog();
             assertErrorMessage();
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "deleteUnmappingField.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/deleteUnmappingField.txt"));
         }
     }
 
@@ -273,7 +276,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             openAnnieDialog();
             checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
     }
 
@@ -460,7 +464,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             checkSuccessfulAddingData(fbDataSource, "add-data-with-custom-dataSource-name");
         } finally {
             deleteOutputStageMetadata();
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
+                    "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
     }
 
