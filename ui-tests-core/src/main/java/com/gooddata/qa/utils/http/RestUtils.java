@@ -33,7 +33,9 @@ import java.util.NoSuchElementException;
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class RestUtils {
 
@@ -636,10 +638,11 @@ public class RestUtils {
         HttpResponse getResponse;
         String response = "";
         try {
-            getResponse =
-                    restApiClient.execute(getRequest, expectedStatusCode, "Invalid status code");
-            if (getResponse.getEntity() != null)
-                response = EntityUtils.toString(getResponse.getEntity());
+            getResponse = restApiClient.execute(getRequest, expectedStatusCode, "Invalid status code");
+            HttpEntity entity = getResponse.getEntity(); 
+            if (entity != null) {
+                response = EntityUtils.toString(entity);
+            }
             EntityUtils.consumeQuietly(getResponse.getEntity());
         } catch (Exception e) {
             throw new IllegalStateException("There is exeception when getting API resource!", e);

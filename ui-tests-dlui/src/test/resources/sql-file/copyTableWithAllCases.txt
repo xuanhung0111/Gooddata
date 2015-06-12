@@ -1,0 +1,5 @@
+COPY opportunity(a__name, a__title, f__price) FROM LOCAL '${DATA_SOURCE_DIR}/opportunity-all-cases.csv' DELIMITER ',';
+COPY person(a__person, l__person__firstname, l__person__lastname, f__age) FROM LOCAL '${DATA_SOURCE_DIR}/person-all-cases.csv' DELIMITER ',';
+COPY abx987z(cp__cp1, a__att2, f__fact1) FROM LOCAL '${DATA_SOURCE_DIR}/abx987z-all-cases.csv' DELIMITER ',';
+COPY employee(a__id, l__id__firstname, l__id__lastname, a__department__address, f__department__age) FROM LOCAL '${DATA_SOURCE_DIR}/employee-all-cases.csv' DELIMITER ',';
+COPY my_dataset(cp__name, a__person__fullname, l__person__fullname__nickname, a__skypename, f__fact1, f__car__fact2) FROM LOCAL '${DATA_SOURCE_DIR}/my-dataset-all-cases.csv' DELIMITER ',';

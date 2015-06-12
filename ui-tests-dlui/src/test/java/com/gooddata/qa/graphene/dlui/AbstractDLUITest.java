@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
@@ -49,7 +50,8 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
     protected static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     private static final String OUTPUT_STAGE_METADATA_URI =
             "/gdc/dataload/projects/%s/outputStage/metadata";
-    protected static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
+    protected static final String ACCEPT_APPLICATION_JSON_WITH_VERSION = "application/json; version=1";
+    protected static final String ACCEPT_TEXT_PLAIN_WITH_VERSION = "text/plain; version=1";
     protected static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
 
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
@@ -71,6 +73,7 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
     protected String technicalUser;
     protected String technicalUserPassword;
     protected String technicalUserUri;
+    protected String dssAuthorizationToken;
     protected String initialLdmMaqlFile = "create-ldm.txt";
 
     protected static final String ADS_URL =
@@ -88,9 +91,10 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
         technicalUser = testParams.loadProperty("technicalUser");
         technicalUserPassword = testParams.loadProperty("technicalUserPassword");
         technicalUserUri = testParams.loadProperty("technicalUserUri");
+        dssAuthorizationToken = testParams.loadProperty("dss.authorizationToken");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI", "setup"})
     public void prepareLDMAndADSInstance() throws JSONException, ParseException, IOException,
             InterruptedException {
         // Override this method in test class if it's necessary to add more users to project
@@ -100,20 +104,21 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
         updateModelOfGDProject(maqlFilePath + initialLdmMaqlFile);
 
-        adsInstance =
-                new ADSInstance().withName("ADS Instance for DLUI test").withAuthorizationToken(
-                        testParams.loadProperty("dss.authorizationToken"));
+        adsInstance = new ADSInstance().withName("ADS Instance for DLUI test")
+                .withAuthorizationToken(dssAuthorizationToken);
         createADSInstance(adsInstance);
         // Override this method in test class if it's necessary to add more users to ads instance
         addUsersToAdsInstance();
+    }
 
-        // Override this method in test class if using other user to set default schema for output
-        // stage
+    @Test(dependsOnMethods = {"prepareLDMAndADSInstance"}, groups = {"initialDataForDLUI", "setup"},
+            alwaysRun = true, priority = 1)
+    public void setUpOutputStageAndCreateCloudConnectProcess() {
+        // Override this method in test class if using other user to set default schema for output stage
         setDefaultSchemaForOutputStage();
         assertTrue(isDataloadProcessCreated(), "DATALOAD process is not created!");
 
-        cloudconnectProcess =
-                new ProcessInfo().withProjectId(testParams.getProjectId())
+        cloudconnectProcess = new ProcessInfo().withProjectId(testParams.getProjectId())
                         .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
         assertEquals(createCloudConnectProcess(cloudconnectProcess), HttpStatus.CREATED.value());
     }
@@ -203,8 +208,13 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
     }
 
     protected void createUpdateADSTable(ADSTables adsTable) {
+        createUpdateADSTableBySQLFiles(adsTable.createTableSqlFile, adsTable.copyTableSqlFile, adsInstance);
+    }
+
+    protected void createUpdateADSTableBySQLFiles(String createTableFile, String copyTableFile, 
+            ADSInstance instance){
         List<ExecutionParameter> params =
-                prepareParamsToUpdateADS(adsTable.createTableSqlFile, adsTable.copyTableSqlFile);
+                prepareParamsToUpdateADS(createTableFile, copyTableFile, instance);
 
         String executionUri =
                 executeCloudConnectProcess(cloudconnectProcess,
@@ -213,13 +223,13 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
     }
 
     protected List<ExecutionParameter> prepareParamsToUpdateADS(String createTableSqlFile,
-            String copyTableSqlFile) {
+            String copyTableSqlFile, ADSInstance instance) {
         List<ExecutionParameter> params = Lists.newArrayList();
 
         params.add(new ExecutionParameter(ADS_USER_PARAM, testParams.getUser()));
         params.add(new ExecutionParameter(ADS_PASSWORD_PARAM, testParams.getPassword()));
         params.add(new ExecutionParameter(ADS_URL_PARAM, ADS_URL.replace("${host}",
-                testParams.getHost()).replace("${adsId}", adsInstance.getId())));
+                testParams.getHost()).replace("${adsId}", instance.getId())));
         try {
             String createTableSql =
                     FileUtils.readFileToString(new File(sqlFilePath + createTableSqlFile),
@@ -247,7 +257,7 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
                 String.format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
 
         HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
-        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
+        putRequest.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION);
 
         HttpResponse putResponse =
                 getRestApiClient().execute(putRequest, HttpStatus.OK,
@@ -263,6 +273,12 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
     protected String getDataloadProcessId() throws IOException, JSONException {
         return ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
                 .getDataloadProcess().getProcessId();
+    }
+
+    protected String getDiffResourceContent(RestApiClient restApiClient, HttpStatus status) {
+        return RestUtils.getResourceWithCustomAcceptHeader(restApiClient, 
+                format(OUTPUTSTAGE_URI, testParams.getProjectId()) + "diff",
+                status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
     }
 
     private ProcessInfo getDataloadProcessInfo() throws IOException, JSONException {

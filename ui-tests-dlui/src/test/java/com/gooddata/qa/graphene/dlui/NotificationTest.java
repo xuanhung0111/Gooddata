@@ -313,7 +313,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
         List<ExecutionParameter> params =
                 prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
-                        "copyTableWithAdditionalFields_Drop_Person.txt");
+                        "copyTableWithAdditionalFields_Drop_Person.txt", adsInstance);
 
         String executionUri =
                 executeCloudConnectProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS,
