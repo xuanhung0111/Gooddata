@@ -119,8 +119,7 @@ public class DiffResourceTest extends AbstractDLUITest {
     }
 
     private String readDiffFileToString(String file) throws IOException {
-        String filePath = maqlFilePath.replace("maql-file", "txt-file") + file;
-        return FileUtils.readFileToString(new File(filePath));
+        return FileUtils.readFileToString(new File(apiResourcesPath + file));
     }
 
     private void assertDiffContent(String actualContent, String expectedContent) throws IOException {

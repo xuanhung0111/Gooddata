@@ -376,6 +376,6 @@ public class DataloadProcessTest extends AbstractDLUITest {
     }
 
     private String getLogFilePath(String fileName) {
-        return maqlFilePath.replace("maql-file", "log-txt") + fileName;
+        return apiResourcesPath + fileName;
     }
 }
