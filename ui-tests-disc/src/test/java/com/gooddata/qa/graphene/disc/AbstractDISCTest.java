@@ -192,12 +192,17 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
 
     protected void deleteProjects(List<ProjectInfo> projectsToDelete) {
         for (ProjectInfo projectToDelete : projectsToDelete) {
+            cleanProcessesInProject(projectToDelete.getProjectId());
             deleteProject(projectToDelete.getProjectId());
         }
     }
 
     protected void cleanProcessesInWorkingProject() {
-        openProjectDetailByUrl(getWorkingProject().getProjectId());
+        cleanProcessesInProject(getWorkingProject().getProjectId());
+    }
+    
+    private void cleanProcessesInProject(String projectId) {
+        openProjectDetailByUrl(projectId);
         browser.navigate().refresh();
         waitForElementVisible(projectDetailPage.getRoot());
         projectDetailPage.deleteAllProcesses();
