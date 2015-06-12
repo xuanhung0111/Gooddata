@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -158,7 +159,8 @@ public class DataloadProcessTest extends AbstractDLUITest {
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException,
             InterruptedException {
-        List<String> deleteFiles = Arrays.asList("dataset.opportunity.csv", "dataset.person.csv");
+        List<String> deleteFiles = new ArrayList<String>(Arrays.asList("f_opportunity.csv",
+                "dataset.opportunity.csv", "f_person.csv", "dataset.person.csv"));
 
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
         deleteDataloadProcessAndCreateNewOne();
@@ -279,21 +281,22 @@ public class DataloadProcessTest extends AbstractDLUITest {
         return gdcFragment.getUserUploadsURL();
     }
 
-    private void deleteFilesFromWebdav(String webDavStructure, List<String> deleteUrls) throws IOException, 
+    private void deleteFilesFromWebdav(String webDavStructure, List<String> deleteUrls) throws IOException,
             InterruptedException {
-        WebDavClient webDav =
-                WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
+        WebDavClient webDav = WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
 
-        boolean isExist = false;
         final int timeout = 2 * 60 * 1000; // 2 mins
         int totalWaitingTime = 0;
-        final int sleepTime = 300;
-        for (String file : deleteUrls) {
-            System.out.println(String.format("Waiting for deleting file %s from WebDav...", file));
-            while (true) {
-                isExist = webDav.isFilePresent(webDavStructure + "/" + file);
-                if (isExist) {
-                    webDav.deleteFile(webDavStructure + "/" +file);
+        final int sleepTime = 200;
+        String fileUrl;
+        while (deleteUrls.size() > 0 && totalWaitingTime < timeout) {
+            for (String file : deleteUrls) {
+                System.out.println(String.format("Waiting for deleting file %s from WebDav...", file));
+
+                fileUrl = webDavStructure + "/" + file;
+                if (webDav.isFilePresent(fileUrl)) {
+                    webDav.deleteFile(fileUrl);
+                    deleteUrls.remove(file);
                     break;
                 }
 
