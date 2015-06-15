@@ -41,6 +41,8 @@
         <propertiesPath>${basedir}${file.separator}${corePropertiesPath}</propertiesPath>
         <modulePropertiesPath>${basedir}${file.separator}..${file.separator}${corePropertiesPath}</modulePropertiesPath>
 
+        <ignoreFailedTests>true</ignoreFailedTests>
+
         <skipTests>false</skipTests>
 
         <version.org.jboss.arquillian>1.1.4.Final</version.org.jboss.arquillian>
@@ -217,7 +219,7 @@
                                     </goals>
                                     <configuration>
                                         <skip>${skipTests}</skip>
-                                        <testFailureIgnore>true</testFailureIgnore>
+                                        <testFailureIgnore>${ignoreFailedTests}</testFailureIgnore>
                                         <failIfNoTests>false</failIfNoTests>
                                         <suiteXmlFiles>
                                             <suiteXmlFile>src/test/resources/${testng.suite.xml}</suiteXmlFile>
