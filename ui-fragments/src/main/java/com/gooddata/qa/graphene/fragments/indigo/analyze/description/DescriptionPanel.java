@@ -1,9 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.description;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-
-import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -25,8 +22,8 @@ public class DescriptionPanel extends AbstractFragment {
     @FindBy(css = ".adi-item-type")
     private WebElement fieldType;
 
-    @FindBy(css = ".adi-item-type~p")
-    private List<WebElement> values;
+    @FindBy(css = ".adi-item-type~div p")
+    private WebElement value;
 
     @FindBy(css = ".s-dataset-name")
     private WebElement dataset;
@@ -44,11 +41,8 @@ public class DescriptionPanel extends AbstractFragment {
         StringBuilder builder = getPrefix(false);
 
         builder.append("Values").append(NEW_LINE);
-        waitForCollectionIsNotEmpty(values);
         waitForDataLoaded();
-        for (WebElement value : values) {
-            builder.append(value.getText()).append(NEW_LINE);
-        }
+        builder.append(waitForElementVisible(value).getText()).append(NEW_LINE);
 
         return builder.toString();
     }
@@ -57,9 +51,8 @@ public class DescriptionPanel extends AbstractFragment {
         StringBuilder builder = getPrefix(false);
 
         builder.append("Defined As").append(NEW_LINE);
-        waitForCollectionIsNotEmpty(values);
         waitForDataLoaded();
-        builder.append(values.get(0).getText()).append(NEW_LINE);
+        builder.append(waitForElementVisible(value).getText()).append(NEW_LINE);
 
         return builder.toString();
     }
@@ -88,7 +81,7 @@ public class DescriptionPanel extends AbstractFragment {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
-                return !LOADING.equals(values.get(0).getText());
+                return !LOADING.equals(value.getText());
             }
         });
     }

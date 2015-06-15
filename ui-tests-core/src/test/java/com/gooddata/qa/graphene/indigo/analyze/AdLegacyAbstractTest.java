@@ -487,7 +487,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withFilters(DATE));
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
-        analysisPage.configTimeFilter("This month");
+        analysisPage.configTimeFilter("Last 12 months");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
@@ -496,7 +496,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();;
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
-        assertEquals(report.getTrackersCount(), 4);
+        assertTrue(report.getTrackersCount() >= 1);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
@@ -834,9 +834,9 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         ReportState baseState = ReportState.getCurrentState(analysisPage);
         analysisPage.addCategory(attribute1)
             .searchBucketItem(attribute2);
-        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList("PROJECT DATA", attribute2));
+        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList(attribute2));
         checkUndoRedoForReport(baseState, true);
-        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList("PROJECT DATA", attribute2));
+        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList(attribute2));
 
         analysisPage.addCategory(attribute1).exportReport();
         checkUndoRedoForReport(baseState, true);

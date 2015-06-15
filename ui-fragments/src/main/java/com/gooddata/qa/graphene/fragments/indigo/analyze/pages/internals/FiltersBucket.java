@@ -183,7 +183,7 @@ public class FiltersBucket extends AbstractFragment {
         WebElement filter = getFilter(dateFilter);
         openDatePanelOfFilter(filter).configTimeFilterByRange(from, to);
         assertEquals(getFilterTextHelper(filter),
-                "Date: " + getAnotherTimeFormat(from) + " – " + getAnotherTimeFormat(to));
+                dateFilter + ": " + getAnotherTimeFormat(from) + " – " + getAnotherTimeFormat(to));
     }
 
     private String getAnotherTimeFormat(String time) throws ParseException {
