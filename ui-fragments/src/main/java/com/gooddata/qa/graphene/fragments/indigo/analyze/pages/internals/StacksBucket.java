@@ -47,6 +47,9 @@ public class StacksBucket extends AbstractFragment {
     }
 
     public String getAddedStackByName() {
+        if (isEmpty()) {
+            return "";
+        }
         return waitForElementVisible(BY_TEXT, waitForElementVisible(item)).getText().trim();
     }
 }

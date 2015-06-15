@@ -81,6 +81,10 @@ public class BucketsPanel extends AbstractFragment {
         return waitForFragmentVisible(metricsBucket).isShowPercentConfigSelected();
     }
 
+    public boolean isCompareSamePeriodConfigSelected() {
+        return waitForFragmentVisible(metricsBucket).isCompareSamePeriodConfigSelected();
+    }
+
     public void changeGranularity(String time) {
         waitForFragmentVisible(categoriesBucket).changeGranularity(time);
     }

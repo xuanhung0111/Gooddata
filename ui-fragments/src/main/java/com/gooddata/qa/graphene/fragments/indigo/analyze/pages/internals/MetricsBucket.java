@@ -115,6 +115,10 @@ public class MetricsBucket extends AbstractFragment {
         return waitForElementPresent(showInPercents).isSelected();
     }
 
+    public boolean isCompareSamePeriodConfigSelected() {
+        return waitForElementPresent(compareToSamePeriod).isSelected();
+    }
+
     public void compareToSamePeriodOfYearBefore() {
         waitForElementVisible(compareToSamePeriod).click();
         assertTrue(compareToSamePeriod.isSelected());
