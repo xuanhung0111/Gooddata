@@ -103,7 +103,7 @@ public class DiffResourceTest extends AbstractDLUITest {
             assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                     "Diff content is incorrect, ADS and LDM not match!");
 
-            String execution = executeDataloadProcess(Lists.newArrayList(new ExecutionParameter(
+            String execution = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(new ExecutionParameter(
                     GDC_DE_SYNCHRONIZE_ALL, true)));
             assertTrue(ProcessUtils.isExecutionSuccessful(restApiClient, execution),
                     "Process execution is not successful!");

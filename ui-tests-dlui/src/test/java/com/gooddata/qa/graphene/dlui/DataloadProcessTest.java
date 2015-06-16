@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -37,11 +36,6 @@ public class DataloadProcessTest extends AbstractDLUITest {
 
     private static final String CONCURRENT_DATA_LOAD_MESSAGE = "The schedule did not run"
             + " because one or more of the datasets in this schedule is already synchronizing.";
-    private static final String INTERNAL_OUTPUT_STAGE_URI =
-            "/gdc/dataload/internal/projects/%s/outputStage/";
-    private static final String MAPPING_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "mapping";
-    private static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
-    private static final String OUTPUT_STATE_METADATA_RESOURCE = OUTPUTSTAGE_URI + "metadata";
     private static final String RUNNING_STATE = "RUNNING";
     private static final String OK_STATE = "OK";
     private static final String ERROR_STATE = "ERROR";
@@ -153,7 +147,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
         deleteDataloadProcessAndCreateNewOne();
 
-        String executionUri = executeDataloadProcess(Lists.newArrayList(
+        String executionUri = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(
                 new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
         waitForExecutionInRunningState(executionUri);
         assertEquals(ProcessUtils.waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE);
@@ -170,7 +164,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         deleteDataloadProcessAndCreateNewOne();
 
         String webDavUrl = getWebDavUrl();
-        String executionUri = executeDataloadProcess(Lists.newArrayList(
+        String executionUri = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(
                 new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
         waitForExecutionInRunningState(executionUri);
         String etlTrigerParams = waitForTriggerEtlPullAndGetParams(executionUri);
@@ -182,35 +176,6 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_etl.txt");
     }
 
-    @Test(dependsOnMethods = {"addUsersToProjects"}, groups = {"dataloadProcessTest"}, priority = 2)
-    public void editorAccessToDataloadResources() throws ParseException, JSONException, IOException {
-        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
-        deleteDataloadProcessAndCreateNewOne();
-        logout();
-        signIn(true, UserRoles.EDITOR);
-        try {
-            RestApiClient editorRestApi =
-                    getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.OK,
-                    ACCEPT_APPLICATION_JSON_WITH_VERSION);
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(OUTPUT_STATE_MODEL_RESOURCE, testParams.getProjectId()),
-                    HttpStatus.OK, ACCEPT_APPLICATION_JSON_WITH_VERSION);
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(OUTPUTSTAGE_URI, testParams.getProjectId()), HttpStatus.OK,
-                    ACCEPT_APPLICATION_JSON_WITH_VERSION);
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(OUTPUT_STATE_METADATA_RESOURCE, testParams.getProjectId()),
-                    HttpStatus.OK, ACCEPT_APPLICATION_JSON_WITH_VERSION);
-            RestUtils.getResource(editorRestApi, executeDataloadProcessSuccessfully(editorRestApi),
-                    HttpStatus.NO_CONTENT);
-        } finally {
-            logout();
-            signIn(true, UserRoles.ADMIN);
-        }
-    }
-
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException,
             IOException, InterruptedException {
@@ -219,7 +184,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
 
         Collection<ExecutionParameter> dataloadExecutionParams =
                 Lists.newArrayList(new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true));
-        String executionUri = executeDataloadProcess(dataloadExecutionParams);
+        String executionUri = executeDataloadProcess(getRestApiClient(), dataloadExecutionParams);
         waitForExecutionInRunningState(executionUri);
         // Check that the second execution will be failed because the first execution is running
         String errorMessage =
@@ -228,13 +193,8 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
     }
 
-    @Test(dependsOnGroups = "dataloadProcessTest", alwaysRun = true)
-    public void cleanUp() {
-        deleteADSInstance(adsInstance);
-    }
-
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 2)
-    private void addUsersToProjects() throws ParseException, IOException, JSONException {
+    public void addUsersToProjects() throws ParseException, IOException, JSONException {
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
                 testParams.getUser(), testParams.getPassword(), technicalUserUri, UserRoles.ADMIN);
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
@@ -243,6 +203,13 @@ public class DataloadProcessTest extends AbstractDLUITest {
         addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
         addUserToAdsInstance(adsInstance, testParams.getEditorProfileUri(),
                 testParams.getEditorUser(), "dataAdmin");
+    }
+
+    @Test(dependsOnGroups = "dataloadProcessTest", alwaysRun = true)
+    public void cleanUp() throws JSONException {
+        logout();
+        signIn(true, UserRoles.ADMIN);
+        deleteADSInstance(adsInstance);
     }
 
     private void waitForExecutionInRunningState(String executionUri) throws ParseException, IOException,
@@ -300,26 +267,6 @@ public class DataloadProcessTest extends AbstractDLUITest {
         }
 
         return responseStatusCode;
-    }
-
-    private String executeDataloadProcessSuccessfully(RestApiClient restApiClient)
-            throws IOException, JSONException {
-        String executionUri =
-                executeDataloadProcess(Lists.newArrayList(new ExecutionParameter(
-                        GDC_DE_SYNCHRONIZE_ALL, true)));
-
-        assertTrue(ProcessUtils.isExecutionSuccessful(restApiClient, executionUri),
-                "Process execution is not successful!");
-        return executionUri;
-    }
-
-    private void deleteDataloadProcessAndCreateNewOne() throws IOException, JSONException {
-        if (!getDataloadProcessId().isEmpty()) {
-            ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
-                    testParams.getProjectId());
-        }
-        createDataLoadProcess();
-        assertFalse(getDataloadProcessId().isEmpty());
     }
 
     private String getLogContent(RestApiClient restApiClient, String executionUri) {

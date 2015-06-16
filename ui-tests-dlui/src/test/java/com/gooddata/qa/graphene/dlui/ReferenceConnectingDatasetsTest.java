@@ -62,9 +62,8 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES);
             createDataLoadProcess();
 
-            String executionUri =
-                    executeDataloadProcess(Lists.newArrayList(new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL,
-                            true)));
+            String executionUri = executeDataloadProcess(getRestApiClient(), 
+                    Lists.newArrayList(new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
             assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
             
             List<String> references = getReferencesOfDataset(DATASET_NAME);
