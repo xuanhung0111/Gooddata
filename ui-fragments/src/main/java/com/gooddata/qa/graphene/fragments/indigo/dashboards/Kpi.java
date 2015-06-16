@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -17,6 +18,12 @@ public class Kpi extends AbstractFragment {
     @FindBy(css = ".kpi-headline > h3")
     private WebElement headline;
 
+    @FindBy(css = ".kpi-headline > h3 .inplaceedit")
+    private WebElement headlineInplaceEdit;
+
+    @FindBy(css = ".kpi-headline > h3 textarea")
+    private WebElement headlineTextarea;
+
     @FindBy(css = ".kpi-value")
     private WebElement value;
 
@@ -25,6 +32,13 @@ public class Kpi extends AbstractFragment {
 
     public String getHeadline() {
         return waitForElementVisible(headline).getText();
+    }
+
+    public void setHeadline(String newHeadline) {
+        waitForElementVisible(headlineInplaceEdit).click();
+        waitForElementVisible(headlineTextarea).clear();
+        headlineTextarea.sendKeys(newHeadline);
+        headlineTextarea.sendKeys(Keys.ENTER);
     }
 
     public String getValue() {
