@@ -474,12 +474,15 @@ public class RestUtils {
         String contentBody = MAQL_EXECUTION_BODY.replace("${maql}", maql);
         HttpRequestBase postRequest =
                 restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody);
-        HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK,
-                "LDM is not updated successful!");
 
         try {
-            JSONObject responseBody = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
-            String pollingUri = responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
+            HttpResponse postResponse =
+                    restApiClient.execute(postRequest, HttpStatus.OK,
+                            "LDM is not updated successful!");
+            JSONObject responseBody =
+                    new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+            String pollingUri =
+                    responseBody.getJSONArray("entries").getJSONObject(0).get("link").toString();
 
             EntityUtils.consumeQuietly(postResponse.getEntity());
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -18,7 +19,9 @@ import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.DataSourcesFragment;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -28,6 +31,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.*;
 
 public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
@@ -233,5 +237,30 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
                     "Please contact a project admin or GoodData Customer Support .",
                     "Incorrect failed message!");
         }
+    }
+    
+    protected void prepareMetricToCheckNewAddedFields(String... facts) {
+        for (String fact : facts) {
+            initFactPage();
+            factsTable.selectObject(fact);
+            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, fact);
+            initMetricPage();
+            waitForFragmentVisible(metricsTable);
+            metricsTable.selectObject(fact + " [Sum]");
+            waitForFragmentVisible(metricDetailPage).setMetricVisibleToAllUser();
+        }
+    }
+
+    protected void checkReportAfterAddingNewField(ReportDefinition reportDefinition,
+            List<String> attributeValues, List<String> metricValues) throws InterruptedException {
+        createReport(reportDefinition, reportDefinition.getName());
+    
+        List<String> attributes = reportPage.getTableReport().getAttributeElements();
+        System.out.println("Attributes: " + attributes.toString());
+        CollectionUtils.isEqualCollection(attributes, attributeValues);
+    
+        List<String> metrics = reportPage.getTableReport().getRawMetricElements();
+        System.out.println("Metric: " + metrics.toString());
+        CollectionUtils.isEqualCollection(metrics, metricValues);
     }
 }

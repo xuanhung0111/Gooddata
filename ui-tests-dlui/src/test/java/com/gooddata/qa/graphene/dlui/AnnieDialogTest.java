@@ -6,7 +6,6 @@ import static org.testng.Assert.*;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.TimeoutException;
@@ -43,9 +42,11 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     @DataProvider(name = "newFieldData")
     public static Object[][] newFieldData() {
         return new Object[][] {
-            {AddedFields.POSITION, Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6", "J7"),
+            {
+                AddedFields.POSITION, Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6", "J7"),
                 Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00")},
-            {AddedFields.TOTALPRICE2, Lists.newArrayList("A", "B", "C", "D", "E", "F"),
+            {
+                AddedFields.TOTALPRICE2, Lists.newArrayList("A", "B", "C", "D", "E", "F"),
                 Lists.newArrayList("400.00", "400.00", "400.00", "400.00", "400.00", "400.00")},
             {
                 AddedFields.LABEL,
@@ -56,7 +57,16 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                 AddedFields.DATE,
                 Lists.newArrayList("01/01/2006", "01/02/2006", "01/02/2007", "01/02/2008",
                         "07/02/2009"),
-                Lists.newArrayList("34.00", "50.00", "36.00", "13.00", "10.00")}};
+                Lists.newArrayList("34.00", "50.00", "36.00", "13.00", "10.00")},
+            {
+                AddedFields.POSITION_CONNECTION_POINT,
+                Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6", "J7"),
+                Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00")},
+            {
+                AddedFields.LABEL_OF_NEW_FIELD,
+                Lists.newArrayList("opportunityA", "opportunityB", "opportunityC", "opportunityD",
+                        "opportunityE", "opportunityF"),
+                Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00")}};
     }
 
     @BeforeClass
@@ -194,35 +204,32 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 1)
     public void prepareMetricsToCheckReport() throws JSONException {
-        List<String> facts = Lists.newArrayList("age", "price", "totalprice");
-        for (String fact : facts) {
-            initFactPage();
-            factsTable.selectObject(fact);
-            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, fact);
-            initMetricPage();
-            waitForFragmentVisible(metricsTable);
-            metricsTable.selectObject(fact + " [Sum]");
-            waitForFragmentVisible(metricDetailPage).setMetricVisibleToAllUser();
-        }
+        prepareMetricToCheckNewAddedFields("age", "price", "totalprice");
     }
 
     @Test(dataProvider = "newFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {
         "annieDialogTest", "addOneField"}, priority = 1)
     public void adminAddSingleFieldFromADSToLDM(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
+            List<String> attributeValues, List<String> metricValues) throws JSONException, InterruptedException {
         addNewDataFromADSToLDM(UserRoles.ADMIN, addedField, attributeValues, metricValues, false);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
             groups = {"annieDialogTest", "addOneField"}, priority = 1)
     public void adminCheckReportWithSingleField(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
+            List<String> attributeValues, List<String> metricValues) throws JSONException, InterruptedException {
         addNewDataFromADSToLDM(UserRoles.ADMIN, addedField, attributeValues, metricValues, true);
     }
 
     @Test(dependsOnGroups = {"addOneField"}, groups = "annieDialogTest", priority = 1)
     public void adminAddMultiFieldsFromADSToLDM() throws JSONException {
-        addMultiFieldsFromADSToLDM(UserRoles.ADMIN);
+        addMultiFieldsFromADSToLDM(UserRoles.ADMIN, false);
+    }
+    
+    @Test(dependsOnMethods = {"prepareMetricsToCheckReport"}, dependsOnGroups = {"addOneField"},
+            groups = "annieDialogTest", priority = 1)
+    public void adminCheckReportWithMultiAddedFields() throws JSONException {
+        addMultiFieldsFromADSToLDM(UserRoles.ADMIN, true);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
@@ -237,21 +244,26 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser"}, groups = {
         "annieDialogTest", "editorAddOneField"}, priority = 1)
     public void editorAddSingleFieldFromADSToLDM(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
-        addNewDataFromADSToLDM(UserRoles.EDITOR, addedField, attributeValues, metricValues,
-                false);
+            List<String> attributeValues, List<String> metricValues) throws JSONException, InterruptedException {
+        addNewDataFromADSToLDM(UserRoles.EDITOR, addedField, attributeValues, metricValues, false);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser",
         "prepareMetricsToCheckReport"}, groups = {"annieDialogTest"}, priority = 1)
     public void editorCheckReportWithSingleField(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
+            List<String> attributeValues, List<String> metricValues) throws JSONException, InterruptedException {
         addNewDataFromADSToLDM(UserRoles.EDITOR, addedField, attributeValues, metricValues, true);
     }
 
     @Test(dependsOnGroups = {"editorAddOneField"}, groups = "annieDialogTest", priority = 1)
     public void editorAddMultiFieldsFromADSToLDM() throws JSONException {
-        addMultiFieldsFromADSToLDM(UserRoles.EDITOR);
+        addMultiFieldsFromADSToLDM(UserRoles.EDITOR, false);
+    }
+
+    @Test(dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
+            dependsOnGroups = {"editorAddOneField"}, groups = "annieDialogTest", priority = 1)
+    public void editorCheckReportWithMultiAddedFields() throws JSONException {
+        addMultiFieldsFromADSToLDM(UserRoles.EDITOR, true);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
@@ -530,7 +542,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                                 prepareADSTable(addedField.getADSTable()).updateDatasetStatus(
                                         addedField.getDataset());
 
-                        checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-attribute");
+                        checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-field-"
+                                + addedField.getField().getName());
                         if (!checkReport)
                             return;
                         checkReportAfterAddNewData(addedField.getReportDefinition(),
@@ -549,15 +562,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                         addedField.getName());
             }
 
-            createReport(reportDefinition, reportDefinition.getName());
-
-            List<String> attributes = reportPage.getTableReport().getAttributeElements();
-            System.out.println("Attributes: " + attributes.toString());
-            CollectionUtils.isEqualCollection(attributes, attributeValues);
-
-            List<String> metrics = reportPage.getTableReport().getRawMetricElements();
-            System.out.println("Metric: " + metrics.toString());
-            CollectionUtils.isEqualCollection(metrics, metricValues);
+            checkReportAfterAddingNewField(reportDefinition, attributeValues, metricValues);
         } catch (InterruptedException e) {
             throw new IllegalStateException("There is exception when checking report!", e);
         }
@@ -604,8 +609,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         }
     }
 
-
-    private void addMultiFieldsFromADSToLDM(UserRoles role) throws JSONException {
+    private void addMultiFieldsFromADSToLDM(UserRoles role, boolean checkReport)
+            throws JSONException {
         String maqlFile = "dropMultiAddedFieldsInLDM.txt";
         addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
             @Override
@@ -629,6 +634,18 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                 checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-multi-fields");
             }
         });
+
+        if (!checkReport)
+            return;
+        checkReportAfterAddNewData(new ReportDefinition().withName("Report with Position")
+                .withHows("Position").withWhats("age [Sum]"), AddedFields.POSITION.getField(),
+                Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6", "J7"),
+                Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00"));
+        checkReportAfterAddNewData(new ReportDefinition().withName("Report with Totalprice2")
+                .withHows("name").withWhats("Totalprice2 [Sum]"),
+                AddedFields.TOTALPRICE2.getField(),
+                Lists.newArrayList("A", "B", "C", "D", "E", "F"),
+                Lists.newArrayList("400.00", "400.00", "400.00", "400.00", "400.00", "400.00"));
     }
 
     private void addDataFromAdsToLdmAndDropAfterTest(UserRoles role, String maqlFile,
@@ -663,6 +680,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                 "dropAddedAttributeInLDM_Person_Position.txt",
                 new ReportDefinition().withName("Report with Position").withHows("Position")
                         .withWhats("age [Sum]")),
+        POSITION_CONNECTION_POINT(
+                ADSTables.WITH_ADDITIONAL_CONNECTION_POINT,
+                new Dataset().withName("person"),
+                new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED),
+                "dropAddedConnectionPointInLDM_Person_Position.txt",
+                new ReportDefinition().withName("Report with Position").withHows("Position")
+                        .withWhats("age [Sum]")),
         TOTALPRICE2(
                 ADSTables.WITH_ADDITIONAL_FIELDS,
                 new Dataset().withName("opportunity"),
@@ -676,6 +700,14 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                 new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED),
                 "dropAddedLabelInLDM_Opportunity_Label.txt",
                 new ReportDefinition().withName("Report with Label").withHows("title")
+                        .withWhats("price [Sum]")),
+        LABEL_OF_NEW_FIELD(
+                ADSTables.WITH_ADDITIONAL_LABEL_OF_NEW_FIELD,
+                new Dataset().withName("opportunity").withFields(
+                        new Field("Title2", FieldTypes.ATTRIBUTE, FieldStatus.ADDED)),
+                new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED),
+                "dropAddedLabelInLDM_Opportunity_LabelOfNewField.txt",
+                new ReportDefinition().withName("Report with Label").withHows("Title2")
                         .withWhats("price [Sum]")),
         DATE(
                 ADSTables.WITH_ADDITIONAL_DATE,

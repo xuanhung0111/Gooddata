@@ -539,7 +539,19 @@ public class AbstractMSFTest extends AbstractProjectTest {
                 "Unknown data source",
                 AdditionalDatasets.TRACK_WITH_NEW_FIELD,
                 AdditionalDatasets.ARTIST_WITH_NEW_FIELD,
-                AdditionalDatasets.AUTHOR_WITH_NEW_FIELD);
+                AdditionalDatasets.AUTHOR_WITH_NEW_FIELD),
+        WITH_ADDITIONAL_CONNECTION_POINT(
+                "createTableWithAdditionalConnectionPoint.txt",
+                "copyTableWithAdditionalConnectionPoint.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS),
+        WITH_ADDITIONAL_LABEL_OF_NEW_FIELD(
+                "createTableWithAdditionalLabelOfNewField.txt",
+                "copyTableWithAdditionalLabelOfNewField.txt",
+                "Unknown data source",
+                AdditionalDatasets.PERSON_WITH_NEW_FIELDS,
+                AdditionalDatasets.OPPORTUNITY_WITH_NEW_FIELDS);
 
         private String createTableSqlFile;
         private String copyTableSqlFile;
