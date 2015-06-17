@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static java.lang.String.format;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -102,10 +104,30 @@ public abstract class AbstractDLUITest extends AbstractMSFTest {
                 expectedStatusCode, getDataloadProcessInfo(), params);
     }
 
-    protected String executeDataloadProcess(Collection<ExecutionParameter> params)
+    protected String executeDataloadProcess(RestApiClient restApiClient, Collection<ExecutionParameter> params)
             throws IOException, JSONException {
         return ProcessUtils
-                .executeProcess(getRestApiClient(), getDataloadProcessInfo(), "", params);
+                .executeProcess(restApiClient, getDataloadProcessInfo(), "", params);
+    }
+
+    protected String executeDataloadProcessSuccessfully(RestApiClient restApiClient)
+            throws IOException, JSONException {
+        String executionUri =
+                executeDataloadProcess(restApiClient, Lists.newArrayList(new ExecutionParameter(
+                        GDC_DE_SYNCHRONIZE_ALL, true)));
+
+        assertTrue(ProcessUtils.isExecutionSuccessful(restApiClient, executionUri),
+                "Process execution is not successful!");
+        return executionUri;
+    }
+
+    protected void deleteDataloadProcessAndCreateNewOne() throws IOException, JSONException {
+        if (!getDataloadProcessId().isEmpty()) {
+            ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
+                    testParams.getProjectId());
+        }
+        createDataLoadProcess();
+        assertFalse(getDataloadProcessId().isEmpty());
     }
 
     protected void openAnnieDialog() {
