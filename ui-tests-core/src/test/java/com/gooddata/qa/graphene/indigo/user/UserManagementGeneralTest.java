@@ -64,7 +64,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private static final String CHANGE_ROLE_FAILED_MESSAGE = "You cannot change your role to %s.";
     private static final String INVITE_USER_SUCCESSFUL_MESSAGE = "Users successfully invited.";
     private static final String INVALID_EMAIL_MESSAGE = "\"%s\" is not a valid email address.";
-    private static final String EXSITING_USER_MESSAGE = "User %s is already in this project.";
+    private static final String EXSITING_USER_MESSAGE = "All users were already in the project.";
     private static final String EMPTY_GROUP_STATE_MESSAGE = "This group is empty";
     private static final String NO_ACTIVE_INVITATIONS_MESSAGE = "No active invitations";
     private static final String NO_DEACTIVATED_USER_MESSAGE = "There are no deactivated users";
@@ -400,7 +400,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         initUserManagementPage();
         userManagementPage.openInviteUserDialog().invitePeople(UserRoles.ADMIN, "Invite existing editor user",
                 editorUser);
-        assertEquals(userManagementPage.getMessageText(), String.format(EXSITING_USER_MESSAGE, editorUser));
+        assertEquals(userManagementPage.getMessageText(), EXSITING_USER_MESSAGE,
+                "Confirm message is not correct when adding exsiting user into the project!");
     }
 
     @Test(dependsOnGroups = { "userManagement" }, groups = { "activeUser" }, alwaysRun = true)
