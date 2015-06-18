@@ -148,6 +148,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             filter.changeTimeFilterValueByClickInTimeLine("2011");
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            report.waitForReportLoading();
             assertTrue(report.getRoot().findElements(By.cssSelector("div[title='2012']")).isEmpty());
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2011']")).isDisplayed());
 
@@ -157,6 +158,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             dashboardEditBar.saveDashboard();
 
             report = dashboardsPage.getContent().getLatestReport(TableReport.class);
+            report.waitForReportLoading();
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());
             getFilterWidget("filter-time").changeTimeFilterValueByClickInTimeLine("2011");
             assertTrue(report.getRoot().findElement(By.cssSelector("div[title='2010']")).isDisplayed());
