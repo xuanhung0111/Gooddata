@@ -40,7 +40,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
     protected static final String PAGE_UPLOAD = "upload.html";
-    protected static final String PAGE_LOGIN = "account.html#/login";
+    private static final String ACCOUNT_PAGE = "account.html";
+    protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
 
@@ -199,8 +200,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void signInAtUI(String username, String password) {
-        openUrl(PAGE_LOGIN);
-        waitForElementVisible(loginFragment.getRoot());
+        if (!browser.getCurrentUrl().contains(ACCOUNT_PAGE)) {
+            openUrl(PAGE_LOGIN);
+            waitForElementVisible(loginFragment.getRoot());
+        }
         loginFragment.login(username, password, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
