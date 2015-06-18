@@ -103,6 +103,7 @@ public class DashboardDrillDialog extends AbstractFragment {
 
     public void changeChartType(String title) {
         waitForElementVisible(this.getRoot());
+        waitForCollectionIsNotEmpty(chartIcons);
         for (WebElement e : chartIcons) {
             if (!title.equals(waitForElementVisible(e)
                     .findElement(By.cssSelector("span")).getAttribute("title").trim()))
