@@ -27,10 +27,11 @@ public class FilterWidget extends AbstractFragment {
     private static final By BY_TITLE_LABEL = By.cssSelector(".titleLabel span");
     private static final By BY_INPUT_LABEL = By.cssSelector("input");
 
-    public void openPanel() {
+    public FilterWidget openPanel() {
         if (!isOpen()) {
             button.click();
         }
+        return this;
     }
 
     public void closePanel() {
@@ -51,7 +52,7 @@ public class FilterWidget extends AbstractFragment {
         return null;
     }
 
-    public List<String> getAllAttributeValues() {
+    public List<String> getAllAttributeValues() throws InterruptedException {
         openPanel();
         return getPanel(AttributeFilterPanel.class).getAllAtributeValues();
     }    
@@ -89,13 +90,14 @@ public class FilterWidget extends AbstractFragment {
         return waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).getText();
     }
 
-    public void changeTitle(String title) {
+    public void changeTitle(String title) throws InterruptedException {
         if (!getRoot().getAttribute("class").contains("yui3-c-filterdashboardwidget-selected")) {
             getRoot().click();
         }
 
         waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).click();
-        WebElement inputElement = waitForElementVisible(BY_INPUT_LABEL, titleContainer);
+        Thread.sleep(2000);
+        WebElement inputElement = titleContainer.findElement(BY_INPUT_LABEL);
         inputElement.clear();
         inputElement.sendKeys(title);
         inputElement.sendKeys(Keys.ENTER);

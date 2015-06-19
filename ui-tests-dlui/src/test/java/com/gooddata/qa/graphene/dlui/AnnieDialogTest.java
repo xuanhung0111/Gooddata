@@ -2,10 +2,11 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.*;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -166,97 +167,63 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         Screenshots.takeScreenshot(browser, "cancel-add-new-field", getClass());
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
-    public void addNewAttributeFromADSToLDM() {
+    @Test(dependsOnGroups = { "initialDataForDLUI" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void adminAddNewAttributeFromADSToLDM() throws JSONException {
+        addNewAttributeFromADSToLDM(UserRoles.ADMIN);
+    }
+
+    @Test(dependsOnGroups = { "initialDataForDLUI" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void adminAddNewFactFromADSToLDM() throws JSONException {
+        addNewFactFromADSToLDM(UserRoles.ADMIN);
+    }
+
+    @Test(dependsOnGroups = { "initialDataForDLUI" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void adminAddNewLabelFromADSToLDM() throws JSONException {
+        addNewLabelFromADSToLDM(UserRoles.ADMIN);
+    }
+
+    @Test(dependsOnGroups = { "initialDataForDLUI" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void adminAddNewDateFieldFromADSToLDM() throws JSONException {
+        addNewDateFieldFromADSToLDM(UserRoles.ADMIN);
+    }
+
+    @Test(dependsOnGroups = { "addOneField" }, groups = "annieDialogTest", priority = 1)
+    public void adminAddMultiFieldsFromADSToLDM() throws JSONException {
+        addMultiFieldsFromADSToLDM(UserRoles.ADMIN);
+    }
+
+    @Test(dependsOnGroups = { "initialDataForDLUI" }, groups = "annieDialogTest", priority = 1)
+    public void addEditorUser() {
         try {
-            Dataset selectedDataset =
-                    new Dataset().withName("person").withFields(
-                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "add-new-attribute");
-        } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
+            addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
+        } catch (Exception e) {
+            throw new IllegalStateException("There is exeception when adding user to project!", e);
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
-    public void addNewFactFromADSToLDM() {
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("opportunity").withFields(
-                            new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "add-new-fact");
-        } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedFactInLDM_Opportunity_Totalprice2.txt");
-        }
+    @Test(dependsOnMethods = { "addEditorUser" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void editorAddNewAttributeFromADSToLDM() throws JSONException {
+        addNewAttributeFromADSToLDM(UserRoles.EDITOR);
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
-    public void addNewLabelFromADSToLDM() {
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("opportunity").withFields(
-                            new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-
-            checkSuccessfulAddingData(dataSource, "add-new-label");
-        } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedLabelInLDM_Opportunity_Label.txt");
-        }
+    @Test(dependsOnMethods = { "addEditorUser" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void editorAddNewFactFromADSToLDM() throws JSONException {
+        addNewFactFromADSToLDM(UserRoles.EDITOR);
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
-    public void addNewDateFieldFromADSToLDM() {
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("person").withFields(
-                            new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "add-new-date");
-        } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedDateInLDM_Person_Date.txt");
-        }
+    @Test(dependsOnMethods = { "addEditorUser" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void editorAddNewLabelFromADSToLDM() throws JSONException {
+        addNewLabelFromADSToLDM(UserRoles.EDITOR);
     }
 
-    @Test(dependsOnMethods = {"addNewAttributeFromADSToLDM", "addNewFactFromADSToLDM",
-        "addNewLabelFromADSToLDM", "addNewDateFieldFromADSToLDM"}, groups = "annieDialogTest",
-            priority = 1)
-    public void addMultiFieldsFromADSToLDM() {
-        try {
-            Dataset personDataset =
-                    new Dataset().withName("person").withFields(
-                            new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED),
-                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
-            Dataset opportunityDataset =
-                    new Dataset().withName("opportunity").withFields(
-                            new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED),
-                            new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED));
+    @Test(dependsOnMethods = { "addEditorUser" }, groups = { "annieDialogTest", "addOneField" }, priority = 1)
+    public void editorAddNewDateFieldFromADSToLDM() throws JSONException {
+        addNewDateFieldFromADSToLDM(UserRoles.EDITOR);
+    }
 
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
-                            personDataset, opportunityDataset);
-
-            checkSuccessfulAddingData(dataSource, "add-new-multi-fields");
-        } finally {
-            dropAddedFieldsInLDM(maqlFilePath + "dropMultiAddedFieldsInLDM.txt");
-        }
+    @Test(dependsOnGroups = { "addOneField" }, groups = "annieDialogTest", priority = 1)
+    public void editorAddMultiFieldsFromADSToLDM() throws JSONException {
+        addMultiFieldsFromADSToLDM(UserRoles.EDITOR);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
@@ -288,49 +255,14 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
-    public void addNewFieldsToLDMWithEditorRole() {
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("person").withFields(
-                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-            try {
-                addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
-            } catch (Exception e) {
-                throw new IllegalStateException("There is exeception when adding user to project!",
-                        e);
-            }
-
-            logout();
-
-            try {
-                signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
-            } catch (Exception e) {
-                signInAtUI(testParams.getUser(), testParams.getPassword());
-                throw new IllegalStateException(
-                        "There is an exception when signIn as Editor user!", e);
-            }
-
-            checkSuccessfulAddingData(dataSource, "add-new-fields-with-editor-role");
-        } finally {
-            logout();
-            signInAtUI(testParams.getUser(), testParams.getPassword());
-            dropAddedFieldsInLDM(maqlFilePath + "dropAddedAttributeInLDM_Person_Position.txt");
-        }
-    }
-
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest")
     public void checkConcurrentDataLoadWithAnnieDialog() throws InterruptedException {
         Dataset dataset =
                 new Dataset().withName("person").withFields(
                         new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
         DataSource dataSource =
-                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA).updateDatasetStatus(dataset);
+                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA).updateDatasetStatus(
+                        dataset);
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
@@ -577,9 +509,9 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     private void waitForAddingDataTask() throws InterruptedException {
-        while(true) {
+        while (true) {
             openAnnieDialog();
-            if(!DATA_CAN_NOT_ADD_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline())
+            if (!DATA_CAN_NOT_ADD_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline())
                     && isDatasourceVisible()) {
                 annieUIDialog.clickOnDismissButton();
                 break;
@@ -589,14 +521,121 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         }
     }
 
-    private boolean isDatasourceVisible() {
+    private boolean isDatasourceVisible() throws InterruptedException {
         try {
             Thread.sleep(1000);
             waitForElementVisible(AnnieUIDialogFragment.BY_DATASOURCES, browser);
             return true;
-        } catch(Exception e) {
-            e.printStackTrace();
+        } catch (TimeoutException e) {
             return false;
         }
+    }
+
+    private void addNewAttributeFromADSToLDM(UserRoles role) throws JSONException {
+        String maqlFile = "dropAddedAttributeInLDM_Person_Position.txt";
+        addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
+            @Override
+            public void doAction(UserRoles role) {
+                Dataset selectedDataset = new Dataset().withName("person").withFields(
+                        new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
+
+                DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                        selectedDataset);
+
+                checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-attribute");
+            }
+        });
+    }
+
+    private void addNewFactFromADSToLDM(UserRoles role) throws JSONException {
+        String maqlFile = "dropAddedFactInLDM_Opportunity_Totalprice2.txt";
+        addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
+            @Override
+            public void doAction(UserRoles role) {
+                Dataset selectedDataset = new Dataset().withName("opportunity").withFields(
+                        new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED));
+
+                DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                        selectedDataset);
+
+                checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-fact");
+            }
+        });
+    }
+
+    private void addNewLabelFromADSToLDM(UserRoles role) throws JSONException {
+        String maqlFile = "dropAddedLabelInLDM_Opportunity_Label.txt";
+        addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
+            @Override
+            public void doAction(UserRoles role) {
+                Dataset selectedDataset = new Dataset().withName("opportunity").withFields(
+                        new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED));
+
+                DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                        selectedDataset);
+
+                checkSuccessfulAddingData(dataSource, role.getName() + "add-new-label");
+            }
+        });
+    }
+
+    private void addNewDateFieldFromADSToLDM(UserRoles role) throws JSONException {
+        String maqlFile = "dropAddedDateInLDM_Person_Date.txt";
+        addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
+            @Override
+            public void doAction(UserRoles role) {
+                Dataset selectedDataset = new Dataset().withName("person").withFields(
+                        new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED));
+
+                DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
+                        selectedDataset);
+
+                checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-date");
+            }
+        });
+    }
+
+    private void addMultiFieldsFromADSToLDM(UserRoles role) throws JSONException {
+        String maqlFile = "dropMultiAddedFieldsInLDM.txt";
+        addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
+            @Override
+            public void doAction(UserRoles role) {
+                Dataset personDataset = new Dataset().withName("person").withFields(
+                        new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED),
+                        new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
+                Dataset opportunityDataset = new Dataset().withName("opportunity").withFields(
+                        new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED),
+                        new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED));
+
+                DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
+                        personDataset, opportunityDataset);
+
+                checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-multi-fields");
+            }
+        });
+    }
+
+    private void addDataFromAdsToLdmAndDropAfterTest(UserRoles role, String maqlFile, TestAction testAction)
+            throws JSONException {
+      try {
+          if (role == UserRoles.EDITOR) {
+              signInWithOtherRole(UserRoles.EDITOR);
+          }
+          testAction.doAction(role);
+      } finally {
+          if (role == UserRoles.EDITOR) {
+              signInWithOtherRole(UserRoles.ADMIN);
+          }
+          dropAddedFieldsInLDM(maqlFilePath + maqlFile);
+      }
+    }
+
+    private void signInWithOtherRole(UserRoles role) throws JSONException {
+        logout();
+        signIn(true, role);
+    }
+
+    private interface TestAction {
+        void doAction(UserRoles role);
     }
 }

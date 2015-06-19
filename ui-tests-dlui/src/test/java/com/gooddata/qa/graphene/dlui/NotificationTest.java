@@ -1,14 +1,20 @@
 package com.gooddata.qa.graphene.dlui;
 
+import static org.testng.Assert.*;
+
+import java.util.List;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
+import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class NotificationTest extends AbstractDLUINotificationTest {
@@ -305,13 +311,14 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
 
-        // Delete existing ads table to make data load process failed
-        executeProcess(
-                cloudconnectProcess.getProcessId(),
-                ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
-                        adsInstance.getId()), sqlFilePath
-                        + "dropTableWithAdditionalFields_Person.txt", sqlFilePath
-                        + "copyTableWithAdditionalFields_Drop_Person.txt");
+        List<ExecutionParameter> params =
+                prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
+                        "copyTableWithAdditionalFields_Drop_Person.txt");
+
+        String executionUri =
+                executeCloudConnectProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS,
+                        params);
+        assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
 
         checkFailedDataAddingResult();
         Screenshots.takeScreenshot(browser, screenshotName, getClass());

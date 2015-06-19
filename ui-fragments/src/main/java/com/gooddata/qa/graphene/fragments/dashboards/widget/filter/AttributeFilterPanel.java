@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static java.lang.Thread.sleep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +36,17 @@ public class AttributeFilterPanel extends FilterPanel {
 
     private static final By ATTRIBUTE_LOADED_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loaded");
 
-    public List<String> getAllAtributeValues() {
+    public List<String> getAllAtributeValues() throws InterruptedException {
+        // wait for attribute values are loaded
+        sleep(3000);
         List<String> actualFilterElements = new ArrayList<String>();
-        waitForCollectionIsNotEmpty(listAttrValues);
         for (WebElement ele : listAttrValues) {
             actualFilterElements.add(waitForElementVisible(ele).getText());
         }
-        close();
+
+        if (!listAttrValues.isEmpty()) {
+            close();
+        }
         return actualFilterElements;
     }
 

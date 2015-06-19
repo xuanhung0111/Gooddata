@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class ChartReport extends AbstractFragment {
@@ -34,10 +36,24 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-data-labels tspan")
     private List<WebElement> dataLabels;
 
-    @FindBy(css = ".highcharts-axis-labels text[text-anchor = 'middle'] tspan")
+    @FindBy(css = ".highcharts-axis-labels text[text-anchor = 'middle']")
     private List<WebElement> axisLabels;
 
     private static final String DESELECTED_COLOR = "rgb(216,216,216)";
+
+    public List<String> getStackLabels() {
+        return getLabels(browser.findElements(By.cssSelector(".highcharts-stack-labels tspan")));
+    }
+
+    private List<String> getLabels(Collection<WebElement> labels) {
+        waitForCollectionIsNotEmpty(labels);
+        return Lists.newArrayList(Collections2.transform(labels, new Function<WebElement, String>(){
+            @Override
+            public String apply(WebElement input) {
+                return input.getText().trim();
+            }
+        }));
+    }
 
     public ChartReport clickOnTrackerByIndex(int index) {
         waitForCollectionIsNotEmpty(trackers);
@@ -94,29 +110,57 @@ public class ChartReport extends AbstractFragment {
         return getTooltipText();
     }
 
+    public boolean isLegendVisible() {
+        return !legends.isEmpty();
+    }
+
+    public boolean areLegendsHorizontal() {
+        List<String[]> values = getTransformValueFormLegend();
+        final String y = values.get(0)[1];
+
+        return Iterables.all(values, new Predicate<String[]>() {
+            @Override
+            public boolean apply(String[] input) {
+                return y.equals(input[1]);
+            }
+        });
+    }
+
+    public boolean areLegendsVertical() {
+        List<String[]> values = getTransformValueFormLegend();
+        final String x = values.get(0)[0];
+
+        return Iterables.all(values, new Predicate<String[]>() {
+            @Override
+            public boolean apply(String[] input) {
+                return x.equals(input[0]);
+            }
+        });
+    }
+
+    private List<String[]> getTransformValueFormLegend() {
+        waitForCollectionIsNotEmpty(legends);
+        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String[]>() {
+            @Override
+            public String[] apply(WebElement input) {
+                return input.getAttribute("transform").replace("translate(", "").replace(")", "").split(",");
+            }
+        }));
+    }
+
     public List<String> getLegends() {
         waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(FluentIterable.from(legends).filter(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return "div".equals(input.getTagName());
-            }
-        }).transform(new Function<WebElement, String>() {
+        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
-                return input.findElement(By.cssSelector("span")).getText();
+                return input.findElement(By.cssSelector("tspan")).getText();
             }
         }));
     }
 
     public List<String> getLegendColors() {
         waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(FluentIterable.from(legends).filter(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return "g".equals(input.getTagName());
-            }
-        }).transform(new Function<WebElement, String>() {
+        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
                 return input.findElement(By.cssSelector("path")).getCssValue("fill");
@@ -129,14 +173,7 @@ public class ChartReport extends AbstractFragment {
     }
 
     public List<String> getDataLabels() {
-        waitForCollectionIsNotEmpty(dataLabels);
-        return Lists.newArrayList(Collections2.transform(dataLabels,
-                new Function<WebElement, String>(){
-            @Override
-            public String apply(WebElement input) {
-                return input.getText().trim();
-            }
-        }));
+        return getLabels(dataLabels);
     }
 
     public List<String> getAxisLabels() {
@@ -144,13 +181,7 @@ public class ChartReport extends AbstractFragment {
         if (axisLabels.isEmpty())
             return Collections.emptyList();
 
-        return Lists.newArrayList(Collections2.transform(axisLabels,
-                new Function<WebElement, String>(){
-            @Override
-            public String apply(WebElement input) {
-                return input.getText().trim();
-            }
-        }));
+        return getLabels(axisLabels);
     }
 
     public ChartReport clickOnLegendByName(String name) {

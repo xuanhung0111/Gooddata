@@ -37,6 +37,7 @@ public final class Process implements Comparable<Process> {
     private final String type;
     private final String name;
     private final String path;
+    private final String ownerLogin;
 
     @Deprecated
     private final List<String> graphs;
@@ -47,12 +48,12 @@ public final class Process implements Comparable<Process> {
 
     @JsonCreator
     private Process(@JsonProperty("type") String type, @JsonProperty("name") String name, @JsonProperty("path") String path,
-                    @JsonProperty("graphs") List<String> graphs, @JsonProperty("executables") List<String> executables, @JsonProperty("links") Links links) {
-        this(type, name, path, graphs, executables, links, false);
+                    @JsonProperty("graphs") List<String> graphs, @JsonProperty("executables") List<String> executables, @JsonProperty("ownerLogin") String ownerLogin, @JsonProperty("links") Links links) {
+        this(type, name, path, graphs, executables, ownerLogin, links, false);
     }
 
     private Process(String type, String name, String path,
-                    List<String> graphs, List<String> executables, Links links, boolean oldClient) {
+                    List<String> graphs, List<String> executables, String ownerLogin, Links links, boolean oldClient) {
         Validate.notEmpty(name, "name can't be empty");
 
         this.type = oldClient ? null : StringUtils.isEmpty(type) ? "GRAPH" : type;
@@ -68,6 +69,7 @@ public final class Process implements Comparable<Process> {
 
         this.graphs = listToUse;
         this.executables = oldClient ? null : listToUse;
+        this.ownerLogin = ownerLogin;
 
         this.links = links;
     }
@@ -94,6 +96,10 @@ public final class Process implements Comparable<Process> {
 
     public String getType() {
         return type;
+    }
+
+    public String getOwnerLogin() {
+        return ownerLogin;
     }
 
     @JsonIgnore
@@ -151,6 +157,7 @@ public final class Process implements Comparable<Process> {
         private String type;
         private String name;
         private String path;
+        private String ownerLogin;
         private Links links;
 
         private List<String> executables;
@@ -163,6 +170,11 @@ public final class Process implements Comparable<Process> {
 
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder ownerLogin(String ownerLogin) {
+            this.ownerLogin = ownerLogin;
             return this;
         }
 
@@ -206,11 +218,13 @@ public final class Process implements Comparable<Process> {
          * @return
          */
         public Process build() {
-            return new Process(this.type, this.name, this.path, this.graphs, this.executables, this.links);
+            return new Process(this.type, this.name, this.path, this.graphs, this.executables, this.ownerLogin,
+                    this.links);
         }
 
         public Process build(boolean oldClient) {
-            return new Process(this.type, this.name, this.path, this.graphs, this.executables, this.links, oldClient);
+            return new Process(this.type, this.name, this.path, this.graphs, this.executables, this.ownerLogin,
+                    this.links, oldClient);
         }
 
     }

@@ -70,7 +70,7 @@ public class FiltersConfigPanel extends AbstractFragment {
 
     public void removeFiltersFromSelectedList(String... filterNames) {
         waitForCollectionIsNotEmpty(filters);
-        Collection<WebElement> affectedELements = Collections2.filter(filters, new Predicate<WebElement>() {
+        Collection<WebElement> affectedElements = Collections2.filter(filters, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
                 return input.getAttribute("class").contains(SELECTED);
@@ -78,7 +78,7 @@ public class FiltersConfigPanel extends AbstractFragment {
         });
 
         List<String> filterInputs = Arrays.asList(filterNames);
-        for (WebElement e : affectedELements) {
+        for (WebElement e : affectedElements) {
             if (!filterInputs.contains(e.findElement(BY_LABEL).getText()))
                 continue;
             assertTrue(e.getAttribute("class").contains(SELECTED));
@@ -88,7 +88,7 @@ public class FiltersConfigPanel extends AbstractFragment {
 
     public void addFiltersToAffectedList(String... filterNames) {
         waitForCollectionIsNotEmpty(filters);
-        Collection<WebElement> unaffectedELements = Collections2.filter(filters, new Predicate<WebElement>() {
+        Collection<WebElement> unaffectedElements = Collections2.filter(filters, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
                 return !input.getAttribute("class").contains(SELECTED);
@@ -96,10 +96,27 @@ public class FiltersConfigPanel extends AbstractFragment {
         });
 
         List<String> filterInputs = Arrays.asList(filterNames);
-        for (WebElement e : unaffectedELements) {
+        for (WebElement e : unaffectedElements) {
             if (!filterInputs.contains(e.findElement(BY_LABEL).getText()))
                 continue;
             assertFalse(e.getAttribute("class").contains(SELECTED));
+            e.findElement(BY_CHECKBOX).click();
+        }
+    }
+
+    public void removeFiltersFromAffectedList(String... filterNames) {
+        waitForCollectionIsNotEmpty(filters);
+        Collection<WebElement> affectedElements = Collections2.filter(filters, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return input.getAttribute("class").contains(SELECTED);
+            }
+        });
+        List<String> filterInputs = Arrays.asList(filterNames);
+        for (WebElement e : affectedElements) {
+            if (!filterInputs.contains(e.findElement(BY_LABEL).getText()))
+                continue;
+            assertTrue(e.getAttribute("class").contains(SELECTED));
             e.findElement(BY_CHECKBOX).click();
         }
     }

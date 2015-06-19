@@ -96,7 +96,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
         System.out.println("Download folder: " + downloadFolder);
         projectDetailPage.checkDownloadProcess(processName, downloadFolder,
-                testParams.getProjectId(), expectedDownloadedProcessSize);
+                expectedDownloadedProcessSize);
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -188,11 +188,7 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
 
         projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
                 ScheduleStatus.UNSCHEDULED);
-
         scheduleDetail.manualRun();
-        scheduleDetail.isInScheduledState();
-        projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),
-                ScheduleStatus.SCHEDULED);
 
         scheduleDetail.isInRunningState();
         projectDetailPage.assertScheduleStatus(successfulScheduleBuilder.getScheduleName(),

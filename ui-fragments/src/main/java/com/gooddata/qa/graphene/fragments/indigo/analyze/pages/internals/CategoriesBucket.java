@@ -7,6 +7,8 @@ import static org.testng.Assert.assertEquals;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -21,9 +23,6 @@ import com.google.common.collect.Lists;
 
 public class CategoriesBucket extends AbstractFragment {
 
-//    @FindBy(css = ".adi-bucket-invitation")
-//    private WebElement addCategoryBucket;
-
     @FindBy(css = ".adi-bucket-item")
     private List<WebElement> items;
 
@@ -36,7 +35,6 @@ public class CategoriesBucket extends AbstractFragment {
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
     private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
     private static final String EMPTY = "s-bucket-empty";
-    private static final By BY_BUCKET_INVITATION = By.cssSelector(".adi-bucket-invitation");
 
     public void addCategory(WebElement category) {
         new Actions(browser).dragAndDrop(category, waitForElementVisible(getRoot()))
@@ -54,13 +52,19 @@ public class CategoriesBucket extends AbstractFragment {
         });
 
         Actions action = new Actions(browser);
-        action.clickAndHold(element)
-              .moveToElement(waitForElementVisible(BY_BUCKET_INVITATION, browser))
-              .perform();
+        WebElement catalogue = browser.findElement(By.className("s-catalogue"));
+        Point location = catalogue.getLocation();
+        Dimension dimension = catalogue.getSize();
+        action.clickAndHold(element).moveByOffset(location.x + dimension.width/2, location.y + dimension.height/2)
+            .perform();
         action.moveToElement(waitForElementPresent(BY_TRASH_PANEL, browser)).perform();
         action.release().perform();
 
         assertEquals(items.size(), oldItemsCount - 1, "Category is not removed yet!");
+    }
+
+    public void replaceCategory(WebElement category) {
+        addCategory(category);
     }
 
     public boolean isEmpty() {
@@ -99,5 +103,4 @@ public class CategoriesBucket extends AbstractFragment {
         waitForElementVisible(this.dimensionSwitch);
         this.dimensionSwitch.selectByVisibleText(dimensionSwitch);
     }
-
 }

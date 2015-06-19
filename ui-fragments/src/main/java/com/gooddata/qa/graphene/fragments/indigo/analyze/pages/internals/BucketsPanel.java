@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -11,6 +12,8 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class BucketsPanel extends AbstractFragment {
+
+    private static final String STACKS_BUCKET_LOCATOR = "s-bucket-stacks";
 
     @FindBy(css = ".s-visualization-picker")
     private VisualizationReportTypePicker reportTypePicker;
@@ -20,6 +23,9 @@ public class BucketsPanel extends AbstractFragment {
 
     @FindBy(css = ".s-bucket-categories")
     private CategoriesBucket categoriesBucket;
+
+    @FindBy(className = STACKS_BUCKET_LOCATOR)
+    private StacksBucket stacksBucket;
 
     public void addMetric(WebElement metric) {
         waitForFragmentVisible(metricsBucket).addMetric(metric);
@@ -101,5 +107,40 @@ public class BucketsPanel extends AbstractFragment {
 
     public void compareToSamePeriodOfYearBefore() {
         waitForFragmentVisible(metricsBucket).compareToSamePeriodOfYearBefore();
+    }
+
+    public void addStackBy(WebElement category) {
+        waitForFragmentVisible(stacksBucket).addCategory(category);
+    }
+
+    public void replaceCategory(WebElement category) {
+        waitForFragmentVisible(categoriesBucket).replaceCategory(category);
+    }
+
+    public void replaceStackBy(WebElement category) {
+        waitForFragmentVisible(stacksBucket).replaceStackBy(category);
+    }
+
+    public boolean isStackByDisabled() {
+        return waitForFragmentVisible(stacksBucket).isStackByDisabled();
+    }
+
+    public String getStackByMessage() {
+        return waitForFragmentVisible(stacksBucket).getStackByMessage();
+    }
+
+    public String getMetricMessage() {
+        return waitForFragmentVisible(metricsBucket).getStackByMessage();
+    }
+
+    public String getAddedStackByName() {
+        return waitForFragmentVisible(stacksBucket).getAddedStackByName();
+    }
+
+    public boolean isStackByBucketEmpty() {
+        if (browser.findElements(By.className(STACKS_BUCKET_LOCATOR)).isEmpty()) {
+            return true;
+        }
+        return waitForFragmentVisible(stacksBucket).isEmpty();
     }
 }

@@ -64,4 +64,19 @@ public class WebDavClient {
     public InputStream getFile(String webContainer) throws IOException {
         return sardine.get(webContainer);
     }
+
+    public boolean deleteFile(String fileUrl) {
+        try {
+            sardine.delete(fileUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        System.out.println("Deleted successful!, " + fileUrl);
+        return true;
+    }
+
+    public boolean isFilePresent(String fileUrl) throws IOException{
+        return sardine.exists(fileUrl);
+    }
 }

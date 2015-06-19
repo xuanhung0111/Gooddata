@@ -127,6 +127,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
                     .waitForReportComputing();
 
         ChartReport report = analysisPage.getChartReport();
+        analysisPage.waitForReportComputing();
         assertTrue(CollectionUtils.isEqualCollection(report.getLegends(),
                 Arrays.asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES)));
     }

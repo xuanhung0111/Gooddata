@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.findby.FindByJQuery;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -225,12 +224,9 @@ public class ScheduleDetail extends ScheduleForm {
 
     @FindBy(css = ".error-trigger-message")
     private WebElement triggerScheduleMissingMessage;
-
-    @FindByJQuery(".ait-execution-history-item-description:contains(RUNNING)")
-    private WebElement runningExecutionItem;
-
-    @FindByJQuery(".ait-execution-history-item-description:contains(SCHEDULED)")
-    private WebElement scheduledExecutionItem;
+    
+    @FindBy(css = ".ait-execution-history-item-description")
+    private WebElement executionItemDescription;
 
     public void assertSchedule(final ScheduleBuilder scheduleBuilder) {
         waitForElementVisible(scheduleTitle);
@@ -556,12 +552,18 @@ public class ScheduleDetail extends ScheduleForm {
         waitForCollectionIsNotEmpty(scheduleExecutionItems);
         try {
             Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
-                    .pollingEvery(2, TimeUnit.SECONDS).until().element(runningExecutionItem).is()
-                    .visible();
+            .pollingEvery(2, TimeUnit.SECONDS).until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver browser) {
+                    System.out.println("Wait for execution state changed to RUNNING!");
+                    return "RUNNING".equals(waitForElementVisible(executionItemDescription).getText());
+                }});
+            
             Graphene.waitGui().until(new Predicate<WebDriver>() {
 
                 @Override
-                public boolean apply(WebDriver arg0) {
+                public boolean apply(WebDriver browser) {
                     return !lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText().isEmpty();
                 }});
             return true;
@@ -573,7 +575,14 @@ public class ScheduleDetail extends ScheduleForm {
     public boolean isInScheduledState() {
         waitForCollectionIsNotEmpty(scheduleExecutionItems);
         try {
-            waitForElementVisible(scheduledExecutionItem);
+            Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
+            .pollingEvery(2, TimeUnit.SECONDS).until(new Predicate<WebDriver>() {
+
+                @Override
+                public boolean apply(WebDriver browser) {
+                    System.out.println("Wait for execution state changed to SCHEDULED!");
+                    return "SCHEDULED".equals(waitForElementVisible(executionItemDescription).getText());
+                }});
             return true;
         } catch (NoSuchElementException e) {
             return false;

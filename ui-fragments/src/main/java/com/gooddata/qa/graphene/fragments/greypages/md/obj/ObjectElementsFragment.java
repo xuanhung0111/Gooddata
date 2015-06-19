@@ -1,28 +1,19 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.obj;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ObjectElementsFragment extends AbstractGreyPagesFragment {
 
-    @FindBy
-    private WebElement submit;
-
     public ArrayList<Pair<String, Integer>> getObjectElements() throws JSONException, InterruptedException {
         ArrayList<Pair<String, Integer>> pairs = new ArrayList<Pair<String, Integer>>();
-
-        Graphene.guardHttp(waitForElementPresent(submit)).click();
 
         waitForElementVisible(BY_GP_PRE_JSON, browser);
         JSONArray attributeElements = loadJSON().getJSONObject("attributeElements").getJSONArray("elements");

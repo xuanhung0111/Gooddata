@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -80,12 +79,9 @@ public class CataloguePanel extends AbstractFragment {
     public String getMetricDescription(String metric) {
         WebElement field = getMetric(metric);
 
-        String javaScript = "var evObj = document.createEvent('MouseEvents');" +
-                "evObj.initMouseEvent(\"mouseover\",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);" +
-                "arguments[0].dispatchEvent(evObj);";
-        ((JavascriptExecutor)browser).executeScript(javaScript, field);
-
-        getActions().moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
+        Actions actions = getActions();
+        actions.moveToElement(field).perform();
+        actions.moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getMetricDescription();
