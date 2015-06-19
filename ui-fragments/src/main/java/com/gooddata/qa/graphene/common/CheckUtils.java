@@ -51,7 +51,13 @@ public final class CheckUtils {
     }
 
     public static void waitForDashboardPageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"),
+                searchContext);
+        if (searchContext.findElements(BY_RED_BAR).size() != 0) {
+            if ("Dashboard no longer exists".equals(searchContext.findElement(BY_RED_BAR).getText())) {
+                waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), searchContext).click();
+            }
+        }
         checkRedBar(searchContext);
     }
 
