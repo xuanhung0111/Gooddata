@@ -30,7 +30,7 @@ public class DiffResourceTest extends AbstractDLUITest {
         projectTitle = "Diff-resource-test";
     }
 
-    @Test(dependsOnMethods = {"prepareLDMAndADSInstance"}, groups = {"DiffResourceTest"})
+    @Test(dependsOnMethods = {"prepareLDMAndADSInstanceForDLUI"}, groups = {"DiffResourceTest"})
     public void checkDiffResourceWithoutADSInstance() throws IOException {
         assertTrue(getDiffResourceContent(getRestApiClient(), HttpStatus.NOT_FOUND)
                 .contains(NO_DATA_WAREHOUSE_ERROR_MESSAGE),
