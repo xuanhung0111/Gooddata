@@ -1,15 +1,18 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
@@ -54,6 +57,9 @@ public class ScheduleDetail extends ScheduleForm {
             "The graph %s doesn't exist because it has been changed (renamed or deleted). "
                     + "It isn't possible to execute this schedule because there is no graph to execute.";
     private static final String OK_GROUP_DESCRIPTION_FORMAT = "OK %d×";
+    private static final String SELECT_SYNCHRONIZE_ALL_DATASETS_TEXT = "All datasets in the project";
+    private static final String SELECT_SYNCHRONIZE_SELECTED_DATASETS_TEXT = "Only selected";
+    private static final String UPLOAD_DATA_HELP_TEXT = "Data will be uploaded using full load.";
 
     private static final By BY_EXECUTION_STATUS = By.cssSelector(".execution-status");
     private static final By BY_EXECUTION_DESCRIPTION = By
@@ -74,6 +80,7 @@ public class ScheduleDetail extends ScheduleForm {
             .xpath("//div[contains(@class, 'ait-schedule-title-section')]//button[1]");
     private static final By BY_OK_GROUP_EXPAND_BUTTON = By.cssSelector(".icon-navigatedown");
     private static final By BY_PARAMETERS_EDIT_SECTION = By.cssSelector(".parameters-section.modified");
+    private static final By BY_TOOLTIP  = By.cssSelector(".bubble-content .content");
 
     @FindBy(css = ".ait-schedule-title-section-heading")
     private WebElement scheduleTitle;
@@ -227,6 +234,15 @@ public class ScheduleDetail extends ScheduleForm {
     
     @FindBy(css = ".ait-execution-history-item-description")
     private WebElement executionItemDescription;
+
+    @FindBy(css = ".mouseoverTrigger.inlineBubbleHelp")
+    private WebElement inlineBubbleHelp; 
+
+    @FindBy(css = ".searchfield-input")
+    private WebElement searchDatasetInput;
+
+    @FindBy(css = ".gd-list-view-item span:not(.ember-view)")
+    private List<WebElement> datasets;
 
     public void assertSchedule(final ScheduleBuilder scheduleBuilder) {
         waitForElementVisible(scheduleTitle);
@@ -680,6 +696,43 @@ public class ScheduleDetail extends ScheduleForm {
         assertSchedule(scheduleBuilder);
     }
 
+    public void cancelChangeAndCheckDatasetDialog(ScheduleBuilder scheduleBuilder) {
+        waitForElementVisible(openDatasetPickerButton).click();
+        waitForElementVisible(selectNoneCustomDatasetsButton).click();
+        assertChecked(Collections.<String>emptyList());
+
+        waitForElementVisible(datasetDialog).findElement(By.className("button-secondary")).click();
+        assertSchedule(scheduleBuilder);
+    }
+
+    public void openDatasetDialog() {
+        waitForElementVisible(openDatasetPickerButton).click();
+        waitForElementVisible(datasetDialog);
+    }
+
+    public void searchDatasetAndCheckResult(String text, List<String> expectedResult) {
+        waitForElementVisible(searchDatasetInput).clear();
+        searchDatasetInput.sendKeys(text);
+        assertTrue(CollectionUtils.isEqualCollection(getDatasets(), expectedResult), 
+                "Search results with keyword" + text + " is not correct!");
+        if (expectedResult.isEmpty()) {
+            assertEquals(getDatasetListCount(), expectedResult.size(), 
+                    "Number of search results with keyword" + text + " is not correct!");
+        }
+    }
+
+    public int getDatasetListCount() {
+        return datasets.size();
+    }
+
+    public List<String> getDatasets() {
+        List<String> list = new ArrayList<String>();
+        for (WebElement ele : datasets) {
+            list.add(ele.getText().trim());
+        }
+        return list;
+    }
+
     private void assertChecked(List<String> datasetsToSynchronize) {
         List<WebElement> items =
                 waitForElementVisible(datasetDialog)
@@ -779,6 +832,17 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     private void assertDataloadScheduleDatasets(ScheduleBuilder scheduleBuilder) {
+        assertTrue(SELECT_SYNCHRONIZE_ALL_DATASETS_TEXT.equals(
+                waitForElementVisible(selectSynchronizeAllDatasets).findElement(BY_PARENT).getText().trim()));
+        assertTrue(waitForElementVisible(selectSynchronizeSelectedDatasets).findElement(BY_PARENT).getText().trim()
+                .contains(SELECT_SYNCHRONIZE_SELECTED_DATASETS_TEXT));
+
+        Actions action = new Actions(browser);
+        action.moveToElement(inlineBubbleHelp).build().perform();
+        assertEquals(waitForElementVisible(BY_TOOLTIP, browser).getText().trim(), UPLOAD_DATA_HELP_TEXT,
+
+                "Upload data help message isn't correct!");
+
         if (scheduleBuilder.isSynchronizeAllDatasets()) {
             assertTrue(selectSynchronizeAllDatasets.isSelected());
             assertTrue(!selectSynchronizeSelectedDatasets.isSelected());

@@ -11,11 +11,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static java.lang.String.format;
 import static org.testng.Assert.*;
+import static java.util.Arrays.asList;
 
 public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
@@ -46,7 +47,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
     public void createDataloadScheduleWithAllDatasets() throws JSONException, InterruptedException {
         try {
-            openProjectDetailPage(getWorkingProject());
+            openProjectDetailByUrl(testParams.getProjectId());
 
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                     .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
@@ -68,8 +69,8 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                     .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
                     .setConfirmed(true).setHasDataloadProcess(true)
-                    .setDatasetsToSynchronize(Arrays.asList(OPPORTUNITY_DATASET))
-                    .setAllDatasets(Arrays.asList(OPPORTUNITY_DATASET, PERSON_DATASET))
+                    .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
+                    .setAllDatasets(asList(OPPORTUNITY_DATASET, PERSON_DATASET))
                     .setScheduleName("1 dataset")
                     .setDataloadDatasetsOverlap(true);
             createAndAssertSchedule(scheduleBuilder);
@@ -87,14 +88,44 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                     .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
                     .setConfirmed(true).setHasDataloadProcess(true)
-                    .setDatasetsToSynchronize(Arrays.asList(OPPORTUNITY_DATASET))
-                    .setAllDatasets(Arrays.asList(OPPORTUNITY_DATASET, PERSON_DATASET))
-                    .setScheduleName("1 dataset (1)").setDataloadDatasetsOverlap(true);
-            createAndAssertSchedule(scheduleBuilder);
+                    .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
+                    .setAllDatasets(asList(OPPORTUNITY_DATASET, PERSON_DATASET))
+                    .setScheduleName("Custom Schedule Name").setDataloadDatasetsOverlap(false);
+            createSchedule(scheduleBuilder);
 
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
+            scheduleDetail.cancelChangeAndCheckDatasetDialog(scheduleBuilder);
+
             scheduleDetail.changeAndCheckDatasetDialog(scheduleBuilder);
+        } finally {
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = { "setUp" }, groups = { "schedule", "tests", "dataloadSchedulesTest" })
+    public void testSearchDataset() throws JSONException, InterruptedException {
+        String fullKey = "opportunity";
+        String partKey = "portu";
+        String invalidKey = "!@#$%%";
+        String multiResultsKey = "p";
+        try {
+            openProjectDetailByUrl(testParams.getProjectId());
+
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                    .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setConfirmed(true).setHasDataloadProcess(true)
+                    .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
+                    .setAllDatasets(asList(OPPORTUNITY_DATASET, PERSON_DATASET))
+                    .setScheduleName("Search Dataset Schedule").setDataloadDatasetsOverlap(false);
+            createSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+
+            scheduleDetail.openDatasetDialog();
+            scheduleDetail.searchDatasetAndCheckResult(fullKey, asList(OPPORTUNITY_DATASET));
+            scheduleDetail.searchDatasetAndCheckResult(partKey, asList(OPPORTUNITY_DATASET));
+            scheduleDetail.searchDatasetAndCheckResult(invalidKey, Collections.<String>emptyList());
+            scheduleDetail.searchDatasetAndCheckResult(multiResultsKey, 
+                    asList(PERSON_DATASET, OPPORTUNITY_DATASET));
         } finally {
             scheduleDetail.disableSchedule();
         }
@@ -107,11 +138,11 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
         ScheduleBuilder schedule1 = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
-                        .setDatasetsToSynchronize(Arrays.asList(OPPORTUNITY_DATASET))
+                        .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
                         .setScheduleName(OPPORTUNITY_DATASET + " (1)");
         ScheduleBuilder schedule2 = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
-                        .setDatasetsToSynchronize(Arrays.asList(OPPORTUNITY_DATASET))
+                        .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
                         .setScheduleName(OPPORTUNITY_DATASET + " (2)");
         try {
             openProjectDetailByUrl(testParams.getProjectId());
@@ -131,12 +162,12 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             openScheduleViaUrl(schedule2.getScheduleUrl());
             scheduleDetail.tryToRun();
-            assertConcurrentDataloadScheduleFailed();
             Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule2-Failed", getClass());
+            assertConcurrentDataloadScheduleFailed();
 
             openScheduleViaUrl(schedule1.getScheduleUrl());
-            scheduleDetail.assertManualRunExecution();
             Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule1-Successful", getClass());
+            scheduleDetail.assertManualRunExecution();
         } finally {
             openScheduleViaUrl(schedule1.getScheduleUrl());
             scheduleDetail.disableSchedule();
@@ -151,6 +182,8 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     private void assertConcurrentDataloadScheduleFailed() {
+        browser.navigate().refresh();
+        waitForElementVisible(scheduleDetail.getRoot());
         scheduleDetail.waitForExecutionFinish();
         assertTrue(scheduleDetail.isLastSchedulerErrorIconVisible());
         assertEquals(scheduleDetail.getExecutionErrorDescription(), CONCURRENT_DATA_LOAD_MESSAGE);
