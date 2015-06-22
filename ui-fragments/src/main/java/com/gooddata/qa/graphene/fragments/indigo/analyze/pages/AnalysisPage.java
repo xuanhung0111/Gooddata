@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
@@ -40,6 +41,13 @@ public class AnalysisPage extends AbstractFragment {
         waitForFragmentVisible(mainEditor);
         waitForFragmentVisible(cataloguePanel);
         mainEditor.dragAndDropMetricToShortcutPanel(cataloguePanel.getMetric(metric), shortcutPanel);
+        return this;
+    }
+
+    public AnalysisPage dragAndDropFactToShortcutPanel(String fact, ShortcutPanel shortcutPanel) {
+        waitForFragmentVisible(mainEditor);
+        waitForFragmentVisible(cataloguePanel);
+        mainEditor.dragAndDropMetricToShortcutPanel(cataloguePanel.getFact(fact), shortcutPanel);
         return this;
     }
 
@@ -98,6 +106,12 @@ public class AnalysisPage extends AbstractFragment {
         waitForFragmentVisible(cataloguePanel);
         bucketsPanel.addMetric(cataloguePanel.getMetric(metric));
         return this;
+    }
+
+    public void addMetricFromFact(String fact) {
+        waitForFragmentVisible(bucketsPanel);
+        waitForFragmentVisible(cataloguePanel);
+        bucketsPanel.addMetric(cataloguePanel.getFact(fact));
     }
 
     public AnalysisPage addCategory(String category) {
@@ -262,6 +276,10 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public String getSelectedGranularity() {
+        return waitForFragmentVisible(bucketsPanel).getSelectedGranularity();
+    }
+
     public String getSelectedDimensionSwitch() {
         return waitForFragmentVisible(bucketsPanel).getSelectedDimensionSwitch();
     }
@@ -392,6 +410,23 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage switchAxisAndStackBy() {
         waitForFragmentVisible(bucketsPanel).switchAxisAndStackBy();
+        return this;
+    }
+
+    public String getFactAggregation(String fact) {
+        return waitForFragmentVisible(bucketsPanel).getFactAggregation(fact);
+    }
+
+    public String getFactAggregationByIndex(String fact, int index) {
+        return waitForFragmentVisible(bucketsPanel).getFactAggregationByIndex(fact, index);
+    }
+
+    public Collection<String> getAllFactAggregations(String fact) {
+        return waitForFragmentVisible(bucketsPanel).getAllFactAggregations(fact);
+    }
+
+    public AnalysisPage changeAggregationOfFact(String fact, String newAggregation) {
+        waitForFragmentVisible(bucketsPanel).changeAggregationOfFact(fact, newAggregation);
         return this;
     }
 }
