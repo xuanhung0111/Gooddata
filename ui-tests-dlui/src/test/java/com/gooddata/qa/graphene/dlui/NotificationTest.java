@@ -283,17 +283,6 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
     }
 
-    private void checkSuccessfulAddingData(DataSource dataSource, String screenshotName) {
-        openAnnieDialog();
-        annieUIDialog.selectFields(dataSource);
-        Screenshots.takeScreenshot(browser, screenshotName + "-select-fields", getClass());
-        annieUIDialog.clickOnApplyButton();
-
-        checkDataAddingProgress();
-        checkSuccessfulDataAddingResult();
-        Screenshots.takeScreenshot(browser, screenshotName + "-result", getClass());
-    }
-
     private void failToAddData(DataSource dataSource, String screenshotName) {
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
