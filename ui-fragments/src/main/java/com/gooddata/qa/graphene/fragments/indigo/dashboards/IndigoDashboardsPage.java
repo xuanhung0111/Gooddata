@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -24,6 +25,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = "s-metric_select")
     protected WebElement metricSelect;
+
+    @FindBy(className = "dashboard")
+    protected WebElement dashboard;
+
+    private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
 
     public IndigoDashboardsPage switchToEditMode() {
         waitForElementVisible(editButton).click();
@@ -56,6 +62,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForKpiLoading();
 
         return this;
+    }
+
+    public void waitForDashboardLoad() {
+        waitForElementVisible(DASHBOARD_LOADED, browser);
     }
 
     public void waitForKpiLoading(){

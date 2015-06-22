@@ -499,6 +499,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initIndigoDashboardsPage() {
         openUrl(PAGE_INDIGO_DASHBOARDS);
         waitForFragmentVisible(indigoDashboardsPage);
+        indigoDashboardsPage.waitForDashboardLoad();
         indigoDashboardsPage.waitForKpiLoading();
     }
 
