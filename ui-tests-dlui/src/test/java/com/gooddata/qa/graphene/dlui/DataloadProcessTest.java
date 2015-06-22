@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.dto.Processes;
 import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
@@ -33,7 +34,7 @@ import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import com.google.common.collect.Lists;
 
-public class DataloadProcessTest extends AbstractDLUITest {
+public class DataloadProcessTest extends AbstractMSFTest {
 
     private static final String CONCURRENT_DATA_LOAD_MESSAGE = "The schedule did not run"
             + " because one or more of the datasets in this schedule is already synchronizing.";
@@ -46,7 +47,13 @@ public class DataloadProcessTest extends AbstractDLUITest {
         projectTitle = "Dataload process test";
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"},
+    @Test(dependsOnMethods = {"createProject"}, groups = { "initialData" })
+    public void initialData() throws JSONException {
+        prepareLDMAndADSInstance();
+        setUpOutputStageAndCreateCloudConnectProcess();
+    }
+
+    @Test(dependsOnGroups = {"initialData"},
             groups = {"dataloadProcessTest"}, priority = 0)
     public void autoCreateDataloadProcess() throws IOException, JSONException, InterruptedException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -61,7 +68,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         executeDataloadProcessSuccessfully(getRestApiClient());
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"},
+    @Test(dependsOnGroups = {"initialData"},
             groups = {"dataloadProcessTest"}, priority = 1)
     public void changeAdsInstanceWhenHavingDataloadProcess() throws IOException, JSONException,
             InterruptedException {
@@ -84,7 +91,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"},
+    @Test(dependsOnGroups = {"initialData"},
             groups = {"dataloadProcessTest"}, priority = 1)
     public void changeAdsInstanceAfterDeleteDataloadProcess() throws IOException, JSONException {
         createDataLoadProcess();
@@ -134,7 +141,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
                 "Process owner of dataload is changed after executed process!");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkSuccessfulExecutionLog() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
@@ -142,7 +149,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_successful.txt");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkExecutionLogWithErrorMapping() throws ParseException, JSONException, IOException,
             InterruptedException {
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
@@ -156,7 +163,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_mapping.txt");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException,
             InterruptedException {
         List<String> deleteFiles = new ArrayList<String>(Arrays.asList("f_opportunity.csv",
@@ -178,7 +185,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_etl.txt");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException,
             IOException, InterruptedException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
@@ -195,7 +202,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 2)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 2)
     public void addUsersToProjects() throws ParseException, IOException, JSONException {
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
                 testParams.getUser(), testParams.getPassword(), technicalUserUri, UserRoles.ADMIN);

@@ -12,13 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-public class DiffResourceTest extends AbstractDLUITest {
+public class DiffResourceTest extends AbstractMSFTest {
     
     private static final String DIFF_WITH_MAPPING_MATCH_TEXT = "-- ADS and LDM column mapping matches.";
     private static final String DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE = "diff-output-stage-empty.txt";
@@ -30,14 +31,22 @@ public class DiffResourceTest extends AbstractDLUITest {
         projectTitle = "Diff-resource-test";
     }
 
-    @Test(dependsOnMethods = {"prepareLDMAndADSInstanceForDLUI"}, groups = {"DiffResourceTest"})
-    public void checkDiffResourceWithoutADSInstance() throws IOException {
+    @Test(dependsOnMethods = {"createProject"}, groups = {"DiffResourceTest"})
+    public void checkDiffResourceWithoutADSInstance() throws IOException, JSONException {
+        prepareLDMAndADSInstance();
+
         assertTrue(getDiffResourceContent(getRestApiClient(), HttpStatus.NOT_FOUND)
                 .contains(NO_DATA_WAREHOUSE_ERROR_MESSAGE),
                 "No data warehouse error message is not displayed in Diff resource!");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"DiffResourceTest"})
+    @Test(dependsOnMethods = {"checkDiffResourceWithoutADSInstance"}, groups = {"DiffResourceTest", "initialData"},
+            alwaysRun = true)
+    public void prepareData() throws IOException, JSONException {
+        setUpOutputStageAndCreateCloudConnectProcess();
+    }
+
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"})
     public void generateLdmAndAdsDifference() throws IOException {
         assertDiffContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                 readDiffFileToString(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE));
@@ -48,7 +57,7 @@ public class DiffResourceTest extends AbstractDLUITest {
                 "Diff content is incorrect, ADS and LDM not match!");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"DiffResourceTest"}, priority = 1)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"}, priority = 1)
     public void  checkDiffResourceAfterChangeAdsInstance () throws IOException {
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
         ADSInstance newInstance = new ADSInstance().withName("ADS Instance for DLUI test")
@@ -69,7 +78,7 @@ public class DiffResourceTest extends AbstractDLUITest {
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"DiffResourceTest"}, priority = 1)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"}, priority = 1)
     public void repairWrongMappingUsingDiffContent() throws IOException {
         createUpdateADSTableBySQLFiles("createTableWithErrorMapping_DiffTest.txt",
                 "copyTableWithErrorMapping_DiffTest.txt", adsInstance);
@@ -84,7 +93,7 @@ public class DiffResourceTest extends AbstractDLUITest {
                 "Diff content is incorrect, ADS and LDM not match!");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"DiffResourceTest"}, priority = 2)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"}, priority = 2)
     public void checkDiffResourceWithAllCases() throws IOException, JSONException {
         ADSInstance newInstance = new ADSInstance().withName("ADS Instance for DLUI test")
               .withAuthorizationToken(dssAuthorizationToken);

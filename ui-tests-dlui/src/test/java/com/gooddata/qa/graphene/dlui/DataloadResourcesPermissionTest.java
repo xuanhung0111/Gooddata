@@ -8,23 +8,29 @@ import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 
-public class DataloadResourcesPermissionTest extends AbstractDLUITest {
+public class DataloadResourcesPermissionTest extends AbstractMSFTest {
 
     private static final String INTERNAL_OUTPUT_STAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
     private static final String MAPPING_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "mapping";
     private static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
-    private static final String OUTPUT_STATE_METADATA_RESOURCE = OUTPUTSTAGE_URI + "metadata";
 
     @BeforeClass
     public void initProjectTitle() {
         projectTitle = "Dataload resources permission test";
     }
 
-    @Test(dependsOnGroups = { "initialDataForDLUI" }, groups = { "DataloadResourcesPermissionTest" })
+    @Test(dependsOnMethods = {"createProject"}, groups = { "initialData" })
+    public void initialData() throws JSONException {
+        prepareLDMAndADSInstance();
+        setUpOutputStageAndCreateCloudConnectProcess();
+    }
+
+    @Test(dependsOnGroups = { "initialData" }, groups = { "DataloadResourcesPermissionTest" })
     public void cannotAccessToProjectMappingResourceOfOtherUser()
             throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -35,7 +41,7 @@ public class DataloadResourcesPermissionTest extends AbstractDLUITest {
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
     }
 
-    @Test(dependsOnGroups = { "initialDataForDLUI" }, groups = { "DataloadResourcesPermissionTest" }, priority = 1)
+    @Test(dependsOnGroups = { "initialData" }, groups = { "DataloadResourcesPermissionTest" }, priority = 1)
     private void addUsersToProjects() throws ParseException, IOException, JSONException {
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(), testParams.getUser(),
                 testParams.getPassword(), testParams.getEditorProfileUri(), UserRoles.EDITOR);
@@ -62,7 +68,7 @@ public class DataloadResourcesPermissionTest extends AbstractDLUITest {
                 String.format(OUTPUTSTAGE_URI, testParams.getProjectId()), HttpStatus.OK,
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
         RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                String.format(OUTPUT_STATE_METADATA_RESOURCE, testParams.getProjectId()), HttpStatus.OK,
+                String.format(OUTPUT_STAGE_METADATA_URI, testParams.getProjectId()), HttpStatus.OK,
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
         RestUtils.getResource(editorRestApi, executeDataloadProcessSuccessfully(editorRestApi),
                 HttpStatus.NO_CONTENT);

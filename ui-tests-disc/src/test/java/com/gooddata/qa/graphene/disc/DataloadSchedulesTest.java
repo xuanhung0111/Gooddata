@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.Collections;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static java.lang.String.format;
 import static org.testng.Assert.*;
 import static java.util.Arrays.asList;
 
@@ -133,8 +132,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
     public void checkConcurrentDataLoadSchedule() {
-        createUpdateADSTableBySQLFiles("createTableWithAdditionalFields.txt",
-                "copyTableWithAdditionalFieldsLargeData.txt", adsInstance);
+        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
 
         ScheduleBuilder schedule1 = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
@@ -192,16 +190,5 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         assertFalse(scheduleDetail.getLastExecutionTime().isEmpty());
         assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE);
         assertNull(scheduleDetail.getLastExecutionLogLink());
-    }
-
-    private String getDataloadProcessUri() throws IOException, JSONException {
-        return getProcessesUri()
-                + ProcessUtils
-                        .getProcessesList(getRestApiClient(), getWorkingProject().getProjectId())
-                        .getDataloadProcess().getProcessId();
-    }
-
-    private String getProcessesUri() {
-        return format(DATALOAD_PROCESS_URI, getWorkingProject().getProjectId());
     }
 }
