@@ -23,7 +23,15 @@ public abstract class AbstractReport extends AbstractFragment {
     @FindBy(css = ".reportInfoPanelHandle")
     protected WebElement reportInfoButton;
 
+    @FindBy(css = ".c-report-too-big p")
+    protected WebElement reportTooBig;
+
+    @FindBy(css = "button.s-btn-show_anyway")
+    protected WebElement showAnywayBtn;
+
     public static final By DRILL_REPORT_LOCATOR = By.cssSelector(".c-drillDialog-report");
+
+    private static final String CELL_LIMIT = "This report has too many data points. It may freeze or crash your browser.";
 
     public void addDrilling(Pair<List<String>, String> pairs, String group) {
         WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(getRoot(), browser);
@@ -81,5 +89,14 @@ public abstract class AbstractReport extends AbstractFragment {
                         .areAllFiltersDisabled();
         configPanel.discardConfiguration();
         return ret;
+    }
+
+    public boolean isCellLimit() {
+        String text = waitForElementVisible(reportTooBig).getText();
+        return CELL_LIMIT.equals(text);
+    }
+
+    public void showAnyway() {
+        waitForElementVisible(showAnywayBtn).click();
     }
 }
