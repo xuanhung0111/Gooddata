@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotE
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -14,6 +15,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
 import com.google.common.base.Function;
@@ -30,35 +33,58 @@ public class CataloguePanel extends AbstractFragment {
     @FindBy(css = ".catalogue-container .adi-catalogue-item")
     private List<WebElement> items;
 
+    @FindBy(className = "s-filter-all")
+    private WebElement filterAll;
+
+    @FindBy(className = "s-filter-metrics")
+    private WebElement filterMetrics;
+
+    @FindBy(className = "s-filter-attributes")
+    private WebElement filterAttributes;
+
     private Actions actions;
 
     private static final By BY_INLINE_HELP = By.cssSelector(".inlineBubbleHelp");
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
-    private static final String METRIC_TYPE = "type-metric";
-    private static final String ATTRIBUTE_TYPE = "type-attribute";
-    private static final String DATE_TYPE = "type-date";
-    private static final String FACT_TYPE = "type-fact";
+    public void filterCatalog(CatalogFilterType type) {
+        WebElement filter;
+        switch(type) {
+            case ALL:
+                filter = filterAll;
+                break;
+            case METRICS_N_FACTS:
+                filter = filterMetrics;
+                break;
+            case ATTRIBUTES:
+                filter = filterAttributes;
+                break;
+            default:
+                filter = filterAll;
+                break;
+        }
+        waitForElementVisible(filter).click();
+    }
 
     public WebElement getMetric(String metric) {
-        return searchAndGetItem(metric, METRIC_TYPE);
+        return searchAndGetItem(metric, FieldType.METRIC);
     }
 
     public WebElement getCategory(String category) {
-        return searchAndGetItem(category, ATTRIBUTE_TYPE);
+        return searchAndGetItem(category, FieldType.ATTRIBUTE);
     }
 
     public WebElement getFact(String fact) {
-        return searchAndGetItem(fact, FACT_TYPE);
+        return searchAndGetItem(fact, FieldType.FACT);
     }
 
     public WebElement getInapplicableCategory(String category) {
-        return searchAndGetInapplicableItem(category, ATTRIBUTE_TYPE);
+        return searchAndGetInapplicableItem(category, FieldType.ATTRIBUTE);
     }
 
     public WebElement getTime(String filter) {
-        return searchAndGetItem(filter, DATE_TYPE);
+        return searchAndGetItem(filter, FieldType.DATE);
     }
 
     public String getTimeDescription(String time) {
@@ -103,7 +129,7 @@ public class CataloguePanel extends AbstractFragment {
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getFactDescription();
     }
 
-    public List<String> getAllCatalogueItemsInViewPort() {
+    public List<String> getAllCatalogFieldNamesInViewPort() {
         return Lists.newArrayList(Collections2.transform(items, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
@@ -146,6 +172,10 @@ public class CataloguePanel extends AbstractFragment {
         });
     }
 
+    public Collection<WebElement> getAllCatalogFieldsInViewPort() {
+        return items;
+    }
+
     private void waitForItemLoaded() {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             public boolean apply(WebDriver input) {
@@ -155,25 +185,25 @@ public class CataloguePanel extends AbstractFragment {
         });
     }
 
-    private WebElement searchAndGetInapplicableItem(final String item, final String type) {
+    private WebElement searchAndGetInapplicableItem(final String item, final FieldType type) {
         searchBucketItem(item);
         return Iterables.find(items, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
                 return item.equals(input.getText().trim())
-                        && input.getAttribute("class").contains(type)
+                        && input.getAttribute("class").contains(type.toString())
                         && input.getAttribute("class").contains("not-available");
             }
         });
     }
 
-    private WebElement searchAndGetItem(final String item, final String type) {
+    private WebElement searchAndGetItem(final String item, final FieldType type) {
         searchBucketItem(item);
         return Iterables.find(items, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
                 return item.equals(input.getText().trim())
-                        && input.getAttribute("class").contains(type);
+                        && input.getAttribute("class").contains(type.toString());
             }
         });
     }

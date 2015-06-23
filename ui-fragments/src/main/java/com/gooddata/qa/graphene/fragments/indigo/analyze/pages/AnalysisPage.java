@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
+import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -132,8 +133,12 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public List<String> getAllCatalogueItemsInViewPort() {
-        return waitForFragmentVisible(cataloguePanel).getAllCatalogueItemsInViewPort();
+    public List<String> getAllCatalogFieldNamesInViewPort() {
+        return waitForFragmentVisible(cataloguePanel).getAllCatalogFieldNamesInViewPort();
+    }
+
+    public Collection<WebElement> getAllCatalogFieldsInViewPort() {
+        return waitForFragmentVisible(cataloguePanel).getAllCatalogFieldsInViewPort();
     }
 
     public AnalysisPage removeCategory(String category) {
@@ -427,6 +432,11 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage changeAggregationOfFact(String fact, String newAggregation) {
         waitForFragmentVisible(bucketsPanel).changeAggregationOfFact(fact, newAggregation);
+        return this;
+    }
+
+    public AnalysisPage filterCatalog(CatalogFilterType type) {
+        waitForFragmentVisible(cataloguePanel).filterCatalog(type);
         return this;
     }
 }
