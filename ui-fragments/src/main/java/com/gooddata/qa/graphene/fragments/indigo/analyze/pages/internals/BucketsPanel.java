@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -154,5 +155,25 @@ public class BucketsPanel extends AbstractFragment {
 
     public void switchAxisAndStackBy() {
         stacksBucket.replaceStackBy(categoriesBucket.getFirstItem());
+    }
+
+    public String getFactAggregation(String fact) {
+        return waitForFragmentVisible(metricsBucket).getFactAggregation(fact);
+    }
+
+    public String getFactAggregationByIndex(String fact, int index) {
+        return waitForFragmentVisible(metricsBucket).getFactAggregationByIndex(fact, index);
+    }
+
+    public String getSelectedGranularity() {
+        return waitForFragmentVisible(categoriesBucket).getSelectedGranularity();
+    }
+
+    public Collection<String> getAllFactAggregations(String fact) {
+        return waitForFragmentVisible(metricsBucket).getAllFactAggregations(fact);
+    }
+
+    public void changeAggregationOfFact(String fact, String newAggregation) {
+        waitForFragmentVisible(metricsBucket).changeAggregationOfFact(fact, newAggregation);
     }
 }

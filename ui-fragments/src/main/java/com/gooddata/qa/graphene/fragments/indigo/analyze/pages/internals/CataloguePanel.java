@@ -49,7 +49,7 @@ public class CataloguePanel extends AbstractFragment {
         return searchAndGetItem(category, ATTRIBUTE_TYPE);
     }
 
-    private WebElement getFact(String fact) {
+    public WebElement getFact(String fact) {
         return searchAndGetItem(fact, FACT_TYPE);
     }
 

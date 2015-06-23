@@ -84,6 +84,10 @@ public class CategoriesBucket extends AbstractFragment {
         waitForElementVisible(granularity).selectByVisibleText(time);
     }
 
+    public String getSelectedGranularity() {
+        return waitForElementVisible(granularity).getFirstSelectedOption().getText();
+    }
+
     public List<String> getAllGranularities() {
         waitForElementVisible(granularity);
         return Lists.newArrayList(Collections2.transform(granularity.getOptions(), new Function<WebElement, String>() {
