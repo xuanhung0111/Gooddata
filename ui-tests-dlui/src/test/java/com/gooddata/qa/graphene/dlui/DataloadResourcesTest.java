@@ -5,6 +5,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
@@ -19,82 +20,105 @@ import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-public class DiffResourceTest extends AbstractMSFTest {
+import static java.util.Arrays.asList;
+
+public class DataloadResourcesTest extends AbstractMSFTest {
     
     private static final String DIFF_WITH_MAPPING_MATCH_TEXT = "-- ADS and LDM column mapping matches.";
     private static final String DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE = "diff-output-stage-empty.txt";
     private static final String NO_DATA_WAREHOUSE_ERROR_MESSAGE =
             "No Data Warehouse schema defined for project %s.";
+    private static final String NO_DATALOAD_PROCESS_MESSAGE = "No DATALOAD process exists in project %s.";
+    private static final String DIFF_KEY = Strings.repeat("-", 50);
+    private static final String MAPPING_OUTPUT_STAGE_EMPTY_FILE = "mapping-output-stage-empty.txt";
 
     @BeforeClass
     public void initialProjectTitle() {
-        projectTitle = "Diff-resource-test";
+        projectTitle = "Dataload-resources-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"DiffResourceTest"})
-    public void checkDiffResourceWithoutADSInstance() throws IOException, JSONException {
+    @Test(dependsOnMethods = {"createProject"}, groups = {"DataloadResourcesTest"})
+    public void checkResourcesWithoutADSInstance() throws IOException, JSONException {
         prepareLDMAndADSInstance();
 
         assertTrue(getDiffResourceContent(getRestApiClient(), HttpStatus.NOT_FOUND)
                 .contains(NO_DATA_WAREHOUSE_ERROR_MESSAGE),
                 "No data warehouse error message is not displayed in Diff resource!");
+
+        assertTrue(getMappingResourceContent(getRestApiClient(), HttpStatus.FORBIDDEN)
+                .contains(NO_DATALOAD_PROCESS_MESSAGE),
+                "No dataload process error message is not displayed in mapping resource!");
     }
 
-    @Test(dependsOnMethods = {"checkDiffResourceWithoutADSInstance"}, groups = {"DiffResourceTest", "initialData"},
-            alwaysRun = true)
+    @Test(dependsOnMethods = {"checkResourcesWithoutADSInstance"},
+            groups = {"DataloadResourcesTest", "initialData"}, alwaysRun = true)
     public void prepareData() throws IOException, JSONException {
         setUpOutputStageAndCreateCloudConnectProcess();
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"})
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"})
     public void generateLdmAndAdsDifference() throws IOException {
-        assertDiffContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
-                readDiffFileToString(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE));
+        assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
+                readResourceFile(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE, DIFF_KEY));
+        assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                readAllLinesOfFile(MAPPING_OUTPUT_STAGE_EMPTY_FILE));
 
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
 
         assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                 "Diff content is incorrect, ADS and LDM not match!");
+        assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                readAllLinesOfFile("mapping-valid-case.txt"));
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"}, priority = 1)
-    public void  checkDiffResourceAfterChangeAdsInstance () throws IOException {
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"}, priority = 1)
+    public void  checkResourcesAfterChangeAdsInstance () throws IOException {
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
         ADSInstance newInstance = new ADSInstance().withName("ADS Instance for DLUI test")
                 .withAuthorizationToken(dssAuthorizationToken);
         createADSInstance(newInstance);
         try {
             setDefaultSchemaForOutputStage(getRestApiClient(), newInstance.getId());
-            System.out.println("equals: " + readDiffFileToString(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE)
-                    .contains(getDiffResourceContent(getRestApiClient(), HttpStatus.OK)));
-            assertDiffContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
-                    readDiffFileToString(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE));
+
+            assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
+                    readResourceFile(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE,  DIFF_KEY));
+            assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                    readAllLinesOfFile(MAPPING_OUTPUT_STAGE_EMPTY_FILE));
+
             setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
+
             assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                     "Diff content is incorrect, ADS and LDM not match!");
+            assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                    readAllLinesOfFile("mapping-valid-case.txt"));
         } finally {
             setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
             deleteADSInstance(newInstance);
         }
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"}, priority = 1)
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"}, priority = 1)
     public void repairWrongMappingUsingDiffContent() throws IOException {
         createUpdateADSTableBySQLFiles("createTableWithErrorMapping_DiffTest.txt",
                 "copyTableWithErrorMapping_DiffTest.txt", adsInstance);
 
         setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
-        assertDiffContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
-                readDiffFileToString("diff-error-mapping.txt"));
+
+        assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
+                readResourceFile("diff-error-mapping.txt", DIFF_KEY));
+        assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                readAllLinesOfFile("mapping-error-case.txt"));
 
         createUpdateADSTableBySQLFiles("alterTableToFixDiffErrorMapping.txt", "copyTable.txt", adsInstance);
 
         assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                 "Diff content is incorrect, ADS and LDM not match!");
+        assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                readAllLinesOfFile("mapping-valid-case.txt"));
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DiffResourceTest"}, priority = 2)
-    public void checkDiffResourceWithAllCases() throws IOException, JSONException {
+    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"}, priority = 2)
+    public void checkResourcesWithAllCases() throws IOException, JSONException {
         ADSInstance newInstance = new ADSInstance().withName("ADS Instance for DLUI test")
               .withAuthorizationToken(dssAuthorizationToken);
         createADSInstance(newInstance);
@@ -103,14 +127,18 @@ public class DiffResourceTest extends AbstractMSFTest {
             updateModelOfGDProject(maqlFilePath + "dropTablesOpportunityPerson.txt");
             updateModelOfGDProject(maqlFilePath + "createDatasetWithAllCases.txt");
 
-            assertDiffContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
-                    readDiffFileToString("diff-all-cases.txt"));
+            assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
+                    readResourceFile("diff-all-cases.txt", DIFF_KEY));
+            assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                    readAllLinesOfFile("mapping-all-cases-error.txt"));
 
             createUpdateADSTableBySQLFiles("createTableWithAllCases.txt", "copyTableWithAllCases.txt",
                     newInstance);
 
             assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                     "Diff content is incorrect, ADS and LDM not match!");
+            assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
+                    readAllLinesOfFile("mapping-all-cases.txt"));
 
             String execution = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(new ExecutionParameter(
                     GDC_DE_SYNCHRONIZE_ALL, true)));
@@ -122,19 +150,24 @@ public class DiffResourceTest extends AbstractMSFTest {
         }
     }
 
-    @Test(dependsOnGroups = {"DiffResourceTest"}, alwaysRun = true)
+    @Test(dependsOnGroups = {"DataloadResourcesTest"}, alwaysRun = true)
     public void cleanUp() {
         deleteADSInstance(adsInstance);
     }
 
-    private String readDiffFileToString(String file) throws IOException {
-        return FileUtils.readFileToString(new File(apiResourcesPath + file));
+    private List<String> readResourceFile(String file, String key) throws IOException {
+        return asList(FileUtils.readFileToString(new File(apiResourcesPath + file)).split(key));
     }
 
-    private void assertDiffContent(String actualContent, String expectedContent) throws IOException {
-        String[] contentParts = expectedContent.split(Strings.repeat("-", 50));
-        for(int i = 0; i < contentParts.length; i++ ){
-            assertTrue(actualContent.contains(contentParts[i].trim()));
+    private List<String> readAllLinesOfFile(String file) throws IOException {
+        return FileUtils.readLines(new File(apiResourcesPath + file));
+    }
+
+    private void assertResourceContent(String actualContent, List<String> expectedParts) throws IOException {
+        for (String part : expectedParts) {
+            assertTrue(actualContent.contains(part.trim()),
+                    "Resource content is not correct with different part: " + part);
         }
     }
+
 }

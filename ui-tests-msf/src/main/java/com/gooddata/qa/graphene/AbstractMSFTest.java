@@ -51,6 +51,10 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     protected static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
     protected static final String OUTPUT_STAGE_METADATA_URI = OUTPUTSTAGE_URI + "metadata";
+    protected static final String INTERNAL_OUTPUT_STAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
+    protected static final String MAPPING_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "mapping";
+    protected static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
+
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
     protected static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
@@ -408,6 +412,11 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return RestUtils.getResourceWithCustomAcceptHeader(restApiClient, 
                 format(OUTPUTSTAGE_URI, testParams.getProjectId()) + "diff",
                 status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
+    }
+
+    protected String getMappingResourceContent(RestApiClient restApiClient, HttpStatus status) {
+        return RestUtils.getResourceWithCustomAcceptHeader(restApiClient,
+                format(MAPPING_RESOURCE, testParams.getProjectId()), status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
     }
 
     private ProcessInfo getDataloadProcessInfo() throws IOException, JSONException {
