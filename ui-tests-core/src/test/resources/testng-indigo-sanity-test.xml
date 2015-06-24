@@ -1,0 +1,43 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="sanity-1" enabled="true">
+        <groups>
+            <dependencies>
+                <group name="sanity" depends-on="projectInit" />
+            </dependencies>
+            <run>
+                <include name="sanity" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerGeneralTest" />
+        </classes>
+    </test>
+
+    <test name="sanity-2" enabled="true">
+        <groups>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="turnOfWalkme" depends-on="createProject" />
+                <group name="init" depends-on="turnOfWalkme" />
+                <group name="sanity" depends-on="init" />
+            </dependencies>
+            <run>
+                <include name="sanity" />
+                <include name="init" />
+                <include name="turnOfWalkme" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesReplaceMetricAttributeTest" />
+            <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesTwoAttributeBucketsTest" />
+        </classes>
+    </test>
+
+</suite>

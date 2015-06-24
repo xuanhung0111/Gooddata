@@ -172,7 +172,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void testWithAttribute() {
         String attribute = getRandomAttribute();
         initAnalysePage();
@@ -189,7 +189,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         analysisPage.changeReportType(ReportType.TABLE).getTableReport();
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void dragMetricToColumnChartShortcutPanel() {
         initAnalysePage();
 
@@ -243,7 +243,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void testSimpleContribution() {
         initAnalysePage();
 
@@ -261,7 +261,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             }
         }, "testSimpleContribution");
 
-        ChartReport report = analysisPage.getChartReport();
+        final ChartReport report = analysisPage.getChartReport();
         int oldTrackersCount = report.getTrackersCount();
         assertTrue(oldTrackersCount >= 1);
         RecommendationContainer recommendationContainer =
@@ -284,7 +284,6 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigSelected());
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
@@ -329,7 +328,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void testSimpleComparison() {
         initAnalysePage();
 
@@ -478,7 +477,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
 
@@ -495,7 +494,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void exportCustomDiscovery() throws InterruptedException {
         initAnalysePage();
 
@@ -561,7 +560,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void filterOnDateAttribute() {
         initAnalysePage();
 
@@ -712,11 +711,11 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
     public void testSimplePoP() {
         initAnalysePage();
 
-        String metric1 = doSafetyMetricAction(new MetricSafetyAction() {
+        final String metric1 = doSafetyMetricAction(new MetricSafetyAction() {
             @Override
             public void action(String metric) {
                 analysisPage.addMetric(metric).addCategory(DATE);
@@ -737,17 +736,14 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(legends.size(), 2);
         assertTrue(isEqualCollection(legends, asList(metric1 + " - previous year", metric1)));
 
-        String metric2 = doSafetyMetricAction(new SafetyActionAdapter() {
+        doSafetyMetricAction(new SafetyActionAdapter() {
             @Override
             public void action(String metric) {
-                analysisPage.addMetric(metric);
+                analysisPage.replaceMetric(metric1, metric);
             }
         }, "testSimplePoP");
 
         assertTrue(report.getTrackersCount() >= 1);
-        legends = report.getLegends();
-        assertEquals(legends.size(), 2);
-        assertTrue(isEqualCollection(legends, asList(metric1, metric2)));
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP})

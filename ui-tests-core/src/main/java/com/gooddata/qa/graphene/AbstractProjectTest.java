@@ -1,11 +1,8 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.qa.graphene.enums.DWHDriver;
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -35,7 +32,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         signIn(false, UserRoles.ADMIN);
     }
 
-    @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
+    @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"createProject"})
     public void createProject() throws JSONException, InterruptedException, IOException {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
@@ -75,7 +72,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         if (addUsersWithOtherRoles) addUsersWithOtherRolesToProject();
     }
 
-    @AfterClass()
+    @AfterClass(alwaysRun = true)
     public void validateProjectTearDown() throws JSONException {
         //it is necessary to login admin to validate project on afterClass
         logout();

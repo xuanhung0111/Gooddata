@@ -28,7 +28,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         projectTitle = "Indigo-GoodSales-Demo-Two-Attribute-Buckets-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, groups = {"sanity"})
     public void dropAttributeToReportHaveOneMetric() {
         initAnalysePage();
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
