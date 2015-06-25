@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.server.browserlaunchers.Sleeper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -126,6 +127,9 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             tableReport.waitForReportLoading();
             checkRedBar(browser);
 
+            // avoid exception: Element is no longer attached to the DOM 
+            Sleeper.sleepTightInSeconds(3);
+
             drillDialog.changeChartType("Table");
             tableReport.waitForReportLoading();
             checkRedBar(browser);
@@ -212,7 +216,8 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withName("Drill-Opportunity")
             .withWhats("# of Opportunities")
-            .withHows("Opportunity");
+            .withHows(new HowItem("Opportunity", "14 West > Explorer", "1-800 Postcards > Educationly",
+                    "1-800 We Answer > Explorer"));
 
         createReport(reportDefinition, "Drill-Opportunity");
         checkRedBar(browser);
