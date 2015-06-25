@@ -28,7 +28,7 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
         projectTitle = "Indigo-GoodSales-Replace-Metric-Attribute-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, groups = {"sanity"})
     public void replaceMetricByNewOne() {
         initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES);

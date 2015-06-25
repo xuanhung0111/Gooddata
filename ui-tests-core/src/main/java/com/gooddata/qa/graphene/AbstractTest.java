@@ -46,7 +46,7 @@ public abstract class AbstractTest extends Arquillian {
     //the projectInit group which will be skipped for loadPlatformPageBeforeTestMethod 
     protected static final String PROJECT_INIT_GROUP = "projectInit";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void loadProperties() {
         propertiesPath = System.getProperty("propertiesPath", System.getProperty("user.dir") +
                 "/ui-tests-core/src/test/resources/variables-env-test.properties".replace("/",

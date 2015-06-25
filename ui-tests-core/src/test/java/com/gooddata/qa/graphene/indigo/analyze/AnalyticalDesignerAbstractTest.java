@@ -21,7 +21,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         projectCreateCheckIterations = 60; // 5 minutes
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"turnOfWalkme"}, priority = 1)
+    @Test(dependsOnGroups = {"createProject"}, groups = {"turnOfWalkme"}, priority = 1)
     public void turnOffWalkme() {
         if (isWalkmeTurnOff) {
             return;
