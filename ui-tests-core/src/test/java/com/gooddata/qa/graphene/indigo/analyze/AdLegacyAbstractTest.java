@@ -208,7 +208,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(analysisPage.searchBucketItem(notAvailableAttribute));
         Screenshots.takeScreenshot(browser, 
                 "testAccessibilityGuidanceForAttributesMetrics - searchInapplicableCategory", getClass());
-        assertTrue(analysisPage.getAllCatalogueItemsInViewPort().contains(notAvailableAttribute));
+        assertTrue(analysisPage.getAllCatalogFieldNamesInViewPort().contains(notAvailableAttribute));
         assertFalse(analysisPage.searchBucketItem(notAvailableAttribute + "not found"));
         Screenshots.takeScreenshot(browser,
                 "testAccessibilityGuidanceForAttributesMetrics - searchNotFound", getClass());
@@ -834,9 +834,9 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         ReportState baseState = ReportState.getCurrentState(analysisPage);
         analysisPage.addCategory(attribute1)
             .searchBucketItem(attribute2);
-        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList(attribute2));
+        assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), Arrays.asList(attribute2));
         checkUndoRedoForReport(baseState, true);
-        assertEquals(analysisPage.getAllCatalogueItemsInViewPort(), Arrays.asList(attribute2));
+        assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), Arrays.asList(attribute2));
 
         analysisPage.addCategory(attribute1).exportReport();
         checkUndoRedoForReport(baseState, true);

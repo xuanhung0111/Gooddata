@@ -6,12 +6,17 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
+import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
@@ -128,5 +133,39 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         assertTrue(analysisPage.isExplorerMessageVisible());
         assertEquals(analysisPage.getExplorerMessage(), "Visualization cannot be displayed");
         analysisPage.resetToBlankState();
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testFilteringFieldsInCatalog() {
+        initAnalysePage();
+        analysisPage.searchBucketItem("am");
+        analysisPage.filterCatalog(CatalogFilterType.METRICS_N_FACTS);
+        assertTrue(Iterables.all(analysisPage.getAllCatalogFieldsInViewPort(), new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                String cssClass = input.getAttribute("class");
+                return cssClass.contains(FieldType.METRIC.toString()) ||
+                        cssClass.contains(FieldType.FACT.toString());
+            }
+        }));
+
+        analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES);
+        assertTrue(Iterables.all(analysisPage.getAllCatalogFieldsInViewPort(), new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString());
+            }
+        }));
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testCreateReportWithFieldsInCatalogFilter() {
+        initAnalysePage();
+        analysisPage.filterCatalog(CatalogFilterType.METRICS_N_FACTS)
+            .addMetric(AMOUNT)
+            .filterCatalog(CatalogFilterType.ATTRIBUTES)
+            .addCategory(STAGE_NAME)
+            .waitForReportComputing();
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 }
