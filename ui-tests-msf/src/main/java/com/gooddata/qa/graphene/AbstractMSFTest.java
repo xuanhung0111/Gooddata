@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
@@ -20,9 +19,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +38,7 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
@@ -42,6 +46,8 @@ import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import com.gooddata.qa.graphene.enums.DatasetElements;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.google.common.collect.Lists;
 
 public class AbstractMSFTest extends AbstractProjectTest {
@@ -50,6 +56,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
             + "%s/schemas/default";
     private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
+    private static final String DATALOAD = "DATALOAD";
 
     protected static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     protected static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
@@ -57,6 +64,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected static final String INTERNAL_OUTPUT_STAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
     protected static final String MAPPING_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "mapping";
     protected static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
+    protected static final String PROJECT_MODEL_VIEW = "/gdc/projects/%s/model/view";
 
     protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
     protected static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
@@ -74,6 +82,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected static final String ADS_URL_PARAM = "ADS_URL";
     protected static final String CREATE_ADS_TABLE_PARAM = "CREATE_TABLE";
     protected static final String COPY_ADS_TABLE_PARAM = "COPY_TABLE";
+    
 
     protected String dssAuthorizationToken;
     protected String technicalUser;
@@ -401,6 +410,65 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected String getMappingResourceContent(RestApiClient restApiClient, HttpStatus status) {
         return RestUtils.getResourceWithCustomAcceptHeader(restApiClient,
                 format(MAPPING_RESOURCE, testParams.getProjectId()), status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
+    }
+
+    protected List<String> getReferencesOfDataset(String dataset) throws ParseException, JSONException,
+            IOException {
+        JSONArray array = RestUtils.getDatasetElementFromModelView(getRestApiClient(), testParams.getProjectId(),
+                dataset, DatasetElements.REFERENCES, JSONArray.class);
+        return new ObjectMapper().readValue(array.toString(), new TypeReference<List<String>>() {
+        });
+    }
+
+    protected int redeployDataLoadProcess(RestApiClient restApiClient) throws IOException, JSONException {
+        HttpRequestBase putRequest = restApiClient.newPutMethod(getDataloadProcessUri(), ProcessUtils
+                .prepareProcessCreationBody(DATALOAD, DEFAULT_DATAlOAD_PROCESS_NAME).toString());
+        int responseStatusCode;
+        try {
+            HttpResponse postResponse = restApiClient.execute(putRequest);
+            responseStatusCode = postResponse.getStatusLine().getStatusCode();
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+            System.out.println("Response status: " + responseStatusCode);
+        } finally {
+            putRequest.releaseConnection();
+        }
+
+        return responseStatusCode;
+    }
+
+    protected void prepareMetricToCheckNewAddedFields(String... facts) {
+        for (String fact : facts) {
+            initFactPage();
+            factsTable.selectObject(fact);
+            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, fact);
+            initMetricPage();
+            waitForFragmentVisible(metricsTable);
+            metricsTable.selectObject(fact + " [Sum]");
+            waitForFragmentVisible(metricDetailPage).setMetricVisibleToAllUser();
+        }
+    }
+
+    protected void checkReportAfterAddingNewField(ReportDefinition reportDefinition,
+            Collection<String> attributeValues, Collection<String> metricValues) throws InterruptedException {
+        createReport(reportDefinition, reportDefinition.getName());
+    
+        List<String> attributes = reportPage.getTableReport().getAttributeElements();
+        System.out.println("Attributes: " + attributes.toString());
+        CollectionUtils.isEqualCollection(attributes, attributeValues);
+    
+        List<String> metrics = reportPage.getTableReport().getRawMetricElements();
+        System.out.println("Metric: " + metrics.toString());
+        CollectionUtils.isEqualCollection(metrics, metricValues);
+    }
+
+    protected void checkReportAfterAddReferenceToDataset() throws InterruptedException {
+        prepareMetricToCheckNewAddedFields("number");
+        ReportDefinition reportDefinition =
+                new ReportDefinition().withName("Report to check reference")
+                        .withHows("artistname").withWhats("number [Sum]");
+        checkReportAfterAddingNewField(reportDefinition, Lists.newArrayList("OOP1", "OOP2",
+                "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"), Lists.newArrayList("1,000.00",
+                "1,200.00", "1,400.00", "1,600.00", "1,800.00", "2,000.00", "700.00", "800.00"));
     }
 
     private ProcessInfo getDataloadProcessInfo() throws IOException, JSONException {

@@ -15,6 +15,9 @@ import com.gooddata.qa.utils.http.RestUtils;
 
 public class DataloadResourcesPermissionTest extends AbstractMSFTest {
 
+    private RestApiClient editorRestApi;
+    private RestApiClient viewerRestApi;
+
     @BeforeClass
     public void initProjectTitle() {
         projectTitle = "Dataload resources permission test";
@@ -24,6 +27,9 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
     public void initialData() throws JSONException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();
+
+        editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
+        viewerRestApi = getRestApiClient(testParams.getViewerUser(), testParams.getViewerPassword());
     }
 
     @Test(dependsOnGroups = { "initialData" }, groups = { "DataloadResourcesPermissionTest" })
@@ -31,7 +37,6 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
             throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
-        RestApiClient editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
         RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
                 String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.FORBIDDEN,
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
@@ -53,7 +58,6 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
             groups = { "DataloadResourcesPermissionTest" },priority = 2)
     public void editorAccessToDataloadResources() throws ParseException, JSONException, IOException {
         deleteDataloadProcessAndCreateNewOne();
-        RestApiClient editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
         RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
                 String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.OK,
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
@@ -74,14 +78,26 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
             groups = { "DataloadResourcesPermissionTest" }, priority = 2)
     public void viewerCannotAccessToMappingResource() throws ParseException, JSONException, IOException {
         deleteDataloadProcessAndCreateNewOne();
-        RestApiClient viewerRestApi = getRestApiClient(testParams.getViewerUser(), testParams.getViewerPassword());
         RestUtils.getResourceWithCustomAcceptHeader(viewerRestApi,
                 String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.FORBIDDEN,
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
     }
 
+    @Test(dependsOnMethods = { "addUsersToProjects" },
+            groups = { "DataloadResourcesPermissionTest" }, priority = 2)
+    public void allProjectMembersCanAccessToProjectModelView() throws ParseException, JSONException, IOException {
+        accessToProjectModelView(getRestApiClient());
+        accessToProjectModelView(editorRestApi);
+        accessToProjectModelView(viewerRestApi);
+    }
+
     @Test(dependsOnGroups = "DataloadResourcesPermissionTest", alwaysRun = true)
     public void cleanUp() {
         deleteADSInstance(adsInstance);
+    }
+
+    private void accessToProjectModelView(RestApiClient restApiClient) {
+        RestUtils.getResource(restApiClient, String.format(PROJECT_MODEL_VIEW, testParams.getProjectId()),
+                HttpStatus.ACCEPTED);
     }
 }
