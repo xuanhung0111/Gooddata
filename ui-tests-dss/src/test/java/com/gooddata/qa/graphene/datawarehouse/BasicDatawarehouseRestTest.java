@@ -503,6 +503,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         JSONObject storage = json.getJSONObject("instance");
         assertTrue(storage.getString("title").equals(title), "Instance title doesn't match");
         assertTrue(storage.getString("description").equals(description), "Instance description doesn't match");
+        assertTrue(storage.getString("environment").equals("TESTING"), "Instance environment is TESTING");
         assertTrue(storage.getString("authorizationToken").equals(authorizationToken),
                 "Instance authorizationToken doesn't match");
         assertTrue(storage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_INSTANCES),

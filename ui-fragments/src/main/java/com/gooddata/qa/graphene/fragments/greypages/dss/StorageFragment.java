@@ -21,6 +21,9 @@ public class StorageFragment extends AbstractDatawarehouseFragment {
     @FindBy
     private WebElement authorizationToken;
 
+    @FindBy(id="environment_testing")
+    private WebElement testingEnv;
+
     @FindBy(xpath = "div[@class='submit']/input")
     private WebElement submit;
 
@@ -30,6 +33,7 @@ public class StorageFragment extends AbstractDatawarehouseFragment {
         waitForElementVisible(title);
         waitForElementVisible(description);
         waitForElementVisible(authorizationToken);
+        waitForElementVisible(testingEnv);
         Assert.assertEquals(submit.getAttribute("value"), "Create", "Submit button is not 'Create'");
         return true;
     }
@@ -40,6 +44,7 @@ public class StorageFragment extends AbstractDatawarehouseFragment {
         if (description != null && description.length() > 0) this.description.sendKeys(description);
         if (authorizationToken != null && authorizationToken.length() > 0)
             this.authorizationToken.sendKeys(authorizationToken);
+        this.testingEnv.click();
         Assert.assertEquals(submit.getAttribute("value"), "Create", "Submit button is not 'Create'");
         Graphene.guardHttp(submit).click();
     }
