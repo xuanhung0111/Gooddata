@@ -1,26 +1,36 @@
 package com.gooddata.qa.graphene.dlui;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.DataSourcesFragment;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.*;
 
-public abstract class AbstractAnnieDialogTest extends AbstractDLUITest {
+public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     protected static final String ANNIE_DIALOG_HEADLINE = "Add data";
 
     private static final String ANNIE_DIALOG_EMPTY_STATE_HEADING = "No additional data available.";
@@ -35,6 +45,30 @@ public abstract class AbstractAnnieDialogTest extends AbstractDLUITest {
             "Please contact a project admin or GoodData Customer Support .";
     private static final String GOODDATA_SUPPORT_LINK =
             "https://support.gooddata.com/?utm_source=de&utm_campaign=error_message&utm_medium=dialog";
+
+    @FindBy(css = ".s-btn-add_data")
+    private WebElement addDataButton;
+
+    @FindBy(css = ".annie-dialog-main")
+    protected AnnieUIDialogFragment annieUIDialog;
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
+    public void prepareDataForDLUI() throws JSONException, ParseException, IOException,
+            InterruptedException {
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
+
+        prepareLDMAndADSInstance();
+        setUpOutputStageAndCreateCloudConnectProcess();
+    }
+
+    protected void openAnnieDialog() {
+        initManagePage();
+        waitForElementVisible(addDataButton).click();
+        browser.switchTo().frame(
+                waitForElementVisible(By.xpath("//iframe[contains(@src,'dlui-annie')]"), browser));
+        waitForElementVisible(annieUIDialog.getRoot());
+    }
 
     protected void checkAvailableAdditionalFields(DataSource datasource, FieldTypes fieldType) {
         annieUIDialog.selectFieldFilter(fieldType);

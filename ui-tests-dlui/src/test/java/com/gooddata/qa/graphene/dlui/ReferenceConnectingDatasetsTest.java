@@ -45,14 +45,14 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnGroups = {"setup"}, groups = {"initialDataForDLUI"})
+    @Test(dependsOnMethods = {"prepareDataForDLUI"}, groups = {"initialDataForDLUI"})
     public void initialData() throws InterruptedException {
         projectId = testParams.getProjectId();
         selectedField = new Field("Trackname", FieldTypes.ATTRIBUTE);
         selectedDataset = new Dataset().withName(DATASET_NAME).withFields(selectedField);
-        dataSource =
-                prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES)
-                        .updateDatasetStatus(selectedDataset);
+
+        dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES)
+                .updateDatasetStatus(selectedDataset);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"reference"})
