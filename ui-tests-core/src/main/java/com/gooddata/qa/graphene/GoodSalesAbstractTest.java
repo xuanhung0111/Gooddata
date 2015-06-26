@@ -11,7 +11,7 @@ public class GoodSalesAbstractTest extends AbstractProjectTest {
 
     protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "GoodSales-test";
         projectTemplate = GOODSALES_TEMPLATE;
