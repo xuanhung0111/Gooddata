@@ -72,6 +72,11 @@ public class FilterWidget extends AbstractFragment {
         getPanel(AttributeFilterPanel.class).changeValues(values);
     }
 
+    public void changeAttributeFilterValueInSingleMode(String value) {
+        openPanel();
+        getPanel(AttributeFilterPanel.class).changeValueInSingleMode(value);
+    }
+
     public String getCurrentValue() {
         return getRoot().getText().split("\n")[1];
     }

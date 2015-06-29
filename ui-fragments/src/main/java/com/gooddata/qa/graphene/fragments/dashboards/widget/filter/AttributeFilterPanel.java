@@ -16,7 +16,7 @@ public class AttributeFilterPanel extends FilterPanel {
     @FindBy(className = "yui3-c-simpleColumn-window")
     private WebElement scroller;
 
-    @FindBy(css = "div.c-checkboxSelectOnly:not(.gdc-hidden)")
+    @FindBy(css = ".yui3-c-simpleColumn-underlay > div:not(.gdc-hidden)")
     private List<FilterPanelRow> rows;
 
     @FindBy(className = "clearVisible")
@@ -86,6 +86,17 @@ public class AttributeFilterPanel extends FilterPanel {
             selectOneValue(value);
         }
         submit();
+    }
+
+    public void changeValueInSingleMode(String value) {
+        waitForValuesToLoad();
+        for (FilterPanelRow row: rows) {
+            if (!value.equals(row.getText())) {
+                continue;
+            }
+            row.getRoot().click();
+            return;
+        }
     }
 
     public AttributeFilterPanel search(String text) {

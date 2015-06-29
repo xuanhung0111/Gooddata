@@ -81,7 +81,8 @@ public class WidgetConfigPanel extends AbstractFragment {
         DRILLING("Drilling", "s-Drilling"),
         PARENT_FILTERS("Parent Filters", "s-Parent"),
         SELECTION("Selection", "s-Selection"),
-        FILTERS("Filters", "filterTab");
+        FILTERS("Filters", "filterTab"),
+        GROUP("Group", "filterTab");
 
         private final String tabName;
         private final String panelClassName;
