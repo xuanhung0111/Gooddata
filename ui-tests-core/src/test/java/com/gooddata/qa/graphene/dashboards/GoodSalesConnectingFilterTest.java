@@ -9,7 +9,7 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.server.browserlaunchers.Sleeper;
+import com.gooddata.qa.graphene.common.Sleeper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
