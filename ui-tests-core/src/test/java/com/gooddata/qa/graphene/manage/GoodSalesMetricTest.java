@@ -44,12 +44,12 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String DATE_FORMAT_PATTERN = "yyyy/MM/dd HH:mm:ss";
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_PATTERN);
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "GoodSales-test-metric";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"initialize"})
     public void initialize() throws InterruptedException, JSONException {
         expectedMetricFormat = "#,##0.00";
         attrFolder = "Date dimension (Snapshot)";
@@ -78,7 +78,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         statusValues = Arrays.asList("Lost", "Open", "Won");
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"filter-share-ratio-metric"})
     public void createShareMetric() throws InterruptedException {
         initMetricPage();
         String metricName = "Share % " + getCurrentDateString();
@@ -90,7 +90,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 productValues);
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"different-granularity-logical-metric"})
     public void createDifferentMetricTest() throws InterruptedException {
         initMetricPage();
         String metric = "Amount";
@@ -102,7 +102,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 productValues);
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"filter-share-ratio-metric"})
     public void createRatioMetricTest() throws InterruptedException {
         initMetricPage();
         String metricName = "Ratio " + getCurrentDateString();
@@ -111,7 +111,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         checkMetricValuesInReport(metricName, null, metricValues, null);
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"aggregation-metric"})
     public void createAggregationMetricTest() throws InterruptedException {
         initMetricPage();
         String fact0 = "Amount";
@@ -194,7 +194,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"numeric-metric"})
     public void createNumericMetricTest() throws InterruptedException {
         initMetricPage();
         String metric0 = "Best Case";
@@ -240,7 +240,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"different-granularity-logical-metric"})
     public void createGranularityMetricTest() throws InterruptedException {
         initMetricPage();
         String fact0 = "Probability";
@@ -306,7 +306,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"different-granularity-logical-metric"})
     public void createLogicalMetricTest() throws InterruptedException {
         initMetricPage();
         String attrFolder0 = "Date dimension (Snapshot)";
@@ -380,7 +380,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initialize"})
+    @Test(dependsOnGroups = {"initialize"}, groups = {"filter-share-ratio-metric"})
     public void createFilterMetricTest() throws InterruptedException {
         initMetricPage();
         String attrFolder = "Date dimension (Snapshot)";
