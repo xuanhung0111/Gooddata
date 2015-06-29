@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
@@ -12,6 +13,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
     private static final By BY_TAB_DROPDOWN_MENU = By.xpath("//div[contains(@class, 's-tab-menu')]");
     private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
+    private static final By BY_TAB_DROPDOWN_DUPLICATE_BUTTON = By.xpath("//li[contains(@class, 's-duplicate')]//a");
+    private static final By BY_TAB_DROPDOWN_COPY_TO_BUTTON = By.xpath("//li[contains(@class, 's-copy_to')]//a");
 
     @FindBy(xpath = "//div[@id='abovePage']/div[contains(@class,'yui3-dashboardtabs-content')]")
     private DashboardTabs tabs;
@@ -228,6 +232,31 @@ public class DashboardsPage extends AbstractFragment {
             waitForElementVisible(dashboardTabDeleteConfirmButton).click();
             waitForElementNotPresent(dashboardTabDeleteDialog);
         }
+        editDashboardBar.saveDashboard();
+        waitForElementNotPresent(editDashboardBar.getRoot());
+        waitForDashboardPageLoaded(browser);
+    }
+
+    public void duplicateDashboardTab(int tabIndex) {
+        tabs.openTab(tabIndex);
+        editDashboard();
+        tabs.selectDropDownMenu(tabIndex);
+        waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser).findElement(BY_TAB_DROPDOWN_DUPLICATE_BUTTON).click();
+        editDashboardBar.saveDashboard();
+        waitForElementNotPresent(editDashboardBar.getRoot());
+        waitForDashboardPageLoaded(browser);
+    }
+
+    public void copyDashboardTab(int tabIndex, String dashboardName) {
+        tabs.openTab(tabIndex);
+        editDashboard();
+        tabs.selectDropDownMenu(tabIndex);
+        Actions actions = new Actions(browser);
+        actions.moveToElement(waitForElementVisible(BY_TAB_DROPDOWN_MENU, browser)
+                .findElement(BY_TAB_DROPDOWN_COPY_TO_BUTTON)).perform();
+        actions.click(waitForElementVisible(By.className("s-" + CssUtils.simplifyText(dashboardName)), browser))
+            .perform();
+        waitForElementVisible(By.className("s-btn-dismiss"), browser).click();
         editDashboardBar.saveDashboard();
         waitForElementNotPresent(editDashboardBar.getRoot());
         waitForDashboardPageLoaded(browser);

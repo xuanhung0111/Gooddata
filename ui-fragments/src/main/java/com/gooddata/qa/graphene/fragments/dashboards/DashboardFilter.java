@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static org.openqa.selenium.server.browserlaunchers.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
@@ -8,7 +10,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
@@ -36,9 +37,9 @@ public class DashboardFilter extends AbstractFragment {
             ".filter_prompts .s-item-${promptName}:not(.gdc-hidden):not(.hidden)";
 
     private String addButton =
-            "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']";
+            "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add' and not(contains(@class, 'disabled'))]";
 
-    @FindBy(xpath = "//div[contains(@class,'yui3-c-collectionwidget-content')]/div[contains(@class,'c-label')]/span")
+    @FindBy(css = ".gdc-overlay-simple:not(.yui3-overlay-hidden) .c-label:not(.hidden)>span")
     private List<WebElement> dateFilterList;
 
     @FindBy(xpath = "//button[text()='next']")
@@ -59,13 +60,13 @@ public class DashboardFilter extends AbstractFragment {
         if (type == DashFilterTypes.PROMPT) {
             waitForElementVisible(promptFilter).click();
             waitForElementVisible(lisPrompt);
-            By selectedPrompt = By.cssSelector(selectedPromptLocator.replace("${promptName}", CssUtils.simplifyText(name)));
+            By selectedPrompt = By.cssSelector(selectedPromptLocator.replace("${promptName}", simplifyText(name)));
             waitForElementVisible(promptSearchInput).sendKeys(name);
             waitForElementVisible(selectedPrompt, browser).click();
         } else {
             waitForElementVisible(showDateAttributesButton).click();
             By attributeToAddLocator = By.cssSelector(selectedAttributeLocator.replace(
-                    "${attributeName}", "s-item-" + CssUtils.simplifyText(name)));
+                    "${attributeName}", "s-item-" + simplifyText(name)));
             waitForElementVisible(attributeSearchInput).sendKeys(name);
             waitForElementVisible(attributeToAddLocator, browser).click();
         }
@@ -73,23 +74,16 @@ public class DashboardFilter extends AbstractFragment {
         Thread.sleep(2000);
     }
 
-    public void addTimeFilter(int dateDimensionIndex, String dataRange) throws InterruptedException {
-        if (browser.findElements(By.xpath(addButton)).size() > 0 && addTimeButton.isDisplayed()) {
-            waitForElementVisible(yearOption).click();
-            WebElement selectYear =
-                    browser.findElement(By.xpath(timeLineLocator.replace("${time}", dataRange)));
-            waitForElementVisible(selectYear).click();
-            waitForElementVisible(addTimeButton).click();
-        } else {
+    public void addTimeFilter(int dateDimensionIndex, String dataRange) {
+        if (browser.findElements(By.xpath(addButton)).isEmpty()) {
             waitForElementVisible(dateFilterList.get(dateDimensionIndex)).click();
+            sleepTightInSeconds(1);
             waitForElementVisible(nextButton).click();
-            waitForElementVisible(yearOption).click();
-            WebElement selectYear =
-                    browser.findElement(By.xpath(timeLineLocator.replace("${time}", dataRange)));
-            waitForElementVisible(selectYear).click();
-            waitForElementVisible(addTimeButton).click();
         }
-        Thread.sleep(2000);
-    }
 
+        waitForElementVisible(yearOption).click();
+        waitForElementVisible(By.xpath(timeLineLocator.replace("${time}", dataRange)), browser).click();
+        waitForElementVisible(addTimeButton).click();
+        sleepTightInSeconds(2);
+    }
 }
