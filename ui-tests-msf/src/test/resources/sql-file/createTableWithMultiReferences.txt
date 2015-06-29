@@ -7,7 +7,9 @@ CREATE TABLE artist (
     l__artistname__artistnickname VARCHAR(128),
     a__artistname VARCHAR(128),
     a__artisttitle VARCHAR(128),
-    f__number NUMERIC(12,2)
+    f__number NUMERIC(12,2), 
+    r__author VARCHAR(128),
+    r__track VARCHAR(128)
 );
 
 CREATE TABLE IF NOT EXISTS author(
@@ -17,7 +19,5 @@ a__authorname varchar(128)
 
 CREATE TABLE track (
     cp__trackid VARCHAR(128),
-    a__trackname   varchar(128), 
-    r__artist VARCHAR(128),
-    r__author VARCHAR(128)
+    a__trackname   varchar(128)
 ); 

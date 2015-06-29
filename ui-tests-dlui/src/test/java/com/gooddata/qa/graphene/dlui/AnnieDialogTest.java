@@ -6,13 +6,11 @@ import static org.testng.Assert.*;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.DataSource;
@@ -20,9 +18,7 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
@@ -39,25 +35,6 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                     + "and due to technical limitations it is not possible to add new data at the same time.";
     private static final String DIALOG_STATE_SECOND_MESSAGE =
             "It can take a while so please come later.";
-
-    @DataProvider(name = "newFieldData")
-    public static Object[][] newFieldData() {
-        return new Object[][] {
-            {AddedFields.POSITION, Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6", "J7"),
-                Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00")},
-            {AddedFields.TOTALPRICE2, Lists.newArrayList("A", "B", "C", "D", "E", "F"),
-                Lists.newArrayList("400.00", "400.00", "400.00", "400.00", "400.00", "400.00")},
-            {
-                AddedFields.LABEL,
-                Lists.newArrayList("opportunityA", "opportunityB", "opportunityC", "opportunityD",
-                        "opportunityE", "opportunityF"),
-                Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00")},
-            {
-                AddedFields.DATE,
-                Lists.newArrayList("01/01/2006", "01/02/2006", "01/02/2007", "01/02/2008",
-                        "07/02/2009"),
-                Lists.newArrayList("34.00", "50.00", "36.00", "13.00", "10.00")}};
-    }
 
     @BeforeClass
     public void initProperties() {
@@ -192,39 +169,19 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         Screenshots.takeScreenshot(browser, "cancel-add-new-field", getClass());
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 1)
-    public void prepareMetricsToCheckReport() throws JSONException {
-        List<String> facts = Lists.newArrayList("age", "price", "totalprice");
-        for (String fact : facts) {
-            initFactPage();
-            factsTable.selectObject(fact);
-            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, fact);
-            initMetricPage();
-            waitForFragmentVisible(metricsTable);
-            metricsTable.selectObject(fact + " [Sum]");
-            waitForFragmentVisible(metricDetailPage).setMetricVisibleToAllUser();
-        }
-    }
-
     @Test(dataProvider = "newFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {
         "annieDialogTest", "addOneField"}, priority = 1)
     public void adminAddSingleFieldFromADSToLDM(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
-        addNewDataFromADSToLDM(UserRoles.ADMIN, addedField, attributeValues, metricValues, false);
-    }
-
-    @Test(dataProvider = "newFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
-            groups = {"annieDialogTest", "addOneField"}, priority = 1)
-    public void adminCheckReportWithSingleField(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
-        addNewDataFromADSToLDM(UserRoles.ADMIN, addedField, attributeValues, metricValues, true);
+            List<String> attributeValues, List<String> metricValues) throws JSONException,
+            InterruptedException {
+        addNewDataAndAssertAnnieDialog(UserRoles.ADMIN, addedField);
     }
 
     @Test(dependsOnGroups = {"addOneField"}, groups = "annieDialogTest", priority = 1)
     public void adminAddMultiFieldsFromADSToLDM() throws JSONException {
-        addMultiFieldsFromADSToLDM(UserRoles.ADMIN);
+        addMultiFieldsAndAssertAnnieDialog(UserRoles.ADMIN);
     }
-
+    
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
     public void addEditorUser() {
         try {
@@ -237,21 +194,14 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser"}, groups = {
         "annieDialogTest", "editorAddOneField"}, priority = 1)
     public void editorAddSingleFieldFromADSToLDM(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
-        addNewDataFromADSToLDM(UserRoles.EDITOR, addedField, attributeValues, metricValues,
-                false);
-    }
-
-    @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser",
-        "prepareMetricsToCheckReport"}, groups = {"annieDialogTest"}, priority = 1)
-    public void editorCheckReportWithSingleField(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException {
-        addNewDataFromADSToLDM(UserRoles.EDITOR, addedField, attributeValues, metricValues, true);
+            List<String> attributeValues, List<String> metricValues) throws JSONException,
+            InterruptedException {
+        addNewDataAndAssertAnnieDialog(UserRoles.EDITOR, addedField);
     }
 
     @Test(dependsOnGroups = {"editorAddOneField"}, groups = "annieDialogTest", priority = 1)
     public void editorAddMultiFieldsFromADSToLDM() throws JSONException {
-        addMultiFieldsFromADSToLDM(UserRoles.EDITOR);
+        addMultiFieldsAndAssertAnnieDialog(UserRoles.EDITOR);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
@@ -519,68 +469,6 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         deleteADSInstance(adsInstance);
     }
 
-    private void addNewDataFromADSToLDM(UserRoles role, final AddedFields addedField,
-            final List<String> attributeValues, final List<String> metricValues,
-            final boolean checkReport) throws JSONException {
-        addDataFromAdsToLdmAndDropAfterTest(role, addedField.getCleanupMaqlFile(),
-                new TestAction() {
-                    @Override
-                    public void doAction(UserRoles role) {
-                        DataSource dataSource =
-                                prepareADSTable(addedField.getADSTable()).updateDatasetStatus(
-                                        addedField.getDataset());
-
-                        checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-attribute");
-                        if (!checkReport)
-                            return;
-                        checkReportAfterAddNewData(addedField.getReportDefinition(),
-                                addedField.getField(), attributeValues, metricValues);
-                    }
-                });
-    }
-
-    private void checkReportAfterAddNewData(ReportDefinition reportDefinition, Field addedField,
-            List<String> attributeValues, List<String> metricValues) {
-        try {
-            if (addedField.getType() == FieldTypes.FACT) {
-                initFactPage();
-                factsTable.selectObject(addedField.getName());
-                waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM,
-                        addedField.getName());
-            }
-
-            createReport(reportDefinition, reportDefinition.getName());
-
-            List<String> attributes = reportPage.getTableReport().getAttributeElements();
-            System.out.println("Attributes: " + attributes.toString());
-            CollectionUtils.isEqualCollection(attributes, attributeValues);
-
-            List<String> metrics = reportPage.getTableReport().getRawMetricElements();
-            System.out.println("Metric: " + metrics.toString());
-            CollectionUtils.isEqualCollection(metrics, metricValues);
-        } catch (InterruptedException e) {
-            throw new IllegalStateException("There is exception when checking report!", e);
-        }
-    }
-
-    private void checkSuccessfulAddingData(DataSource dataSource, String screenshotName) {
-        openAnnieDialog();
-        annieUIDialog.selectFields(dataSource);
-        Screenshots.takeScreenshot(browser, "select-fields-to-" + screenshotName, getClass());
-        annieUIDialog.clickOnApplyButton();
-
-        checkDataAddingProgress();
-        checkSuccessfulDataAddingResult();
-        Screenshots.takeScreenshot(browser, "sucessful-" + screenshotName, getClass());
-        annieUIDialog.clickOnCloseButton();
-
-        dataSource.applyAddSelectedFields();
-
-        openAnnieDialog();
-        checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
-        annieUIDialog.clickOnDismissButton();
-    }
-
     private void waitForAddingDataTask() throws InterruptedException {
         while (true) {
             openAnnieDialog();
@@ -601,123 +489,6 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             return true;
         } catch (TimeoutException e) {
             return false;
-        }
-    }
-
-
-    private void addMultiFieldsFromADSToLDM(UserRoles role) throws JSONException {
-        String maqlFile = "dropMultiAddedFieldsInLDM.txt";
-        addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
-            @Override
-            public void doAction(UserRoles role) {
-                Dataset personDataset =
-                        new Dataset().withName("person").withFields(
-                                new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED),
-                                new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
-                Dataset opportunityDataset =
-                        new Dataset().withName("opportunity")
-                                .withFields(
-                                        new Field("Totalprice2", FieldTypes.FACT,
-                                                FieldStatus.SELECTED),
-                                        new Field("Label", FieldTypes.LABEL_HYPERLINK,
-                                                FieldStatus.SELECTED));
-
-                DataSource dataSource =
-                        prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
-                                personDataset, opportunityDataset);
-
-                checkSuccessfulAddingData(dataSource, role.getName() + "-add-new-multi-fields");
-            }
-        });
-    }
-
-    private void addDataFromAdsToLdmAndDropAfterTest(UserRoles role, String maqlFile,
-            TestAction testAction) throws JSONException {
-        try {
-            if (role == UserRoles.EDITOR) {
-                signInWithOtherRole(UserRoles.EDITOR);
-            }
-            testAction.doAction(role);
-        } finally {
-            if (role == UserRoles.EDITOR) {
-                signInWithOtherRole(UserRoles.ADMIN);
-            }
-            dropAddedFieldsInLDM(maqlFilePath + maqlFile);
-        }
-    }
-
-    private void signInWithOtherRole(UserRoles role) throws JSONException {
-        logout();
-        signIn(true, role);
-    }
-
-    private interface TestAction {
-        void doAction(UserRoles role);
-    }
-
-    enum AddedFields {
-        POSITION(
-                ADSTables.WITH_ADDITIONAL_FIELDS,
-                new Dataset().withName("person"),
-                new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED),
-                "dropAddedAttributeInLDM_Person_Position.txt",
-                new ReportDefinition().withName("Report with Position").withHows("Position")
-                        .withWhats("age [Sum]")),
-        TOTALPRICE2(
-                ADSTables.WITH_ADDITIONAL_FIELDS,
-                new Dataset().withName("opportunity"),
-                new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED),
-                "dropAddedFactInLDM_Opportunity_Totalprice2.txt",
-                new ReportDefinition().withName("Report with Totalprice2").withHows("name")
-                        .withWhats("Totalprice2 [Sum]")),
-        LABEL(
-                ADSTables.WITH_ADDITIONAL_FIELDS,
-                new Dataset().withName("opportunity"),
-                new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED),
-                "dropAddedLabelInLDM_Opportunity_Label.txt",
-                new ReportDefinition().withName("Report with Label").withHows("title")
-                        .withWhats("price [Sum]")),
-        DATE(
-                ADSTables.WITH_ADDITIONAL_DATE,
-                new Dataset().withName("person"),
-                new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED),
-                "dropAddedDateInLDM_Person_Date.txt",
-                new ReportDefinition().withName("Report with Date").withHows("Date (Date)")
-                        .withWhats("age [Sum]"));
-
-        private ADSTables adsTable;
-        private Dataset dataset;
-        private Field field;
-        private String cleanupMaqlFile;
-        private ReportDefinition reportDefinition;
-
-        private AddedFields(ADSTables adsTable, Dataset dataset, Field field,
-                String cleanupMaqlFile, ReportDefinition reportDefinition) {
-            this.adsTable = adsTable;
-            this.dataset = dataset;
-            this.field = field;
-            this.cleanupMaqlFile = cleanupMaqlFile;
-            this.reportDefinition = reportDefinition;
-        }
-
-        public ADSTables getADSTable() {
-            return this.adsTable;
-        }
-
-        public Dataset getDataset() {
-            return this.dataset.withFields(field);
-        }
-
-        public Field getField() {
-            return this.field;
-        }
-
-        public String getCleanupMaqlFile() {
-            return this.cleanupMaqlFile;
-        }
-
-        public ReportDefinition getReportDefinition() {
-            return this.reportDefinition;
         }
     }
 }

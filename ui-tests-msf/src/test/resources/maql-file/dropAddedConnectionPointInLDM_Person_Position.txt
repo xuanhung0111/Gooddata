@@ -1,0 +1,1 @@
+ALTER ATTRIBUTE {attr.person.position} DROP KEYS {f_person.id};ALTER DATASET {dataset.person} DROP {attr.person.position};DROP {attr.person.position} CASCADE;CREATE ATTRIBUTE {attr.person.factsof} VISUAL(TITLE \"Records of person\", FOLDER {dim.person}) AS KEYS {f_person.id} FULLSET;ALTER DATASET {dataset.person} ADD {attr.person.factsof};SYNCHRONIZE {dataset.person};

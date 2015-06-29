@@ -1,6 +1,6 @@
 TRUNCATE TABLE artist;
 TRUNCATE TABLE track;
 TRUNCATE TABLE author;
-COPY artist(cp__artistid,l__artistname__artistnickname,a__artistname,a__artisttitle,f__number) FROM LOCAL '${DATA_SOURCE_DIR}/artist-multi-references.csv' DELIMITER ',' SKIP 1 ABORT ON ERROR;
+COPY artist(cp__artistid,l__artistname__artistnickname,a__artistname,a__artisttitle,f__number, r__track, r__author) FROM LOCAL '${DATA_SOURCE_DIR}/artist-multi-references.csv' DELIMITER ',' SKIP 1 ABORT ON ERROR;
 COPY author(cp__authorid,a__authorname) FROM LOCAL '${DATA_SOURCE_DIR}/author.csv' DELIMITER ',' SKIP 1 ABORT ON ERROR;
-COPY track(cp__trackid , a__trackname, r__artist, r__author) FROM LOCAL '${DATA_SOURCE_DIR}/track-multi-references.csv' DELIMITER ',' SKIP 1 ABORT ON ERROR;
+COPY track(cp__trackid , a__trackname) FROM LOCAL '${DATA_SOURCE_DIR}/track-multi-references.csv' DELIMITER ',' SKIP 1 ABORT ON ERROR;
