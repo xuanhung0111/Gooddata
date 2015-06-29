@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.openqa.selenium.server.browserlaunchers.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
