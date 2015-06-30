@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -11,7 +12,6 @@ import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertTrue;
 
@@ -22,6 +22,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     private static final String TESTING_REPORT_CHART = "Testing report chart";
 
     private static final String ACCOUNT = "Account";
+    private static final String DATE = "Date (Created)";
     private static final String AMOUNT = "Amount";
     private static final String QUOTA = "Quota";
 
@@ -37,7 +38,10 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
                 new ReportDefinition()
                     .withName(TESTING_REPORT_TABLE)
                     .withWhats(AMOUNT, QUOTA)
-                    .withHows(ACCOUNT),
+                    .withHows(
+                            new HowItem(ACCOUNT, HowItem.Position.LEFT),
+                            new HowItem(DATE, HowItem.Position.TOP)
+                    ),
                 TESTING_REPORT_TABLE
         );
         createReport(
@@ -62,7 +66,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
             report.showAnyway();
 
             assertTrue(isEqualCollection(asList(AMOUNT, QUOTA), report.getMetricsHeader()));
-            assertTrue(isEqualCollection(singleton(ACCOUNT), report.getAttributesHeader()));
+            assertTrue(isEqualCollection(asList(ACCOUNT, DATE), report.getAttributesHeader()));
         } finally {
             dashboardsPage.deleteDashboard();
         }
