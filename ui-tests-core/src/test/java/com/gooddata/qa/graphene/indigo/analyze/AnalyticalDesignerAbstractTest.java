@@ -1,7 +1,11 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -40,5 +44,26 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
 
     @Test(dependsOnGroups = {"turnOfWalkme"}, alwaysRun = true, groups = {"init"})
     public void prepareToTestAdAfterTurnOffWalkme() {
+    }
+
+    protected void checkingOpenAsReport(String screenShot) {
+        takeScreenshot(browser, screenShot + "-AD-page", getClass());
+        if (!analysisPage.isExportToReportButtonEnabled()) {
+            System.out.println("[Open as Report] button is disabled. Skip export report!");
+            return;
+        }
+
+        analysisPage.exportReport();
+        String currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
+        }
+        waitForAnalysisPageLoaded(browser);
+        waitForFragmentVisible(reportPage);
+        takeScreenshot(browser, screenShot, getClass());
+        checkRedBar(browser);
+        browser.close();
+        browser.switchTo().window(currentWindowHandle);
     }
 }

@@ -58,6 +58,7 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
 
         analysisPage.redo();
         assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), asList(QUOTA, AMOUNT, EXPECTED)));
+        checkingOpenAsReport("replaceMetricByNewOne");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -95,6 +96,7 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
         assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
         assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
         assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
+        checkingOpenAsReport("replaceAttributeByNewOne");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -107,5 +109,6 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
         analysisPage.switchAxisAndStackBy();
         assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(DEPARTMENT)));
         assertEquals(analysisPage.getAddedStackByName(), STAGE_NAME);
+        checkingOpenAsReport("switchAttributesBetweenAxisAndStackBy");
     }
 }

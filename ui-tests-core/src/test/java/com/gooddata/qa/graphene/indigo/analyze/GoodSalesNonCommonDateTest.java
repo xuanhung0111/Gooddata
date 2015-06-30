@@ -51,6 +51,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.waitForReportComputing();
         assertEquals(analysisPage.getFilterText(ACTIVITY), ACTIVITY + ": This year");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
+        checkingOpenAsReport("applyOnFilter");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -66,6 +67,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.configTimeFilter("Last 90 days");
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        checkingOpenAsReport("applyOnBucket");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -87,6 +89,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
 
         analysisPage.changeDimensionSwitchInBucket(ACTIVITY);
         assertEquals(analysisPage.getFilterText(ACTIVITY), ACTIVITY + ": All time");
+        checkingOpenAsReport("applyOnBothFilterAndBucket");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -117,6 +120,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
                 return input.endsWith("%");
             }
         }));
+        checkingOpenAsReport("showPercent");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -132,6 +136,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.waitForReportComputing();
         assertTrue(CollectionUtils.isEqualCollection(report.getLegends(),
                 Arrays.asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES)));
+        checkingOpenAsReport("periodOverPeriod");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -156,6 +161,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         assertFalse(analysisPage.isReportComputing());
         panel.select("This month");
         analysisPage.waitForReportComputing();
+        checkingOpenAsReport("switchBetweenPresetsAndDataRange");
     }
 
     @Test(dependsOnGroups = {"init"})
