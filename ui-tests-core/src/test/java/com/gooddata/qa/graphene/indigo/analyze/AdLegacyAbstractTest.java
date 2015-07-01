@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -35,7 +37,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.collect.Lists;
 
 public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTest {
@@ -158,6 +159,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         TableReport report = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
         assertEquals(report.getHeaders(), Arrays.asList(attribute1.toUpperCase()));
+        checkingOpenAsReport("testWithAttribute");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
@@ -178,6 +180,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         analysisPage.addCategory(attribute1);
         assertEquals(report.getTrackersCount(), 3);
+        checkingOpenAsReport("dragMetricToColumnChartShortcutPanel");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
@@ -193,6 +196,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        checkingOpenAsReport("dragMetricToTrendShortcutPanel");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
@@ -202,15 +206,15 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
         analysisPage.addInapplicableCategory(notAvailableAttribute);
         assertEquals(analysisPage.getExplorerMessage(), "Visualization cannot be displayed");
-        Screenshots.takeScreenshot(browser,
+        takeScreenshot(browser,
                 "testAccessibilityGuidanceForAttributesMetrics - inapplicableCategory", getClass());
 
         assertTrue(analysisPage.searchBucketItem(notAvailableAttribute));
-        Screenshots.takeScreenshot(browser, 
+        takeScreenshot(browser, 
                 "testAccessibilityGuidanceForAttributesMetrics - searchInapplicableCategory", getClass());
         assertTrue(analysisPage.getAllCatalogFieldNamesInViewPort().contains(notAvailableAttribute));
         assertFalse(analysisPage.searchBucketItem(notAvailableAttribute + "not found"));
-        Screenshots.takeScreenshot(browser,
+        takeScreenshot(browser,
                 "testAccessibilityGuidanceForAttributesMetrics - searchNotFound", getClass());
     }
 
@@ -239,6 +243,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(report.getTrackersCount(), 3);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigSelected());
+        checkingOpenAsReport("testSimpleContribution");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CONTRIBUTION_GROUP})
@@ -258,6 +263,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         comparisonRecommendation.select(attribute1).apply();
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
+        checkingOpenAsReport("testAnotherApproachToShowContribution");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
@@ -285,6 +291,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(analysisPage.getFilterText(attribute2), attribute2 + ": All");
         assertEquals(report.getTrackersCount(), 6);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        checkingOpenAsReport("testSimpleComparison");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {COMPARISON_GROUP})
@@ -324,6 +331,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
+        checkingOpenAsReport("testComparisonAndPoPAttribute");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
@@ -351,6 +359,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         assertTrue(report.getTrackersCount() >= 1);
+        checkingOpenAsReport("supportParameter");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
@@ -376,6 +385,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         analysisPage.addCategory(attribute2);
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        checkingOpenAsReport("displayInColumnChartWithOnlyMetric");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {TRENDING_GROUP})
@@ -387,6 +397,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(analysisPage.isFilterVisible(relatedDate));
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+        checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
@@ -441,6 +452,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
             assertEquals(reportheaders.next().toLowerCase(), analysisHeaders.next().toLowerCase(), "Headers are not correct");
         }
+        checkRedBar(browser);
 
         browser.close();
         browser.switchTo().window(currentWindowHandle);
@@ -468,6 +480,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         analysisPage.configTimeFilter("This year");
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": This year");
         assertEquals(report.getTrackersCount(), 6);
+        checkingOpenAsReport("filterOnDateAttribute");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
@@ -479,6 +492,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": All time");
         assertEquals(analysisPage.getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
+        checkingOpenAsReport("testDateInCategoryAndDateInFilter");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
@@ -497,6 +511,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();;
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         assertTrue(report.getTrackersCount() >= 1);
+        checkingOpenAsReport("trendingRecommendationOverrideDateFilter");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
@@ -509,6 +524,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(analysisPage.getFilterText(attribute1), attribute1 + ": All");
 
         assertEquals(analysisPage.addFilter(attribute2).getFilterText(attribute2), attribute2 + ": All");
+        checkingOpenAsReport("dragAndDropAttributeToFilterBucket");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
@@ -529,6 +545,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        checkingOpenAsReport("addFilterDoesNotHideRecommendation");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
@@ -552,6 +569,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
+        checkingOpenAsReport("compararisonRecommendationOverrideDateFilter");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
@@ -625,7 +643,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 browser.switchTo().window(handle);
         }
         waitForFragmentVisible(reportPage);
-        Screenshots.takeScreenshot(browser, "allowDateFilterByRange-emptyFilters", getClass());
+        takeScreenshot(browser, "allowDateFilterByRange-emptyFilters", getClass());
         assertTrue(reportPage.getFilters().isEmpty());
         browser.close();
         browser.switchTo().window(currentWindowHandle);
@@ -641,9 +659,10 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         }
         waitForFragmentVisible(reportPage);
         List<String> filters = reportPage.getFilters();
-        Screenshots.takeScreenshot(browser, "allowDateFilterByRange-dateFilters", getClass());
+        takeScreenshot(browser, "allowDateFilterByRange-dateFilters", getClass());
         assertEquals(filters.size(), 1);
         assertEquals(filters.get(0), "Date (" + relatedDate + ") is between 01/12/2014 and 01/12/2015");
+        checkRedBar(browser);
         browser.close();
         browser.switchTo().window(currentWindowHandle);
     }
@@ -673,6 +692,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
         assertEquals(legends, Arrays.asList(metric1, metric2));
+        checkingOpenAsReport("testSimplePoP");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {PERIOD_OVER_PERIOD_GROUP})
@@ -692,6 +712,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(analysisPage.isFilterVisible(relatedDate));
         assertEquals(analysisPage.getFilterText(relatedDate), relatedDate + ": Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        checkingOpenAsReport("testAnotherApproachToShowPoP");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {RESET_GROUP})
@@ -784,7 +805,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         analysisPage.removeFilter(attribute2);
         actionsCount++;
         assertFalse(analysisPage.isFilterVisible(attribute2));
-        Screenshots.takeScreenshot(browser, "Indigo_remove_filter", this.getClass());
+        takeScreenshot(browser, "Indigo_remove_filter", this.getClass());
 
         analysisPage.undo();
         assertTrue(analysisPage.isFilterVisible(attribute2));
@@ -868,6 +889,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         analysisPage.addMetric(metric3);
         assertTrue(report.getTrackersCount() > 0);
         assertEquals(analysisPage.getAllAddedMetricNames(), Arrays.asList(metric1, metric2, metric3));
+        checkingOpenAsReport("checkSeriesStateTransitions");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
@@ -917,6 +939,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(analysisContent, getTableContentFromReportPage(Graphene.createPageFragment(
                         com.gooddata.qa.graphene.fragments.reports.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser))));
+        checkRedBar(browser);
 
         browser.close();
         browser.switchTo().window(currentWindowHandle);
@@ -937,6 +960,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertFalse(analysisPage.isShowPercentConfigSelected());
 
         assertEquals(report.getLegendColors(), Arrays.asList("rgb(13, 103, 178)", "rgb(76, 178, 72)"));
+        checkingOpenAsReport("checkShowPercentAndLegendColor");
     }
 
     protected void filterOnAttribute(String filterText, String... filterValues) {

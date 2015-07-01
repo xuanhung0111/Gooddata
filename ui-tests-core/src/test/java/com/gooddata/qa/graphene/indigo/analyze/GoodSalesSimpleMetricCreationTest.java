@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
@@ -51,6 +51,7 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
         analysisPage.addCategory(STAGE_NAME).waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getYaxisTitle(), "Sum of " + AMOUNT);
+        checkingOpenAsReport("createSimpleMetricFromFact");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -68,6 +69,7 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
         assertEquals(analysisPage.getDateFilterText(), "Activity: Last 4 quarters");
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertEquals(analysisPage.getSelectedGranularity(), "Quarter");
+        checkingOpenAsReport("createSimpleMetricFromFactUsingShortcut");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -103,5 +105,6 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
 
         analysisPage.compareToSamePeriodOfYearBefore().waitForReportComputing();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        checkingOpenAsReport("testMetricAggregations");
     }
 }

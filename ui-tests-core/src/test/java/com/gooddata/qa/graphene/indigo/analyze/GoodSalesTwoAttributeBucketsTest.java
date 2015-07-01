@@ -53,6 +53,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
 
         analysisPage.replaceStackBy(REGION);
         assertEquals(analysisPage.getAddedStackByName(), REGION);
+        checkingOpenAsReport("dropThirdAttributeToBucket");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -68,6 +69,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.addStackBy(DEPARTMENT);
         analysisPage.waitForReportComputing();
         assertFalse(analysisPage.isShowPercentConfigEnabled());
+        checkingOpenAsReport("disablePopCheckboxOnDroppingNonDateAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -116,6 +118,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         assertFalse(analysisPage.isShowPercentConfigEnabled());
         assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
+        checkingOpenAsReport("recommendNextStep");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -131,6 +134,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.replaceCategory(REGION);
         assertFalse(analysisPage.isFilterVisible(ACTIVITY_TYPE));
         assertTrue(analysisPage.isFilterVisible(REGION));
+        checkingOpenAsReport("attributesInFilterMenu");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -140,6 +144,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.configAttributeFilter(DEPARTMENT, "Inside Sales");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 2);
+        checkingOpenAsReport("applyAttributeFiltersInReport");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -178,6 +183,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.configAttributeFilter(ACTIVITY_TYPE, "Email", "Phone Call");
         analysisPage.configTimeFilter("Last year");
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        checkingOpenAsReport("applyFilterInReportHasDateAndAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -195,6 +201,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
         assertFalse(analysisPage.isCompareSamePeriodConfigSelected());
         assertEquals(analysisPage.getAllAddedCategoryNames(), Arrays.asList(ACTIVITY_TYPE));
+        checkingOpenAsReport("uncheckSelectedPopCheckbox");
     }
 
     @Test(dependsOnGroups = {"init"})
