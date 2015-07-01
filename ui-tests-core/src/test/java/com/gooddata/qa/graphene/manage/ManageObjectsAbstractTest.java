@@ -106,8 +106,8 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         String targetFolderName = waitForElementVisible(dataPage.getTargetFolder(targetFolderIndex))
                 .getText();
         dataPage.getTargetFolder(targetFolderIndex).click();
-        waitForElementVisible(dataPage.getProgressMessageBox());
-        Assert.assertTrue(dataPage.getProgressMessageBox().getText().contains("Moving "));
+        String progressText = waitForElementVisible(dataPage.getProgressMessageBox()).getText();
+        Assert.assertTrue(progressText.contains("Moving "));
         String message = String.format("Success! %d %s(s) moved to \"%s\" folder.",
                 objectsList.size(), objectType.getName(), targetFolderName);
         waitForElementVisible(dataPage.getStatusMessageOnGreenBar());
@@ -124,9 +124,8 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         waitForElementVisible(dataPage.getMoveObjectsDialog());
         dataPage.getMoveObjectsDialogInput().sendKeys(targetFolder);
         dataPage.getMoveObjectsDialogConfirmButton().click();
-        waitForElementVisible(dataPage.getProgressMessageBox());
-
-        Assert.assertTrue(dataPage.getProgressMessageBox().getText().contains("Moving"));
+        String progressText = waitForElementVisible(dataPage.getProgressMessageBox()).getText();
+        Assert.assertTrue(progressText.contains("Moving"));    
         String message = String.format("Success! %d %s(s) moved to \"%s\" folder.",
                 objectsList.size(), objectType.getName(), targetFolder);
         waitForElementVisible(dataPage.getStatusMessageOnGreenBar());
@@ -183,9 +182,8 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-before-deleting-selected-objects", this.getClass());
         dataPage.getDeleteConfirmButton().click();
-        Assert.assertTrue(waitForElementVisible(dataPage.getProgressMessageBox()).getText()
-                .contains("Deleting "));
-        waitForElementNotPresent(dataPage.getProgressMessageBox());
+        String progressText = waitForElementVisible(dataPage.getProgressMessageBox()).getText();
+        Assert.assertTrue(progressText.contains("Deleting "));    
         String message = String.format("%d %s(s) deleted.", deletedObjects.size(),
                 objectType.getName());
         Assert.assertEquals(waitForElementVisible(dataPage.getStatusMessageOnGreenBar()).getText(),

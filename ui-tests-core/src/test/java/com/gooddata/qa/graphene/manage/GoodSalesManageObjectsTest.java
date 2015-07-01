@@ -81,38 +81,42 @@ public class GoodSalesManageObjectsTest extends ManageObjectsAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"moveObjects", "fact"})
     public void moveFactsBetweenFolders() throws InterruptedException {
-        List<String> movedObjects = Arrays.asList("Duration", "Velocity");
+        List<String> movedObjects = Arrays.asList("Amount", "Days to Close", "Duration", "Probability", 
+                "Velocity", "Timeline (Date)");
         moveObjectsBetweenFolders(ObjectTypes.FACT, factsTable, movedObjects, "2", "Stage History");
     }
 
     @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"moveObjects", "attribute"})
     public void moveAttributesBetweenFolders() throws InterruptedException {
-        List<String> movedObjects = Arrays.asList("Activity", "Priority");
+        List<String> movedObjects = Arrays.asList("Activity", "Priority", "Product", "Region");
         moveObjectsBetweenFolders(ObjectTypes.ATTRIBUTE, attributesTable, movedObjects, "2", "Activity");
     }
 
     @Test(dependsOnMethods = {"createProject"}, priority = 1, groups = {"moveObjects", "metric"})
     public void moveMetricsBetweenFolders() throws InterruptedException {
-        List<String> movedObjects = Arrays.asList("Amount [BOP]", "_Close [EOP]");
+        List<String> movedObjects = Arrays.asList("Amount [BOP]", "Best Case [BOP]", "Probability [BOP]", 
+                "_Close [EOP]");
         moveObjectsBetweenFolders(ObjectTypes.METRIC, metricsTable, movedObjects, "2", "_System");
     }
 
     @Test(dependsOnMethods = {"createProject"}, priority = 2, groups = {"deleteObjects", "fact"})
     public void deleteFacts() throws InterruptedException {
-        List<String> deletedObjects = Arrays.asList("Duration", "Velocity");
+        List<String> deletedObjects = Arrays.asList("Amount", "Days to Close", "Duration", "Probability", 
+                "Velocity", "Timeline (Date)");
         deleteObjectsTable(factsTable, deletedObjects, factsList, ObjectTypes.FACT);
     }
 
     @Test(dependsOnMethods = {"createProject"}, priority = 2, groups = {"deleteObjects", "attribute"})
     public void deleteAttributes() throws InterruptedException {
         List<String> deletedObjects = Arrays.asList("Activity", "Department",
-                "Month of Quarter (Created)");
+                "Month of Quarter (Created)", "Priority", "Product", "Region");
         deleteObjectsTable(attributesTable, deletedObjects, attributesList, ObjectTypes.ATTRIBUTE);
     }
 
     @Test(dependsOnMethods = {"createProject"}, priority = 2, groups = {"deleteObjects", "metric"})
     public void deleteMetrics() throws InterruptedException {
-        List<String> deletedObjects = Arrays.asList("Amount [BOP]", "_Close [EOP]");
+        List<String> deletedObjects = Arrays.asList("Amount [BOP]", "Best Case [BOP]", "Probability [BOP]", 
+                "_Close [EOP]");
         deleteObjectsTable(metricsTable, deletedObjects, metricsList, ObjectTypes.METRIC);
     }
 }
