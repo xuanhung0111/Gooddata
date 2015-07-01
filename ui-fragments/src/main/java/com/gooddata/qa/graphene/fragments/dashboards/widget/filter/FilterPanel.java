@@ -46,6 +46,10 @@ public class FilterPanel extends AbstractFragment {
     }
 
     public void submit() {
+        waitForElementPresent(applyButton);
+        if (applyButton.getAttribute("class").contains("gdc-hidden")) {
+            return;
+        }
         waitForElementVisible(applyButton).click();
     }
 }

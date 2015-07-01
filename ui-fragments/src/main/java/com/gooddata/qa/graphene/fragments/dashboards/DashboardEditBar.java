@@ -18,6 +18,7 @@ import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 
 public class DashboardEditBar extends AbstractFragment {
 
@@ -89,6 +90,9 @@ public class DashboardEditBar extends AbstractFragment {
 
     @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]//span[text()='Date']")
     private WebElement dateFilter;
+
+    @FindBy(xpath = "//div[contains(@class,'gdc-menu-simple')]//span[text()='Group']")
+    private WebElement groupFilter;
 
     @FindBy(xpath = "//div[contains(@class,'s-active-tab')]")
     private DashboardEditFilter dashboardEditFilter;
@@ -201,6 +205,13 @@ public class DashboardEditBar extends AbstractFragment {
         dashboardFilter.addTimeFilter(dateDimensionIndex, dateRange);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
+    }
+
+    public WidgetConfigPanel openGroupConfigPanel() {
+        waitForElementVisible(addFilterMenu).click();
+        waitForElementVisible(groupFilter).click();
+        return Graphene.createPageFragment(WidgetConfigPanel.class,
+                waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
     }
 
     public void addTextToDashboard(TextObject textObject, String text,
