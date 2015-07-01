@@ -2,14 +2,15 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -25,6 +26,7 @@ import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.HowItem.Position;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
@@ -33,6 +35,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 
@@ -42,6 +46,8 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     private static final String REPORT_2 = "Report2";
     private static final String REPORT_3 = "Report3";
 
+    private static final String DEPARTMENT = "Department";
+    private static final String REGION = "Region";
     private static final String OPP_SNAPSHOT = "Opp. Snapshot";
     private static final String STAGE_NAME = "Stage Name";
     private static final String ACCOUNT = "Account";
@@ -144,6 +150,140 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         addListAttributeFilterToDashboardAndMoveToRightPlace(MONTH_YEAR_SNAPSHOT, DashboardWidgetDirection.DOWN);
 
         dashboardEditBar.saveDashboard();
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testAdvanceCombineCascadingAndGroupFilter() throws InterruptedException {
+        initDashboardsPage();
+        dashboardsPage.addNewDashboard(TMP_DASHBOARD);
+
+        try {
+            dashboardsPage.editDashboard();
+            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+
+            addListAttributeFilterToDashboardAndMoveToRightPlace(PRODUCT, DashboardWidgetDirection.LEFT);
+            addListAttributeFilterToDashboardAndMoveToRightPlace(ACCOUNT, DashboardWidgetDirection.RIGHT);
+            addListAttributeFilterToDashboardAndMoveToRightPlace(REGION, DashboardWidgetDirection.UP);
+            addListAttributeFilterToDashboardAndMoveToRightPlace(DEPARTMENT, DashboardWidgetDirection.MIDDLE);
+
+            dashboardEditBar.setParentsFilterUsingDataset(ACCOUNT, OPP_SNAPSHOT, PRODUCT);
+            dashboardEditBar.setParentsFilterUsingDataset(REGION, OPP_SNAPSHOT, ACCOUNT);
+            dashboardEditBar.setParentsFilter(DEPARTMENT, REGION);
+
+            WidgetConfigPanel configPanel = dashboardEditBar.openGroupConfigPanel();
+            configPanel.getTab(WidgetConfigPanel.Tab.GROUP, GroupConfigPanel.class)
+                .selectFilters(ACCOUNT, PRODUCT);
+            configPanel.saveConfiguration();
+
+            configPanel = dashboardEditBar.openGroupConfigPanel();
+            configPanel.getTab(WidgetConfigPanel.Tab.GROUP, GroupConfigPanel.class)
+                .selectFilters(REGION, DEPARTMENT);
+            configPanel.saveConfiguration();
+            dashboardEditBar.saveDashboard();
+
+            WebElement groupAButton = waitForElementVisible(
+                    By.cssSelector(".yui3-c-dashboardwidget.odd .s-btn-apply"), browser);
+            WebElement groupBButton = waitForElementVisible(
+                    By.cssSelector(".yui3-c-dashboardwidget.even .s-btn-apply"), browser);
+            DashboardContent dashboardContent = dashboardsPage.getContent();
+            FilterWidget regionFilter = dashboardContent.getFilterWidget(simplifyText(REGION));
+            FilterWidget departmentFilter = dashboardContent.getFilterWidget(simplifyText(DEPARTMENT));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
+
+            regionFilter.changeAttributeFilterValue("East Coast");
+            regionFilter.getRoot().click();
+            departmentFilter.changeAttributeFilterValue("Direct Sales");
+            departmentFilter.getRoot().click();
+
+            assertTrue(groupAButton.getAttribute("class").contains("disabled"));
+            assertFalse(groupBButton.getAttribute("class").contains("disabled"));
+            groupBButton.click();
+            assertEquals(regionFilter.getCurrentValue(), "East Coast");
+            assertEquals(departmentFilter.getCurrentValue(), "Direct Sales");
+            assertEquals(productFilter.getCurrentValue(), "All");
+            assertEquals(accountFilter.getCurrentValue(), "All");
+            assertTrue(groupAButton.getAttribute("class").contains("disabled"));
+            assertTrue(groupBButton.getAttribute("class").contains("disabled"));
+
+            productFilter.changeAttributeFilterValue("Educationly");
+            productFilter.getRoot().click();
+            assertEquals(regionFilter.getCurrentValue(), "All");
+            assertEquals(departmentFilter.getCurrentValue(), "All");
+            assertEquals(productFilter.getCurrentValue(), "Educationly");
+            assertEquals(accountFilter.getCurrentValue(), "All");
+            assertFalse(groupAButton.getAttribute("class").contains("disabled"));
+            assertFalse(groupBButton.getAttribute("class").contains("disabled"));
+
+            regionFilter.changeAttributeFilterValue("West Coast");
+            regionFilter.getRoot().click();
+            groupAButton.click();
+            groupBButton.click();
+        } finally {
+            dashboardsPage.deleteDashboard();
+        }
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testBasicCombineCascadingAndGroupFilter() throws InterruptedException {
+        makeCopyFromDashboard(ATTRIBUTE_TEST_DASHBOARD);
+
+        try {
+            dashboardsPage.editDashboard();
+            DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
+            dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
+            dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, STAGE_NAME);
+
+            WidgetConfigPanel configPanel = dashboardEditBar.openGroupConfigPanel();
+            configPanel.getTab(WidgetConfigPanel.Tab.GROUP, GroupConfigPanel.class)
+                .selectFilters(ACCOUNT, STAGE_NAME, PRODUCT);
+            configPanel.saveConfiguration();
+            dashboardEditBar.saveDashboard();
+
+            WebElement groupButton = waitForElementVisible(By.cssSelector(".s-btn-apply"), browser);
+            DashboardContent dashboardContent = dashboardsPage.getContent();
+            FilterWidget accountFilter = dashboardContent.getFilterWidget(simplifyText(ACCOUNT));
+            FilterWidget stageNameFilter = dashboardContent.getFilterWidget(simplifyText(STAGE_NAME));
+            FilterWidget productFilter = dashboardContent.getFilterWidget(simplifyText(PRODUCT));
+            accountFilter.changeAttributeFilterValue("123 Exteriors", "14 West");
+            accountFilter.getRoot().click();
+            assertFalse(groupButton.getAttribute("class").contains("disabled"));
+
+            assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), asList("Closed Won",
+                    "Closed Lost")));
+            assertTrue(isEqualCollection(productFilter.getAllAttributeValues(), asList("CompuSci", "Educationly",
+                    "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid")));
+
+            stageNameFilter.changeAttributeFilterValue("Closed Won");
+            stageNameFilter.getRoot().click();
+            productFilter.changeAttributeFilterValue("Explorer");
+            productFilter.getRoot().click();
+            groupButton.click();
+            Sleeper.sleepTightInSeconds(2);
+            assertEquals(dashboardContent.getReport("Report1", TableReport.class)
+                    .getAttributeElementsByRow().size(), 1);
+            assertEquals(dashboardContent.getReport("Report2", TableReport.class)
+                    .getAttributeElementsByRow().size(), 1);
+
+            accountFilter.changeAttributeFilterValue("101 Financial");
+            accountFilter.getRoot().click();
+            assertEquals(productFilter.getCurrentValue(), "All");
+            assertEquals(stageNameFilter.getCurrentValue(), "All");
+            assertEquals(dashboardContent.getReport("Report1", TableReport.class)
+                    .getAttributeElementsByRow().size(), 1);
+            assertEquals(dashboardContent.getReport("Report2", TableReport.class)
+                    .getAttributeElementsByRow().size(), 1);
+
+            groupButton.click();
+            Sleeper.sleepTightInSeconds(2);
+            assertEquals(dashboardContent.getReport("Report1", TableReport.class)
+                    .getAttributeElementsByRow().size(), 2);
+            assertEquals(dashboardContent.getReport("Report2", TableReport.class)
+                    .getAttributeElementsByRow().size(), 2);
+
+        } finally {
+            dashboardsPage.deleteDashboard();
+        }
     }
 
     @Test(dependsOnGroups = {"init"})
