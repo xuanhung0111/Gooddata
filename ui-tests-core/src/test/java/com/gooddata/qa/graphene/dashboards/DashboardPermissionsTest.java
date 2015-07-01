@@ -30,19 +30,20 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     private static final String XENOFOBES_XYLOPHONES = "Xenofobes & xylophones";
     private static final String ALCOHOLICS_ANONYMOUS = "Alcoholics anonymous";
+    private static final String UNCHANGED_DASHBOARD = "Unchanged dashboard";
     private String viewerLogin;
     private String editorLogin;
     private String userGroup1Id; 
     private String userGroup2Id;
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void before() throws InterruptedException {
         addUsersWithOtherRoles = true;
         viewerLogin = testParams.getViewerUser();
         editorLogin = testParams.getEditorUser();
     }
-    
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"}, priority = 0)
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity" }, priority = 0)
     public void checkBackToTheOnlyOneVisibileDashboard() throws InterruptedException, JSONException {
         try {
             selectDashboard("Pipeline Analysis");
@@ -76,14 +77,14 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * lock dashboard - only admins can edit
      * @throws Exception 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = { "admin-tests", "sanity" })
     public void shouldLockDashboard() throws Exception {
         createDashboard("Locked dashboard");
         lockDashboard(true);
         assertEquals(dashboardsPage.isLocked(), true);
     }
     
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity" })
     public void shouldUnlockDashboard() throws Exception {
         createDashboard("Unlocked dashboard");
         lockDashboard(false);
@@ -94,7 +95,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * publish - make dashboard visible to every1 ( don't touch locking )
      * @throws InterruptedException 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = { "admin-tests", "sanity" })
     public void shouldPublishDashboard() throws InterruptedException {
         createDashboard("Published dashboard");
         publishDashboard(true);
@@ -105,7 +106,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      * unpublish - make dashboard visible to owner only ( don't touch locking )
      * @throws InterruptedException 
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = { "admin-tests", "sanity" })
     public void shouldUnpublishDashboard() throws InterruptedException {
         createDashboard("Unpublished dashboard");
         publishDashboard(false);
@@ -119,7 +120,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
      */
     @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
     public void shouldNotChangePermissionsWhenCancelled() throws InterruptedException {
-        createDashboard("Unchanged dashboard");
+        createDashboard(UNCHANGED_DASHBOARD);
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
@@ -162,7 +163,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     /**
      * click to "eye" icon instead of settings and check that dashboard is locked and not visible for all
      */
-    @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests"})
+    @Test(dependsOnMethods = {"createProject"}, groups = { "admin-tests", "sanity" })
     public void checkPermissionDialogInDashboardEditMode() throws InterruptedException{
         createDashboard("Check Permission in Edit Mode");
         
@@ -179,7 +180,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     /**
      * check dashboard names visible to viewer - should see both - both are visible to every1
      */
-    @Test(dependsOnGroups = {"admin-tests"}, groups = {"viewer-tests"})
+    @Test(dependsOnGroups = {"admin-tests"}, groups = {"viewer-tests", "sanity"})
     public void prepareEditorAndViewerTests() throws JSONException, InterruptedException {
         initDashboardsPage();
         
@@ -208,7 +209,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     /**
      * check dashboard names visible to viewer - should see both - both are visible to every1
      */
-    @Test(dependsOnMethods = {"prepareEditorAndViewerTests"}, groups = {"viewer-tests"})
+    @Test(dependsOnMethods = {"prepareEditorAndViewerTests"}, groups = {"viewer-tests", "sanity"})
     public void prepareViewerTests() throws JSONException, InterruptedException {
         initDashboardsPage();
         
@@ -219,7 +220,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     /**
      * check dashboard names visible to viewer - should see both - both are visible to every1
      */
-    @Test(dependsOnMethods = {"prepareViewerTests"}, groups = {"viewer-tests"})
+    @Test(dependsOnMethods = {"prepareViewerTests"}, groups = {"viewer-tests", "sanity"})
     public void shouldShowLockedAndUnlockedDashboardsToViewer() throws JSONException, InterruptedException {
         initDashboardsPage();
         List<String> dashboards = dashboardsPage.getDashboardsNames();
@@ -242,7 +243,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertFalse(dashboardsPage.isLocked());
     }
     
-    @Test(dependsOnGroups = {"viewer-tests"}, groups = {"editor-tests"})
+    @Test(dependsOnGroups = {"viewer-tests"}, groups = {"editor-tests", "sanity"}, alwaysRun = true)
     public void prepareEditorTests() throws JSONException, InterruptedException {
         initDashboardsPage();
         
@@ -250,7 +251,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         signIn(false, UserRoles.EDITOR);
     }
 
-    @Test(dependsOnMethods = {"prepareEditorTests"}, groups = {"editor-tests"})
+    @Test(dependsOnMethods = {"prepareEditorTests"}, groups = {"editor-tests", "sanity"})
     public void shouldShowLockedAndUnlockedDashboardsToEditor() throws JSONException, InterruptedException {
         initDashboardsPage();
         List<String> dashboards = dashboardsPage.getDashboardsNames();
@@ -300,7 +301,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
          assertEquals(permissionsDialog.getAddedGrantees().size(), 2);
      }
     
-    @Test(dependsOnGroups = {"editor-tests"}, groups = {"acl-tests"})
+    @Test(dependsOnGroups = {"editor-tests"}, groups = {"acl-tests", "sanity"}, alwaysRun = true)
     public void prepareACLTests() throws Exception {
         initDashboardsPage();
         
@@ -315,9 +316,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         userGroup2Id = getUserGroupID(userGroup2Uri);
     }
 
-    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
+    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldHaveGranteeCandidatesAvailable() throws JSONException, InterruptedException {
-        selectDashboard("Unchanged dashboard");
+        createDashboard("ACL test dashboard");
+        publishDashboard(false);
 
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -341,7 +343,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldNotShareDashboardWhenDialogWasDismissed() throws JSONException, InterruptedException {
-        selectDashboard("Unchanged dashboard");
+        selectDashboard(UNCHANGED_DASHBOARD);
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -351,8 +353,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertEquals(permissionsDialog.getAddedGrantees().size(), 1);
     }
     
-    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
+    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldShareDashboardToUsers() throws JSONException, InterruptedException {
+        closeDialogIfVisible();
         createDashboard("Dashboard shared to users");
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
@@ -363,8 +366,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertEquals(permissionsDialog.getAddedGrantees().size(), 3);
     }
     
-    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
+    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldShareDashboardToGroups() throws JSONException, InterruptedException {
+        closeDialogIfVisible();
         createDashboard("Dashboard shared to groups");
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
@@ -377,7 +381,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldShowNoUserIfNoneMatchesSearchQuery() throws JSONException, InterruptedException {
-        selectDashboard("Unchanged dashboard");
+        selectDashboard(UNCHANGED_DASHBOARD);
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -388,7 +392,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldShowCorrectResultIfSearchQueryContainsSpecialCharacters() 
             throws JSONException, InterruptedException {
-        selectDashboard("Unchanged dashboard");
+        selectDashboard(UNCHANGED_DASHBOARD);
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -400,7 +404,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     
     @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
     public void shouldShowNoResultIfSearchGroup() throws JSONException, InterruptedException {
-        selectDashboard("Unchanged dashboard");
+        selectDashboard(UNCHANGED_DASHBOARD);
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
         final AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
@@ -425,8 +429,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertEquals(addGranteesDialog.getGranteesCount(editorLogin, false), 0);
     }
 
-    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests"})
+    @Test(dependsOnMethods = {"prepareACLTests"}, groups = {"acl-tests", "sanity"})
     public void shouldShowDashboardSharedWithAllUser() throws JSONException, InterruptedException {
+        closeDialogIfVisible();
         createDashboard("Dashboard shared to all users and groups");
         
         final PermissionsDialog permissionsDialog = dashboardsPage.openPermissionsDialog();
@@ -542,7 +547,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         assertEquals(permissionsDialog.getAddedGrantees().size(), 5);
     }
     
-    @Test(dependsOnGroups = {"acl-tests"}, groups = {"acl-tests-usergroups"})
+    @Test(dependsOnGroups = {"acl-tests"}, groups = {"acl-tests-usergroups", "sanity"}, alwaysRun = true)
     public void prepareUsergroupTests() throws IOException, JSONException {
         initDashboardsPage();
         
@@ -553,7 +558,7 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup2Id, testParams.getViewerProfileUri());
     }
     
-    @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups"})
+    @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups", "sanity"})
     public void shouldVisibleToUserInGroup() throws InterruptedException, JSONException {
         createDashboard("Dashboard shared to user group");
         
@@ -711,4 +716,19 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         String[] parts = userGroupUri.split("/");
         return parts[parts.length -1];
     }
+
+    private void closeDialogIfVisible() {
+        initDashboardsPage();
+        System.out.println("Try to close permission dialog...");
+        if (!dashboardsPage.isPermissionDialogVisible())
+            return;
+
+        PermissionsDialog permissionsDialog = dashboardsPage.getPermissionsDialog();
+        if (permissionsDialog.isDoneButtonVisible()) {
+            permissionsDialog.done();
+        } else {
+            permissionsDialog.cancel();
+        }
+    }
 }
+

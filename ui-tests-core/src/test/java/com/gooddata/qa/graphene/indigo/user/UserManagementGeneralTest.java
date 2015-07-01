@@ -77,17 +77,17 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private String userManagementPassword;
     private String userManagementUri;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "User-management-general" + System.currentTimeMillis();
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void addUsers() {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = { "createProject" }, groups = { "initialize" })
+    @Test(dependsOnMethods = { "createProject" }, groups = { "initialize", "sanity" })
     public void initData() throws JSONException, IOException {
         group1 = "Group1";
         group2 = "Group2";
@@ -110,7 +110,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         enableUserManagementFeature();
     }
 
-    @Test(dependsOnMethods = { "initData" }, groups = { "initialize" })
+    @Test(dependsOnMethods = { "initData" }, groups = { "initialize", "sanity" })
     public void prepareUserManagementAdminAndDashboard() throws InterruptedException,
             ParseException, IOException, JSONException {
         // Use another admin user (userManagementAdmin) for testing
@@ -127,7 +127,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         dashboardsPage.addNewDashboard(DASHBOARD_TEST);
     }
 
-    @Test(dependsOnMethods = { "prepareUserManagementAdminAndDashboard" }, groups = { "initialize" })
+    @Test(dependsOnMethods = { "prepareUserManagementAdminAndDashboard" }, groups = { "initialize", "sanity" })
     public void prepareUserGroups() throws JSONException, IOException {
         createUserGroups(group1, group2, group3);
 
@@ -139,14 +139,14 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         userManagementPage.addUsersToGroup(group3, viewerUser);
     }
 
-    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })
     public void accessFromProjectsAndUsersPage() {
         initProjectsAndUsersPage();
         projectAndUsersPage.openUserManagementPage();
         waitForFragmentVisible(userManagementPage);
     }
 
-    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })
     public void accessFromDashboardPage() throws InterruptedException {
         initDashboardsPage();
         selectDashboard(DASHBOARD_TEST);
@@ -206,7 +206,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI", "sanity" })
     public void verifyUserManagementUI() throws IOException, JSONException {
         initDashboardsPage();
         initUserManagementPage();
@@ -216,7 +216,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         userManagementPage.openGroupDialog(GroupDialog.State.CREATE).closeDialog();
     }
 
-    @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI" })
+    @Test(dependsOnGroups = { "initialize" }, groups = { "verifyUI", "sanity" })
     public void verifyUserGroupsList() {
         initDashboardsPage();
         initUserManagementPage();
@@ -292,7 +292,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = { "verifyUI" }, groups = { "userManagement" })
+    @Test(dependsOnGroups = { "verifyUI" }, groups = { "userManagement", "sanity" })
     public void adminChangeGroupsMemberOf() {
         initDashboardsPage();
         initUserManagementPage();
@@ -326,7 +326,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         assertTrue(userManagementPage.getAllUserEmails().contains(userManagementAdmin));
     }
 
-    @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement" })
+    @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
     public void adminRemoveUserGroup() throws ParseException, JSONException, IOException {
         String groupName = "New Group";
         String userGroupUri = RestUtils.addUserGroup(restApiClient, testParams.getProjectId(), groupName);
@@ -340,7 +340,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         assertEquals(userManagementPage.getUserGroupsCount(), userGroupsCount - 1);
     }
 
-    @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement" })
+    @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
     public void changeRoleOfUsers() {
         try {
             initDashboardsPage();
@@ -397,7 +397,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         assertFalse(userManagementPage.isChangeRoleButtonPresent());
     }
 
-    @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement" })
+    @Test(dependsOnMethods = { "verifyUserManagementUI" }, groups = { "userManagement", "sanity" })
     public void inviteUserToProject() throws IOException, MessagingException {
         initDashboardsPage();
         initUserManagementPage();
@@ -428,7 +428,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
                 "Confirm message is not correct when adding exsiting user into the project!");
     }
 
-    @Test(dependsOnGroups = { "userManagement" }, groups = { "activeUser" }, alwaysRun = true)
+    @Test(dependsOnGroups = { "userManagement" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
     public void checkUserCannotDeactivateHimself() {
         initDashboardsPage();
         initUserManagementPage();
@@ -441,7 +441,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         assertEquals(userManagementPage.getStateGroupMessage(), NO_DEACTIVATED_USER_MESSAGE);
     }
 
-    @Test(dependsOnMethods = { "checkUserCannotDeactivateHimself" }, groups = { "activeUser" }, alwaysRun = true)
+    @Test(dependsOnMethods = { "checkUserCannotDeactivateHimself" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
     public void deactivateUsers() {
         List<String> emailsList = asList(editorUser, viewerUser);
 
@@ -455,7 +455,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         assertTrue(compareCollections(userManagementPage.getAllUserEmails(), emailsList));
     }
 
-    @Test(dependsOnMethods = { "deactivateUsers" }, groups = { "activeUser" }, alwaysRun = true)
+    @Test(dependsOnMethods = { "deactivateUsers" }, groups = { "activeUser", "sanity" }, alwaysRun = true)
     public void activateUsers() {
         initDashboardsPage();
         initUserManagementPage();
@@ -469,7 +469,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         assertTrue(userManagementPage.getAllUserEmails().containsAll(asList(editorUser, viewerUser)));
     }
 
-    @Test(dependsOnGroups = "verifyUI")
+    @Test(dependsOnGroups = { "verifyUI" }, groups = { "sanity" })
     public void addNewGroup() {
         String group = "Test add group";
         checkAddingUserGroup(group);
