@@ -150,10 +150,11 @@ public class AbstractGreyPageTest extends AbstractTest {
         return WebDavClient.getInstance(testParams.getUser(), testParams.getPassword()).getFile(webContainer + "/" + resourceFile.getName());
     }
 
-    public String exportProject(boolean exportUsers, boolean exportData, int statusPollingCheckIterations) throws JSONException, InterruptedException {
+    public String exportProject(boolean exportUsers, boolean exportData, boolean crossDataCenter,
+            int statusPollingCheckIterations) throws JSONException, InterruptedException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/export");
         waitForElementPresent(exportFragment.getRoot());
-        return exportFragment.invokeExport(exportUsers, exportData, statusPollingCheckIterations);
+        return exportFragment.invokeExport(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
     }
 
     public void importProject(String exportToken, int statusPollingCheckIterations)
