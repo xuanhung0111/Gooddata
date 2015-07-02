@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 
@@ -36,7 +38,9 @@ public class DashboardContent extends AbstractFragment {
         return reports.size();
     }
 
-    private static String REPORT_IMAGE_LOCATOR = "//div[contains(@class, '${reportName}')]//img";
+    private static String REPORT_IMAGE_LOCATOR = "div.s-${reportName} img";
+    private static String REPORT_IMAGE_LOADED_LOCATOR =
+            "div.s-${reportName} span.c-report-loading-message[style ^='display: none']";
 
     public <T extends AbstractReport> T getReport(int reportIndex, Class<T> clazz) {
         return createPageFragment(clazz, reports.get(reportIndex));
@@ -65,8 +69,11 @@ public class DashboardContent extends AbstractFragment {
     }
 
     public WebElement getImageFromReport(String reportName){
-        By eleBy =  By.xpath(REPORT_IMAGE_LOCATOR.replace("${reportName}", simplifyText(reportName)));
-        return waitForElementVisible(eleBy, browser);
+        reportName = simplifyText(reportName);
+        final By reportLoaded = By.cssSelector(REPORT_IMAGE_LOADED_LOCATOR.replace("${reportName}", reportName));
+        final By reportImg =  By.cssSelector(REPORT_IMAGE_LOCATOR.replace("${reportName}", reportName));
+        waitForElementPresent(reportLoaded, browser);
+        return waitForElementVisible(reportImg, browser);
      }
 
     public List<FilterWidget> getFilters() {
@@ -83,6 +90,7 @@ public class DashboardContent extends AbstractFragment {
     }
 
     public FilterWidget getFilterWidget(final String condition) {
+        waitForCollectionIsNotEmpty(filters);
         WebElement filter = Iterables.find(filters, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
