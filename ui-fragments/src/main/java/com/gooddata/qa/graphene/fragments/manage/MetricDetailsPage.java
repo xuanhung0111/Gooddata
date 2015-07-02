@@ -14,7 +14,7 @@ public class MetricDetailsPage extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'MAQLDocumentationContainer')]")
     private WebElement maql;
 
-    @FindBy(xpath = "//span[contains(@class,'metric_format')]")
+    @FindBy(className = "formatter")
     private WebElement metricFormat;
 
     @FindBy(css = "#p-objectPage .s-btn-delete")
