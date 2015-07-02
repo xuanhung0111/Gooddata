@@ -1,16 +1,21 @@
 package com.gooddata.qa.graphene.aqe;
 
+import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.HowItem.Position;
@@ -25,11 +30,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
-import org.apache.commons.collections.CollectionUtils;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.assertTrue;
-import static java.util.Arrays.asList;
 
 @Test(groups = {"GoodSalesValidElements"}, description = "Tests for GoodSales project relates to ValidElements resource")
 public class ValidElementsResourceTest extends GoodSalesAbstractTest {
@@ -66,7 +66,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             .withAttribute(monthYearCreatedAttr)
             .withAttributeElements("Jan 2010", "Feb 2010", "Mar 2010"));
     }
-    
+
     /*
      * This test is to cover the following bug:
      * "AQE-1029 - Cascading filter: get 400 bad request when opening list value of child filter"
@@ -86,7 +86,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
             dashboardEditBar.saveDashboard();
 
             FilterWidget departmentFilter = getFilterWidget(departmentAttr);
-            FilterWidget productFilter    = getFilterWidget(productAttr);
+            FilterWidget productFilter = getFilterWidget(productAttr);
 
             assertTrue(CollectionUtils.isEqualCollection(allDepartmentValues,
                     departmentFilter.getAllAttributeValues()), "List of filter elements is not properly.");
@@ -122,12 +122,12 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                         483.1f, 36.7f, 2.3f, 1.9f, 1.4f, 1.3f);
         System.out.println("Verifying element resource of time filter ...");
         openDashboardTab(1);
-        
+
         getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("01/01/2008", "12/30/2014");
         Screenshots.takeScreenshot(browser, "AQE-Check time filter", this.getClass());
         Thread.sleep(2000);
         checkRedBar(browser);
-        
+
         TableReport dashboardTableReport = getDashboardTableReport(top5OpenByMoneyReport);
         assertTrue(CollectionUtils.isEqualCollection(dashboardTableReport.getAttributeElements(),
                             reportAttributeValues),
@@ -165,8 +165,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         signInAsDifferentUser(UserRoles.EDITOR);
         openDashboardTab(1);
         assertTrue(CollectionUtils.isEqualCollection(getFilterWidget("Status").getAllAttributeValues(),
-                asList("Open")),
-                "Variable filter is applied incorrecly");
+                asList("Open")), "Variable filter is applied incorrecly");
         getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("10/01/2014", "12/31/2014");
         Thread.sleep(5000);
 
@@ -237,15 +236,16 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         browser.get(browser.getCurrentUrl() + "&renderImgForce=true");
         waitForDashboardPageLoaded(browser);
         browser.navigate().refresh();
-        getFilterWidget("Activity Date").changeTimeFilterByEnterFromAndToDate("01/01/2008", "12/30/2014");
+        dashboardsPage.getContent().getFilterWidget(simplifyText("Comparison Quarter(s)"))
+            .changeTimeFilterByEnterFromAndToDate("01/01/2011", "06/30/2011");
+        dashboardsPage.getContent().getFilterWidget(simplifyText("Activity Date"))
+            .changeTimeFilterByEnterFromAndToDate("01/01/2011", "06/30/2011");
 
-        List<String> reportsToCheck =
-                asList("Activities by Type", "Activity Level", "Activity by Sales Rep");
-        for(Iterator<String> list = reportsToCheck.iterator(); list.hasNext(); ) {
-            WebElement reportImg = dashboardsPage.getContent().getImageFromReport(list.next());
+        List<String> reportsToCheck = asList("Activities by Type", "Activity Level", "Activity by Sales Rep");
+        for(String report : reportsToCheck) {
+            WebElement reportImg = dashboardsPage.getContent().getImageFromReport(report);
             assertTrue(RestUtils.isValidImage(testParams.getHost(), testParams.getUser(),
-                    testParams.getPassword(), reportImg),
-                    "Image reports are not loaded properly");
+                    testParams.getPassword(), reportImg), "Image reports are not loaded properly");
         }
     }
 
@@ -253,8 +253,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
         for (FilterWidget filter : dashboardsPage.getFilters()) {
-            if (!filter.getRoot().getAttribute("class")
-                                 .contains("s-" + CssUtils.simplifyText(filterName)))
+            if (!filter.getRoot().getAttribute("class").contains("s-" + simplifyText(filterName)))
                 continue;
             return filter;
         }
