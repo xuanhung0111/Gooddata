@@ -1,11 +1,13 @@
 package com.gooddata.qa.graphene.project;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.TimeoutException;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -46,6 +48,14 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
             }
             return result;
         }
+    }
+
+    @DataProvider(name = "testExportCrossDataCenter")
+    public Object[][] testExportCrossDataCenter() {
+        return new Object[][] {
+                {false},
+                {true}
+        };
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -101,9 +111,10 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         }
     }
 
-    @Test(dependsOnMethods = {"loadProject"})
-    public void exportImportProject() throws JSONException, InterruptedException, IOException {
-        String exportToken = exportProject(exportUsers, exportData, statusPollingCheckIterations);
+    @Test(dependsOnMethods = {"loadProject"}, dataProvider = "testExportCrossDataCenter")
+    public void exportImportProject(boolean crossDataCenter)
+            throws JSONException, InterruptedException, IOException {
+        String exportToken = exportProject(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
         String parentProjectId = testParams.getProjectId();
         boolean validationTimeoutOK = true;
         // New projectID is needed here. Load it from export, validate, delete and restore original one
