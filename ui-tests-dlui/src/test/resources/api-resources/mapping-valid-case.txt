@@ -1,0 +1,36 @@
+  "mappingDefinition":{
+    "tableMappings":[
+      {
+          "table":"opportunity",
+          "dataset":"dataset.opportunity",
+          "columnMappings":[
+              "columnMapping":{
+                "column":"cp__name",
+                "target":{"existingElement":{"reference":"label.opportunity.name"}}
+
+                "column":"f__totalprice",
+                "target":{"existingElement":{"reference":"fact.opportunity.totalprice"}}
+
+                "column":"f__price",
+                "target":{"existingElement":{"reference":"fact.opportunity.price"}}
+
+                "column":"a__title",
+                "target":{"existingElement":{"reference":"label.opportunity.title"}}
+
+          "table":"person",
+          "dataset":"dataset.person",
+          "columnMappings":[
+                "column":"l__person__personid",
+                "target":{"existingElement":{"reference":"label.person.person.personid"}}
+
+                "column":"l__person__lastname",
+                "target":{"existingElement":{"reference":"label.person.person.lastname"}}
+
+                "column":"f__age",
+                "target":{"existingElement":{"reference":"fact.person.age"}}
+
+                "column":"l__person__firstname",
+                "target":{"existingElement":{"reference":"label.person.person.firstname"}}
+
+                "column":"a__person",
+                "target":{"existingElement":{"reference":"label.person.person"}}

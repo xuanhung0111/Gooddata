@@ -15,10 +15,6 @@ import com.gooddata.qa.utils.http.RestUtils;
 
 public class DataloadResourcesPermissionTest extends AbstractMSFTest {
 
-    private static final String INTERNAL_OUTPUT_STAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
-    private static final String MAPPING_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "mapping";
-    private static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
-
     @BeforeClass
     public void initProjectTitle() {
         projectTitle = "Dataload resources permission test";
