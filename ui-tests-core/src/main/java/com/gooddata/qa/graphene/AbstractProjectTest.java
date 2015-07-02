@@ -57,7 +57,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
                     projectCreateCheckIterations));
 
             if (testParams.getDwhDriver().equals(DWHDriver.VERTICA)) {
-                String exportToken = exportProject(true, true, projectCreateCheckIterations * 5);
+                String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
                 deleteProject(testParams.getProjectId());
 
                 openUrl(PAGE_GDC_PROJECTS);

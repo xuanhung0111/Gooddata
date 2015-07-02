@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
@@ -20,9 +21,14 @@ public class ExportFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement submit;
 
-    public String invokeExport(boolean expUsers, boolean expData, int checkIterations) throws JSONException, InterruptedException {
+    @FindBy
+    private WebElement crossDataCenterExport;
+
+    public String invokeExport(boolean expUsers, boolean expData, boolean crossDataCenter, int checkIterations)
+            throws JSONException, InterruptedException {
         if (expData) waitForElementVisible(exportData).click();
         if (expUsers) waitForElementVisible(exportUsers).click();
+        if (crossDataCenter) waitForElementVisible(crossDataCenterExport).click();
         Graphene.guardHttp(submit).click();
         String exportToken = getExportToken();
 
