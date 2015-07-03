@@ -95,7 +95,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected ProcessInfo dataloadProcess;
     protected ADSInstance adsInstance;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialProperties() {
         dssAuthorizationToken = testParams.loadProperty("dss.authorizationToken");
 
@@ -449,16 +449,19 @@ public class AbstractMSFTest extends AbstractProjectTest {
     }
 
     protected void checkReportAfterAddingNewField(ReportDefinition reportDefinition,
-            Collection<String> attributeValues, Collection<String> metricValues) throws InterruptedException {
+            Collection<String> attributeValues, Collection<String> metricValues)
+            throws InterruptedException {
         createReport(reportDefinition, reportDefinition.getName());
-    
+
         List<String> attributes = reportPage.getTableReport().getAttributeElements();
         System.out.println("Attributes: " + attributes.toString());
-        CollectionUtils.isEqualCollection(attributes, attributeValues);
-    
+        assertTrue(CollectionUtils.isEqualCollection(attributes, attributeValues),
+                "Incorrect attribute values!");
+
         List<String> metrics = reportPage.getTableReport().getRawMetricElements();
         System.out.println("Metric: " + metrics.toString());
-        CollectionUtils.isEqualCollection(metrics, metricValues);
+        assertTrue(CollectionUtils.isEqualCollection(metrics, metricValues),
+                "Incorrect metric values!");
     }
 
     protected void checkReportAfterAddReferenceToDataset() throws InterruptedException {

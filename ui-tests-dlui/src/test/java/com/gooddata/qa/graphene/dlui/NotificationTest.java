@@ -5,8 +5,9 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
-
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.DataSource;
@@ -21,7 +22,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class NotificationTest extends AbstractDLUINotificationTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Dlui-notification-test-" + System.currentTimeMillis();
 
@@ -36,97 +37,39 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         technicalUserUri = testParams.loadProperty("technicalUserUri");
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "george")
+    @DataProvider(name = "basicNotificationData")
+    protected static Object[][] provideBasicData() {
+        return new Object[][] { {AddedFields.POSITION}, {AddedFields.TOTALPRICE2}};
+    }
+
+    @DataProvider(name = "extendedFieldData")
+    protected static Object[][] provideExtendedData() {
+        return new Object[][] { {AddedFields.LABEL}, {AddedFields.DATE},
+            {AddedFields.POSITION_CONNECTION_POINT}};
+    }
+
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"george", "basicTest"})
     public void signInWithGeorge() {
         logout();
         signInAtUI(technicalUser, technicalUserPassword);
     }
 
-    @Test(dependsOnMethods = "signInWithGeorge", groups = "george")
-    public void addNewAttributeFromADSToLDM() {
+    @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithGeorge", groups = {
+        "george", "basicTest"})
+    public void checkNotificationForAddingSingleBasicField(AddedFields addedField)
+            throws JSONException {
         long requestTime = System.currentTimeMillis();
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("person").withFields(
-                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "george-add-new-attribute");
-        } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedAttributeInLDM_Person_Position.txt"));
-        }
-
-        checkSuccessfulDataAddingEmail(requestTime, "Position");
+        addNewFieldAndCheckNotification(UserRoles.ADMIN, addedField, requestTime);
     }
 
-    @Test(dependsOnMethods = "signInWithGeorge", groups = "george")
-    public void addNewFactFromADSToLDM() {
+    @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithGeorge",
+            groups = {"george"})
+    public void checkNotificationForAddingSingleField(AddedFields addedField) throws JSONException {
         long requestTime = System.currentTimeMillis();
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("opportunity").withFields(
-                            new Field("Totalprice2", FieldTypes.FACT, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "george-add-new-fact");
-        } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedFactInLDM_Opportunity_Totalprice2.txt"));
-        }
-
-        checkSuccessfulDataAddingEmail(requestTime, "Totalprice2");
+        addNewFieldAndCheckNotification(UserRoles.ADMIN, addedField, requestTime);
     }
 
-    @Test(dependsOnMethods = "signInWithGeorge", groups = "george")
-    public void addNewLabelFromADSToLDM() {
-        long requestTime = System.currentTimeMillis();
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("opportunity").withFields(
-                            new Field("Label", FieldTypes.LABEL_HYPERLINK, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "george-add-new-label");
-        } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedLabelInLDM_Opportunity_Label.txt"));
-        }
-
-        checkSuccessfulDataAddingEmail(requestTime, "Label");
-    }
-
-    @Test(dependsOnMethods = "signInWithGeorge", groups = "george")
-    public void addNewDateFieldFromADSToLDM() {
-        long requestTime = System.currentTimeMillis();
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("person").withFields(
-                            new Field("Date", FieldTypes.DATE, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "george-add-new-date");
-        } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedDateInLDM_Person_Date.txt"));
-        }
-
-        checkSuccessfulDataAddingEmail(requestTime, "Date");
-    }
-
-    @Test(dependsOnMethods = {"signInWithGeorge"}, groups = "george")
+    @Test(dependsOnMethods = {"signInWithGeorge"}, groups = {"george"})
     public void addMultiFieldsFromADSToLDM() {
         long requestTime = System.currentTimeMillis();
         try {
@@ -145,13 +88,14 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             checkSuccessfulAddingData(dataSource, "add-new-multi-fields");
         } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/dropMultiAddedFieldsInLDM.txt"));
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
+                    + "/dropMultiAddedFieldsInLDM.txt"));
         }
 
         checkSuccessfulDataAddingEmail(requestTime, "Date", "Label", "Position", "Totalprice2");
     }
 
-    @Test(dependsOnMethods = "signInWithGeorge", groups = "george")
+    @Test(dependsOnMethods = "signInWithGeorge", groups = {"george"})
     public void failToAddNewField() {
         long requestTime = System.currentTimeMillis();
         try {
@@ -171,7 +115,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         checkFailedDataAddingEmail(requestTime, "Position");
     }
 
-    @Test(dependsOnMethods = "signInWithGeorge", groups = "george")
+    @Test(dependsOnMethods = "signInWithGeorge", groups = {"george"})
     public void failToLoadDataForNewField() throws InterruptedException {
 
         long requestTime = System.currentTimeMillis();
@@ -186,41 +130,34 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             failToLoadData(dataSource, "george-fail-to-load-data");
         } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedAttributeInLDM_Person_Position.txt"));
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
+                    + "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
 
         checkFailedDataAddingEmail(requestTime, "Position");
     }
 
-    @Test(dependsOnGroups = "george", groups = "annie", alwaysRun = true)
+    @Test(dependsOnGroups = "george", groups = {"annie", "basicTest"}, alwaysRun = true)
     public void signInWithAnnie() {
         logout();
         signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
     }
 
-    @Test(dependsOnMethods = "signInWithAnnie", groups = "annie")
-    public void addDataWithEditorRole() {
+    @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithAnnie", groups = {
+        "annie", "basicTest"})
+    public void checkBasicNotificationWithEditorRole(AddedFields addedField) throws JSONException {
         long requestTime = System.currentTimeMillis();
-        try {
-            Dataset selectedDataset =
-                    new Dataset().withName("person").withFields(
-                            new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
-
-            DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
-                            selectedDataset);
-
-            checkSuccessfulAddingData(dataSource, "annie-add-new-fields");
-        } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedAttributeInLDM_Person_Position.txt"));
-        }
-
-        checkSuccessfulDataAddingEmailForEditor(requestTime, "Position");
+        addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
     }
 
-    @Test(dependsOnMethods = "signInWithAnnie", groups = "annie")
+    @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithAnnie",
+            groups = {"annie"})
+    public void checkExtendedNotificationWithEditor(AddedFields addedField) throws JSONException {
+        long requestTime = System.currentTimeMillis();
+        addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
+    }
+
+    @Test(dependsOnMethods = "signInWithAnnie", groups = {"annie"})
     public void failToAddNewFieldWithEditorRole() {
         long requestTime = System.currentTimeMillis();
         try {
@@ -241,7 +178,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         checkFailedDataAddingEmailForEditor(requestTime, "Position");
     }
 
-    @Test(dependsOnMethods = "signInWithAnnie", groups = "annie")
+    @Test(dependsOnMethods = "signInWithAnnie", groups = {"annie"})
     public void failToLoadDataForNewFieldWithEdiorRole() throws InterruptedException {
         long requestTime = System.currentTimeMillis();
         try {
@@ -255,8 +192,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
             failToLoadData(dataSource, "annie-fail-to-load-data");
         } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedAttributeInLDM_Person_Position.txt"));
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
+                    + "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
 
         checkFailedDataAddingEmail(requestTime, "Position");
@@ -314,11 +251,23 @@ public class NotificationTest extends AbstractDLUINotificationTest {
                         "copyTableWithAdditionalFields_Drop_Person.txt", adsInstance);
 
         String executionUri =
-                executeCloudConnectProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS,
-                        params);
+                executeCloudConnectProcess(cloudconnectProcess,
+                        DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params);
         assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
 
         checkFailedDataAddingResult();
         Screenshots.takeScreenshot(browser, screenshotName, getClass());
+    }
+
+    private void addNewFieldAndCheckNotification(UserRoles role, AddedFields addedField,
+            long requestTime) throws JSONException {
+        try {
+            checkNewDataAdding(role, addedField);
+            checkSuccessfulDataAddingNotification(role, requestTime, addedField.getField()
+                    .getName());
+        } finally {
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/"
+                    + addedField.getCleanupMaqlFile()));
+        }
     }
 }

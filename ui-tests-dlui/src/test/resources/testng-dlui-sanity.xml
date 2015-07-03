@@ -1,0 +1,40 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+	<test name="Annie dialog sanity tests">
+		<groups>
+			<define name="sanity_annie_dialog">
+				<include name="basicTest" />
+				<include name="initialDataForDLUI" />
+				<include name="createProject" />
+				<include name="projectInit" />
+				<include name="arquillian" />
+			</define>
+			<run>
+				<include name="sanity_annie_dialog" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.dlui.AnnieDialogTest" />
+		</classes>
+	</test>
+
+	<test name="DLUI notification sanity tests">
+		<groups>
+			<define name="sanity_notification">
+				<include name="basicTest" />
+				<include name="initialDataForDLUI" />
+				<include name="createProject" />
+				<include name="projectInit" />
+				<include name="arquillian" />
+			</define>
+			<run>
+				<include name="sanity_notification" />
+			</run>
+		</groups>
+		<classes>
+			<class name="com.gooddata.qa.graphene.dlui.NotificationTest" />
+		</classes>
+	</test>
+
+</suite>
