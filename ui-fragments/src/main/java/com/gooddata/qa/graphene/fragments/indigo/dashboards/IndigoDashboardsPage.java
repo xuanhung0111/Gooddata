@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -15,21 +16,28 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = Kpi.MAIN_CLASS)
-    protected List<Kpi> kpis;
+    private List<Kpi> kpis;
 
-    @FindBy(className = "s-edit_button")
-    protected WebElement editButton;
+    @FindBy(className = EDIT_BUTTON_SELECTOR)
+    private WebElement editButton;
 
     @FindBy(className = "s-cancel_button")
-    protected WebElement cancelButton;
+    private WebElement cancelButton;
+
+    @FindBy(className = "s-save_button")
+    private WebElement saveButton;
 
     @FindBy(className = "s-metric_select")
-    protected WebElement metricSelect;
+    private WebElement metricSelect;
 
     @FindBy(className = "dashboard")
-    protected WebElement dashboard;
+    private WebElement dashboard;
+
+    @FindBy(xpath = "//*[contains(concat(' ', normalize-space(@class), ' '), ' s-dialog ')]")
+    private ConfirmDialog dialog;
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
+    private static final String EDIT_BUTTON_SELECTOR = "s-edit_button";
 
     public IndigoDashboardsPage switchToEditMode() {
         waitForElementVisible(editButton).click();
@@ -40,9 +48,20 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage cancelEditMode() {
         waitForElementVisible(cancelButton).click();
+
+        return this;
+    }
+
+    public IndigoDashboardsPage saveEditMode() {
+        waitForElementVisible(saveButton).click();
         waitForElementVisible(this.editButton);
 
         return this;
+    }
+
+    public ConfirmDialog waitForDialog() {
+        waitForElementVisible(dialog.getRoot());
+        return dialog;
     }
 
     public Kpi selectKpi(int index) {
@@ -64,12 +83,25 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public void waitForDashboardLoad() {
+    public IndigoDashboardsPage waitForDashboardLoad() {
         waitForElementVisible(DASHBOARD_LOADED, browser);
+
+        return this;
     }
 
-    public void waitForKpiLoading(){
+    public IndigoDashboardsPage waitForKpiLoading(){
         waitForElementNotPresent(Kpi.IS_LOADING);
+
+        return this;
+    }
+
+    public boolean checkIfEditButtonIsPresent() {
+        try {
+            browser.findElement(By.className(EDIT_BUTTON_SELECTOR));
+            return true;
+        } catch (NoSuchElementException ignored) {
+            return false;
+        }
     }
 
 }
