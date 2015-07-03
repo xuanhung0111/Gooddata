@@ -10,7 +10,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
@@ -19,6 +18,7 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
@@ -266,7 +266,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         System.out.println("These tabs are available for selected project: " + tabLabels.toString());
         for (int i = 0; i < tabLabels.size(); i++) {
             if (validation) assertEquals(tabLabels.get(i), expectedTabs[i],
-                    "Expected tab name doesn't not match, index:" + i + ", " + tabLabels.get(i));
+                    "Expected tab name doesn't match, index:" + i + ", " + tabLabels.get(i));
             tabs.openTab(i);
             System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
             waitForDashboardPageLoaded(browser);
@@ -399,7 +399,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType,
                           String screenshotName) throws InterruptedException {
         initProjectsPage();
-        initDashboardsPage();
+        initEmptyDashboardsPage();
         initUploadPage();
         upload.uploadFile(filePath);
         Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());
@@ -432,6 +432,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initUploadPage() {
         openUrl(PAGE_UPLOAD);
         waitForElementVisible(upload.getRoot());
+    }
+
+    public void initEmptyDashboardsPage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
+        waitForElementVisible(By.id("p-projectDashboardPage"), browser);
     }
 
     public void initDashboardsPage() {
