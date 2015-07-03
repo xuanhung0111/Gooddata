@@ -1,14 +1,15 @@
 package com.gooddata.qa.graphene.manage;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Arrays.asList;
 
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -20,16 +21,14 @@ import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
 
     private List<String> attributesList;
-    private String csvFilePath;
 
     @BeforeClass
     public void setProjectTitle() {
-        csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
         projectTitle = "SimpleProject-test-geos-labels";
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void initialize() throws InterruptedException, JSONException {
+    public void initialize() {
         attributesList =
                 asList("Geo_pushpin", "AUS_State_Name", "AUS_State_ISO", "StateName", "StateID",
                         "StateCode", "CountyID", "CountryName", "Country_ISO2", "Country_ISO3",
@@ -37,7 +36,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                         "CZ_District_KNOK");
         Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
         columnIndexAndType.put(9, OptionDataType.TEXT);
-        uploadCSV(csvFilePath + "attribute_geo_labels.csv", columnIndexAndType,
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_geo_labels.csv"), columnIndexAndType,
                 "attribute_geo_labels");
     }
 

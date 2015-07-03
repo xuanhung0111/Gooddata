@@ -1,9 +1,13 @@
 package com.gooddata.qa.graphene.dlui;
 
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -19,8 +23,6 @@ import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
-import static java.util.Arrays.asList;
 
 public class DataloadResourcesTest extends AbstractMSFTest {
     
@@ -124,8 +126,10 @@ public class DataloadResourcesTest extends AbstractMSFTest {
         createADSInstance(newInstance);
         setDefaultSchemaForOutputStage(getRestApiClient(), newInstance.getId());
         try {
-            updateModelOfGDProject(maqlFilePath + "dropTablesOpportunityPerson.txt");
-            updateModelOfGDProject(maqlFilePath + "createDatasetWithAllCases.txt");
+            String dropTableFile = getResourceAsString("/" + MAQL_FILES + "/dropTablesOpportunityPerson.txt");
+            String createDatasetFile = getResourceAsString("/" + MAQL_FILES + "/createDatasetWithAllCases.txt");
+            updateModelOfGDProject(dropTableFile);
+            updateModelOfGDProject(createDatasetFile);
 
             assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                     readResourceFile("diff-all-cases.txt", DIFF_KEY));
@@ -156,11 +160,11 @@ public class DataloadResourcesTest extends AbstractMSFTest {
     }
 
     private List<String> readResourceFile(String file, String key) throws IOException {
-        return asList(FileUtils.readFileToString(new File(apiResourcesPath + file)).split(key));
+        return asList(getResourceAsString("/" + API_RESOURCES + "/" + file).split(key));
     }
 
     private List<String> readAllLinesOfFile(String file) throws IOException {
-        return FileUtils.readLines(new File(apiResourcesPath + file));
+        return FileUtils.readLines(getResourceAsFile("/" + API_RESOURCES + "/" + file));
     }
 
     private void assertResourceContent(String actualContent, List<String> expectedParts) throws IOException {

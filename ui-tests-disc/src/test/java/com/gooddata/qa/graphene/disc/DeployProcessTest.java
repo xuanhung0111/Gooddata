@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -10,7 +13,6 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
 
     @BeforeClass
     public void initProperties() {
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
         projectTitle = "Disc-test-deploy-process";
     }
 
@@ -104,8 +106,9 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
     public void notZipFileErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
-        deployForm.tryToDeployProcess(zipFilePath + "not-zip-file.7z", ProcessTypes.DEFAULT,
-                "Not zip file");
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/not-zip-file.7z");
+        deployForm.tryToDeployProcess(filePath, ProcessTypes.DEFAULT, "Not zip file");
         deployForm.assertInvalidPackageError();
     }
 
@@ -113,8 +116,9 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
     public void tooLargeZipFileErrorDeployment() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
-        deployForm.tryToDeployProcess(zipFilePath + "too-large-file.zip", ProcessTypes.DEFAULT,
-                "Too large file");
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/too-large-file.zip");
+        deployForm.tryToDeployProcess(filePath, ProcessTypes.DEFAULT, "Too large file");
         deployForm.assertInvalidPackageError();
     }
 

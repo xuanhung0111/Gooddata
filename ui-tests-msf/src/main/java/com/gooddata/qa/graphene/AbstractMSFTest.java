@@ -1,8 +1,14 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -10,12 +16,10 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
@@ -25,11 +29,11 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
+import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
@@ -38,7 +42,6 @@ import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
-import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.google.common.collect.Lists;
 
 public class AbstractMSFTest extends AbstractProjectTest {
@@ -79,7 +82,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected String technicalUser;
     protected String technicalUserPassword;
     protected String technicalUserUri;
-    protected String apiResourcesPath;
     protected String initialLdmMaqlFile = "create-ldm.txt";
 
     protected ProjectInfo workingProject;
@@ -89,11 +91,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     @BeforeClass
     public void initialProperties() {
-        maqlFilePath = testParams.loadProperty("maqlFilePath") + testParams.getFolderSeparator();
-        sqlFilePath = testParams.loadProperty("sqlFilePath") + testParams.getFolderSeparator();
-        zipFilePath = testParams.loadProperty("zipFilePath") + testParams.getFolderSeparator();
-        apiResourcesPath = testParams.loadProperty("apiResourcesPath") + testParams.getFolderSeparator();
-
         dssAuthorizationToken = testParams.loadProperty("dss.authorizationToken");
 
         technicalUser = testParams.loadProperty("technicalUser");
@@ -110,7 +107,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected void prepareLDMAndADSInstance() throws JSONException {
         // Override this method in test class if it's necessary to add more users to project
         addUsersToProject();
-        updateModelOfGDProject(maqlFilePath + initialLdmMaqlFile);
+        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
         adsInstance = new ADSInstance().withName("ADS Instance for DLUI test")
                 .withAuthorizationToken(dssAuthorizationToken);
         createADSInstance(adsInstance);
@@ -168,19 +165,10 @@ public class AbstractMSFTest extends AbstractProjectTest {
         params.add(new ExecutionParameter(ADS_PASSWORD_PARAM, testParams.getPassword()));
         params.add(new ExecutionParameter(ADS_URL_PARAM, ADS_URL.replace("${host}",
                 testParams.getHost()).replace("${adsId}", instance.getId())));
-        try {
-            String createTableSql =
-                    FileUtils.readFileToString(new File(sqlFilePath + createTableSqlFile),
-                            StandardCharsets.UTF_8);
-            String copyTableSql =
-                    FileUtils.readFileToString(new File(sqlFilePath + copyTableSqlFile),
-                            StandardCharsets.UTF_8);
-            params.add(new ExecutionParameter(CREATE_ADS_TABLE_PARAM, createTableSql));
-            params.add(new ExecutionParameter(COPY_ADS_TABLE_PARAM, copyTableSql));
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "There is an exception during reading file to string! ", e);
-        }
+        String createTableSql = getResourceAsString("/" + SQL_FILES + "/" + createTableSqlFile);
+        String copyTableSql = getResourceAsString("/" + SQL_FILES + "/" + copyTableSqlFile);
+        params.add(new ExecutionParameter(CREATE_ADS_TABLE_PARAM, createTableSql));
+        params.add(new ExecutionParameter(COPY_ADS_TABLE_PARAM, copyTableSql));
         return params;
     }
 
@@ -194,22 +182,22 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected int createCloudConnectProcess(ProcessInfo processInfo) {
         String uploadFilePath =
-                uploadZipFileToWebDavWithoutWebContainer(zipFilePath + CLOUDCONNECT_PROCESS_PACKAGE);
+                uploadZipFileToWebDavWithoutWebContainer(CLOUDCONNECT_PROCESS_PACKAGE);
         return ProcessUtils.createCloudConnectProcess(getRestApiClient(), processInfo,
                 uploadFilePath.substring(uploadFilePath.indexOf("/uploads")) + "/"
                         + CLOUDCONNECT_PROCESS_PACKAGE);
     }
 
-    protected void updateModelOfGDProject(String maqlFile) {
+    protected void updateModelOfGDProject(String maql) {
         System.out.println("Update model of GD project!");
-        String pollingUri = sendRequestToUpdateModel(maqlFile);
+        String pollingUri = sendRequestToUpdateModel(maql);
         RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
         assertEquals(RestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri), "OK",
                 "Model is not updated successfully!");
     }
 
-    protected void dropAddedFieldsInLDM(String maqlFile) {
-        String pollingUri = sendRequestToUpdateModel(maqlFile);
+    protected void dropAddedFieldsInLDM(String maql) {
+        String pollingUri = sendRequestToUpdateModel(maql);
         RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
         if (!"OK".equals(RestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri))) {
             HttpRequestBase getRequest = getRestApiClient().newGetMethod(pollingUri);
@@ -300,10 +288,11 @@ public class AbstractMSFTest extends AbstractProjectTest {
                 "Default schema is not set successfully!");
     }
 
-    protected String uploadZipFileToWebDavWithoutWebContainer(String zipFile) {
+    protected String uploadZipFileToWebDavWithoutWebContainer(String zipFileName) {
         WebDavClient webDav =
                 WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
-        File resourceFile = new File(zipFile);
+        File resourceFile = getResourceAsFile("/" + ZIP_FILES + "/" + zipFileName);
+        System.out.println("Resource file: " + resourceFile.getAbsolutePath());
         openUrl(PAGE_GDC);
         waitForElementPresent(gdcFragment.getRoot());
         assertTrue(webDav.createStructure(gdcFragment.getUserUploadsURL()),
@@ -314,8 +303,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return webDav.getWebDavStructure();
     }
 
-    
-    
     protected String getAdsUrl(ADSInstance adsInstance) {
         return ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
                 adsInstance.getId());
@@ -459,17 +446,12 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return metadataObject;
     }
 
-    private String sendRequestToUpdateModel(String maqlFile) {
-        String maql = "";
+    private String sendRequestToUpdateModel(String maql) {
         String pollingUri = "";
         try {
-            maql = FileUtils.readFileToString(new File(maqlFile));
-            pollingUri =
-                    RestUtils.executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(),
-                            maql);
+            pollingUri = RestUtils.executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(), maql);
         } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an exeception during LDM update!", e);
+            throw new IllegalStateException("There is an exeception during LDM update!", e);
         }
 
         return pollingUri;

@@ -1,5 +1,10 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,12 +23,10 @@ import com.gooddata.qa.graphene.fragments.reports.ReportWithImage;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-
-@Test(groups = {"projectSimpleAttribute"}, description = "Tests for configuration of attribute labels functionality on simple project in GD platform")
+@Test(groups = {"projectSimpleAttribute"},
+      description = "Tests for configuration of attribute labels functionality on simple project in GD platform")
 public class AttributeLabelsTest extends AbstractProjectTest {
 
-    private String csvFilePath;
     private String hyperlinkAttr;
     private String hyperlinkReport;
 
@@ -32,7 +35,6 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @BeforeClass
     public void setProjectTitle() {
-        csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
         projectTitle = "SimpleProject-test-attribute-labels";
     }
 
@@ -43,9 +45,10 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initialize"})
-    public void initDataTest() throws InterruptedException {
+    public void initDataTest() {
         Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
-        uploadCSV(csvFilePath + "attribute_labels.csv", columnIndexAndType, "attribute-labels");
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_labels.csv"), columnIndexAndType,
+                "attribute-labels");
     }
 
     @Test(dependsOnMethods = {"initialize"})

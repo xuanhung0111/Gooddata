@@ -23,7 +23,7 @@ public class UploadFragment extends AbstractFragment {
     @FindBy(css = "div.s-uploadPage-annotation table")
     private UploadColumns uploadColumns;
 
-    public void uploadFile(String filePath) throws InterruptedException {
+    public void uploadFile(String filePath) {
         System.out.println("Going to upload file: " + filePath);
         waitForElementPresent(uploadFile).sendKeys(filePath);
         waitForElementNotVisible(uploadFile);

@@ -2,6 +2,7 @@ package com.gooddata.qa.utils.io;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -32,4 +33,15 @@ public class ResourceUtils {
         }
     }
 
+    public static File getResourceAsFile(final String resourceName) {
+        final URL resourceUrl = ResourceUtils.class.getResource(resourceName);
+        if (resourceUrl == null) {
+            throw new IllegalStateException("Resource '" + resourceName + "' not found!");
+        }
+        return new File(resourceUrl.getFile());
+    }
+
+    public static String getFilePathFromResource(final String resourceName) {
+        return getResourceAsFile(resourceName).getAbsolutePath();
+    }
 }

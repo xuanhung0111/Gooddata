@@ -3,7 +3,11 @@ package com.gooddata.qa.graphene.disc;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -53,8 +57,9 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
             String processName) {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(projects);
-        deployForm.deployProcess(zipFilePath + deployPackage.getPackageName(),
-                deployPackage.getPackageType(), processName);
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + deployPackage.getPackageName());
+        deployForm.deployProcess(filePath, deployPackage.getPackageType(), processName);
         assertDeployedProcessInProjects(processName, projects, deployPackage);
     }
 
@@ -62,8 +67,9 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         String processUrl = null;
         waitForElementVisible(projectDetailPage.getRoot());
         projectDetailPage.clickOnDeployProcessButton();
-        deployForm.deployProcess(zipFilePath + deployPackage.getPackageName(),
-                deployPackage.getPackageType(), processName);
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + deployPackage.getPackageName());
+        deployForm.deployProcess(filePath, deployPackage.getPackageType(), processName);
         assertFalse(projectDetailPage.isErrorDialogVisible());
         processUrl = browser.getCurrentUrl();
         projectDetailPage.checkFocusedProcess(processName);
@@ -78,8 +84,9 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         waitForElementVisible(projectDetailPage.getRoot());
         projectDetailPage.clickOnRedeployButton(processName);
         waitForElementVisible(deployForm.getRoot());
-        deployForm.redeployProcess(zipFilePath + redeployPackage.getPackageName(),
-                redeployPackage.getPackageType(), redeployProcessName);
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + redeployPackage.getPackageName());
+        deployForm.redeployProcess(filePath, redeployPackage.getPackageType(), redeployProcessName);
         waitForElementNotPresent(deployForm.getRoot());
         assertFalse(projectDetailPage.isErrorDialogVisible());
         projectDetailPage.checkFocusedProcess(redeployProcessName);

@@ -1,5 +1,11 @@
 package com.gooddata.qa.graphene.upload;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.testng.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,9 +18,6 @@ import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 import com.gooddata.qa.utils.graphene.Screenshots;
-
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 @Test(groups= { "uploadTests" }, description = "Overall tests for upload.html page in GD platform")
 public class UploadTest extends AbstractUploadTest {
@@ -176,7 +179,8 @@ public class UploadTest extends AbstractUploadTest {
 			columnIndexAndType.put(2, OptionDataType.TEXT);
 			columnIndexAndType.put(3, OptionDataType.TEXT);
 			columnIndexAndType.put(4, OptionDataType.NUMBER);
-            uploadCSV(csvFilePath + "change-column-type.csv", columnIndexAndType, "change-column-type");
+            uploadCSV(getFilePathFromResource("/" + UPLOAD_CSV + "/change-column-type.csv"), columnIndexAndType,
+                    "change-column-type");
 
 			// Check non-number value in report
 			List<String> what = new ArrayList<String>();

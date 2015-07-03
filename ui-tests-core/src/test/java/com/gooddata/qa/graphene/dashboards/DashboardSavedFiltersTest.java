@@ -1,25 +1,35 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.*;
-import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-
-import org.json.JSONException;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.utils.http.RestUtils.setFeatureFlags;
+import static com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption.createFeatureClassOption;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption.createFeatureClassOption;
-import static com.gooddata.qa.utils.http.RestUtils.setFeatureFlags;
-import static org.testng.Assert.*;
+import org.json.JSONException;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditFilter;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardSettingsDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 
 @Test(groups = {"dashboardSavedFilters"}, description = "Test saved filters work on dashboard in Portal")
 public class DashboardSavedFiltersTest extends AbstractProjectTest{
@@ -39,9 +49,8 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init-data"})
-    public void uploadCsvDataForBlankProject() throws InterruptedException {
-        String csvFilePath = testParams.loadProperty("csvFilePath") + testParams.getFolderSeparator();
-        uploadCSV(csvFilePath + "payroll.csv", null, "payroll");
+    public void uploadCsvDataForBlankProject() {
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"), null, "payroll");
     }
 
     @Test(dependsOnGroups = {"init-data"}, priority = 1)

@@ -24,7 +24,7 @@
                 <propertiesPath>${modulePropertiesPath}</propertiesPath>
                 <csvFilePath>${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}geochart-csv</csvFilePath>
             </properties>
-            <build>
+              <build>
                 <testResources>
                     <testResource>
                         <directory>src/test/resources</directory>
@@ -36,10 +36,6 @@
                     <testResource>
                         <directory>src/test/resources</directory>
                         <filtering>false</filtering>
-                        <includes>
-                            <include>**/*.xml</include>
-                            <include>**/*.properties</include>
-                        </includes>
                     </testResource>
                 </testResources>
             </build>

@@ -1,5 +1,12 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.testng.Assert.assertEquals;
+
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -10,9 +17,6 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.*;
 
 public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
 
@@ -41,8 +45,9 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
             DeployPackages deployPackage, ProcessTypes processType, String processName) {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(projects);
-        deployForm.tryToDeployProcess(zipFilePath + deployPackage.getPackageName(), processType,
-                processName);
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + deployPackage.getPackageName());
+        deployForm.tryToDeployProcess(filePath, processType, processName);
         String failedDeployError =
                 String.format(FAILED_DEPLOY_ERROR_BAR_IN_PROJECTS_PAGE,
                         deployPackage.getPackageName(), processName);
@@ -60,8 +65,9 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
         String failedDeployMessage =
                 String.format(FAILED_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE,
                         deployPackage.getPackageName(), processName);
-        deployForm.tryToDeployProcess(zipFilePath + deployPackage.getPackageName(), processType,
-                processName);
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + deployPackage.getPackageName());
+        deployForm.tryToDeployProcess(filePath, processType, processName);
         waitForElementVisible(projectDetailPage.getDeployErrorDialog());
         System.out.println("Error deploy dialog message: "
                 + projectDetailPage.getDeployErrorDialog().getText());
@@ -78,8 +84,9 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
         String failedDeployMessage =
                 String.format(FAILED_REDEPLOY_MESSAGE, redeployPackage.getPackageName(),
                         redeployProcessName);
-        deployForm.tryToDeployProcess(zipFilePath + redeployPackage.getPackageName(),
-                redeployProcessType, redeployProcessName);
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + redeployPackage.getPackageName());
+        deployForm.tryToDeployProcess(filePath, redeployProcessType, redeployProcessName);
         waitForElementPresent(projectDetailPage.getDeployErrorDialog());
         assertEquals(failedDeployMessage, projectDetailPage.getDeployErrorDialog().getText());
         Screenshots.takeScreenshot(browser, "assert-failed-redeployed-process-"
@@ -116,8 +123,9 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
         final String progressDialogMessage =
                 String.format(DEPLOY_PROGRESS_MESSAGE_IN_PROJECTS_PAGE, zipFileName, processName);
         waitForElementVisible(deployForm.getRoot());
-        deployForm.checkDeployProgress(zipFilePath + zipFileName, processType, processName,
-                progressDialogMessage);
+
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + zipFileName);
+        deployForm.checkDeployProgress(filePath, processType, processName, progressDialogMessage);
 
         if (isSuccessful) {
             final String successfulDeployMessage =
@@ -154,7 +162,8 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
                 String.format(DEPLOY_PROGRESS_MESSAGE_IN_PROJECT_DETAIL_PAGE, zipFileName,
                         processName);
         waitForElementVisible(deployForm.getRoot());
-        deployForm.checkDeployProgress(zipFilePath + zipFileName, processType, processName, expectedProgressDialogMessage);
+        String filePath = getFilePathFromResource("/" + ZIP_FILES + "/" + zipFileName);
+        deployForm.checkDeployProgress(filePath, processType, processName, expectedProgressDialogMessage);
 
         if (!isSuccessful)
             return;
