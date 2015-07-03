@@ -1,59 +1,147 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class DashboardsGeneralTest extends GoodSalesAbstractTest {
 
+    private Kpi selectedKpi;
+    private String selectedKpiDataHeadline;
+    private String selectedKpiDataValue;
+
+    @BeforeClass
+    public void before() throws InterruptedException {
+        addUsersWithOtherRoles = true;
+    }
+
     @Test(dependsOnMethods = {"createProject"})
+    public void initDashboardTests() {
+        initDashboardsPage();
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
     public void kpisLoadedCheck() {
         initIndigoDashboardsPage();
     }
 
-    @Test(dependsOnMethods = {"createProject"})
-    public void checkEditModeCancel() {
-        Kpi selectedKpi;
-        String selectedKpiDataHeadline;
-        String selectedKpiDataValue;
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
+    public void checkEditModeCancelNoChanges() {
+        processKpiSelection(0);
 
-        initIndigoDashboardsPage();
-
-        indigoDashboardsPage.switchToEditMode();
-
-        selectedKpi = indigoDashboardsPage.selectKpi(0);
-        selectedKpiDataHeadline = selectedKpi.getHeadline();
-        selectedKpiDataValue = selectedKpi.getValue();
-
-        indigoDashboardsPage.selectMetricByIndex(0).cancelEditMode();
+        indigoDashboardsPage.cancelEditMode();
 
         assertEquals(selectedKpi.getHeadline(), selectedKpiDataHeadline);
         assertEquals(selectedKpi.getValue(), selectedKpiDataValue);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
-    public void checkKpiTitleChange() {
-        Kpi selectedKpi;
-        String selectedKpiDataHeadline;
-
-        initIndigoDashboardsPage();
-
-        indigoDashboardsPage.switchToEditMode();
-
-        selectedKpi = indigoDashboardsPage.selectKpi(0);
-        selectedKpiDataHeadline = selectedKpi.getHeadline();
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
+    public void checkKpiTitleChangeAndDiscard() {
+        processKpiSelection(0);
 
         selectedKpi.setHeadline("Test headline");
 
         assertNotEquals(selectedKpi.getHeadline(), selectedKpiDataHeadline);
 
-        indigoDashboardsPage.selectMetricByIndex(0);
-        assertTrue(selectedKpi.getHeadline().equals("Test headline"));
-
-        indigoDashboardsPage.cancelEditMode();
+        indigoDashboardsPage
+                .cancelEditMode()
+                .waitForDialog()
+                .submitClick();
 
         assertEquals(selectedKpi.getHeadline(), selectedKpiDataHeadline);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
+    public void checkKpiTitleChangeAndAbortCancel() {
+        processKpiSelection(0);
+
+        selectedKpi.setHeadline("Test headline");
+
+        assertTrue(selectedKpi.getHeadline().equals("Test headline"));
+
+        indigoDashboardsPage
+                .cancelEditMode()
+                .waitForDialog()
+                .cancelClick();
+
+        assertTrue(selectedKpi.getHeadline().equals("Test headline"));
+        assertNotEquals(selectedKpi.getHeadline(), selectedKpiDataHeadline);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
+    public void checkKpiTitleChangeAndSave() {
+        processKpiSelection(0);
+
+        selectedKpi.setHeadline("Test headline");
+
+        assertNotEquals(selectedKpi.getHeadline(), selectedKpiDataHeadline);
+
+        indigoDashboardsPage.saveEditMode();
+
+        assertEquals(selectedKpi.getHeadline(), "Test headline");
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
+    public void checkKpiTitleChangeWhenMetricChange() {
+        processKpiSelection(1);
+
+        indigoDashboardsPage.selectMetricByIndex(0);
+        selectedKpi.setHeadline("");
+        String metricHeadline = selectedKpi.getHeadline();
+
+        assertNotEquals(metricHeadline, "");
+
+        indigoDashboardsPage.selectMetricByIndex(1);
+
+        assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
+    public void checkKpiTitlePersistenceWhenMetricChange() {
+        processKpiSelection(0);
+
+        indigoDashboardsPage.selectMetricByIndex(0);
+        selectedKpi.setHeadline("abc");
+        String metricHeadline = selectedKpi.getHeadline();
+
+        assertEquals(metricHeadline, "abc");
+
+        indigoDashboardsPage.selectMetricByIndex(1);
+
+        assertEquals(selectedKpi.getHeadline(), "abc");
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"userTests"})
+    public void checkViewerCannotEditDashboard() throws JSONException, InterruptedException {
+        try {
+            initDashboardsPage();
+
+            logout();
+            signIn(false, UserRoles.VIEWER);
+
+            initDashboardsPage();
+            initIndigoDashboardsPage();
+
+            assertEquals(indigoDashboardsPage.checkIfEditButtonIsPresent(), false);
+        } finally {
+            logout();
+            signIn(false, UserRoles.VIEWER);
+        }
+    }
+
+    private Kpi processKpiSelection(int index) {
+        selectedKpi = initIndigoDashboardsPage()
+                .switchToEditMode()
+                .selectKpi(index);
+
+        selectedKpiDataHeadline = selectedKpi.getHeadline();
+        selectedKpiDataValue = selectedKpi.getValue();
+
+        return selectedKpi;
     }
 
 }

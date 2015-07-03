@@ -495,11 +495,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForFragmentVisible(userManagementPage);
     }
 
-    public void initIndigoDashboardsPage() {
+    public IndigoDashboardsPage initIndigoDashboardsPage() {
         openUrl(PAGE_INDIGO_DASHBOARDS);
         waitForFragmentVisible(indigoDashboardsPage);
-        indigoDashboardsPage.waitForDashboardLoad();
-        indigoDashboardsPage.waitForKpiLoading();
+
+        return indigoDashboardsPage
+                .waitForDashboardLoad()
+                .waitForKpiLoading();
     }
 
     public void initEmailSchedulesPage() {
