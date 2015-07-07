@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.datawarehouse;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,10 +13,10 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
 @Test(groups = {"datawarehouse"}, description = "Basic verification of datawarehouse restapi in GD platform")
@@ -176,14 +175,12 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
     public void createInstanceWithoutTitle() throws JSONException {
-        createInvalidStorage(null, STORAGE_DESCRIPTION, authorizationToken,
-                "DSS instance title must not be empty.");
+        createInvalidStorage(null, STORAGE_DESCRIPTION, authorizationToken, "title must not be empty");
     }
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
     public void createInstanceWithoutAuthToken() throws JSONException {
-        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null,
-                "DSS instance authorization token must not be empty.");
+        createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null, "token must not be empty");
     }
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
@@ -196,13 +193,13 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
     public void createStorageWithInvalidAuthToken() throws JSONException {
         // use non-datawarehouse-enabled authorization token to create a new datawarehouse
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, testParams.getAuthorizationToken(),
-                "Project group with name '" + testParams.getAuthorizationToken() + "' does not have valid DSS " +
-                        "connection information (DSS cluster is missing).");
+                "Project group with name '" + testParams.getAuthorizationToken() +
+                        "' does not have valid connection information");
     }
 
     @Test(dependsOnMethods = {"createInstance"})
     public void updateStorageWithEmptyTitle() throws JSONException {
-        invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "DSS instance title must not be empty.");
+        invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "title must not be empty");
     }
 
     /**
@@ -328,8 +325,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
     public void addExistingUserToStorage() throws JSONException, InterruptedException {
-        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE,
-                "User '" + userCreatedById + "' already exists in DSS instance '");
+        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedById + "' already exists");
     }
 
     /**
@@ -349,19 +345,19 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         InstanceFragment storage = createPageFragment(InstanceFragment.class, browser.findElement(BY_GP_FORM_SECOND));
         assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
         storage.deleteStorage();
-        verifyStorageNotReady(storageUrl);
+        verifyDeletedInstanceNotReady(storageUrl);
     }
 
     @Test(dependsOnMethods = {"deleteDeletedInstance"})
     public void getUsersInDeletedStorage() throws JSONException {
         browser.get(getBasicRootUrl() + getStorageUsersUrl());
-        verifyStorageNotReady(getStorageUsersUrl());
+        verifyDeletedInstanceNotReady(getStorageUsersUrl());
     }
 
     @Test(dependsOnMethods = {"deleteDeletedInstance"})
     public void getJdbcInfoInDeletedStorage() throws JSONException {
         browser.get(getBasicRootUrl() + getStorageJdbcUrl());
-        verifyStorageNotReady(getStorageJdbcUrl());
+        verifyDeletedInstanceNotReady(getStorageJdbcUrl());
     }
 
     @Test(dependsOnMethods = {"deleteDeletedInstance"})
@@ -371,7 +367,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         assertTrue(storageForm.verifyValidEditStorageForm(UPDATED_STORAGE_TITLE, UPDATED_STORAGE_DESCRIPTION),
                 "Edit form doesn't contain current values");
         storageForm.updateStorage(UPDATED_STORAGE_TITLE, UPDATED_STORAGE_DESCRIPTION);
-        verifyStorageNotReady(storageUrl);
+        verifyDeletedInstanceNotReady(storageUrl);
     }
 
     // TODO add next invalid cases when permissions are implemented
@@ -427,11 +423,11 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
     }
 
     private void createInvalidStorage(String title, String description, String authorizationToken,
-                                      String expectedErrorMessage) throws JSONException {
+                                      String expectedErrorMessageSubstring) throws JSONException {
         waitForElementVisible(storageForm.getRoot());
         assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
         storageForm.fillCreateStorageForm(title, description, authorizationToken);
-        verifyErrorMessage(expectedErrorMessage, PAGE_INSTANCES);
+        verifyErrorMessage(expectedErrorMessageSubstring, PAGE_INSTANCES);
     }
 
     private void verifyUser(final String role, final String screenshotName) throws JSONException {
@@ -571,7 +567,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
                 "Schema dss link doesn't match");
     }
 
-    private void verifyStorageNotReady(final String url) throws JSONException {
-        verifyErrorMessage("Cannot perform action. DSS instance is in DELETED state.", url);
+    private void verifyDeletedInstanceNotReady(final String url) throws JSONException {
+        verifyErrorMessage("is in DELETED state", url);
     }
 }

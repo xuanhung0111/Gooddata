@@ -180,13 +180,13 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     @Test(dependsOnMethods = {"gpFormsAvailable"})
     public void createStorageWithoutTitle() throws JSONException {
         createInvalidStorage(null, STORAGE_DESCRIPTION, dssAuthorizationToken,
-                "DSS instance title must not be empty.");
+                "title must not be empty");
     }
 
     @Test(dependsOnMethods = {"gpFormsAvailable"})
     public void createStorageWithoutAuthToken() throws JSONException {
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, null,
-                "DSS instance authorization token must not be empty.");
+                "token must not be empty");
     }
 
     @Test(dependsOnMethods = {"gpFormsAvailable"})
@@ -199,13 +199,13 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     public void createStorageWithNonDssAuthToken() throws JSONException {
         // use non-dss-enabled authorization token to create new dss
         createInvalidStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, testParams.getAuthorizationToken(),
-                "Project group with name '" + testParams.getAuthorizationToken() + "' does not have valid DSS " +
-                        "connection information (DSS cluster is missing).");
+                "Project group with name '" + testParams.getAuthorizationToken() +
+                        "' does not have valid connection information");
     }
 
     @Test(dependsOnMethods = {"createStorage"})
     public void updateStorageWithEmptyTitle() throws JSONException {
-        invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "DSS instance title must not be empty.");
+        invalidUpdateOfStorage(null, STORAGE_DESCRIPTION, "title must not be empty");
     }
 
     /**
@@ -331,8 +331,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
 
     @Test(dependsOnMethods = {"verifyStorageEnabled"})
     public void addExistingUserToStorage() throws JSONException, InterruptedException {
-        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE,
-                "User '" + userCreatedById + "' already exists in DSS instance '");
+        invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedById + "' already exists");
     }
 
     /**
@@ -352,19 +351,19 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         StorageFragment storage = createPageFragment(StorageFragment.class, browser.findElement(BY_GP_FORM_SECOND));
         assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
         storage.deleteStorage();
-        verifyStorageNotReady(storageUrl);
+        verifyDeletedInstanceNotReady(storageUrl);
     }
 
     @Test(dependsOnMethods = {"deleteDeletedStorage"})
     public void getUsersInDeletedStorage() throws JSONException {
         browser.get(getBasicRootUrl() + getStorageUsersUrl());
-        verifyStorageNotReady(getStorageUsersUrl());
+        verifyDeletedInstanceNotReady(getStorageUsersUrl());
     }
 
     @Test(dependsOnMethods = {"deleteDeletedStorage"})
     public void getJdbcInfoInDeletedStorage() throws JSONException {
         browser.get(getBasicRootUrl() + getStorageJdbcUrl());
-        verifyStorageNotReady(getStorageJdbcUrl());
+        verifyDeletedInstanceNotReady(getStorageJdbcUrl());
     }
 
     @Test(dependsOnMethods = {"deleteDeletedStorage"})
@@ -374,7 +373,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         assertTrue(storageForm.verifyValidEditStorageForm(UPDATED_STORAGE_TITLE, UPDATED_STORAGE_DESCRIPTION),
                 "Edit form doesn't contain current values");
         storageForm.updateStorage(UPDATED_STORAGE_TITLE, UPDATED_STORAGE_DESCRIPTION);
-        verifyStorageNotReady(storageUrl);
+        verifyDeletedInstanceNotReady(storageUrl);
     }
 
     // TODO add next invalid cases when permissions are implemented
@@ -416,11 +415,11 @@ public class BasicDSSRestTest extends AbstractDSSTest {
     }
 
     private void createInvalidStorage(String title, String description, String authorizationToken,
-                                      String expectedErrorMessage) throws JSONException {
+                                      String expectedErrorMessageSubstring) throws JSONException {
         waitForElementVisible(storageForm.getRoot());
         assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
         storageForm.fillCreateStorageForm(title, description, authorizationToken);
-        verifyErrorMessage(expectedErrorMessage, PAGE_DSS_INSTANCES);
+        verifyErrorMessage(expectedErrorMessageSubstring, PAGE_DSS_INSTANCES);
     }
 
     private void verifyUser(final String role, final String screenshotName) throws JSONException {
@@ -527,7 +526,7 @@ public class BasicDSSRestTest extends AbstractDSSTest {
                 "Login of user in profile doesn't match");
     }
 
-    private void verifyStorageNotReady(final String url) throws JSONException {
-        verifyErrorMessage("Cannot perform action. DSS instance is in DELETED state.", url);
+    private void verifyDeletedInstanceNotReady(final String url) throws JSONException {
+        verifyErrorMessage("is in DELETED state", url);
     }
 }
