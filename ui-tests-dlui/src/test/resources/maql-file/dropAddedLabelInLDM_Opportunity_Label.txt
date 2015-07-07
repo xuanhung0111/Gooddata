@@ -1,1 +1,0 @@
-DROP {label.opportunity.title.label};SYNCHRONIZE {dataset.opportunity} PRESERVE DATA;

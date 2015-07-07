@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -37,7 +38,11 @@ public class FilterPanel extends AbstractFragment {
     }
 
     public void close() {
-        waitForElementVisible(cancelButton).click();
+        waitForElementPresent(cancelButton);
+        if (cancelButton.getAttribute("class").contains("gdc-hidden")) {
+            return;
+        }
+        cancelButton.click();
     }
 
     public void submit() {

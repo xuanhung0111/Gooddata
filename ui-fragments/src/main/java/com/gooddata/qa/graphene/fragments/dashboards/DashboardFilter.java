@@ -52,6 +52,9 @@ public class DashboardFilter extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']")
     private WebElement addTimeButton;
 
+    @FindBy(css = ".dateCheckbox input")
+    private WebElement showDateAttributesButton;
+
     public void addListFilter(DashFilterTypes type, String name) throws InterruptedException {
         if (type == DashFilterTypes.PROMPT) {
             waitForElementVisible(promptFilter).click();
@@ -60,6 +63,7 @@ public class DashboardFilter extends AbstractFragment {
             waitForElementVisible(promptSearchInput).sendKeys(name);
             waitForElementVisible(selectedPrompt, browser).click();
         } else {
+            waitForElementVisible(showDateAttributesButton).click();
             By attributeToAddLocator = By.cssSelector(selectedAttributeLocator.replace(
                     "${attributeName}", "s-item-" + CssUtils.simplifyText(name)));
             waitForElementVisible(attributeSearchInput).sendKeys(name);

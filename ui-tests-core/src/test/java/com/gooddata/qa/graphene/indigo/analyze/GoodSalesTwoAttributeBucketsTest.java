@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static org.testng.Assert.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.testng.annotations.BeforeClass;
@@ -153,5 +154,67 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
 
         analysisPage.changeReportType(ReportType.TABLE);
         assertTrue(analysisPage.isStackByBucketEmpty());
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testAttributeReplaceDate() {
+        initAnalysePage();
+        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.isDateFilterVisible());
+
+        analysisPage.addCategory(ACTIVITY_TYPE);
+        assertFalse(analysisPage.isDateFilterVisible());
+        assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void applyFilterInReportHasDateAndAttribute() {
+        initAnalysePage();
+        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE))
+            .addStackBy(ACTIVITY_TYPE);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+
+        analysisPage.configAttributeFilter(ACTIVITY_TYPE, "Email", "Phone Call");
+        analysisPage.configTimeFilter("Last year");
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void uncheckSelectedPopCheckbox() {
+        initAnalysePage();
+        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
+
+        analysisPage.compareToSamePeriodOfYearBefore();
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+
+        analysisPage.addCategory(ACTIVITY_TYPE);
+        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
+        assertFalse(analysisPage.isCompareSamePeriodConfigSelected());
+        assertEquals(analysisPage.getAllAddedCategoryNames(), Arrays.asList(ACTIVITY_TYPE));
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testUndoRedo() {
+        dropAttributeToReportHaveOneMetric();
+        analysisPage.undo();
+        assertTrue(analysisPage.isStackByBucketEmpty());
+        analysisPage.redo();
+        assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
+
+        analysisPage.addStackBy(REGION);
+        assertEquals(analysisPage.getAddedStackByName(), REGION);
+
+        analysisPage.undo();
+        assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
+
+        analysisPage.undo();
+        assertTrue(analysisPage.isStackByBucketEmpty());
+
+        analysisPage.redo().redo();
+        assertEquals(analysisPage.getAddedStackByName(), REGION);
     }
 }

@@ -10,6 +10,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
 import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
@@ -44,7 +45,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
-    protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards";
+    protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
     
     /**
      * ----- UI fragmnets -----
@@ -498,6 +499,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initIndigoDashboardsPage() {
         openUrl(PAGE_INDIGO_DASHBOARDS);
         waitForFragmentVisible(indigoDashboardsPage);
+        indigoDashboardsPage.waitForKpiLoading();
     }
 
     public void initEmailSchedulesPage() {

@@ -15,7 +15,6 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
     private static final String EMAIL_OPEN = "% Email Open";
     private static final String EMAIL_SENT = "% Emails Sent";
     private static final String NUMBER_OF_EMAILS = "# of Emails";
-    private static final String NUMBER_OF_VISITS = "# of Visits";
     private static final String CHANNEL = "Channel";
     private static final String CAMPAIGNS = "Campaigns";
     private static final String CLICKTHROUGHS_ID = "ClickthroughsID";
@@ -28,12 +27,12 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
         metric1 = EMAIL_OPEN;
         metric2 = EMAIL_SENT;
         metric3 = NUMBER_OF_EMAILS;
-        metric4 = NUMBER_OF_VISITS;
         attribute1 = CAMPAIGNS;
         attribute2 = CHANNEL;
         attribute3 = CLICKTHROUGHS_ID;
 
         notAvailableAttribute = "OpportunityID";
+        relatedDate = "Closed Date";
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})
@@ -67,7 +66,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)
@@ -80,7 +79,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
     }
 
     @SuppressWarnings("unchecked")
-    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP}, enabled = false)
+    @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()
             .withMetrics(EMAIL_OPEN)

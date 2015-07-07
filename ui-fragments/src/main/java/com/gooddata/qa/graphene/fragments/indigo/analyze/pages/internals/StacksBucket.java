@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertEquals;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -29,7 +28,6 @@ public class StacksBucket extends AbstractFragment {
 
     public void addCategory(WebElement category) {
         new Actions(browser).dragAndDrop(category, waitForElementVisible(getRoot())).perform();
-        assertEquals(item.findElement(BY_TEXT).getText(), category.getText());
     }
 
     public boolean isWarningMessageShown() {
@@ -49,6 +47,9 @@ public class StacksBucket extends AbstractFragment {
     }
 
     public String getAddedStackByName() {
+        if (isEmpty()) {
+            return "";
+        }
         return waitForElementVisible(BY_TEXT, waitForElementVisible(item)).getText().trim();
     }
 }

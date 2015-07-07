@@ -29,6 +29,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP})
     public void init() throws JSONException {
+        browser.manage().window().maximize();
+
         // sign in with admin user
         signIn(false, UserRoles.ADMIN);
     }

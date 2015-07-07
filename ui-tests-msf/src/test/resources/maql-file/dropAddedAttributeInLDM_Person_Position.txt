@@ -1,0 +1,1 @@
+ALTER ATTRIBUTE {attr.person.position} DROP KEYS {d_person_position.id}, {f_person.position_id};ALTER DATASET {dataset.person} DROP {attr.person.position};DROP {attr.person.position} CASCADE;SYNCHRONIZE {dataset.person} PRESERVE DATA;

@@ -177,6 +177,7 @@ public class ReportVisualizer extends AbstractFragment {
 
         waitForElementVisible(createMetricButton).click();
         waitForElementVisible(metricOperationSelect).selectByVisibleText(metricOperation.name());
+        waitForCollectionIsNotEmpty(waitForElementVisible(performOperationSelect).getOptions());
         waitForElementVisible(performOperationSelect).selectByVisibleText(metricOnFact);
 
         if (metricName != null) {

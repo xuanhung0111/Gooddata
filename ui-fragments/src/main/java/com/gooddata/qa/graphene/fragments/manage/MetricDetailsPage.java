@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
@@ -19,10 +19,17 @@ public class MetricDetailsPage extends AbstractFragment {
 
     @FindBy(css = "#p-objectPage .s-btn-delete")
     private WebElement deleteButton;
+    
+    @FindBy(css = ".s-btn-sharing__amp__permissions")
+    private WebElement sharingAndPermissionsButton;
 
     private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
     private static final By inputEditor = By.className("ipeEditor");
+    
+    private static final By visibilityCheckbox = By.id("settings-visibility");
+    private static final By savePermissionSettingButton = By.cssSelector(".s-permissionSettingsDialog .s-btn-save_permissions");
+    
 
     public String getMAQL(String metricName) {
         return waitForElementVisible(maql).getText();
@@ -51,5 +58,15 @@ public class MetricDetailsPage extends AbstractFragment {
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(confirmDeleteButtonLocator, browser).click();
         waitForDataPageLoaded(browser);
+    }
+    
+    public void setMetricVisibleToAllUser() {
+        waitForElementVisible(sharingAndPermissionsButton).click();
+        final WebElement checkbox = waitForElementVisible(visibilityCheckbox, browser);
+        if (!checkbox.isSelected())
+            checkbox.click();
+        Graphene.waitGui().until().element(checkbox).is().selected();
+        waitForElementVisible(savePermissionSettingButton, browser).click();
+        waitForElementNotVisible(checkbox);
     }
 }

@@ -2,27 +2,26 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class MetricsBucket extends AbstractFragment {
-
-//    @FindBy(css = ".adi-bucket-invitation")
-//    private WebElement addMetricBucket;
 
     @FindBy(css = ".s-show-in-percent")
     private WebElement showInPercents;
@@ -43,6 +42,20 @@ public class MetricsBucket extends AbstractFragment {
     public void addMetric(WebElement metric) {
         new Actions(browser).dragAndDrop(metric, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
         assertTrue(getItemNames().contains(metric.getText().trim()));
+    }
+
+    private WebElement getMetric(final String name) {
+        return Iterables.find(items, new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement input) {
+                return name.equals(input.findElement(BY_TEXT).getText());
+            }
+        });
+    }
+
+    public void replaceMetric(String oldMetric, WebElement newMetric) {
+        new Actions(browser).dragAndDrop(newMetric, getMetric(oldMetric)).perform();
+        assertTrue(getItemNames().contains(newMetric.getText().trim()));
     }
 
     public boolean isWarningMessageShown() {
@@ -68,9 +81,11 @@ public class MetricsBucket extends AbstractFragment {
         });
     
         Actions action = new Actions(browser);
-        action.clickAndHold(element)
-              .moveToElement(waitForElementVisible(BY_BUCKET_INVITATION, browser))
-              .perform();
+        WebElement catalogue = browser.findElement(By.className("s-catalogue"));
+        Point location = catalogue.getLocation();
+        Dimension dimension = catalogue.getSize();
+        action.clickAndHold(element).moveByOffset(location.x + dimension.width/2, location.y + dimension.height/2)
+            .perform();
         action.moveToElement(waitForElementPresent(BY_TRASH_PANEL, browser)).perform();
         action.release().perform();
     
@@ -98,6 +113,10 @@ public class MetricsBucket extends AbstractFragment {
 
     public boolean isShowPercentConfigSelected() {
         return waitForElementPresent(showInPercents).isSelected();
+    }
+
+    public boolean isCompareSamePeriodConfigSelected() {
+        return waitForElementPresent(compareToSamePeriod).isSelected();
     }
 
     public void compareToSamePeriodOfYearBefore() {

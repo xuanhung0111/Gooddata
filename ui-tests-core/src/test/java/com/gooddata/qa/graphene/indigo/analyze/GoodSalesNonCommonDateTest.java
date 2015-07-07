@@ -22,6 +22,8 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";
     private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
+    private static final String ACTIVITY_DATE = "Activity (Date)";
+    private static final String OPP_SNAPSHOT = "Opp. Snapshot";
 
     @BeforeClass
     public void initialize() {
@@ -61,7 +63,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeGranularity("Month");
         analysisPage.waitForReportComputing();
 
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days");
+        analysisPage.configTimeFilter("Last 90 days");
         analysisPage.waitForReportComputing();
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
     }
@@ -102,7 +104,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days")
+        analysisPage.configTimeFilter("Last 90 days")
                     .turnOnShowInPercents()
                     .waitForReportComputing();
         // wait for data labels rendered
@@ -122,7 +124,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days")
+        analysisPage.configTimeFilter("Last 90 days")
                     .compareToSamePeriodOfYearBefore()
                     .waitForReportComputing();
 
@@ -137,7 +139,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter(ACTIVITY, "Last 90 days");
+        analysisPage.configTimeFilter("Last 90 days");
         analysisPage.waitForReportComputing();
 
         WebElement dateFilter = analysisPage.getFilter(ACTIVITY);
@@ -191,5 +193,26 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         filter.click();
         waitForElementVisible(panel.getRoot());
         assertEquals(panel.getSelectedDimensionSwitch(), CREATED);
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void exploreFact() {
+        initAnalysePage();
+        StringBuilder expected = new StringBuilder(ACTIVITY_DATE).append("\n")
+                .append("Field Type\n")
+                .append("Fact\n")
+                .append("Dataset\n")
+                .append("Activity\n");
+        assertEquals(analysisPage.getFactDescription(ACTIVITY_DATE), expected.toString());
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testUnusableFactGreyOut() throws InterruptedException {
+        initAnalysePage();
+        analysisPage.addCategory(OPP_SNAPSHOT);
+        // AD needs time to calculate not available attributes/metrics/facts
+        Thread.sleep(3000);
+        analysisPage.searchBucketItem(ACTIVITY_DATE);
+        analysisPage.isInapplicableAttributeMetricInViewPort();
     }
 }

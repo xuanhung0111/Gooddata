@@ -27,7 +27,7 @@ public class CataloguePanel extends AbstractFragment {
     @FindBy(css = ".searchfield-input")
     private WebElement searchInput;
 
-    @FindBy(css = ".catalogue-container div.adi-bucket-item-handle>div")
+    @FindBy(css = ".catalogue-container .adi-catalogue-item")
     private List<WebElement> items;
 
     private Actions actions;
@@ -39,6 +39,7 @@ public class CataloguePanel extends AbstractFragment {
     private static final String METRIC_TYPE = "type-metric";
     private static final String ATTRIBUTE_TYPE = "type-attribute";
     private static final String DATE_TYPE = "type-date";
+    private static final String FACT_TYPE = "type-fact";
 
     public WebElement getMetric(String metric) {
         return searchAndGetItem(metric, METRIC_TYPE);
@@ -46,6 +47,10 @@ public class CataloguePanel extends AbstractFragment {
 
     public WebElement getCategory(String category) {
         return searchAndGetItem(category, ATTRIBUTE_TYPE);
+    }
+
+    private WebElement getFact(String fact) {
+        return searchAndGetItem(fact, FACT_TYPE);
     }
 
     public WebElement getInapplicableCategory(String category) {
@@ -60,7 +65,7 @@ public class CataloguePanel extends AbstractFragment {
         WebElement field = getTime(time);
         Actions actions = getActions();
         actions.moveToElement(field).perform();
-        actions.moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
+        actions.moveToElement(field.findElement(BY_INLINE_HELP)).perform();
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getTimeDescription();
@@ -70,7 +75,7 @@ public class CataloguePanel extends AbstractFragment {
         WebElement field = getCategory(attribute);
         Actions actions = getActions();
         actions.moveToElement(field).perform();
-        actions.moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
+        actions.moveToElement(field.findElement(BY_INLINE_HELP)).perform();
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getAttributeDescription();
@@ -81,10 +86,21 @@ public class CataloguePanel extends AbstractFragment {
 
         Actions actions = getActions();
         actions.moveToElement(field).perform();
-        actions.moveToElement(field.findElement(BY_PARENT).findElement(BY_INLINE_HELP)).perform();
+        actions.moveToElement(field.findElement(BY_INLINE_HELP)).perform();
 
         return Graphene.createPageFragment(DescriptionPanel.class,
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getMetricDescription();
+    }
+
+    public String getFactDescription(String fact) {
+        WebElement field = getFact(fact);
+
+        Actions actions = getActions();
+        actions.moveToElement(field).perform();
+        actions.moveToElement(field.findElement(BY_INLINE_HELP)).perform();
+
+        return Graphene.createPageFragment(DescriptionPanel.class,
+                waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getFactDescription();
     }
 
     public List<String> getAllCatalogueItemsInViewPort() {
@@ -125,7 +141,7 @@ public class CataloguePanel extends AbstractFragment {
         return Iterables.any(items, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
-                return input.findElement(BY_PARENT).getAttribute("class").contains("not-available");
+                return input.getAttribute("class").contains("not-available");
             }
         });
     }
@@ -144,10 +160,9 @@ public class CataloguePanel extends AbstractFragment {
         return Iterables.find(items, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
-                WebElement parent = input.findElement(BY_PARENT);
                 return item.equals(input.getText().trim())
-                        && parent.getAttribute("class").contains(type)
-                        && parent.getAttribute("class").contains("not-available");
+                        && input.getAttribute("class").contains(type)
+                        && input.getAttribute("class").contains("not-available");
             }
         });
     }
@@ -158,7 +173,7 @@ public class CataloguePanel extends AbstractFragment {
             @Override
             public boolean apply(WebElement input) {
                 return item.equals(input.getText().trim())
-                        && input.findElement(BY_PARENT).getAttribute("class").contains(type);
+                        && input.getAttribute("class").contains(type);
             }
         });
     }

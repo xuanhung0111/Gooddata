@@ -284,7 +284,11 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void setParentsFilter(String filter, String parentFilterName) {
-        dashboardEditFilter.addParentFilters(filter, parentFilterName);
+    public void setParentsFilter(String filter, String... parentFilterNames) {
+        dashboardEditFilter.addParentFilters(filter, parentFilterNames);
+    }
+
+    public void setParentsFilterUsingDataset(String filter, String linkedDataset, String... parentFilterNames) {
+        dashboardEditFilter.addParentFiltersUsingDataset(filter, linkedDataset, parentFilterNames);
     }
 }

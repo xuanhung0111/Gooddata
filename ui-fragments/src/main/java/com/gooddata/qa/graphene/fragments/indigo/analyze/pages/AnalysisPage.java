@@ -151,8 +151,8 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPage configTimeFilter(String relatedDate, String period) {
-        waitForFragmentVisible(mainEditor).configTimeFilter(relatedDate, period);
+    public AnalysisPage configTimeFilter(String period) {
+        waitForFragmentVisible(mainEditor).configTimeFilter(period);
         return this;
     }
 
@@ -160,8 +160,8 @@ public class AnalysisPage extends AbstractFragment {
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
      */
-    public AnalysisPage configTimeFilterByRangeButNotApply(String from, String to) {
-        waitForFragmentVisible(mainEditor).configTimeFilterByRangeButNotApply(from, to);
+    public AnalysisPage configTimeFilterByRangeButNotApply(String dateFilter, String from, String to) {
+        waitForFragmentVisible(mainEditor).configTimeFilterByRangeButNotApply(dateFilter, from, to);
         return this;
     }
 
@@ -170,8 +170,8 @@ public class AnalysisPage extends AbstractFragment {
      * @param to   format MM/DD/YYYY
      * @throws ParseException 
      */
-    public AnalysisPage configTimeFilterByRange(String from, String to) throws ParseException {
-        waitForFragmentVisible(mainEditor).configTimeFilterByRange(from, to);
+    public AnalysisPage configTimeFilterByRange(String dateFilter, String from, String to) throws ParseException {
+        waitForFragmentVisible(mainEditor).configTimeFilterByRange(dateFilter, from, to);
         return this;
     }
 
@@ -200,6 +200,10 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(cataloguePanel).getMetricDescription(metric);
     }
 
+    public String getFactDescription(String fact) {
+        return waitForFragmentVisible(cataloguePanel).getFactDescription(fact);
+    }
+
     public List<String> getAllAddedCategoryNames() {
         return waitForFragmentVisible(bucketsPanel).getAllAddedCategoryNames();
     }
@@ -220,6 +224,10 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(bucketsPanel).isShowPercentConfigSelected();
     }
 
+    public boolean isCompareSamePeriodConfigSelected() {
+        return waitForFragmentVisible(bucketsPanel).isCompareSamePeriodConfigSelected();
+    }
+
     public boolean isCompareSamePeriodConfigEnabled() {
         return waitForFragmentVisible(bucketsPanel).isCompareSamePeriodConfigEnabled();
     }
@@ -228,8 +236,16 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(mainEditor).getFilterText(dateOrAttribute);
     }
 
+    public String getDateFilterText() {
+        return waitForFragmentVisible(mainEditor).getDateFilterText();
+    }
+
     public boolean isFilterVisible(String dateOrAttribute) {
         return waitForFragmentVisible(mainEditor).isFilterVisible(dateOrAttribute);
+    }
+
+    public boolean isDateFilterVisible() {
+        return waitForFragmentVisible(mainEditor).isDateFilterVisible();
     }
 
     public AnalysisPage exportReport() {
@@ -333,6 +349,12 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage replaceMetric(String oldMetric, String newMetric) {
+        waitForFragmentVisible(cataloguePanel);
+        waitForFragmentVisible(bucketsPanel).replaceMetric(oldMetric, cataloguePanel.getMetric(newMetric));
+        return this;
+    }
+
     public AnalysisPage replaceCategory(String category) {
         waitForFragmentVisible(cataloguePanel);
         waitForFragmentVisible(bucketsPanel).replaceCategory(cataloguePanel.getCategory(category));
@@ -366,5 +388,10 @@ public class AnalysisPage extends AbstractFragment {
 
     public String getExportToReportButtonTooltipText() {
         return waitForFragmentVisible(pageHeader).getExportToReportButtonTooltipText();
+    }
+
+    public AnalysisPage switchAxisAndStackBy() {
+        waitForFragmentVisible(bucketsPanel).switchAxisAndStackBy();
+        return this;
     }
 }

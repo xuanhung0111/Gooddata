@@ -81,6 +81,10 @@ public class BucketsPanel extends AbstractFragment {
         return waitForFragmentVisible(metricsBucket).isShowPercentConfigSelected();
     }
 
+    public boolean isCompareSamePeriodConfigSelected() {
+        return waitForFragmentVisible(metricsBucket).isCompareSamePeriodConfigSelected();
+    }
+
     public void changeGranularity(String time) {
         waitForFragmentVisible(categoriesBucket).changeGranularity(time);
     }
@@ -113,6 +117,10 @@ public class BucketsPanel extends AbstractFragment {
         waitForFragmentVisible(stacksBucket).addCategory(category);
     }
 
+    public void replaceMetric(String oldMetric, WebElement newMetric) {
+        waitForFragmentVisible(metricsBucket).replaceMetric(oldMetric, newMetric);
+    }
+
     public void replaceCategory(WebElement category) {
         waitForFragmentVisible(categoriesBucket).replaceCategory(category);
     }
@@ -142,5 +150,9 @@ public class BucketsPanel extends AbstractFragment {
             return true;
         }
         return waitForFragmentVisible(stacksBucket).isEmpty();
+    }
+
+    public void switchAxisAndStackBy() {
+        stacksBucket.replaceStackBy(categoriesBucket.getFirstItem());
     }
 }

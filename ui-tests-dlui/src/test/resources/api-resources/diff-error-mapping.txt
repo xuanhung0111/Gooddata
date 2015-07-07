@@ -1,0 +1,24 @@
+--------------------------------------------------
+-- opportunity --
+--------------------------------------------------
+-- Columns specified in the LDM are missing in the ADS. Run the following commands to add the columns.
+ALTER TABLE "opportunity" ADD COLUMN "a__title" VARCHAR(128) DEFAULT NULL;
+
+/*
+-- The columns below exist in the ADS but are missing from the LDM. You can use the following DDL to remove them from the ADS.
+ALTER TABLE "opportunity" DROP COLUMN "a__titleErrorMapping";
+*/
+
+
+--------------------------------------------------
+-- person --
+--------------------------------------------------
+-- Columns specified in the LDM are missing in the ADS. Run the following commands to add the columns.
+ALTER TABLE "person" ADD COLUMN "f__age" NUMERIC(12,2) DEFAULT NULL;
+
+/*
+-- The columns below exist in the ADS but are missing from the LDM. You can use the following DDL to remove them from the ADS.
+ALTER TABLE "person" DROP COLUMN "f__ageErrorMapping";
+*/
+
+

@@ -108,6 +108,14 @@ public class DashboardEditFilter extends AbstractFragment{
             .addParentsFilter(parentFilterNames);
     }
  
+    public void addParentFiltersUsingDataset(String filterName, String linkedDataset, String... parentFilterNames) {
+        WidgetConfigPanel configPanel = WidgetConfigPanel.
+                openConfigurationPanelFor(getAttributeFilter(filterName), browser);
+
+        configPanel.getTab(WidgetConfigPanel.Tab.PARENT_FILTERS, ParentFiltersConfigPanel.class)
+            .addParentsFilterUsingDataset(linkedDataset, parentFilterNames);
+    }
+
     /**
      * panel for re-editing time filter type
      *

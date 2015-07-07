@@ -1,0 +1,23 @@
+--------------------------------------------------
+-- opportunity --
+--------------------------------------------------
+CREATE TABLE "opportunity" (
+    "cp__name" VARCHAR(128),
+    "a__title" VARCHAR(128),
+    "f__price" NUMERIC(12,2),
+    "f__totalprice" NUMERIC(12,2)
+);
+
+
+--------------------------------------------------
+-- person --
+--------------------------------------------------
+CREATE TABLE "person" (
+    "l__person__personid" VARCHAR(128),
+    "l__person__lastname" VARCHAR(128),
+    "l__person__firstname" VARCHAR(128),
+    "a__person" VARCHAR(128),
+    "f__age" NUMERIC(12,2)
+);
+
+

@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.dlui;
 
 import static org.testng.Assert.*;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -311,9 +311,9 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
 
-        List<ExecutionParameter> params =
+        Collection<ExecutionParameter> params =
                 prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
-                        "copyTableWithAdditionalFields_Drop_Person.txt");
+                        "copyTableWithAdditionalFields_Drop_Person.txt", adsInstance);
 
         String executionUri =
                 executeCloudConnectProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS,

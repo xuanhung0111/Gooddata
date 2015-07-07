@@ -28,13 +28,19 @@ public class AttributeFilterPanel extends FilterPanel {
     @FindBy(className = "s-afp-input")
     private WebElement search;
 
-    @FindBy(css = "div.yui3-c-simpleColumn-underlay label.ellipsisEnabled")
+    @FindBy(css = "div.yui3-c-simpleColumn-underlay .yui3-widget")
     private List<WebElement> listAttrValues;
 
     private static final String CLEAR_VISIBLE = ":not(.gdc-hidden)>.clearVisible";
     private static final String SELECT_VISIBLE = ":not(.gdc-hidden)>.selectVisible";
 
     private static final By ATTRIBUTE_LOADED_LOCATOR = By.cssSelector(".yui3-c-simpleColumn-window.loaded");
+    private static final By SHOW_ALL_BUTTON_LOCATOR = By.className("s-btn-show_all");
+
+    public AttributeFilterPanel showAllAttributes() {
+        waitForElementVisible(SHOW_ALL_BUTTON_LOCATOR, getRoot()).click();
+        return this;
+    }
 
     public List<String> getAllAtributeValues() throws InterruptedException {
         // wait for attribute values are loaded

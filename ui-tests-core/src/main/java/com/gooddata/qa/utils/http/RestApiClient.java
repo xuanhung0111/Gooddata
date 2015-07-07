@@ -20,6 +20,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -27,6 +29,9 @@ import org.apache.http.impl.client.*;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Wrapper for Gooddata REST API client which simplifies its usage
@@ -45,7 +50,15 @@ public class RestApiClient {
     private final HttpClient httpClient;
 
     public RestApiClient(String host, String user, String password, boolean useSST, boolean useApiProxy) {
-        httpHost = new HttpHost(host, 443, "https");
+        String[] parts = host.split(":");
+        String hostName = parts[0];
+        int port;
+        if (parts.length == 2) {
+            port = Integer.parseInt(parts[1]);
+        } else {
+            port = 443;
+        }
+        httpHost = new HttpHost(hostName, port, "https");
         httpClient = getGooddataHttpClient(httpHost, user, password, useSST, useApiProxy);
     }
 
@@ -114,9 +127,26 @@ public class RestApiClient {
     }
 
     protected HttpClient getGooddataHttpClient(HttpHost hostGoodData, String user, String password,
-            boolean useSST, boolean useApiProxy) {
+            boolean useSST, boolean useApiProxy) throws RuntimeException {
         final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        if (hostGoodData.getHostName().equals("localhost")) {
+            // disable SSL certificate validation if running through Grizzly on dev machine
+            SSLContextBuilder builder = new SSLContextBuilder();
+            SSLConnectionSocketFactory sslsf;
+            try {
+                builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+                sslsf = new SSLConnectionSocketFactory(builder.build());
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("Could not create SSL context for untrusted authority SSL key backend", e);
+            } catch (KeyStoreException e) {
+                throw new RuntimeException("Could not create SSL context for untrusted authority SSL key backend", e);
+            } catch (KeyManagementException e) {
+                throw new RuntimeException("Could not create SSL context for untrusted authority SSL key backend", e);
+            }
+
+            httpClientBuilder.setSSLSocketFactory(sslsf);
+        }
         if (useSST) {
             HttpClient httpClient = httpClientBuilder.build();
             SSTRetrievalStrategy sstStrategy = new LoginSSTRetrievalStrategy(httpClient, hostGoodData, user,

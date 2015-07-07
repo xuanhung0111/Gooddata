@@ -2,11 +2,11 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -37,11 +37,6 @@ public class DataloadProcessTest extends AbstractDLUITest {
 
     private static final String CONCURRENT_DATA_LOAD_MESSAGE = "The schedule did not run"
             + " because one or more of the datasets in this schedule is already synchronizing.";
-    private static final String INTERNAL_OUTPUT_STAGE_URI =
-            "/gdc/dataload/internal/projects/%s/outputStage/";
-    private static final String MAPPING_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "mapping";
-    private static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
-    private static final String OUTPUT_STATE_METADATA_RESOURCE = OUTPUTSTAGE_URI + "metadata";
     private static final String RUNNING_STATE = "RUNNING";
     private static final String OK_STATE = "OK";
     private static final String ERROR_STATE = "ERROR";
@@ -144,8 +139,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
         String executionUri = executeDataloadProcessSuccessfully(getRestApiClient());
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri),
-                "execution_log_successful.txt");
+        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_successful.txt");
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
@@ -154,25 +148,25 @@ public class DataloadProcessTest extends AbstractDLUITest {
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
         deleteDataloadProcessAndCreateNewOne();
 
-        String executionUri = executeDataloadProcess(Lists.newArrayList(
+        String executionUri = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(
                 new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
         waitForExecutionInRunningState(executionUri);
         assertEquals(ProcessUtils.waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE);
 
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri),
-                "execution_log_error_mapping.txt");
+        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_mapping.txt");
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException,
             InterruptedException {
-        List<String> deleteFiles = Arrays.asList("dataset.opportunity.csv", "dataset.person.csv");
+        List<String> deleteFiles = new ArrayList<String>(Arrays.asList("f_opportunity.csv",
+                "dataset.opportunity.csv", "f_person.csv", "dataset.person.csv"));
 
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
         deleteDataloadProcessAndCreateNewOne();
 
         String webDavUrl = getWebDavUrl();
-        String executionUri = executeDataloadProcess(Lists.newArrayList(
+        String executionUri = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(
                 new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
         waitForExecutionInRunningState(executionUri);
         String etlTrigerParams = waitForTriggerEtlPullAndGetParams(executionUri);
@@ -181,37 +175,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertEquals(ProcessUtils.waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE,
                 "Execution is not failed because of ETL pull error!");
 
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri),
-                "execution_log_error_etl.txt");
-    }
-
-    @Test(dependsOnMethods = {"addUsersToProjects"}, groups = {"dataloadProcessTest"}, priority = 2)
-    public void editorAccessToDataloadResources() throws ParseException, JSONException, IOException {
-        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
-        deleteDataloadProcessAndCreateNewOne();
-        logout();
-        signIn(true, UserRoles.EDITOR);
-        try {
-            RestApiClient editorRestApi =
-                    getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.OK,
-                    ACCEPT_HEADER_VALUE_WITH_VERSION);
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(OUTPUT_STATE_MODEL_RESOURCE, testParams.getProjectId()),
-                    HttpStatus.OK, ACCEPT_HEADER_VALUE_WITH_VERSION);
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(OUTPUTSTAGE_URI, testParams.getProjectId()), HttpStatus.OK,
-                    ACCEPT_HEADER_VALUE_WITH_VERSION);
-            RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                    String.format(OUTPUT_STATE_METADATA_RESOURCE, testParams.getProjectId()),
-                    HttpStatus.OK, ACCEPT_HEADER_VALUE_WITH_VERSION);
-            RestUtils.getResource(editorRestApi, executeDataloadProcessSuccessfully(editorRestApi),
-                    HttpStatus.NO_CONTENT);
-        } finally {
-            logout();
-            signIn(true, UserRoles.ADMIN);
-        }
+        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_etl.txt");
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 3)
@@ -222,7 +186,7 @@ public class DataloadProcessTest extends AbstractDLUITest {
 
         Collection<ExecutionParameter> dataloadExecutionParams =
                 Lists.newArrayList(new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true));
-        String executionUri = executeDataloadProcess(dataloadExecutionParams);
+        String executionUri = executeDataloadProcess(getRestApiClient(), dataloadExecutionParams);
         waitForExecutionInRunningState(executionUri);
         // Check that the second execution will be failed because the first execution is running
         String errorMessage =
@@ -231,13 +195,8 @@ public class DataloadProcessTest extends AbstractDLUITest {
         assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
     }
 
-    @Test(dependsOnGroups = "dataloadProcessTest", alwaysRun = true)
-    public void cleanUp() {
-        deleteADSInstance(adsInstance);
-    }
-
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"dataloadProcessTest"}, priority = 2)
-    private void addUsersToProjects() throws ParseException, IOException, JSONException {
+    public void addUsersToProjects() throws ParseException, IOException, JSONException {
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
                 testParams.getUser(), testParams.getPassword(), technicalUserUri, UserRoles.ADMIN);
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
@@ -246,6 +205,13 @@ public class DataloadProcessTest extends AbstractDLUITest {
         addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
         addUserToAdsInstance(adsInstance, testParams.getEditorProfileUri(),
                 testParams.getEditorUser(), "dataAdmin");
+    }
+
+    @Test(dependsOnGroups = "dataloadProcessTest", alwaysRun = true)
+    public void cleanUp() throws JSONException {
+        logout();
+        signIn(true, UserRoles.ADMIN);
+        deleteADSInstance(adsInstance);
     }
 
     private void waitForExecutionInRunningState(String executionUri) throws ParseException, IOException,
@@ -264,12 +230,12 @@ public class DataloadProcessTest extends AbstractDLUITest {
 
         long timeOut = System.currentTimeMillis() + 5 * 60 * 1000; // 5 minutes
         while (true) {
-            logContent = getLogContent(restApiClient, executionUri);
+            logContent = getLogContent(getRestApiClient(), executionUri);
             Pattern myPattern = Pattern.compile("ETL pull triggered, params: (.*)");
             Matcher m = myPattern.matcher(logContent);
 
             if (m.find()) {
-                state = ProcessUtils.getExecutionStatus(restApiClient, executionUri);
+                state = ProcessUtils.getExecutionStatus(getRestApiClient(), executionUri);
                 assertEquals(state, RUNNING_STATE);
                 return m.group(1);
             }
@@ -305,28 +271,8 @@ public class DataloadProcessTest extends AbstractDLUITest {
         return responseStatusCode;
     }
 
-    private String executeDataloadProcessSuccessfully(RestApiClient restApiClient)
-            throws IOException, JSONException {
-        String executionUri =
-                executeDataloadProcess(Lists.newArrayList(new ExecutionParameter(
-                        GDC_DE_SYNCHRONIZE_ALL, true)));
-
-        assertTrue(ProcessUtils.isExecutionSuccessful(restApiClient, executionUri),
-                "Process execution is not successful!");
-        return executionUri;
-    }
-
-    private void deleteDataloadProcessAndCreateNewOne() throws IOException, JSONException {
-        if (!getDataloadProcessId().isEmpty()) {
-            ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
-                    testParams.getProjectId());
-        }
-        createDataLoadProcess();
-        assertFalse(getDataloadProcessId().isEmpty());
-    }
-
     private String getLogContent(RestApiClient restApiClient, String executionUri) {
-        return RestUtils.getResource(getRestApiClient(), executionUri + "/log", HttpStatus.OK);
+        return RestUtils.getResource(restApiClient, executionUri + "/log", HttpStatus.OK);
     }
 
     private String getWebDavUrl() {
@@ -335,21 +281,22 @@ public class DataloadProcessTest extends AbstractDLUITest {
         return gdcFragment.getUserUploadsURL();
     }
 
-    private void deleteFilesFromWebdav(String webDavStructure, List<String> deleteUrls) throws IOException, 
+    private void deleteFilesFromWebdav(String webDavStructure, List<String> deleteUrls) throws IOException,
             InterruptedException {
-        WebDavClient webDav =
-                WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
+        WebDavClient webDav = WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
 
-        boolean isExist = false;
         final int timeout = 2 * 60 * 1000; // 2 mins
         int totalWaitingTime = 0;
-        final int sleepTime = 300;
-        for (String file : deleteUrls) {
-            System.out.println(String.format("Waiting for deleting file %s from WebDav...", file));
-            while (true) {
-                isExist = webDav.isFilePresent(webDavStructure + "/" + file);
-                if (isExist) {
-                    webDav.deleteFile(webDavStructure + "/" +file);
+        final int sleepTime = 200;
+        String fileUrl;
+        while (deleteUrls.size() > 0 && totalWaitingTime < timeout) {
+            for (String file : deleteUrls) {
+                System.out.println(String.format("Waiting for deleting file %s from WebDav...", file));
+
+                fileUrl = webDavStructure + "/" + file;
+                if (webDav.isFilePresent(fileUrl)) {
+                    webDav.deleteFile(fileUrl);
+                    deleteUrls.remove(file);
                     break;
                 }
 
@@ -366,14 +313,19 @@ public class DataloadProcessTest extends AbstractDLUITest {
     private void assertContentLogFile(String logContent, String expectedLogFile) throws IOException {
         List<String> allLines = FileUtils.readLines(new File(getLogFilePath(expectedLogFile)));
         for (String line : allLines) {
-            if (!logContent.contains(line)) {
+            boolean containsLine = logContent.contains(line.trim()); 
+            if (!containsLine) {
                 System.out.println("Different line: " + line);
             }
-            assertTrue(logContent.contains(line), "Log content is not correct!");
+            assertTrue(containsLine, "Log content is not correct!");
         }
+
+        Pattern myPattern = Pattern.compile("Selected datasets: dataset.opportunity,\\s?dataset.person");
+        Matcher m = myPattern.matcher(logContent);
+        assertTrue(m.find(), "Log content is not correct!");
     }
 
     private String getLogFilePath(String fileName) {
-        return maqlFilePath.replace("maql-file", "log-txt") + fileName;
+        return apiResourcesPath + fileName;
     }
 }
