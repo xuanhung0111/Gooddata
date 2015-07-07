@@ -109,10 +109,18 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public void addMetricFromFact(String fact) {
+    public AnalysisPage addMetricFromFact(String fact) {
         waitForFragmentVisible(bucketsPanel);
         waitForFragmentVisible(cataloguePanel);
-        bucketsPanel.addMetric(cataloguePanel.getFact(fact));
+        bucketsPanel.addMetricFromFact(cataloguePanel.getFact(fact));
+        return this;
+    }
+
+    public AnalysisPage addMetricFromAttribute(String attribute) {
+        waitForFragmentVisible(bucketsPanel);
+        waitForFragmentVisible(cataloguePanel);
+        bucketsPanel.addMetricFromAttribute(cataloguePanel.getCategory(attribute));
+        return this;
     }
 
     public AnalysisPage addCategory(String category) {
@@ -437,6 +445,20 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage filterCatalog(CatalogFilterType type) {
         waitForFragmentVisible(cataloguePanel).filterCatalog(type);
+        return this;
+    }
+
+    public boolean isMetricConfigurationCollapsed(String metric) {
+        return waitForFragmentVisible(bucketsPanel).isMetricConfigurationCollapsed(metric);
+    }
+
+    public AnalysisPage expandMetricConfiguration(String metric) {
+        waitForFragmentVisible(bucketsPanel).expandMetricConfiguration(metric);
+        return this;
+    }
+
+    public AnalysisPage collapseMetricConfiguration(String metric) {
+        waitForFragmentVisible(bucketsPanel).collapseMetricConfiguration(metric);
         return this;
     }
 }

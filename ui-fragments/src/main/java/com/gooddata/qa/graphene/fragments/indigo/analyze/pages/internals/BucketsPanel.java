@@ -32,6 +32,14 @@ public class BucketsPanel extends AbstractFragment {
         waitForFragmentVisible(metricsBucket).addMetric(metric);
     }
 
+    public void addMetricFromFact(WebElement fact) {
+        waitForFragmentVisible(metricsBucket).addMetricFromFact(fact);
+    }
+
+    public void addMetricFromAttribute(WebElement attribute) {
+        waitForFragmentVisible(metricsBucket).addMetricFromAttribute(attribute);
+    }
+
     public void removeMetric(String metric) {
         waitForFragmentVisible(metricsBucket).removeMetric(metric);
     }
@@ -175,5 +183,17 @@ public class BucketsPanel extends AbstractFragment {
 
     public void changeAggregationOfFact(String fact, String newAggregation) {
         waitForFragmentVisible(metricsBucket).changeAggregationOfFact(fact, newAggregation);
+    }
+
+    public boolean isMetricConfigurationCollapsed(String metric) {
+        return waitForFragmentVisible(metricsBucket).isMetricConfigurationCollapsed(metric);
+    }
+
+    public void expandMetricConfiguration(String metric) {
+        waitForFragmentVisible(metricsBucket).expandMetricConfiguration(metric);
+    }
+
+    public void collapseMetricConfiguration(String metric) {
+        waitForFragmentVisible(metricsBucket).collapseMetricConfiguration(metric);
     }
 }
