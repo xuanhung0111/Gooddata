@@ -23,6 +23,7 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
 
     private static final String AMOUNT = "Amount";
     private static final String STAGE_NAME = "Stage Name";
+    private static final String SUM_OF_AMOUNT = "Sum of " + AMOUNT;
 
     @BeforeClass
     public void initialize() {
@@ -33,8 +34,9 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
     @Test(dependsOnGroups = {"init"})
     public void createSimpleMetricFromFact() {
         initAnalysePage();
-        analysisPage.addMetricFromFact(AMOUNT);
-        assertEquals(analysisPage.getFactAggregation(AMOUNT), "SUM");
+        analysisPage.addMetricFromFact(AMOUNT)
+            .expandMetricConfiguration(SUM_OF_AMOUNT);
+        assertEquals(analysisPage.getMetricAggregation(SUM_OF_AMOUNT), "Sum");
         analysisPage.waitForReportComputing();
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -50,7 +52,7 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
 
         analysisPage.addCategory(STAGE_NAME).waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
-        assertEquals(report.getYaxisTitle(), "Sum of " + AMOUNT);
+        assertEquals(report.getYaxisTitle(), SUM_OF_AMOUNT);
         checkingOpenAsReport("createSimpleMetricFromFact");
     }
 
@@ -58,9 +60,10 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
     public void createSimpleMetricFromFactUsingShortcut() {
         initAnalysePage();
         analysisPage.dragAndDropFactToShortcutPanel(AMOUNT, ShortcutPanel.AS_A_COLUMN_CHART)
-            .waitForReportComputing();
-        assertEquals(analysisPage.getFactAggregation(AMOUNT), "SUM");
-        assertEquals(analysisPage.getChartReport().getYaxisTitle(), "Sum of " + AMOUNT);
+            .waitForReportComputing()
+            .expandMetricConfiguration(SUM_OF_AMOUNT);
+        assertEquals(analysisPage.getMetricAggregation(SUM_OF_AMOUNT), "Sum");
+        assertEquals(analysisPage.getChartReport().getYaxisTitle(), SUM_OF_AMOUNT);
 
         analysisPage.resetToBlankState();
 
@@ -75,36 +78,46 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
     @Test(dependsOnGroups = {"init"})
     public void testMetricAggregations() {
         initAnalysePage();
-        analysisPage.addMetricFromFact(AMOUNT);
-        assertEquals(analysisPage.getFactAggregation(AMOUNT), "SUM");
+        analysisPage.addMetricFromFact(AMOUNT)
+            .expandMetricConfiguration(SUM_OF_AMOUNT);
+        assertEquals(analysisPage.getMetricAggregation(SUM_OF_AMOUNT), "Sum");
         ChartReport report = analysisPage.waitForReportComputing().getChartReport();
-        assertEquals(report.getYaxisTitle(), "Sum of " + AMOUNT);
+        assertEquals(report.getYaxisTitle(), SUM_OF_AMOUNT);
 
-        assertTrue(isEqualCollection(analysisPage.getAllFactAggregations(AMOUNT),
-                asList("SUM", "MAX", "MIN", "AVG", "RUNSUM", "MEDIAN")));
+        assertTrue(isEqualCollection(analysisPage.getAllMetricAggregations(SUM_OF_AMOUNT),
+                asList("Sum", "Minimum", "Maximum", "Average", "Running sum", "Median")));
 
         Map<String, String> aggregations = new HashMap<String, String>();
-        aggregations.put("MAX", "Maximum ");
-        aggregations.put("MIN", "Minimum ");
-        aggregations.put("AVG", "Average ");
-        aggregations.put("RUNSUM", "Runsum of ");
-        aggregations.put("MEDIAN", "Median ");
+        aggregations.put("Maximum", "Maximum ");
+        aggregations.put("Minimum", "Minimum ");
+        aggregations.put("Average", "Average ");
+        aggregations.put("Running sum", "Running sum of ");
+        aggregations.put("Median", "Median ");
+        String metricFromAmountTitle = SUM_OF_AMOUNT;
 
         for (Map.Entry<String, String> entry: aggregations.entrySet()) {
-            analysisPage.changeAggregationOfFact(AMOUNT, entry.getKey()).waitForReportComputing();
-            assertEquals(analysisPage.getChartReport().getYaxisTitle(), entry.getValue() + AMOUNT);
+            analysisPage.changeMetricAggregation(metricFromAmountTitle, entry.getKey())
+                .waitForReportComputing();
+            metricFromAmountTitle = entry.getValue() + AMOUNT;
+            assertEquals(analysisPage.getChartReport().getYaxisTitle(), metricFromAmountTitle);
         }
 
-        analysisPage.addMetricFromFact(AMOUNT);
-        assertEquals(analysisPage.getFactAggregationByIndex(AMOUNT, 1), "SUM");
+        analysisPage.addMetricFromFact(AMOUNT)
+            .expandMetricConfiguration(SUM_OF_AMOUNT);
+        assertEquals(analysisPage.getMetricAggregation(SUM_OF_AMOUNT), "Sum");
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
-        analysisPage.undo().addCategory(DATE).waitForReportComputing();
-        analysisPage.turnOnShowInPercents().waitForReportComputing();
+        analysisPage.undo()
+            .expandMetricConfiguration(SUM_OF_AMOUNT)
+            .addCategory(DATE)
+            .waitForReportComputing()
+            .turnOnShowInPercents()
+            .waitForReportComputing();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
-        analysisPage.compareToSamePeriodOfYearBefore().waitForReportComputing();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
+        analysisPage.compareToSamePeriodOfYearBefore()
+            .waitForReportComputing();
+        assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("testMetricAggregations");
     }
 }

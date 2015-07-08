@@ -165,24 +165,20 @@ public class BucketsPanel extends AbstractFragment {
         stacksBucket.replaceStackBy(categoriesBucket.getFirstItem());
     }
 
-    public String getFactAggregation(String fact) {
-        return waitForFragmentVisible(metricsBucket).getFactAggregation(fact);
-    }
-
-    public String getFactAggregationByIndex(String fact, int index) {
-        return waitForFragmentVisible(metricsBucket).getFactAggregationByIndex(fact, index);
+    public String getMetricAggregation(String metric) {
+        return waitForFragmentVisible(metricsBucket).getMetricAggregation(metric);
     }
 
     public String getSelectedGranularity() {
         return waitForFragmentVisible(categoriesBucket).getSelectedGranularity();
     }
 
-    public Collection<String> getAllFactAggregations(String fact) {
-        return waitForFragmentVisible(metricsBucket).getAllFactAggregations(fact);
+    public Collection<String> getAllMetricAggregations(String metric) {
+        return waitForFragmentVisible(metricsBucket).getAllMetricAggregations(metric);
     }
 
-    public void changeAggregationOfFact(String fact, String newAggregation) {
-        waitForFragmentVisible(metricsBucket).changeAggregationOfFact(fact, newAggregation);
+    public void changeMetricAggregation(String metric, String newAggregation) {
+        waitForFragmentVisible(metricsBucket).changeMetricAggregation(metric, newAggregation);
     }
 
     public boolean isMetricConfigurationCollapsed(String metric) {

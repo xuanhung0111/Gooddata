@@ -134,17 +134,13 @@ public class MetricsBucket extends AbstractFragment {
         return waitForElementVisible(BY_STACK_WARNING, getRoot()).getText().trim();
     }
 
-    public String getFactAggregation(String fact) {
-        return getFactAggregationByIndex(fact, 0);
-    }
-
-    public String getFactAggregationByIndex(String fact, int index) {
-        return new Select(getFactByIndex(fact, index).findElement(BY_FACT_AGGREGATION)).getFirstSelectedOption()
+    public String getMetricAggregation(String metric) {
+        return new Select(getMetric(metric).findElement(BY_FACT_AGGREGATION)).getFirstSelectedOption()
                 .getText();
     }
 
-    public Collection<String> getAllFactAggregations(String fact) {
-        return Collections2.transform(new Select(getFact(fact).findElement(BY_FACT_AGGREGATION)).getOptions(),
+    public Collection<String> getAllMetricAggregations(String metric) {
+        return Collections2.transform(new Select(getMetric(metric).findElement(BY_FACT_AGGREGATION)).getOptions(),
                 new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
@@ -153,8 +149,8 @@ public class MetricsBucket extends AbstractFragment {
         });
     }
 
-    public void changeAggregationOfFact(String fact, String newAggregation) {
-        new Select(getFact(fact).findElement(BY_FACT_AGGREGATION)).selectByVisibleText(newAggregation);
+    public void changeMetricAggregation(String metric, String newAggregation) {
+        new Select(getMetric(metric).findElement(BY_FACT_AGGREGATION)).selectByVisibleText(newAggregation);
     }
 
     public boolean isMetricConfigurationCollapsed(String name) {
@@ -178,35 +174,21 @@ public class MetricsBucket extends AbstractFragment {
     }
 
     private WebElement getMetric(final String name) {
-        List<WebElement> items = getItems(name);
-        if (items.isEmpty()) {
+        WebElement item = getItem(name);
+        if (item == null) {
             throw new NoSuchElementException("Cannot find metric: " + name);
         }
-        return items.get(0);
+        return item;
     }
 
-    private WebElement getFact(final String name) {
-        return getFactByIndex(name, 0);
-    }
-
-    private WebElement getFactByIndex(final String name, final int index) {
-        List<WebElement> items = getItems(name);
-        if (items.isEmpty()) {
-            throw new NoSuchElementException("Cannot find fact: " + name);
-        }
-        return items.get(index);
-    }
-
-    private List<WebElement> getItems(final String name) {
-        List<WebElement> result = Lists.newArrayList();
-
+    private WebElement getItem(final String name) {
         for (WebElement input : items) {
             if (name.equals(getHeaderFrom(input).getText())) {
-                result.add(input);
+                return input;
             }
         }
 
-        return result;
+        return null;
     }
 
     private boolean isMetricConfigurationCollapsed(WebElement metric) {

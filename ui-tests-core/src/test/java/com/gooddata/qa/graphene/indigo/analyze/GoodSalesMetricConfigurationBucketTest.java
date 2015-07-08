@@ -53,14 +53,14 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
         assertTrue(analysisPage.addMetricFromFact(AMOUNT)
                 .isMetricConfigurationCollapsed(sumOfAmount));
 
-        analysisPage.expandMetricConfiguration(sumOfAmount).changeAggregationOfFact(sumOfAmount, "Average");
+        analysisPage.expandMetricConfiguration(sumOfAmount).changeMetricAggregation(sumOfAmount, "Average");
         assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), singleton(averageAmount)));
 
         assertTrue(analysisPage.addMetricFromFact(DURATION)
                 .isMetricConfigurationCollapsed(sumOfDuration));
 
         analysisPage.expandMetricConfiguration(sumOfDuration)
-            .changeAggregationOfFact(sumOfDuration, "Running sum");
+            .changeMetricAggregation(sumOfDuration, "Running sum");
         assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
                 asList(averageAmount, runningSumOfDuration)));
 

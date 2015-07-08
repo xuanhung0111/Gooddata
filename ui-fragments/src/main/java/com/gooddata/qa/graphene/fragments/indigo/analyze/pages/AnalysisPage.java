@@ -426,20 +426,16 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public String getFactAggregation(String fact) {
-        return waitForFragmentVisible(bucketsPanel).getFactAggregation(fact);
+    public String getMetricAggregation(String metric) {
+        return waitForFragmentVisible(bucketsPanel).getMetricAggregation(metric);
     }
 
-    public String getFactAggregationByIndex(String fact, int index) {
-        return waitForFragmentVisible(bucketsPanel).getFactAggregationByIndex(fact, index);
+    public Collection<String> getAllMetricAggregations(String metric) {
+        return waitForFragmentVisible(bucketsPanel).getAllMetricAggregations(metric);
     }
 
-    public Collection<String> getAllFactAggregations(String fact) {
-        return waitForFragmentVisible(bucketsPanel).getAllFactAggregations(fact);
-    }
-
-    public AnalysisPage changeAggregationOfFact(String fact, String newAggregation) {
-        waitForFragmentVisible(bucketsPanel).changeAggregationOfFact(fact, newAggregation);
+    public AnalysisPage changeMetricAggregation(String metric, String newAggregation) {
+        waitForFragmentVisible(bucketsPanel).changeMetricAggregation(metric, newAggregation);
         return this;
     }
 
