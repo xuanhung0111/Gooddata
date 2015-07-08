@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
@@ -90,7 +90,7 @@ public class DashboardContent extends AbstractFragment {
     }
 
     public FilterWidget getFilterWidget(final String condition) {
-        waitForCollectionIsNotEmpty(filters);
+        waitForDashboardPageLoaded(browser);
         WebElement filter = Iterables.find(filters, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {

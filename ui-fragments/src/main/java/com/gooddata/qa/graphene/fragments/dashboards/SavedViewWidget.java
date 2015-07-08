@@ -66,9 +66,10 @@ public class SavedViewWidget extends AbstractFragment{
         }
     }
 
-    public void openSavedViewMenu() {
+    public SavedViewWidget openSavedViewMenu() {
         waitForElementVisible(this.getRoot()).click();
         waitForElementVisible(savedViewPopupMenu.getRoot());
+        return this;
     }
 
     /**
