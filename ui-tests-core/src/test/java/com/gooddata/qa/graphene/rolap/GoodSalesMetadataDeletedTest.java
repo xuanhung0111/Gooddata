@@ -499,9 +499,8 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
             case SAVED_VIEW:
                 initDashboardsPage();
                 dashboardsPage.selectDashboard(DASHBOARD_NAME);
-                SavedViewWidget widget = dashboardsPage.getSavedViewWidget();
-                widget.openSavedViewMenu();
-                return !widget.getSavedViewPopupMenu().getAllSavedViewNames().contains(object);
+                return !dashboardsPage.getSavedViewWidget().openSavedViewMenu().getSavedViewPopupMenu()
+                        .getAllSavedViewNames().contains(object);
             case DASHBOARD_GEO:
                 initDashboardsPage();
                 dashboardsPage.selectDashboard(DASHBOARD_NAME);
