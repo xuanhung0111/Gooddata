@@ -89,28 +89,29 @@ public class DashboardsGeneralTest extends GoodSalesAbstractTest {
     public void checkKpiTitleChangeWhenMetricChange() {
         processKpiSelection(1);
 
-        indigoDashboardsPage.selectMetricByIndex(0);
-        selectedKpi.setHeadline("");
+        indigoDashboardsPage.selectMetricByName("Amount");
+
         String metricHeadline = selectedKpi.getHeadline();
 
-        assertNotEquals(metricHeadline, "");
+        assertEquals(metricHeadline, "Amount");
 
-        indigoDashboardsPage.selectMetricByIndex(1);
+        indigoDashboardsPage.selectMetricByName("Lost");
 
-        assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
+        assertEquals(selectedKpi.getHeadline(), "Lost");
     }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"adminTests"})
     public void checkKpiTitlePersistenceWhenMetricChange() {
         processKpiSelection(0);
 
-        indigoDashboardsPage.selectMetricByIndex(0);
+        indigoDashboardsPage.selectMetricByName("Amount");
+
         selectedKpi.setHeadline("abc");
         String metricHeadline = selectedKpi.getHeadline();
 
         assertEquals(metricHeadline, "abc");
 
-        indigoDashboardsPage.selectMetricByIndex(1);
+        indigoDashboardsPage.selectMetricByName("Amount");
 
         assertEquals(selectedKpi.getHeadline(), "abc");
     }
@@ -143,5 +144,4 @@ public class DashboardsGeneralTest extends GoodSalesAbstractTest {
 
         return selectedKpi;
     }
-
 }

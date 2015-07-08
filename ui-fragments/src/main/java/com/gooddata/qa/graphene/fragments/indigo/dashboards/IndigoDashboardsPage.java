@@ -5,14 +5,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = Kpi.MAIN_CLASS)
@@ -28,7 +25,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private WebElement saveButton;
 
     @FindBy(className = "s-metric_select")
-    private WebElement metricSelect;
+    private MetricSelect metricSelect;
 
     @FindBy(className = "dashboard")
     private WebElement dashboard;
@@ -67,7 +64,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public Kpi selectKpi(int index) {
         Kpi tempKpi = getKpiByIndex(index);
         tempKpi.getRoot().click();
-        waitForElementPresent(metricSelect);
+        waitForElementVisible(metricSelect.getRoot());
         return tempKpi;
     }
 
@@ -75,9 +72,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return kpis.get(index);
     }
 
-    public IndigoDashboardsPage selectMetricByIndex(int index) {
-        Select dropDown = new Select(waitForElementVisible(this.metricSelect));
-        dropDown.selectByIndex(index);
+    public IndigoDashboardsPage selectMetricByName(String name) {
+        waitForElementVisible(metricSelect.getRoot());
+        metricSelect.byName(name);
         waitForKpiLoading();
 
         return this;
@@ -89,7 +86,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage waitForKpiLoading(){
+    public IndigoDashboardsPage waitForKpiLoading() {
         waitForElementNotPresent(Kpi.IS_LOADING);
 
         return this;
