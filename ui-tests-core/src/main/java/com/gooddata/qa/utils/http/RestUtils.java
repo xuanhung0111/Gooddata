@@ -181,17 +181,28 @@ public class RestUtils {
         String contentBody = CREATE_USER_CONTENT_BODY.replace("${userEmail}", userEmail).replace("${userPassword}",
                 userPassword);
         HttpRequestBase postRequest = restApiClient.newPostMethod(DOMAIN_USER_LINK, contentBody);
-        HttpResponse postReponse = restApiClient.execute(postRequest, HttpStatus.CREATED,
+        String userUri;
+        try {
+            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.CREATED,
                 "New user is not created!");
-        String userUri = new JSONObject(EntityUtils.toString(postReponse.getEntity())).getString("uri");
-        System.out.println("New user uri: " + userUri);
+            userUri = new JSONObject(EntityUtils.toString(postResponse.getEntity())).getString("uri");
+            System.out.println("New user uri: " + userUri);
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+        } finally {
+            postRequest.releaseConnection();
+        }
 
         return userUri;
     }
 
     public static void deleteUser(RestApiClient restApiClient, String deletetedUserUri) {
         HttpRequestBase deleteRequest = restApiClient.newDeleteMethod(deletetedUserUri);
-        restApiClient.execute(deleteRequest, HttpStatus.OK, "User is not deleted!");
+        try {
+            HttpResponse response = restApiClient.execute(deleteRequest, HttpStatus.OK, "User is not deleted!");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            deleteRequest.releaseConnection();
+        }
     }
 
     public static void addUserToProject(String host, String projectId, String domainUser,
@@ -204,15 +215,18 @@ public class RestUtils {
         String contentBody = ADD_USER_CONTENT_BODY.replace("${userRoles}", roleUri)
                 .replace("${self}", inviteeProfile);
         HttpRequestBase postRequest = restApiClient.newPostMethod(usersUri, contentBody);
-        HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
-        JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
-        assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"),
-                "User isn't assigned properly into the project");
-        System.out.println(
-                format("Successfully assigned user %s to project %s by domain admin %s", inviteeProfile, projectId,
-                        domainUser));
-        
-        EntityUtils.consumeQuietly(postResponse.getEntity());
+        try {
+            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
+            JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+            assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"),
+                    "User isn't assigned properly into the project");
+            System.out.println(format("Successfully assigned user %s to project %s by domain admin %s",
+                    inviteeProfile, projectId, domainUser));
+
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+        } finally {
+            postRequest.releaseConnection();
+        }
     }
 
     public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
@@ -367,7 +381,13 @@ public class RestUtils {
 
             final HttpPost postRequest = restApiClient.newPostMethod(projectFeatureFlagsUri.toString(),
                     featureFlagObject.toString());
-            restApiClient.execute(postRequest, HttpStatus.CREATED, "Invalid status code");
+            try {
+               HttpResponse response = 
+                       restApiClient.execute(postRequest, HttpStatus.CREATED, "Invalid status code");
+               EntityUtils.consumeQuietly(response.getEntity());
+            } finally {
+                postRequest.releaseConnection();
+            }
         }
     }
 
@@ -497,7 +517,7 @@ public class RestUtils {
         setFeatureFlagsToProject(restApiClient, projectId,
                 new FeatureFlagOption(featureFlag.getFlagName(), true));
     }
-    
+
     public static void verifyValidLink(RestApiClient restApiClient, String link) {
         HttpRequestBase getRequest = restApiClient.newGetMethod(link);
         try {
