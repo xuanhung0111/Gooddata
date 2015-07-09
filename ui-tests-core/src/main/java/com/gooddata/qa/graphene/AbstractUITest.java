@@ -41,7 +41,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
     protected static final String PAGE_UPLOAD = "upload.html";
-    private static final String ACCOUNT_PAGE = "account.html";
+    protected static final String ACCOUNT_PAGE = "account.html";
     protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";

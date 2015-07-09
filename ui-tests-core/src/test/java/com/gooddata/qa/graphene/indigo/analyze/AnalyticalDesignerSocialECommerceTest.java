@@ -32,6 +32,8 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
 
         notAvailableAttribute = "Company";
         relatedDate = DATE;
+
+        metric1Uri = "/gdc/md/%s/obj/427";
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})

@@ -33,6 +33,8 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
 
         notAvailableAttribute = "OpportunityID";
         relatedDate = "Closed Date";
+
+        metric1Uri = "/gdc/md/%s/obj/5539";
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPLORE_PROJECT_DATA_GROUP})

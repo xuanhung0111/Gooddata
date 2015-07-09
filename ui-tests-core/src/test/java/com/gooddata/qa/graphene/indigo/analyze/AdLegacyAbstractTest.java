@@ -5,10 +5,12 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
@@ -37,6 +40,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
 public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTest {
@@ -64,6 +69,8 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
     protected String notAvailableAttribute;
     protected String relatedDate;
+
+    protected String metric1Uri;
 
     @SuppressWarnings("serial")
     private static final Map<String, String> walkmeContents = new HashMap<String, String>() {{
@@ -907,12 +914,14 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
-    public void checkMetricFormating() throws InterruptedException {
+    public void checkMetricFormating() throws InterruptedException, org.apache.http.ParseException,
+        JSONException, IOException {
         initMetricPage();
 
         waitForFragmentVisible(metricEditorPage).openMetricDetailPage(metric1);
         String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
-        metricDetailPage.changeMetricFormat(oldFormat + "[red]");
+        RestUtils.changeMetricFormat(getRestApiClient(), format(metric1Uri, testParams.getProjectId()),
+                oldFormat + "[red]");
 
         try {
             initAnalysePage();
@@ -929,7 +938,8 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         } finally {
             initMetricPage();
             waitForFragmentVisible(metricEditorPage).openMetricDetailPage(metric1);
-            waitForFragmentVisible(metricDetailPage).changeMetricFormat(oldFormat);
+            waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
+            assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
         }
     }
 

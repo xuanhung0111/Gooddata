@@ -42,13 +42,6 @@ public class MetricDetailsPage extends AbstractFragment {
         assertEquals(getMetricFormat(), expectedFormat, "Metric format is not set properly");
     }
 
-    public void changeMetricFormat(String newFormat) {
-        waitForElementVisible(metricFormat).click();
-        Graphene.createPageFragment(MetricFormatterDialog.class,
-                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(newFormat);
-        assertEquals(getMetricFormat(), newFormat, "New format is not applied!");
-    }
-
     public void changeMetricFormat(MetricFormatterDialog.Formatter format) {
         waitForElementVisible(metricFormat).click();
         Graphene.createPageFragment(MetricFormatterDialog.class,
