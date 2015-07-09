@@ -275,6 +275,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), oldTrackersCount);
+        analysisPage.expandMetricConfiguration(metric);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
@@ -422,6 +423,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
             assertTrue(analysisPage.isDateFilterVisible());
             assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
+            analysisPage.expandMetricConfiguration(metric);
             assertTrue(analysisPage.isShowPercentConfigEnabled());
             assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
     

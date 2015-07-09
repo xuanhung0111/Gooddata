@@ -109,10 +109,18 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public void addMetricFromFact(String fact) {
+    public AnalysisPage addMetricFromFact(String fact) {
         waitForFragmentVisible(bucketsPanel);
         waitForFragmentVisible(cataloguePanel);
-        bucketsPanel.addMetric(cataloguePanel.getFact(fact));
+        bucketsPanel.addMetricFromFact(cataloguePanel.getFact(fact));
+        return this;
+    }
+
+    public AnalysisPage addMetricFromAttribute(String attribute) {
+        waitForFragmentVisible(bucketsPanel);
+        waitForFragmentVisible(cataloguePanel);
+        bucketsPanel.addMetricFromAttribute(cataloguePanel.getCategory(attribute));
+        return this;
     }
 
     public AnalysisPage addCategory(String category) {
@@ -418,25 +426,35 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public String getFactAggregation(String fact) {
-        return waitForFragmentVisible(bucketsPanel).getFactAggregation(fact);
+    public String getMetricAggregation(String metric) {
+        return waitForFragmentVisible(bucketsPanel).getMetricAggregation(metric);
     }
 
-    public String getFactAggregationByIndex(String fact, int index) {
-        return waitForFragmentVisible(bucketsPanel).getFactAggregationByIndex(fact, index);
+    public Collection<String> getAllMetricAggregations(String metric) {
+        return waitForFragmentVisible(bucketsPanel).getAllMetricAggregations(metric);
     }
 
-    public Collection<String> getAllFactAggregations(String fact) {
-        return waitForFragmentVisible(bucketsPanel).getAllFactAggregations(fact);
-    }
-
-    public AnalysisPage changeAggregationOfFact(String fact, String newAggregation) {
-        waitForFragmentVisible(bucketsPanel).changeAggregationOfFact(fact, newAggregation);
+    public AnalysisPage changeMetricAggregation(String metric, String newAggregation) {
+        waitForFragmentVisible(bucketsPanel).changeMetricAggregation(metric, newAggregation);
         return this;
     }
 
     public AnalysisPage filterCatalog(CatalogFilterType type) {
         waitForFragmentVisible(cataloguePanel).filterCatalog(type);
+        return this;
+    }
+
+    public boolean isMetricConfigurationCollapsed(String metric) {
+        return waitForFragmentVisible(bucketsPanel).isMetricConfigurationCollapsed(metric);
+    }
+
+    public AnalysisPage expandMetricConfiguration(String metric) {
+        waitForFragmentVisible(bucketsPanel).expandMetricConfiguration(metric);
+        return this;
+    }
+
+    public AnalysisPage collapseMetricConfiguration(String metric) {
+        waitForFragmentVisible(bucketsPanel).collapseMetricConfiguration(metric);
         return this;
     }
 }

@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static org.testng.Assert.*;
+import static java.util.Arrays.asList;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
-import java.util.Arrays;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
@@ -44,8 +45,8 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        assertTrue(CollectionUtils.isEqualCollection(panel.getAllDimensionSwitchs(),
-                Arrays.asList(ACTIVITY, "Closed", CREATED, "Snapshot", "Timeline")));
+        assertTrue(isEqualCollection(panel.getAllDimensionSwitchs(),
+                asList(ACTIVITY, "Closed", CREATED, "Snapshot", "Timeline")));
 
         panel.select("This year");
         analysisPage.waitForReportComputing();
@@ -108,6 +109,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
         analysisPage.configTimeFilter("Last 90 days")
+                    .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
                     .turnOnShowInPercents()
                     .waitForReportComputing();
         // wait for data labels rendered
@@ -129,13 +131,14 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
         analysisPage.configTimeFilter("Last 90 days")
+                    .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
                     .compareToSamePeriodOfYearBefore()
                     .waitForReportComputing();
 
         ChartReport report = analysisPage.getChartReport();
         analysisPage.waitForReportComputing();
-        assertTrue(CollectionUtils.isEqualCollection(report.getLegends(),
-                Arrays.asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES)));
+        assertTrue(isEqualCollection(report.getLegends(),
+                asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES)));
         checkingOpenAsReport("periodOverPeriod");
     }
 

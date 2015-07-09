@@ -33,13 +33,13 @@ public class CategoriesBucket extends AbstractFragment {
     private Select dimensionSwitch;
 
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
-    private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
+    private static final By BY_HEADER = By.className("adi-bucket-item-header");
     private static final String EMPTY = "s-bucket-empty";
 
     public void addCategory(WebElement category) {
         new Actions(browser).dragAndDrop(category, waitForElementVisible(getRoot()))
                 .perform();
-        assertEquals(items.get(items.size() - 1).findElement(BY_TEXT).getText(), category.getText());
+        assertEquals(items.get(items.size() - 1).findElement(BY_HEADER).getText(), category.getText());
     }
 
     public void removeCategory(final String category) {
@@ -47,7 +47,7 @@ public class CategoriesBucket extends AbstractFragment {
         WebElement element = Iterables.find(items, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
-                return category.equals(input.findElement(BY_TEXT).getText());
+                return category.equals(input.findElement(BY_HEADER).getText());
             }
         });
 
@@ -75,7 +75,7 @@ public class CategoriesBucket extends AbstractFragment {
         return Lists.newArrayList(Collections2.transform(items, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
-                return input.findElement(BY_TEXT).getText();
+                return input.findElement(BY_HEADER).getText();
             }
         }));
     }

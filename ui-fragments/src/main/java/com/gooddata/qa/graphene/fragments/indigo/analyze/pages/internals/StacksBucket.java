@@ -19,7 +19,7 @@ public class StacksBucket extends AbstractFragment {
 
     private static final String BUCKET_WITH_WARN_MESSAGE = "bucket-with-warn-message";
     private static final String EMPTY = "s-bucket-empty";
-    private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
+    private static final By BY_HEADER = By.className("adi-bucket-item-header");
     private static final By BY_STACK_WARNING = By.className("adi-stack-warn");
 
     public boolean isEmpty() {
@@ -50,6 +50,6 @@ public class StacksBucket extends AbstractFragment {
         if (isEmpty()) {
             return "";
         }
-        return waitForElementVisible(BY_TEXT, waitForElementVisible(item)).getText().trim();
+        return waitForElementVisible(BY_HEADER, waitForElementVisible(item)).getText().trim();
     }
 }

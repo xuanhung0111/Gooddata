@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,7 +63,8 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         initAnalysePage();
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
                 .withCategories(ACTIVITY_TYPE));
-        analysisPage.waitForReportComputing();
+        analysisPage.waitForReportComputing()
+            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
@@ -103,12 +106,14 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
     @Test(dependsOnGroups = {"init"})
     public void recommendNextStep() {
         dropAttributeToReportHaveOneMetric();
+        analysisPage.expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
         assertFalse(analysisPage.isShowPercentConfigEnabled());
         assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
         analysisPage.resetToBlankState();
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
         assertFalse(analysisPage.isShowPercentConfigEnabled());
         assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() > 0);
@@ -189,7 +194,8 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
     @Test(dependsOnGroups = {"init"})
     public void uncheckSelectedPopCheckbox() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
+        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE))
+            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
 

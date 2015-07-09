@@ -26,10 +26,10 @@ import com.google.common.collect.Lists;
 
 public class MetricsBucket extends AbstractFragment {
 
-    @FindBy(css = ".s-show-in-percent")
+    @FindBy(css = ".adi-bucket-configuration .s-show-in-percent")
     private WebElement showInPercents;
 
-    @FindBy(css = ".s-show-pop")
+    @FindBy(css = ".adi-bucket-configuration .s-show-pop")
     private WebElement compareToSamePeriod;
 
     @FindBy(css = ".adi-bucket-item")
@@ -37,18 +37,26 @@ public class MetricsBucket extends AbstractFragment {
 
     private static final String DISABLED = "is-disabled";
     private static final String EMPTY = "s-bucket-empty";
-    private static final String TYPE_METRIC = "type-metric";
-    private static final String TYPE_FACT = "type-fact";
 
-    private static final By BY_TEXT = By.cssSelector(".adi-bucket-item-handle>div");
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
     private static final By BY_BUCKET_INVITATION = By.cssSelector(".adi-bucket-invitation");
     private static final By BY_STACK_WARNING = By.className("adi-stack-warn");
-    private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
+    public static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
+    private static final By BY_HEADER = By.className("adi-bucket-item-header");
 
     public void addMetric(WebElement metric) {
         new Actions(browser).dragAndDrop(metric, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
         assertTrue(getItemNames().contains(metric.getText().trim()));
+    }
+
+    public void addMetricFromFact(WebElement fact) {
+        new Actions(browser).dragAndDrop(fact, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
+        assertTrue(getItemNames().contains("Sum of " + fact.getText().trim()));
+    }
+
+    public void addMetricFromAttribute(WebElement attribute) {
+        new Actions(browser).dragAndDrop(attribute, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
+        assertTrue(getItemNames().contains("Count of " + attribute.getText().trim()));
     }
 
     public void replaceMetric(String oldMetric, WebElement newMetric) {
@@ -64,7 +72,7 @@ public class MetricsBucket extends AbstractFragment {
         return Lists.newArrayList(Collections2.transform(items, new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
-                return input.findElement(BY_TEXT).getText();
+                return getHeaderFrom(input).getText();
             }
         }));
     }
@@ -74,7 +82,7 @@ public class MetricsBucket extends AbstractFragment {
         WebElement element = Iterables.find(items, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
-                return metric.equals(input.findElement(BY_TEXT).getText());
+                return metric.equals(getHeaderFrom(input).getText());
             }
         });
 
@@ -126,17 +134,13 @@ public class MetricsBucket extends AbstractFragment {
         return waitForElementVisible(BY_STACK_WARNING, getRoot()).getText().trim();
     }
 
-    public String getFactAggregation(String fact) {
-        return getFactAggregationByIndex(fact, 0);
-    }
-
-    public String getFactAggregationByIndex(String fact, int index) {
-        return new Select(getFactByIndex(fact, index).findElement(BY_FACT_AGGREGATION)).getFirstSelectedOption()
+    public String getMetricAggregation(String metric) {
+        return new Select(getMetric(metric).findElement(BY_FACT_AGGREGATION)).getFirstSelectedOption()
                 .getText();
     }
 
-    public Collection<String> getAllFactAggregations(String fact) {
-        return Collections2.transform(new Select(getFact(fact).findElement(BY_FACT_AGGREGATION)).getOptions(),
+    public Collection<String> getAllMetricAggregations(String metric) {
+        return Collections2.transform(new Select(getMetric(metric).findElement(BY_FACT_AGGREGATION)).getOptions(),
                 new Function<WebElement, String>() {
             @Override
             public String apply(WebElement input) {
@@ -145,42 +149,53 @@ public class MetricsBucket extends AbstractFragment {
         });
     }
 
-    public void changeAggregationOfFact(String fact, String newAggregation) {
-        new Select(getFact(fact).findElement(BY_FACT_AGGREGATION)).selectByVisibleText(newAggregation);
+    public void changeMetricAggregation(String metric, String newAggregation) {
+        new Select(getMetric(metric).findElement(BY_FACT_AGGREGATION)).selectByVisibleText(newAggregation);
+    }
+
+    public boolean isMetricConfigurationCollapsed(String name) {
+        return isMetricConfigurationCollapsed(getMetric(name));
+    }
+
+    public void expandMetricConfiguration(String name) {
+        WebElement metric = getMetric(name);
+        if (!isMetricConfigurationCollapsed(metric)) {
+            return;
+        }
+        getHeaderFrom(metric).click();
+    }
+
+    public void collapseMetricConfiguration(String name) {
+        WebElement metric = getMetric(name);
+        if (isMetricConfigurationCollapsed(metric)) {
+            return;
+        }
+        getHeaderFrom(metric).click();
     }
 
     private WebElement getMetric(final String name) {
-        List<WebElement> items = getItems(name, TYPE_METRIC);
-        if (items.isEmpty()) {
+        WebElement item = getItem(name);
+        if (item == null) {
             throw new NoSuchElementException("Cannot find metric: " + name);
         }
-        return items.get(0);
+        return item;
     }
 
-    private WebElement getFact(final String name) {
-        return getFactByIndex(name, 0);
-    }
-
-    private WebElement getFactByIndex(final String name, final int index) {
-        List<WebElement> items = getItems(name, TYPE_FACT);
-        if (items.isEmpty()) {
-            throw new NoSuchElementException("Cannot find fact: " + name);
-        }
-        return items.get(index);
-    }
-
-    private List<WebElement> getItems(final String name, final String type) {
-        List<WebElement> result = Lists.newArrayList();
-        WebElement textEl;
-
+    private WebElement getItem(final String name) {
         for (WebElement input : items) {
-            textEl = input.findElement(BY_TEXT);
-            if (textEl.findElement(BY_PARENT).getAttribute("class").contains(type) &&
-                    name.equals(textEl.getText())) {
-                result.add(input);
+            if (name.equals(getHeaderFrom(input).getText())) {
+                return input;
             }
         }
 
-        return result;
+        return null;
+    }
+
+    private boolean isMetricConfigurationCollapsed(WebElement metric) {
+        return getHeaderFrom(metric).getAttribute("class").contains("collapsed");
+    }
+
+    private WebElement getHeaderFrom(WebElement metric) {
+        return metric.findElement(BY_HEADER);
     }
 }
