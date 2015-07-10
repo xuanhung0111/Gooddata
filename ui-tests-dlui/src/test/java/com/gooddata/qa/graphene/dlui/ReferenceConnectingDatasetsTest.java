@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
-import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertTrue;
 
@@ -133,7 +132,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             dataSource =
                     prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_MULTI_REFERECES)
                             .updateDatasetStatus(selectedDataset);
-            updateModelOfGDProject(getFilePathFromResource("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
+            updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
             updateFieldToSelected();
             addNewFieldWithAnnieDialog(dataSource);
 
