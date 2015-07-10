@@ -1,5 +1,13 @@
 package com.gooddata.qa.graphene.dlui;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,8 +21,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.Test;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.DataSource;
@@ -24,21 +32,17 @@ import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.DataSourcesFragment;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
-import static org.testng.Assert.*;
 
 public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     protected static final String ANNIE_DIALOG_HEADLINE = "Add data";
@@ -425,7 +429,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
             if (role == UserRoles.EDITOR) {
                 signInWithOtherRole(UserRoles.ADMIN);
             }
-            dropAddedFieldsInLDM(maqlFilePath + maqlFile);
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/" + maqlFile));
         }
     }
 

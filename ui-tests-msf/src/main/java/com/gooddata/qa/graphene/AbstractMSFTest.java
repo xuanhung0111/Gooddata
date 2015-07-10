@@ -75,9 +75,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected static final String CREATE_ADS_TABLE_PARAM = "CREATE_TABLE";
     protected static final String COPY_ADS_TABLE_PARAM = "COPY_TABLE";
 
-    protected String maqlFilePath;
-    protected String sqlFilePath;
-    protected String zipFilePath;
     protected String dssAuthorizationToken;
     protected String technicalUser;
     protected String technicalUserPassword;
