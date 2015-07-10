@@ -1,11 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForProjectsPageLoaded;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -23,17 +19,22 @@ import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.google.common.collect.Lists;
 
 public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
+    private static final String DISC_HEADER_TITLE = "Data Integration Console";
+    private static final String PROJECTS_BUTTON_TITLE = "Projects";
+    private static final String OVERVIEW_BUTTON_TITLE = "Overview";
     private static final int MINIMUM_NUMBER_OF_PROJECTS = 25;
 
     @BeforeClass
     public void initProperties() {
-        projectTitle = "Disc-test-projects-page";
+        // Created time is used to identify the working project in case user has no admin role
+        projectTitle = "Disc-test-projects-page-" + System.currentTimeMillis();
     }
 
     @AfterMethod
@@ -43,8 +44,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkProjectFilterOptions() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.checkProjectFilterOptions();
         assertEquals(ProjectStateFilters.ALL.getOption(), discProjectsPage
                 .getSelectedFilterOption().getText());
@@ -75,8 +75,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             prepareDataForAdditionalProjects(additionalProjects);
             prepareDataForProjectsPageTest(ProjectStateFilters.SCHEDULED, getWorkingProject());
 
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
+            initDISCProjectsPage();
             discProjectsPage.checkProjectFilter(ProjectStateFilters.SCHEDULED, getProjects());
         } finally {
             deleteProjects(additionalProjects);
@@ -114,7 +113,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
                         Executables.FAILED_GRAPH);
         createSchedule(scheduleBuilder3);
 
-        openUrl(DISC_PROJECTS_PAGE_URL);
+        initDISCProjectsPage();
         waitForElementVisible(discProjectsList.getRoot());
         discProjectsList.assertDataLoadingProcesses(2, 3, getProjects());
     }
@@ -125,9 +124,14 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         openProjectDetailByUrl(testParams.getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
+        initDISCProjectsPage();
+        waitForElementVisible(discProjectsList.getRoot());
+        assertTrue(discProjectsList.getLastSuccessfulExecutionInfo(getWorkingProject()).isEmpty());
+
         ScheduleBuilder scheduleBuilder1 =
                 new ScheduleBuilder().setProcessName(processName).setExecutable(
                         Executables.SUCCESSFUL_GRAPH);
+        openProjectDetailByUrl(testParams.getProjectId());
         createSchedule(scheduleBuilder1);
         scheduleDetail.manualRun();
         scheduleDetail.assertSuccessfulExecution();
@@ -142,11 +146,33 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         scheduleDetail.manualRun();
         scheduleDetail.assertFailedExecution(scheduleBuilder2.getExecutable());
 
-        openUrl(DISC_PROJECTS_PAGE_URL);
+        initDISCProjectsPage();
         waitForElementVisible(discProjectsList.getRoot());
-        System.out.println("Successful Execution Date: " + lastSuccessfulExecutionDate);
         discProjectsList.assertLastLoaded(lastSuccessfulExecutionDate,
-                lastSuccessfulExecutionTime.substring(14), getProjects());
+                lastSuccessfulExecutionTime.substring(14), getWorkingProject());
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkLastSuccessfulAutoExecution() {
+        String processName = "Check Last Successful Auto Execution";
+        openProjectDetailByUrl(testParams.getProjectId());
+        deployInProjectDetailPage(DeployPackages.BASIC, processName);
+
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(processName)
+                        .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
+        createSchedule(scheduleBuilder);
+
+        scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+        scheduleDetail.assertSuccessfulExecution();
+        String lastSuccessfulExecutionDate = scheduleDetail.getLastExecutionDate();
+        String lastSuccessfulExecutionTime = scheduleDetail.getLastExecutionTime();
+
+        initDISCProjectsPage();
+        waitForElementVisible(discProjectsList.getRoot());
+        discProjectsList.assertLastLoaded(lastSuccessfulExecutionDate,
+                lastSuccessfulExecutionTime.substring(14), getWorkingProject());
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -156,14 +182,12 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             openUrl(PAGE_PROJECTS);
             logout();
             signIn(false, UserRoles.VIEWER);
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
+            initDISCProjectsPage();
             discProjectsList.assertProjectNotAdmin(getWorkingProject().getProjectName());
             openUrl(PAGE_PROJECTS);
             logout();
             signIn(false, UserRoles.EDITOR);
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
+            initDISCProjectsPage();
             discProjectsList.assertProjectNotAdmin(getWorkingProject().getProjectName());
         } catch (ParseException e) {
             System.out.println("There is problem during adding user to project: ");
@@ -188,8 +212,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkPagingOptions() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.checkProjectsPagingOptions();
     }
 
@@ -201,8 +224,8 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         int projectsNumber =
                 projectsPage.getProjectsElements().size()
                         + projectsPage.getDemoProjectsElements().size();
+        List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
         if (projectsNumber <= MINIMUM_NUMBER_OF_PROJECTS) {
-            List<ProjectInfo> additionalProjects = new ArrayList<ProjectInfo>();
             for (int i = 0; i < 25 - projectsNumber + 1; i++) {
                 ProjectInfo projectInfo =
                         new ProjectInfo().setProjectName("Disc-test-paging-projects-page-" + i);
@@ -211,15 +234,17 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             createMultipleProjects(additionalProjects);
         }
 
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
-        discProjectsPage.checkPagingProjectsPage("20");
+        try {
+            initDISCProjectsPage();
+            discProjectsPage.checkPagingProjectsPage("20");
+        } finally {
+            deleteProjects(additionalProjects);
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkEmptySearchResult() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.checkEmptySearchResult("no search result");
     }
 
@@ -255,8 +280,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkSearchProjectInUnscheduledState() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.searchProjectInSpecificState(ProjectStateFilters.UNSCHEDULED,
                 getWorkingProject());
     }
@@ -268,8 +292,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         List<ProjectInfo> additionalProjects = Arrays.asList(projectInfo);
         createMultipleProjects(additionalProjects);
         try {
-            openUrl(DISC_PROJECTS_PAGE_URL);
-            waitForElementVisible(discProjectsPage.getRoot());
+            initDISCProjectsPage();
             discProjectsPage.searchProjectByUnicodeName(unicodeProjectName);
         } finally {
             deleteProjects(additionalProjects);
@@ -279,15 +302,13 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkDefaultSearchBox() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.checkDefaultSearchBox();
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkDeleteSearchKey() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.checkDeleteSearchKey("no search result");
     }
 
@@ -309,7 +330,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             projectAndUsersPage.leaveProject();
             waitForProjectsPageLoaded(browser);
 
-            openUrl(DISC_PROJECTS_PAGE_URL);
+            initDISCProjectsPage();
             waitForElementVisible(discProjectsList.getRoot());
             for (ProjectInfo project : additionalProjects) {
                 assertNotNull(discProjectsList.selectProjectWithAdminRole(project));
@@ -322,5 +343,18 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
             logout();
             signInAtUI(testParams.getUser(), testParams.getPassword());
         }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkProjectsPageHeader() {
+        initDISCProjectsPage();
+        waitForFragmentVisible(discNavigation);
+        assertEquals(discNavigation.getHeaderTitle(), DISC_HEADER_TITLE);
+        assertEquals(discNavigation.getOverviewButtonTitle(), OVERVIEW_BUTTON_TITLE);
+        assertEquals(discNavigation.getProjectsButtonTitle(), PROJECTS_BUTTON_TITLE);
+        discNavigation.clickOnOverviewButton();
+        waitForFragmentVisible(discOverview);
+        discNavigation.clickOnProjectsButton();
+        waitForFragmentVisible(discProjectsPage);
     }
 }
