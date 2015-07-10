@@ -46,7 +46,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	@FindBy(css = "button.s-btn-load")
 	protected WebElement loadButton;
 
-	@FindBy(xpath = "//div[@class='message is-error s-uploadIndex-error is-visible']")
+	@FindBy(className = "s-uploadIndex-error")
 	protected WebElement errorMessageElement;
 
 	private static final By BY_EMPTY_DATASET = By
@@ -55,16 +55,17 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	@FindBy
 	protected WebElement uploadFile;
 
+	private static final String EMPTY_DASHBOARD = "Empty dashboard";
+	private static final String DEFAULT_DASHBOARD = "Default dashboard";
+
 	@BeforeClass
 	public void initProperties() {
 		projectTitle = "SimpleProject-test-upload";
 
 		expectedDashboardsAndTabs = new HashMap<String, String[]>();
-		expectedDashboardsAndTabs.put("Default dashboard",
-				new String[] { "Your Sample Reports" });
+		expectedDashboardsAndTabs.put(DEFAULT_DASHBOARD, new String[] { "Your Sample Reports" });
 		emptyDashboardsAndTabs = new HashMap<String, String[]>();
-		emptyDashboardsAndTabs.put("Default dashboard",
-				new String[] { "First Tab" });
+		emptyDashboardsAndTabs.put(EMPTY_DASHBOARD, new String[] { "First Tab" });
 	}
 
 	protected void prepareReport(String reportName, ReportTypes reportType,
@@ -110,7 +111,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 	}
 
 	protected void selectFileToUpload(String fileName) {
-		initDashboardsPage();
+	    initEmptyDashboardsPage();
 		initUploadPage();
         upload.uploadFile(getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv"));
 	}
@@ -123,12 +124,12 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 			{
 			assertEquals(uploadColumns.getColumns().get(columnIndex).findElement(BY_BUBBLE)
 					.findElement(BY_BUBBLE_CONTENT).getText(), bubbleMessage);
-			System.out.print("System shows error message: " + bubbleMessage);
+			System.out.println("System shows error message: " + bubbleMessage);
 			};
 	}
 	
 	protected void uploadInvalidCSVFile(String fileName, String errorTitle, String errorMessage, String errorSupport) throws InterruptedException{
-		initDashboardsPage();
+	    initEmptyDashboardsPage();
 		initUploadPage();
 		String filePath = getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv");
 		System.out.println("Going to upload file: " + filePath);
@@ -183,9 +184,12 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
             uploadCSV(getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv"), null, "simple-upload-"
 							+ fileName);
             verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, false);
+            addEmptyDashboard();
 		} finally {
 	        waitForDashboardPageLoaded(browser);
 			deleteDashboard();
+			dashboardsPage.selectDashboard(EMPTY_DASHBOARD);
+			dashboardsPage.deleteDashboard();
 			deleteDataset(fileName);
 			waitForElementVisible(BY_EMPTY_DATASET, browser);
 		}
@@ -195,6 +199,8 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 			throws InterruptedException {
 		initDashboardsPage();
 		deleteDashboard();
+		dashboardsPage.selectDashboard(EMPTY_DASHBOARD);
+		dashboardsPage.deleteDashboard();
 		for (String dataset : datasets) {
 			deleteDataset(dataset);
 		}
@@ -222,12 +228,13 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
 		Screenshots.takeScreenshot(browser, uploadFileName + "-dashboard",
 				this.getClass());
+		addEmptyDashboard();
 
 		// Check Date in report
 		List<String> what = new ArrayList<String>();
 		what.add("Sum of Amount");
 		List<String> how = new ArrayList<String>();
-		how.add("Month/Year");
+		how.add("Month/Year (" + uploadFileName + "_paydate)");
 		prepareReport("Report with " + uploadFileName, ReportTypes.TABLE, what,
 				how);
 		List<String> attributeElements = report.getAttributeElements();
@@ -244,5 +251,11 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
 				expectedAttributeElements);
 		System.out.println("Date format with " + uploadFileName
 				+ " is displayed well in report!");
+	}
+
+	protected void addEmptyDashboard() throws InterruptedException {
+	    initDashboardsPage();
+        dashboardsPage.addNewDashboard(EMPTY_DASHBOARD);
+        dashboardsPage.selectDashboard(DEFAULT_DASHBOARD);
 	}
 }
