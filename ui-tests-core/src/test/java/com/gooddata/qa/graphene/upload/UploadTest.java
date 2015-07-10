@@ -74,6 +74,7 @@ public class UploadTest extends AbstractUploadTest {
 			checkAttributeName("kiểm tra ký tự đặc biệt");
 			Screenshots.takeScreenshot(browser,
 					"attribute-name-with-unicode-character", this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("payroll",
 					"Date (payroll_paydate)");
@@ -101,6 +102,7 @@ public class UploadTest extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"payroll-negative-number-csv-upload" + "-dashboard",
 					this.getClass());
+			addEmptyDashboard();
 
 			// Create a report and check negative value
 			List<String> what = new ArrayList<String>();
@@ -146,6 +148,7 @@ public class UploadTest extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"payroll-null-number-csv-upload" + "-dashboard",
 					this.getClass());
+			addEmptyDashboard();
 
 			// Check null value in report
 			List<String> what = new ArrayList<String>();
@@ -177,6 +180,7 @@ public class UploadTest extends AbstractUploadTest {
 			columnIndexAndType.put(3, OptionDataType.TEXT);
 			columnIndexAndType.put(4, OptionDataType.NUMBER);
             uploadCSV(csvFilePath + "change-column-type.csv", columnIndexAndType, "change-column-type");
+            addEmptyDashboard();
 
 			// Check non-number value in report
 			List<String> what = new ArrayList<String>();
@@ -263,6 +267,7 @@ public class UploadTest extends AbstractUploadTest {
 					false);
 			Screenshots.takeScreenshot(browser, "payroll-no-header-csv-upload"
 					+ "-dashboard", this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("payroll-no-header",
 					"Date (payroll-no-header_column8)");
@@ -290,6 +295,7 @@ public class UploadTest extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"payroll-without-fact-csv-upload" + "-dashboard",
 					this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("payroll-without-fact");
 			this.cleanDashboardAndDatasets(datasets);
@@ -315,6 +321,7 @@ public class UploadTest extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"payroll-without-attribute-csv-upload" + "-dashboard",
 					this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("without-attribute");
 			this.cleanDashboardAndDatasets(datasets);
@@ -338,6 +345,7 @@ public class UploadTest extends AbstractUploadTest {
 					false);
 			Screenshots.takeScreenshot(browser, "payroll-Date-EU-csv-upload"
 					+ "-dashboard", this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("payroll-Date-EU",
 					"Date (payroll-Date-EU_paydate)");
@@ -362,6 +370,7 @@ public class UploadTest extends AbstractUploadTest {
 					false);
 			Screenshots.takeScreenshot(browser, "payroll-Date-US-csv-upload"
 					+ "-dashboard", this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("payroll-Date-US",
 					"Date (payroll-Date-US_paydate)");
@@ -388,6 +397,7 @@ public class UploadTest extends AbstractUploadTest {
 					false);
 			Screenshots.takeScreenshot(browser, "without-Date-csv-upload"
 					+ "-dashboard", this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("without-Date");
 			this.cleanDashboardAndDatasets(datasets);
@@ -468,6 +478,7 @@ public class UploadTest extends AbstractUploadTest {
 					false);
 			Screenshots.takeScreenshot(browser, "auto-guessed-ID-csv-upload"
 					+ "-dashboard", this.getClass());
+			addEmptyDashboard();
 
 			// Check ID field in report
 			List<String> what = new ArrayList<String>();
@@ -514,6 +525,7 @@ public class UploadTest extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"auto-guessed-many-ID-csv-upload" + "-dashboard",
 					this.getClass());
+			addEmptyDashboard();
 
 			// Check ID field in report
 			List<String> what = new ArrayList<String>();
@@ -577,6 +589,7 @@ public class UploadTest extends AbstractUploadTest {
 			Screenshots.takeScreenshot(browser,
 					"data-with-crazy-footer-csv-upload" + "-dashboard",
 					this.getClass());
+			addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("data-with-crazy-footer",
 					"Date (data-with-crazy-footer_closedate)",
@@ -604,6 +617,7 @@ public class UploadTest extends AbstractUploadTest {
 			waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
             verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs,
 					false);
+            addEmptyDashboard();
 		} finally {
 			List<String> datasets = Arrays.asList("delimiter-invalid");
 			this.cleanDashboardAndDatasets(datasets);
