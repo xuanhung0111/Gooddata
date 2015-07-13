@@ -5,12 +5,10 @@
         <groups>
             <dependencies>
                 <group name="createProject" depends-on="projectInit" />
-                <group name="initialize" depends-on="createProject" />
-                <group name="numeric-metric" depends-on="initialize" />
+                <group name="numeric-metric" depends-on="createProject" />
             </dependencies>
             <run>
                 <include name="numeric-metric" />
-                <include name="initialize" />
                 <include name="createProject" />
                 <include name="projectInit" />
                 <include name="arquillian" />

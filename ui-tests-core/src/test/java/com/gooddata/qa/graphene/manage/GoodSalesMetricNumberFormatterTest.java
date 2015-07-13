@@ -41,7 +41,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = {"createProject"})
     public void testNumberFormatEditor() throws InterruptedException {
         initMetricPage();
-        waitForFragmentVisible(metricEditorPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
         waitForFragmentVisible(metricDetailPage).changeMetricFormatButDiscard(Formatter.BARS);
         // don't know why get text of metric format in metric detail page return #,##0 instead of #,##0.00
         assertTrue(Formatter.DEFAULT.toString().startsWith(metricDetailPage.getMetricFormat()));
@@ -166,7 +166,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     private void resetMetricFormat() {
         initProjectsPage();
         initMetricPage();
-        waitForFragmentVisible(metricEditorPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
         waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
         assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
     }
