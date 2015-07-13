@@ -16,10 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
@@ -259,25 +256,6 @@ public class DataloadProcessTest extends AbstractMSFTest {
     private String getOwnerLogin() throws IOException, JSONException {
         return ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
                 .getDataloadProcess().getOwnerLogin();
-    }
-
-    private int redeployDataLoadProcess(RestApiClient restApiClient) throws IOException,
-            JSONException {
-        HttpRequestBase putRequest =
-                restApiClient.newPutMethod(getDataloadProcessUri(), ProcessUtils
-                        .prepareProcessCreationBody("DATALOAD", DEFAULT_DATAlOAD_PROCESS_NAME)
-                        .toString());
-        int responseStatusCode;
-        try {
-            HttpResponse postResponse = restApiClient.execute(putRequest);
-            responseStatusCode = postResponse.getStatusLine().getStatusCode();
-            EntityUtils.consumeQuietly(postResponse.getEntity());
-            System.out.println("Response status: " + responseStatusCode);
-        } finally {
-            putRequest.releaseConnection();
-        }
-
-        return responseStatusCode;
     }
 
     private String getLogContent(RestApiClient restApiClient, String executionUri) {

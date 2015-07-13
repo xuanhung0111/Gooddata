@@ -354,7 +354,7 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void assertManualRunExecution() {
-        assertTrue(lastExecutionItem.findElement(BY_MANUAL_ICON).isDisplayed());
+        assertTrue(waitForElementVisible(lastExecutionItem).findElement(BY_MANUAL_ICON).isDisplayed());
     }
 
     public void checkRescheduleMessageAndDefault() {

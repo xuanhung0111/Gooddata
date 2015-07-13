@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.http.ParseException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
@@ -24,16 +21,13 @@ import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
 
-    private String projectId;
     private Dataset selectedDataset;
     private DataSource dataSource;
     private Field selectedField;
@@ -50,7 +44,6 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
 
     @Test(dependsOnMethods = {"prepareDataForDLUI"}, groups = {"initialDataForDLUI"})
     public void initialData() throws InterruptedException {
-        projectId = testParams.getProjectId();
         selectedField = new Field("Trackname", FieldTypes.ATTRIBUTE);
         selectedDataset = new Dataset().withName(DATASET_NAME).withFields(selectedField);
 
@@ -88,14 +81,8 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             assertTrue(references.contains("dataset.artist"),
                     "Reference was not added automatically!");
             checkRemainingAdditionalFields(dataSource);
-            
-            prepareMetricToCheckNewAddedFields("number");
-            ReportDefinition reportDefinition =
-                    new ReportDefinition().withName("Report to check reference")
-                            .withHows("artistname").withWhats("number [Sum]");
-            checkReportAfterAddingNewField(reportDefinition, Lists.newArrayList("OOP1", "OOP2",
-                    "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"), Lists.newArrayList("1,000.00",
-                    "1,200.00", "1,400.00", "1,600.00", "1,800.00", "2,000.00", "700.00", "800.00"));
+
+            checkReportAfterAddReferenceToDataset();
         } finally {
             dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
                     "/dropAddedReferenceAddedField_Annie.txt"));
@@ -189,14 +176,6 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         annieUIDialog.clickOnDismissButton();
-    }
-
-    private List<String> getReferencesOfDataset(String dataset) throws ParseException,
-            JSONException, IOException {
-        JSONArray array =
-                RestUtils.getDatasetElementFromModelView(getRestApiClient(), projectId, dataset,
-                        DatasetElements.REFERENCES, JSONArray.class);
-        return new ObjectMapper().readValue(array.toString(), new TypeReference<List<String>>() {});
     }
 
     private void updateFieldToSelected() {
