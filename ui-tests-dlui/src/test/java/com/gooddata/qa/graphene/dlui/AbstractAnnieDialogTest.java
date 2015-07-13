@@ -257,31 +257,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         addMultiFieldsFromADSToLDM(role, false);
     }
 
-    protected void prepareMetricToCheckNewAddedFields(String... facts) {
-        for (String fact : facts) {
-            initFactPage();
-            factsTable.selectObject(fact);
-            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, fact);
-            initMetricPage();
-            waitForFragmentVisible(metricsTable);
-            metricsTable.selectObject(fact + " [Sum]");
-            waitForFragmentVisible(metricDetailPage).setMetricVisibleToAllUser();
-        }
-    }
-
-    protected void checkReportAfterAddingNewField(ReportDefinition reportDefinition,
-            Collection<String> attributeValues, Collection<String> metricValues) throws InterruptedException {
-        createReport(reportDefinition, reportDefinition.getName());
-    
-        List<String> attributes = reportPage.getTableReport().getAttributeElements();
-        System.out.println("Attributes: " + attributes.toString());
-        CollectionUtils.isEqualCollection(attributes, attributeValues);
-    
-        List<String> metrics = reportPage.getTableReport().getRawMetricElements();
-        System.out.println("Metric: " + metrics.toString());
-        CollectionUtils.isEqualCollection(metrics, metricValues);
-    }
-
     private void addNewDataFromADSToLDM(UserRoles role, final AddedFields addedField,
             final Collection<String> attributeValues, final Collection<String> metricValues,
             final boolean checkReport) throws JSONException {
