@@ -39,12 +39,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     private static final String DIALOG_STATE_SECOND_MESSAGE =
             "It can take a while so please come later.";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Dlui-annie-dialog-test";
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"basicTest", "annieDialogTest"},
+            priority = 0)
     public void checkEmptyStateInAnnieDialog() {
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
 
@@ -52,60 +53,67 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         checkEmptyAnnieDialog();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"basicTest", "annieDialogTest"},
+            priority = 0)
     public void checkAvailableAdditionalFields() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         Screenshots.takeScreenshot(browser, "available-additional-fields", getClass());
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkAvailableAdditionalAttributes() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.ATTRIBUTE);
         Screenshots.takeScreenshot(browser, "available-additional-attributes", getClass());
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkAvailableAdditionalFacts() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.FACT);
         Screenshots.takeScreenshot(browser, "available-additional-facts", getClass());
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkAvailableAdditionalLabelHyperlink() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.LABEL_HYPERLINK);
         Screenshots.takeScreenshot(browser, "available-additional-label-hyperlinks", getClass());
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkAdditionalDateField() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_DATE);
 
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.DATE);
         Screenshots.takeScreenshot(browser, "available-additional-date", getClass());
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkEmptyStateWithDateFilter() {
         DataSource dataSource = prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.DATE);
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkSearchAllFields() {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -118,10 +126,10 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         annieUIDialog.enterSearchKey("Pos");
         checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         Screenshots.takeScreenshot(browser, "search-additional-fields", getClass());
-
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkErrorMappingOnAnnieDialog() {
         // Prepare an ADS which doesn't contain some fields in LDM
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
@@ -130,7 +138,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         assertErrorMessage();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void selectAndDeselectFields() {
         Field selectedField1 = new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED);
         Field selectedField2 = new Field("Title2", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED);
@@ -149,9 +157,10 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         checkSelectedFieldNumber(dataSource);
         annieUIDialog.deselectFields(dataSource);
         assertNoDataSelectedState();
+        annieUIDialog.clickOnDismissButton();
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkCancelAddNewFieldFromADSToLDM() {
         Dataset selectedDataset =
                 new Dataset().withName("person").withFields(
@@ -170,22 +179,30 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         openAnnieDialog();
         checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         Screenshots.takeScreenshot(browser, "cancel-add-new-field", getClass());
+        annieUIDialog.clickOnDismissButton();
+    }
+
+    @Test(dataProvider = "basicFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {
+        "basicTest", "addOneField", "annieDialogTest"}, priority = 1)
+    public void adminAddSingleBasicFieldFromADSToLDM(AddedFields addedField,
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewDataAddingAndCleanAddedData(UserRoles.ADMIN, addedField);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {
-        "annieDialogTest", "addOneField"}, priority = 1)
+        "addOneField", "annieDialogTest"}, priority = 1)
     public void adminAddSingleFieldFromADSToLDM(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException,
-            InterruptedException {
-        addNewDataAndAssertAnnieDialog(UserRoles.ADMIN, addedField);
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewDataAddingAndCleanAddedData(UserRoles.ADMIN, addedField);
     }
 
-    @Test(dependsOnGroups = {"addOneField"}, groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"addOneField"}, groups = {"annieDialogTest"}, priority = 1)
     public void adminAddMultiFieldsFromADSToLDM() throws JSONException {
         addMultiFieldsAndAssertAnnieDialog(UserRoles.ADMIN);
     }
-    
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
+
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"basicTest", "annieDialogTest"},
+            priority = 1)
     public void addEditorUser() {
         try {
             addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
@@ -194,20 +211,26 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         }
     }
 
-    @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser"}, groups = {
-        "annieDialogTest", "editorAddOneField"}, priority = 1)
-    public void editorAddSingleFieldFromADSToLDM(AddedFields addedField,
-            List<String> attributeValues, List<String> metricValues) throws JSONException,
-            InterruptedException {
-        addNewDataAndAssertAnnieDialog(UserRoles.EDITOR, addedField);
+    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser"}, groups = {
+        "basicTest", "editorAddOneField", "annieDialogTest"}, priority = 1)
+    public void editorAddSingleBaiscFieldFromADSToLDM(AddedFields addedField,
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewDataAddingAndCleanAddedData(UserRoles.EDITOR, addedField);
     }
 
-    @Test(dependsOnGroups = {"editorAddOneField"}, groups = "annieDialogTest", priority = 1)
+    @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser"}, groups = {
+        "editorAddOneField", "annieDialogTest"}, priority = 1)
+    public void editorAddSingleFieldFromADSToLDM(AddedFields addedField,
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewDataAddingAndCleanAddedData(UserRoles.EDITOR, addedField);
+    }
+
+    @Test(dependsOnGroups = {"editorAddOneField"}, groups = {"annieDialogTest"}, priority = 1)
     public void editorAddMultiFieldsFromADSToLDM() throws JSONException {
         addMultiFieldsAndAssertAnnieDialog(UserRoles.EDITOR);
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest", priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 1)
     public void checkFailToAddNewField() {
         try {
             Dataset selectedDataset =
@@ -221,7 +244,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             openAnnieDialog();
             annieUIDialog.selectFields(dataSource);
 
-            updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/addUnmappingFieldToLDM.txt"));
+            updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES
+                    + "/addUnmappingFieldToLDM.txt"));
 
             annieUIDialog.clickOnApplyButton();
             checkDataAddingProgress();
@@ -236,7 +260,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest")
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"})
     public void checkConcurrentDataLoadWithAnnieDialog() throws InterruptedException {
         Dataset dataset =
                 new Dataset().withName("person").withFields(
@@ -276,12 +300,12 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             openAnnieDialog();
             checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         } finally {
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedAttributeInLDM_Person_Position.txt"));
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
+                    + "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkCustomDataSourceName() {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -301,12 +325,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             Screenshots.takeScreenshot(browser, "check-custom-data-source-name-1", getClass());
             checkAvailableAdditionalFields(gaDataSource, FieldTypes.ALL);
             Screenshots.takeScreenshot(browser, "check-custom-data-source-name-2", getClass());
+            annieUIDialog.clickOnDismissButton();
         } finally {
             deleteOutputStageMetadata();
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkDataSourceNameCaseSensitive() {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -340,12 +365,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             checkAvailableAdditionalFields(GoogleanalyticsDataSource, FieldTypes.ALL);
             Screenshots.takeScreenshot(browser, "check-custom-data-source-name-Googleanalytics",
                     getClass());
+            annieUIDialog.clickOnDismissButton();
         } finally {
             deleteOutputStageMetadata();
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkUnicodeDataSourceName() {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -379,12 +405,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             Screenshots.takeScreenshot(browser, "check-unicode-data-source-name-3", getClass());
             checkAvailableAdditionalFields(unicodeSourceName4, FieldTypes.ALL);
             Screenshots.takeScreenshot(browser, "check-unicode-data-source-name-4", getClass());
+            annieUIDialog.clickOnDismissButton();
         } finally {
             deleteOutputStageMetadata();
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void checkEmptyDataSourceName() {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -402,12 +429,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             checkAvailableAdditionalFields(emptyDataSourceName.withName(DEFAULT_DATA_SOURCE_NAME),
                     FieldTypes.ALL);
             Screenshots.takeScreenshot(browser, "check-empty-data-source-name", getClass());
+            annieUIDialog.clickOnDismissButton();
         } finally {
             deleteOutputStageMetadata();
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 0)
     public void deleteDataSourceName() {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -436,12 +464,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             openAnnieDialog();
             checkAvailableAdditionalFields(unknownDataSource, FieldTypes.ALL);
             Screenshots.takeScreenshot(browser, "delete-data-source-name", getClass());
+            annieUIDialog.clickOnDismissButton();
         } finally {
             deleteOutputStageMetadata();
         }
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 1)
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"}, priority = 1)
     public void addNewDataWithCustomDataSourceName() {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -464,10 +493,11 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             checkSuccessfulAddingData(fbDataSource, "add-data-with-custom-dataSource-name");
         } finally {
             deleteOutputStageMetadata();
-            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES +
-                    "/dropAddedAttributeInLDM_Person_Position.txt"));
+            dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
+                    + "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
     }
+
 
     @Test(dependsOnGroups = "annieDialogTest", alwaysRun = true)
     public void cleanUp() {

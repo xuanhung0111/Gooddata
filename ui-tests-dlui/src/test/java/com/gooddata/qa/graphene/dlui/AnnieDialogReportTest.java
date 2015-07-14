@@ -1,10 +1,12 @@
 package com.gooddata.qa.graphene.dlui;
 
 import java.util.Collection;
+
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.dlui.AbstractAnnieDialogTest.ReportWithAddedFields;
 import com.gooddata.qa.graphene.enums.UserRoles;
 
 public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
@@ -19,12 +21,18 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
         prepareMetricToCheckNewAddedFields("age", "price", "totalprice");
     }
 
+    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
+            groups = {"annieDialogTest", "addOneField"})
+    public void adminCheckReportWithBasicSingleField(AddedFields addedField,
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
+    }
+
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
             groups = {"annieDialogTest", "addOneField"})
     public void adminCheckReportWithSingleField(AddedFields addedField,
-            Collection<String> attributeValues, Collection<String> metricValues)
-            throws JSONException, InterruptedException {
-        addNewDataAndCheckReport(UserRoles.ADMIN, addedField, attributeValues, metricValues);
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
     }
 
     @Test(dependsOnMethods = {"prepareMetricsToCheckReport"}, dependsOnGroups = {"addOneField"},
@@ -42,12 +50,18 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
         }
     }
 
+    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser",
+        "prepareMetricsToCheckReport"}, groups = {"annieDialogTest", "editorAddOneField"})
+    public void editorCheckReportWithBasicSingleField(AddedFields addedField,
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
+    }
+
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser",
         "prepareMetricsToCheckReport"}, groups = {"annieDialogTest", "editorAddOneField"})
     public void editorCheckReportWithSingleField(AddedFields addedField,
-            Collection<String> attributeValues, Collection<String> metricValues)
-            throws JSONException, InterruptedException {
-        addNewDataAndCheckReport(UserRoles.EDITOR, addedField, attributeValues, metricValues);
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+        checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
     @Test(dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
