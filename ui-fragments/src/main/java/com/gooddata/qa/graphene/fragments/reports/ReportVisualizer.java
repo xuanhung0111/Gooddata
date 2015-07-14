@@ -87,13 +87,14 @@ public class ReportVisualizer extends AbstractFragment {
 
     private String selectedFactLocator ="//select[contains(@class,'s-sme-objSelect')]/option[text()='${factName}']";
 
-    public void selectWhatArea(List<WhatItem> what) throws InterruptedException {
+    public ReportVisualizer selectWhatArea(List<WhatItem> what) throws InterruptedException {
         waitForElementVisible(whatButton).click();
 
         for (WhatItem item : what) {
             searchAndWaitForItemReloaded(metricFilterInput, item.getMetric(), whatMetrics);
             selectAndConfigureMetric(item);
         }
+        return this;
     }
 
     private void selectAndConfigureMetric(WhatItem what) throws InterruptedException {
@@ -115,6 +116,15 @@ public class ReportVisualizer extends AbstractFragment {
             popupPanel.searchAndSelectItem(what.getDrillStep());
             break;
         }
+    }
+
+    public WebElement getMetric(String name) {
+        for (WebElement metric : whatMetrics) {
+            if (name.equals(metric.getText().trim())) {
+                return metric;
+            }
+        }
+        return null;
     }
 
     public void selectHowArea(List<HowItem> how) throws InterruptedException {
@@ -188,12 +198,13 @@ public class ReportVisualizer extends AbstractFragment {
         waitForElementVisible(addMetricButton).click();
     }
 
-    public void finishReportChanges() throws InterruptedException {
+    public ReportVisualizer finishReportChanges() throws InterruptedException {
         // When webapp do a lot of CRUD things, its rendering job will work slowly,
         // so need a short time to wait in case like this
         Thread.sleep(2000);
 
         waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser).sendKeys(Keys.ENTER);
+        return this;
     }
 
     public void selectReportVisualisation(ReportTypes reportVisualizationType) {
