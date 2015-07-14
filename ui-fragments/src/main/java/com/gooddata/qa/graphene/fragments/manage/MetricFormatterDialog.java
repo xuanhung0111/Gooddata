@@ -71,6 +71,7 @@ public class MetricFormatterDialog extends AbstractFragment {
 
     public static enum Formatter {
         DEFAULT("#,##0.00"),
+        GDC("GDC#,##0.00"),
         BARS(new StringBuilder("[>=9][color=2190c0]██████████;")
             .append("[>=8][color=2190c0]█████████░;")
             .append("[>=7][color=2190c0]████████░░;")
