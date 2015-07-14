@@ -403,6 +403,46 @@ public class SchedulesTest extends AbstractSchedulesTest {
             assertSchedule(scheduleBuilder.setProcessName(redeployedProcessName)
                     .setScheduleName(Executables.FAILED_GRAPH.getExecutableName())
                     .setExecutable(newExecutable));
+            
+            scheduleDetail.manualRun();
+            scheduleDetail.assertFailedExecution(newExecutable);
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkBrokenScheduleWithRenamedGraph() {
+        try {
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+
+            String processName = "Check Broken Schedule With Deleted Graph";
+            deployInProjectDetailPage(DeployPackages.ONE_GRAPH, processName);
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName)
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH_FOR_BROKEN_SCHEDULE);
+            createAndAssertSchedule(scheduleBuilder);
+            scheduleDetail.clickOnCloseScheduleButton();
+
+            String redeployedProcessName = "Redeployed Process";
+            redeployProcess(processName, DeployPackages.ONE_GRAPH_RENAMED,
+                    redeployedProcessName, scheduleBuilder);
+
+            projectDetailPage.checkBrokenScheduleSection(redeployedProcessName);
+            assertBrokenSchedule(scheduleBuilder);
+
+            brokenSchedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()).click();
+            waitForElementVisible(scheduleDetail.getRoot());
+            Executables newExecutable = Executables.SUCCESSFUL_GRAPH_FOR_BROKEN_SCHEDULE_RENAMED;
+            scheduleDetail.checkMessageInBrokenScheduleDetail(scheduleBuilder.getScheduleName());
+
+            scheduleDetail.fixBrokenSchedule(newExecutable);
+            assertSchedule(scheduleBuilder.setProcessName(redeployedProcessName)
+                    .setScheduleName(newExecutable.getExecutableName())
+                    .setExecutable(newExecutable));
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
         } finally {
             cleanProcessesInWorkingProject();
         }

@@ -6,6 +6,8 @@ import java.util.List;
 public enum DeployPackages {
 
     BASIC("Basic", "Basic", ProcessTypes.GRAPH),
+    ONE_GRAPH("One_Graph", "One_Graph", ProcessTypes.GRAPH),
+    ONE_GRAPH_RENAMED("One_Graph_Renamed", "One_Graph", ProcessTypes.GRAPH),
     CLOUDCONNECT("cloudconnect", "DWHS", ProcessTypes.GRAPH),
     RUBY("ruby", "ruby", ProcessTypes.RUBY),
     EXECUTABLES_GRAPH("executables", "executables", ProcessTypes.GRAPH),
@@ -65,6 +67,8 @@ public enum DeployPackages {
                         + "Component [GD Dataset Writer:GD_DATASET_WRITER] finished with status ERROR.: "
                         + "Unrecoverable error in SLI upload occurred."),
         SUCCESSFUL_GRAPH(DeployPackages.BASIC, "successfulGraph.grf", "graph"),
+        SUCCESSFUL_GRAPH_FOR_BROKEN_SCHEDULE(DeployPackages.ONE_GRAPH, "successfulGraph.grf", "graph"),
+        SUCCESSFUL_GRAPH_FOR_BROKEN_SCHEDULE_RENAMED(DeployPackages.ONE_GRAPH_RENAMED, "successfulGraph_Rename.grf", "graph"),
         DWHS1(DeployPackages.CLOUDCONNECT, "DWHS1.grf", "graph"),
         DWHS2(DeployPackages.CLOUDCONNECT, "DWHS2.grf", "graph"),
         RUBY1(DeployPackages.RUBY, "ruby1.rb", "script"),
