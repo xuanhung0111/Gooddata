@@ -24,6 +24,8 @@ import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -111,6 +113,48 @@ public class ReportPage extends AbstractFragment {
 
     @FindBy(css = ".s-btn-options")
     private WebElement optionsButton;
+
+    @FindBy(css = ".s-btn-__show_configuration:not(.gdc-hidden)")
+    private WebElement showConfigurationButton;
+
+    private static final By CUSTOM_NUMBER_FORMAT_LOCATOR = By.className("s-btn-custom_number_formats");
+    private static final By CUSTOM_METRIC_FORMAT_LOCATOR = By.className("customMetricFormatItem-format");
+    private static final By APPLY_CONFIG_FORMAT_LOCATOR = By.cssSelector(".s-btn-apply:not(.disabled)");
+
+    public ReportPage showConfiguration() {
+        waitForElementVisible(showConfigurationButton).click();
+        return this;
+    }
+
+    private ReportPage hideConfiguration() {
+        waitForElementVisible(By.className("s-btn-hide__"), browser).click();
+        return this;
+    }
+
+    public String getCustomNumberFormat() {
+        waitForElementVisible(CUSTOM_NUMBER_FORMAT_LOCATOR, browser).click();
+        return waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).getText();
+    }
+
+    public ReportPage changeNumberFormat(Formatter format) {
+        waitForElementVisible(CUSTOM_NUMBER_FORMAT_LOCATOR, browser).click();
+        waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
+        Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(format);
+        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
+        hideConfiguration();
+        return this;
+    }
+
+    public ReportPage changeNumberFormatButDiscard(Formatter format) {
+        waitForElementVisible(CUSTOM_NUMBER_FORMAT_LOCATOR, browser).click();
+        waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
+        Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
+        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
+        hideConfiguration();
+        return this;
+    }
 
     public TableReport getTableReport() {
         return tableReport;

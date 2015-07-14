@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -14,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
@@ -32,6 +34,16 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
 
     protected String imapEditorUser;
     protected String imapEditorPassword;
+    
+    protected void checkSuccessfulDataAddingNotification(UserRoles role, long receivedTime,
+            String... fieldNames) {
+        Document message =
+                role.equals(UserRoles.ADMIN) ? getEmailOfAdminUser(
+                        SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime)
+                        : getEmailOfEditorUser(SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT,
+                                receivedTime);
+        assertSuccessDataAddingEmailContent(message, fieldNames);
+    }
 
     protected void checkSuccessfulDataAddingEmail(long receivedTime, String... fieldNames) {
         assertSuccessDataAddingEmailContent(

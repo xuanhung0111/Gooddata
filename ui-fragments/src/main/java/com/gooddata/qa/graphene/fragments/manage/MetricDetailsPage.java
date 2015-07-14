@@ -25,8 +25,6 @@ public class MetricDetailsPage extends AbstractFragment {
 
     private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
-    private static final By inputEditor = By.className("ipeEditor");
-    
     private static final By visibilityCheckbox = By.id("settings-visibility");
     private static final By savePermissionSettingButton = By.cssSelector(".s-permissionSettingsDialog .s-btn-save_permissions");
     
@@ -46,12 +44,21 @@ public class MetricDetailsPage extends AbstractFragment {
 
     public void changeMetricFormat(String newFormat) {
         waitForElementVisible(metricFormat).click();
-        WebElement input = waitForElementVisible(inputEditor, browser);
-        input.clear();
-        input.sendKeys(newFormat);
-        waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
-        waitForElementNotVisible(input);
+        Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(newFormat);
         assertEquals(getMetricFormat(), newFormat, "New format is not applied!");
+    }
+
+    public void changeMetricFormat(MetricFormatterDialog.Formatter format) {
+        waitForElementVisible(metricFormat).click();
+        Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(format);
+    }
+
+    public void changeMetricFormatButDiscard(MetricFormatterDialog.Formatter format) {
+        waitForElementVisible(metricFormat).click();
+        Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
     }
 
     public void deleteMetric() throws InterruptedException {
