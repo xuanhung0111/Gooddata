@@ -88,10 +88,10 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
                 asList("Sum", "Minimum", "Maximum", "Average", "Running sum", "Median")));
 
         Map<String, String> aggregations = new HashMap<String, String>();
-        aggregations.put("Maximum", "Maximum ");
-        aggregations.put("Minimum", "Minimum ");
-        aggregations.put("Average", "Average ");
-        aggregations.put("Running sum", "Running sum of ");
+        aggregations.put("Maximum", "Max ");
+        aggregations.put("Minimum", "Min ");
+        aggregations.put("Average", "Avg ");
+        aggregations.put("Running sum", "Runsum of ");
         aggregations.put("Median", "Median ");
         String metricFromAmountTitle = SUM_OF_AMOUNT;
 
@@ -108,7 +108,7 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
         analysisPage.undo()
-            .expandMetricConfiguration(SUM_OF_AMOUNT)
+            .expandMetricConfiguration(metricFromAmountTitle)
             .addCategory(DATE)
             .waitForReportComputing()
             .turnOnShowInPercents()

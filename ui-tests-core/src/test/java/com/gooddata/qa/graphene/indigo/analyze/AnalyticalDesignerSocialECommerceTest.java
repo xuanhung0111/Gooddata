@@ -53,7 +53,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
 
         StringBuilder expected = new StringBuilder(ORDERS).append("\n")
                 .append("Field Type\n")
-                .append("Metric\n")
+                .append("Calculated Measure\n")
                 .append("Defined As\n")
                 .append("select Orders/(Visits+Cart Additions+Checkouts+Orders)\n");
         assertEquals(analysisPage.getMetricDescription(ORDERS), expected.toString());

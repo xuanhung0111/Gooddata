@@ -53,7 +53,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
         initAnalysePage();
         StringBuilder expected = new StringBuilder(EMAIL_OPEN).append("\n")
                 .append("Field Type\n")
-                .append("Metric\n")
+                .append("Calculated Measure\n")
                 .append("Defined As\n")
                 .append("SELECT Email Status = Open / # of Emails\n");
         assertEquals(analysisPage.getMetricDescription(EMAIL_OPEN), expected.toString());
@@ -61,7 +61,7 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
     public void filterOnAttribute() {
-        filterOnAttribute(CAMPAIGNS + ": Email Promot..., Top Sellers ...",
+        filterOnAttribute(CAMPAIGNS + ": Email Promotions, Top Sellers Blog Series\n(2)",
                 "Email Promotions", "Top Sellers Blog Series");
     }
 

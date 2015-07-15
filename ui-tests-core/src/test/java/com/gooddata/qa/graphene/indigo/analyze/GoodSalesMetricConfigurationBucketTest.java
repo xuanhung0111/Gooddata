@@ -46,8 +46,8 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
     public void testMetricFromFact() {
         String sumOfAmount = "Sum of " + AMOUNT;
         String sumOfDuration = "Sum of " + DURATION;
-        String averageAmount = "Average " + AMOUNT;
-        String runningSumOfDuration = "Running sum of " + DURATION;
+        String averageAmount = "Avg " + AMOUNT;
+        String runningSumOfDuration = "Runsum of " + DURATION;
 
         initAnalysePage();
         assertTrue(analysisPage.addMetricFromFact(AMOUNT)
@@ -100,13 +100,13 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
         assertFalse(analysisPage.isShowPercentConfigEnabled());
 
         analysisPage.undo()
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
+            .expandMetricConfiguration("% " + NUMBER_OF_ACTIVITIES);
         assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isCompareSamePeriodConfigSelected());
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
-        analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, AMOUNT)
+        analysisPage.replaceMetric("% " + NUMBER_OF_ACTIVITIES, AMOUNT)
             .expandMetricConfiguration(AMOUNT);
         assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigEnabled());

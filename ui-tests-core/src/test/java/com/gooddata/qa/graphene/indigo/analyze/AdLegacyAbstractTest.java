@@ -149,13 +149,13 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withCategories(attribute1));
-        assertEquals(analysisPage.getExplorerMessage(), "Now select a metric to display");
+        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
-                                 .getExplorerMessage(), "Now select a metric to display");
+                                 .getExplorerMessage(), "Now select a measure to display");
 
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
-                .getExplorerMessage(), "Now select a metric to display");
+                .getExplorerMessage(), "Now select a measure to display");
 
         TableReport report = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
         assertEquals(report.getHeaders(), Arrays.asList(attribute1.toUpperCase()));
@@ -234,7 +234,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 6);
-        analysisPage.expandMetricConfiguration(metric1);
+        analysisPage.expandMetricConfiguration("% " + metric1);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
@@ -470,7 +470,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withCategories(attribute1));
-        assertEquals(analysisPage.getExplorerMessage(), "Now select a metric to display");
+        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 

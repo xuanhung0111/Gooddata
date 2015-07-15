@@ -209,7 +209,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
         StringBuilder expected = new StringBuilder(ACTIVITY_DATE).append("\n")
                 .append("Field Type\n")
-                .append("Fact\n")
+                .append("Measure\n")
                 .append("Dataset\n")
                 .append("Activity\n");
         assertEquals(analysisPage.getFactDescription(ACTIVITY_DATE), expected.toString());
