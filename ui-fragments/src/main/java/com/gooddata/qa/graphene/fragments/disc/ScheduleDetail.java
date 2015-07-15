@@ -30,14 +30,14 @@ import static org.testng.Assert.*;
 
 public class ScheduleDetail extends ScheduleForm {
 
+    private static final int MAX_EXECUTION_HISTORY_LOADING_TIME = 5; // In minutes
+    private static final int MAX_SCHEDULE_RUN_TIME = 15; // In minutes
     private static final int MAX_DELAY_TIME_WAITING_AUTO_RUN = 2; // In minutes
 
     public enum Confirmation {
         SAVE_CHANGES,
         CANCEL_CHANGES;
     }
-
-    private static final int MAX_SCHEDULE_RUN_TIME = 15; // In minutes
 
     private static final String INVALID_SCHEDULE_TITLE_ERROR =
             "\'${scheduleName}\' name already in use within the process. Change the name.";
@@ -321,24 +321,24 @@ public class ScheduleDetail extends ScheduleForm {
                     }
 
                 });
-        waitForElementVisible(lastExecutionItem);
+        getLastExecution();
     }
 
     public void assertSuccessfulExecution() {
         waitForExecutionFinish();
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_STATUS)
                 .findElement(BY_OK_STATUS_ICON).isDisplayed());
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText().contains("OK"));
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_DESCRIPTION).getText().contains("OK"));
         assertExecutionDetail();
     }
 
     public void assertFailedExecution(Executables executable) {
         waitForExecutionFinish();
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_STATUS)
                 .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
         System.out.println("Error message of failed execution: "
-                + lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText());
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
+                + getLastExecution().findElement(BY_EXECUTION_DESCRIPTION).getText());
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_DESCRIPTION).getText()
                 .contains(executable.getErrorMessage()));
         assertExecutionDetail();
     }
@@ -346,15 +346,15 @@ public class ScheduleDetail extends ScheduleForm {
     public void assertManualStoppedExecution() {
         waitForExecutionFinish();
         waitForElementVisible(BY_ERROR_STATUS_ICON, browser);
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_STATUS)
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_STATUS)
                 .findElement(BY_ERROR_STATUS_ICON).isDisplayed());
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText()
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_DESCRIPTION).getText()
                 .equals("MANUALLY STOPPED"));
         assertExecutionDetail();
     }
 
     public void assertManualRunExecution() {
-        assertTrue(waitForElementVisible(lastExecutionItem).findElement(BY_MANUAL_ICON).isDisplayed());
+        assertTrue(getLastExecution().findElement(BY_MANUAL_ICON).isDisplayed());
     }
 
     public void checkRescheduleMessageAndDefault() {
@@ -580,7 +580,7 @@ public class ScheduleDetail extends ScheduleForm {
 
                 @Override
                 public boolean apply(WebDriver browser) {
-                    return !lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText().isEmpty();
+                    return !getLastExecution().findElement(BY_EXECUTION_RUNTIME).getText().isEmpty();
                 }});
             return true;
         } catch (NoSuchElementException e) {
@@ -606,24 +606,23 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public String getLastExecutionDate() {
-        return lastExecutionItem.findElement(BY_EXECUTION_DATE).getText();
+        return getLastExecution().findElement(BY_EXECUTION_DATE).getText();
     }
 
     public String getLastExecutionTime() {
-        return lastExecutionItem.findElement(BY_EXECUTION_TIMES).getText();
+        return getLastExecution().findElement(BY_EXECUTION_TIMES).getText();
     }
 
     public String getExecutionRuntime() {
-        return lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText();
+        return getLastExecution().findElement(BY_EXECUTION_RUNTIME).getText();
     }
 
     public String getExecutionDescription() {
-        return lastExecutionItem.findElement(BY_EXECUTION_DESCRIPTION).getText();
+        return getLastExecution().findElement(BY_EXECUTION_DESCRIPTION).getText();
     }
 
     public String getExecutionErrorDescription() {
-        waitForElementVisible(lastExecutionItem);
-        return waitForElementVisible(lastExecutionItem.findElement(BY_EXECUTION_ERROR_DESCRIPTION)).getText();
+        return getLastExecution().findElement(BY_EXECUTION_ERROR_DESCRIPTION).getText();
     }
 
     public boolean isStarted() {
@@ -656,15 +655,21 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public String getLastExecutionLogLink() {
-        return lastExecutionItem.findElement(BY_EXECUTION_LOG).getAttribute("href");
+        return getLastExecution().findElement(BY_EXECUTION_LOG).getAttribute("href");
     }
 
     public String getLastExecutionLogTitle() {
-        return lastExecutionItem.findElement(BY_EXECUTION_LOG).getAttribute("title").trim();
+        return getLastExecution().findElement(BY_EXECUTION_LOG).getAttribute("title").trim();
     }
 
     public boolean isLastSchedulerErrorIconVisible() {
-        return waitForElementVisible(lastExecutionItem).findElements(BY_SCHEDULER_ERROR_STATUS_ICON).size() > 0 ;
+        return getLastExecution().findElements(BY_SCHEDULER_ERROR_STATUS_ICON).size() > 0 ;
+    }
+    
+    public WebElement getLastExecution() {
+        if (scheduleExecutionItems.isEmpty())
+            waitForExecutionHistoryLoading();
+        return waitForElementVisible(lastExecutionItem);
     }
 
     public void changeValidScheduleName(String newScheduleName, Confirmation saveChange) {
@@ -733,19 +738,6 @@ public class ScheduleDetail extends ScheduleForm {
         return list;
     }
 
-    private void assertChecked(List<String> datasetsToSynchronize) {
-        List<WebElement> items =
-                waitForElementVisible(datasetDialog)
-                        .findElements(By.className("gd-list-view-item"));
-        for (WebElement item : items) {
-            if (datasetsToSynchronize.contains(item.getText())) {
-                assertTrue(item.getAttribute("class").contains("is-selected"));
-            } else {
-                assertTrue(!item.getAttribute("class").contains("is-selected"));
-            }
-        }
-    }
-
     public void changeInvalidScheduleName(String invalidScheduleName) {
         changeScheduleName(invalidScheduleName);
         waitForElementVisible(saveScheduleTitleButton).click();
@@ -781,6 +773,34 @@ public class ScheduleDetail extends ScheduleForm {
         waitForElementNotPresent(deleteScheduleDialog);
     }
 
+    private void assertChecked(List<String> datasetsToSynchronize) {
+        List<WebElement> items =
+                waitForElementVisible(datasetDialog)
+                        .findElements(By.className("gd-list-view-item"));
+        for (WebElement item : items) {
+            if (datasetsToSynchronize.contains(item.getText())) {
+                assertTrue(item.getAttribute("class").contains("is-selected"));
+            } else {
+                assertTrue(!item.getAttribute("class").contains("is-selected"));
+            }
+        }
+    }
+
+    private void waitForExecutionHistoryLoading() {
+        Graphene.waitGui().withTimeout(MAX_EXECUTION_HISTORY_LOADING_TIME, TimeUnit.MINUTES)
+                .pollingEvery(1, TimeUnit.MINUTES).until(new Predicate<WebDriver>() {
+
+                    @Override
+                    public boolean apply(WebDriver webDriver) {
+                        if (!scheduleExecutionItems.isEmpty())
+                            return true;
+                        System.out.println("Execution history is loading!");
+                        browser.navigate().refresh();
+                        return false;
+                    }
+                });
+    }
+
     private void waitForAutoRun(int waitingTimeInMinutes) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         final int executionNumberBeforeAutoRun = scheduleExecutionItems.size();
@@ -805,17 +825,17 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     private void assertExecutionDetail() {
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_LOG).isDisplayed());
-        assertTrue(lastExecutionItem.findElement(BY_EXECUTION_LOG).isEnabled());
-        assertFalse(lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText().isEmpty());
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_LOG).isDisplayed());
+        assertTrue(getLastExecution().findElement(BY_EXECUTION_LOG).isEnabled());
+        assertFalse(getLastExecution().findElement(BY_EXECUTION_RUNTIME).getText().isEmpty());
         System.out.println("Execution Runtime: "
-                + lastExecutionItem.findElement(BY_EXECUTION_RUNTIME).getText());
-        assertFalse(lastExecutionItem.findElement(BY_EXECUTION_DATE).getText().isEmpty());
+                + getLastExecution().findElement(BY_EXECUTION_RUNTIME).getText());
+        assertFalse(getLastExecution().findElement(BY_EXECUTION_DATE).getText().isEmpty());
         System.out.println("Execution Date: "
-                + lastExecutionItem.findElement(BY_EXECUTION_DATE).getText());
-        assertFalse(lastExecutionItem.findElement(BY_EXECUTION_TIMES).getText().isEmpty());
+                + getLastExecution().findElement(BY_EXECUTION_DATE).getText());
+        assertFalse(getLastExecution().findElement(BY_EXECUTION_TIMES).getText().isEmpty());
         System.out.println("Execution Times: "
-                + lastExecutionItem.findElement(BY_EXECUTION_TIMES).getText());
+                + getLastExecution().findElement(BY_EXECUTION_TIMES).getText());
     }
 
     private void addRetry(String retryDelay) {

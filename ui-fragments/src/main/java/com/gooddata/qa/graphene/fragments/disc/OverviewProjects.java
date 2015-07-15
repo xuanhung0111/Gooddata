@@ -117,6 +117,11 @@ public class OverviewProjects extends AbstractFragment {
         waitForCollectionIsNotEmpty(overviewProcesses);
         assertOverviewProcesses(projectState, expectedOverviewProject.getOverviewProcesses());
     }
+    
+    public void accessProjectDetailPage(ProjectInfo project) {
+        waitForElementVisible(BY_OVERVIEW_PROJECT_TITLE_LINK,
+                getOverviewProjectWithAdminRole(project)).click();
+    }
 
     public void assertOverviewEmptyState(OverviewProjectStates state) {
         assertEquals(getOverviewEmptyStateMessage(), state.getOverviewEmptyState());

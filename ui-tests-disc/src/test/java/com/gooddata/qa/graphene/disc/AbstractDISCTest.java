@@ -24,9 +24,6 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 
 public abstract class AbstractDISCTest extends AbstractMSFTest {
 
-    protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
-    protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
-
     private List<ProjectInfo> projects;
 
     protected List<ProjectInfo> getProjects() {

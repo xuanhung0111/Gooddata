@@ -1,12 +1,14 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -214,4 +216,27 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
                 ScheduleStatus.DISABLED);
     }
 
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkAccessProjectDetailWithNonAdminRole() throws ParseException, IOException,
+            JSONException {
+        try {
+            addUsersWithOtherRolesToProject();
+
+            accessProjectDetailWithNonAdminRole(testParams.getEditorUser(),
+                    testParams.getEditorPassword());
+            logout();
+            accessProjectDetailWithNonAdminRole(testParams.getViewerUser(),
+                    testParams.getViewerPassword());
+        } finally {
+            logout();
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        }
+    }
+
+    private void accessProjectDetailWithNonAdminRole(String user, String password)
+            throws JSONException {
+        signInAtGreyPages(user, password);
+        openUrl(DISC_PROJECTS_PAGE_URL + "/" + testParams.getProjectId());
+        waitForFragmentVisible(discOverviewProjects);
+    }
 }

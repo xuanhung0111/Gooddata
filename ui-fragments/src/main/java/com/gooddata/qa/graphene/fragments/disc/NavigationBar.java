@@ -9,10 +9,32 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class NavigationBar extends AbstractFragment {
 
-    @FindBy(xpath = "//a[text()='Projects']")
+    @FindBy(css = ".ait-header-fragment .app-title")
+    private WebElement headerTitle;
+    
+    @FindBy(css = ".ait-header-projects-btn")
     private WebElement projectsButton;
+    
+    @FindBy(css = ".ait-header-overview-btn")
+    private WebElement overviewButton;
 
     public void clickOnProjectsButton() {
         waitForElementPresent(projectsButton).click();
+    }
+    
+    public void clickOnOverviewButton() {
+        waitForElementVisible(overviewButton).click();
+    }
+    
+    public String getHeaderTitle() {
+        return waitForElementVisible(headerTitle).getText();
+    }
+    
+    public String getProjectsButtonTitle() {
+        return waitForElementPresent(projectsButton).getText();
+    }
+    
+    public String getOverviewButtonTitle() {
+        return waitForElementVisible(overviewButton).getText();
     }
 }

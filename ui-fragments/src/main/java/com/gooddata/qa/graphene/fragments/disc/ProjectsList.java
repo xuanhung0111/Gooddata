@@ -12,6 +12,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -75,17 +76,15 @@ public class ProjectsList extends AbstractTable {
         }
         waitForElementVisible(getRoot());
     }
-
-    public void assertLastLoaded(String executionDate, String executionTime,
-            List<ProjectInfo> projects) {
-        String expectedLastLoaded = executionDate + " " + executionTime;
-        System.out.println("expectedLastLoaded " + expectedLastLoaded);
-        for (ProjectInfo project : projects) {
-            assertEquals(
-                    expectedLastLoaded,
-                    selectProjectWithAdminRole(project).findElement(
-                            BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION).getText());
-        }
+    
+    public void assertLastLoaded(String executionDate, String executionTime, ProjectInfo project) {
+        assertEquals(getLastSuccessfulExecutionInfo(project),
+                Joiner.on(" ").join(executionDate, executionTime));
+    }
+    
+    public String getLastSuccessfulExecutionInfo(ProjectInfo project) {
+        return waitForElementPresent(BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION,
+                selectProjectWithAdminRole(project)).getText();
     }
 
     public WebElement selectProjectWithAdminRole(final ProjectInfo project) {
