@@ -29,6 +29,7 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_TAB_DROPDOWN_DELETE_BUTTON = By.xpath("//li[contains(@class, 's-delete')]//a");
     private static final By BY_TAB_DROPDOWN_DUPLICATE_BUTTON = By.xpath("//li[contains(@class, 's-duplicate')]//a");
     private static final By BY_TAB_DROPDOWN_COPY_TO_BUTTON = By.xpath("//li[contains(@class, 's-copy_to')]//a");
+    private static final By BY_PERMISSION_DIALOG_LOCATOR = By.className("s-permissionSettingsDialog");
 
     @FindBy(xpath = "//div[@id='abovePage']/div[contains(@class,'yui3-dashboardtabs-content')]")
     private DashboardTabs tabs;
@@ -65,9 +66,6 @@ public class DashboardsPage extends AbstractFragment {
 
     @FindBy(className = "yui3-c-projectdashboard-content")
     private DashboardContent content;
-
-    @FindBy(xpath = "//div[contains(@class,'s-permissionSettingsDialog')]")
-    private PermissionsDialog permissionsDialog;
 
     @FindBy(css = ".s-unlistedIcon")
     private WebElement unlistedIcon;
@@ -111,7 +109,8 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public PermissionsDialog getPermissionsDialog() {
-        return waitForFragmentVisible(permissionsDialog);
+        return Graphene.createPageFragment(PermissionsDialog.class, waitForElementVisible(
+                BY_PERMISSION_DIALOG_LOCATOR, browser));
     }
 
     public SavedViewWidget getSavedViewWidget() {
@@ -285,22 +284,22 @@ public class DashboardsPage extends AbstractFragment {
     }
 
     public void publishDashboard(boolean listed) {
-        openPermissionsDialog();
+        PermissionsDialog dialog = openPermissionsDialog();
 
-        permissionsDialog.publish(listed ? PublishType.EVERYONE_CAN_ACCESS : PublishType.SPECIFIC_USERS_CAN_ACCESS);
-        permissionsDialog.submit();
+        dialog.publish(listed ? PublishType.EVERYONE_CAN_ACCESS : PublishType.SPECIFIC_USERS_CAN_ACCESS);
+        dialog.submit();
     }
 
     public void lockDashboard(boolean lock) {
-        openPermissionsDialog();
+        PermissionsDialog dialog = openPermissionsDialog();
 
         if (lock) {
-            permissionsDialog.lock();
+            dialog.lock();
         } else {
-            permissionsDialog.unlock();
+            dialog.unlock();
         }
 
-        permissionsDialog.submit();
+        dialog.submit();
     }
 
     public PermissionsDialog lockIconClick() {
@@ -374,6 +373,10 @@ public class DashboardsPage extends AbstractFragment {
         } catch (NoSuchElementException nsee) {
             return false;
         }
+    }
+
+    public boolean isPermissionDialogVisible() {
+        return browser.findElements(BY_PERMISSION_DIALOG_LOCATOR).size() > 0 ;
     }
 
     private SimpleMenu openEditExportEmbedMenu() {

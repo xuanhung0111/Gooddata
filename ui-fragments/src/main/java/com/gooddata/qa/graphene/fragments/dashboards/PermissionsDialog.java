@@ -13,6 +13,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class PermissionsDialog extends AbstractFragment {
 
+    private static final By DONE_BUTTON_CSS_SELECTOR = By.cssSelector(".s-btn-done");
     private static final By GRANTEE_EMAIL_CSS_SELECTOR = By.cssSelector(".grantee-email");
     private static final By GRANTEE_NAME_CSS_SELECTOR = By.cssSelector(".grantee-name");
     private static final By ADDED_GRANTEE_INFO_CSS_SELECTOR = By.cssSelector(".grantee-info");
@@ -189,6 +190,14 @@ public class PermissionsDialog extends AbstractFragment {
 
     public void cancel() {
         waitForElementVisible(cancel).click();
+    }
+
+    public void done() {
+        waitForElementVisible(DONE_BUTTON_CSS_SELECTOR, browser).click();
+    }
+
+    public boolean isDoneButtonVisible() {
+        return browser.findElements(DONE_BUTTON_CSS_SELECTOR).size() > 0;
     }
 
     public String getTitleOfSubmitButton() {
