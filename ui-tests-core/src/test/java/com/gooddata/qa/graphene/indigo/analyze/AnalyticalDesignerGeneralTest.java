@@ -178,13 +178,13 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withCategories(attribute));
-        assertEquals(analysisPage.getExplorerMessage(), "Now select a metric to display");
+        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART).getExplorerMessage(),
-                "Now select a metric to display");
+                "Now select a measure to display");
 
         assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART).getExplorerMessage(),
-                "Now select a metric to display");
+                "Now select a measure to display");
 
         analysisPage.changeReportType(ReportType.TABLE);
         if (analysisPage.isExplorerMessageVisible()) {
@@ -275,7 +275,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), oldTrackersCount);
-        analysisPage.expandMetricConfiguration(metric);
+        analysisPage.expandMetricConfiguration("% " + metric);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
@@ -563,7 +563,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withCategories(getRandomAttribute()));
-        assertEquals(analysisPage.getExplorerMessage(), "Now select a metric to display");
+        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 
