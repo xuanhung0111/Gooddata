@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -329,6 +328,8 @@ public class SchedulesTest extends AbstractSchedulesTest {
                             new Parameter().setParamName("secure param 2")
                                     .setParamValue("secure value 2").setSecureParam());
             scheduleDetail.addNewParams(newParams, Confirmation.SAVE_CHANGES);
+            browser.navigate().refresh();
+            waitForFragmentVisible(scheduleDetail);
             assertSchedule(scheduleBuilder.setParameters(newParams));
         } finally {
             cleanProcessesInWorkingProject();
@@ -668,7 +669,6 @@ public class SchedulesTest extends AbstractSchedulesTest {
             createAndAssertSchedule(scheduleBuilder2);
 
             scheduleDetail.manualRun();
-            assertTrue(scheduleDetail.isInScheduledState());
             assertTrue(scheduleDetail.isInRunningState());
             scheduleDetail.assertSuccessfulExecution();
         } finally {

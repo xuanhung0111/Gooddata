@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -18,9 +19,12 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.google.common.base.Predicate;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import java.io.File;
@@ -46,6 +50,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
     protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
+
+    protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
+    protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
     
     /**
      * ----- UI fragmnets -----
@@ -515,5 +522,22 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForSchedulesPageLoaded(browser);
         waitForElementNotVisible(BY_SCHEDULES_LOADING);
         waitForElementVisible(emailSchedulesPage.getRoot());
+    }
+
+    public void initDISCOverviewPage() {
+        openUrl(DISC_OVERVIEW_PAGE);
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+
+            @Override
+            public boolean apply(WebDriver browser) {
+                return !discOverview.getStateNumber(OverviewProjectStates.FAILED).isEmpty();
+            }
+        });
+        waitForFragmentVisible(discOverviewProjects);
+    }
+
+    public void initDISCProjectsPage() {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForFragmentVisible(discProjectsPage);
     }
 }

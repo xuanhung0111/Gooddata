@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="dp-sanity" enabled="true">
+        <groups>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="sanity" depends-on="createProject" />
+            </dependencies>
+            <run>
+                <include name="sanity" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest" />
+        </classes>
+    </test>
+
+</suite>

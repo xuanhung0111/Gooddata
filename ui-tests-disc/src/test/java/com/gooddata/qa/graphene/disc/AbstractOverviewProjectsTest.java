@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
 import java.io.IOException;
@@ -76,18 +76,6 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         }
     }
 
-    protected void openOverviewPage() {
-        openUrl(DISC_OVERVIEW_PAGE);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return !discOverview.getStateNumber(OverviewProjectStates.FAILED).isEmpty();
-            }
-        });
-        waitForElementVisible(discOverviewProjects.getRoot());
-    }
-
     protected void prepareDataForOverviewScheduledStateTests(List<ProjectInfo> additionalProjects,
             OverviewProjectDetails overviewProject) {
         prepareDataForAdditionalProjects(additionalProjects);
@@ -105,7 +93,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         overviewProject.addProcess(overviewProcess);
         prepareDataForCheckingOverviewState(projectState, overviewProject);
 
-        openOverviewPage();
+        initDISCOverviewPage();
         discOverview.selectOverviewState(projectState);
         waitForElementVisible(discOverviewProjects.getRoot());
         discOverview.assertOverviewStateNumber(projectState,
@@ -225,7 +213,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         overviewProject.addProcess(overviewProcess);
         prepareDataForCheckingOverviewState(projectState, overviewProject);
 
-        openOverviewPage();
+        initDISCOverviewPage();
         waitForElementVisible(discOverview.getRoot());
         discOverview.selectOverviewState(projectState);
         waitForElementVisible(discOverviewProjects.getRoot());
@@ -245,7 +233,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
             OverviewProjectStates projectState, OverviewProjectDetails overviewProject) {
         prepareDataForCheckingOverviewState(projectState, overviewProject);
 
-        openOverviewPage();
+        initDISCOverviewPage();
         waitForElementVisible(discOverview.getRoot());
         discOverview.selectOverviewState(projectState);
         waitForElementVisible(discOverviewProjects.getRoot());
@@ -273,7 +261,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         overviewProject.addProcess(overviewProcess).addProcess(disabledProcess);
         prepareDataForCheckingOverviewState(projectState, overviewProject);
 
-        openOverviewPage();
+        initDISCOverviewPage();
         discOverview.selectOverviewState(projectState);
         waitForElementVisible(discOverviewProjects.getRoot());
         discOverviewProjects.checkOnOverviewSchedules(new OverviewProjectDetails().setProjectInfo(
@@ -307,7 +295,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         overviewProject.addProcess(overviewProcess).addProcess(selectedProcess);
         prepareDataForCheckingOverviewState(projectState, overviewProject);
 
-        openOverviewPage();
+        initDISCOverviewPage();
         waitForElementVisible(discOverview.getRoot());
         discOverview.selectOverviewState(projectState);
         waitForElementVisible(discOverviewProjects.getRoot());
@@ -398,27 +386,23 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
 
     protected void checkProjectsFilter(ProjectStateFilters projectState) {
         prepareDataForProjectsPageTest(projectState, getWorkingProject());
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.checkProjectFilter(projectState, getProjects());
     }
 
     protected void checkSearchProjectInSpecificState(ProjectStateFilters projectFilter) {
         prepareDataForProjectsPageTest(projectFilter, getWorkingProject());
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.searchProjectInSpecificState(projectFilter, getWorkingProject());
     }
 
     protected void checkSearchWorkingProjectByName() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.searchProjectByName(projectTitle);
     }
 
     protected void checkSearchWorkingProjectById() {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsPage.getRoot());
+        initDISCProjectsPage();
         discProjectsPage.searchProjectById(getWorkingProject());
     }
 
@@ -441,7 +425,7 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
             scheduleUrls.add(browser.getCurrentUrl());
             scheduleDetail.clickOnCloseScheduleButton();
         }
-        
+
         for (String scheduleUrl : scheduleUrls) {
             openScheduleViaUrl(scheduleUrl);
             scheduleDetail.manualRun();

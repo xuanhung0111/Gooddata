@@ -58,7 +58,7 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     @Test(dependsOnGroups = {"schedules"})
     public void verifyCreatedSchedules() {
         initEmailSchedulesPage();
-        assertEquals(emailSchedulesPage.getNumberOfSchedules(), 1, "Schedule is properly created.");
+        assertEquals(emailSchedulesPage.getNumberOfGlobalSchedules(), 1, "Schedule is properly created.");
         Screenshots.takeScreenshot(browser, "Goodsales-schedules", this.getClass());
     }
 
