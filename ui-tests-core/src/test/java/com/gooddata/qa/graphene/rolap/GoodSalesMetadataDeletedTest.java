@@ -511,7 +511,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 return dashboardsPage.getContent().getNumberOfReports() == 0;
             case SCHEDULE_EMAIL:
                 initEmailSchedulesPage();
-                return !emailSchedulesPage.isSchedulePresent(object);
+                return !emailSchedulesPage.isGlobalSchedulePresent(object);
             case DASHBOARD_EMBED:
                 browser.get(object);
                 return REQUESTED_DASHBOARD_NOT_EXIST.equals(

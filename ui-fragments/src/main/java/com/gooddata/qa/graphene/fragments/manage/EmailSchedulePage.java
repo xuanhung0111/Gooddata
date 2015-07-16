@@ -8,17 +8,22 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.Assert;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static org.testng.Assert.*;
 
 public class EmailSchedulePage extends AbstractFragment {
 
-    @FindBy(css = ".listView .listTable .s-dataPage-listRow .title > a > span")
-    protected List<WebElement> scheduledEmailsTitles;
+    private static final By BY_SCHEDULE_AUTHOR = By.cssSelector(".author a");
+    private static final By BY_SCHEDULE_BCC_EMAILS = By.cssSelector(".bcc span");
+    private static final By BY_SCHEDULE_CONTROLS = By.cssSelector(".controls span");
+    private static final By BY_PARENT_TR_TAG = By.xpath("ancestor::tr[1]");
+    private static final By BY_PRIVATE_SCHEDULES_TABLE_HIDDEN = By.cssSelector(".dashCreated.hidden");
+    private static final By BY_SCHEDULE_EMAIL_TITLES = By.cssSelector(".s-dataPage-listRow .title span");
 
     @FindBy(css = ".s-btn-schedule_new_email")
     private WebElement addScheduleButton;
@@ -26,8 +31,11 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".noSchedulesMsg")
     private WebElement noSchedulesMessage;
 
-    @FindBy(css = ".listTable")
-    private WebElement schedulesTable;
+    @FindBy(css = ".listView>.listTable")
+    private WebElement globalSchedulesTable;
+
+    @FindBy(css = ".listView .dashCreated .listTable")
+    private WebElement privateSchedulesTable;
 
     @FindBy(css = ".detailView")
     private WebElement scheduleDetail;
@@ -103,28 +111,28 @@ public class EmailSchedulePage extends AbstractFragment {
         waitForElementVisible(scheduleDetail);
     }
 
-    public int getNumberOfSchedules() {
-        int schedulesCount = waitForElementPresent(schedulesTable).
-                findElement(By.tagName("tbody")).findElements(By.tagName("tr")).size();
-        if (schedulesCount == 0 && noSchedulesMessage.isDisplayed()) {
-            return 0;
-        } else {
-            return schedulesCount;
-        }
+    public List<WebElement> getGlobalScheduleTitles() {
+        return waitForElementPresent(globalSchedulesTable).findElements(BY_SCHEDULE_EMAIL_TITLES);
     }
 
-    public boolean isSchedulePresent(String title) {
-        if (this.getNumberOfSchedules() == 0) {
-            return false;
-        }
+    public List<WebElement> getPrivateScheduleTitles() {
+        return waitForElementPresent(privateSchedulesTable).findElements(BY_SCHEDULE_EMAIL_TITLES);
+    }
 
-        for (WebElement scheduledEmailsTitle : scheduledEmailsTitles) {
-            if (scheduledEmailsTitle.getAttribute("title").matches("^" + title + ".*$")) {
-                return true;
-            }
-        }
+    public int getNumberOfGlobalSchedules() {
+        return getGlobalScheduleTitles().size();
+    }
 
-        return false;
+    public int getNumberOfPrivateSchedules() {
+        return getPrivateScheduleTitles().size();
+    }
+
+    public boolean isGlobalSchedulePresent(String title) {
+        return isSchedulePresent(this.getGlobalScheduleTitles(), title);
+    }
+
+    public boolean isPrivateSchedulePresent(String title) {
+        return isSchedulePresent(this.getPrivateScheduleTitles(), title);
     }
 
     public String getSubscribed(String scheduleName) {
@@ -153,12 +161,13 @@ public class EmailSchedulePage extends AbstractFragment {
         emailMessageInput.sendKeys(emailBody);
         waitForElementVisible(dashboardsSelector);
         waitForEmailSchedulePageLoaded(browser);
-        Assert.assertTrue(dashboardsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Dashboards selector is not selected by default");
+        assertTrue(dashboardsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"),
+                "Dashboards selector is not selected by default");
         selectDashboard(dashboardName);
         // TODO - schedule (will be sent in the nearest time slot now)
         Graphene.guardAjax(waitForElementVisible(saveButton)).click();
         waitForElementNotVisible(scheduleDetail);
-        waitForElementVisible(schedulesTable);
+        waitForElementVisible(globalSchedulesTable);
     }
 
     public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName,
@@ -170,18 +179,19 @@ public class EmailSchedulePage extends AbstractFragment {
         emailMessageInput.sendKeys(emailBody);
         waitForElementVisible(reportsSelector).click();
         waitForEmailSchedulePageLoaded(browser);
-        Assert.assertTrue(reportsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"), "Reports selector is not selected");
+        assertTrue(reportsSelector.getAttribute("class").contains("yui3-c-radiowidgetitem-selected"),
+                "Reports selector is not selected");
         selectReport(reportName);
         selectReportFormat(format);
         // TODO - schedule (will be sent in the nearest time slot now)
         Graphene.guardAjax(waitForElementVisible(saveButton)).click();
         waitForElementNotVisible(scheduleDetail);
-        waitForElementVisible(schedulesTable);
+        waitForElementVisible(globalSchedulesTable);
     }
 
     public String getScheduleMailUriByName(String scheduleName) {
         String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
-        WebElement aElement = waitForElementPresent(schedulesTable).findElement(By.cssSelector(anchorSelector));
+        WebElement aElement = waitForElementPresent(globalSchedulesTable).findElement(By.cssSelector(anchorSelector));
         String hRef = aElement.getAttribute("href");
 
         String[] hRefParts = hRef.split("\\|");
@@ -192,6 +202,44 @@ public class EmailSchedulePage extends AbstractFragment {
         String deleteSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) +
                 " ~ .controls .s-btn-delete";
         waitForElementVisible(By.cssSelector(deleteSelector), browser).click();
+    }
+
+    public WebElement getPrivateSchedule(String title) {
+        for (WebElement scheduledEmailsTitle : getPrivateScheduleTitles()) {
+            if (scheduledEmailsTitle.getAttribute("title").matches("^" + title + ".*$")) {
+                return scheduledEmailsTitle.findElement(BY_PARENT_TR_TAG);
+            }
+        }
+
+        throw new IllegalArgumentException("Schedule could not found!");
+    }
+
+    public String getAuthorUriOfSchedule(WebElement schedule) {
+        return waitForElementVisible(schedule).findElement(BY_SCHEDULE_AUTHOR).getAttribute("gdc:link");
+    }
+
+    public String getBccEmailsOfPrivateSchedule(WebElement schedule) {
+        return waitForElementVisible(schedule).findElement(BY_SCHEDULE_BCC_EMAILS).getAttribute("title");
+    }
+
+    public List<String> getControlsOfSchedule(WebElement schedule) {
+        List<WebElement> controlElements = waitForElementVisible(schedule).findElements(BY_SCHEDULE_CONTROLS);
+        if (controlElements.size() == 0) 
+            throw new IllegalArgumentException("No control buttons for this schedule: " + schedule);
+
+        List<String> results = new ArrayList<String>();
+        for (WebElement ele : controlElements) {
+            results.add(ele.getText());
+        }
+        return results;
+    }
+
+    public boolean isPrivateSchedulesTableVisible() {
+        return browser.findElements(BY_PRIVATE_SCHEDULES_TABLE_HIDDEN).isEmpty();
+    }
+
+    public boolean isBccColumnPresent() {
+        return waitForElementVisible(privateSchedulesTable).findElements(BY_SCHEDULE_BCC_EMAILS).size() > 0;
     }
 
     private void searchItem(String item) throws InterruptedException {
@@ -210,9 +258,9 @@ public class EmailSchedulePage extends AbstractFragment {
                     return;
                 }
             }
-            Assert.fail("Requested dashboard wasn't found");
+            fail("Requested dashboard wasn't found");
         } else {
-            Assert.fail("No dashboards are available");
+            fail("No dashboards are available");
         }
     }
 
@@ -226,9 +274,9 @@ public class EmailSchedulePage extends AbstractFragment {
                     return;
                 }
             }
-            Assert.fail("Requested report wasn't found");
+            fail("Requested report wasn't found");
         } else {
-            Assert.fail("No reports are available");
+            fail("No reports are available");
         }
     }
 
@@ -262,6 +310,16 @@ public class EmailSchedulePage extends AbstractFragment {
 
     private WebElement getScheduleLink(String scheduleName) {
         String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
-        return waitForElementPresent(schedulesTable).findElement(By.cssSelector(anchorSelector));
+        return waitForElementPresent(globalSchedulesTable).findElement(By.cssSelector(anchorSelector));
+    }
+
+    private boolean isSchedulePresent(Collection<WebElement> scheduleTitles, String title) {
+        for (WebElement scheduledEmailsTitle : scheduleTitles) {
+            if (scheduledEmailsTitle.getAttribute("title").matches("^" + title + ".*$")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

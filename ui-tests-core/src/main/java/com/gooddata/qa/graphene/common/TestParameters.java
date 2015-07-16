@@ -15,6 +15,7 @@ public class TestParameters {
     private String projectId;
     private String user;
     private String password;
+    private String userProfileUri;
     private String editorProfileUri;
     private String viewerProfileUri;
     private String editorUser;
@@ -38,6 +39,7 @@ public class TestParameters {
         host = loadProperty("host");
         user = loadProperty("user");
         password = loadProperty("password");
+        userProfileUri = loadProperty("userProfileUri");
         editorProfileUri = loadProperty("editorProfileUri");
         viewerProfileUri = loadProperty("viewerProfileUri");
         editorUser = loadProperty("editorUser");
@@ -103,6 +105,10 @@ public class TestParameters {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUserProfileUri() {
+        return userProfileUri;
     }
 
     public String getEditorProfileUri() {
