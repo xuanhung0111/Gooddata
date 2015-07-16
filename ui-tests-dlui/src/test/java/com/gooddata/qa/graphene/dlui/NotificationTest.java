@@ -125,7 +125,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
                             new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA).updateDatasetStatus(
                             selectedDataset);
 
             failToLoadData(dataSource, "george-fail-to-load-data");
@@ -187,7 +187,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
                             new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
 
             DataSource dataSource =
-                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS).updateDatasetStatus(
+                    prepareADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA).updateDatasetStatus(
                             selectedDataset);
 
             failToLoadData(dataSource, "annie-fail-to-load-data");
