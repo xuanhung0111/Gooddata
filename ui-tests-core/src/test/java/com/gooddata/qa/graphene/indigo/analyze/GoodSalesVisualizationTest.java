@@ -1,15 +1,27 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
+import com.gooddata.md.Attribute;
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.md.Restriction;
+import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -167,5 +179,69 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .addCategory(STAGE_NAME)
             .waitForReportComputing();
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
+    }
+
+    @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-7777")
+    public void testAggregationFunctionList() {
+        initAnalysePage();
+        assertEquals(analysisPage.addMetricFromFact(AMOUNT)
+            .expandMetricConfiguration("Sum of " + AMOUNT)
+            .getAllMetricAggregations("Sum of " + AMOUNT),
+            asList("Sum", "Average", "Minimum", "Maximum", "Median", "Running sum"));
+    }
+
+    @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6401")
+    public void gridlinesShouldBeCheckedWhenExportBarChart() {
+        initAnalysePage();
+        analysisPage.createReport(new ReportDefinition().withMetrics(AMOUNT)
+                .withCategories(STAGE_NAME).withType(ReportType.BAR_CHART))
+                .waitForReportComputing()
+                .exportReport();
+        String currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
+        }
+        waitForAnalysisPageLoaded(browser);
+        waitForFragmentVisible(reportPage);
+        checkRedBar(browser);
+
+        reportPage.showConfiguration();
+        waitForElementVisible(By.cssSelector(".globalSettings .btnSilver"), browser).click();
+        WebElement gridlines = waitForElementVisible(
+                By.xpath("//input[./following-sibling::*[@title='Gridlines']]"), browser);
+        assertTrue(gridlines.isSelected());
+
+        browser.close();
+        browser.switchTo().window(currentWindowHandle);
+    }
+
+    @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6942")
+    public void testCaseSensitiveSortInAttributeMetric() throws InterruptedException {
+        GoodData goodDataClient = getGoodDataClient();
+        Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
+        MetadataService mdService = goodDataClient.getMetadataService();
+
+        initManagePage();
+        String attribute = mdService.getObjUri(project, Attribute.class,
+                Restriction.identifier("attr.product.id"));
+        mdService.createObj(project, new Metric("aaaaA1", "SELECT COUNT([" + attribute + "])", "#,##0"));
+        mdService.createObj(project, new Metric("AAAAb2", "SELECT COUNT([" + attribute + "])", "#,##0"));
+
+        try {
+            initAnalysePage();
+            analysisPage.searchBucketItem("aaaa");
+            assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), asList("aaaaA1", "AAAAb2"));
+        } finally {
+            deleteMetric("aaaaA1");
+            deleteMetric("AAAAb2");
+        }
+    }
+
+    private void deleteMetric(String metric) throws InterruptedException {
+        initMetricPage();
+        metricEditorPage.openMetricDetailPage(metric);
+        waitForFragmentVisible(metricDetailPage).deleteMetric();
+        assertFalse(metricEditorPage.isMetricVisible(metric));
     }
 }
