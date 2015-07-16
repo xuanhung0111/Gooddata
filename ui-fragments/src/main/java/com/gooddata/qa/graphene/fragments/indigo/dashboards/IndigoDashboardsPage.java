@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -66,6 +69,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
         tempKpi.getRoot().click();
         waitForElementVisible(metricSelect.getRoot());
         return tempKpi;
+    }
+
+    public String getValueFromKpi(final String name) {
+        return Iterables.find(kpis, new Predicate<Kpi>() {
+            @Override
+            public boolean apply(Kpi input) {
+                return name.equals(input.getHeadline());
+            }
+        }).getValue();
     }
 
     public Kpi getKpiByIndex(int index) {

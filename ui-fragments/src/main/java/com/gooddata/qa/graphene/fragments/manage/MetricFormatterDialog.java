@@ -1,10 +1,11 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
@@ -31,16 +32,7 @@ public class MetricFormatterDialog extends AbstractFragment {
     @FindBy(className = "formatter-preset-image-colors")
     private WebElement colorsFormatter;
 
-    @FindBy(className = "formatter-format")
-    private WebElement input;
-
     public static final By LOCATOR = By.className("c-formatterDialog");
-
-    public MetricFormatterDialog changeFormat(String newFormat) {
-        waitForElementVisible(input).clear();
-        input.sendKeys(newFormat);
-        return submit();
-    }
 
     public MetricFormatterDialog changeFormat(Formatter format) {
         waitForElementVisible(getPresetFormatterFrom(format)).click();
@@ -101,7 +93,8 @@ public class MetricFormatterDialog extends AbstractFragment {
         COLORS(new StringBuilder("[<0][red]$#,#.##;")
             .append("[<1000][blue]$#,#.##;")
             .append("[>=1000][green]$#,#.##")
-            .toString());
+            .toString()),
+        UTF_8("新年快樂");
 
         private String text;
 
