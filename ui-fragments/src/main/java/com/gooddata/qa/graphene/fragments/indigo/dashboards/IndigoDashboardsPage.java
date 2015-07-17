@@ -11,8 +11,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = Kpi.MAIN_CLASS)
@@ -29,6 +28,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = "s-metric_select")
     private MetricSelect metricSelect;
+
+    @FindBy(className = "kpi-placeholder")
+    private WebElement addWidget;
 
     @FindBy(className = "dashboard")
     private WebElement dashboard;
@@ -66,6 +68,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public Kpi selectKpi(int index) {
         Kpi tempKpi = getKpiByIndex(index);
+        waitForElementPresent(tempKpi.getRoot());
         tempKpi.getRoot().click();
         waitForElementVisible(metricSelect.getRoot());
         return tempKpi;
@@ -87,7 +90,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage selectMetricByName(String name) {
         waitForElementVisible(metricSelect.getRoot());
         metricSelect.byName(name);
-        waitForKpiLoading();
+        waitForKpiContentLoading();
 
         return this;
     }
@@ -98,9 +101,28 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage waitForKpiLoading() {
-        waitForElementNotPresent(Kpi.IS_LOADING);
+    public IndigoDashboardsPage waitForKpiWidgetLoading(){
+        waitForElementNotPresent(Kpi.IS_WIDGET_LOADING);
 
+        return this;
+    }
+
+    public IndigoDashboardsPage waitForKpiContentLoading(){
+        waitForKpiWidgetLoading();
+        waitForElementNotPresent(Kpi.IS_CONTENT_LOADING);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage waitForKpiEditable(){
+        waitForElementVisible(Kpi.IS_EDITABLE, browser);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage addWidget(String metricName) {
+        waitForElementPresent(addWidget).click();
+        selectMetricByName(metricName);
         return this;
     }
 

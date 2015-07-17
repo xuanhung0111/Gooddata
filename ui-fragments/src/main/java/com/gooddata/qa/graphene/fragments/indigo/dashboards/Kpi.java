@@ -13,7 +13,11 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 public class Kpi extends AbstractFragment {
     public static final String MAIN_CLASS = "s-dashboard-kpi-component";
 
-    public static final By IS_LOADING = By.cssSelector("." + MAIN_CLASS + ".is-loading");
+    public static final By IS_WIDGET_LOADING = By.cssSelector("." + MAIN_CLASS + ".widget-loading");
+
+    public static final By IS_CONTENT_LOADING = By.cssSelector("." + MAIN_CLASS + ".content-loading");
+
+    public static final By IS_EDITABLE = By.cssSelector("." + MAIN_CLASS + ".is-editable");
 
     @FindBy(css = ".kpi-headline > h3")
     private WebElement headline;
@@ -34,11 +38,24 @@ public class Kpi extends AbstractFragment {
         return waitForElementVisible(headline).getText();
     }
 
-    public void setHeadline(String newHeadline) {
+    public void clearHeadline() {
         waitForElementVisible(headlineInplaceEdit).click();
-        waitForElementVisible(headlineTextarea).clear();
+
+        // hit backspace multiple times, because .clear()
+        // event does not trigger onchange event
+        // https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear%28%29
+        int headlineLength = headlineInplaceEdit.getText().length();
+        for (int i = 0; i < headlineLength; i++) {
+            headlineTextarea.sendKeys(Keys.BACK_SPACE);
+        }
+    }
+
+    public void setHeadline(String newHeadline) {
+        clearHeadline();
         headlineTextarea.sendKeys(newHeadline);
         headlineTextarea.sendKeys(Keys.ENTER);
+
+        waitForElementVisible(headlineInplaceEdit);
     }
 
     public String getValue() {

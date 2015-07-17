@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="manipulate-widgets-tests">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest" />
+        </classes>
+    </test>
+
+    <test name="permissions-tests">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.EditModePermissionsTest" />
+        </classes>
+    </test>
+
+    <test name="metric-formatting-tests">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.MetricFormattingTest" />
+        </classes>
+    </test>
+
+</suite>
