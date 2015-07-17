@@ -21,6 +21,9 @@ public class DashboardScheduleDialog extends AbstractFragment {
     @FindBy(css = ".s-btn-schedule")
     private WebElement scheduleButton;
 
+    @FindBy(css = ".s-btn-cancel")
+    private WebElement cancelButton;
+
     @FindBy(css = ".tabs-dropdown-button")
     private WebElement tabsButton;
 
@@ -71,6 +74,8 @@ public class DashboardScheduleDialog extends AbstractFragment {
 
     @FindBy(css = ".s-schedule-info-message")
     private WebElement infoText;
+
+    private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".bubble-negative .content");
 
     public String getCustomEmailSubject() {
         return waitForElementVisible(emailSubjectInput).getAttribute("value");
@@ -144,9 +149,23 @@ public class DashboardScheduleDialog extends AbstractFragment {
         selectSingle(index, onDayButton);
     }
 
-    public void schedule() {
-        scheduleButton.click();
-        waitForElementNotVisible(scheduleButton);
+    public boolean schedule() {
+        waitForElementVisible(scheduleButton).click();
+        if (browser.findElements(ERROR_MESSAGE_LOCATOR).isEmpty()) {
+            waitForElementNotVisible(scheduleButton);
+            return true;
+        }
+        return false;
+    }
+
+    public void cancelSchedule() {
+        waitForElementVisible(cancelButton).click();
+        waitForElementNotVisible(cancelButton);
+    }
+
+    public String getErrorMessage() {
+        waitForElementVisible(scheduleButton).click();
+        return waitForElementVisible(ERROR_MESSAGE_LOCATOR, browser).getText();
     }
 
     public boolean isFilterMessagePresent() {

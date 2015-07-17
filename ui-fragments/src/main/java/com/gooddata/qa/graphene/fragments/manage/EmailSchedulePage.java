@@ -1,20 +1,31 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import com.gooddata.qa.CssUtils;
-import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForEmailSchedulePageLoaded;
+import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
+import static java.lang.String.format;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static org.testng.Assert.*;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
+
+import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 
 public class EmailSchedulePage extends AbstractFragment {
 
@@ -24,6 +35,12 @@ public class EmailSchedulePage extends AbstractFragment {
     private static final By BY_PARENT_TR_TAG = By.xpath("ancestor::tr[1]");
     private static final By BY_PRIVATE_SCHEDULES_TABLE_HIDDEN = By.cssSelector(".dashCreated.hidden");
     private static final By BY_SCHEDULE_EMAIL_TITLES = By.cssSelector(".s-dataPage-listRow .title span");
+
+    private static final String SCHEDULE_SELECTOR = "tbody td.title.s-title-%s";
+    private static final String SCHEDULE_ANCHOR_SELECTOR = SCHEDULE_SELECTOR + " a";
+    private static final String CONTROL_SELECTOR = SCHEDULE_SELECTOR + " ~ .controls";
+    private static final String DELETE_SELECTOR = CONTROL_SELECTOR + " .s-btn-delete";
+    private static final String DUPLICATE_SELECTOR = CONTROL_SELECTOR + " .s-btn-duplicate";
 
     @FindBy(css = ".s-btn-schedule_new_email")
     private WebElement addScheduleButton;
@@ -76,6 +93,9 @@ public class EmailSchedulePage extends AbstractFragment {
     @FindBy(css = ".timeScheduler .description")
     private WebElement timeDescription;
 
+    @FindBy(css = ".repeatBase .selection")
+    private Select repeatBaseSelection;
+
     @FindBy(css = ".dashboards .picker .selected label")
     private List<WebElement> attachedDashboards;
 
@@ -86,8 +106,20 @@ public class EmailSchedulePage extends AbstractFragment {
         return waitForElementVisible(emailSubjectInput).getAttribute("value");
     }
 
+    public EmailSchedulePage setSubject(String subject) {
+        waitForElementVisible(emailSubjectInput).clear();
+        emailSubjectInput.sendKeys(subject);
+        return this;
+    }
+
     public String getMessageFromInput() {
         return waitForElementVisible(emailMessageInput).getAttribute("value");
+    }
+
+    public EmailSchedulePage setMessage(String message) {
+        waitForElementVisible(emailMessageInput).clear();
+        emailMessageInput.sendKeys(message);
+        return this;
     }
 
     public String getToFromInput() {
@@ -98,6 +130,11 @@ public class EmailSchedulePage extends AbstractFragment {
         return timeDescription.getText();
     }
 
+    public EmailSchedulePage changeTime(RepeatTime time) {
+        waitForElementVisible(repeatBaseSelection).selectByVisibleText(time.toString());
+        return this;
+    }
+
     public List<String> getAttachedDashboards() {
         List<String> selected = new ArrayList<String>();
         for (WebElement label : attachedDashboards) {
@@ -106,9 +143,16 @@ public class EmailSchedulePage extends AbstractFragment {
         return selected;
     }
 
-    public void openSchedule(String scheduleName) {
+    public EmailSchedulePage openSchedule(String scheduleName) {
         Graphene.guardAjax(getScheduleLink(scheduleName)).click();
         waitForElementVisible(scheduleDetail);
+        return this;
+    }
+
+    public String getScheduleDescription(String scheduleName) {
+        String description = format(SCHEDULE_ANCHOR_SELECTOR, simplifyText(scheduleName)) + " span";
+        return waitForElementPresent(globalSchedulesTable).findElement(By.cssSelector(description))
+                .getAttribute("title");
     }
 
     public List<WebElement> getGlobalScheduleTitles() {
@@ -152,8 +196,15 @@ public class EmailSchedulePage extends AbstractFragment {
         return waitForElementVisible(noSchedulesMessage).getText();
     }
 
+    public EmailSchedulePage saveSchedule() {
+        Graphene.guardAjax(waitForElementVisible(saveButton)).click();
+        waitForElementNotVisible(scheduleDetail);
+        waitForElementVisible(globalSchedulesTable);
+        return this;
+    }
+
     public void scheduleNewDahboardEmail(String emailTo, String emailSubject, String emailBody,
-            String dashboardName) throws InterruptedException {
+            String dashboardName) {
         Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
         waitForElementVisible(scheduleDetail);
         waitForElementVisible(emailToInput).sendKeys(emailTo);
@@ -165,13 +216,16 @@ public class EmailSchedulePage extends AbstractFragment {
                 "Dashboards selector is not selected by default");
         selectDashboard(dashboardName);
         // TODO - schedule (will be sent in the nearest time slot now)
-        Graphene.guardAjax(waitForElementVisible(saveButton)).click();
-        waitForElementNotVisible(scheduleDetail);
-        waitForElementVisible(globalSchedulesTable);
+        saveSchedule();
     }
 
     public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName,
-            ExportFormat format) throws InterruptedException {
+            ExportFormat format) {
+        scheduleNewReportEmail(emailTo, emailSubject, emailBody, reportName, format, null);
+    }
+
+    public void scheduleNewReportEmail(String emailTo, String emailSubject, String emailBody, String reportName,
+            ExportFormat format, RepeatTime repeatTime) {
         Graphene.guardAjax(waitForElementVisible(addScheduleButton)).click();
         waitForElementVisible(scheduleDetail);
         waitForElementVisible(emailToInput).sendKeys(emailTo);
@@ -183,14 +237,15 @@ public class EmailSchedulePage extends AbstractFragment {
                 "Reports selector is not selected");
         selectReport(reportName);
         selectReportFormat(format);
+        if (repeatTime != null) {
+            changeTime(repeatTime);
+        }
         // TODO - schedule (will be sent in the nearest time slot now)
-        Graphene.guardAjax(waitForElementVisible(saveButton)).click();
-        waitForElementNotVisible(scheduleDetail);
-        waitForElementVisible(globalSchedulesTable);
+        saveSchedule();
     }
 
     public String getScheduleMailUriByName(String scheduleName) {
-        String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
+        String anchorSelector = format(SCHEDULE_ANCHOR_SELECTOR, simplifyText(scheduleName));
         WebElement aElement = waitForElementPresent(globalSchedulesTable).findElement(By.cssSelector(anchorSelector));
         String hRef = aElement.getAttribute("href");
 
@@ -198,10 +253,23 @@ public class EmailSchedulePage extends AbstractFragment {
         return hRefParts[hRefParts.length - 1];
     }
 
-    public void deleteSchedule(String scheduleName) {
-        String deleteSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) +
-                " ~ .controls .s-btn-delete";
-        waitForElementVisible(By.cssSelector(deleteSelector), browser).click();
+    public void deleteSchedule(final String scheduleName) {
+        final int numberOfSchedule = getNumberOfGlobalSchedules();
+        waitForElementVisible(By.cssSelector(format(DELETE_SELECTOR, simplifyText(scheduleName))), browser)
+            .click();
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver browser) {
+                return getNumberOfGlobalSchedules() == numberOfSchedule - 1;
+            }
+        });
+    }
+
+    public void duplicateSchedule(String scheduleName) {
+        waitForElementVisible(By.cssSelector(format(DUPLICATE_SELECTOR, simplifyText(scheduleName))), browser)
+            .click();
+        waitForElementVisible(scheduleDetail);
+        saveSchedule();
     }
 
     public WebElement getPrivateSchedule(String title) {
@@ -242,13 +310,67 @@ public class EmailSchedulePage extends AbstractFragment {
         return waitForElementVisible(privateSchedulesTable).findElements(BY_SCHEDULE_BCC_EMAILS).size() > 0;
     }
 
-    private void searchItem(String item) throws InterruptedException {
-        waitForElementVisible(searchInput).clear();
-        searchInput.sendKeys(item);
-        Thread.sleep(2000);
+    public EmailSchedulePage selectReportFormat(ExportFormat format) {
+        if (formatsList == null || formatsList.isEmpty()) {
+            return this;
+        }
+
+        By checkboxLocator = By.tagName("input");
+        switch (format) {
+            case ALL:
+                for (WebElement ele : formatsList) {
+                    selectCheckbox(ele.findElement(checkboxLocator));
+                }
+                break;
+            case PDF:
+                selectCheckbox(formatsList.get(1).findElement(checkboxLocator));
+                break;
+            case EXCEL_XLS:
+                selectCheckbox(formatsList.get(2).findElement(checkboxLocator));
+                break;
+            case EXCEL_XLSX:
+                selectCheckbox(formatsList.get(3).findElement(checkboxLocator));
+                break;
+            case CSV:
+                selectCheckbox(formatsList.get(4).findElement(checkboxLocator));
+                break;
+            default:
+                System.out.println("Invalid format!!!");
+                break;
+        }
+
+        return this;
     }
 
-    private void selectDashboard(String dashboardName) throws InterruptedException {
+    public List<String> getSelectedFormats() {
+        List<String> selectedFormats = Lists.newArrayList();
+        if (formatsList == null || formatsList.isEmpty()) {
+            return selectedFormats;
+        }
+
+        By checkboxLocator = By.tagName("input");
+        for (WebElement ele : formatsList) {
+            if (ele.findElement(checkboxLocator).isSelected()) {
+                selectedFormats.add(ele.getText());
+            }
+        }
+        return selectedFormats;
+    }
+
+    private void selectCheckbox(WebElement checkbox) {
+        if (checkbox.isSelected()) {
+            return;
+        }
+        checkbox.click();
+    }
+
+    private void searchItem(String item) {
+        waitForElementVisible(searchInput).clear();
+        searchInput.sendKeys(item);
+        sleepTightInSeconds(2);
+    }
+
+    private void selectDashboard(String dashboardName) {
         searchItem(dashboardName);
         waitForCollectionIsNotEmpty(dashboardsList);
         if (dashboardsList != null && dashboardsList.size() > 0) {
@@ -264,7 +386,7 @@ public class EmailSchedulePage extends AbstractFragment {
         }
     }
 
-    private void selectReport(String reportName) throws InterruptedException {
+    private void selectReport(String reportName) {
         searchItem(reportName);
         waitForCollectionIsNotEmpty(reportsList);
         if (reportsList != null && reportsList.size() > 0) {
@@ -280,37 +402,9 @@ public class EmailSchedulePage extends AbstractFragment {
         }
     }
 
-    private void selectReportFormat(ExportFormat format) {
-        if (formatsList != null && formatsList.size() > 0) {
-            By checkboxLocator = By.tagName("input");
-            switch (format) {
-                case ALL:
-                    for (int i = 1; i < formatsList.size(); i++) {
-                        formatsList.get(i).findElement(checkboxLocator).click();
-                    }
-                    break;
-                case PDF:
-                    formatsList.get(1).findElement(checkboxLocator).click();
-                    break;
-                case EXCEL_XLS:
-                    formatsList.get(2).findElement(checkboxLocator).click();
-                    break;
-                case EXCEL_XLSX:
-                    formatsList.get(3).findElement(checkboxLocator).click();
-                    break;
-                case CSV:
-                    formatsList.get(4).findElement(checkboxLocator).click();
-                    break;
-                default:
-                    System.out.println("Invalid format!!!");
-                    break;
-            }
-        }
-    }
-
     private WebElement getScheduleLink(String scheduleName) {
-        String anchorSelector = "tbody td.title.s-title-" + CssUtils.simplifyText(scheduleName) + " a";
-        return waitForElementPresent(globalSchedulesTable).findElement(By.cssSelector(anchorSelector));
+        return waitForElementPresent(globalSchedulesTable).findElement(
+                By.cssSelector(format(SCHEDULE_ANCHOR_SELECTOR, simplifyText(scheduleName))));
     }
 
     private boolean isSchedulePresent(Collection<WebElement> scheduleTitles, String title) {
@@ -321,5 +415,24 @@ public class EmailSchedulePage extends AbstractFragment {
         }
 
         return false;
+    }
+
+    public static enum RepeatTime {
+        NONE("Does not repeat"),
+        DAILY("Daily"),
+        WEEKLY("Weekly"),
+        MONTHLY("Monthly"),
+        YEARLY("Yearly");
+
+        private String label;
+
+        private RepeatTime(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 }

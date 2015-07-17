@@ -18,6 +18,7 @@ import org.joda.time.format.DateTimeFormatter;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -38,6 +39,8 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
     protected static final int MAILBOX_POLL_INTERVAL_MILLIS = 30000;
 
     protected static final String FROM = "noreply@gooddata.com";
+
+    protected File attachmentsDirectory;
 
     @BeforeClass
     public void setUpImap() throws Exception {

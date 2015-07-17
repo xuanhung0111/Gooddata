@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene.fragments.dashboards.menu;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
 
 import java.util.Collection;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -62,7 +62,7 @@ public class DashboardMenu extends SimpleMenu {
         }
 
         dashboard.findElement(BY_LINK).click();
-        Sleeper.sleepTightInSeconds(3);
+        sleepTightInSeconds(3);
         waitForDashboardPageLoaded(browser);
         return true;
     }

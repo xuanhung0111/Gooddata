@@ -1,8 +1,13 @@
 package com.gooddata.qa.graphene.common;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
+import static java.lang.String.format;
+import static org.testng.Assert.fail;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -10,19 +15,18 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.testng.Assert.fail;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
 
 public final class CheckUtils {
 
     private static final String STATUS_BAR_SELECTOR = "div#status > div.box-%s div.leftContainer";
-    private static final By BY_GREEN_BAR = By.cssSelector(String.format(STATUS_BAR_SELECTOR, "success"));
-    private static final By BY_RED_BAR = By.cssSelector(String.format(STATUS_BAR_SELECTOR, "error"));
-    private static final By BY_RED_BAR_WARNING = By.cssSelector("div.c-status.box-warning");
+    private static final By BY_GREEN_BAR = By.cssSelector(format(STATUS_BAR_SELECTOR, "success"));
     private static final By BY_REPORT_ERROR = By.cssSelector("div.error-container");
+
+    public static final By BY_RED_BAR = By.cssSelector(format(STATUS_BAR_SELECTOR, "error"));
+    public static final By BY_RED_BAR_WARNING = By.cssSelector(format(STATUS_BAR_SELECTOR, "warning"));
+    public static final By BY_DISMISS_BUTTON = By.cssSelector("div#status .s-btn-dismiss");
 
     private CheckUtils() {
     }
@@ -57,7 +61,7 @@ public final class CheckUtils {
                 searchContext);
         if (searchContext.findElements(BY_RED_BAR).size() != 0) {
             if ("Dashboard no longer exists".equals(searchContext.findElement(BY_RED_BAR).getText())) {
-                waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), searchContext).click();
+                waitForElementVisible(BY_DISMISS_BUTTON, searchContext).click();
             }
             Graphene.waitGui().withTimeout(5, TimeUnit.SECONDS).until(new Predicate<WebDriver>() {
                 @Override
