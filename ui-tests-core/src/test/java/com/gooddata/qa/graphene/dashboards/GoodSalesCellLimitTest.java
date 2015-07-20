@@ -4,7 +4,6 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import org.testng.annotations.BeforeClass;
@@ -59,7 +58,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createTestingReports"})
     public void tableCellLimitAndShowAnyway() throws InterruptedException {
         try {
-            addReportToNewDashboard(TESTING_REPORT_TABLE);
+            addReportToNewDashboard(TESTING_REPORT_TABLE, TEST_CELL_LIMIT + TESTING_REPORT_TABLE);
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
 
             assertTrue(report.isCellLimit());
@@ -75,7 +74,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createTestingReports"})
     public void chartCellLimitAndShowAnyway() throws InterruptedException {
         try {
-            addReportToNewDashboard(TESTING_REPORT_CHART);
+            addReportToNewDashboard(TESTING_REPORT_CHART, TEST_CELL_LIMIT + TESTING_REPORT_CHART);
             ChartReport report = dashboardsPage.getContent().getLatestReport(ChartReport.class);
 
             assertTrue(report.isCellLimit());
@@ -85,15 +84,5 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
         } finally {
             dashboardsPage.deleteDashboard();
         }
-    }
-
-    private void addReportToNewDashboard(String name) throws InterruptedException  {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard(TEST_CELL_LIMIT + " " + name);
-        dashboardsPage.editDashboard();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.addReportToDashboard(name);
-        dashboardEditBar.saveDashboard();
-        checkRedBar(browser);
     }
 }
