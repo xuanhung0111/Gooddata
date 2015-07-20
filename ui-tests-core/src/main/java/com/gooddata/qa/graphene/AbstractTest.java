@@ -77,7 +77,7 @@ public abstract class AbstractTest extends Arquillian {
         };
     }
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void loadPlatformPageBeforeTestMethod(Method m) {
         if (Arrays.asList(m.getAnnotation(Test.class).groups()).contains(PROJECT_INIT_GROUP)){
             return;

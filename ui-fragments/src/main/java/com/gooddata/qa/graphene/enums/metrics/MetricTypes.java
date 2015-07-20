@@ -40,6 +40,7 @@ public enum MetricTypes {
     RUNSTDEV("SELECT RUNSTDEV(__fact__)", "Aggregation"),
     VAR("SELECT VAR(__fact__)", "Aggregation"),
     RUNVAR("SELECT RUNVAR(__fact__)", "Aggregation"),
+    FORECAST("SELECT FORECAST(__metric__, 6)", "Aggregation"),
 
     // Filter
     EQUAL("= (equals)", "SELECT __metric__ WHERE __attr__ = __attrValue__", "Filters"),
@@ -59,6 +60,8 @@ public enum MetricTypes {
             "WITHOUT PARENT FILTER",
             "SELECT __metric__ - (SELECT __metric__ BY ALL __attr__ WITHOUT PARENT FILTER)",
             "Filters"),
+    TOP("SELECT __metric__ WHERE TOP(5) IN (SELECT __metric__ BY __attr__)", "Filters"),
+    BOTTOM("SELECT __metric__ WHERE BOTTOM(25%) IN (SELECT __metric__ BY __attr__)", "Filters"),
 
     // Logical
     AND("SELECT __metric__ WHERE __attr__ = __attrValue__ AND __attr__ = __attrValue__", "Logical"),
@@ -85,7 +88,8 @@ public enum MetricTypes {
     BY_ALL_EXCEPT(
             "BY ALL IN ALL OTHER DIMENSIONS EXCEPT (FOR)",
             "SELECT __metric__ BY ALL IN ALL OTHER DIMENSIONS EXCEPT __attr__",
-            "Granularity");
+            "Granularity"),
+    WITHIN("SELECT RANK(__metric__) WITHIN (__attr__)", "Granularity");
 
     private final String label;
     private final String maql;

@@ -6,8 +6,8 @@ import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttribu
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,10 +19,14 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.common.CheckUtils;
+import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
+import com.gooddata.qa.graphene.fragments.reports.ReportVisualizer;
+import com.gooddata.qa.graphene.fragments.reports.TableReport;
 
 @Test(groups = {"GoodSalesMetrics"},
         description = "Tests for GoodSales project (metric creation functionality) in GD platform")
@@ -57,12 +61,16 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String LOST = "Lost";
     private static final String WON = "Won";
     private static final String STATUS = "Status";
+    private static final String DEPARTMENT = "Department";
+    private static final String AVG_AMOUNT = "Avg. Amount";
 
     private static final String AGGREGATION = "Aggregation";
     private static final String NUMERIC = "Numeric";
     private static final String GRANULARITY = "Granularity";
     private static final String LOGICAL = "Logical";
     private static final String FILTER = "Filters";
+
+    private static final String NO_DATA_MATCH_REPORT_MESSAGE = "No data match the filtering criteria";
 
     private static final List<String> PRODUCT_VALUES = asList("CompuSci", "Educationly", "Explorer",
             "Grammar Plus", "PhoenixSoft", "WonderKid");
@@ -152,6 +160,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             } else if (metric.in(asList(MetricTypes.MIN, MetricTypes.RUNMIN))) {
                 customMetricInfo.withFacts(DURATION);
 
+            } else if (metric== MetricTypes.FORECAST) {
+                customMetricInfo.withMetrics(AMOUNT);
+
             } else {
                 customMetricInfo.withFacts(AMOUNT);
                 if (metric == MetricTypes.CORREL) {
@@ -161,7 +172,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             createCustomMetric(customMetricInfo, metric, AGGREGATION);
 
-            if (metric.in(asList(MetricTypes.AVG, MetricTypes.COUNT, MetricTypes.MEDIAN))) {
+            if (metric.in(asList(MetricTypes.FORECAST, MetricTypes.AVG, MetricTypes.COUNT, MetricTypes.MEDIAN))) {
                 checkMetricValuesInReport(customMetricInfo.getName(), STAGE_NAME, getMetricValues(metric),
                       STAGE_NAME_VALUES);
                 continue;
@@ -255,6 +266,10 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 customMetricInfo.withMetrics(NUMBER_OF_OPEN_OPPS)
                     .withAttributes(buildAttribute(DATE_DIMENSION_CLOSE, YEAR_CLOSE));
 
+            } else if (metric == MetricTypes.WITHIN) {
+                customMetricInfo.withMetrics(AVG_AMOUNT)
+                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT));
+
             } else {
                 customMetricInfo.withMetrics(AMOUNT, NUMBER_OF_WON_OPPS)
                     .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT));
@@ -265,7 +280,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             createCustomMetric(customMetricInfo, metric, GRANULARITY);
 
-            if (metric.in(asList(MetricTypes.BY, MetricTypes.BY_ALL_EXCEPT))) {
+            if (metric.in(asList(MetricTypes.BY, MetricTypes.BY_ALL_EXCEPT, MetricTypes.WITHIN))) {
                 checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(metric), QUARTER_YEAR_VALUES);
                 continue;
@@ -353,8 +368,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
     public void createFilterMetricTest() {
-        CustomMetricUI customMetricInfo = new CustomMetricUI()
-            .withMetrics(NUMBER_OF_OPEN_OPPS);
+        CustomMetricUI customMetricInfo = new CustomMetricUI();
 
         for (MetricTypes metric : MetricTypes.values()) {
             if (!metric.getType().equalsIgnoreCase(FILTER)) {
@@ -363,11 +377,15 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             initMetricPage();
             customMetricInfo.withName(metric + " " + getCurrentDateString())
-                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT));
+                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT))
+                .withMetrics(NUMBER_OF_OPEN_OPPS);
 
             if (metric.in(asList(MetricTypes.LESS, MetricTypes.LESS_OR_EQUAL))) {
                 customMetricInfo.withAttributeValues(
                         buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2011));
+
+            } else if (metric.in(asList(MetricTypes.TOP, MetricTypes.BOTTOM))) {
+                customMetricInfo.addMoreMetrics(AMOUNT);
 
             } else if (metric == MetricTypes.BETWEEN) {
                 customMetricInfo.withAttributeValues(
@@ -388,7 +406,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
             createCustomMetric(customMetricInfo, metric, FILTER);
 
-            if (metric.in(asList(MetricTypes.LESS, MetricTypes.EQUAL))) {
+            if (metric.in(asList(MetricTypes.LESS, MetricTypes.EQUAL, MetricTypes.BOTTOM))) {
                 checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(MetricTypes.EQUAL), asList("Q2/2010", "Q3/2010", "Q4/2010"));
                 continue;
@@ -401,7 +419,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 continue;
             }
 
-            if (metric.in(asList(MetricTypes.GREATER_OR_EQUAL, MetricTypes.BETWEEN))) {
+            if (metric.in(asList(MetricTypes.GREATER_OR_EQUAL, MetricTypes.BETWEEN, MetricTypes.TOP))) {
                 checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
                         getMetricValues(MetricTypes.BETWEEN), QUARTER_YEAR_VALUES);
                 continue;
@@ -423,6 +441,87 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             checkMetricValuesInReport(customMetricInfo.getName(), QUARTER_YEAR_SNAPSHOT,
                     getMetricValues(MetricTypes.NOT_IN), asList("Q1/2012", "Q2/2012"));
         }
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
+    public void checkGreyedOutAndNonGreyedOutAttributes() {
+        CustomMetricUI customMetricInfo = new CustomMetricUI().withName("SUM-Amount")
+                .withFacts(AMOUNT);
+        initMetricPage();
+        createCustomMetric(customMetricInfo, MetricTypes.SUM, AGGREGATION);
+
+        ReportDefinition reportDefinition = new ReportDefinition()
+                .withName("Report-" + customMetricInfo.getName()).withWhats(customMetricInfo.getName());
+        initReportCreation();
+        ReportVisualizer visualiser = reportPage.getVisualiser();
+        visualiser.selectWhatArea(reportDefinition.getWhats());
+
+        List<String> greyedOutAttribues = asList("Activity Type", "Date (Activity)", "Date (Timeline)",
+                STAGE_HISTORY);
+
+        List<String> nonGreyedOutAttribues = asList("Account", "Date (Created)", "Opp. Snapshot", "Opportunity",
+                DEPARTMENT, PRODUCT, STAGE_NAME, YEAR_CLOSE, MONTH_YEAR_SNAPSHOT);
+        visualiser.clickOnHow();
+        for(String attribute : greyedOutAttribues) {
+            assertTrue(visualiser.isGreyedOutAttribute(attribute),
+                    String.format("Attribue %s is not unreachable", attribute));
+        }
+
+        for(String attribute : nonGreyedOutAttribues) {
+            assertFalse(visualiser.isGreyedOutAttribute(attribute),
+                    String.format("Attribue %s is unreachable", attribute));
+        }
+        visualiser.finishReportChanges();
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
+    public void checkDrillDownDefine() {
+        initAttributePage();
+        attributePage.initAttribute(STAGE_NAME);
+        attributeDetailPage.setDrillToAttribute(DEPARTMENT);
+
+        String metricName = "RUNSUM-Amount";
+        CustomMetricUI customMetricInfo = new CustomMetricUI().withName(metricName).withFacts(AMOUNT);
+        initMetricPage();
+        createCustomMetric(customMetricInfo, MetricTypes.RUNSUM, AGGREGATION);
+
+        ReportDefinition reportDefinition = new ReportDefinition().withName("Report-" + metricName)
+                .withWhats(metricName).withHows(STAGE_NAME);
+        createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
+        reportPage.getTableReport().drillOnAttributeValue("Short List");
+        Sleeper.sleepTight(1000); // Wait for drill report is present
+
+        TableReport drillReport = reportPage.getTableReport();
+        drillReport.waitForReportLoading();
+        List<Float> drillReportMetrics = asList(1.72400224E8f, 1.16374376E8f, 2.88774592E8f);
+        List<String> drillReportAttributes = asList("Direct Sales", "Inside Sales");
+        System.out.println("Drill metrics: " + drillReport.getMetricElements());
+        System.out.println("Drill attribues: " + drillReport.getAttributeElements());
+        assertTrue(isEqualCollection(drillReport.getMetricElements(), drillReportMetrics),
+                "Metric values list of drill report is incorrrect");
+        assertTrue(isEqualCollection(drillReport.getAttributeElements(), drillReportAttributes),
+                "Metric values list of drill report is incorrrect");
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
+    public void createInvalidMetric() {
+        CustomMetricUI customMetricInfo = new CustomMetricUI().withName("WRONG METRIC WITH BETWEEN")
+                .withMetrics(NUMBER_OF_OPEN_OPPS)
+                .withAttributes(buildAttribute(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT))
+                .withAttributeValues(
+                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2012),
+                        buildAttributeValue(DATE_DIMENSION_SNAPSHOT, YEAR_SNAPSHOT, YEAR_2010));
+        initMetricPage();
+        createCustomMetric(customMetricInfo, MetricTypes.BETWEEN, FILTER);
+
+        ReportDefinition reportDefinition = new ReportDefinition()
+                .withName("Report-" + customMetricInfo.getName()).withWhats(customMetricInfo.getName());
+        createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
+        waitForFragmentVisible(reportPage);
+        CheckUtils.checkRedBar(browser);
+        assertEquals(reportPage.getVisualiser().getDataReportHelpMessage(), NO_DATA_MATCH_REPORT_MESSAGE,
+                "Report help message is incorrect!");
+        reportPage.saveReport();
     }
 
     private void checkMetricValuesInReport(String metricName, String attributeName, List<Float> metricValues,
@@ -615,6 +714,15 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 return asList(730f, 918f);
             case WITHOUT_PF:
                 return asList(-116624637.54f);
+            case WITHIN:
+                return asList(3.0f, 2.0f, 1.0f, 1.0f, 2.0f, 4.0f, 3.0f, 2.0f, 1.0f);
+            case TOP:
+                return asList(149.0f, 210.0f, 232.0f, 272.0f, 338.0f, 437.0f, 534.0f, 730.0f, 918.0f);
+            case BOTTOM:
+                return asList(149.0f, 210.0f, 232.0f);
+            case FORECAST:
+                return asList(1.8447266E7f, 4249028.0f, 5612062.5f, 2606293.5f, 3067466.0f, 1862015.8f,
+                        3.8310752E7f, 4.2470572E7f);
         }
         return Collections.emptyList();
     }
