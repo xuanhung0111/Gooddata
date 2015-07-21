@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
@@ -13,12 +14,12 @@ import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 
 public class LongRunTimeTest extends AbstractSchedulesTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Disc-test-long-time-running-schedule";
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkScheduleAutoRun() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -38,7 +39,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkErrorExecution() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -58,7 +59,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkRetryExecution() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -83,7 +84,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkStopAutoExecution() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -97,6 +98,11 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            /*
+             * Wait for schedule execution is in running state for a few seconds to make sure that
+             * the runtime field will be shown well
+             */
+            Sleeper.sleepTightInSeconds(5);
             scheduleDetail.manualStop();
             scheduleDetail.assertManualStoppedExecution();
         } finally {
@@ -104,7 +110,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkLongTimeExecution() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -123,7 +129,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"disabledSchedule"})
     public void disableSchedule() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -147,7 +153,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"repeatedFailures"})
     public void checkScheduleFailForManyTimes() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
@@ -166,7 +172,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkScheduleTriggerByFailedSchedule() {
         try {
             String processName = "Check Schedule With Trigger Schedule";
@@ -187,7 +193,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"autoRun"})
     public void checkMultipleScheduleTriggers() {
         try {
             String processName1 = "Check Schedule With Trigger Schedule 1";
@@ -207,8 +213,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
                             .setExecutable(Executables.FAILED_GRAPH)
                             .setCronTime(ScheduleCronTimes.AFTER)
                             .setTriggerScheduleGroup(dependentScheduleBuilder1.getProcessName())
-                            .setTriggerScheduleOption(
-                                    dependentScheduleBuilder1.getExecutable().getExecutablePath());
+                            .setTriggerScheduleOption(dependentScheduleBuilder1.getScheduleName());
             prepareScheduleWithBasicPackage(dependentScheduleBuilder2);
 
             runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
@@ -221,7 +226,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule-trigger"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"disabledSchedule"})
     public void checkDisableDependentSchedule() {
         try {
             String processName = "Check Schedule With Trigger Schedule";

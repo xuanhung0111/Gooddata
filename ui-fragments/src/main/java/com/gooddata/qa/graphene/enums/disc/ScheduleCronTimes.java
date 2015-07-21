@@ -1,7 +1,5 @@
 package com.gooddata.qa.graphene.enums.disc;
 
-import java.util.Calendar;
-
 public enum ScheduleCronTimes {
 
     /*
@@ -35,12 +33,6 @@ public enum ScheduleCronTimes {
     }
 
     public int getWaitingAutoRunInMinutes() {
-        if (this != CRON_30_MINUTES && this != CRON_15_MINUTES)
-            return waitingAutoRunInMinutes;
-        Calendar startWaitingTime = Calendar.getInstance();
-        int waitingTimeFromNow =
-                waitingAutoRunInMinutes - startWaitingTime.get(Calendar.MINUTE)
-                        % waitingAutoRunInMinutes;
-        return waitingTimeFromNow;
+        return waitingAutoRunInMinutes;
     }
 }
