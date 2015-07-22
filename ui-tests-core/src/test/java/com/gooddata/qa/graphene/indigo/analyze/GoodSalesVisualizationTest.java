@@ -4,13 +4,17 @@ import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
@@ -27,6 +31,7 @@ import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -42,6 +47,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
     private static final String EXPORT_ERROR_MESSAGE = "Visualization is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to Open as Report.";
+
+    private static final String NUMBER_OF_ACTIVITIES_URI = "/gdc/md/%s/obj/14636";
 
     @BeforeClass
     public void initialize() {
@@ -235,6 +242,86 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         } finally {
             deleteMetric("aaaaA1");
             deleteMetric("AAAAb2");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(dependsOnGroups = {"init"})
+    public void checkXssInMetricAttribute() {
+        String xssAttribute = "<button>" + ACTIVITY_TYPE + "</button>";
+        String xssMetric = "<button>" + NUMBER_OF_ACTIVITIES + "</button>";
+
+        initAttributePage();
+        waitForFragmentVisible(attributePage).initAttribute(ACTIVITY_TYPE);
+        waitForFragmentVisible(attributeDetailPage).renameAttribute(xssAttribute);
+
+        initMetricPage();
+        waitForFragmentVisible(metricEditorPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricDetailPage).renameMetric(xssMetric);
+
+        try {
+            initAnalysePage();
+            assertFalse(analysisPage.searchBucketItem("<button> test XSS </button>"));
+            assertFalse(analysisPage.searchBucketItem("<script> alert('test'); </script>"));
+            assertTrue(analysisPage.searchBucketItem("<button>"));
+            assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
+
+            StringBuilder expected = new StringBuilder(xssMetric).append("\n")
+                    .append("Field Type\n")
+                    .append("Calculated Measure\n")
+                    .append("Defined As\n")
+                    .append("SELECT COUNT(Activity)\n");
+            assertEquals(analysisPage.getMetricDescription(xssMetric), expected.toString());
+
+            expected = new StringBuilder(xssAttribute).append("\n")
+                    .append("Field Type\n")
+                    .append("Attribute\n")
+                    .append("Values\n")
+                    .append("Email\n")
+                    .append("In Person Meeting\n")
+                    .append("Phone Call\n")
+                    .append("Web Meeting\n");
+            assertEquals(analysisPage.getAttributeDescription(xssAttribute), expected.toString());
+
+            analysisPage.createReport(new ReportDefinition().withMetrics(xssMetric).withCategories(xssAttribute))
+                .waitForReportComputing();
+            assertEquals(analysisPage.getAllAddedMetricNames(), asList(xssMetric));
+            assertEquals(analysisPage.getAllAddedCategoryNames(), asList(xssAttribute));
+            assertTrue(analysisPage.isFilterVisible(xssAttribute));
+            assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
+                    asList(asList(ACTIVITY_TYPE, "Email"), asList(xssMetric, "33,920")));
+        } finally {
+            initAttributePage();
+            waitForFragmentVisible(attributePage).initAttribute(xssAttribute);
+            waitForFragmentVisible(attributeDetailPage).renameAttribute(ACTIVITY_TYPE);
+
+            initMetricPage();
+            waitForFragmentVisible(metricEditorPage).openMetricDetailPage(xssMetric);
+            waitForFragmentVisible(metricDetailPage).renameMetric(NUMBER_OF_ACTIVITIES);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(dependsOnGroups = {"init"})
+    public void checkXssInMetricData() throws ParseException, JSONException, IOException {
+        initMetricPage();
+        String uri = format(NUMBER_OF_ACTIVITIES_URI, testParams.getProjectId());
+        RestUtils.changeMetricFormat(getRestApiClient(), uri, "<script> alert('test'); </script> #,##0.00");
+
+        try {
+            initAnalysePage();
+            analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
+                    .withCategories(ACTIVITY_TYPE))
+                  .addStackBy(ACTIVITY_TYPE)
+                  .waitForReportComputing();
+            ChartReport report = analysisPage.getChartReport();
+            assertTrue(report.getTrackersCount() >= 1);
+            assertEquals(report.getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
+
+            assertEquals(report.getTooltipTextOnTrackerByIndex(0),
+                    asList(asList(ACTIVITY_TYPE, "Email"), asList("Email", "<script> alert('test')")));
+        } finally {
+            RestUtils.changeMetricFormat(getRestApiClient(), uri, "#,##0");
         }
     }
 
