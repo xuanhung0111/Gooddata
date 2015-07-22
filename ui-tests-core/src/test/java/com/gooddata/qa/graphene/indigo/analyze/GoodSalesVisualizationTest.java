@@ -240,8 +240,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
     private void deleteMetric(String metric) throws InterruptedException {
         initMetricPage();
-        metricEditorPage.openMetricDetailPage(metric);
+        metricPage.openMetricDetailPage(metric);
         waitForFragmentVisible(metricDetailPage).deleteMetric();
-        assertFalse(metricEditorPage.isMetricVisible(metric));
+        assertFalse(metricPage.isMetricVisible(metric));
     }
 }

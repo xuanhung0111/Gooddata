@@ -33,7 +33,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         String screenshot = "testCustomMetricFormatting-" + format.name();
         String uri = format(NUMBER_OF_ACTIVITIES_URI, testParams.getProjectId());
         initMetricPage();
-        waitForFragmentVisible(metricEditorPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
         try {
             RestUtils.changeMetricFormat(getRestApiClient(), uri, format.toString());
             initIndigoDashboardsPage();
@@ -47,7 +47,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
             }
         } finally {
             initMetricPage();
-            waitForFragmentVisible(metricEditorPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+            waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
             waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
             assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
         }
