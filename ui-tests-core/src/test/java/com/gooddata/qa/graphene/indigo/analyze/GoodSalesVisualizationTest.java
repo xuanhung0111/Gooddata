@@ -256,7 +256,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         waitForFragmentVisible(attributeDetailPage).renameAttribute(xssAttribute);
 
         initMetricPage();
-        waitForFragmentVisible(metricEditorPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
         waitForFragmentVisible(metricDetailPage).renameMetric(xssMetric);
 
         try {
@@ -296,7 +296,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             waitForFragmentVisible(attributeDetailPage).renameAttribute(ACTIVITY_TYPE);
 
             initMetricPage();
-            waitForFragmentVisible(metricEditorPage).openMetricDetailPage(xssMetric);
+            waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric);
             waitForFragmentVisible(metricDetailPage).renameMetric(NUMBER_OF_ACTIVITIES);
         }
     }
@@ -327,8 +327,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
     private void deleteMetric(String metric) throws InterruptedException {
         initMetricPage();
-        metricEditorPage.openMetricDetailPage(metric);
+        metricPage.openMetricDetailPage(metric);
         waitForFragmentVisible(metricDetailPage).deleteMetric();
-        assertFalse(metricEditorPage.isMetricVisible(metric));
+        assertFalse(metricPage.isMetricVisible(metric));
     }
 }

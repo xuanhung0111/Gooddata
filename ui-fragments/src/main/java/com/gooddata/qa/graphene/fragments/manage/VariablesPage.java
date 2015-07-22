@@ -24,11 +24,12 @@ public class VariablesPage extends AbstractFragment {
     @FindBy(id = "variablesTable")
     private ObjectsTable variablesTable;
 
-    public void createVariable(AbstractVariable var) throws InterruptedException {
+    public String createVariable(AbstractVariable var) throws InterruptedException {
         waitForElementVisible(createVariableButton).click();
         waitForObjectPageLoaded(browser);
         String variableDetailsWindowHandle = browser.getWindowHandle();
         browser.switchTo().window(variableDetailsWindowHandle);
+        String uri = "";
 
         String varName = var.getName();
         if (var instanceof AttributeVariable) {
@@ -36,11 +37,10 @@ public class VariablesPage extends AbstractFragment {
 
             variableDetailPage.createFilterVariable(attrVar);
             openVariableFromList(varName);
+            uri = getUri();
             variableDetailPage.verifyAttributeVariable(attrVar);
-            return;
-        }
 
-        if (var instanceof NumericVariable) {
+        } else if (var instanceof NumericVariable) {
             NumericVariable numVar = (NumericVariable) var;
 
             variableDetailPage.createNumericVariable(numVar);
@@ -49,8 +49,11 @@ public class VariablesPage extends AbstractFragment {
                 variableDetailPage.setUserValueNumericVariable(numVar.getUserNumber());
                 openVariableFromList(varName);
             }
+            uri = getUri();
             variableDetailPage.verifyNumericalVariable(numVar);
         }
+
+        return uri;
     }
 
     public void openVariableFromList(String variableName) {
@@ -64,5 +67,14 @@ public class VariablesPage extends AbstractFragment {
         waitForDataPageLoaded(browser);
         waitForFragmentVisible(variablesTable);
         return variablesTable.getAllItems().contains(variableName);
+    }
+
+    private String getUri() {
+        for (String part : browser.getCurrentUrl().split("\\|")) {
+            if (part.startsWith("/gdc/md/")) {
+                return part;
+            }
+        }
+        return "";
     }
 }

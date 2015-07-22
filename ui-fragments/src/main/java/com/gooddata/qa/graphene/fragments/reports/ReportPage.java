@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collections;
@@ -177,10 +178,10 @@ public class ReportPage extends AbstractFragment {
         return reportName.getAttribute("title");
     }
 
-    public void createReport(ReportDefinition reportDefinition) throws InterruptedException {
+    public void createReport(ReportDefinition reportDefinition) {
         // Wait to avoid red bar randomly
         // Red bar message: An error occurred while performing this operation.
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
 
         setReportName(reportDefinition.getName());
 
@@ -214,7 +215,7 @@ public class ReportPage extends AbstractFragment {
         // Report have to refresh some parts, e.g. the What button have to enable, then disable, then enable.
         // If we navigate to another url when create report is not finished, unsaved change dialog will appear.
         // Use sleep here to make sure that process is finished
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
     }
 
     public void createSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal){
@@ -270,7 +271,7 @@ public class ReportPage extends AbstractFragment {
         return reportName;
     }
 
-    public void addFilter(FilterItem filterItem) throws InterruptedException {
+    public ReportPage addFilter(FilterItem filterItem) {
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(filterButton).click();
         waitForElementVisible(reportFilter.getRoot());
@@ -296,16 +297,17 @@ public class ReportPage extends AbstractFragment {
         textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountAfter = getNumber(textOnFilterButton);
         assertEquals(filterCountAfter, filterCountBefore + 1, "Filter wasn't added");
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
+        return this;
     }
 
-    public void saveReport() throws InterruptedException {
+    public void saveReport() {
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(createReportButton).click();
         if (browser.findElements(By.xpath(confirmSaveDialogLocator)).size() > 0) {
             waitForElementVisible(confirmSaveButton).click();
         }
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
     }
 

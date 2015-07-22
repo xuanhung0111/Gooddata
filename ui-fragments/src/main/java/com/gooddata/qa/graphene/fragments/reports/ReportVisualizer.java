@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.Sleeper.*;
 
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class ReportVisualizer extends AbstractFragment {
 
     private String selectedFactLocator ="//select[contains(@class,'s-sme-objSelect')]/option[text()='${factName}']";
 
-    public ReportVisualizer selectWhatArea(List<WhatItem> what) throws InterruptedException {
+    public ReportVisualizer selectWhatArea(List<WhatItem> what) {
         waitForElementVisible(whatButton).click();
 
         for (WhatItem item : what) {
@@ -97,13 +98,13 @@ public class ReportVisualizer extends AbstractFragment {
         return this;
     }
 
-    private void selectAndConfigureMetric(WhatItem what) throws InterruptedException {
+    private void selectAndConfigureMetric(WhatItem what) {
         for (WebElement metric : whatMetrics) {
             if (!what.getMetric().equals(metric.getText().trim()))
                 continue;
 
             metric.findElement(By.cssSelector("input")).click();
-            Thread.sleep(2000);
+            sleepTightInSeconds(2);
 
             if (what.getDrillStep() == null)
                 break;
@@ -127,7 +128,7 @@ public class ReportVisualizer extends AbstractFragment {
         return null;
     }
 
-    public void selectHowArea(List<HowItem> how) throws InterruptedException {
+    public void selectHowArea(List<HowItem> how) {
         waitForElementVisible(howButton).click();
 
         for (HowItem howItem : how) {
@@ -150,13 +151,13 @@ public class ReportVisualizer extends AbstractFragment {
         }
     }
 
-    private WebElement selectAttributeWithPosition(Attribute attribute, HowItem.Position position) throws InterruptedException {
+    private WebElement selectAttributeWithPosition(Attribute attribute, HowItem.Position position) {
         String attributeName = attribute.getName();
         selectAttribute(attributeName);
 
-        Thread.sleep(500);
+        sleepTight(500);
         WebElement attributeElement = findAttribute(attributeName);
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         WebElement attributePositionElement = waitForElementVisible(attributeElement.findElement(By.cssSelector("div")));
         String attributeClass =  attributePositionElement.getAttribute("class");
 
@@ -167,7 +168,7 @@ public class ReportVisualizer extends AbstractFragment {
         return attributeElement;
     }
 
-    private void selectAttribute(String attribute) throws InterruptedException {
+    private void selectAttribute(String attribute) {
         searchAndWaitForItemReloaded(attributeFilterInput, attribute, howAttributes);
         findAttribute(attribute).findElement(By.cssSelector("input")).click();
     }
@@ -198,10 +199,10 @@ public class ReportVisualizer extends AbstractFragment {
         waitForElementVisible(addMetricButton).click();
     }
 
-    public ReportVisualizer finishReportChanges() throws InterruptedException {
+    public ReportVisualizer finishReportChanges() {
         // When webapp do a lot of CRUD things, its rendering job will work slowly,
         // so need a short time to wait in case like this
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
 
         waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser).sendKeys(Keys.ENTER);
         return this;
@@ -234,15 +235,15 @@ public class ReportVisualizer extends AbstractFragment {
     }
 
     private void searchAndWaitForItemReloaded(WebElement input, String searchItem,
-            final List<WebElement> itemsShouldBeReloaded) throws InterruptedException {
+            final List<WebElement> itemsShouldBeReloaded) {
         waitForElementVisible(input).clear();
         input.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         waitForCollectionIsEmpty(itemsShouldBeReloaded);
 
         input.clear();
         input.sendKeys(searchItem);
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         waitForCollectionIsNotEmpty(itemsShouldBeReloaded);
     }
 

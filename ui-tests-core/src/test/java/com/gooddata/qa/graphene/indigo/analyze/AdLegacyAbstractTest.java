@@ -918,7 +918,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         JSONException, IOException {
         initMetricPage();
 
-        waitForFragmentVisible(metricEditorPage).openMetricDetailPage(metric1);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(metric1);
         String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
         RestUtils.changeMetricFormat(getRestApiClient(), format(metric1Uri, testParams.getProjectId()),
                 oldFormat + "[red]");
@@ -937,7 +937,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
             assertEquals(tableReport.getFormatFromValue(dataLabels.get(0)), "color: rgb(255, 0, 0);");
         } finally {
             initMetricPage();
-            waitForFragmentVisible(metricEditorPage).openMetricDetailPage(metric1);
+            waitForFragmentVisible(metricPage).openMetricDetailPage(metric1);
             waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
             assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
         }

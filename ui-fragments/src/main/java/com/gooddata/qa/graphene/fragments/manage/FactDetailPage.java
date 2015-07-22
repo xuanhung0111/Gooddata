@@ -68,7 +68,7 @@ public class FactDetailPage extends AbstractFragment {
         waitForElementVisible(metricLink, browser).click();
         String expectedMaql = String.format("SELECT %s(%s)", metricType, factName);
         String expectedFormat = "#,##0.00";
-        metricDetailPage.checkCreatedMetric(metricName, expectedMaql, expectedFormat);
+        assertTrue(metricDetailPage.isMetricCreatedSuccessfully(metricName, expectedMaql, expectedFormat));
     }
 
     public void changeFactFolder(String newFolderName) {

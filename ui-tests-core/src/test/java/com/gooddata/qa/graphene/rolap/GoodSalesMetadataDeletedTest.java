@@ -479,7 +479,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
                 return true;
             case METRIC:
                 initMetricPage();
-                return !metricEditorPage.isMetricVisible(object);
+                return !metricPage.isMetricVisible(object);
             case ATTRIBUTE:
                 initAttributePage();
                 return !attributePage.isAttributeVisible(object);
@@ -619,7 +619,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private String createMetricUsing(AttributeInfo attribute) throws InterruptedException {
         String name = "Metric " + System.currentTimeMillis();
         initMetricPage();
-        metricEditorPage.createDifferentMetric(name, WIN_RATE_METRIC, attribute.dataset, attribute.name,
+        metricPage.createDifferentMetric(name, WIN_RATE_METRIC, attribute.dataset, attribute.name,
                 attribute.elements[0].name);
 
         return name;
