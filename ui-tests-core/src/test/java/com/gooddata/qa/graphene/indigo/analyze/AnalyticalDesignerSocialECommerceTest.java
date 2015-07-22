@@ -76,7 +76,7 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
             .withFilters(DATE);
 
         verifyChartReport(reportDefinition, Arrays.asList(Arrays.asList(DEVICE, "Tablet"),
-                Arrays.asList(ORDERS, "11%")));
+                Arrays.asList(ORDERS, "0.11")));
     }
 
     @SuppressWarnings("unchecked")
