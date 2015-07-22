@@ -45,9 +45,18 @@ public class MetricDetailsPage extends AbstractFragment {
         return waitForElementVisible(metricFormat).getText();
     }
 
-    public void checkCreatedMetric(String metricName, String expectedMaql, String expectedFormat) {
-        assertEquals(getMAQL(metricName), expectedMaql, "Metric is not created properly");
-        assertEquals(getMetricFormat(), expectedFormat, "Metric format is not set properly");
+    public boolean isMetricCreatedSuccessfully(String metricName, String expectedMaql, String expectedFormat) {
+        if (!expectedMaql.equals(getMAQL(metricName))) {
+            System.out.println("Metric is not created properly");
+            return false;
+        }
+
+        if (!expectedFormat.equals(getMetricFormat())) {
+            System.out.println("Metric format is not set properly");
+            return false;
+        }
+
+        return true;
     }
 
     public void changeMetricFormat(MetricFormatterDialog.Formatter format) {
@@ -62,12 +71,12 @@ public class MetricDetailsPage extends AbstractFragment {
                 waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
     }
 
-    public void deleteMetric() throws InterruptedException {
+    public void deleteMetric() {
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(CONFIRM_DELETE_BUTTON_LOCATOR, browser).click();
         waitForDataPageLoaded(browser);
     }
-    
+
     public void setMetricVisibleToAllUser() {
         waitForElementVisible(sharingAndPermissionsButton).click();
         final WebElement checkbox = waitForElementVisible(VISIBILITY_CHECKBOX, browser);

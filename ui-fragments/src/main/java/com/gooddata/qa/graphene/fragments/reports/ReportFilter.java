@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 import static com.gooddata.qa.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +100,7 @@ public class ReportFilter extends AbstractFragment {
     private String listOfElementLocator = 
             "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
 
-    public void addFilterSelectList(SelectFromListValuesFilterItem filterItem) throws InterruptedException {
+    public void addFilterSelectList(SelectFromListValuesFilterItem filterItem) {
         System.out.println("Adding attribute filter ......");
         WebElement addFilterButton = waitForElementVisible(BY_ADD_FILTER_BUTTON, browser);
 
@@ -123,10 +124,10 @@ public class ReportFilter extends AbstractFragment {
     /* 
      * Please do not refactor it or make sure Zendesk4CheckTest is passed.
      */
-    private void searchAndSelectAttribute(String attribute) throws InterruptedException {
+    private void searchAndSelectAttribute(String attribute) {
         String panelLocator = ".gdc-overlay-simple:not(.hidden):not(.yui3-overlay-hidden)";
         waitForElementVisible(By.cssSelector(panelLocator + " input.gdc-input"), browser).sendKeys(attribute);
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         waitForElementVisible(By.cssSelector(panelLocator + " div.es_body:not(.hidden):not(.gdc-hidden)"),
                 browser).click();
         waitForElementVisible(By.cssSelector(panelLocator + " .s-btn-select"), browser).click();
@@ -135,13 +136,13 @@ public class ReportFilter extends AbstractFragment {
     /* 
      * Please do not refactor it or make sure Zendesk4CheckTest is passed.
      */
-    private void searchAndSelectAttributeValues(Collection<String> values) throws InterruptedException {
+    private void searchAndSelectAttributeValues(Collection<String> values) {
         String panelLocator = ".listContainer";
         WebElement input = waitForElementVisible(By.cssSelector(panelLocator + " input.gdc-input"), browser);
         for (String val: values) {
             input.clear();
             input.sendKeys(val);
-            Thread.sleep(3000);
+            sleepTightInSeconds(3);
             waitForElementVisible(By.cssSelector(panelLocator +
                     " div.es_body:not(.hidden):not(.gdc-hidden) > input"), browser).click();
         }
@@ -156,7 +157,7 @@ public class ReportFilter extends AbstractFragment {
         waitForElementVisible(By.xpath(createAttributeXPath(ATTRIBUTE_IN_HOW_FROM_LIST, "${label}", elementName)), browser).click();
     }
 
-    public void addRankFilter(RankingFilterItem filterItem) throws InterruptedException {
+    public void addRankFilter(RankingFilterItem filterItem) {
         System.out.println("Adding Rank Filter ......");
         String attribute = filterItem.getAttribute();
         String metric = filterItem.getMetric();
@@ -183,7 +184,7 @@ public class ReportFilter extends AbstractFragment {
         } else {
             waitForElementVisible(topOption).click();
         }
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         waitForElementVisible(rankSizeSelect);
         if (Arrays.asList(1, 3, 5, 10).contains(rankSize)) {
             rankSizeSelect.selectByValue(String.valueOf(rankSize));

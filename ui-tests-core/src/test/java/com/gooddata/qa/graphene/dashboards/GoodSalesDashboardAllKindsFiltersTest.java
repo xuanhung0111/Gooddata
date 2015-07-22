@@ -10,10 +10,8 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -21,6 +19,9 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
+import com.gooddata.md.Metric;
+import com.gooddata.project.Project;
 import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.HowItem;
@@ -31,7 +32,6 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
-import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
@@ -51,6 +51,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     private static final String YEAR_SNAPSHOT = "Year (Snapshot)";
 
     private static final String STAGE_NAME_FILTER = "stage_name";
+
+    private String nVariableUri = "";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -211,7 +213,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         variablePage.createVariable(new AttributeVariable("FQuarter/Year")
                 .withAttribute("Quarter/Year (Snapshot)").withAttributeElements("Q1/2012", "Q2/2012", "Q3/2012",
                         "Q4/2012"));
-        variablePage.createVariable(new NumericVariable("NVariable").withDefaultNumber(123456));
+        nVariableUri = variablePage.createVariable(new NumericVariable("NVariable").withDefaultNumber(123456));
     }
 
     @Test(dependsOnMethods = {"createVariables"})
@@ -294,18 +296,17 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         variablePage.openVariableFromList("NVariable");
         variableDetailPage.setDefaultValue(2011);
 
-        initMetricPage();
-        Map<String, String> data = new HashMap<String, String>();
-        data.put("metric0", AMOUNT);
-        data.put("attrFolder0", "Date dimension (Snapshot)");
-        data.put("attribute0", YEAR_SNAPSHOT);
-        data.put("variable0", "NVariable");
-        metricEditorPage.createFilterMetric(MetricTypes.GREATER, "NVariable", data);
+        GoodData goodDataClient = getGoodDataClient();
+        Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
+        String metric = "GREATER-NVariable";
+        String expression = "SELECT [/gdc/md/${pid}/obj/1279] WHERE [/gdc/md/${pid}/obj/513] > [" +
+                nVariableUri + "]";
+        goodDataClient.getMetadataService().createObj(project, new Metric(metric,
+                expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
 
         initReportsPage();
-        createReport(
-                new ReportDefinition().withName("Report 4").withWhats(AMOUNT, "NVariable").withHows(YEAR_SNAPSHOT),
-                "Report 4");
+        createReport(new ReportDefinition().withName("Report 4").withWhats(AMOUNT, metric)
+                .withHows(YEAR_SNAPSHOT), "Report 4");
 
         initDashboardsPage();
         try {

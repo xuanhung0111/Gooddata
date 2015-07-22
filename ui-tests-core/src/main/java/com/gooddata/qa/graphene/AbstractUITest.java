@@ -116,7 +116,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected MetricDetailsPage metricDetailPage;
 
     @FindBy(id = "new")
-    protected MetricEditorDialog metricEditorPage;
+    protected MetricPage metricPage;
 
     @FindBy(id = "factsTable")
     protected ObjectsTable factsTable;
@@ -361,7 +361,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForDashboardPage();
     }
 
-    public void createReport(ReportDefinition reportDefinition, String screenshotName) throws InterruptedException {
+    public void createReport(ReportDefinition reportDefinition, String screenshotName) {
         initReportsPage();
         selectReportsDomainFolder("My Reports");
         reportsPage.startCreateReport();
