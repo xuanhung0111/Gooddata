@@ -1,23 +1,28 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import org.openqa.selenium.By;
 /**
  * Kpi - key performance indicator widget
  */
 public class Kpi extends AbstractFragment {
-    public static final String MAIN_CLASS = "s-dashboard-kpi-component";
+    // TODO: when having more widget types, separate, keep "Add widget" in mind
+    public static final String MAIN_CLASS = "dash-item";
+    public static final String KPI_CSS_SELECTOR = "." + MAIN_CLASS + ":not(.is-placeholder)";
 
-    public static final By IS_WIDGET_LOADING = By.cssSelector("." + MAIN_CLASS + ".widget-loading");
+    public static final By IS_WIDGET_LOADING = By.cssSelector("." + MAIN_CLASS + " .widget-loading");
 
-    public static final By IS_CONTENT_LOADING = By.cssSelector("." + MAIN_CLASS + ".content-loading");
+    public static final By IS_CONTENT_LOADING = By.cssSelector("." + MAIN_CLASS + " .content-loading");
 
-    public static final By IS_EDITABLE = By.cssSelector("." + MAIN_CLASS + ".is-editable");
+    public static final By IS_EDITABLE = By.cssSelector("." + MAIN_CLASS + " .is-editable");
+
+    @FindBy(css = ".dash-item-delete")
+    protected WebElement deleteButton;
 
     @FindBy(css = ".kpi-headline > h3")
     private WebElement headline;
@@ -65,5 +70,9 @@ public class Kpi extends AbstractFragment {
 
     public String getMetric() {
         return waitForElementVisible(metric).getText();
+    }
+
+    public void deleteKpi() {
+        waitForElementVisible(deleteButton).click();
     }
 }

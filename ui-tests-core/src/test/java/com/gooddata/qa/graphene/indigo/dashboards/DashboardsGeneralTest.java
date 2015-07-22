@@ -17,13 +17,4 @@ public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
     public void initDashboardTests() {
         initDashboardsPage();
     }
-
-    protected Kpi selectKpiByIndex(int index) {
-        Kpi selectedKpi = initIndigoDashboardsPage()
-            .switchToEditMode()
-            .waitForKpiEditable()
-            .selectKpi(index);
-
-        return selectedKpi;
-    }
 }
