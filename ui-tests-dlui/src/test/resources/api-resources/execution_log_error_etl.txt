@@ -53,7 +53,7 @@ SQL query: SELECT
 Rows retrieved: 54657
 End of retrieving data from ADS output stage
 Retrieving data from ADS output stage
-Rows retrieved: 1440615
+Rows retrieved: 301628
 End of retrieving data from ADS output stage
 ====================== SLI Manifest ======================
 
