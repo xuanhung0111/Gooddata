@@ -362,15 +362,20 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void createReport(ReportDefinition reportDefinition, String screenshotName) {
+        initReportCreation();
+        reportPage.createReport(reportDefinition);
+        Screenshots.takeScreenshot(browser, screenshotName + "-" + reportDefinition.getName() + "-" +
+                reportDefinition.getType().getName(), this.getClass());
+        checkRedBar(browser);
+    }
+
+    public void initReportCreation() {
         initReportsPage();
         selectReportsDomainFolder("My Reports");
         reportsPage.startCreateReport();
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
         assertNotNull(reportPage, "Report page not initialized!");
-        reportPage.createReport(reportDefinition);
-        Screenshots.takeScreenshot(browser, screenshotName + "-" + reportDefinition.getName() + "-" + reportDefinition.getType().getName(), this.getClass());
-        checkRedBar(browser);
     }
 
     public void verifyDashboardExport(String dashboardName, long minimalSize) {
