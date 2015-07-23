@@ -32,6 +32,8 @@ public class ReportVisualizer extends AbstractFragment {
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
+    private static final String SND_UNREACHABLE_CLASS = "sndUnReachable";
+
     @FindBy(css = ".s-snd-AttributesContainer .element .metricName")
     private List<WebElement> howAttributes;
 
@@ -88,6 +90,8 @@ public class ReportVisualizer extends AbstractFragment {
 
     private String selectedFactLocator ="//select[contains(@class,'s-sme-objSelect')]/option[text()='${factName}']";
 
+    private static final By EMPTY_DATA_REPORT_HELP = By.id("emptyDataReportHelp");
+
     public ReportVisualizer selectWhatArea(List<WhatItem> what) {
         waitForElementVisible(whatButton).click();
 
@@ -135,6 +139,20 @@ public class ReportVisualizer extends AbstractFragment {
             WebElement attribute = selectAttributeWithPosition(howItem.getAttribute(), howItem.getPosition());
             filterHowAttribute(attribute, howItem);
         }
+    }
+
+    public void clickOnHow() {
+        waitForElementVisible(howButton).click();
+    }
+
+    public boolean isGreyedOutAttribute(String attribute) {
+        searchAndWaitForItemReloaded(attributeFilterInput, attribute, howAttributes);
+        return findAttribute(attribute).findElement(BY_PARENT)
+                .getAttribute("class").contains(SND_UNREACHABLE_CLASS);
+    }
+
+    public String getDataReportHelpMessage() {
+        return waitForElementVisible(EMPTY_DATA_REPORT_HELP, browser).findElement(By.className("alert")).getText();
     }
 
     private void filterHowAttribute(WebElement attribute, HowItem howItem) {

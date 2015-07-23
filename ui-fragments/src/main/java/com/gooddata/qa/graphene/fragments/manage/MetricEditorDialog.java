@@ -76,6 +76,8 @@ public class MetricEditorDialog extends AbstractFragment {
         createTemplateMetricTab(metricType);
         if (metricType == MetricTypes.COUNT) {
             selectAttributes(metricUI);
+        } else if (metricType == MetricTypes.FORECAST) {
+            selectMetrics(metricUI);
         } else {
             selectFacts(metricUI);
         }
