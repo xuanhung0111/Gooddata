@@ -18,6 +18,13 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest {
 
     protected static final String DATE = "Date";
+    protected static final String NUMBER_OF_ACTIVITIES = "# of Activities";
+    protected static final String ACTIVITY_TYPE = "Activity Type";
+    protected static final String AMOUNT = "Amount";
+    protected static final String STAGE_NAME = "Stage Name";
+    protected static final String ACCOUNT = "Account";
+    protected static final String DEPARTMENT = "Department";
+
     protected boolean isWalkmeTurnOff = false;
 
     @BeforeClass

@@ -14,10 +14,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Metrics
 
 public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
-    private static final String AMOUNT = "Amount";
     private static final String DURATION = "Duration";
-    private static final String ACTIVITY_TYPE = "Activity Type";
 
     @BeforeClass
     public void initialize() {

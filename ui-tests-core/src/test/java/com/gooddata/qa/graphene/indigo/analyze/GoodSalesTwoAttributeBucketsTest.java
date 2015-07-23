@@ -17,10 +17,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
     private static final String BEST_CASE = "Best Case";
-    private static final String ACTIVITY_TYPE = "Activity Type";
-    private static final String DEPARTMENT = "Department";
     private static final String PRIORITY = "Priority";
     private static final String REGION = "Region";
 

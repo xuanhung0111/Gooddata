@@ -21,8 +21,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String AMOUNT = "Amount";
-    private static final String STAGE_NAME = "Stage Name";
     private static final String SUM_OF_AMOUNT = "Sum of " + AMOUNT;
 
     @BeforeClass

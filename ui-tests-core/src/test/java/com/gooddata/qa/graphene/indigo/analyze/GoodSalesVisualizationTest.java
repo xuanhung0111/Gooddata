@@ -37,13 +37,7 @@ import com.google.common.collect.Iterables;
 
 public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String AMOUNT = "Amount";
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
     private static final String NUMBER_OF_WON_OPPS = "# of Won Opps.";
-    private static final String STAGE_NAME = "Stage Name";
-    private static final String ACCOUNT = "Account";
-    private static final String ACTIVITY_TYPE = "Activity Type";
-    private static final String DEPARTMENT = "Department";
     private static final String PERCENT_OF_GOAL = "% of Goal";
     private static final String IS_WON = "Is Won?";
 
