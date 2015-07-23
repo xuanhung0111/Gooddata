@@ -7,10 +7,14 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static org.testng.Assert.*;
 
 public class DeployForm extends AbstractFragment {
+
+    private static final String INVALID_PACKAGE_ERROR =
+            "A zip file is required. The file must be smaller than 5 MB.";
 
     private static final By BY_FILE_INPUT_ERROR = By
             .cssSelector(".select-zip .zip-name-text input");
@@ -63,8 +67,7 @@ public class DeployForm extends AbstractFragment {
 
     public void assertInvalidPackageError() {
         assertTrue(inputFileHasError());
-        assertEquals(getErrorBubble().getText(),
-                "A zip file is required. The file must be smaller than 1MB.");
+        assertEquals(getErrorBubble().getText(), INVALID_PACKAGE_ERROR);
     }
 
     public void assertInvalidProcessNameError() {
