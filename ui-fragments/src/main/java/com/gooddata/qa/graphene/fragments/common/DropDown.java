@@ -23,6 +23,11 @@ public class DropDown extends AbstractFragment {
     private List<WebElement> items;
 
     public void selectItem(String name) {
+        tryToSelectItem(name);
+        waitForElementNotVisible(this.getRoot());
+    }
+
+    public void tryToSelectItem(String name) {
         for (WebElement e : items) {
             if (!name.equals(e.getText().trim()))
                 continue;
@@ -30,11 +35,9 @@ public class DropDown extends AbstractFragment {
             e.click();
             break;
         }
-
-        waitForElementNotVisible(this.getRoot());
     }
 
-    public void searchItem(String name) {
+    public DropDown searchItem(String name) {
         waitForElementVisible(this.getRoot());
 
         waitForElementVisible(searchInput).clear();
@@ -44,6 +47,7 @@ public class DropDown extends AbstractFragment {
         searchInput.clear();
         searchInput.sendKeys(name);
         waitForCollectionIsNotEmpty(items);
+        return this;
     }
 
     public void searchAndSelectItem(String name) {

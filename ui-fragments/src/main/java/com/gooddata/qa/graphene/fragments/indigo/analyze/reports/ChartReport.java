@@ -41,7 +41,7 @@ public class ChartReport extends AbstractFragment {
 
     private static final String DESELECTED_COLOR = "rgb(216,216,216)";
 
-    private static final By BY_Y_AXIS_TITLE = By.cssSelector(".highcharts-yaxis-title > tspan");
+    private static final By BY_Y_AXIS_TITLE = By.cssSelector(".highcharts-yaxis-title");
 
     public String getYaxisTitle() {
         List<WebElement> yAxisTitle = getRoot().findElements(BY_Y_AXIS_TITLE);

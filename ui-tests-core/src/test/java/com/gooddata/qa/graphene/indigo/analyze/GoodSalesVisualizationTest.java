@@ -32,13 +32,7 @@ import com.google.common.collect.Iterables;
 
 public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String AMOUNT = "Amount";
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
     private static final String NUMBER_OF_WON_OPPS = "# of Won Opps.";
-    private static final String STAGE_NAME = "Stage Name";
-    private static final String ACCOUNT = "Account";
-    private static final String ACTIVITY_TYPE = "Activity Type";
-    private static final String DEPARTMENT = "Department";
 
     private static final String EXPORT_ERROR_MESSAGE = "Visualization is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to Open as Report.";
