@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.entity.disc;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
@@ -375,7 +376,14 @@ public class ScheduleBuilder {
         }
 
         public int getWaitingAutoRunInMinutes() {
-            return waitingAutoRunInMinutes;
+            if (this.getCronTime() != ScheduleCronTimes.CRON_30_MINUTES
+                    && this.getCronTime() != ScheduleCronTimes.CRON_15_MINUTES)
+                return waitingAutoRunInMinutes;
+            Calendar startWaitingTime = Calendar.getInstance();
+            int waitingTimeFromNow =
+                    waitingAutoRunInMinutes - startWaitingTime.get(Calendar.MINUTE)
+                            % waitingAutoRunInMinutes;
+            return waitingTimeFromNow;
         }
 
         public CronTimeBuilder setWaitingAutoRunInMinutes(int waitingAutoRunInMinutes) {
