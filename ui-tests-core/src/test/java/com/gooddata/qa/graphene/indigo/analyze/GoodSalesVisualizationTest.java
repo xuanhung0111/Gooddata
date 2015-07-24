@@ -44,11 +44,13 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     private static final String ACCOUNT = "Account";
     private static final String ACTIVITY_TYPE = "Activity Type";
     private static final String DEPARTMENT = "Department";
+    private static final String PERCENT_OF_GOAL = "% of Goal";
+    private static final String IS_WON = "Is Won?";
 
     private static final String EXPORT_ERROR_MESSAGE = "Visualization is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to Open as Report.";
 
-    private static final String NUMBER_OF_ACTIVITIES_URI = "/gdc/md/%s/obj/14636";
+    private static final String PERCENT_OF_GOAL_URI = "/gdc/md/%s/obj/8136";
 
     @BeforeClass
     public void initialize() {
@@ -248,15 +250,15 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @SuppressWarnings("unchecked")
     @Test(dependsOnGroups = {"init"})
     public void checkXssInMetricAttribute() {
-        String xssAttribute = "<button>" + ACTIVITY_TYPE + "</button>";
-        String xssMetric = "<button>" + NUMBER_OF_ACTIVITIES + "</button>";
+        String xssAttribute = "<button>" + IS_WON + "</button>";
+        String xssMetric = "<button>" + PERCENT_OF_GOAL + "</button>";
 
         initAttributePage();
-        waitForFragmentVisible(attributePage).initAttribute(ACTIVITY_TYPE);
+        waitForFragmentVisible(attributePage).initAttribute(IS_WON);
         waitForFragmentVisible(attributeDetailPage).renameAttribute(xssAttribute);
 
         initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);
         waitForFragmentVisible(metricDetailPage).renameMetric(xssMetric);
 
         try {
@@ -270,17 +272,15 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                     .append("Field Type\n")
                     .append("Calculated Measure\n")
                     .append("Defined As\n")
-                    .append("SELECT COUNT(Activity)\n");
+                    .append("select Won/Quota\n");
             assertEquals(analysisPage.getMetricDescription(xssMetric), expected.toString());
 
             expected = new StringBuilder(xssAttribute).append("\n")
                     .append("Field Type\n")
                     .append("Attribute\n")
                     .append("Values\n")
-                    .append("Email\n")
-                    .append("In Person Meeting\n")
-                    .append("Phone Call\n")
-                    .append("Web Meeting\n");
+                    .append("false\n")
+                    .append("true\n");
             assertEquals(analysisPage.getAttributeDescription(xssAttribute), expected.toString());
 
             analysisPage.createReport(new ReportDefinition().withMetrics(xssMetric).withCategories(xssAttribute))
@@ -289,15 +289,15 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             assertEquals(analysisPage.getAllAddedCategoryNames(), asList(xssAttribute));
             assertTrue(analysisPage.isFilterVisible(xssAttribute));
             assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
-                    asList(asList(ACTIVITY_TYPE, "Email"), asList(xssMetric, "33,920")));
+                    asList(asList(IS_WON, "true"), asList(xssMetric, "[1161")));
         } finally {
             initAttributePage();
             waitForFragmentVisible(attributePage).initAttribute(xssAttribute);
-            waitForFragmentVisible(attributeDetailPage).renameAttribute(ACTIVITY_TYPE);
+            waitForFragmentVisible(attributeDetailPage).renameAttribute(IS_WON);
 
             initMetricPage();
             waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric);
-            waitForFragmentVisible(metricDetailPage).renameMetric(NUMBER_OF_ACTIVITIES);
+            waitForFragmentVisible(metricDetailPage).renameMetric(PERCENT_OF_GOAL);
         }
     }
 
@@ -305,23 +305,26 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void checkXssInMetricData() throws ParseException, JSONException, IOException {
         initMetricPage();
-        String uri = format(NUMBER_OF_ACTIVITIES_URI, testParams.getProjectId());
+        waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);
+        String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
+
+        String uri = format(PERCENT_OF_GOAL_URI, testParams.getProjectId());
         RestUtils.changeMetricFormat(getRestApiClient(), uri, "<script> alert('test'); </script> #,##0.00");
 
         try {
             initAnalysePage();
-            analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
-                    .withCategories(ACTIVITY_TYPE))
-                  .addStackBy(ACTIVITY_TYPE)
+            analysisPage.createReport(new ReportDefinition().withMetrics(PERCENT_OF_GOAL)
+                    .withCategories(IS_WON))
+                  .addStackBy(IS_WON)
                   .waitForReportComputing();
             ChartReport report = analysisPage.getChartReport();
             assertTrue(report.getTrackersCount() >= 1);
-            assertEquals(report.getLegends(), asList("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
+            assertEquals(report.getLegends(), asList("true"));
 
             assertEquals(report.getTooltipTextOnTrackerByIndex(0),
-                    asList(asList(ACTIVITY_TYPE, "Email"), asList("Email", "<script> alert('test')")));
+                    asList(asList(IS_WON, "true"), asList("true", "<script> alert('test')")));
         } finally {
-            RestUtils.changeMetricFormat(getRestApiClient(), uri, "#,##0");
+            RestUtils.changeMetricFormat(getRestApiClient(), uri, oldFormat);
         }
     }
 
