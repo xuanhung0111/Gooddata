@@ -90,8 +90,8 @@ public class TableReport extends AbstractReport {
         waitForReportLoading();
         List<List<String>> result = Lists.newArrayList();
         List<String> row = null;
+        List<String> lastRow = null;
         Pair<Integer, Integer> possition = null;
-        String text = null;
         int lastRowIndex = 0;
 
         for (WebElement element: attributeElementInGrid) {
@@ -99,12 +99,14 @@ public class TableReport extends AbstractReport {
             if (possition.getLeft() == lastRowIndex + 1) {
                 if (row != null) {
                     result.add(row);
-                    text = row.get(0);
+                    lastRow = row;
                 }
                 lastRowIndex++;
                 row = Lists.newArrayList();
                 if (possition.getRight() > 0) {
-                    row.add(text);
+                    for (int i = 0; i < possition.getRight(); i++) {
+                        row.add(lastRow.get(i));
+                    }
                 }
             }
             row.add(element.getText().trim());
