@@ -549,7 +549,7 @@ public class RestUtils {
         try {
             HttpResponse getResponse = restApiClient.execute(getRequest);
             assertEquals(getResponse.getStatusLine().getStatusCode(), HttpStatus.OK.value(),
-                    "Invalid link!");
+                    "Invalid link: " + link);
 
             EntityUtils.consumeQuietly(getResponse.getEntity());
         } finally {
