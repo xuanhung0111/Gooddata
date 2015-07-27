@@ -457,4 +457,22 @@ public class AnalysisPage extends AbstractFragment {
         waitForFragmentVisible(bucketsPanel).collapseMetricConfiguration(metric);
         return this;
     }
+
+    public AnalysisPage addFilterMetric(String metric, String attribute, String... values) {
+        waitForFragmentVisible(bucketsPanel).addFilterMetric(metric, attribute, values);
+        return this;
+    }
+
+    public String getFilterMetricText(String metric) {
+        return waitForFragmentVisible(bucketsPanel).getFilterMetricText(metric);
+    }
+
+    public boolean canAddAnotherAttributeFilterToMetric(String metric) {
+        return waitForFragmentVisible(bucketsPanel).canAddAnotherAttributeFilterToMetric(metric);
+    }
+
+    public AnalysisPage removeAttributeFilterFromMetric(String metric) {
+        waitForFragmentVisible(bucketsPanel).removeAttributeFilterFromMetric(metric);
+        return this;
+    }
 }

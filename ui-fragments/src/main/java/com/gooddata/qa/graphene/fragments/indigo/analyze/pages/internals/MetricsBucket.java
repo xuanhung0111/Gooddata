@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
@@ -8,6 +9,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.Collection;
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
@@ -17,7 +19,9 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -43,6 +47,10 @@ public class MetricsBucket extends AbstractFragment {
     private static final By BY_STACK_WARNING = By.className("adi-stack-warn");
     public static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
     private static final By BY_HEADER = By.className("adi-bucket-item-header");
+    private static final By BY_ADD_ATTRIBUTE_FILTER = By.className("s-btn-add_attribute_filter");
+    private static final By BY_REMOVE_ATTRIBUTE_FILTER = By.className("remove-attribute-filter");
+    private static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
+    private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
 
     public void addMetric(WebElement metric) {
         new Actions(browser).dragAndDrop(metric, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
@@ -173,6 +181,33 @@ public class MetricsBucket extends AbstractFragment {
         getHeaderFrom(metric).click();
     }
 
+    public void addFilterMetric(String metric, String attribute, String... values) {
+        getMetric(metric).findElement(BY_ADD_ATTRIBUTE_FILTER).click();
+
+        Graphene.createPageFragment(DropDown.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
+                .searchItem(attribute)
+                .tryToSelectItem(attribute);
+
+        Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
+                .clear()
+                .selectItems(values)
+                .apply();
+    }
+
+    public String getFilterMetricText(String metric) {
+        return getMetric(metric).findElement(BY_ATTRIBUTE_FILTER_BUTTON).getText();
+    }
+
+    public boolean canAddAnotherAttributeFilterToMetric(String metric) {
+        return getMetric(metric).findElements(BY_ADD_ATTRIBUTE_FILTER).size() > 0;
+    }
+
+    public void removeAttributeFilterFromMetric(String metric) {
+        getMetric(metric).findElement(BY_REMOVE_ATTRIBUTE_FILTER).click();
+    }
+
     private WebElement getMetric(final String name) {
         WebElement item = getItem(name);
         if (item == null) {
@@ -183,7 +218,7 @@ public class MetricsBucket extends AbstractFragment {
 
     private WebElement getItem(final String name) {
         for (WebElement input : items) {
-            if (name.equals(getHeaderFrom(input).getText())) {
+            if (name.equals(getHeaderFrom(input).findElement(By.className("s-title")).getText())) {
                 return input;
             }
         }
@@ -197,5 +232,41 @@ public class MetricsBucket extends AbstractFragment {
 
     private WebElement getHeaderFrom(WebElement metric) {
         return metric.findElement(BY_HEADER);
+    }
+
+    public class AttributeFilterPicker extends AbstractFragment {
+
+        @FindBy(className = "s-btn-clear")
+        private WebElement clearButton;
+
+        @FindBy(css = ".ember-list-container > div > div")
+        private List<WebElement> items;
+
+        @FindBy(css = ".s-btn-apply:not(.disabled)")
+        private WebElement applyButton;
+
+        public AttributeFilterPicker clear() {
+            waitForElementVisible(clearButton).click();
+            return this;
+        }
+
+        public AttributeFilterPicker selectItems(String... items) {
+            findItem:
+            for (String item : items) {
+                for (WebElement row : this.items) {
+                    if (row.getAttribute("class").contains("s-" + CssUtils.simplifyText(item))) {
+                        row.findElement(By.tagName("input")).click();
+                        continue findItem;
+                    }
+                }
+                throw new NoSuchElementException("Cannot find attribute: " + item);
+            }
+            return this;
+        }
+
+        public void apply() {
+            waitForElementVisible(applyButton).click();
+            waitForElementNotVisible(getRoot());
+        }
     }
 }
