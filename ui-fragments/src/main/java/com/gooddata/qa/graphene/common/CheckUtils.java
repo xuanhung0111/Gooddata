@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
+import java.util.ArrayList;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -10,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.fail;
@@ -203,4 +205,31 @@ public final class CheckUtils {
 
         return items;
     }
+
+    /**
+     * Check if element is currently present in DOM
+     * @see http://stackoverflow.com/questions/7991522/selenium-webdriver-test-if-element-is-present
+     * @param locatorKey By element for location
+     * @param driver driver to search
+     * @return
+     */
+    public static boolean isElementPresent(By locatorKey, WebDriver driver) {
+        return driver.findElements(locatorKey).size() > 0;
+    }
+
+    /**
+     * Get texts of all elements matching given By selector under specified context
+     * @param selector selector to match items
+     * @param context search context
+     * @return array of strings with element texts
+     */
+    public static Collection<String> getElementTexts(By selector, SearchContext context) {
+        List<String> texts = new ArrayList<String>();
+        for (WebElement ele : context.findElements(selector)) {
+            texts.add(ele.getText());
+        }
+
+        return texts;
+    }
+
 }

@@ -1,9 +1,10 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-public class MetricSelect extends ReactDropdown {
+public class DateDimensionSelect extends ReactDropdown {
 
     @Override
     public String getDropdownCssSelector() {
-        return ".overlay .metrics-list";
+        return ".overlay .dimensions-list";
     }
+
 }

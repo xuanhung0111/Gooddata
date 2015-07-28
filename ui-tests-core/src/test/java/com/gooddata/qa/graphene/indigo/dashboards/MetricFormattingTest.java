@@ -71,9 +71,13 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         try {
             Kpi selectedKpi = initIndigoDashboardsPage()
                 .switchToEditMode()
-                .addWidget(xssMetric)
+                .addWidget(xssMetric, DATE_CREATED)
                 .selectLastKpi();
-            waitForFragmentVisible(indigoDashboardsPage).selectMetricByName(xssMetric);
+
+            indigoDashboardsPage
+                .getConfigurationPanel()
+                .selectMetricByName(xssMetric);
+
             assertEquals(selectedKpi.getHeadline(), xssMetric);
 
             selectedKpi.setHeadline(xssHeadline);
@@ -97,7 +101,14 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
         try {
             Kpi selectedKpi = selectKpiByIndex(0);
-            waitForFragmentVisible(indigoDashboardsPage).selectMetricByName(PERCENT_OF_GOAL);
+            indigoDashboardsPage
+                .getConfigurationPanel()
+                .selectMetricByName(PERCENT_OF_GOAL);
+
+            // Check that loading happened
+            indigoDashboardsPage
+                .waitForAllKpiWidgetContentLoading()
+                .waitForAllKpiWidgetContentLoaded();
             assertEquals(selectedKpi.getValue(), "<button>11.61</button>");
         } finally {
             RestUtils.changeMetricFormat(getRestApiClient(), uri, oldFormat);
