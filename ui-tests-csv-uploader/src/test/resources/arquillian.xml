@@ -1,0 +1,23 @@
+<arquillian xmlns="http://jboss.org/schema/arquillian"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="
+        http://jboss.org/schema/arquillian
+        http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+
+    <!-- possible options are listed at https://docs.jboss.org/author/display/ARQ/Drone -->
+    <extension qualifier="webdriver">
+        <!-- use firefox directly if you want to run tests from IDE -->
+        <property name="browser">${browser:firefox}</property>
+        <property name="remoteReusable">false</property>
+        <property name="remoteAddress">http://localhost:4444/wd/hub</property>
+        <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
+    </extension>
+
+    <extension qualifier="graphene">
+        <property name="waitModelInterval">${timeout:90}</property>
+        <property name="waitGuiInterval">${timeout:90}</property>
+        <property name="waitAjaxInterval">${timeout:90}</property>
+        <property name="waitGuardInterval">${timeout:90}</property>
+    </extension>
+
+</arquillian>

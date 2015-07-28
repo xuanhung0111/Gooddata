@@ -19,6 +19,7 @@
         <module>ui-tests-disc</module>
         <module>ui-tests-dlui</module>
         <module>ui-tests-msf</module>
+        <module>ui-tests-csv-uploader</module>
   </modules>
 
     <properties>
