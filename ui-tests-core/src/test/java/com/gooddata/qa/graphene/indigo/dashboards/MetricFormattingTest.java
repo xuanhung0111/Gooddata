@@ -1,19 +1,26 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
-import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import com.gooddata.qa.utils.http.RestUtils;
-import java.io.IOException;
 import static java.lang.String.format;
-import org.apache.http.ParseException;
-import org.json.JSONException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.utils.http.RestUtils;
+
 public class MetricFormattingTest extends DashboardWithWidgetsTest {
+
+    private static final String PERCENT_OF_GOAL = "% of Goal";
+    private static final String PERCENT_OF_GOAL_URI = "/gdc/md/%s/obj/8136";
     private static final String NUMBER_OF_ACTIVITIES_URI = "/gdc/md/%s/obj/14636";
 
     @DataProvider(name = "formattingProvider")
@@ -50,6 +57,50 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
             waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
             waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
             assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
+        }
+    }
+
+    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"})
+    public void checkXssInMetricName() {
+        String xssMetric = "<button>" + PERCENT_OF_GOAL + "</button>";
+        String xssHeadline = "<script>alert('Hi')</script>";
+        initMetricPage();
+        waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);
+        waitForFragmentVisible(metricDetailPage).renameMetric(xssMetric);
+
+        try {
+            Kpi selectedKpi = initIndigoDashboardsPage()
+                .switchToEditMode()
+                .addWidget(xssMetric)
+                .selectLastKpi();
+            waitForFragmentVisible(indigoDashboardsPage).selectMetricByName(xssMetric);
+            assertEquals(selectedKpi.getHeadline(), xssMetric);
+
+            selectedKpi.setHeadline(xssHeadline);
+            assertEquals(selectedKpi.getHeadline(), xssHeadline);
+
+        } finally {
+            initMetricPage();
+            waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric);
+            waitForFragmentVisible(metricDetailPage).renameMetric(PERCENT_OF_GOAL);
+        }
+    }
+
+    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"})
+    public void checkXssInMetricFormat() throws ParseException, JSONException, IOException {
+        initMetricPage();
+        waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);
+        String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
+
+        String uri = format(PERCENT_OF_GOAL_URI, testParams.getProjectId());
+        RestUtils.changeMetricFormat(getRestApiClient(), uri, "<button>#,##0.00</button>");
+
+        try {
+            Kpi selectedKpi = selectKpiByIndex(0);
+            waitForFragmentVisible(indigoDashboardsPage).selectMetricByName(PERCENT_OF_GOAL);
+            assertEquals(selectedKpi.getValue(), "<button>11.61</button>");
+        } finally {
+            RestUtils.changeMetricFormat(getRestApiClient(), uri, oldFormat);
         }
     }
 }
