@@ -6,20 +6,19 @@ import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
-public class DatasetTable extends AbstractTable {
+public class SourcesTable extends AbstractTable {
 
-    public WebElement getDataset(final String datasetName) {
-        WebElement dataset = Iterables.find(getRows(), new Predicate<WebElement>() {
+    public WebElement getSource(final String sourceName) {
+        return Iterables.tryFind(getRows(), new Predicate<WebElement>() {
 
             @Override
             public boolean apply(WebElement row) {
-                return row.getText().contains(datasetName);
+                return row.getText().contains(sourceName);
             }
-        });
-        return dataset;
+        }).orNull();
     }
     
-    public int getNumberOfDatasets() {
+    public int getNumberOfSources() {
         return getNumberOfRows();
     }
 }
