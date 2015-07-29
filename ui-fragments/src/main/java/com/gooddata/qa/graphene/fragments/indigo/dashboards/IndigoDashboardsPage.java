@@ -74,6 +74,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return tempKpi;
     }
 
+    public Kpi selectLastKpi() {
+        return selectKpi(kpis.size() - 1);
+    }
+
     public String getValueFromKpi(final String name) {
         return Iterables.find(kpis, new Predicate<Kpi>() {
             @Override
@@ -134,5 +138,4 @@ public class IndigoDashboardsPage extends AbstractFragment {
             return false;
         }
     }
-
 }

@@ -6,6 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 
 public class MetricDetailsPage extends AbstractFragment {
@@ -22,11 +23,16 @@ public class MetricDetailsPage extends AbstractFragment {
     @FindBy(css = ".s-btn-sharing__amp__permissions")
     private WebElement sharingAndPermissionsButton;
 
+    @FindBy(css = "div.objectHeader table tbody tr td h2")
+    private WebElement name;
+
     private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
     private static final By visibilityCheckbox = By.id("settings-visibility");
     private static final By savePermissionSettingButton = By.cssSelector(".s-permissionSettingsDialog .s-btn-save_permissions");
-    
+
+    private static final By RENAME_INPUT_LOCATOR = By.cssSelector(".c-ipeEditorIn input");
+    private static final By OK_BUTTON_LOCATOR = By.cssSelector(".c-ipeEditorControls button");
 
     public String getMAQL(String metricName) {
         return waitForElementVisible(maql).getText();
@@ -76,5 +82,19 @@ public class MetricDetailsPage extends AbstractFragment {
         Graphene.waitGui().until().element(checkbox).is().selected();
         waitForElementVisible(savePermissionSettingButton, browser).click();
         waitForElementNotVisible(checkbox);
+    }
+
+    public void renameMetric(String newName) {
+        waitForElementVisible(name).click();
+        WebElement input = waitForElementVisible(RENAME_INPUT_LOCATOR, browser);
+        input.clear();
+        input.sendKeys(newName);
+        waitForElementVisible(OK_BUTTON_LOCATOR, browser).click();
+        waitForElementVisible(name);
+        assertEquals(getName(), newName, "new metric name is not updated!");
+    }
+
+    private String getName() {
+        return waitForElementVisible(name).getText();
     }
 }
