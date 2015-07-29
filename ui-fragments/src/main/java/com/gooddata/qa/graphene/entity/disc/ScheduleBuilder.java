@@ -311,8 +311,8 @@ public class ScheduleBuilder {
         public CronTimeBuilder setHourInDay(String hourInDay) {
             this.hourInDay = hourInDay;
             this.cronFormatInProjectDetailPage =
-                    this.cronFormatInProjectDetailPage.replace("${hour}", CharMatcher.anyOf("0")
-                            .trimLeadingFrom(hourInDay));
+                    this.cronFormatInProjectDetailPage.replace("${hour}", "00".equals(hourInDay) ? "0"
+                            : CharMatcher.anyOf("0").trimLeadingFrom(hourInDay));
             return this;
         }
 
