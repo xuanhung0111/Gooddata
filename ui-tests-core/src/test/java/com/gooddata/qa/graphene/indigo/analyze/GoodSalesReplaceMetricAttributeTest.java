@@ -13,14 +13,8 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 
 public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
-    private static final String AMOUNT = "Amount";
     private static final String EXPECTED = "Expected";
     private static final String QUOTA = "Quota";
-
-    private static final String STAGE_NAME = "Stage Name";
-    private static final String ACTIVITY_TYPE = "Activity Type";
-    private static final String DEPARTMENT = "Department";
 
     @BeforeClass
     public void initialize() {

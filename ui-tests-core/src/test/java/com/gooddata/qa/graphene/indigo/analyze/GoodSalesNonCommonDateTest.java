@@ -22,7 +22,6 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
 
     private static final String ACTIVITY = "Activity";
     private static final String CREATED = "Created";
-    private static final String NUMBER_OF_ACTIVITIES = "# of Activities";
     private static final String ACTIVITY_DATE = "Activity (Date)";
     private static final String OPP_SNAPSHOT = "Opp. Snapshot";
 
