@@ -162,8 +162,6 @@ public class CataloguePanel extends AbstractFragment {
     }
 
     public boolean isInapplicableAttributeMetricInViewPort() {
-        waitForElementVisible(searchInput).clear();
-        waitForCollectionIsNotEmpty(items);
         return Iterables.any(items, new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
