@@ -5,22 +5,28 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.CronTimeBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
+import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public class SchedulesTest extends AbstractSchedulesTest {
 
@@ -184,7 +190,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.manualRun();
@@ -1019,6 +1025,178 @@ public class SchedulesTest extends AbstractSchedulesTest {
             browser.get(dependentScheduleBuilder.getScheduleUrl());
             waitForElementVisible(scheduleDetail.getRoot());
             scheduleDetail.checkTriggerScheduleMissing();
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkExecutionLog() {
+        try {
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+
+            String processName = "Check Execution Log";
+            ScheduleBuilder successfulSchedule =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY);
+            prepareScheduleWithBasicPackage(successfulSchedule);
+
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+            RestUtils.verifyValidLink(getRestApiClient(), scheduleDetail.getLastExecutionLogLink());
+            scheduleDetail.clickOnCloseScheduleButton();
+
+            ScheduleBuilder failedSchedule =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY);
+            createSchedule(failedSchedule);
+
+            scheduleDetail.manualRun();
+            scheduleDetail.assertFailedExecution(failedSchedule.getExecutable());
+            RestUtils.verifyValidLink(getRestApiClient(), scheduleDetail.getLastExecutionLogLink());
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void editScheduleNameWithPencilIcon() {
+        try {
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+
+            String processName = "Edit schedule name by pencil icon";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            String newScheduleName = "Schedule name by pencil";
+            scheduleDetail.editScheduleNameByPencilIcon(newScheduleName, Confirmation.SAVE_CHANGES);
+            scheduleDetail.assertSchedule(scheduleBuilder.setScheduleName(newScheduleName));
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkEffectiveUserOfSchedule() throws JSONException, ParseException, IOException {
+        try {
+            addUserToProject(testParams.getEditorProfileUri(), UserRoles.ADMIN);
+            addUserToProject(testParams.getViewerProfileUri(), UserRoles.ADMIN);
+
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+
+            String processName = "Check Effective User of Schedule";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            assertTrue(scheduleDetail.getEffectiveUser().contains(testParams.getUser()),
+                    "Incorrect effective user: " + scheduleDetail.getEffectiveUser());
+
+            logout();
+            signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
+
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+            assertTrue(scheduleDetail.getEffectiveUser().contains(testParams.getUser()),
+                    "Incorrect effective user: " + scheduleDetail.getEffectiveUser());
+            scheduleDetail.clickOnCloseScheduleButton();
+
+            redeployProcess(processName, DeployPackages.BASIC, "Re-deploy to Check Effective User",
+                    scheduleBuilder);
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            assertTrue(scheduleDetail.getEffectiveUser().contains(testParams.getEditorUser()),
+                    "Incorrect effective user: " + scheduleDetail.getEffectiveUser());
+
+            logout();
+            signInAtGreyPages(testParams.getViewerUser(), testParams.getViewerPassword());
+
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+            assertTrue(scheduleDetail.getEffectiveUser().contains(testParams.getEditorUser()),
+                    "Incorrect effective user: " + scheduleDetail.getEffectiveUser());
+        } finally {
+            logout();
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            cleanProcessesInWorkingProject();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkExecutionTooltipOnTimeLine() {
+        try {
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+
+            String processName = "Check Execution Tooltip On Timeline";
+            ScheduleBuilder successfulSchedule =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY);
+            prepareScheduleWithBasicPackage(successfulSchedule);
+
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+            assertTrue(scheduleDetail.isCorrectSuccessfulExecutionTooltip(), "Incorrect tooltip!");
+            scheduleDetail.clickOnCloseScheduleButton();
+
+            ScheduleBuilder failedSchedule =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY);
+            createSchedule(failedSchedule);
+            scheduleDetail.manualRun();
+            scheduleDetail.assertFailedExecution(failedSchedule.getExecutable());
+            assertTrue(scheduleDetail.isCorrectFailedExecutionTooltip(failedSchedule.getExecutable()),
+                    "Incorrect tooltip!");
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void closeScheduleDetail() {
+        try {
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+
+            String processName = "Close schedule detail";
+            ScheduleBuilder successfulSchedule =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH);
+            prepareScheduleWithBasicPackage(successfulSchedule);
+            projectDetailPage.getExecutableTabByProcessName(processName).click();
+            waitForFragmentNotVisible(scheduleDetail);
+
+            openScheduleViaUrl(successfulSchedule.getScheduleUrl());
+            projectDetailPage.getExecutableTabByProcessName(processName).click();
+            waitForFragmentNotVisible(scheduleDetail);
+
+            ScheduleBuilder failedSchedule =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH);
+            createSchedule(failedSchedule);
+            failedSchedule.setScheduleUrl(browser.getCurrentUrl());
+            scheduleDetail.clickOnCloseScheduleButton();
+            waitForFragmentNotVisible(scheduleDetail);
+
+            openScheduleViaUrl(failedSchedule.getScheduleUrl());
+            scheduleDetail.clickOnCloseScheduleButton();
+            waitForFragmentNotVisible(scheduleDetail);
+
+            ScheduleBuilder longTimeSchedule =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(
+                            Executables.LONG_TIME_RUNNING_GRAPH);
+            createSchedule(longTimeSchedule);
+            longTimeSchedule.setScheduleUrl(browser.getCurrentUrl());
+            waitForFragmentVisible(schedulesTable).getScheduleTitle(successfulSchedule.getScheduleName()).click();
+            Sleeper.sleepTightInSeconds(3);
+            waitForFragmentVisible(scheduleDetail);
+            assertSchedule(successfulSchedule);
+
+            openScheduleViaUrl(longTimeSchedule.getScheduleUrl());
+            waitForFragmentVisible(schedulesTable).getScheduleTitle(failedSchedule.getScheduleName()).click();
+            Sleeper.sleepTightInSeconds(3);
+            waitForFragmentVisible(scheduleDetail);
+            assertSchedule(failedSchedule);
         } finally {
             cleanProcessesInWorkingProject();
         }

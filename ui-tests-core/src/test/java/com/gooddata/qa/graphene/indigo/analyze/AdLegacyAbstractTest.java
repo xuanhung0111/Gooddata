@@ -12,7 +12,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -590,21 +589,6 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertEquals(legends.size(), 2);
         assertEquals(legends, Arrays.asList(metric1 + " - previous year", metric1));
         checkingOpenAsReport("compararisonRecommendationOverrideDateFilter");
-    }
-
-    @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
-    public void checkTooltipDateFilterPreset() {
-        initAnalysePage();
-
-        analysisPage.addFilter(DATE);
-        analysisPage.getFilter(relatedDate).click();
-        DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
-                waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        panel.hoverOnPeriod("This month");
-        String currentMonthYear = new SimpleDateFormat("MMM YYYY")
-            .format(Calendar.getInstance(TimeZone.getTimeZone("GMT-7:00")).getTime());
-        System.out.println(currentMonthYear);
-        assertTrue(panel.getTooltipFromPeriod().startsWith(currentMonthYear));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
