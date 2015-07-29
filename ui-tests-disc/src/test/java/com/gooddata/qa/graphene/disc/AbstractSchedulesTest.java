@@ -87,8 +87,7 @@ public abstract class AbstractSchedulesTest extends AbstractDISCTest {
             deployInProjectDetailPage(dependentScheduleBuilder.getExecutable()
                     .getExecutablePackage(), dependentScheduleProcess);
 
-        triggerScheduleBuilder.setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                .setMinuteInHour("59");
+        triggerScheduleBuilder.setCronTime(ScheduleCronTimes.CRON_EVERYDAY);
         createAndAssertSchedule(triggerScheduleBuilder);
         triggerScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 

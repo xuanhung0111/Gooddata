@@ -21,9 +21,9 @@ public class SchedulesTable extends AbstractTable {
         return getScheduleElement(executableName, BY_SCHEDULE_CRON);
     }
 
-    public WebElement getSchedule(String executableName) {
+    public WebElement getSchedule(String scheduleName) {
         for (int i = 0; i < this.getNumberOfRows(); i++) {
-            if (waitForElementVisible(BY_SCHEDULE_TITLE, getRow(i)).getText().equals(executableName))
+            if (waitForElementVisible(BY_SCHEDULE_TITLE, getRow(i)).getText().equals(scheduleName))
                 return getRow(i);
         }
         return null;

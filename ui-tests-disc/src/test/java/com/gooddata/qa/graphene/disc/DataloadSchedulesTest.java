@@ -2,7 +2,9 @@ package com.gooddata.qa.graphene.disc;
 
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -145,12 +147,14 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     public void checkConcurrentDataLoadSchedule() {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
 
-        ScheduleBuilder schedule1 = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
-                        .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
+        ScheduleBuilder schedule1 =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
                         .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
                         .setScheduleName(OPPORTUNITY_DATASET + " (1)");
-        ScheduleBuilder schedule2 = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
-                        .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
+        ScheduleBuilder schedule2 =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
                         .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
                         .setScheduleName(OPPORTUNITY_DATASET + " (2)");
         try {
@@ -233,10 +237,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES);
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/create-ldm-references.txt"));
 
-        ScheduleBuilder schedule = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
-                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES).setHasDataloadProcess(true)
-                .setSynchronizeAllDatasets(true)
-                .setScheduleName("Check Auto Creation Connecting");
+        ScheduleBuilder schedule =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
+                        .setSynchronizeAllDatasets(true).setScheduleName("Check Auto Creation Connecting");
 
         openProjectDetailPage(getWorkingProject());
         createSchedule(schedule);
@@ -254,6 +258,143 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             openScheduleViaUrl(schedule.getScheduleUrl());
             scheduleDetail.disableSchedule();
         }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"}, priority = 1)
+    public void autoRunDataloadSchedule() {
+        try {
+            openProjectDetailByUrl(testParams.getProjectId());
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
+                            .setConfirmed(true).setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
+                            .setScheduleName("Auto Run Dataload Schedule");
+            createAndAssertSchedule(scheduleBuilder);
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.waitForExecutionFinish();
+            scheduleDetail.assertSuccessfulExecution();
+        } finally {
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
+    public void disableDataloadSchedule() {
+        try {
+            openProjectDetailByUrl(testParams.getProjectId());
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
+                            .setConfirmed(true).setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
+                            .setScheduleName("Disabled Dataload Schedule");
+            createAndAssertSchedule(scheduleBuilder);
+
+            scheduleDetail.disableSchedule();
+            assertTrue(scheduleDetail.isDisabledSchedule(scheduleBuilder.getCronTimeBuilder()));
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+
+            scheduleBuilder.setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            scheduleDetail.changeCronTime(scheduleBuilder.getCronTimeBuilder(), Confirmation.SAVE_CHANGES);
+
+            scheduleDetail.enableSchedule();
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.assertSuccessfulExecution();
+        } finally {
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
+    public void dependentDataloadSchedule() {
+        String processName = DEFAULT_DATAlOAD_PROCESS_NAME;
+
+        ScheduleBuilder triggerScheduleBuilder =
+                new ScheduleBuilder().setProcessName(processName).setHasDataloadProcess(true)
+                        .setSynchronizeAllDatasets(true).setScheduleName("Trigger Schedule")
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY);
+        ScheduleBuilder dependentScheduleBuilder =
+                new ScheduleBuilder().setProcessName(processName).setHasDataloadProcess(true)
+                        .setSynchronizeAllDatasets(true).setScheduleName("Dependent Schedule")
+                        .setCronTime(ScheduleCronTimes.AFTER).setTriggerScheduleGroup(processName)
+                        .setTriggerScheduleOption(triggerScheduleBuilder.getScheduleName());
+        try {
+            openProjectDetailByUrl(testParams.getProjectId());
+            createAndAssertSchedule(triggerScheduleBuilder);
+            triggerScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+            createAndAssertSchedule(dependentScheduleBuilder);
+            dependentScheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+
+            runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
+            waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            scheduleDetail.assertSuccessfulExecution();
+        } finally {
+            openScheduleViaUrl(triggerScheduleBuilder.getScheduleUrl());
+            scheduleDetail.disableSchedule();
+            openScheduleViaUrl(dependentScheduleBuilder.getScheduleUrl());
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
+    public void addRetryToDataloadSchedule() {
+        try {
+            openProjectDetailByUrl(testParams.getProjectId());
+
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setConfirmed(true)
+                            .setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
+                            .setScheduleName("Dataload Schedule with Retry");
+            createAndAssertSchedule(scheduleBuilder);
+            scheduleDetail.addValidRetry("15", Confirmation.SAVE_CHANGES);
+        } finally {
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
+    public void checkDataloadScheduleAtOverviewPage() {
+        openProjectDetailByUrl(testParams.getProjectId());
+
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setConfirmed(true)
+                        .setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
+                        .setScheduleName("Dataload Schedule at Overview page");
+        try {
+            createAndAssertSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+
+            initDISCOverviewPage();
+            discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
+            waitForElementVisible(discOverviewProjects.getRoot());
+            discOverviewProjects.assertOverviewCustomScheduleName(OverviewProjectStates.SUCCESSFUL,
+                    getWorkingProject(), scheduleBuilder);
+        } finally {
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadSchedulesTest"})
+    public void deleteDataloadSchedule() {
+        openProjectDetailByUrl(testParams.getProjectId());
+
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setConfirmed(true)
+                        .setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
+                        .setScheduleName("Delete Dataload Schedule");
+        createAndAssertSchedule(scheduleBuilder);
+        scheduleDetail.deleteSchedule(Confirmation.SAVE_CHANGES);
+        assertNull(waitForFragmentVisible(schedulesTable).getSchedule(scheduleBuilder.getScheduleName()),
+                "Schedule is not deleted well!");
     }
 
     @Test(dependsOnGroups = {"dataloadSchedulesTest", "reference"}, alwaysRun = true)
@@ -282,9 +423,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             scheduleId = m.group(1);
             return RestUtils.getResource(getRestApiClient(),
                     String.format(SCHEDULE_DETAIL_URI, testParams.getProjectId(), scheduleId), HttpStatus.OK);
-        } 
+        }
 
-        throw new IllegalStateException("Schedule ID wasn't found, we could not get schedule detail content!"); 
+        throw new IllegalStateException("Schedule ID wasn't found, we could not get schedule detail content!");
     }
 
     private void runManualAndCheckExecutionSuccessful(String screenShot) {

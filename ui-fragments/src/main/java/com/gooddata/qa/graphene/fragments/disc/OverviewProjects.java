@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -232,7 +233,11 @@ public class OverviewProjects extends AbstractFragment {
                 .findElement(BY_OVERVIEW_PROJECT_SCHEDULE_GRAPH_NAME).getText();
 
         assertEquals(overviewScheduleName, scheduleBuilder.getScheduleName());
-        assertEquals(overviewScheduleGraphName, scheduleBuilder.getExecutable().getExecutablePath());
+        if (scheduleBuilder.isDataloadProcess())
+            assertTrue(overviewScheduleGraphName.isEmpty(), "Dataload schedule with invalid title: "
+                    + overviewScheduleGraphName);
+        else
+            assertEquals(overviewScheduleGraphName, scheduleBuilder.getExecutable().getExecutablePath());
     }
 
     private void assertProjectInfoWithOnlyOneSchedule(OverviewProjectStates projectState,
