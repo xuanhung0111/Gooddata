@@ -11,13 +11,20 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.md.Restriction;
+import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.common.CheckUtils;
 import com.gooddata.qa.graphene.common.Sleeper;
@@ -82,6 +89,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String DEFAULT_METRIC_NUMBER_FORMAT = "#,##0.00";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    private MetadataService mdService;
+    private Project project;
 
     @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
@@ -443,6 +453,44 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
+    @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
+    public void initializeGoodDataSDK() {
+        mdService = getGoodDataClient().getMetadataService();
+        project = getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
+    }
+
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"filter-share-ratio-metric"})
+    public void createTimeMacrosMetrics() {
+        for (MetricTypes metric : asList(MetricTypes.THIS, MetricTypes.PREVIOUS, MetricTypes.NEXT)) {
+            checkMetricValuesInReport(createMetricByGoodDataClient(metric).getTitle(),
+                    PRODUCT, getMetricValues(metric), PRODUCT_VALUES);
+        }
+    }
+
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"filter-share-ratio-metric"})
+    public void createMetricsWithParentFilterExcept() {
+        List<Float> withPFExceptValues = getMetricValues(MetricTypes.WITH_PF_EXCEPT);
+        List<Float> withoutPFExceptValues = getMetricValues(MetricTypes.WITHOUT_PF_EXCEPT);
+        List<String> attributeValues = asList("2010", "2011", "2012");
+
+        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITH_PF_EXCEPT).getTitle(),
+                YEAR_SNAPSHOT, withPFExceptValues, attributeValues);
+        addFilterAndCheckReport(attributeValues, withPFExceptValues,
+                PRODUCT, "CompuSci", "Educationly", "Explorer");
+        addFilterAndCheckReport(attributeValues, withPFExceptValues, 
+                STAGE_NAME, "Interest", "Discovery", "Short List");
+        addFilterAndCheckReport(attributeValues, asList(1.7967886E7f, 6.2103956E7f, 8.0406328E7f),
+                DEPARTMENT, "Direct Sales");
+
+        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITHOUT_PF_EXCEPT).getTitle(),
+                YEAR_SNAPSHOT, withoutPFExceptValues, attributeValues);
+        addFilterAndCheckReport(attributeValues, withoutPFExceptValues, DEPARTMENT, "Direct Sales");
+        addFilterAndCheckReport(attributeValues, asList(1.3019884E7f, 4.7406964E7f, 6.5819096E7f),
+                PRODUCT, "CompuSci", "Explorer");
+        addFilterAndCheckReport(attributeValues, asList(883466.2f, 1.6477721E7f, 1.7635596E7f),
+                STAGE_NAME, "Interest", "Discovery");
+    }
+
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
     public void checkGreyedOutAndNonGreyedOutAttributes() {
         CustomMetricUI customMetricInfo = new CustomMetricUI().withName("SUM-Amount")
@@ -554,6 +602,55 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             assertEquals(attributeValuesinGrid, attributeValues);
         }
         reportPage.saveReport();
+    }
+
+    private Metric createMetricByGoodDataClient(MetricTypes metricType) {
+        String amountUri = "[" + mdService.getObjUri(project, Metric.class, Restriction.title(AMOUNT)) + "]";
+        String dateClosedUri =
+                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title("Date (Closed)")) + "]";
+        String dateSnapshotUri = 
+                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title("Date (Created)"))  + "]";
+        String dateCreatedUri = 
+                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title("Date (Snapshot)")) + "]";
+        String stageNameUri =
+                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title(STAGE_NAME)) + "]";
+        String productUri = "[" + mdService.getObjUri(project, Attribute.class, Restriction.title(PRODUCT)) + "]";
+
+        String metric = "__metric__";
+        String attribute = "__attr__";
+        String maql = metricType.getMaql().replaceFirst(metric, amountUri);
+
+        switch (metricType) {
+            case THIS:
+                maql = maql.replaceFirst(attribute, dateClosedUri);
+                break;
+            case PREVIOUS:
+                maql = maql.replaceFirst(attribute, dateSnapshotUri);
+                break;
+            case NEXT:
+                maql = maql.replaceFirst(attribute, dateCreatedUri);
+                break;
+            case WITH_PF_EXCEPT:
+            case WITHOUT_PF_EXCEPT:
+                maql = maql.replaceFirst(attribute, productUri).replaceFirst(attribute, stageNameUri);
+                break;
+            default:
+                break;
+        }
+
+        return mdService.createObj(project, new Metric(metricType.getLabel(),
+                maql, DEFAULT_METRIC_NUMBER_FORMAT));
+    }
+
+    private void addFilterAndCheckReport(Collection<String> attributeValues, Collection<Float> metricValues,
+            String filter, String... filterValues) {
+        reportPage.addFilter(FilterItem.Factory.createListValuesFilter(filter, filterValues))
+                .saveReport();
+        TableReport report = reportPage.getTableReport();
+        assertTrue(CollectionUtils.isEqualCollection(report.getMetricElements(), metricValues),
+                "Metric values list is incorrrect");
+        assertTrue(CollectionUtils.isEqualCollection(report.getAttributeElements(), attributeValues),
+                "Attribute values list is incorrrect");
     }
 
     private void checkMetricValuesInReport(String metricName, List<Float> metricValues) {
@@ -723,6 +820,16 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             case FORECAST:
                 return asList(1.8447266E7f, 4249028.0f, 5612062.5f, 2606293.5f, 3067466.0f, 1862015.8f,
                         3.8310752E7f, 4.2470572E7f);
+            case THIS:
+                return asList(2.7219256E7f, 2.2946896E7f, 3.8596196E7f, 8042032.0f, 9525858.0f, 1.0291577E7f);
+            case PREVIOUS:
+                return asList(2.72229E7f, 2.2946896E7f, 3.8596196E7f, 8042032.0f, 9525858.0f, 1.0291577E7f);
+            case NEXT:
+                return asList(2.72229E7f, 2.2946896E7f, 3.8596196E7f, 8042032.0f, 9525858.0f, 1.0291577E7f);
+            case WITH_PF_EXCEPT:
+                return asList(2.6922362E7f, 8.6178608E7f, 1.16625456E8f);
+            case WITHOUT_PF_EXCEPT:
+                return asList(2.6922362E7f, 8.6178608E7f, 1.16625456E8f);
         }
         return Collections.emptyList();
     }

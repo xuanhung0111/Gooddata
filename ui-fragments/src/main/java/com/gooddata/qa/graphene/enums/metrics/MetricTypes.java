@@ -63,6 +63,12 @@ public enum MetricTypes {
     TOP("SELECT __metric__ WHERE TOP(5) IN (SELECT __metric__ BY __attr__)", "Filters"),
     BOTTOM("SELECT __metric__ WHERE BOTTOM(25%) IN (SELECT __metric__ BY __attr__)", "Filters"),
 
+    THIS("SELECT __metric__ WHERE __attr__ < THIS", "Filters-SDK"),
+    PREVIOUS("SELECT __metric__ WHERE __attr__ < PREVIOUS", "Filters-SDK"),
+    NEXT("SELECT __metric__ WHERE __attr__ < NEXT", "Filters-SDK"),
+    WITH_PF_EXCEPT("SELECT __metric__ WITH PARENT FILTER EXCEPT __attr__, __attr__", "Filters-SDK"),
+    WITHOUT_PF_EXCEPT("SELECT __metric__ WITHOUT PARENT FILTER EXCEPT __attr__, __attr__", "Filters-SDK"),
+
     // Logical
     AND("SELECT __metric__ WHERE __attr__ = __attrValue__ AND __attr__ = __attrValue__", "Logical"),
     OR("SELECT __metric__ WHERE __attr__ = __attrValue__ OR __attr__ = __attrValue__", "Logical"),
