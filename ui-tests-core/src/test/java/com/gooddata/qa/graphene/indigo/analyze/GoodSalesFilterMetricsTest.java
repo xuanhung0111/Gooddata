@@ -101,7 +101,7 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email, Phone Call, Web Meeting)",
                 NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE));
         assertEquals(analysisPage.getFilterMetricText(NUMBER_OF_ACTIVITIES),
-                format("%s: Email, Phone Call, Web Meeting", ACTIVITY_TYPE));
+                format("%s: Email, Phone Call, Web Meeting\n(3)", ACTIVITY_TYPE));
         assertFalse(analysisPage.canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
     }
 }
