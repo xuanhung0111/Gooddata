@@ -81,6 +81,7 @@ public class ScheduleDetail extends ScheduleForm {
     private static final By BY_OK_GROUP_EXPAND_BUTTON = By.cssSelector(".icon-navigatedown");
     private static final By BY_PARAMETERS_EDIT_SECTION = By.cssSelector(".parameters-section.modified");
     private static final By BY_TOOLTIP  = By.cssSelector(".bubble-content .content");
+    private static final By BY_EXECUTION_TOOLTIP = By.cssSelector(".execution-tooltip");
 
     @FindBy(css = ".ait-schedule-title-section-heading")
     private WebElement scheduleTitle;
@@ -243,7 +244,16 @@ public class ScheduleDetail extends ScheduleForm {
 
     @FindBy(css = ".gd-list-view-item span:not(.ember-view)")
     private List<WebElement> datasets;
-
+    
+    @FindBy(css = ".ait-schedule-title-section .icon-edit")
+    private WebElement editScheduleNamePencilIcon;
+    
+    @FindBy(css = ".ait-schedule-timeline-section .execution")
+    private WebElement timelineExecution;
+    
+    @FindBy(xpath = "//.[@class='schedule-title']//span[2]")
+    private WebElement effectiveUser;
+    
     public void assertSchedule(final ScheduleBuilder scheduleBuilder) {
         waitForElementVisible(scheduleTitle);
         assertEquals(scheduleBuilder.getScheduleName(), scheduleTitle.getText());
@@ -679,6 +689,15 @@ public class ScheduleDetail extends ScheduleForm {
         else
             waitForElementVisible(cancelChangeScheduleTitleButton).click();
     }
+    
+    public void editScheduleNameByPencilIcon(String newScheduleName, Confirmation saveChange) {
+        waitForElementVisible(editScheduleNamePencilIcon).click();
+        waitForElementVisible(scheduleTitleInput).sendKeys(newScheduleName);
+        if (saveChange == Confirmation.SAVE_CHANGES)
+            waitForElementVisible(saveScheduleTitleButton).click();
+        else
+            waitForElementVisible(cancelChangeScheduleTitleButton).click();
+    }
 
     public void changeAndCheckDatasetDialog(ScheduleBuilder scheduleBuilder) {
         assertTrue(!selectSynchronizeAllDatasets.isSelected());
@@ -771,6 +790,35 @@ public class ScheduleDetail extends ScheduleForm {
         else
             waitForElementVisible(cancelDeleteScheduleButton).click();
         waitForElementNotPresent(deleteScheduleDialog);
+    }
+    
+    public String getTimelineExecutionTooltip() {
+        Actions action = new Actions(browser);
+        action.moveToElement(timelineExecution);
+        action.perform();
+        return waitForElementVisible(BY_EXECUTION_TOOLTIP, browser).getText();
+    }
+    
+    public boolean isCorrectSuccessfulExecutionTooltip() {
+        String excutionTooltip = getTimelineExecutionTooltip();
+        if (!excutionTooltip.contains("Successful execution"))
+            return false;
+        if (!excutionTooltip.contains(String.format("Runtime %s", getExecutionRuntime())))
+            return false;
+        return true;
+    }
+    
+    public boolean isCorrectFailedExecutionTooltip(Executables executable) {
+        String excutionTooltip = getTimelineExecutionTooltip();
+        if (!excutionTooltip.contains("Failed execution"))
+            return false;
+        if (!excutionTooltip.contains(executable.getErrorMessage()))
+            return false;
+        return true;
+    }
+    
+    public String getEffectiveUser() {
+        return waitForElementVisible(effectiveUser).getText();
     }
 
     private void assertChecked(List<String> datasetsToSynchronize) {
