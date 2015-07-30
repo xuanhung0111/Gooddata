@@ -9,6 +9,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.gooddata.qa.graphene.common.Sleeper;
 
 public class MetricDetailsPage extends AbstractFragment {
 
@@ -20,7 +21,7 @@ public class MetricDetailsPage extends AbstractFragment {
 
     @FindBy(css = "#p-objectPage .s-btn-delete")
     private WebElement deleteButton;
-    
+
     @FindBy(css = ".s-btn-sharing__amp__permissions")
     private WebElement sharingAndPermissionsButton;
 
@@ -95,6 +96,11 @@ public class MetricDetailsPage extends AbstractFragment {
         waitForElementVisible(OK_BUTTON_LOCATOR, browser).click();
         waitForElementVisible(name);
         assertEquals(getName(), newName, "new metric name is not updated!");
+        // name changed in UI is not sufficient for successful metric name change
+        // since this change is done on background, navigating to different page may
+        // interrupt it and metric name is not changed.
+        // TODO: attach some notification class to gdc-client or consider changing via rest
+        Sleeper.sleepTightInSeconds(1);
     }
 
     private String getName() {

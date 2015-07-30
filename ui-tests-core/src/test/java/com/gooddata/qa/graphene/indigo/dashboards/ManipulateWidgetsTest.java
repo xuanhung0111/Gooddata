@@ -75,15 +75,19 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
     @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
     public void checkKpiTitleChangeWhenMetricChange() {
         Kpi selectedKpi = selectKpiByIndex(0);
-
-        indigoDashboardsPage.selectMetricByName(AMOUNT);
         selectedKpi.setHeadline("");
+
+        indigoDashboardsPage.getConfigurationPanel()
+            .selectMetricByName(AMOUNT)
+            .selectDateDimensionByName(DATE_CREATED);
 
         String metricHeadline = selectedKpi.getHeadline();
 
         assertEquals(metricHeadline, AMOUNT);
 
-        indigoDashboardsPage.selectMetricByName(LOST);
+        indigoDashboardsPage.getConfigurationPanel()
+            .selectMetricByName(LOST)
+            .selectDateDimensionByName(DATE_CREATED);
         assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
     }
 
@@ -91,14 +95,18 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
     public void checkKpiTitlePersistenceWhenMetricChange() {
         Kpi selectedKpi = selectKpiByIndex(0);
 
-        indigoDashboardsPage.selectMetricByName(AMOUNT);
+        indigoDashboardsPage.getConfigurationPanel()
+            .selectMetricByName(AMOUNT)
+            .selectDateDimensionByName(DATE_CREATED);
 
         selectedKpi.setHeadline(TEST_HEADLINE);
         String metricHeadline = selectedKpi.getHeadline();
 
         assertEquals(metricHeadline, TEST_HEADLINE);
 
-        indigoDashboardsPage.selectMetricByName(AMOUNT);
+        indigoDashboardsPage.getConfigurationPanel()
+            .selectMetricByName(AMOUNT)
+            .selectDateDimensionByName(DATE_CREATED);
 
         assertEquals(selectedKpi.getHeadline(), TEST_HEADLINE);
     }

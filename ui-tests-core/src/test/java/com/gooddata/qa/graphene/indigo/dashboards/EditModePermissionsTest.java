@@ -5,7 +5,7 @@ import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
 
@@ -22,7 +22,7 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             initDashboardsPage();
             initIndigoDashboardsPage();
 
-            assertEquals(indigoDashboardsPage.checkIfEditButtonIsPresent(), false);
+            assertFalse(indigoDashboardsPage.isEditButtonPresent());
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);
@@ -40,7 +40,7 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             initDashboardsPage();
             initIndigoDashboardsPage();
 
-            assertTrue(indigoDashboardsPage.checkIfEditButtonIsPresent());
+            assertTrue(indigoDashboardsPage.isEditButtonPresent());
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);

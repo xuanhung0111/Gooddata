@@ -44,6 +44,7 @@ public class Kpi extends AbstractFragment {
         // hit backspace multiple times, because .clear()
         // event does not trigger onchange event
         // https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#clear%28%29
+        waitForElementVisible(headlineTextarea);
         int headlineLength = headlineInplaceEdit.getText().length();
         for (int i = 0; i < headlineLength; i++) {
             headlineTextarea.sendKeys(Keys.BACK_SPACE);

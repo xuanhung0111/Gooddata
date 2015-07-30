@@ -5,13 +5,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import com.gooddata.qa.graphene.common.Sleeper;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = Kpi.MAIN_CLASS)
@@ -26,8 +26,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "s-save_button")
     private WebElement saveButton;
 
-    @FindBy(className = "s-metric_select")
-    private MetricSelect metricSelect;
+    @FindBy(className = "configuration-panel")
+    private ConfigurationPanel configurationPanel;
 
     @FindBy(className = "kpi-placeholder")
     private WebElement addWidget;
@@ -39,11 +39,20 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private ConfirmDialog dialog;
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
+    private static final By SAVE_BUTTON_ENABLED = By.cssSelector(".s-save_button:not(.disabled)");
     private static final String EDIT_BUTTON_SELECTOR = "s-edit_button";
+
+    public ConfigurationPanel getConfigurationPanel() {
+        return configurationPanel;
+    }
 
     public IndigoDashboardsPage switchToEditMode() {
         waitForElementVisible(editButton).click();
-        waitForElementVisible(this.cancelButton);
+        waitForElementVisible(cancelButton);
+
+        // There's an animation switching to edit mode,
+        // so wait until the css transition is finished
+        Sleeper.sleepTight(500);
 
         return this;
     }
@@ -56,9 +65,19 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage saveEditMode() {
         waitForElementVisible(saveButton).click();
-        waitForElementVisible(this.editButton);
+        waitForElementVisible(editButton);
 
         return this;
+    }
+
+    // if save is disabled, use cancel. But leave edit mode in any case
+    public IndigoDashboardsPage leaveEditMode() {
+        boolean isSaveEnabled = isElementPresent(SAVE_BUTTON_ENABLED, browser);
+        if (isSaveEnabled) {
+            return saveEditMode();
+        }
+
+        return cancelEditMode();
     }
 
     public ConfirmDialog waitForDialog() {
@@ -70,7 +89,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
         Kpi tempKpi = getKpiByIndex(index);
         waitForElementPresent(tempKpi.getRoot());
         tempKpi.getRoot().click();
-        waitForElementVisible(metricSelect.getRoot());
+
+        waitForFragmentVisible(configurationPanel).waitForButtonsLoaded();
         return tempKpi;
     }
 
@@ -91,28 +111,26 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return kpis.get(index);
     }
 
-    public IndigoDashboardsPage selectMetricByName(String name) {
-        waitForElementVisible(metricSelect.getRoot());
-        metricSelect.byName(name);
-        waitForKpiContentLoading();
-
-        return this;
-    }
-
     public IndigoDashboardsPage waitForDashboardLoad() {
         waitForElementVisible(DASHBOARD_LOADED, browser);
 
         return this;
     }
 
-    public IndigoDashboardsPage waitForKpiWidgetLoading(){
+    public IndigoDashboardsPage waitForAllKpiWidgetsLoaded(){
         waitForElementNotPresent(Kpi.IS_WIDGET_LOADING);
 
         return this;
     }
 
-    public IndigoDashboardsPage waitForKpiContentLoading(){
-        waitForKpiWidgetLoading();
+    public IndigoDashboardsPage waitForAllKpiWidgetContentLoading(){
+        waitForElementPresent(Kpi.IS_CONTENT_LOADING, browser);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage waitForAllKpiWidgetContentLoaded(){
+        waitForAllKpiWidgetsLoaded();
         waitForElementNotPresent(Kpi.IS_CONTENT_LOADING);
 
         return this;
@@ -124,18 +142,21 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage addWidget(String metricName) {
+    public IndigoDashboardsPage clickAddWidget() {
         waitForElementPresent(addWidget).click();
-        selectMetricByName(metricName);
         return this;
     }
 
-    public boolean checkIfEditButtonIsPresent() {
-        try {
-            browser.findElement(By.className(EDIT_BUTTON_SELECTOR));
-            return true;
-        } catch (NoSuchElementException ignored) {
-            return false;
-        }
+    public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName) {
+        clickAddWidget();
+        configurationPanel
+            .selectMetricByName(metricName)
+            .selectDateDimensionByName(dateDimensionName);
+
+        return waitForAllKpiWidgetContentLoaded();
+    }
+
+    public boolean isEditButtonPresent() {
+        return isElementPresent(By.className(EDIT_BUTTON_SELECTOR), browser);
     }
 }

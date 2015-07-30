@@ -525,7 +525,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
         return indigoDashboardsPage
                 .waitForDashboardLoad()
-                .waitForKpiWidgetLoading();
+                .waitForAllKpiWidgetsLoaded();
     }
 
     public void initEmailSchedulesPage() {
