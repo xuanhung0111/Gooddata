@@ -757,6 +757,43 @@ public class RestUtils {
         throw new NoSuchElementException("Dataset element not found!");
     }
 
+    public static String updateFirstNameOfCurrentAccount(RestApiClient restApiClient, String newFirstName)
+            throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newGetMethod("/gdc/account/profile/current");
+        String currentProfileUri;
+        JSONObject currentProfile;
+        String oldFirstName;
+
+        try {
+            HttpResponse response = restApiClient.execute(request, HttpStatus.OK, "Invalid status code");
+            currentProfile = new JSONObject(EntityUtils.toString(response.getEntity()))
+                .getJSONObject("accountSetting");
+            oldFirstName = currentProfile.getString("firstName");
+            currentProfileUri = currentProfile.getJSONObject("links").getString("self");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            request.releaseConnection();
+        }
+
+        request = restApiClient.newPutMethod(currentProfileUri,
+                new JSONObject().put("accountSetting",
+                        new JSONObject().put("country", currentProfile.get("country"))
+                        .put("phoneNumber", currentProfile.get("phoneNumber"))
+                        .put("timezone", currentProfile.get("timezone"))
+                        .put("companyName", currentProfile.get("companyName"))
+                        .put("lastName", currentProfile.get("lastName"))
+                        .put("firstName", newFirstName)
+                ).toString());
+
+        try {
+            HttpResponse response = restApiClient.execute(request, HttpStatus.OK, "Invalid status code");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            request.releaseConnection();
+        }
+        return oldFirstName;
+    }
+
     private static String getPollingUriFrom(RestApiClient restApiClient, String projectId, String uri)
             throws ParseException, JSONException, IOException {
         HttpRequestBase request = restApiClient.newGetMethod(uri);
