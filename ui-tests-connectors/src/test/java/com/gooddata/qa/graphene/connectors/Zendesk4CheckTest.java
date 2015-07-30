@@ -297,7 +297,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronization", "createZendeskTicketEventsReport"},
-            groups = {"zendeskApiTests", "zendeskAfterCreateTests", "connectorWalkthrough"}, enabled = false)
+            groups = {"zendeskApiTests", "zendeskAfterCreateTests", "connectorWalkthrough"})
     public void testTicketEventsAfterIncrementalSync()
             throws IOException, JSONException, InterruptedException {
         createTicketTagsReport(createdZendeskTicketId);
@@ -345,7 +345,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsUpdate","createZendeskTicketEventsReport"},
-            groups = {"zendeskApiTests", "zendeskAfterUpdateTests", "connectorWalkthrough"}, enabled = false)
+            groups = {"zendeskApiTests", "zendeskAfterUpdateTests", "connectorWalkthrough"})
     public void testTicketEventsAfterTicketUpdate() throws IOException, JSONException, InterruptedException {
         afterTicketUpdateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
                 DateTime.now().minusMinutes(10));
@@ -354,7 +354,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         Screenshots.takeScreenshot(browser, "ticket-tags-after-update-ticket-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = { "testIncrementalSynchronizationAfterObjectsUpdate","createZendeskTicketEventsReport" },
+    @Test(dependsOnMethods = { "testTicketEventsAfterTicketUpdate" },
             groups = {"zendeskApiTests", "connectorWalkthrough", "deleteZendeskObjects"})
     public void deleteZendeskTicket() throws IOException {
         zendeskHelper.deleteTicket(createdZendeskTicketId);
@@ -409,7 +409,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @SuppressWarnings("unchecked")
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion", "createZendeskTicketEventsReport"},
-            groups = {"zendeskApiTests", "zendeskAfterDeletionTests", "connectorWalkthrough"}, enabled = false)
+            groups = {"zendeskApiTests", "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testTicketEventsAfterDeletion() throws IOException, JSONException, InterruptedException {
         afterTicketDeleteEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
                 DateTime.now().minusMinutes(10));
@@ -450,8 +450,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 reportMetricsResults.get(BACKLOG_TICKETS_REPORT_NAME).intValue(),
                 "Backlog tickets count doesn't match after full sync");
 
-        //TODO ZEN-271
-        /*checkTicketEventsReport(createdZendeskTicketId, afterTicketCreateEventId, AFTER_TICKET_CREATE_EVENTS);
+        checkTicketEventsReport(createdZendeskTicketId, afterTicketCreateEventId, AFTER_TICKET_CREATE_EVENTS);
         checkTicketEventsReport(createdZendeskTicketId, afterTicketUpdateEventId, AFTER_TICKET_UPDATE_EVENTS);
         checkTicketEventsReport(createdZendeskTicketId, afterTicketDeleteEventId, AFTER_TICKET_DELETE_EVENTS);
 
@@ -460,7 +459,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                         AFTER_TICKET_UPDATE_EVENTS, AFTER_TICKET_DELETE_EVENTS),
                 "Total count of TicketEvents after tests is different than expected.");
 
-        checkTicketTagsReport(createdZendeskTicketId, TAGS_AFTER_FULL_LOAD);*/
+        checkTicketTagsReport(createdZendeskTicketId, TAGS_AFTER_FULL_LOAD);
     }
 
     private void createOneNumberReportDefinition(String reportName, String metricTitle) {
