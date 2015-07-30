@@ -29,6 +29,7 @@ import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.PublishType;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.UserStates;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -137,6 +138,39 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         userManagementPage.addUsersToGroup(group1, userManagementAdmin);
         userManagementPage.addUsersToGroup(group2, editorUser);
         userManagementPage.addUsersToGroup(group3, viewerUser);
+    }
+
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
+    public void checkXssInUsername() throws ParseException, JSONException, IOException {
+        RestApiClient restApiClient = getRestApiClient(userManagementAdmin, userManagementPassword);
+        String xssUser = "<button>XSS user</button>";
+        initDashboardsPage();
+        String oldUser = RestUtils.updateFirstNameOfCurrentAccount(restApiClient, xssUser);
+
+        try {
+            initUserManagementPage();
+            for (String name : waitForFragmentVisible(userManagementPage).getAllUsernames()) {
+                if (name.startsWith(xssUser)){
+                    return;
+                }
+            }
+            fail("Cannot find user with first name: " + xssUser);
+        } finally {
+            initDashboardsPage();
+            RestUtils.updateFirstNameOfCurrentAccount(restApiClient, oldUser);
+        }
+    }
+
+    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
+    public void checkXssInGroupName() {
+        String xssGroup = "<button>group</button>";
+        initDashboardsPage();
+        initUserManagementPage();
+        waitForFragmentVisible(userManagementPage).createNewGroup(xssGroup);
+        assertTrue(userManagementPage.getAllUserGroups().contains(xssGroup));
+        userManagementPage.openSpecificGroupPage(xssGroup);
+        userManagementPage.deleteUserGroup();
+        assertFalse(userManagementPage.getAllUserGroups().contains(xssGroup));
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })

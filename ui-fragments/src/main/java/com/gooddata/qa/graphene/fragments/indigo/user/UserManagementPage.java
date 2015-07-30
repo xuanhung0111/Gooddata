@@ -47,6 +47,9 @@ public class UserManagementPage extends AbstractFragment {
     @FindBy(className = "users-user-email")
     private List<WebElement> userEmailsList;
 
+    @FindBy(className = "users-user-name")
+    private List<WebElement> usernames;
+
     @FindBy(className = "users-change-group")
     private WebElement changeGroupButton;
 
@@ -210,6 +213,17 @@ public class UserManagementPage extends AbstractFragment {
         }
 
         return allUserEmails;
+    }
+
+    public List<String> getAllUsernames() {
+        List<String> allUsernames = new ArrayList<String>();
+
+        waitForFragmentVisible(usersTable);
+        for (WebElement name : usernames) {
+            allUsernames.add(waitForElementVisible(name).getText().trim());
+        }
+
+        return allUsernames;
     }
 
     public List<String> getAllUserGroups() {
