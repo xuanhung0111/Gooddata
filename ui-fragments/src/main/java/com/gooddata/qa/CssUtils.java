@@ -14,8 +14,7 @@ public class CssUtils {
      * classes.
      */
     public static String simplifyText(String text) {
-        String escapedText = StringEscapeUtils.escapeHtml(text);
-        String replacedText = escapedText.replaceAll("[^a-zA-Z0-9]", "_");
+        String replacedText = text.replaceAll("[^a-zA-Z0-9]", "_");
         return replacedText.toLowerCase();
     }
 }

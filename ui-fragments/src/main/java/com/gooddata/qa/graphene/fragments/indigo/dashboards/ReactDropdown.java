@@ -25,7 +25,7 @@ public abstract class ReactDropdown extends AbstractFragment {
     public ReactDropdown selectByName(String name) {
         ensureDropdownOpen();
 
-        String nameSimplified = simplifyText(name.replace("<", "_").replace(">", "_"));
+        String nameSimplified = simplifyText(name);
         // in case there is a search field, use it
         if (this.hasSearchField()) {
             this.searchForText(name);
