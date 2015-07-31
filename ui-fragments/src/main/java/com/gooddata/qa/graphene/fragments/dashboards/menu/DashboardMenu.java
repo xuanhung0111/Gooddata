@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -42,7 +43,7 @@ public class DashboardMenu extends SimpleMenu {
         });
     }
 
-    public boolean selectDashboardByName(final String name) throws InterruptedException {
+    public boolean selectDashboardByName(final String name) {
         return selectDashboardByPredicate(new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement e) {
@@ -51,7 +52,7 @@ public class DashboardMenu extends SimpleMenu {
         });
     }
 
-    private boolean selectDashboardByPredicate(Predicate<WebElement> predicate) throws InterruptedException {
+    private boolean selectDashboardByPredicate(Predicate<WebElement> predicate) {
         waitForAllItemsVisible();
         WebElement dashboard = Iterables.find(items, predicate, null);
 
@@ -61,7 +62,7 @@ public class DashboardMenu extends SimpleMenu {
         }
 
         dashboard.findElement(BY_LINK).click();
-        Thread.sleep(3000);
+        Sleeper.sleepTightInSeconds(3);
         waitForDashboardPageLoaded(browser);
         return true;
     }

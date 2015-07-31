@@ -38,6 +38,9 @@ public class ReportsPage extends AbstractFragment {
     @FindBy(className = "s-btn-move___")
     private WebElement moveReportButton;
 
+    @FindBy(className = "s-btn-delete___")
+    private WebElement deleteReportButton;
+
     public ReportsFolders getDefaultFolders() {
         return defaultFolders;
     }
@@ -84,6 +87,17 @@ public class ReportsPage extends AbstractFragment {
         waitForElementVisible(moveReportButton).click();
         waitForElementVisible(By.className("ipeEditor"), browser).sendKeys(folder);
         waitForElementVisible(By.className("s-ipeSaveButton"), browser).click();
+        checkGreenBar(browser);
+    }
+
+    public void tryDeleteReports(String... reports) {
+        waitForFragmentVisible(reportsList).selectReports(reports);
+        waitForElementVisible(deleteReportButton).click();
+        waitForElementVisible(By.className("s-btn-delete"), browser).click();
+    }
+
+    public void deleteReports(String... reports) {
+        tryDeleteReports(reports);
         checkGreenBar(browser);
     }
 }
