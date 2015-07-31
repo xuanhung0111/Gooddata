@@ -9,13 +9,10 @@ import com.google.common.collect.Iterables;
 public class SourcesTable extends AbstractTable {
 
     public WebElement getSource(final String sourceName) {
-        return Iterables.tryFind(getRows(), new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement row) {
-                return row.getText().contains(sourceName);
-            }
-        }).orNull();
+        return getRows().stream()
+                .filter(row -> row.getText().contains(sourceName))
+                .findFirst()
+                .orElse(null);
     }
     
     public int getNumberOfSources() {

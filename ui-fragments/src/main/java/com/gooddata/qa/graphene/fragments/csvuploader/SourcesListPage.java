@@ -27,8 +27,7 @@ public class SourcesListPage extends AbstractFragment {
     private SourcesTable othersSourcesTable;
 
     public void clickAddDataButton() {
-        waitForAddDataButtonVisible();
-        addDataButton.click();
+        waitForAddDataButtonVisible().click();
     }
 
     public WebElement waitForHeaderVisible() {

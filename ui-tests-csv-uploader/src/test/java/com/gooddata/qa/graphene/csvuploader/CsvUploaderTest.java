@@ -11,8 +11,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static org.apache.commons.io.FilenameUtils.removeExtension;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
@@ -20,10 +24,14 @@ import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.gooddata.warehouse.Warehouse;
 
+import java.util.function.Function;
+
 public class CsvUploaderTest extends AbstractMSFTest {
 
     private static final String DATA_UPLOAD_PAGE_URI = "data/#/project/%s/sources";
-    private static final String PAYROLL_CSV_FILE_NAME = "payroll.csv";
+    private static final String CSV_FILE_NAME = "payroll.csv";
+    /** This csv file has incorrect column count (one more than expected) on the line number 2. */
+    private static final String BAD_CSV_FILE_NAME = "payroll.bad.csv";
 
     private AdsHelper adsHelper;
 
@@ -66,20 +74,34 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
     @Test(dependsOnMethods = {"checkEmptyState"})
     public void checkCsvUploadHappyPath() throws Exception {
-        setUpOutputStage();
+        adsHelper.associateAdsWithProject(ads, testParams.getProjectId());
 
+        checkCsvUpload(CSV_FILE_NAME, this::uploadCsv, true);
+
+        final String sourceName = removeExtension(CSV_FILE_NAME);
+        assertNotNull(sourcesListPage.getMySourcesTable().getSource(sourceName),
+                "Source with name '" + sourceName + "' wasn't found in sources list.");
+    }
+
+    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    public void checkCsvBadFormat() throws Exception {
+        checkCsvUpload(BAD_CSV_FILE_NAME, this::uploadBadCsv, false);
+
+        final String sourceName = removeExtension(BAD_CSV_FILE_NAME);
+        assertNull(sourcesListPage.getMySourcesTable().getSource(sourceName),
+                "Source with name '" + sourceName + "' should not be in sources list.");
+    }
+
+    private void checkCsvUpload(String csvFileName,
+                                Function<String, Integer> uploadCsvFunction,
+                                boolean newDatasetExpected) throws JSONException {
         initDataUploadPage();
 
         final int datasetCountBeforeUpload = sourcesListPage.getMySourcesCount();
 
-        uploadCsv(getCsvFileToUpload());
+        final int datasetCountAfterUpload = uploadCsvFunction.apply(getCsvFileToUpload(csvFileName));
 
-        assertEquals(sourcesListPage.getMySourcesCount(), datasetCountBeforeUpload + 1);
-        assertNotNull(sourcesListPage.getMySourcesTable().getSource(PAYROLL_CSV_FILE_NAME));
-    }
-
-    private void setUpOutputStage() throws JSONException {
-        adsHelper.associateAdsWithProject(ads, testParams.getProjectId());
+        assertEquals(datasetCountAfterUpload, newDatasetExpected ? datasetCountBeforeUpload + 1 : datasetCountBeforeUpload);
     }
 
     private void initDataUploadPage() {
@@ -87,27 +109,43 @@ public class CsvUploaderTest extends AbstractMSFTest {
         waitForFragmentVisible(sourcesListPage);
     }
 
-    private void uploadCsv(String csvFileToUpload) {
+    private int uploadCsv(String csvFileToUpload) {
 
-        sourcesListPage.clickAddDataButton();
-
-        waitForFragmentVisible(fileUploadDialog);
-
-        fileUploadDialog.pickCsvFile(csvFileToUpload);
-        fileUploadDialog.clickUploadButton();
+        uploadFile(csvFileToUpload);
 
         waitForFragmentVisible(dataPreviewPage);
 
-        dataPreviewPage.selectFact();
-        dataPreviewPage.triggerIntegration();
+        dataPreviewPage.selectFact().triggerIntegration();
 
         //waiting for refresh data from backend
-        Sleeper.sleepTightInSeconds(5);
+        // TODO: remove sleep while proper "progress" is implemented in data section UI
+        Sleeper.sleepTightInSeconds(10);
 
-        waitForFragmentVisible(sourcesListPage);
+        return waitForFragmentVisible(sourcesListPage).getMySourcesCount();
     }
 
-    private String getCsvFileToUpload() {
-        return ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + PAYROLL_CSV_FILE_NAME);
+    private int uploadBadCsv(String csvFileToUpload) {
+
+        uploadFile(csvFileToUpload);
+
+        // the processing should not go any further but display validation error directly in File Upload Dialog
+        assertThat(fileUploadDialog.getBackendValidationErrors(), contains("csv.validations.structural.incorrect-column-count"));
+
+        waitForFragmentVisible(fileUploadDialog).clickCancelButton();
+        waitForFragmentVisible(sourcesListPage);
+
+        return sourcesListPage.getMySourcesCount();
+    }
+
+    private void uploadFile(String csvFileToUpload) {
+        waitForFragmentVisible(sourcesListPage).clickAddDataButton();
+
+        waitForFragmentVisible(fileUploadDialog)
+                .pickCsvFile(csvFileToUpload)
+                .clickUploadButton();
+    }
+
+    private String getCsvFileToUpload(String csvFileName) {
+        return ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + csvFileName);
     }
 }

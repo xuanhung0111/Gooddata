@@ -16,14 +16,14 @@ public class DataPreviewPage extends AbstractFragment {
     @FindBy(className = "s-integration-button")
     private WebElement triggerIntegrationButton;
 
-    public void selectFact() {
+    public DataPreviewPage selectFact() {
         waitForElementVisible(factColumnPicker);
         final Select select = new Select(factColumnPicker.findElement(By.tagName("select")));
         select.selectByValue("FACT");
+        return this;
     }
 
     public void triggerIntegration() {
-        waitForElementVisible(triggerIntegrationButton);
-        triggerIntegrationButton.click();
+        waitForElementVisible(triggerIntegrationButton).click();
     }
 }
