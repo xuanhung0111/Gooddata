@@ -39,7 +39,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Recommen
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
@@ -920,10 +919,11 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
             TableReport tableReport = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
             assertEquals(tableReport.getFormatFromValue(dataLabels.get(0)), "color: rgb(255, 0, 0);");
         } finally {
+            RestUtils.changeMetricFormat(getRestApiClient(), format(metric1Uri, testParams.getProjectId()),
+                    oldFormat);
             initMetricPage();
             waitForFragmentVisible(metricPage).openMetricDetailPage(metric1);
-            waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
-            assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
+            assertEquals(metricDetailPage.getMetricFormat(), oldFormat);
         }
     }
 
