@@ -93,9 +93,9 @@ public class ReportPage extends AbstractFragment {
 
     private String confirmSaveDialogLocator = "//div[contains(@class,'c-dashboardUsageWarningDialog')]";
 
-    private static final By visibilityCheckboxLocator = By.id("settings-visibility");
+    private static final By VISIBILITY_CHECKBOX_LOCATOR = By.id("settings-visibility");
 
-    private static final By reportSettingsSaveBtnLocator = By.cssSelector(".s-btn-save:not(.gdc-hidden)");
+    private static final By REPORT_SETTINGS_SAVE_BUTTON_LOCATOR = By.cssSelector(".s-btn-save:not(.gdc-hidden)");
 
     @FindBy(xpath = "//span[2]/button[3]")
     private WebElement confirmSaveButton;
@@ -121,6 +121,10 @@ public class ReportPage extends AbstractFragment {
     private static final By CUSTOM_NUMBER_FORMAT_LOCATOR = By.className("s-btn-custom_number_formats");
     private static final By CUSTOM_METRIC_FORMAT_LOCATOR = By.className("customMetricFormatItem-format");
     private static final By APPLY_CONFIG_FORMAT_LOCATOR = By.cssSelector(".s-btn-apply:not(.disabled)");
+    private static final By ADD_TAGS_BUTTON_LOCATOR = By.className("s-btn-add_tags");
+
+    private static final By TAG_INPUT_LOCATOR = By.cssSelector(".c-ipeEditorIn input");
+    private static final By OK_BUTTON_LOCATOR = By.cssSelector(".c-ipeEditorControls .s-btn-add");
 
     public ReportPage showConfiguration() {
         waitForElementVisible(showConfigurationButton).click();
@@ -359,14 +363,32 @@ public class ReportPage extends AbstractFragment {
         setReportVisibleSettings(false);
     }
 
+    public ReportPage addTag(String tag) {
+        waitForAnalysisPageLoaded(browser);
+        openOptionsMenu().select("Settings");
+
+        WebElement addTagButton = waitForElementVisible(ADD_TAGS_BUTTON_LOCATOR, browser);
+        addTagButton.click();
+        waitForElementNotVisible(addTagButton);
+
+        WebElement input = waitForElementVisible(TAG_INPUT_LOCATOR, browser);
+        input.clear();
+        input.sendKeys(tag);
+        waitForElementVisible(OK_BUTTON_LOCATOR, browser).click();
+        waitForElementVisible(addTagButton);
+
+        waitForElementVisible(REPORT_SETTINGS_SAVE_BUTTON_LOCATOR, browser).click();
+        return this;
+    }
+
     private void setReportVisibleSettings(boolean isVisible) {
         waitForAnalysisPageLoaded(browser);
         openOptionsMenu().select("Settings");
-        WebElement visibleCheckbox = waitForElementVisible(visibilityCheckboxLocator, browser);
+        WebElement visibleCheckbox = waitForElementVisible(VISIBILITY_CHECKBOX_LOCATOR, browser);
         if (isVisible != visibleCheckbox.isSelected()) {
             visibleCheckbox.click();
         }
-        waitForElementVisible(reportSettingsSaveBtnLocator, browser).click();
+        waitForElementVisible(REPORT_SETTINGS_SAVE_BUTTON_LOCATOR, browser).click();
         waitForElementNotVisible(visibleCheckbox);
     }
 
