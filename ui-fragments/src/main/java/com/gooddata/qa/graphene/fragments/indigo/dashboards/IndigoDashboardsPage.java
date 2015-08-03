@@ -154,7 +154,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage waitForKpiEditable(){
-        waitForElementVisible(Kpi.IS_EDITABLE, browser);
+        waitForElementNotPresent(Kpi.IS_NOT_EDITABLE);
 
         return this;
     }

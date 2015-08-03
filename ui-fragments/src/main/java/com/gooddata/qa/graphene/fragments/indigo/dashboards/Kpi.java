@@ -19,7 +19,7 @@ public class Kpi extends AbstractFragment {
 
     public static final By IS_CONTENT_LOADING = By.cssSelector("." + MAIN_CLASS + " .content-loading");
 
-    public static final By IS_EDITABLE = By.cssSelector("." + MAIN_CLASS + " .is-editable");
+    public static final By IS_NOT_EDITABLE = By.cssSelector("." + MAIN_CLASS + " .kpi:not(.is-editable)");
 
     @FindBy(css = ".dash-item-delete")
     protected WebElement deleteButton;
