@@ -8,8 +8,14 @@ import org.openqa.selenium.WebDriver;
 import static org.testng.Assert.assertFalse;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeClass;
 
 public class EditModePermissionsTest extends DashboardsGeneralTest {
+
+    @BeforeClass
+    public void before() throws InterruptedException {
+        addUsersWithOtherRoles = true;
+    }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"userTests"})
     public void checkViewerCannotEditDashboard() throws JSONException, InterruptedException {
