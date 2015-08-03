@@ -14,7 +14,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import com.gooddata.qa.graphene.common.Sleeper;
 
 public class IndigoDashboardsPage extends AbstractFragment {
-    @FindBy(className = Kpi.MAIN_CLASS)
+    @FindBy(css = Kpi.KPI_CSS_SELECTOR)
     private List<Kpi> kpis;
 
     @FindBy(className = EDIT_BUTTON_SELECTOR)
@@ -54,7 +54,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
         // so wait until the css transition is finished
         Sleeper.sleepTight(500);
 
-        return this;
+        // wait until editing is allowed
+        return waitForKpiEditable();
     }
 
     public IndigoDashboardsPage cancelEditMode() {
@@ -85,6 +86,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return dialog;
     }
 
+    public int getKpisCount() {
+        return kpis.size();
+    }
+
     public Kpi selectKpi(int index) {
         Kpi tempKpi = getKpiByIndex(index);
         waitForElementPresent(tempKpi.getRoot());
@@ -96,6 +101,18 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public Kpi selectLastKpi() {
         return selectKpi(kpis.size() - 1);
+    }
+
+    public IndigoDashboardsPage deleteLastKpi() {
+        selectLastKpi().deleteKpi();
+
+        return this;
+    }
+
+    public IndigoDashboardsPage deleteKpi(int index) {
+        selectKpi(index).deleteKpi();
+
+        return this;
     }
 
     public String getValueFromKpi(final String name) {

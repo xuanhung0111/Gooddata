@@ -12,7 +12,9 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
     public void checkEditModeCancelNoChanges() {
-        Kpi selectedKpi = selectKpiByIndex(0);
+        Kpi selectedKpi = initIndigoDashboardsPage()
+            .switchToEditMode()
+            .selectKpi(0);
 
         String kpiHeadline = selectedKpi.getHeadline();
         String kpiValue = selectedKpi.getValue();
@@ -25,7 +27,10 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
     public void checkKpiTitleChangeAndDiscard() {
-        Kpi selectedKpi = selectKpiByIndex(0);
+        Kpi selectedKpi = initIndigoDashboardsPage()
+            .switchToEditMode()
+            .selectKpi(0);
+
         String kpiHeadline = selectedKpi.getHeadline();
         String modifiedHeadline = generateUniqueHeadlineTitle();
 
@@ -43,7 +48,10 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
     public void checkKpiTitleChangeAndAbortCancel() {
-        Kpi selectedKpi = selectKpiByIndex(0);
+        Kpi selectedKpi = initIndigoDashboardsPage()
+            .switchToEditMode()
+            .selectKpi(0);
+
         String kpiHeadline = selectedKpi.getHeadline();
         String modifiedHeadline = generateUniqueHeadlineTitle();
 
@@ -58,12 +66,14 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         assertEquals(selectedKpi.getHeadline(), modifiedHeadline);
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
-
     }
 
     @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
     public void checkKpiTitleChangeAndSave() {
-        Kpi selectedKpi = selectKpiByIndex(0);
+        Kpi selectedKpi = initIndigoDashboardsPage()
+            .switchToEditMode()
+            .selectKpi(0);
+
         String uniqueHeadline = generateUniqueHeadlineTitle();
         selectedKpi.setHeadline(uniqueHeadline);
 
@@ -74,7 +84,10 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
     public void checkKpiTitleChangeWhenMetricChange() {
-        Kpi selectedKpi = selectKpiByIndex(0);
+        Kpi selectedKpi = initIndigoDashboardsPage()
+            .switchToEditMode()
+            .selectKpi(0);
+
         selectedKpi.setHeadline("");
 
         indigoDashboardsPage.getConfigurationPanel()
@@ -93,7 +106,9 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
     public void checkKpiTitlePersistenceWhenMetricChange() {
-        Kpi selectedKpi = selectKpiByIndex(0);
+        Kpi selectedKpi = initIndigoDashboardsPage()
+            .switchToEditMode()
+            .selectKpi(0);
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(AMOUNT)
@@ -109,6 +124,50 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .selectDateDimensionByName(DATE_CREATED);
 
         assertEquals(selectedKpi.getHeadline(), TEST_HEADLINE);
+    }
+
+    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    public void checkDeleteKpiConfirmAndSave() {
+        int kpisCount = initIndigoDashboardsPage().getKpisCount();
+
+        int kpisCountAfterAdd = kpisCount + 1;
+
+        indigoDashboardsPage
+            .switchToEditMode()
+            .addWidget(AMOUNT, DATE_CREATED)
+            .saveEditMode();
+
+        assertEquals(kpisCountAfterAdd, indigoDashboardsPage.getKpisCount());
+        assertEquals(kpisCountAfterAdd, initIndigoDashboardsPage().getKpisCount());
+
+        indigoDashboardsPage
+            .switchToEditMode()
+            .deleteLastKpi()
+            .waitForDialog()
+            .submitClick();
+
+        indigoDashboardsPage.saveEditMode();
+
+        assertEquals(kpisCount, initIndigoDashboardsPage().getKpisCount());
+    }
+
+    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    public void checkDeleteKpiConfirmAndDiscard() {
+        int kpisCount = initIndigoDashboardsPage().getKpisCount();
+
+        indigoDashboardsPage
+            .switchToEditMode()
+            .deleteKpi(0)
+            .waitForDialog()
+            .submitClick();
+
+        indigoDashboardsPage
+            .cancelEditMode()
+            .waitForDialog()
+            .submitClick();
+
+        assertEquals(kpisCount, indigoDashboardsPage.getKpisCount());
+        assertEquals(kpisCount, initIndigoDashboardsPage().getKpisCount());
     }
 
     private String generateUniqueHeadlineTitle() {

@@ -100,7 +100,10 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         RestUtils.changeMetricFormat(getRestApiClient(), uri, "<button>#,##0.00</button>");
 
         try {
-            Kpi selectedKpi = selectKpiByIndex(0);
+            Kpi selectedKpi = initIndigoDashboardsPage()
+                .switchToEditMode()
+                .selectKpi(0);
+
             indigoDashboardsPage
                 .getConfigurationPanel()
                 .selectMetricByName(PERCENT_OF_GOAL);
