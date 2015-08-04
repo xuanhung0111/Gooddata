@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
@@ -39,9 +39,6 @@ public class DashboardFilter extends AbstractFragment {
     private String addButton =
             "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add' and not(contains(@class, 'disabled'))]";
 
-    @FindBy(css = ".gdc-overlay-simple:not(.yui3-overlay-hidden) .c-label:not(.hidden)>span")
-    private List<WebElement> dateFilterList;
-
     @FindBy(xpath = "//button[text()='next']")
     private WebElement nextButton;
 
@@ -53,8 +50,9 @@ public class DashboardFilter extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'yui3-c-tabtimefiltereditor')]//button[text()='Add']")
     private WebElement addTimeButton;
 
-    @FindBy(css = ".dateCheckbox input")
-    private WebElement showDateAttributesButton;
+    private static final By BY_DATE_FILTER_LIST = 
+            By.cssSelector(".gdc-overlay-simple:not(.yui3-overlay-hidden) .c-label:not(.hidden)>span"); 
+    private static final By BY_SHOW_DATE_ATTRIBUTES_BUTTON = By.cssSelector(".dateCheckbox .s-enabled input");
 
     public void addListFilter(DashFilterTypes type, String name) throws InterruptedException {
         if (type == DashFilterTypes.PROMPT) {
@@ -64,18 +62,20 @@ public class DashboardFilter extends AbstractFragment {
             waitForElementVisible(promptSearchInput).sendKeys(name);
             waitForElementVisible(selectedPrompt, browser).click();
         } else {
-            waitForElementVisible(showDateAttributesButton).click();
+            waitForElementVisible(BY_SHOW_DATE_ATTRIBUTES_BUTTON, browser).click();
             By attributeToAddLocator = By.cssSelector(selectedAttributeLocator.replace(
                     "${attributeName}", "s-item-" + simplifyText(name)));
             waitForElementVisible(attributeSearchInput).sendKeys(name);
             waitForElementVisible(attributeToAddLocator, browser).click();
         }
         waitForElementVisible(addFilterButton).click();
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
     }
 
     public void addTimeFilter(int dateDimensionIndex, String dataRange) {
         if (browser.findElements(By.xpath(addButton)).isEmpty()) {
+            List<WebElement> dateFilterList = browser.findElements(BY_DATE_FILTER_LIST);
+            waitForCollectionIsNotEmpty(dateFilterList);
             waitForElementVisible(dateFilterList.get(dateDimensionIndex)).click();
             sleepTightInSeconds(1);
             waitForElementVisible(nextButton).click();

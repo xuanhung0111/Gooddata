@@ -20,7 +20,7 @@ public class FilterPanelRow extends AbstractFragment {
     private WebElement checkbox;
 
     public WebElement getSelectOnly() {
-        return selectOnly;
+    	return waitForElementVisible(selectOnly);
     }
 
     public WebElement getCheckbox() {
