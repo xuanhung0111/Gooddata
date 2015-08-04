@@ -11,6 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -32,6 +33,9 @@ public class CsvUploaderTest extends AbstractMSFTest {
     private static final String CSV_FILE_NAME = "payroll.csv";
     /** This csv file has incorrect column count (one more than expected) on the line number 2. */
     private static final String BAD_CSV_FILE_NAME = "payroll.bad.csv";
+
+    private static final String UPLOAD_DIALOG_NAME = "upload-dialog";
+    private static final String DATA_PAGE_NAME = "data-page";
 
     private AdsHelper adsHelper;
 
@@ -69,6 +73,9 @@ public class CsvUploaderTest extends AbstractMSFTest {
     public void checkEmptyState() {
         initDataUploadPage();
         sourcesListPage.waitForEmptyStateLoaded();
+
+        takeScreenshot(browser, DATA_PAGE_NAME + "-empty", getClass());
+
         System.out.println("Empty state message: " + sourcesListPage.getEmptyStateMessage());
     }
 
@@ -77,6 +84,8 @@ public class CsvUploaderTest extends AbstractMSFTest {
         adsHelper.associateAdsWithProject(ads, testParams.getProjectId());
 
         checkCsvUpload(CSV_FILE_NAME, this::uploadCsv, true);
+
+        takeScreenshot(browser, DATA_PAGE_NAME + "-one-dataset-uploaded", getClass());
 
         final String sourceName = removeExtension(CSV_FILE_NAME);
         assertNotNull(sourcesListPage.getMySourcesTable().getSource(sourceName),
@@ -99,7 +108,7 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
         final int datasetCountBeforeUpload = sourcesListPage.getMySourcesCount();
 
-        final int datasetCountAfterUpload = uploadCsvFunction.apply(getCsvFileToUpload(csvFileName));
+        final int datasetCountAfterUpload = uploadCsvFunction.apply(csvFileName);
 
         assertEquals(datasetCountAfterUpload, newDatasetExpected ? datasetCountBeforeUpload + 1 : datasetCountBeforeUpload);
     }
@@ -109,9 +118,9 @@ public class CsvUploaderTest extends AbstractMSFTest {
         waitForFragmentVisible(sourcesListPage);
     }
 
-    private int uploadCsv(String csvFileToUpload) {
+    private int uploadCsv(String csvFileName) {
 
-        uploadFile(csvFileToUpload);
+        uploadFile(csvFileName);
 
         waitForFragmentVisible(dataPreviewPage);
 
@@ -124,12 +133,14 @@ public class CsvUploaderTest extends AbstractMSFTest {
         return waitForFragmentVisible(sourcesListPage).getMySourcesCount();
     }
 
-    private int uploadBadCsv(String csvFileToUpload) {
+    private int uploadBadCsv(String csvFileName) {
 
-        uploadFile(csvFileToUpload);
+        uploadFile(csvFileName);
 
         // the processing should not go any further but display validation error directly in File Upload Dialog
         assertThat(fileUploadDialog.getBackendValidationErrors(), contains("csv.validations.structural.incorrect-column-count"));
+
+        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-validation-errors-" + csvFileName, getClass());
 
         waitForFragmentVisible(fileUploadDialog).clickCancelButton();
         waitForFragmentVisible(sourcesListPage);
@@ -137,12 +148,16 @@ public class CsvUploaderTest extends AbstractMSFTest {
         return sourcesListPage.getMySourcesCount();
     }
 
-    private void uploadFile(String csvFileToUpload) {
+    private void uploadFile(String csvFileName) {
         waitForFragmentVisible(sourcesListPage).clickAddDataButton();
 
-        waitForFragmentVisible(fileUploadDialog)
-                .pickCsvFile(csvFileToUpload)
-                .clickUploadButton();
+        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-initial-state-" + csvFileName, getClass());
+
+        waitForFragmentVisible(fileUploadDialog).pickCsvFile(getCsvFileToUpload(csvFileName));
+
+        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-csv-file-picked-" + csvFileName, getClass());
+
+        fileUploadDialog.clickUploadButton();
     }
 
     private String getCsvFileToUpload(String csvFileName) {
