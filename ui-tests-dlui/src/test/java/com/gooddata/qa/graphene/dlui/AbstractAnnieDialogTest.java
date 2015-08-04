@@ -374,7 +374,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
                         addedField.getName());
             }
 
-            checkReportAfterAddingNewField(reportWithAddedFields.getReportDefinition(),
+            createAndCheckReport(reportWithAddedFields.getReportDefinition(),
                     reportWithAddedFields.getAttributeValues(),
                     reportWithAddedFields.getMetricValues());
         } catch (InterruptedException e) {

@@ -134,7 +134,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             ReportDefinition reportDefinition1 =
                     new ReportDefinition().withName("Report to check reference 1")
                             .withHows("Trackname").withWhats("number [Sum]");
-            checkReportAfterAddingNewField(reportDefinition1, Lists.newArrayList("10 trackNameA",
+            createAndCheckReport(reportDefinition1, Lists.newArrayList("10 trackNameA",
                     "11 trackNameA", "12 trackNameA", "13 trackNameA", "14 trackNameA",
                     "1 trackNameA", "2 trackNameA", "3 trackNameA", "4 trackNameA", "5 trackNameA",
                     "6 trackNameA", "7 trackNameA", "8 trackNameA", "9 trackNameA"),
@@ -143,7 +143,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             ReportDefinition reportDefinition2 =
                     new ReportDefinition().withName("Report to check reference 2")
                             .withHows("authorid").withWhats("number [Sum]");
-            checkReportAfterAddingNewField(reportDefinition2, Lists.newArrayList("author1",
+            createAndCheckReport(reportDefinition2, Lists.newArrayList("author1",
                     "author10", "author11", "author12", "author13", "author14", "author19",
                     "author2", "author3", "author4", "author5", "author6", "author7", "author8"),
                     Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00",

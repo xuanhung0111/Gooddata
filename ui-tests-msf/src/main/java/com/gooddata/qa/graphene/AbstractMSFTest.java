@@ -448,9 +448,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
         }
     }
 
-    protected void checkReportAfterAddingNewField(ReportDefinition reportDefinition,
-            Collection<String> attributeValues, Collection<String> metricValues)
-            throws InterruptedException {
+    protected void createAndCheckReport(ReportDefinition reportDefinition, Collection<String> attributeValues,
+            Collection<String> metricValues) throws InterruptedException {
         createReport(reportDefinition, reportDefinition.getName());
 
         List<String> attributes = reportPage.getTableReport().getAttributeElements();
@@ -469,7 +468,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
         ReportDefinition reportDefinition =
                 new ReportDefinition().withName("Report to check reference")
                         .withHows("artistname").withWhats("number [Sum]");
-        checkReportAfterAddingNewField(reportDefinition, Lists.newArrayList("OOP1", "OOP2",
+        createAndCheckReport(reportDefinition, Lists.newArrayList("OOP1", "OOP2",
                 "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"), Lists.newArrayList("1,000.00",
                 "1,200.00", "1,400.00", "1,600.00", "1,800.00", "2,000.00", "700.00", "800.00"));
     }
