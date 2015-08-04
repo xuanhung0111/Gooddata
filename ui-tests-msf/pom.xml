@@ -12,7 +12,7 @@
         <profile>
             <id>selenium</id>
             <properties>
-                <testng.suite.xml>testng-disc.xml</testng.suite.xml>
+                <testng.suite.xml>testng-msf-core-dummy.xml</testng.suite.xml>
                 <propertiesPath>${modulePropertiesPath}</propertiesPath>
             </properties>
             <build>

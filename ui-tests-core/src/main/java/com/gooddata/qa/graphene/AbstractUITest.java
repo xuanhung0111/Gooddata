@@ -5,7 +5,6 @@ import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
-import com.gooddata.qa.graphene.fragments.csvuploader.DataUploadPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -54,8 +53,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
     protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
-    
-    protected static final String DATA_UPLOAD_PAGE_URI = "data/#/project/%s/datasets";
     
     /**
      * ----- UI fragmnets -----
@@ -181,9 +178,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = "#app-dashboards")
     protected IndigoDashboardsPage indigoDashboardsPage;
     
-    @FindBy(css = "#app-data")
-    protected DataUploadPage dataUploadPage;
-
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
      *
@@ -192,8 +186,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
      * @throws org.json.JSONException
      */
     protected void signIn(boolean greyPages, UserRoles userRole) throws JSONException {
-        String user = null;
-        String password = null;
+        String user;
+        String password;
         switch (userRole) {
             case ADMIN:
                 user = testParams.getUser();
@@ -552,8 +546,4 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForFragmentVisible(discProjectsPage);
     }
     
-    public void initDataUploadPage() {
-        openUrl(String.format(DATA_UPLOAD_PAGE_URI, testParams.getProjectId()));
-        waitForFragmentVisible(dataUploadPage);
-    }
 }

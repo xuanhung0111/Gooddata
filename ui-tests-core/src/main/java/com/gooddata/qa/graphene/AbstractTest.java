@@ -8,6 +8,7 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 
+import org.apache.http.HttpHost;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.testng.Arquillian;
 import org.openqa.selenium.WebDriver;
@@ -114,8 +115,7 @@ public abstract class AbstractTest extends Arquillian {
 
     /**
      * Create {@link com.gooddata.qa.utils.http.RestApiClient} for specific user. It doesn't save it to the context!
-     * @param userLogin
-     * @param userPassword
+     *
      * @return {@link com.gooddata.qa.utils.http.RestApiClient} for specific user.
      */
     public RestApiClient getRestApiClient(final String userLogin, final String userPassword) {
@@ -124,7 +124,9 @@ public abstract class AbstractTest extends Arquillian {
 
     public GoodData getGoodDataClient() {
         if (goodDataClient == null) {
-            goodDataClient = new GoodData(testParams.getHost(), testParams.getUser(), testParams.getPassword());
+            final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
+            goodDataClient = new GoodData(httpHost.getHostName(), testParams.getUser(), testParams.getPassword(),
+                    httpHost.getPort());
         }
         return goodDataClient;
     }

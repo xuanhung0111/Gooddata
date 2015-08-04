@@ -45,21 +45,26 @@ import java.security.NoSuchAlgorithmException;
 public class RestApiClient {
 
     public static final String API_PROXY_HOST = "na-apiproxy-dev.na.getgooddata.com";
+    private static final int DEFAULT_PORT = 443;
 
     private final HttpHost httpHost;
     private final HttpClient httpClient;
 
     public RestApiClient(String host, String user, String password, boolean useSST, boolean useApiProxy) {
+        httpHost = parseHost(host);
+        httpClient = getGooddataHttpClient(httpHost, user, password, useSST, useApiProxy);
+    }
+
+    public static HttpHost parseHost(String host) {
         String[] parts = host.split(":");
         String hostName = parts[0];
         int port;
         if (parts.length == 2) {
             port = Integer.parseInt(parts[1]);
         } else {
-            port = 443;
+            port = DEFAULT_PORT;
         }
-        httpHost = new HttpHost(hostName, port, "https");
-        httpClient = getGooddataHttpClient(httpHost, user, password, useSST, useApiProxy);
+        return new HttpHost(hostName, port, "https");
     }
 
     public HttpHost getHttpHost() {
@@ -118,8 +123,7 @@ public class RestApiClient {
     }
 
     protected AbstractHttpEntity getEntity(String content) {
-        StringEntity entity = new StringEntity(content, ContentType.APPLICATION_JSON);
-        return entity;
+        return new StringEntity(content, ContentType.APPLICATION_JSON);
     }
 
     protected void setAcceptHeader(HttpRequestBase requestBase) {
