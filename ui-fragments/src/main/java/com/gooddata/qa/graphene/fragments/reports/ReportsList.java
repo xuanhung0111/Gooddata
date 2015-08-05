@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.reports;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -15,6 +16,7 @@ public class ReportsList extends AbstractFragment {
 
     private static final By BY_REPORT_LABEL = By.xpath("h3/a");
     private static final By BY_REPORT_CHECKBOX = By.tagName("input");
+    private static final By BY_FAVORITE = By.className("favorite");
 
     @FindBy(css = "div.report")
     private List<WebElement> reports;
@@ -98,6 +100,21 @@ public class ReportsList extends AbstractFragment {
                 getReportWebElement(i).findElement(BY_REPORT_CHECKBOX).click();
             }
         }
+    }
+
+    public void addFavorite(String... reports) {
+        List<String> reportNames = Arrays.asList(reports);
+        for (int i = 0; i < this.reports.size(); i++) {
+            if (reportNames.contains(getReportLabel(i))) {
+                getReportWebElement(i).findElement(BY_FAVORITE).click();
+            }
+        }
+    }
+
+    public Optional<WebElement> getReportWebElement(String name) {
+        return reports.stream()
+                .filter(element -> name.equals(element.findElement(BY_REPORT_LABEL).getText()))
+                .findFirst();
     }
 
     private WebElement getReportWebElement(int i) {
