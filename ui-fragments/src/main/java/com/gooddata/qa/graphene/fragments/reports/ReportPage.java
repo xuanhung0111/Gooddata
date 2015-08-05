@@ -165,13 +165,14 @@ public class ReportPage extends AbstractFragment {
         return visualiser;
     }
 
-    public void setReportName(String reportName) {
+    public ReportPage setReportName(String reportName) {
         waitForElementVisible(this.reportName).click();
         waitForElementVisible(reportNameInput).clear();
         reportNameInput.sendKeys(reportName);
         waitForElementVisible(reportNameSaveButton).click();
         waitForElementNotVisible(reportNameInput);
         assertEquals(this.reportName.getText(), reportName, "Report name wasn't updated");
+        return this;
     }
 
     public String getReportName() {
@@ -201,6 +202,10 @@ public class ReportPage extends AbstractFragment {
 
         visualiser.selectReportVisualisation(reportDefinition.getType());
         waitForAnalysisPageLoaded(browser);
+        createReport();
+    }
+
+    public void createReport() {
         waitForElementVisible(createReportButton).click();
         waitForElementVisible(confirmDialogCreateButton).click();
         waitForElementNotVisible(confirmDialogCreateButton);
