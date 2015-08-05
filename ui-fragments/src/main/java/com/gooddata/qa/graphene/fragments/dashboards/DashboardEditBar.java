@@ -13,6 +13,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
+import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
@@ -248,12 +249,12 @@ public class DashboardEditBar extends AbstractFragment {
         waitForElementNotVisible(this.getRoot());
     }
 
-    public void deleteDashboard() throws InterruptedException {
+    public void deleteDashboard() {
         waitForElementVisible(actionsMenu).click();
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(deleteDashboardDialogButton).click();
         waitForElementNotPresent(this.getRoot());
-        Thread.sleep(3000); // take sometime for saving current dashboard into user profile settings
+        Sleeper.sleepTightInSeconds(3); // take sometime for saving current dashboard into user profile settings
     }
 
     public void moveWidget(WebElement widget, int x, int y) {

@@ -357,7 +357,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void selectDashboard(String name) throws InterruptedException {
         initDashboardsPage();
-        dashboardsPage.selectDashboard(name);
+        assertTrue(dashboardsPage.selectDashboard(name), 
+                String.format("Cannot select dashboard named: %s", name));
         waitForDashboardPage();
     }
 

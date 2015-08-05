@@ -1,13 +1,16 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForReportsPageLoaded;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ReportsFolders extends AbstractFragment {
 
@@ -41,6 +44,7 @@ public class ReportsFolders extends AbstractFragment {
         for (int i = 0; i < folders.size(); i++) {
             if (getFolderLabel(i).equals(folderName)) {
                 openFolder(i);
+                waitForReportsPageLoaded(browser);
                 return;
             }
         }
@@ -104,6 +108,12 @@ public class ReportsFolders extends AbstractFragment {
             folderNames.add(getFolderLabel(i));
         }
         return folderNames;
+    }
+
+    public Optional<WebElement> getFolderWebElement(String name) {
+        return folders.stream()
+                .filter(element -> name.equals(element.findElement(BY_LINK).getText()))
+                .findFirst();
     }
 
     private WebElement getFolderWebElement(int i) {

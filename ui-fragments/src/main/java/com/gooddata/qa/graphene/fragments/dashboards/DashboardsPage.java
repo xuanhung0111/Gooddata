@@ -125,7 +125,7 @@ public class DashboardsPage extends AbstractFragment {
         return name;
     }
 
-    public boolean selectDashboard(String dashboardName) throws InterruptedException {
+    public boolean selectDashboard(String dashboardName) {
         if (getDashboardName().contains(dashboardName)) {
             System.out.println("Dashboard '" + dashboardName + "'already selected");
             return true;
@@ -261,7 +261,7 @@ public class DashboardsPage extends AbstractFragment {
         waitForDashboardPageLoaded(browser);
     }
 
-    public void addNewDashboard(String dashboardName) throws InterruptedException {
+    public void addNewDashboard(String dashboardName) {
         openEditExportEmbedMenu().select("Add Dashboard");
         waitForElementVisible(newDashboardNameInput);
 
@@ -272,7 +272,7 @@ public class DashboardsPage extends AbstractFragment {
         editDashboardBar.saveDashboard();
     }
 
-    public void deleteDashboard() throws InterruptedException {
+    public void deleteDashboard() {
         editDashboard();
         editDashboardBar.deleteDashboard();
     }
