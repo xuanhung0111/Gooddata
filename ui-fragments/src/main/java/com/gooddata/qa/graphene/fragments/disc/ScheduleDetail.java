@@ -906,9 +906,9 @@ public class ScheduleDetail extends ScheduleForm {
                 .contains(SELECT_SYNCHRONIZE_SELECTED_DATASETS_TEXT));
 
         Actions action = new Actions(browser);
-        action.moveToElement(inlineBubbleHelp).build().perform();
+        action.moveToElement(scheduleTitle).perform();
+        action.moveToElement(inlineBubbleHelp).perform();
         assertEquals(waitForElementVisible(BY_TOOLTIP, browser).getText().trim(), UPLOAD_DATA_HELP_TEXT,
-
                 "Upload data help message isn't correct!");
 
         if (scheduleBuilder.isSynchronizeAllDatasets()) {
