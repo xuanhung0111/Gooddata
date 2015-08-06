@@ -1,12 +1,13 @@
 /*
  * Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved.
  */
-package com.gooddata.qa.graphene.connectors;
+package com.gooddata.qa.graphene.connectors.zendesk;
 
 import static org.testng.Assert.fail;
 
 import java.io.IOException;
 
+import com.gooddata.qa.graphene.connectors.ZendeskHelper;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

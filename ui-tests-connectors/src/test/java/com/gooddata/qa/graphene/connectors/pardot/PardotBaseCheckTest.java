@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.connectors;
+package com.gooddata.qa.graphene.connectors.pardot;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

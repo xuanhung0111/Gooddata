@@ -8,7 +8,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.connectors.PardotBaseCheckTest"/>
+            <class name="com.gooddata.qa.graphene.connectors.pardot.PardotBaseCheckTest"/>
         </classes>
     </test>
 
@@ -19,7 +19,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.connectors.PardotPremiumCheckTest"/>
+            <class name="com.gooddata.qa.graphene.connectors.pardot.PardotPremiumCheckTest"/>
         </classes>
     </test>
 
@@ -30,7 +30,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.connectors.CoupaCheckTest"/>
+            <class name="com.gooddata.qa.graphene.connectors.coupa.CoupaCheckTest"/>
         </classes>
     </test>
 

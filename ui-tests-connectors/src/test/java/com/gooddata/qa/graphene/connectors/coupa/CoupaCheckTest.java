@@ -1,5 +1,6 @@
-package com.gooddata.qa.graphene.connectors;
+package com.gooddata.qa.graphene.connectors.coupa;
 
+import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;

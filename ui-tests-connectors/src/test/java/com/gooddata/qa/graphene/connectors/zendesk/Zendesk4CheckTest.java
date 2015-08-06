@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2007-2013, GoodData(R) Corporation. All rights reserved.
  */
-package com.gooddata.qa.graphene.connectors;
+package com.gooddata.qa.graphene.connectors.zendesk;
 
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
@@ -13,6 +13,7 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.OneNumberReportDefinitionContent;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
+import com.gooddata.qa.graphene.connectors.ZendeskHelper;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.Connectors;
