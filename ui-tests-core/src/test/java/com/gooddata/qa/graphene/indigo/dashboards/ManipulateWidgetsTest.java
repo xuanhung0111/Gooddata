@@ -1,16 +1,18 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import java.util.UUID;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import org.testng.annotations.Test;
 
 public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     private static final String TEST_HEADLINE = "Test headline";
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkEditModeCancelNoChanges() {
         Kpi selectedKpi = initIndigoDashboardsPage()
             .switchToEditMode()
@@ -23,9 +25,11 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         assertEquals(selectedKpi.getHeadline(), kpiHeadline);
         assertEquals(selectedKpi.getValue(), kpiValue);
+
+        takeScreenshot(browser, "checkEditModeCancelNoChanges", getClass());
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndDiscard() {
         Kpi selectedKpi = initIndigoDashboardsPage()
             .switchToEditMode()
@@ -46,7 +50,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertEquals(selectedKpi.getHeadline(), kpiHeadline);
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndAbortCancel() {
         Kpi selectedKpi = initIndigoDashboardsPage()
             .switchToEditMode()
@@ -68,7 +72,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiTitleChangeAndSave() {
         Kpi selectedKpi = initIndigoDashboardsPage()
             .switchToEditMode()
@@ -80,9 +84,11 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage.saveEditMode();
 
         assertEquals(selectedKpi.getHeadline(), uniqueHeadline);
+
+        takeScreenshot(browser, "checkKpiTitleChangeAndSave-" + uniqueHeadline, getClass());
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiTitleChangeWhenMetricChange() {
         Kpi selectedKpi = initIndigoDashboardsPage()
             .switchToEditMode()
@@ -104,7 +110,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiTitlePersistenceWhenMetricChange() {
         Kpi selectedKpi = initIndigoDashboardsPage()
             .switchToEditMode()
@@ -124,9 +130,11 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .selectDateDimensionByName(DATE_CREATED);
 
         assertEquals(selectedKpi.getHeadline(), TEST_HEADLINE);
+
+        takeScreenshot(browser, "checkKpiTitlePersistenceWhenMetricChange-" + TEST_HEADLINE, getClass());
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkDeleteKpiConfirmAndSave() {
         int kpisCount = initIndigoDashboardsPage().getKpisCount();
 
@@ -151,7 +159,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertEquals(kpisCount, initIndigoDashboardsPage().getKpisCount());
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, groups = {"adminTests"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkDeleteKpiConfirmAndDiscard() {
         int kpisCount = initIndigoDashboardsPage().getKpisCount();
 

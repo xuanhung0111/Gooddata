@@ -49,7 +49,7 @@ public abstract class ReactDropdown extends AbstractFragment {
     public Collection<String> getValues() {
         ensureDropdownOpen();
 
-        String itemSelector = getDropdownCssSelector() + " .gd-list-view-item";
+        String itemSelector = getDropdownCssSelector() + " .gd-list-item";
         return getElementTexts(By.cssSelector(itemSelector), browser);
     }
 
