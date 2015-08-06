@@ -5,7 +5,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
-import com.gooddata.qa.graphene.fragments.common.LoginFragment;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -15,7 +15,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
-import com.gooddata.qa.graphene.fragments.reports.ReportPage;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;

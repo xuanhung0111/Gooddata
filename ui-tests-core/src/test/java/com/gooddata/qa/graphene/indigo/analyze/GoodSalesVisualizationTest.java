@@ -37,7 +37,7 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 

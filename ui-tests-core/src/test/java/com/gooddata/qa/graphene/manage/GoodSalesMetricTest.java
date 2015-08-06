@@ -42,8 +42,8 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.fragments.reports.ReportVisualizer;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportVisualizer;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 @Test(groups = {"GoodSalesMetrics"},
         description = "Tests for GoodSales project (metric creation functionality) in GD platform")

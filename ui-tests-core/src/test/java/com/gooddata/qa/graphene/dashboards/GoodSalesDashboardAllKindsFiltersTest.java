@@ -36,8 +36,8 @@ import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
-import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest {
 

@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.reports;
+package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;

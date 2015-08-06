@@ -13,8 +13,8 @@ import org.testng.Assert;
 
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.ParentFiltersConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 

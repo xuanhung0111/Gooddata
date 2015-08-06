@@ -22,7 +22,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
 

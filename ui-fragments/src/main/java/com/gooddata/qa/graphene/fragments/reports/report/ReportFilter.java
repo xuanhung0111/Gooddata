@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.reports;
+package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;

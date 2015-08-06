@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.reports;
+package com.gooddata.qa.graphene.fragments.reports.report;
 
 import java.util.ArrayList;
 import java.util.List;

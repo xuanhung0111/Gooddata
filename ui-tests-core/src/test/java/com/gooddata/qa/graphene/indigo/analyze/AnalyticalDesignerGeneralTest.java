@@ -530,9 +530,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
                 browser.switchTo().window(handel);
         }
 
-        com.gooddata.qa.graphene.fragments.reports.TableReport tableReport =
+        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
                 Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.TableReport.class,
+                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser));
 
         Iterator<String> attributes = tableReport.getAttributeElements().iterator();

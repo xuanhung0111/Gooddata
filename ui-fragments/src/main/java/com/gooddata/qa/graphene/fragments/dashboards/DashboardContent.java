@@ -14,7 +14,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
+import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;

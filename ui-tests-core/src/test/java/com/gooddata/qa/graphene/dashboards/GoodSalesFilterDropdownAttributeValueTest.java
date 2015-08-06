@@ -50,7 +50,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.base.Function;
 
 public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstractTest {

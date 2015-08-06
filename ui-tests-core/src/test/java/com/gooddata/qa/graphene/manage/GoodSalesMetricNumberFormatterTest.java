@@ -22,8 +22,8 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.fragments.reports.ReportVisualizer;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportVisualizer;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {

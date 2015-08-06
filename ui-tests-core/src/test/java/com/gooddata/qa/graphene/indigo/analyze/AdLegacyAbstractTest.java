@@ -441,9 +441,9 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 browser.switchTo().window(handle);
         }
 
-        com.gooddata.qa.graphene.fragments.reports.TableReport tableReport =
+        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
                 Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.TableReport.class,
+                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser));
 
         Iterator<String> attributes = tableReport.getAttributeElements().iterator();
@@ -946,7 +946,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         }
 
         assertEquals(analysisContent, getTableContentFromReportPage(Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.TableReport.class,
+                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser))));
         checkRedBar(browser);
 
@@ -1042,7 +1042,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     private List<List<String>> getTableContentFromReportPage(
-            com.gooddata.qa.graphene.fragments.reports.TableReport tableReport) {
+            com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport) {
         List<List<String>> content = Lists.newArrayList();
         List<String> attributes = tableReport.getAttributeElements();
         List<String> metrics = tableReport.getRawMetricElements();

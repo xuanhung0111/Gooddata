@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.reports;
+package com.gooddata.qa.graphene.fragments.reports.report;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

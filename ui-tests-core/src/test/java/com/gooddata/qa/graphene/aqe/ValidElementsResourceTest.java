@@ -27,7 +27,7 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 

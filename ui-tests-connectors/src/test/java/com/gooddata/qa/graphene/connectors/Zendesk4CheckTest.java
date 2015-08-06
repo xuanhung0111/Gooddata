@@ -16,7 +16,7 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.Connectors;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.report.ReportExportFormat;

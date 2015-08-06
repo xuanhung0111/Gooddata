@@ -23,7 +23,7 @@ import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 

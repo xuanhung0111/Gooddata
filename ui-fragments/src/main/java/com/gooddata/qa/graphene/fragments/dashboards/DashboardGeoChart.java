@@ -10,7 +10,7 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.reports.ReportPage;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 

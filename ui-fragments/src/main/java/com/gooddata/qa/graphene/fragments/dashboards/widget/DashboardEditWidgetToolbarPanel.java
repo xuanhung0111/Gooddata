@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.common;
+package com.gooddata.qa.graphene.fragments.dashboards.widget;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 

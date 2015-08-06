@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.fragments.greypages.sfdccredentials;
+package com.gooddata.qa.graphene.fragments.greypages.sfdc;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;

@@ -29,7 +29,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.collect.Sets;
 
 @Test(groups = {"GoodSalesDrillReport"}, description = "Drill report placed on dashboard")
