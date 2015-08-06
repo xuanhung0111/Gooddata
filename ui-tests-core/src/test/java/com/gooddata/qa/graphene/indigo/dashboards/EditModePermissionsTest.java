@@ -13,7 +13,7 @@ import org.testng.annotations.BeforeClass;
 
 public class EditModePermissionsTest extends DashboardsGeneralTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void before() throws InterruptedException {
         addUsersWithOtherRoles = true;
     }
