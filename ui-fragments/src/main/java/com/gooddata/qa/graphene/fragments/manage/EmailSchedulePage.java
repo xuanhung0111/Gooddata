@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;

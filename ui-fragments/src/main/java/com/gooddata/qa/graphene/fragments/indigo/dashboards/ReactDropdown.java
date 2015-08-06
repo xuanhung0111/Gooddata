@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.getElementTexts;
 import static com.gooddata.qa.graphene.common.CheckUtils.isElementPresent;

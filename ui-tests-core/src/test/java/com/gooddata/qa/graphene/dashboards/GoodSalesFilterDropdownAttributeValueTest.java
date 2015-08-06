@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.addMUFToUser;
 import static com.gooddata.qa.utils.http.RestUtils.createMUFObj;
 import static com.gooddata.qa.utils.http.RestUtils.executePostRequest;

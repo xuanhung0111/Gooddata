@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.aqe;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
 import static java.util.Arrays.asList;

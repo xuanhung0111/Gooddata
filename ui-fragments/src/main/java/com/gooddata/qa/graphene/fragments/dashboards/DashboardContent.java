@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;

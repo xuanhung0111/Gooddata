@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
  */
-package com.gooddata.qa;
+package com.gooddata.qa.utils;
 
 import org.apache.commons.lang.StringEscapeUtils;
 

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

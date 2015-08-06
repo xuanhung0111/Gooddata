@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import com.gooddata.GoodData;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
-import com.gooddata.qa.CssUtils;
+import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.HowItem.Position;
