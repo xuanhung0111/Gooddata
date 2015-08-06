@@ -13,7 +13,7 @@ import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.OneNumberReportDefinitionContent;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
-import com.gooddata.qa.graphene.entity.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
@@ -318,7 +318,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private void createTicketTagsReport(int ticketId) throws InterruptedException {
-        createReport(new com.gooddata.qa.graphene.entity.ReportDefinition().withName(TICKET_TAGS_REPORT_NAME)
+        createReport(new com.gooddata.qa.graphene.entity.report.ReportDefinition().withName(TICKET_TAGS_REPORT_NAME)
                                            .withHows(new HowItem("Ticket Tag", HowItem.Position.LEFT))
                                            .withHows(new HowItem("Ticket Tag Deleted Flag", HowItem.Position.LEFT))
                                            .withHows(new HowItem("Ticket Id", HowItem.Position.LEFT)),

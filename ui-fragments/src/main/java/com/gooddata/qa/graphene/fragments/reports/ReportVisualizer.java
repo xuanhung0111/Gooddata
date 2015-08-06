@@ -14,9 +14,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.entity.Attribute;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.WhatItem;
+import com.gooddata.qa.graphene.entity.report.Attribute;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;

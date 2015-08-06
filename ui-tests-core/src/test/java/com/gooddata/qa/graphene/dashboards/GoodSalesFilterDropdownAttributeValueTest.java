@@ -129,8 +129,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         // *** create report 2 ***
         initReportsPage();
-        com.gooddata.qa.graphene.entity.ReportDefinition rd =
-                new com.gooddata.qa.graphene.entity.ReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
+        com.gooddata.qa.graphene.entity.report.ReportDefinition rd =
+                new com.gooddata.qa.graphene.entity.report.ReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
                         .withHows(STAGE_NAME).withHows(YEAR_SNAPSHOT);
         createReport(rd, REPORT_2);
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(F_STAGE_NAME, "Discovery", "2010", "2011",

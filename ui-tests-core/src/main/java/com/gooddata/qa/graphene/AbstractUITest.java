@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;

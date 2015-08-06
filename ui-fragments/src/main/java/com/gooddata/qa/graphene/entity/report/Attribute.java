@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.entity;
+package com.gooddata.qa.graphene.entity.report;
 
 public class Attribute{
 

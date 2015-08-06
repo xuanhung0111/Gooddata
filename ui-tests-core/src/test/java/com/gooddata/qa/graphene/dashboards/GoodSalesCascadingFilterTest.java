@@ -27,8 +27,8 @@ import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.HowItem.Position;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
@@ -101,8 +101,8 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
         // *** create report 3 ***
         initReportsPage();
-        com.gooddata.qa.graphene.entity.ReportDefinition rd =
-                new com.gooddata.qa.graphene.entity.ReportDefinition()
+        com.gooddata.qa.graphene.entity.report.ReportDefinition rd =
+                new com.gooddata.qa.graphene.entity.report.ReportDefinition()
                         .withName(REPORT_3)
                         .withWhats(AMOUNT)
                         .withHows(STAGE_NAME)

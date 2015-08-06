@@ -37,7 +37,7 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.utils.CheckUtils;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.ExportFormat;

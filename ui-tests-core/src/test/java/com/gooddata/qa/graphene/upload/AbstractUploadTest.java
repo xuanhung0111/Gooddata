@@ -22,8 +22,8 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
