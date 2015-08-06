@@ -12,8 +12,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
@@ -23,6 +21,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
 

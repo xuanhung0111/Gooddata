@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 
 @Test(groups = {"login"}, description = "Tests for basic login functionality in GD platform")
