@@ -20,8 +20,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkGreenBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

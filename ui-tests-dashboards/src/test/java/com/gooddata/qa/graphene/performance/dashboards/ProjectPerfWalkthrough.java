@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.performance.dashboards;
 
 import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.common.CheckUtils;
+import com.gooddata.qa.graphene.utils.CheckUtils;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ClearCaches;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"projectDashboardPerf"}, description = "Tests for performance of rendering dashboards of given project")
 public class ProjectPerfWalkthrough extends AbstractUITest {

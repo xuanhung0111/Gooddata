@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.query.attributes;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 
 import org.json.JSONException;
 import org.openqa.selenium.By;

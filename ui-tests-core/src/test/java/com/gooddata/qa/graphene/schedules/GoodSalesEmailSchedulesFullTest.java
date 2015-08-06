@@ -4,13 +4,8 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.graphene.common.CheckUtils.BY_DISMISS_BUTTON;
-import static com.gooddata.qa.graphene.common.CheckUtils.BY_RED_BAR;
-import static com.gooddata.qa.graphene.common.CheckUtils.BY_RED_BAR_WARNING;
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.addMUFToUser;
 import static com.gooddata.qa.utils.http.RestUtils.createMUFObj;

@@ -14,7 +14,7 @@ import org.openqa.selenium.support.FindBy;
 import java.io.File;
 import java.io.IOException;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
 

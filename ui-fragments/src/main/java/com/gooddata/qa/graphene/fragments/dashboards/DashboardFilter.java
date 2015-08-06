@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -26,7 +26,7 @@ import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.common.Sleeper;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.HowItem;
 import com.gooddata.qa.graphene.entity.HowItem.Position;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;

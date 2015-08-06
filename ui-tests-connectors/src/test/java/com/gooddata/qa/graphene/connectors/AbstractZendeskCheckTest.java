@@ -11,7 +11,7 @@ import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTest {
 

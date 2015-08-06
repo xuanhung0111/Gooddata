@@ -32,7 +32,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
 
 public class AbstractUITest extends AbstractGreyPageTest {

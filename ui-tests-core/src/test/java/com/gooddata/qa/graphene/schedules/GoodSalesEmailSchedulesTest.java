@@ -3,8 +3,8 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 

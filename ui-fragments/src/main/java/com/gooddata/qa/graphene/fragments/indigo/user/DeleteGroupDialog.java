@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.user;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

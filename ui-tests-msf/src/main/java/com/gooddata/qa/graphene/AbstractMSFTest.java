@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;

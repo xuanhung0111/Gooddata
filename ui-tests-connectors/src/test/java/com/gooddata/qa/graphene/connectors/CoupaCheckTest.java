@@ -15,7 +15,7 @@ import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFrag
 import java.util.HashMap;
 
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"connectors", "coupa"}, description = "Checklist tests for Coupa connector in GD platform")
 public class CoupaCheckTest extends AbstractConnectorsCheckTest {

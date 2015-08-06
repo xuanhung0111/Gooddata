@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 

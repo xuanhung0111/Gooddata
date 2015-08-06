@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;

@@ -11,10 +11,9 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
 
 public class AnnieUIDialogFragment extends AbstractFragment {

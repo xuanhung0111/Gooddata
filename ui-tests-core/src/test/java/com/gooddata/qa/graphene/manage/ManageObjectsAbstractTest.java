@@ -14,7 +14,7 @@ import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 

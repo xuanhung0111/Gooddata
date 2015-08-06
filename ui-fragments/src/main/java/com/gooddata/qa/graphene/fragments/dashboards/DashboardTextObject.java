@@ -4,9 +4,8 @@ import org.openqa.selenium.By;
 
 import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.addlink.AddLinkDialog;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class DashboardTextObject extends AbstractFragment {
     

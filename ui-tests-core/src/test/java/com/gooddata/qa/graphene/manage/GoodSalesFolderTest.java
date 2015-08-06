@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.UserRoles;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"GoodSalesFolder"}, description = "Tests for view and edit folder on GoodSales project in GD platform")
 public class GoodSalesFolderTest extends GoodSalesAbstractTest {

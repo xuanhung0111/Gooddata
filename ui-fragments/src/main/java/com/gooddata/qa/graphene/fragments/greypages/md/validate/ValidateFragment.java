@@ -8,7 +8,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ValidateFragment extends AbstractGreyPagesFragment {
 

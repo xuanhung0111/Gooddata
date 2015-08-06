@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;

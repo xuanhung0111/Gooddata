@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene;
 
 import com.gooddata.GoodData;
-import com.gooddata.qa.graphene.common.CheckUtils;
+import com.gooddata.qa.graphene.utils.CheckUtils;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.utils.http.RestApiClient;

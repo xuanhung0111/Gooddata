@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 
 import java.util.List;
 

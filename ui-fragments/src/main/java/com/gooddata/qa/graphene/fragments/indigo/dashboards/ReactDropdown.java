@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.getElementTexts;
-import static com.gooddata.qa.graphene.common.CheckUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import java.util.Collection;
 import org.openqa.selenium.By;

@@ -10,9 +10,10 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import com.gooddata.qa.graphene.common.Sleeper;
 import org.jboss.arquillian.graphene.findby.ByJQuery;
+import com.gooddata.qa.graphene.utils.Sleeper;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = Kpi.KPI_CSS_SELECTOR)

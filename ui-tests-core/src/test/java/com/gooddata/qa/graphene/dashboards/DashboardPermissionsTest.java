@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog.ALERT_INFOBOX_CSS_SELECTOR;
 import static org.testng.Assert.*;
 

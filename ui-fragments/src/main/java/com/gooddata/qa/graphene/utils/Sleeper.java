@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.common;
+package com.gooddata.qa.graphene.utils;
 
 /**
  * Primitives for sleeping

@@ -20,7 +20,7 @@ import static java.lang.String.format;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"dss"}, description = "Basic verification of dss restapi in GD platform")
 public class BasicDSSRestTest extends AbstractDSSTest {

@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 

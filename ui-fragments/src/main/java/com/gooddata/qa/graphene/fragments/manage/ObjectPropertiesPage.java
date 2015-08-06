@@ -15,7 +15,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ObjectPropertiesPage extends AbstractFragment {
 

@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.Sleeper.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.*;
 
 import java.util.List;
 

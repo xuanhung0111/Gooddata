@@ -11,8 +11,8 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 public class DashboardScheduleDialog extends AbstractFragment {
 

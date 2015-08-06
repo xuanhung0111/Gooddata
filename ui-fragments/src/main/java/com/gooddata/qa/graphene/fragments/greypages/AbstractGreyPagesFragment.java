@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public abstract class AbstractGreyPagesFragment extends AbstractFragment {
 

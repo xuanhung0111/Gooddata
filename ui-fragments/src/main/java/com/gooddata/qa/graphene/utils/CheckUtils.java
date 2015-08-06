@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.common;
+package com.gooddata.qa.graphene.utils;
 
 import static java.lang.String.format;
 import static org.testng.Assert.fail;

@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;

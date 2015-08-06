@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;

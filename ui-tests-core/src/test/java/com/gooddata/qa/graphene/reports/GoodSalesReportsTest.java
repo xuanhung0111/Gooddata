@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"GoodSalesReports"}, description = "Tests for GoodSales project (reports functionality) in GD platform")
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {

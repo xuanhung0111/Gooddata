@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public abstract class AbstractProjectTest extends AbstractUITest {
 

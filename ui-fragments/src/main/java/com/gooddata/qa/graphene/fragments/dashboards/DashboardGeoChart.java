@@ -12,7 +12,7 @@ import org.testng.Assert;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.reports.ReportPage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class DashboardGeoChart extends AbstractFragment {
 

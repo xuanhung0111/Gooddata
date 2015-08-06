@@ -9,7 +9,7 @@ import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class CoupaInstanceFragment extends AbstractGreyPagesFragment {
 

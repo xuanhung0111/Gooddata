@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForObjectPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForObjectPageLoaded;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

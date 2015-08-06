@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 
 import java.util.List;

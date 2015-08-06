@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"dashboardPerf"}, description = "Tests for performance od rendering dashboards in GoodSales project")
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {

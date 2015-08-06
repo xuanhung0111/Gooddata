@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -36,8 +35,8 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.common.CheckUtils;
-import com.gooddata.qa.graphene.common.Sleeper;
+import com.gooddata.qa.graphene.utils.CheckUtils;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;

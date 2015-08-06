@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 import java.util.HashMap;
 
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTest {
 

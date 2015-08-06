@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.assertEquals;
 
 import org.jboss.arquillian.graphene.Graphene;

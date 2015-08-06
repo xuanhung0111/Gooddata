@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.user;
 
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import java.io.IOException;
 import java.util.Collection;

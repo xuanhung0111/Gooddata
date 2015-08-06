@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 
 import java.util.Collection;
 import java.util.List;

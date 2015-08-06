@@ -12,9 +12,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
-import com.gooddata.qa.graphene.common.Sleeper;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;

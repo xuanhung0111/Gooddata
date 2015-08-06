@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.greypages.datawarehouse;
 
-import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.AbstractDatawarehouseFragment;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
@@ -9,7 +8,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class InstanceUsersFragment extends AbstractDatawarehouseFragment {
 

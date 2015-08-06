@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
-import com.gooddata.qa.graphene.common.Sleeper;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.SourcesListPage;
 import org.json.JSONException;
@@ -10,7 +10,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.hamcrest.MatcherAssert.assertThat;

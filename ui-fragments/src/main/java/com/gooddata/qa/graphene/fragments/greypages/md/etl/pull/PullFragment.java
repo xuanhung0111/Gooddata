@@ -6,7 +6,7 @@ import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class PullFragment extends AbstractGreyPagesFragment {
 

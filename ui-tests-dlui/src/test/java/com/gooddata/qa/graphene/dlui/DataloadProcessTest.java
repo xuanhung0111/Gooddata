@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dlui;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static org.testng.Assert.assertEquals;

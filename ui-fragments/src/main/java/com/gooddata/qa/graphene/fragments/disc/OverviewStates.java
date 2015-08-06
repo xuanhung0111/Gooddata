@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
 
 public class OverviewStates extends AbstractFragment {

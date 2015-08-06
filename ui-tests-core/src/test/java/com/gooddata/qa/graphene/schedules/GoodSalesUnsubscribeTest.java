@@ -3,9 +3,9 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -28,6 +28,13 @@ import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
+import javax.mail.Message;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 @Test(groups = {"GoodSalesUnsubscribe"}, description = "Tests for GoodSales project - unsubscribe in GD platform")
 public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTest {

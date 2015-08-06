@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 
 @Test(groups = {"GoodSalesReportFilters"},
         description = "Tests for GoodSales project (report filters functionality)")

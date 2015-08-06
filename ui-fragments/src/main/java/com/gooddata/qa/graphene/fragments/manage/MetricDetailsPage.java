@@ -8,8 +8,8 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import com.gooddata.qa.graphene.common.Sleeper;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.utils.Sleeper;
 
 public class MetricDetailsPage extends AbstractFragment {
 

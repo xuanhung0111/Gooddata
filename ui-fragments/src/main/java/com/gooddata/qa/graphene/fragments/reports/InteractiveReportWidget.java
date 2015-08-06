@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -14,7 +14,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import com.gooddata.qa.graphene.common.frame.InFrameAction;
+import com.gooddata.qa.graphene.utils.frame.InFrameAction;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
