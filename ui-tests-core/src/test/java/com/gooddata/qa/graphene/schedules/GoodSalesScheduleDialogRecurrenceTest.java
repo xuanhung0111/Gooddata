@@ -7,8 +7,8 @@ import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.AbstractRecurren
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfMonthTestCase;
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfWeekTestCase;
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.WeeklyTestCase;
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;

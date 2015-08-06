@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.qa.graphene.enums.DWHDriver;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import org.json.JSONException;

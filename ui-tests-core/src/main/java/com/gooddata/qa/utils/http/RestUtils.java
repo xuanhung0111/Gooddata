@@ -1,8 +1,8 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.qa.graphene.enums.DatasetElements;
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;

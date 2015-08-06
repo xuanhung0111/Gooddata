@@ -17,6 +17,10 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.ScheduleMailPssClient;
+import com.gooddata.qa.utils.mail.ImapClient;
 
 import java.io.File;
 import java.io.FileReader;
@@ -54,10 +58,7 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
-import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
-import com.gooddata.qa.utils.http.ScheduleMailPssClient;
-import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
 @Test(groups = {"GoodSalesSchedules"},
@@ -229,8 +230,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             .withAttribute("Activity Type").withAttributeElements("Email"));
 
         initReportsPage();
-        com.gooddata.qa.graphene.entity.ReportDefinition rd =
-                new com.gooddata.qa.graphene.entity.ReportDefinition().withName("Filtered variable report")
+        com.gooddata.qa.graphene.entity.report.ReportDefinition rd =
+                new com.gooddata.qa.graphene.entity.report.ReportDefinition().withName("Filtered variable report")
                 .withHows("Activity Type").withWhats("# of Activities");
         createReport(rd, "Filtered variable report");
         reportPage.addFilter(FilterItem.Factory.createVariableFilter("FVariable", "Email"));

@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.dashboard;
 
 public enum TextObject {
     HEADLINE("Headline", "yui3-c-textdashboardwidget-middleText"),

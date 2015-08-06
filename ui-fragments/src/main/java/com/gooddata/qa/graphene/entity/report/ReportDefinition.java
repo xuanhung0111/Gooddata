@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
 
 public class ReportDefinition {
 

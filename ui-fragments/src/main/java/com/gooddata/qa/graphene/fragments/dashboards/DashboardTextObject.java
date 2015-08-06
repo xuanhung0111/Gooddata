@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import org.openqa.selenium.By;
 
-import com.gooddata.qa.graphene.enums.TextObject;
+import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;

@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.dashboard;
 
 public enum DashFilterTypes {
     ATTRIBUTE("attribute filter"),

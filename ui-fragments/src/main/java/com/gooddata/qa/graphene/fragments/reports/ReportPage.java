@@ -21,7 +21,7 @@ import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
 import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
 import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
-import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;

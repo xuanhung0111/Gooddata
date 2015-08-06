@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.common;
 
 import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 import org.json.JSONException;
 import org.testng.Assert;

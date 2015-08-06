@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
-import com.gooddata.qa.graphene.enums.DWHDriver;
-import com.gooddata.qa.graphene.enums.ProjectEnvironment;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 import org.apache.commons.io.FileUtils;

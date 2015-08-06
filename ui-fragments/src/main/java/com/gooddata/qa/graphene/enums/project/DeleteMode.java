@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.enums;
+package com.gooddata.qa.graphene.enums.project;
 
 public enum DeleteMode {
     DELETE_ALWAYS,

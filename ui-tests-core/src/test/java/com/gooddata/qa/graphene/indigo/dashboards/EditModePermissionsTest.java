@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;

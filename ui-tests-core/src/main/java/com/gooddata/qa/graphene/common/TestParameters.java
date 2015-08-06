@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.common;
 
-import com.gooddata.qa.graphene.enums.DWHDriver;
-import com.gooddata.qa.graphene.enums.DeleteMode;
-import com.gooddata.qa.graphene.enums.ProjectEnvironment;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.project.DeleteMode;
+import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 
 import java.util.Properties;
 import java.util.UUID;

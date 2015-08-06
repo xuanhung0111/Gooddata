@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import com.gooddata.qa.graphene.enums.PublishType;
+import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import org.openqa.selenium.By;
@@ -87,8 +87,8 @@ public class PermissionsDialog extends AbstractFragment {
     }
 
     /**
-     * @param publishType  {@link com.gooddata.qa.graphene.enums.PublishType#EVERYONE_CAN_ACCESS} - publish to everyone,
-     * {@link com.gooddata.qa.graphene.enums.PublishType#SPECIFIC_USERS_CAN_ACCESS}  - 
+     * @param publishType  {@link com.gooddata.qa.graphene.enums.dashboard.PublishType#EVERYONE_CAN_ACCESS} - publish to everyone,
+     * {@link com.gooddata.qa.graphene.enums.dashboard.PublishType#SPECIFIC_USERS_CAN_ACCESS}  -
      * publish to specific user (by default owner + others can be added in different dialog)
      */
     public void publish(PublishType publishType) {
