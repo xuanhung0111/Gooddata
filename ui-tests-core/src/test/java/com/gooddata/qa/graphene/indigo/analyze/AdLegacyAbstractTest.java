@@ -76,8 +76,9 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
                 + "and create visualizations quickly and easily. Intelligent on-screen recommendations help you "
                 + "discover new and surprising insights. Let's get started!");
 
-        put("Begin by exploring your data", "Metrics represent quantitative data (measures).\n\n"
-                + "Attributes represent qualitative data (categories).");
+        put("Begin by exploring your data", "Measures represent quantitative data (values).\n\n"
+                + "Attributes represent qualitative data (categories).\n\n"
+                + "Date is a special item which represents all the dates in your project.");
 
         put("Create a new visualization", "Drag data from the list onto the canvas and watch as your "
                 + "visualization takes shape!");
@@ -89,8 +90,8 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         put("Filter your visualization", "Drag the Date field or any attribute here.");
 
-        put("Save your visualization as a report", "When ready, open your visualization in the Report Editor. "
-                + "From there you can save it and add it to a dashboard.");
+        put("Save your visualization as a report", "When you are ready, open your visualization in the "
+                + "Report Editor. From there you can save it and add it to a dashboard.");
 
         put("Clear your canvas", "Restart your exploration at any time.");
 

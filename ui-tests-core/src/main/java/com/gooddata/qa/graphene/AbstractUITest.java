@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
+import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.common.LoginFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -479,8 +480,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void initAnalysePage() {
-        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
-        waitForFragmentVisible(analysisPage);
+        // work around CL-8058
+        initEmptyDashboardsPage();
+        ApplicationHeaderBar.goToAnalysisPage(browser);
     }
 
 
