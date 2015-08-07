@@ -53,6 +53,7 @@ public class IndigoRestUtils {
                         put("title", "${title}");
                     }});
                     put("content", new JSONObject() {{
+                        put("comparisonType", "none");
                         put("metric", "${metric}");
                         put("dateDimension", "${dateDimension}");
                     }});
