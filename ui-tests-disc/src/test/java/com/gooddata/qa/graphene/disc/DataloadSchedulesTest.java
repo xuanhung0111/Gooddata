@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
+import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
@@ -8,6 +9,7 @@ import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.google.common.collect.Lists;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -72,8 +74,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnMethods = {"setUp", "createDataloadScheduleWithAllDatasets"}, groups = {
-        "schedule", "tests", "dataloadSchedulesTest"})
+    @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
     public void createDataloadScheduleWithCustomDatasets() throws JSONException, InterruptedException {
         try {
             openProjectDetailPage(getWorkingProject());
@@ -83,8 +84,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                     .setConfirmed(true).setHasDataloadProcess(true)
                     .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
                     .setAllDatasets(asList(OPPORTUNITY_DATASET, PERSON_DATASET))
-                    .setScheduleName("1 dataset")
-                    .setDataloadDatasetsOverlap(true);
+                    .setScheduleName("1 dataset");
             createAndAssertSchedule(scheduleBuilder);
         } finally {
             scheduleDetail.disableSchedule();
@@ -180,7 +180,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             openScheduleViaUrl(schedule1.getScheduleUrl());
             Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule1-Successful", getClass());
-            scheduleDetail.assertManualRunExecution();
+            scheduleDetail.assertSuccessfulExecution();
         } finally {
             openScheduleViaUrl(schedule1.getScheduleUrl());
             scheduleDetail.disableSchedule();
@@ -230,10 +230,150 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         }
     }
 
-    @Test(dependsOnGroups = {"dataloadSchedulesTest"}, groups = {"reference"}, alwaysRun = true)
+    @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
+    public void checkDataloadDatasetsOverlap() throws JSONException, InterruptedException {
+        ScheduleBuilder allDatasetsLoad = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                .setConfirmed(true).setHasDataloadProcess(true)
+                .setSynchronizeAllDatasets(true)
+                .setScheduleName("Not Overlap");
+        ScheduleBuilder oneDatasetLoad = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
+                .setConfirmed(true).setHasDataloadProcess(true)
+                .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
+                .setAllDatasets(asList(OPPORTUNITY_DATASET, PERSON_DATASET))
+                .setScheduleName("Overlap")
+                .setDataloadDatasetsOverlap(true);
+        try {
+            openProjectDetailPage(getWorkingProject());
+            createSchedule(allDatasetsLoad);
+            allDatasetsLoad.setScheduleUrl(browser.getCurrentUrl());
+            assertSchedule(allDatasetsLoad);
+            
+            createSchedule(oneDatasetLoad);
+            oneDatasetLoad.setScheduleUrl(browser.getCurrentUrl());
+            assertSchedule(oneDatasetLoad);
+        } finally {
+            openScheduleViaUrl(allDatasetsLoad.getScheduleUrl());
+            scheduleDetail.deleteSchedule(Confirmation.SAVE_CHANGES);
+            openScheduleViaUrl(oneDatasetLoad.getScheduleUrl());
+            scheduleDetail.deleteSchedule(Confirmation.SAVE_CHANGES);
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
+    public void checkManualDataloadOfAllDatasets() throws InterruptedException {
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
+                        .setSynchronizeAllDatasets(true).setScheduleName("Manual dataload of all datasets");
+        try {
+            deleteAndCreateDefaultModel();
+
+            openProjectDetailByUrl(testParams.getProjectId());
+            createSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+
+            checkReportOfAllDatasets();
+        } finally {
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
+    public void checkManualDataloadOfOneDataset() throws InterruptedException {
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
+                        .setDatasetsToSynchronize(asList(OPPORTUNITY_DATASET))
+                        .setAllDatasets(asList(OPPORTUNITY_DATASET, PERSON_DATASET))
+                        .setScheduleName("Manual dataload of opportunity");
+        try {
+            deleteAndCreateDefaultModel();
+
+            openProjectDetailByUrl(testParams.getProjectId());
+            createSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+
+            scheduleDetail.manualRun();
+            scheduleDetail.assertSuccessfulExecution();
+
+            prepareMetricToCheckNewAddedFields("age", "price");
+            createAndCheckReport(new ReportDefinition().withName("Opportunity dataset").withHows("name")
+                    .withWhats("price [Sum]"), Lists.newArrayList("A", "B", "C", "D", "E", "F"),
+                    Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00"));
+            createAndCheckReport(
+                    new ReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
+                    Lists.newArrayList("(empty value)"), Lists.newArrayList(""));
+        } finally {
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
+    public void checkAutoDataloadOfAllDatasets() throws InterruptedException {
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
+                        .setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
+                        .setScheduleName("Auto dataload of all datasets");
+        try {
+            deleteAndCreateDefaultModel();
+
+            openProjectDetailByUrl(testParams.getProjectId());
+            createSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.assertSuccessfulExecution();
+
+            checkReportOfAllDatasets();
+        } finally {
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
+    public void checkAutoDataloadOfOneDataset() throws InterruptedException {
+        ScheduleBuilder scheduleBuilder =
+                new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                        .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
+                        .setHasDataloadProcess(true).setDatasetsToSynchronize(asList(PERSON_DATASET))
+                        .setAllDatasets(asList(OPPORTUNITY_DATASET, PERSON_DATASET))
+                        .setScheduleName("Auto dataload of opportunity");
+        try {
+            deleteAndCreateDefaultModel();
+
+            openProjectDetailByUrl(testParams.getProjectId());
+            createSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+
+            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            scheduleDetail.assertSuccessfulExecution();
+
+            prepareMetricToCheckNewAddedFields("age", "price");
+            createAndCheckReport(new ReportDefinition().withName("Opportunity dataset").withHows("name")
+                    .withWhats("price [Sum]"), Lists.newArrayList("(empty value)"), Lists.newArrayList(""));
+            createAndCheckReport(
+                    new ReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
+                    Lists.newArrayList("A", "B", "C", "D", "E", "F", "J"),
+                    Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00"));
+        } finally {
+            openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
+            scheduleDetail.disableSchedule();
+        }
+    }
+
+    @Test(dependsOnGroups = {"dataloadSchedulesTest", "dataloadScheduleReportTest"}, groups = {"reference"}, alwaysRun = true)
     public void autoCreationConnectingDatasets() throws InterruptedException, ParseException,
             JSONException, IOException {
-        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/dropTablesOpportunityPerson.txt"));
+        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/dropDefaultModel.txt"));
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES);
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/create-ldm-references.txt"));
 
@@ -397,7 +537,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                 "Schedule is not deleted well!");
     }
 
-    @Test(dependsOnGroups = {"dataloadSchedulesTest", "reference"}, alwaysRun = true)
+    @Test(dependsOnGroups = {"dataloadSchedulesTest", "dataloadScheduleReportTest", "reference"}, alwaysRun = true)
     public void cleanUp() {
         deleteADSInstance(adsInstance);
     }
@@ -430,10 +570,22 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     private void runManualAndCheckExecutionSuccessful(String screenShot) {
         scheduleDetail.manualRun();
-        browser.navigate().refresh();
-        waitForElementVisible(scheduleDetail.getRoot());
-        scheduleDetail.waitForExecutionFinish();
+        scheduleDetail.assertSuccessfulExecution();
         Screenshots.takeScreenshot(browser, screenShot, getClass());
-        scheduleDetail.assertManualRunExecution();
+    }
+    
+    private void deleteAndCreateDefaultModel() {
+        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/dropDefaultModel.txt"));
+        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
+    }
+    
+    private void checkReportOfAllDatasets() throws InterruptedException {
+        prepareMetricToCheckNewAddedFields("age", "price");
+        createAndCheckReport(new ReportDefinition().withName("Opportunity dataset").withHows("name").withWhats("price [Sum]"),
+                Lists.newArrayList("A", "B", "C", "D", "E", "F"),
+                Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00"));
+        createAndCheckReport(new ReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
+                Lists.newArrayList("A", "B", "C", "D", "E", "F", "J"),
+                Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00"));
     }
 }
