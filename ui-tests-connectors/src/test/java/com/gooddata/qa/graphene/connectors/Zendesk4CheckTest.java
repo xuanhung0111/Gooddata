@@ -3,18 +3,6 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
@@ -56,6 +44,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 @SuppressWarnings("serial")
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
 public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
@@ -72,13 +72,15 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private static Map<String, FieldChange> AFTER_TICKET_CREATE_EVENTS = new HashMap<String, FieldChange>() {{
         put("type", new FieldChange("Ticket Type", "question", EMPTY_VALUE));
         put("priority", new FieldChange("Priority", "high", EMPTY_VALUE));
-        put("tags", new FieldChange("Tags", "first, second, to-be-deleted", "N/A", false));
+        put("organization", new FieldChange("Organization", "GoodData QA", EMPTY_VALUE, true, false));
+        put("group", new FieldChange("Group", "Support", EMPTY_VALUE, true, false));
+        put("tags", new FieldChange("Tags", "first, second, to-be-deleted", "N/A", false, true));
         put("status", new FieldChange("Status", "new", EMPTY_VALUE));
     }};
 
     private static Map<String, FieldChange> AFTER_TICKET_UPDATE_EVENTS = new HashMap<String, FieldChange>() {{
         put("type", new FieldChange("Ticket Type", "incident", "question"));
-        put("tags", new FieldChange("Tags", "first, second", "first, second, to-be-deleted", false));
+        put("tags", new FieldChange("Tags", "first, second", "first, second, to-be-deleted", false, true));
         put("status", new FieldChange("Status", "open", "new"));
     }};
 
@@ -86,7 +88,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         put("status", new FieldChange("Status", "deleted", "open"));
     }};
 
-    private static FieldChange TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false);;
+    private static FieldChange TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false, true);
 
     private static final String JSON_USER_CREATE = getResourceAsString("/zendesk-api/user-create.json");
 
@@ -297,7 +299,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronization", "createZendeskTicketEventsReport"},
-            groups = {"zendeskApiTests", "zendeskAfterCreateTests", "connectorWalkthrough"}, enabled = false)
+            groups = {"zendeskApiTests", "zendeskAfterCreateTests", "connectorWalkthrough"})
     public void testTicketEventsAfterIncrementalSync()
             throws IOException, JSONException, InterruptedException {
         createTicketTagsReport(createdZendeskTicketId);
@@ -345,7 +347,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsUpdate","createZendeskTicketEventsReport"},
-            groups = {"zendeskApiTests", "zendeskAfterUpdateTests", "connectorWalkthrough"}, enabled = false)
+            groups = {"zendeskApiTests", "zendeskAfterUpdateTests", "connectorWalkthrough"})
     public void testTicketEventsAfterTicketUpdate() throws IOException, JSONException, InterruptedException {
         afterTicketUpdateEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
                 DateTime.now().minusMinutes(10));
@@ -354,7 +356,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         Screenshots.takeScreenshot(browser, "ticket-tags-after-update-ticket-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = { "testIncrementalSynchronizationAfterObjectsUpdate","createZendeskTicketEventsReport" },
+    @Test(dependsOnMethods = { "testTicketEventsAfterTicketUpdate" },
             groups = {"zendeskApiTests", "connectorWalkthrough", "deleteZendeskObjects"})
     public void deleteZendeskTicket() throws IOException {
         zendeskHelper.deleteTicket(createdZendeskTicketId);
@@ -409,7 +411,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @SuppressWarnings("unchecked")
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion", "createZendeskTicketEventsReport"},
-            groups = {"zendeskApiTests", "zendeskAfterDeletionTests", "connectorWalkthrough"}, enabled = false)
+            groups = {"zendeskApiTests", "zendeskAfterDeletionTests", "connectorWalkthrough"})
     public void testTicketEventsAfterDeletion() throws IOException, JSONException, InterruptedException {
         afterTicketDeleteEventId = zendeskHelper.loadLastTicketEventId(createdZendeskTicketId,
                 DateTime.now().minusMinutes(10));
@@ -450,8 +452,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 reportMetricsResults.get(BACKLOG_TICKETS_REPORT_NAME).intValue(),
                 "Backlog tickets count doesn't match after full sync");
 
-        //TODO ZEN-271
-        /*checkTicketEventsReport(createdZendeskTicketId, afterTicketCreateEventId, AFTER_TICKET_CREATE_EVENTS);
+        checkTicketEventsReport(createdZendeskTicketId, afterTicketCreateEventId, AFTER_TICKET_CREATE_EVENTS);
         checkTicketEventsReport(createdZendeskTicketId, afterTicketUpdateEventId, AFTER_TICKET_UPDATE_EVENTS);
         checkTicketEventsReport(createdZendeskTicketId, afterTicketDeleteEventId, AFTER_TICKET_DELETE_EVENTS);
 
@@ -460,7 +461,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                         AFTER_TICKET_UPDATE_EVENTS, AFTER_TICKET_DELETE_EVENTS),
                 "Total count of TicketEvents after tests is different than expected.");
 
-        checkTicketTagsReport(createdZendeskTicketId, TAGS_AFTER_FULL_LOAD);*/
+        checkTicketTagsReport(createdZendeskTicketId, TAGS_AFTER_FULL_LOAD);
     }
 
     private void createOneNumberReportDefinition(String reportName, String metricTitle) {
@@ -524,8 +525,12 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                     put("comment", new JSONObject() {{
                         put("body", "Description of automatically created ticket");
                     }});
-                    for (String fieldName : expectedEvents.keySet()) {
-                        put(fieldName, expectedEvents.get(fieldName).newValue);
+                    for (Map.Entry<String, FieldChange> expectedEvent: expectedEvents.entrySet()) {
+                        final String fieldName = expectedEvent.getKey();
+                        final FieldChange fieldChange = expectedEvent.getValue();
+                        if (fieldChange.toBeSend) {
+                            put(fieldName, fieldChange.newValue);
+                        }
                     }
                 }});
             }}.toString();
@@ -538,8 +543,12 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         try {
             return new JSONObject() {{
                 put("ticket", new JSONObject() {{
-                    for (String fieldName : expectedEvents.keySet()) {
-                        put(fieldName, expectedEvents.get(fieldName).newValue);
+                    for (Map.Entry<String, FieldChange> expectedEvent: expectedEvents.entrySet()) {
+                        final String fieldName = expectedEvent.getKey();
+                        final FieldChange fieldChange = expectedEvent.getValue();
+                        if (fieldChange.toBeSend) {
+                            put(fieldName, fieldChange.newValue);
+                        }
                     }
                 }});
             }}.toString();
@@ -549,9 +558,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private int ticketEventChangesCount(Map<String, FieldChange>... ticketEvents) {
-        // Everytime there is "Organization" field change
         // TODO: what if some new field to ticket form is added?
-        int changesCount = 1;
+        int changesCount = 0;
 
         for (Map<String, FieldChange> changes : ticketEvents) {
             for (String fieldName : changes.keySet()) {
@@ -685,17 +693,19 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         private final String fieldAlias;
         private final String newValue;
         private final String oldValue;
-        private boolean toBeChecked = true;
+        private final boolean toBeChecked;
+        private final boolean toBeSend;
 
         public FieldChange(String fieldAlias, String newValue, String oldValue) {
+            this(fieldAlias, newValue, oldValue, true, true);
+        }
+
+        public FieldChange(String fieldAlias, String newValue, String oldValue, boolean toBeChecked, boolean toBeSend) {
             this.fieldAlias = fieldAlias;
             this.newValue = newValue;
             this.oldValue = oldValue;
-        }
-
-        public FieldChange(String fieldAlias, String newValue, String oldValue, boolean toBeChecked) {
-            this(fieldAlias, newValue, oldValue);
             this.toBeChecked = toBeChecked;
+            this.toBeSend = toBeSend;
         }
     }
 }
