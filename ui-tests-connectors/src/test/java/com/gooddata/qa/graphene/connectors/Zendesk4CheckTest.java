@@ -72,13 +72,15 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     private static Map<String, FieldChange> AFTER_TICKET_CREATE_EVENTS = new HashMap<String, FieldChange>() {{
         put("type", new FieldChange("Ticket Type", "question", EMPTY_VALUE));
         put("priority", new FieldChange("Priority", "high", EMPTY_VALUE));
-        put("tags", new FieldChange("Tags", "first, second, to-be-deleted", "N/A", false));
+        put("organization", new FieldChange("Organization", "GoodData QA", EMPTY_VALUE, true, false));
+        put("group", new FieldChange("Group", "Support", EMPTY_VALUE, true, false));
+        put("tags", new FieldChange("Tags", "first, second, to-be-deleted", "N/A", false, true));
         put("status", new FieldChange("Status", "new", EMPTY_VALUE));
     }};
 
     private static Map<String, FieldChange> AFTER_TICKET_UPDATE_EVENTS = new HashMap<String, FieldChange>() {{
         put("type", new FieldChange("Ticket Type", "incident", "question"));
-        put("tags", new FieldChange("Tags", "first, second", "first, second, to-be-deleted", false));
+        put("tags", new FieldChange("Tags", "first, second", "first, second, to-be-deleted", false, true));
         put("status", new FieldChange("Status", "open", "new"));
     }};
 
@@ -86,7 +88,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         put("status", new FieldChange("Status", "deleted", "open"));
     }};
 
-    private static FieldChange TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false);;
+    private static FieldChange TAGS_AFTER_FULL_LOAD = new FieldChange("Tags", "first, second", "N/A", false, true);
 
     private static final String JSON_USER_CREATE = getResourceAsString("/zendesk-api/user-create.json");
 
@@ -523,8 +525,12 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                     put("comment", new JSONObject() {{
                         put("body", "Description of automatically created ticket");
                     }});
-                    for (String fieldName : expectedEvents.keySet()) {
-                        put(fieldName, expectedEvents.get(fieldName).newValue);
+                    for (Map.Entry<String, FieldChange> expectedEvent: expectedEvents.entrySet()) {
+                        final String fieldName = expectedEvent.getKey();
+                        final FieldChange fieldChange = expectedEvent.getValue();
+                        if (fieldChange.toBeSend) {
+                            put(fieldName, fieldChange.newValue);
+                        }
                     }
                 }});
             }}.toString();
@@ -537,8 +543,12 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         try {
             return new JSONObject() {{
                 put("ticket", new JSONObject() {{
-                    for (String fieldName : expectedEvents.keySet()) {
-                        put(fieldName, expectedEvents.get(fieldName).newValue);
+                    for (Map.Entry<String, FieldChange> expectedEvent: expectedEvents.entrySet()) {
+                        final String fieldName = expectedEvent.getKey();
+                        final FieldChange fieldChange = expectedEvent.getValue();
+                        if (fieldChange.toBeSend) {
+                            put(fieldName, fieldChange.newValue);
+                        }
                     }
                 }});
             }}.toString();
@@ -548,9 +558,8 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private int ticketEventChangesCount(Map<String, FieldChange>... ticketEvents) {
-        // Everytime there is "Organization" and "Group" field change
         // TODO: what if some new field to ticket form is added?
-        int changesCount = 2;
+        int changesCount = 0;
 
         for (Map<String, FieldChange> changes : ticketEvents) {
             for (String fieldName : changes.keySet()) {
@@ -684,17 +693,19 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
         private final String fieldAlias;
         private final String newValue;
         private final String oldValue;
-        private boolean toBeChecked = true;
+        private final boolean toBeChecked;
+        private final boolean toBeSend;
 
         public FieldChange(String fieldAlias, String newValue, String oldValue) {
+            this(fieldAlias, newValue, oldValue, true, true);
+        }
+
+        public FieldChange(String fieldAlias, String newValue, String oldValue, boolean toBeChecked, boolean toBeSend) {
             this.fieldAlias = fieldAlias;
             this.newValue = newValue;
             this.oldValue = oldValue;
-        }
-
-        public FieldChange(String fieldAlias, String newValue, String oldValue, boolean toBeChecked) {
-            this(fieldAlias, newValue, oldValue);
             this.toBeChecked = toBeChecked;
+            this.toBeSend = toBeSend;
         }
     }
 }
