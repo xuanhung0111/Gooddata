@@ -36,6 +36,27 @@
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesReplaceMetricAttributeTest" />
+        </classes>
+    </test>
+
+    <test name="sanity-3" enabled="true">
+        <groups>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="turnOfWalkme" depends-on="createProject" />
+                <group name="init" depends-on="turnOfWalkme" />
+                <group name="sanity" depends-on="init" />
+            </dependencies>
+            <run>
+                <include name="sanity" />
+                <include name="init" />
+                <include name="turnOfWalkme" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesTwoAttributeBucketsTest" />
         </classes>
     </test>
