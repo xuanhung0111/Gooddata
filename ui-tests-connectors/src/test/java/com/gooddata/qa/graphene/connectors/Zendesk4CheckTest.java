@@ -3,18 +3,6 @@
  */
 package com.gooddata.qa.graphene.connectors;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
 import com.gooddata.md.Attribute;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
@@ -55,6 +43,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 @SuppressWarnings("serial")
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")
@@ -548,9 +548,9 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private int ticketEventChangesCount(Map<String, FieldChange>... ticketEvents) {
-        // Everytime there is "Organization" field change
+        // Everytime there is "Organization" and "Group" field change
         // TODO: what if some new field to ticket form is added?
-        int changesCount = 1;
+        int changesCount = 2;
 
         for (Map<String, FieldChange> changes : ticketEvents) {
             for (String fieldName : changes.keySet()) {
