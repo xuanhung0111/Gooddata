@@ -14,7 +14,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
@@ -59,6 +61,8 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
             .xpath("//div[contains(@class,'bottomButtons')]//button[text()='Apply']");
     private static final By noDataMessage = By.xpath("//div[@class='alert-title']");
 
+    private static final String SCATTER_DASHBOARD = "Scatter Explorer"; 
+
     @Test(dependsOnMethods = {"createProject"}, groups = {"addAndEditScatterWidgetTest"})
     public void addScatterWidgetTest() throws InterruptedException {
         Map<String, String> data = new HashMap<String, String>();
@@ -70,12 +74,15 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         data.put("yAxisMetric", "Avg. Amount");
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardsPage.addNewDashboard("Scatter Explorer");
+        dashboardsPage.addNewDashboard(SCATTER_DASHBOARD);
         Thread.sleep(2000);
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         dashboardEditBar.addScatterWidgetToDashboard(data);
+        Thread.sleep(2000);
         Screenshots.takeScreenshot(browser, "scatter-explorer", this.getClass());
         dashboardEditBar.saveDashboard();
+        Thread.sleep(2000);
         testScatterWidgetDisplaying();
     }
 
@@ -83,32 +90,34 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
             groups = {"addAndEditScatterWidgetTest"})
     public void addColorSeriesTest() throws InterruptedException {
         Map<String, String> data = new HashMap<String, String>();
-        data.put("colorAttributeFolder", "Stage");
-        data.put("colorAttribute", "Status");
+        data.put("colorAttributeFolder", "Sales Rep");
+        data.put("colorAttribute", "Department");
+        Thread.sleep(2000);
         initDashboardsPage();
+        dashboardsPage.selectDashboard(SCATTER_DASHBOARD);
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardEditBar.addColorToScatterWidget(data);
+        Thread.sleep(2000);
         Screenshots.takeScreenshot(browser, "scatter-explorer-added-color-series", this.getClass());
         String parentWindowHandle = browser.getWindowHandle();
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         // check whether color legend is added to scatter widget
         List<WebElement> series = browser.findElements(legendSeries);
-        assertEquals(series.size(), 3, "Color legend is not added to Scatter chart");
+        assertEquals(series.size(), 2, "Color legend is not added to Scatter chart");
         // check the second column header is STATUS
         List<WebElement> tableHeaderColumnElements = browser.findElements(tableHeaderColumns);
-        assertEquals(tableHeaderColumnElements.get(1).getText(), "STATUS",
-                "STATUS column is not added to table");
+        assertEquals(tableHeaderColumnElements.get(1).getText(), "DEPARTMENT",
+                "Color column is not added to table");
         browser.switchTo().window(parentWindowHandle);
         dashboardEditBar.saveDashboard();
         // hover on data point
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         // check if dataPoints has been rendered
         waitForElementVisible(dataPoints, browser);
         List<WebElement> dataPointElements = browser.findElements(dataPoints);
-        WebElement selectedDataPointElement = dataPointElements.get(5);
+        WebElement selectedDataPointElement = dataPointElements.get(7);
         Actions builder = new Actions(browser);
         Actions hoverOverDataPoint = builder.moveToElement(selectedDataPointElement);
         hoverOverDataPoint.perform();
@@ -117,13 +126,14 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         assertEquals(waitForElementVisible(nameTooltip, browser).getText(), "STAGE NAME");
         assertTrue(waitForElementVisible(contentTooltip, browser).isDisplayed(),
                 "Tooltip name is not displayed");
-        assertEquals(browser.findElements(contentTooltip).get(0).getText(), "Status");
+        assertEquals(browser.findElements(contentTooltip).get(0).getText(), "Department");
         assertEquals(browser.findElements(contentTooltip).get(1).getText(), "Amount");
         assertEquals(browser.findElements(contentTooltip).get(2).getText(), "Avg. Amount");
         // click on one data point to make other data points become gray and
         // explorer table is selected correspondingly
         WebElement tableStatusElement = browser.findElement(tableStatus);
         selectedDataPointElement.click();
+        Thread.sleep(2000);
         assertEquals(selectedDataPointElement.getAttribute("fill"), "rgb(77,133,255)");
         for (Iterator<WebElement> iterator = dataPointElements.iterator(); iterator.hasNext();) {
             WebElement dataPointElement = (WebElement) iterator.next();
@@ -132,23 +142,25 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
                 System.out.println(dataPointElement.getLocation() + " is gray");
             }
         }
-        assertEquals(tableStatusElement.getText(), "1 selected out of 8 total",
+        assertEquals(tableStatusElement.getText(), "1 selected out of 16 total",
                 "Table does not contain data of the selected data point");
         browser.switchTo().window(parentWindowHandle);
         // disable color
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         dashboardEditBar.disableColorInScatterWidget();
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        Thread.sleep(2000);
+        switchToScatterFrame();
         // check whether color legend is removed from scatter widget
         series = browser.findElements(legendSeries);
         assertEquals(series.size(), 1, "Color legend is not removed from Scatter chart");
         // check the second column header is no longer STATUS
         tableHeaderColumnElements = browser.findElements(tableHeaderColumns);
-        assertNotEquals(tableHeaderColumnElements.get(1).getText(), "STATUS",
-                "STATUS column header is not removed from table");
+        assertNotEquals(tableHeaderColumnElements.get(1).getText(), "DEPARTMENT",
+                "Color column header is not removed from table");
         browser.switchTo().window(parentWindowHandle);
         dashboardEditBar.saveDashboard();
+        Thread.sleep(2000);
     }
 
     @Test(dependsOnMethods = {"addScatterWidgetTest"}, priority = 3,
@@ -168,8 +180,12 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         metric.put("property", "Expected");
         metricList.add(metric);
         data.put("metricList", metricList);
+
+        Thread.sleep(2000);
         initDashboardsPage();
+        dashboardsPage.selectDashboard(SCATTER_DASHBOARD);
         dashboardsPage.editDashboard();
+        Thread.sleep(1000);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardEditBar.addColumnsToScatterWidget(data);
         Screenshots.takeScreenshot(browser, "scatter-explorer-added-additional-column",
@@ -177,8 +193,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         dashboardEditBar.saveDashboard();
         Thread.sleep(3000);
         String parentWindowHandle = browser.getWindowHandle();
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         List<WebElement> tableHeaderColumnElements = browser.findElements(tableHeaderColumns);
         assertEquals(tableHeaderColumnElements.get(3).getText(), "PRODUCT NAME",
                 "PRODUCT NAME column is not added to table");
@@ -187,13 +202,15 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         // remove additional columns
         browser.switchTo().window(parentWindowHandle);
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         dashboardEditBar.removeColumnsFromScatterWidget();
+        Thread.sleep(2000);
         // check whether Product and Expected removed from table or not
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         assertEquals(browser.findElements(tableHeaderColumns).size(), 3);
         browser.switchTo().window(parentWindowHandle);
         dashboardEditBar.saveDashboard();
+        Thread.sleep(2000);
     }
 
     @Test(dependsOnMethods = {"addScatterWidgetTest"}, priority = 4,
@@ -203,10 +220,14 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         String scatterSubtitleText = new String("this is a test for scatter explorer");
         String fakeScatterTitleText = new String("New Scatter Explorer 2");
         String fakeScatterSubtitleText = new String("this is a test for scatter explorer 2");
+
+        Thread.sleep(2000);
         initDashboardsPage();
+        dashboardsPage.selectDashboard(SCATTER_DASHBOARD);
+        Thread.sleep(2000);
         dashboardsPage.editDashboard();
-        checkRedBar(browser);
         Thread.sleep(3000);
+        checkRedBar(browser);
         String parentWindowHandle = browser.getWindowHandle();
         // click on the scatter widget in EDIT mode to make it enable
         waitForElementVisible(BY_IFRAME_SCATTER, browser).click();
@@ -241,7 +262,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         Screenshots.takeScreenshot(browser, "change-scatter-explorer-name-and-description",
                 this.getClass());
         Thread.sleep(3000);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         WebElement scatterTitleInViewModeElement =
                 waitForElementVisible(scatterTitleInViewMode, browser);
         WebElement scatterSubtitleInViewModeElement =
@@ -253,6 +274,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         browser.switchTo().window(parentWindowHandle);
         // check editing scatter title/subtitle then cancel
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         // click on the scatter widget in EDIT mode to make it enable
         waitForElementVisible(BY_IFRAME_SCATTER, browser).click();
         browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
@@ -269,7 +291,8 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         scatterSubtitleInputElement.sendKeys(fakeScatterSubtitleText);
         browser.switchTo().window(parentWindowHandle);
         dashboardsPage.getDashboardEditBar().cancelDashboard();
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        Thread.sleep(2000);
+        switchToScatterFrame();
         scatterTitleInViewModeElement = waitForElementVisible(scatterTitleInViewMode, browser);
         scatterSubtitleInViewModeElement =
                 waitForElementVisible(scatterSubTitleInViewMode, browser);
@@ -284,6 +307,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"addScatterWidgetTest"}, priority = 5,
             groups = {"addAndEditScatterWidgetTest"})
     public void shareScatterExplorerTest() throws InterruptedException {
+        Thread.sleep(2000);
         initDashboardsPage();
         DashboardEmbedDialog dialog = dashboardsPage.embedDashboard();
         String uri = dialog.getPreviewURI();
@@ -297,6 +321,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"addScatterWidgetTest"}, priority = 6,
             groups = {"addAndEditScatterWidgetTest"})
     public void exportDashboardContainingScatterExplorerTest() throws InterruptedException {
+        Thread.sleep(2000);
         initDashboardsPage();
         String exportedDashboardName = dashboardsPage.exportDashboardTab(0);
         verifyDashboardExport(exportedDashboardName, expectedDashboardExportSize);
@@ -313,6 +338,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         data.put("yAxisMetricFolder", "Sales Figures");
         data.put("yAxisMetric", "Avg. Amount");
         String parentWindowHandle = browser.getWindowHandle();
+        Thread.sleep(2000);
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.addNewDashboard("Scatter Explorer 2");
@@ -322,19 +348,20 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         browser.navigate().refresh();
         Thread.sleep(2000);
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         dashboardEditBar.addScatterWidgetToDashboard(data);
+        Thread.sleep(2000);
         Screenshots.takeScreenshot(browser, "scatter-explorer-with-too-many-data-points",
                 this.getClass());
         // check "too many data points" message
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         WebElement alertMessageElement = waitForElementVisible(alertMessage, browser);
         assertEquals(alertMessageElement.getText().trim(), "Too many data points");
         browser.switchTo().window(parentWindowHandle);
         dashboardEditBar.saveDashboard();
+        Thread.sleep(2000);
         // check this alert message still show after saving dashboard
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         alertMessageElement = waitForElementVisible(alertMessage, browser);
         assertEquals(alertMessageElement.getText().trim(), "Too many data points");
     }
@@ -350,7 +377,9 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         data.put("yAxisMetricFolder", "Sales Figures");
         data.put("yAxisMetric", "Avg. Amount");
         String parentWindowHandle = browser.getWindowHandle();
+
         initDashboardsPage();
+        Thread.sleep(2000);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.addNewDashboard("Scatter Explorer 3");
         // after creating the new dashboard, the browser still keeps the iframe of the previous
@@ -359,20 +388,21 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         browser.navigate().refresh();
         Thread.sleep(2000);
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         dashboardEditBar.addScatterWidgetToDashboard(data, true);
+        Thread.sleep(2000);
         Screenshots.takeScreenshot(browser, "scatter-explorer-with-invalid-configuration",
                 this.getClass());
         // check "invalid configuration" message
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         WebElement invalidConfigurationAlertElement =
                 waitForElementVisible(invalidConfigurationAlert, browser);
         assertEquals(invalidConfigurationAlertElement.getText().trim(), "Invalid configuration");
         browser.switchTo().window(parentWindowHandle);
         dashboardEditBar.saveDashboard();
+        Thread.sleep(2000);
         // check this alert message still show after saving dashboard
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         invalidConfigurationAlertElement =
                 waitForElementVisible(invalidConfigurationAlert, browser);
         assertEquals(invalidConfigurationAlertElement.getText().trim(), "Invalid configuration");
@@ -391,6 +421,8 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         data.put("colorAttributeFolder", "Sales Rep");
         data.put("colorAttribute", "Sales Rep");
         String parentWindowHandle = browser.getWindowHandle();
+
+        Thread.sleep(2000);
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.addNewDashboard("Scatter Explorer 4");
@@ -400,14 +432,24 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         browser.navigate().refresh();
         Thread.sleep(2000);
         dashboardsPage.editDashboard();
+        Thread.sleep(2000);
         dashboardEditBar.addScatterWidgetToDashboard(data);
+        Thread.sleep(2000);
         dashboardEditBar.addColorToScatterWidget(data);
+        Thread.sleep(2000);
         dashboardEditBar.addTimeFilterToDashboard(1, "last");
+        Thread.sleep(2000);
+
+        String fromDate = "01/01/2013";
+        String toDate = "12/30/2013";
+        dashboardEditBar.getDashboardEditFilter().changeTimeFilterByEnterFromDateToDate(fromDate, toDate);
+
+        Thread.sleep(2000);
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "Sales Rep");
+        Thread.sleep(2000);
         // check scatter widget is rendered well
         checkRedBar(browser);
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         // check whether color legend is added to scatter widget
         List<WebElement> series = browser.findElements(legendSeries);
         assertEquals(series.size(), 19, "Color legend is not added to Scatter chart");
@@ -441,9 +483,13 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         selectedOnly.click();
         panel.submit();
         Thread.sleep(4000);
+        
+        dashboardsPage.getContent().getFilterWidget(CssUtils.simplifyText("Date dimension (Closed)"))
+                .changeTimeFilterByEnterFromAndToDate(fromDate, toDate);
+        Sleeper.sleepTight(1000);
+
         Screenshots.takeScreenshot(browser, "scatter-explorer-applied-filter", this.getClass());
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         series = browser.findElements(legendSeries);
         assertEquals(series.size(), 1, "Attribute filter is not applied to scatter");
         browser.switchTo().window(parentWindowHandle);
@@ -455,8 +501,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         checkRedBar(browser);
         Screenshots
                 .takeScreenshot(browser, "scatter-explorer-filtered-out-values", this.getClass());
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         WebElement noDataMessageElement = waitForElementVisible(noDataMessage, browser);
         assertEquals(noDataMessageElement.getText().trim(), "No data",
                 "Scatter widget is not filtered out values");
@@ -465,8 +510,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
     private void testScatterWidgetDisplaying() throws InterruptedException {
         Thread.sleep(2000);
         // hover on data point
-        waitForElementVisible(BY_IFRAME_SCATTER, browser);
-        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
+        switchToScatterFrame();
         waitForElementVisible(dataPoints, browser);
         List<WebElement> dataPointElements = browser.findElements(dataPoints);
         WebElement selectedDataPointElement = dataPointElements.get(7);
@@ -506,6 +550,11 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
             System.out.println(dataPointElement.getLocation() + " is blue");
         }
         assertEquals(tableStatusElement.getText(), "8 total", "Table does not contain report data");
+    }
+
+    private void switchToScatterFrame() {
+        waitForElementVisible(BY_IFRAME_SCATTER, browser);
+        browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
     }
 
 }

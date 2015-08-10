@@ -57,6 +57,7 @@ public class DashboardScatterExplorer extends AbstractFragment {
         waitForElementVisible(embeddedWidgetConfigAttributeButton, browser).click();
         WebElement propertySelectionDialogWebELement =
                 waitForElementVisible(propertySelectionDialogPanel, browser);
+        Thread.sleep(3000);
         waitForElementVisible(searchPropertyText, browser).sendKeys(data.get("dataPoint"));
         By attributeFolderWidget =
                 By.xpath(widgetPropertyFolderLocator.replace("${propertyFolderLabel}",
@@ -68,7 +69,7 @@ public class DashboardScatterExplorer extends AbstractFragment {
         waitForElementNotVisible(propertySelectionDialogWebELement);
         waitForElementVisible(embeddedWidgetConfigXAxisButton, browser).click();
         waitForElementVisible(searchPropertyText, browser).sendKeys(data.get("xAxisMetric"));
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         By xAxisFolderWidget =
                 By.xpath(widgetPropertyFolderLocator.replace("${propertyFolderLabel}",
                         data.get("xAxisMetricFolder")));
@@ -115,7 +116,6 @@ public class DashboardScatterExplorer extends AbstractFragment {
         WebElement propertySelectionDialogWebELement =
                 waitForElementVisible(propertySelectionDialogPanel, browser);
         waitForElementVisible(searchPropertyText, browser).sendKeys(data.get("colorAttribute"));
-        Thread.sleep(2000); // wait for illegal attribute disabled.
         By attributeFolderWidget =
                 By.xpath(widgetPropertyFolderLocator.replace("${propertyFolderLabel}",
                         data.get("colorAttributeFolder")));
