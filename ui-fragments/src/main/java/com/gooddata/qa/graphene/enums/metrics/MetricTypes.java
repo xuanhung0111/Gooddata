@@ -69,6 +69,9 @@ public enum MetricTypes {
     WITH_PF_EXCEPT("SELECT __metric__ WITH PARENT FILTER EXCEPT __attr__, __attr__", "Filters-SDK"),
     WITHOUT_PF_EXCEPT("SELECT __metric__ WITHOUT PARENT FILTER EXCEPT __attr__, __attr__", "Filters-SDK"),
 
+    GREATEST("SELECT GREATEST (__metric__, __metric__, __metric__) BY __attr__", "Filters-SDK"),
+    LEAST("SELECT LEAST (__metric__, __metric__, __metric__) BY __attr__", "Filters-SDK"),
+
     // Logical
     AND("SELECT __metric__ WHERE __attr__ = __attrValue__ AND __attr__ = __attrValue__", "Logical"),
     OR("SELECT __metric__ WHERE __attr__ = __attrValue__ OR __attr__ = __attrValue__", "Logical"),

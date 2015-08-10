@@ -233,10 +233,10 @@ public class ReportPage extends AbstractFragment {
         visualiser.addSimpleMetric(metricOperation, metricOnFact, metricName, addToGlobal);
     }
 
-    public String exportReport(ExportFormat format) throws InterruptedException {
+    public String exportReport(ExportFormat format) {
         // Wait to avoid red bar randomly
         // Red bar message: An error occurred while performing this operation.
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
 
         String reportName = getReportName();
         waitForElementVisible(exportButton).click();
@@ -270,11 +270,11 @@ public class ReportPage extends AbstractFragment {
                 break;
         }
         waitForElementVisible(currentExportLink).click();
-        Thread.sleep(5000);
+        sleepTightInSeconds(5);
         // waitForElementVisible(BY_EXPORTING_STATUS); //this waiting is causing
         // some unexpected issues in tests when the export (xls/csv) is too fast
         waitForElementVisible(exportButton);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         System.out.println("Report " + reportName + " exported to "
                 + format.getName());
         return reportName;
