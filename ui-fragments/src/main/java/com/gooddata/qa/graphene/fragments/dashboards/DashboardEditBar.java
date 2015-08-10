@@ -201,8 +201,8 @@ public class DashboardEditBar extends AbstractFragment {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addFilterMenu).click();
         waitForElementVisible(dateFilter).click();
-        Thread.sleep(2000);
         waitForElementVisible(dashboardFilter.getRoot());
+        Thread.sleep(1000);
         dashboardFilter.addTimeFilter(dateDimensionIndex, dateRange);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");

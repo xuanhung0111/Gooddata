@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -13,6 +14,7 @@ import org.testng.Assert;
 import com.gooddata.qa.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.ParentFiltersConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 
@@ -38,6 +40,12 @@ public class DashboardEditFilter extends AbstractFragment{
             if (filter.getAttribute("class").contains("s-filter-time")) return filter;
         }
         return null;
+    }
+
+    public void changeTimeFilterByEnterFromDateToDate(String startTime, String endTime) {
+        FilterWidget filterWidget = Graphene.createPageFragment(FilterWidget.class,
+                waitForElementVisible(getTimeFilter()));
+        filterWidget.changeTimeFilterByEnterFromAndToDate(startTime, endTime);
     }
 
     /**
