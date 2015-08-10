@@ -25,9 +25,6 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
 
         dateFilter.selectByName(dateFilterThisYear);
 
-        // wait until loading is initiated
-        indigoDashboardsPage.getKpiByIndex(0).waitForLoading();
-
         String dateFilterSelection = dateFilter.getSelection();
 
         takeScreenshot(browser, "checkDateFilterChangeValue-this-year", getClass());
