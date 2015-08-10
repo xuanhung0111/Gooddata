@@ -26,6 +26,13 @@ public class SourcesListPage extends AbstractFragment {
     @FindBy(className = "others-sources")
     private SourcesTable othersSourcesTable;
 
+    @FindBy(className = "s-source-detail-button")
+    private WebElement sourceDetailButton;
+
+    public void clickSourceDetailButton() {
+        waitForElementVisible(sourceDetailButton).click();
+    }
+
     public void clickAddDataButton() {
         waitForAddDataButtonVisible().click();
     }

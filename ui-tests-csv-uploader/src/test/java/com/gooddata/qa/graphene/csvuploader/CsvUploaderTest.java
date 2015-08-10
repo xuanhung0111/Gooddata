@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.csvuploader;
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
+import com.gooddata.qa.graphene.fragments.csvuploader.SourceDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.SourcesListPage;
 import org.json.JSONException;
 import org.openqa.selenium.support.FindBy;
@@ -13,8 +14,10 @@ import org.testng.annotations.Test;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
@@ -30,12 +33,14 @@ import java.util.function.Function;
 public class CsvUploaderTest extends AbstractMSFTest {
 
     private static final String DATA_UPLOAD_PAGE_URI = "data/#/project/%s/sources";
-    private static final String CSV_FILE_NAME = "payroll.csv";
+    private static final String CSV_DATASET_NAME = "payroll";
+    private static final String CSV_FILE_NAME = CSV_DATASET_NAME + ".csv";
     /** This csv file has incorrect column count (one more than expected) on the line number 2. */
-    private static final String BAD_CSV_FILE_NAME = "payroll.bad.csv";
+    private static final String BAD_CSV_FILE_NAME = CSV_DATASET_NAME + ".bad.csv";
 
     private static final String UPLOAD_DIALOG_NAME = "upload-dialog";
     private static final String DATA_PAGE_NAME = "data-page";
+    private static final String SOURCE_DETAIL_PAGE_NAME = "source-detail";
 
     private AdsHelper adsHelper;
 
@@ -49,6 +54,9 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
     @FindBy(className = "s-data-preview")
     private DataPreviewPage dataPreviewPage;
+
+    @FindBy(className = "s-source-detail")
+    private SourceDetailPage sourceDetailPage;
 
     @BeforeClass
     public void initProperties() {
@@ -90,6 +98,24 @@ public class CsvUploaderTest extends AbstractMSFTest {
         final String sourceName = removeExtension(CSV_FILE_NAME);
         assertNotNull(sourcesListPage.getMySourcesTable().getSource(sourceName),
                 "Source with name '" + sourceName + "' wasn't found in sources list.");
+    }
+
+    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    public void checkCsvDatasetDetail() {
+        initDataUploadPage();
+        sourcesListPage.clickSourceDetailButton();
+
+        waitForFragmentVisible(sourceDetailPage);
+
+        takeScreenshot(browser, SOURCE_DETAIL_PAGE_NAME, getClass());
+
+        assertThat(sourceDetailPage.getSourceName(), is(CSV_DATASET_NAME));
+        assertThat(sourceDetailPage.getColumnNames(), containsInAnyOrder("Lastname","Firstname","Education","Position",
+                "Department","State","County","Paydate","Amount"));
+
+        sourceDetailPage.clickBackButton();
+
+        waitForFragmentVisible(sourcesListPage);
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
