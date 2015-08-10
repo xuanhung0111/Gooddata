@@ -104,12 +104,10 @@ public class VariableDetailPage extends AbstractFragment {
     protected ObjectPropertiesPage objectPropertiesPage;
 
     private static final String listOfAttributeLocator =
-            "//div[contains(@class,'yui3-c-simpleColumn-underlay')]/div[contains(@class,'c-label') and contains(@class,'s-item-${label}')]";
+            "div.yui3-c-simpleColumn-underlay > div.c-label.s-item-${label}:not(.gdc-hidden):not(.hidden)";
 
     private static final String listOfElementLocator =
             "div.yui3-c-simpleColumn-underlay > div.c-checkBox.s-item-${label}:not(.gdc-hidden)";
-
-    private static final String attributeToAddLocator = "//span[text()='${variableName}']";
 
     public void createNumericVariable(NumericVariable var) throws InterruptedException {
         waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(var.getName());
@@ -132,10 +130,8 @@ public class VariableDetailPage extends AbstractFragment {
         String attribute = var.getAttribute();
         searchAttributeText.sendKeys(attribute);
         By listOfAttribute =
-                By.xpath(listOfAttributeLocator.replace("${label}", CssUtils.simplifyText(attribute)));
-        waitForElementVisible(listOfAttribute, browser);
-        By attributeToAdd = By.xpath(attributeToAddLocator.replace("${variableName}", attribute));
-        waitForElementVisible(attributeToAdd, browser).click();
+                By.cssSelector(listOfAttributeLocator.replace("${label}", CssUtils.simplifyText(attribute)));
+        waitForElementVisible(listOfAttribute, browser).click();
         waitForElementVisible(selectButton).click();
 
         if (!var.getAttributeElements().isEmpty()) {
