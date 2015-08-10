@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static java.lang.String.format;
+import java.util.ArrayList;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.testng.Assert.assertEquals;
@@ -39,7 +40,7 @@ import static org.testng.Assert.assertTrue;
 
 public class RestUtils {
 
-    private static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
+    public static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
     private static final String USERS_LINK = "/gdc/projects/%s/users";
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
     private static final String LDM_LINK = "/gdc/projects/%s/ldm";
@@ -277,12 +278,12 @@ public class RestUtils {
         modifyUsersInUserGroup(restApiClient, userGroupId, "SET", userURIs);
     }
 
-    private static void modifyUsersInUserGroup(RestApiClient restApiClient, String userGroupId, 
+    private static void modifyUsersInUserGroup(RestApiClient restApiClient, String userGroupId,
             String operation, String... userURIs) throws JSONException {
         HttpRequestBase postRequest = null;
         try {
             String modifyMemberUri = String.format(USER_GROUP_MODIFY_MEMBERS_LINK, userGroupId);
-            postRequest = restApiClient.newPostMethod(modifyMemberUri, 
+            postRequest = restApiClient.newPostMethod(modifyMemberUri,
                     buildModifyMembersContent(operation, userURIs));
             restApiClient.execute(postRequest, HttpStatus.NO_CONTENT, "Modify Users on User Group failed");
         } finally {
@@ -292,7 +293,7 @@ public class RestUtils {
         }
     }
 
-    private static String buildModifyMembersContent(final String operation, final String... userURIs) 
+    private static String buildModifyMembersContent(final String operation, final String... userURIs)
             throws JSONException {
         return new JSONObject() {{
             put("modifyMembers", new JSONObject() {{
@@ -302,7 +303,7 @@ public class RestUtils {
         }}.toString();
     }
 
-    public static String getLDMImageURI(String host, String projectId, String user, String password) 
+    public static String getLDMImageURI(String host, String projectId, String user, String password)
             throws ParseException, IOException, JSONException {
         RestApiClient restApiClient = new RestApiClient(host, user, password, true, false);
         String ldmUri = String.format(LDM_LINK, projectId);
@@ -382,7 +383,7 @@ public class RestUtils {
             final HttpPost postRequest = restApiClient.newPostMethod(projectFeatureFlagsUri.toString(),
                     featureFlagObject.toString());
             try {
-               HttpResponse response = 
+               HttpResponse response =
                        restApiClient.execute(postRequest, HttpStatus.CREATED, "Invalid status code");
                EntityUtils.consumeQuietly(response.getEntity());
             } finally {
@@ -391,7 +392,7 @@ public class RestUtils {
         }
     }
 
-    public static String createMUFObj(final RestApiClient restApiClient, String projectID, String mufTitle, 
+    public static String createMUFObj(final RestApiClient restApiClient, String projectID, String mufTitle,
             Map<String, Collection<String>> conditions) throws IOException, JSONException {
         String mdObjURI = format(OBJ_LINK, projectID);
         String MUFExpressions = buildFilterExpression(projectID, conditions);
@@ -411,7 +412,7 @@ public class RestUtils {
 
     private static String buildFilterExpression(final String projectID, Map<String,
             Collection<String>> conditions) {
-      //syntax: "([<Attribute_URI_1>] IN ([<element_URI_1>], [element_URI_2], [...] )) AND 
+      //syntax: "([<Attribute_URI_1>] IN ([<element_URI_1>], [element_URI_2], [...] )) AND
       //([<Attribute_URI_2>] IN ([<element_URI_1>], [element_URI_2], [...]))";
         List<String> expressions = Lists.newArrayList();
         String attributeURI = "[/gdc/md/%s/obj/%s]";
@@ -447,7 +448,7 @@ public class RestUtils {
         }
     }
 
-    public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, String projectID, 
+    public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, String projectID,
             String dashboardID) throws JSONException, IOException {
         setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_POPUP, null);
     }
@@ -512,7 +513,7 @@ public class RestUtils {
                 putRequest.releaseConnection();
             }
         }
-        
+
     }
 
     public static String executeMAQL(RestApiClient restApiClient, String projectId, String maql)
@@ -667,7 +668,7 @@ public class RestUtils {
 
         return status;
     }
-    
+
     public static String getResourceWithCustomAcceptHeader(RestApiClient restApiClient, String uri,
             HttpStatus expectedStatusCode, String acceptHeader) {
         return getResource(restApiClient, uri, expectedStatusCode, acceptHeader);
@@ -688,7 +689,7 @@ public class RestUtils {
         String response = "";
         try {
             getResponse = restApiClient.execute(getRequest, expectedStatusCode, "Invalid status code");
-            HttpEntity entity = getResponse.getEntity(); 
+            HttpEntity entity = getResponse.getEntity();
             if (entity != null) {
                 response = EntityUtils.toString(entity);
             }
@@ -701,8 +702,8 @@ public class RestUtils {
 
         return response;
     }
-    
-    public static JSONObject getProjectModelView(RestApiClient restApiClient, String projectId) 
+
+    public static JSONObject getProjectModelView(RestApiClient restApiClient, String projectId)
             throws ParseException, JSONException, IOException {
         JSONObject modelViewObject = null;
         String pollingUri =
@@ -721,7 +722,7 @@ public class RestUtils {
                 }
                 EntityUtils.consumeQuietly(getResponse.getEntity());
             } while(status == HttpStatus.ACCEPTED.value());
-            
+
         } finally {
             request.releaseConnection();
         }
@@ -748,7 +749,7 @@ public class RestUtils {
     public static <T> T getDatasetElementFromModelView(RestApiClient restApiClient, String projectId,
             String dataset, DatasetElements element, Class<T> returnType) throws ParseException, JSONException,
             IOException {
-        Object object = 
+        Object object =
                 getDatasetModelView(restApiClient, projectId, dataset).get(element.toString().toLowerCase());
         System.out.println(format("Get %s of dataset %s...", element, dataset));
         if(returnType.isInstance(object)) {
@@ -799,7 +800,7 @@ public class RestUtils {
         HttpRequestBase request = restApiClient.newGetMethod(uri);
         String pollUri = "";
         try {
-            HttpResponse response = restApiClient.execute(request); 
+            HttpResponse response = restApiClient.execute(request);
             pollUri =  new JSONObject(EntityUtils.toString(response.getEntity()))
                 .getJSONObject("asyncTask").getJSONObject("link").getString("poll");
 
@@ -809,5 +810,11 @@ public class RestUtils {
             request.releaseConnection();
         }
         return pollUri;
+    }
+
+    public static void deleteObject(RestApiClient restApiClient, String uri) {
+        HttpRequestBase request = restApiClient.newDeleteMethod(uri);
+        HttpResponse response = restApiClient.execute(request);
+        EntityUtils.consumeQuietly(response.getEntity());
     }
 }

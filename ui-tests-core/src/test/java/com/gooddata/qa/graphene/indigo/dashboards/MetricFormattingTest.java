@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -35,7 +36,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         };
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"}, dataProvider = "formattingProvider")
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, dataProvider = "formattingProvider", groups = {"desktop"})
     public void testCustomMetricFormatting(Formatter format, String expectedValue, boolean compareFormat) throws ParseException, JSONException, IOException {
         String screenshot = "testCustomMetricFormatting-" + format.name();
         String uri = format(NUMBER_OF_ACTIVITIES_URI, testParams.getProjectId());
@@ -60,7 +61,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkXssInMetricName() {
         String xssMetric = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssHeadline = "<script>alert('Hi')</script>";
@@ -90,7 +91,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initIndigoDashboardWithWidgets"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkXssInMetricFormat() throws ParseException, JSONException, IOException {
         initMetricPage();
         waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);

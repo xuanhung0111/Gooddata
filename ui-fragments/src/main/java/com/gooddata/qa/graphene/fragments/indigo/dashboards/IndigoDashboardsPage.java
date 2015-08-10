@@ -12,12 +12,13 @@ import java.util.List;
 
 import static com.gooddata.qa.graphene.common.CheckUtils.*;
 import com.gooddata.qa.graphene.common.Sleeper;
+import org.jboss.arquillian.graphene.findby.ByJQuery;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = Kpi.KPI_CSS_SELECTOR)
     private List<Kpi> kpis;
 
-    @FindBy(className = EDIT_BUTTON_SELECTOR)
+    @FindBy(className = EDIT_BUTTON_CLASS_NAME)
     private WebElement editButton;
 
     @FindBy(className = "s-cancel_button")
@@ -38,9 +39,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(xpath = "//*[contains(concat(' ', normalize-space(@class), ' '), ' s-dialog ')]")
     private ConfirmDialog dialog;
 
+    @FindBy(className = "dash-filters-date")
+    private DateFilter dateFilter;
+
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector(".s-save_button:not(.disabled)");
-    private static final String EDIT_BUTTON_SELECTOR = "s-edit_button";
+
+    private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
+    private static final String EDIT_BUTTON_VISIBLE_JQUERY_SELECTOR = "." + EDIT_BUTTON_CLASS_NAME + ":visible";
 
     public ConfigurationPanel getConfigurationPanel() {
         return configurationPanel;
@@ -173,7 +179,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForAllKpiWidgetContentLoaded();
     }
 
-    public boolean isEditButtonPresent() {
-        return isElementPresent(By.className(EDIT_BUTTON_SELECTOR), browser);
+    public boolean isEditButtonVisible() {
+        ByJQuery buttonVisible = ByJQuery.selector(EDIT_BUTTON_VISIBLE_JQUERY_SELECTOR);
+        return isElementPresent(buttonVisible, browser);
+    }
+
+    public DateFilter waitForDateFilter() {
+        return waitForFragmentVisible(dateFilter);
     }
 }

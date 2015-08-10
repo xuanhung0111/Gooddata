@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
 import com.gooddata.qa.graphene.enums.UserRoles;
 import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
@@ -12,12 +13,12 @@ import org.testng.annotations.BeforeClass;
 
 public class EditModePermissionsTest extends DashboardsGeneralTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void before() throws InterruptedException {
         addUsersWithOtherRoles = true;
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"userTests"})
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
     public void checkViewerCannotEditDashboard() throws JSONException, InterruptedException {
         try {
             initDashboardsPage();
@@ -28,14 +29,14 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             initDashboardsPage();
             initIndigoDashboardsPage();
 
-            assertFalse(indigoDashboardsPage.isEditButtonPresent());
+            assertFalse(indigoDashboardsPage.isEditButtonVisible());
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"userTests"})
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
     public void checkEditorCanEditDashboard() throws JSONException, InterruptedException {
         try {
             initDashboardsPage();
@@ -46,14 +47,14 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             initDashboardsPage();
             initIndigoDashboardsPage();
 
-            assertTrue(indigoDashboardsPage.isEditButtonPresent());
+            assertTrue(indigoDashboardsPage.isEditButtonVisible());
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"userTests"})
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
     public void testNavigateToIndigoDashboardWithoutLogin() throws JSONException {
         try {
             initDashboardsPage();

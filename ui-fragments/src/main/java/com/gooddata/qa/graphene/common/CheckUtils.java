@@ -210,11 +210,11 @@ public final class CheckUtils {
      * Check if element is currently present in DOM
      * @see http://stackoverflow.com/questions/7991522/selenium-webdriver-test-if-element-is-present
      * @param locatorKey By element for location
-     * @param driver driver to search
+     * @param context context to search
      * @return
      */
-    public static boolean isElementPresent(By locatorKey, WebDriver driver) {
-        return driver.findElements(locatorKey).size() > 0;
+    public static boolean isElementPresent(By locatorKey, SearchContext context) {
+        return context.findElements(locatorKey).size() > 0;
     }
 
     /**
