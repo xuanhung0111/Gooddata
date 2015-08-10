@@ -1,23 +1,33 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.testng.Assert.*;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.prefs.CsvPreference;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -31,6 +41,7 @@ import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.entity.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
+import com.gooddata.qa.graphene.enums.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.reports.ReportVisualizer;
 import com.gooddata.qa.graphene.fragments.reports.TableReport;
@@ -70,6 +81,12 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String STATUS = "Status";
     private static final String DEPARTMENT = "Department";
     private static final String AVG_AMOUNT = "Avg. Amount";
+    private static final String SNAPSHOT_BOP = "_Snapshot [BOP]";
+    private static final String SNAPSHOT_EOP1 = "_Snapshot [EOP-1]";
+    private static final String SNAPSHOT_EOP2 = "_Snapshot [EOP-2]";
+    private static final String NUMBER_OF_LOST_OPPS = "# of Lost Opps.";
+    private static final String NEGATIVE = "negative";
+    private static final String NULL_METRIC = "null-metric";
 
     private static final String AGGREGATION = "Aggregation";
     private static final String NUMERIC = "Numeric";
@@ -453,13 +470,79 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"filter-share-ratio-metric"})
+    @DataProvider(name = "greatestLeastProvider")
+    public Object[][] greatestLeastProvider() {
+        return new Object[][] {
+            {"GREATEST_LEAST_basic", asList(SNAPSHOT_BOP, SNAPSHOT_EOP1, SNAPSHOT_EOP2),
+                    getResultInGreatestLeastBasic()},
+            {"GREATEST_LEAST_no_aggregation", asList(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS, NEGATIVE), asList(
+                    asList(null, "262", "-38", "262", "-38"),
+                    asList(null, "247", "-53", "247", "-53"),
+                    asList(null, "198", "-102", "198", "-102"),
+                    asList(null, "46", "-254", "46", "-254"),
+                    asList(null, "87", "-213", "87", "-213"),
+                    asList(null, "78", "-222", "78", "-222"),
+                    asList("1770", null, null, "1770", "1770"))},
+            {"GREATEST_LEAST_null", asList(NUMBER_OF_OPEN_OPPS, NULL_METRIC, SNAPSHOT_BOP), asList(
+                    asList("262", "1", "40334", "40334", "1"),
+                    asList("247", "1", "40334", "40334", "1"),
+                    asList("198", null, "40334", "40334", "198"),
+                    asList("46", null, "40334", "40334", "46"),
+                    asList("87", null, "40334", "40334", "87"),
+                    asList("78", null, "40334", "40334", "78"),
+                    asList("null", null, "40334", "40334", "40334"),
+                    asList("null", null, "40334", "40334", "40334"))}
+        };
+    }
+
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric", "init-metrics"})
+    public void createNegativeMetric() {
+        String negativeMaql = "SELECT [" + mdService.getObjUri(project, Metric.class,
+                Restriction.title(NUMBER_OF_OPEN_OPPS)) + "] - 300";
+        mdService.createObj(project, new Metric(NEGATIVE, negativeMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+    }
+
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric", "init-metrics"})
+    public void createMetricHasNullValue() {
+        String nullMaql = "SELECT CASE WHEN [" + mdService.getObjUri(project, Metric.class,
+                Restriction.title(NUMBER_OF_OPEN_OPPS)) + "] > 200 THEN 1 END";
+        mdService.createObj(project, new Metric(NULL_METRIC, nullMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+    }
+
+    @Test(dependsOnGroups = {"init-metrics"}, groups = {"non-UI-metric"},
+            dataProvider = "greatestLeastProvider")
+    public void testGreatestAndLeastFunction(String reportName, List<String> metrics,
+            List<List<String>> expectedResult) throws IOException {
+        List<String> greatestLeastMetrics = createGreatestAndLeastMetric(STAGE_NAME, metrics);
+
+        ReportDefinition rd = new ReportDefinition().withName(reportName).withHows(STAGE_NAME);
+        metrics.stream().forEach(metric -> rd.withWhats(metric));
+        greatestLeastMetrics.stream().forEach(metric -> rd.withWhats(metric));
+        createReport(rd, rd.getName());
+
+        initReportsPage();
+        waitForFragmentVisible(reportsPage).getReportsList().openReport(reportName);
+        waitForAnalysisPageLoaded(browser);
+
+        List<List<String>> actualResult = new ArrayList<>();
+        try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
+                reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
+            reader.getHeader(true);
+            List<String> reportResult;
+            while ((reportResult = reader.read()) != null) {
+                actualResult.add(reportResult.subList(1, reportResult.size()));
+            }
+        }
+        assertEquals(actualResult, expectedResult);
+    }
+
+    @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
     public void initializeGoodDataSDK() {
         mdService = getGoodDataClient().getMetadataService();
         project = getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"filter-share-ratio-metric"})
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
     public void createTimeMacrosMetrics() {
         for (MetricTypes metric : asList(MetricTypes.THIS, MetricTypes.PREVIOUS, MetricTypes.NEXT)) {
             checkMetricValuesInReport(createMetricByGoodDataClient(metric).getTitle(),
@@ -467,7 +550,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"filter-share-ratio-metric"})
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
     public void createMetricsWithParentFilterExcept() {
         List<Float> withPFExceptValues = getMetricValues(MetricTypes.WITH_PF_EXCEPT);
         List<Float> withoutPFExceptValues = getMetricValues(MetricTypes.WITHOUT_PF_EXCEPT);
@@ -682,6 +765,28 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
+    private List<String> createGreatestAndLeastMetric(String attribute, List<String> metrics) {
+        Attribute attrObj = mdService.getObj(project, Attribute.class, Restriction.title(attribute));
+
+        String greatestMaql = MetricTypes.GREATEST.getMaql()
+                .replace("__attr__", format("[%s]", attrObj.getUri()));
+        String leastMaql = MetricTypes.LEAST.getMaql()
+                .replace("__attr__", format("[%s]", attrObj.getUri()));
+
+        for (String metric : metrics) {
+            String uri = mdService.getObjUri(project, Metric.class, Restriction.title(metric));
+            greatestMaql = greatestMaql.replaceFirst("__metric__", format("[%s]", uri));
+            leastMaql = leastMaql.replaceFirst("__metric__", format("[%s]", uri));
+        };
+
+        String greatestMetric = MetricTypes.GREATEST.getLabel() + System.currentTimeMillis();
+        String leastMetric = MetricTypes.LEAST.getLabel() + System.currentTimeMillis();
+        mdService.createObj(project, new Metric(greatestMetric, greatestMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+        mdService.createObj(project, new Metric(leastMetric, leastMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+
+        return asList(greatestMetric, leastMetric);
+    }
+
     private List<Float> getMetricValues(MetricTypes metric) {
         switch (metric) {
             case ABS:
@@ -830,7 +935,16 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 return asList(2.6922362E7f, 8.6178608E7f, 1.16625456E8f);
             case WITHOUT_PF_EXCEPT:
                 return asList(2.6922362E7f, 8.6178608E7f, 1.16625456E8f);
+            default:
+                return Collections.emptyList();
         }
-        return Collections.emptyList();
+    }
+
+    private List<List<String>> getResultInGreatestLeastBasic() {
+        List<List<String>> results = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            results.add(asList("40334", "41054", "41048", "41054", "40334"));
+        }
+        return results;
     }
 }
