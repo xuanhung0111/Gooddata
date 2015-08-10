@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +16,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import com.gooddata.qa.graphene.common.Sleeper;
 import com.gooddata.qa.graphene.enums.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.TextObject;
 import com.gooddata.qa.graphene.enums.WidgetTypes;
@@ -250,11 +252,15 @@ public class DashboardEditBar extends AbstractFragment {
     }
 
     public void deleteDashboard() {
+        tryToDeleteDashboard();
+        waitForElementNotPresent(this.getRoot());
+        sleepTightInSeconds(3); // take sometime for saving current dashboard into user profile settings
+    }
+
+    public void tryToDeleteDashboard() {
         waitForElementVisible(actionsMenu).click();
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(deleteDashboardDialogButton).click();
-        waitForElementNotPresent(this.getRoot());
-        Sleeper.sleepTightInSeconds(3); // take sometime for saving current dashboard into user profile settings
     }
 
     public void moveWidget(WebElement widget, int x, int y) {

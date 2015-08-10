@@ -3,45 +3,50 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
-import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
-
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static com.gooddata.qa.graphene.common.CheckUtils.BY_RED_BAR;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.common.CheckUtils.waitForSchedulesPageLoaded;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForSchedulesPageLoaded;
-
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
-import com.google.common.base.Joiner;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
+import org.jboss.arquillian.graphene.Graphene;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-import static java.util.Arrays.asList;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -50,6 +55,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private static final String SCHEDULE_WITH_INTERNAL_RECIPIENTS = 
             "Schedule with recipents are member of project";
     private static final String SCHEDULE_WITH_EXTERNAL_RECIPIENTS = "Schedule with recipents are external";
+    private static final String SCHEDULE_WITH_INVALID_RECIPIENTS = "Schedule with invalid recipient";
+    private static final String SCHEDULE_WITH_MORE_THAN_10_RECIPIENTS = "Schedule with more than 10 recipients";
     private static final String PUBLIC_SCHEDULE = "Public schedule test";
     private static final String PIPELINE_ANALYSIS_DASHBOARD = "Pipeline Analysis";
     private static final String DELETE = "Delete";
@@ -133,6 +140,24 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         }
     }
 
+    @Test(dependsOnMethods = {"createDashboardSchedule"}, groups = {"schedules"})
+    public void deleteDashboardUsedInSchedule() {
+        initDashboardsPage();
+        dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
+        dashboardsPage.editDashboard();
+        dashboardsPage.getDashboardEditBar().tryToDeleteDashboard();
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver browser) {
+                return browser.findElements(BY_RED_BAR).size() != 0;
+            }
+        });
+        assertEquals(browser.findElement(BY_RED_BAR).getText(),
+                "Report or dashboard cannot be deleted. Please remove it from its scheduled distribution first.");
+        waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), browser).click();
+        dashboardsPage.getDashboardEditBar().cancelDashboard();
+    }
+
     @Test(dependsOnGroups = {"schedules"}, alwaysRun = true)
     public void verifyRecipientsOfSchedule() throws JSONException, InterruptedException, ParseException, IOException {
         loginAs(UserRoles.ADMIN);
@@ -212,8 +237,17 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         initDashboardsPage();
         dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
         createDashboardSchedule(SCHEDULE_WITHOUT_RECIPIENTS, Collections.<String>emptyList());
-        createDashboardSchedule(SCHEDULE_WITH_INTERNAL_RECIPIENTS, asList(testParams.getEditorUser(), testParams.getViewerUser()));
+        createDashboardSchedule(SCHEDULE_WITH_INTERNAL_RECIPIENTS,
+                asList(testParams.getEditorUser(), testParams.getViewerUser()));
         createDashboardSchedule(SCHEDULE_WITH_EXTERNAL_RECIPIENTS, asList(imapUser));
+        createDashboardSchedule(SCHEDULE_WITH_INVALID_RECIPIENTS, asList("invalid"),
+                "Incorrect format. Enter a list of comma-separated email addresses");
+        List<String> recipients = new ArrayList<String>();
+        for (int i = 1; i <= 12; i++) {
+            recipients.add("bear+" + i + "@gooddata.com");
+        }
+        createDashboardSchedule(SCHEDULE_WITH_MORE_THAN_10_RECIPIENTS, recipients,
+                "Maximum of ten recipients allowed. Remove some recipients.");
 
         initEmailSchedulesPage();
         String schedule = "Public schedule test";
@@ -352,7 +386,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
                 "Private Schedule" + SCHEDULE_WITH_INTERNAL_RECIPIENTS + " was not displayed as expected!");
     }
 
-    private void createDashboardSchedule(String subject, List<String> recipients) {
+    private void createDashboardSchedule(String subject, List<String> recipients, String error) {
         initDashboardsPage();
         DashboardScheduleDialog dashboardScheduleDialog = dashboardsPage.showDashboardScheduleDialog();
         dashboardScheduleDialog.showCustomForm();
@@ -361,7 +395,14 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         dashboardScheduleDialog.setCustomRecipients(recipients);
         dashboardScheduleDialog.selectTime(1);
         Screenshots.takeScreenshot(browser, "Screenshot " + subject, this.getClass());
-        dashboardScheduleDialog.schedule();
+        if(!dashboardScheduleDialog.schedule()) {
+            assertEquals(dashboardScheduleDialog.getErrorMessage(), error);
+            dashboardScheduleDialog.cancelSchedule();
+        }
+    }
+
+    private void createDashboardSchedule(String subject, List<String> recipients) {
+        createDashboardSchedule(subject, recipients, "");
     }
 
     private void createDefaultDashboardSchedule() {
