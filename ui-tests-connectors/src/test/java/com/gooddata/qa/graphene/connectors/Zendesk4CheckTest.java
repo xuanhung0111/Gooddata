@@ -611,10 +611,11 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
                 if (reportResult.size() < 5) {
                     fail("Ticket Event report has incorrect count of cells.");
                 }
-
                 final String fieldNameAlias = StringUtils.trimToEmpty(reportResult.get(0));
                 String newValue = StringUtils.trimToEmpty(reportResult.get(1));
-                newValue = newValue.substring(newValue.indexOf("]") + 2); // format: [Status] open;
+                if (newValue.contains("] ")) {
+                    newValue = newValue.substring(newValue.indexOf("]") + 2); // format: [Status] open;
+                }
                 String oldValue = StringUtils.trimToEmpty(reportResult.get(2));
                 if (oldValue.contains("] ")) {
                     oldValue = oldValue.substring(oldValue.indexOf("]") + 2); // format: [Status] new
