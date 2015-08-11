@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 public class DashboardsPage extends AbstractFragment {
     private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 
@@ -134,13 +135,13 @@ public class DashboardsPage extends AbstractFragment {
         return openDashboardMenu().selectDashboardByName(dashboardName);
     }
 
-    public boolean selectDashboard(int dashboardIndex) throws InterruptedException {
+    public boolean selectDashboard(int dashboardIndex) {
         DashboardMenu menu = openDashboardMenu();
         if (menu == null) {
             System.out.println("This project has only one dashboard!");
             return false;
         }
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
 
         return menu.selectDashboardByIndex(dashboardIndex);
     }
@@ -180,34 +181,34 @@ public class DashboardsPage extends AbstractFragment {
         waitForElementPresent(editDashboardBar.getRoot());
     }
 
-    public String exportDashboardTab(int tabIndex) throws InterruptedException {
+    public String exportDashboardTab(int tabIndex) {
         tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
         String tabName = tabs.getTabLabel(0);
         openEditExportEmbedMenu().select("Export to PDF");
         waitForElementVisible(BY_EXPORTING_PANEL, browser);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         waitForElementNotPresent(BY_EXPORTING_PANEL);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         System.out.println("Dashboard " + tabName + " exported to PDF...");
         return tabName;
     }
 
-    public String printDashboardTab(int tabIndex) throws InterruptedException {
+    public String printDashboardTab(int tabIndex) {
         tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
         String tabName = tabs.getTabLabel(0);
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(printPdfButton).click();
         waitForElementVisible(BY_PRINTING_PANEL, browser);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         waitForElementNotPresent(BY_PRINTING_PANEL);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         System.out.println("Dashboard " + tabName + " printed to Pdf");
         return tabName;
     }
 
-    public DashboardEmbedDialog embedDashboard() throws InterruptedException {
+    public DashboardEmbedDialog embedDashboard() {
         waitForDashboardPageLoaded(browser);
         openEditExportEmbedMenu().select("Embed");
         waitForElementVisible(dashboardEmbedDialog.getRoot());
@@ -220,7 +221,7 @@ public class DashboardsPage extends AbstractFragment {
         newTabDialog.createTab(tabName);
     }
 
-    public void deleteDashboardTab(int tabIndex) throws InterruptedException {
+    public void deleteDashboardTab(int tabIndex) {
         tabs.openTab(tabIndex);
         editDashboard();
         boolean nonEmptyTab = browser.findElements(emptyTabPlaceholder).size() == 0;
@@ -312,17 +313,15 @@ public class DashboardsPage extends AbstractFragment {
         return getPermissionsDialog();
     }
 
-    public void saveAsDashboard(String dashboardName, PermissionType permissionType) throws InterruptedException {
+    public void saveAsDashboard(String dashboardName, PermissionType permissionType) {
         saveAsDashboard(dashboardName, false, permissionType);
     }
     
-    public void saveAsDashboardAndEnableSavedViews(String dashboardName, PermissionType permissionType) 
-            throws InterruptedException {
+    public void saveAsDashboardAndEnableSavedViews(String dashboardName, PermissionType permissionType) {
         saveAsDashboard(dashboardName, true, permissionType);
     }
     
-    private void saveAsDashboard(String dashboardName, boolean isSavedViews, PermissionType permissionType) 
-            throws InterruptedException{
+    private void saveAsDashboard(String dashboardName, boolean isSavedViews, PermissionType permissionType) {
         SaveAsDialog saveAsDialog = openSaveAsDialog();
         
         saveAsDialog.saveAs(dashboardName, isSavedViews, permissionType);

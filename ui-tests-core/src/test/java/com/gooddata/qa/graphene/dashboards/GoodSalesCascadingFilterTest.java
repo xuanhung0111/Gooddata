@@ -3,7 +3,7 @@ package com.gooddata.qa.graphene.dashboards;
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static java.lang.Thread.sleep;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -67,7 +67,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
-    public void createReports() throws InterruptedException {
+    public void createReports() {
         GoodData goodDataClient = getGoodDataClient();
         Project project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         MetadataService mdService = goodDataClient.getMetadataService();
@@ -113,7 +113,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReports"}, groups = {"init"})
-    public void prepareAttributeFiltersDashboard() throws InterruptedException {
+    public void prepareAttributeFiltersDashboard() {
         initDashboardsPage();
 
         dashboardsPage.addNewDashboard(ATTRIBUTE_TEST_DASHBOARD);
@@ -133,7 +133,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReports"}, groups = {"init"})
-    public void prepareDateFiltersDashboard() throws InterruptedException {
+    public void prepareDateFiltersDashboard() {
         initDashboardsPage();
 
         dashboardsPage.addNewDashboard(DATE_TEST_DASHBOARD);
@@ -153,7 +153,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testAdvanceCombineCascadingAndGroupFilter() throws InterruptedException {
+    public void testAdvanceCombineCascadingAndGroupFilter() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(TMP_DASHBOARD);
 
@@ -225,7 +225,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testBasicCombineCascadingAndGroupFilter() throws InterruptedException {
+    public void testBasicCombineCascadingAndGroupFilter() {
         makeCopyFromDashboard(ATTRIBUTE_TEST_DASHBOARD);
 
         try {
@@ -287,7 +287,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void cascadingFilterForAttributeFilter() throws InterruptedException {
+    public void cascadingFilterForAttributeFilter() {
         makeCopyFromDashboard(ATTRIBUTE_TEST_DASHBOARD);
 
         try {
@@ -322,7 +322,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void cascadingFilterForAttributeFilterWithSingleOption() throws InterruptedException {
+    public void cascadingFilterForAttributeFilterWithSingleOption() {
         makeCopyFromDashboard(ATTRIBUTE_TEST_DASHBOARD);
 
         try {
@@ -340,7 +340,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
             dashboardEditBar.setParentsFilterUsingDataset(STAGE_NAME, OPP_SNAPSHOT, ACCOUNT);
             dashboardEditBar.setParentsFilterUsingDataset(PRODUCT, OPP_SNAPSHOT, STAGE_NAME);
             dashboardEditBar.saveDashboard();
-            sleep(2000);
+            sleepTightInSeconds(2);
 
             assertEquals(accountFilter.getCurrentValue(), "1000Bulbs.com");
             assertTrue(isEqualCollection(stageNameFilter.getAllAttributeValues(), singleton("Closed Lost")));
@@ -354,7 +354,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void cascadingFilterForDateFilter() throws InterruptedException {
+    public void cascadingFilterForDateFilter() {
         makeCopyFromDashboard(DATE_TEST_DASHBOARD);
 
         try {
@@ -390,7 +390,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testAttributeFilterIsParentManyFilters() throws InterruptedException {
+    public void testAttributeFilterIsParentManyFilters() {
         makeCopyFromDashboard(ATTRIBUTE_TEST_DASHBOARD);
 
         try {
@@ -426,7 +426,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testDateFilterIsParentManyFilters() throws InterruptedException {
+    public void testDateFilterIsParentManyFilters() {
         makeCopyFromDashboard(DATE_TEST_DASHBOARD);
 
         try {
@@ -466,7 +466,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testAttributeFilterDoesntBelongCascading() throws InterruptedException {
+    public void testAttributeFilterDoesntBelongCascading() {
         makeCopyFromDashboard(ATTRIBUTE_TEST_DASHBOARD);
 
         try {
@@ -495,7 +495,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testFilterIsChildOfManyFilters() throws InterruptedException {
+    public void testFilterIsChildOfManyFilters() {
         makeCopyFromDashboard(ATTRIBUTE_TEST_DASHBOARD);
 
         try {
@@ -528,7 +528,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testFilterLinkingBetweenTabs() throws InterruptedException {
+    public void testFilterLinkingBetweenTabs() {
         FilterWidget accountFilter;
         FilterWidget stageNameFilter;
         FilterWidget productFilter;
@@ -595,7 +595,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
     }
     
     private FilterWidget addListAttributeFilterToDashboardAndMoveToRightPlace(String attributeName,
-            DashboardWidgetDirection dashboardWidgetDirection) throws InterruptedException {
+            DashboardWidgetDirection dashboardWidgetDirection) {
         dashboardsPage.getDashboardEditBar().addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, attributeName);
         FilterWidget filterWidget = dashboardsPage.getContent().getFilterWidget(simplifyText(attributeName));
         WebElement filter = filterWidget.getRoot();
@@ -604,7 +604,7 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
         return filterWidget;
     }
 
-    private void makeCopyFromDashboard(String dashboard) throws InterruptedException {
+    private void makeCopyFromDashboard(String dashboard) {
         initDashboardsPage();
 
         dashboardsPage.selectDashboard(dashboard);

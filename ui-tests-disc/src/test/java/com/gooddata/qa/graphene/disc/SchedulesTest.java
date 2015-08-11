@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -182,7 +183,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkStopManualExecution() throws InterruptedException {
+    public void checkStopManualExecution() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
 
@@ -199,7 +200,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
              * Wait for schedule execution is in running state for a few seconds to make sure that
              * the runtime field will be shown well
              */
-            Thread.sleep(5000);
+            sleepTight(5000);
             scheduleDetail.manualStop();
             browser.navigate().refresh();
             waitForElementVisible(scheduleDetail.getRoot());

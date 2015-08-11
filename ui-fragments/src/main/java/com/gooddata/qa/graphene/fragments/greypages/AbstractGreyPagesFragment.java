@@ -1,12 +1,14 @@
 package com.gooddata.qa.graphene.fragments.greypages;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 
 import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 public abstract class AbstractGreyPagesFragment extends AbstractFragment {
 
@@ -20,7 +22,7 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
         return new JSONObject(waitForElementPresent(BY_GP_PRE_JSON, browser).getText());
     }
 
-    protected boolean waitForPollState(String expectedValidState, int maxIterations) throws JSONException, InterruptedException {
+    protected boolean waitForPollState(String expectedValidState, int maxIterations) throws JSONException {
         int i = 0;
         String state = "";
         while (!expectedValidState.equals(state = getPollState())) {
@@ -29,7 +31,7 @@ public abstract class AbstractGreyPagesFragment extends AbstractFragment {
             assertNotEquals(state, "ERROR", "Error state appeared");
             assertNotEquals(state, "DELETED", "Deleted status appeared");
             assertNotEquals(state, "CANCELED", "Canceled status appeared");
-            Thread.sleep(5000);
+            sleepTightInSeconds(5);
             browser.navigate().refresh();
             i++;
         }

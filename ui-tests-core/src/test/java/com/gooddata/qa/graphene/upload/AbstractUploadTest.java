@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoade
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
@@ -68,7 +69,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
     }
 
     protected void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
-            throws InterruptedException {
+            {
         initReportsPage();
         reportsPage.startCreateReport();
         waitForAnalysisPageLoaded(browser);
@@ -88,25 +89,25 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         reportPage.createReport(reportDefinition);
     }
 
-    protected void deleteDataset(String datasetName) throws InterruptedException {
+    protected void deleteDataset(String datasetName) {
         initManagePage();
         datasetsTable.selectObject(datasetName);
         datasetDetailPage.deleteDataset();
     }
 
-    protected void deleteDashboard() throws InterruptedException {
+    protected void deleteDashboard() {
         dashboardsPage.deleteDashboard();
         waitForDashboardPageLoaded(browser);
         verifyProjectDashboardsAndTabs(true, emptyDashboardsAndTabs, false);
     }
 
-    protected void checkAttributeName(String attributeName) throws InterruptedException {
+    protected void checkAttributeName(String attributeName) {
         initAttributePage();
         System.out.println("Check attribute name is displayed well.");
         assertTrue(attributesTable.selectObject(attributeName));
     }
 
-    protected void selectFileToUpload(String fileName) throws InterruptedException {
+    protected void selectFileToUpload(String fileName) {
         initEmptyDashboardsPage();
         initUploadPage();
         upload.uploadFile(getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv"));
@@ -125,14 +126,14 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
     }
 
     protected void uploadInvalidCSVFile(String fileName, String errorTitle, String errorMessage,
-            String errorSupport) throws InterruptedException {
+            String errorSupport) {
         initEmptyDashboardsPage();
         initUploadPage();
         String filePath = getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv");
         System.out.println("Going to upload file: " + filePath);
         waitForElementPresent(uploadFile).sendKeys(filePath);
         if (!waitForElementVisible(errorMessageElement).isDisplayed()) {
-            Thread.sleep(30000);
+            sleepTightInSeconds(30);
         }
         Screenshots.takeScreenshot(browser, "check-incorrect-csv-file-upload", this.getClass());
         if (errorTitle != null) {
@@ -171,7 +172,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         }
     }
 
-    public void uploadFileAndClean(String fileName) throws InterruptedException {
+    public void uploadFileAndClean(String fileName) {
         try {
             uploadCSV(getFilePathFromResource("/" + UPLOAD_CSV + "/" + fileName + ".csv"), null, "simple-upload-"
                     + fileName);
@@ -187,7 +188,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         }
     }
 
-    protected void cleanDashboardAndDatasets(List<String> datasets) throws InterruptedException {
+    protected void cleanDashboardAndDatasets(List<String> datasets) {
         initDashboardsPage();
         deleteDashboard();
         dashboardsPage.selectDashboard(EMPTY_DASHBOARD);
@@ -198,7 +199,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         assertTrue(dataPage.getRoot().findElement(BY_EMPTY_DATASET).isDisplayed());
     }
 
-    protected void uploadDifferentDateFormat(String uploadFileName) throws InterruptedException {
+    protected void uploadDifferentDateFormat(String uploadFileName) {
         selectFileToUpload(uploadFileName);
         Screenshots.takeScreenshot(browser, "different-date-format-csv-upload-" + uploadFileName, this.getClass());
         UploadColumns uploadColumns = upload.getUploadColumns();
@@ -234,7 +235,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         System.out.println("Date format with " + uploadFileName + " is displayed well in report!");
     }
 
-    protected void addEmptyDashboard() throws InterruptedException {
+    protected void addEmptyDashboard() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(EMPTY_DASHBOARD);
         dashboardsPage.selectDashboard(DEFAULT_DASHBOARD);

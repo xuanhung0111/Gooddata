@@ -126,7 +126,7 @@ public class AbstractGreyPageTest extends AbstractTest {
         return statusReturning;
     }
 
-    public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException, InterruptedException {
+    public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/ldm/manage2");
         waitForElementPresent(manage2Fragment.getRoot());
         assertTrue(manage2Fragment.postMAQL(maql, statusPollingCheckIterations), "MAQL was not successfully processed");
@@ -151,14 +151,14 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     public String exportProject(boolean exportUsers, boolean exportData, boolean crossDataCenter,
-            int statusPollingCheckIterations) throws JSONException, InterruptedException {
+            int statusPollingCheckIterations) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/export");
         waitForElementPresent(exportFragment.getRoot());
         return exportFragment.invokeExport(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
     }
 
     public void importProject(String exportToken, int statusPollingCheckIterations)
-            throws JSONException, InterruptedException {
+            throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/import");
         waitForElementPresent(importFragment.getRoot());
         assertTrue(importFragment.invokeImport(exportToken, statusPollingCheckIterations),
@@ -166,32 +166,32 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations)
-            throws JSONException, InterruptedException {
+            throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/etl/pull");
         waitForElementPresent(pullFragment.getRoot());
         assertTrue(pullFragment.invokePull(integrationEntry, statusPollingCheckIterations),
                 "ETL PULL was not successfully processed");
     }
 
-    public JSONObject fetchSLIManifest(String dataset) throws JSONException, InterruptedException {
+    public JSONObject fetchSLIManifest(String dataset) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/ldm/singleloadinterface");
         waitForElementPresent(singleLoadInterfaceFragment.getRoot());
         return singleLoadInterfaceFragment.postDataset(dataset);
     }
 
-    public int getAttributeID(String attributeTitle) throws JSONException, InterruptedException {
+    public int getAttributeID(String attributeTitle) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/query/attributes");
         waitForElementPresent(queryAttributesFragment.getRoot());
         return queryAttributesFragment.getAttributeIDByTitle(attributeTitle);
     }
 
-    public JSONObject getObjectByID(int objectID) throws JSONException, InterruptedException {
+    public JSONObject getObjectByID(int objectID) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/" + objectID);
         waitForElementPresent(objectFragment.getRoot());
         return objectFragment.getObject();
     }
 
-    public ArrayList<Pair<String, Integer>> getObjectElementsByID(int objectID) throws JSONException, InterruptedException {
+    public ArrayList<Pair<String, Integer>> getObjectElementsByID(int objectID) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/" + objectID + "/elements");
         waitForElementPresent(objectElementsFragment.getRoot());
         return objectElementsFragment.getObjectElements();
@@ -249,9 +249,9 @@ public class AbstractGreyPageTest extends AbstractTest {
         out.close();
         in.close();
     }
-    
-    protected void replaceContentInSVGFile(File file, Pair<String,String>... replaceStrings)
-            throws IOException {
+
+    protected void replaceContentInSVGFile(File file,
+            @SuppressWarnings("unchecked") Pair<String,String>... replaceStrings) throws IOException {
         FileInputStream input = new FileInputStream(file);
         FileOutputStream output = null;
         try {

@@ -24,7 +24,7 @@ public class VariablesPage extends AbstractFragment {
     @FindBy(id = "variablesTable")
     private ObjectsTable variablesTable;
 
-    public String createVariable(AbstractVariable var) throws InterruptedException {
+    public String createVariable(AbstractVariable var) {
         waitForElementVisible(createVariableButton).click();
         waitForObjectPageLoaded(browser);
         String variableDetailsWindowHandle = browser.getWindowHandle();

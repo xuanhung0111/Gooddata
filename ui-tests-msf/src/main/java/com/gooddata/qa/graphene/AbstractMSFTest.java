@@ -449,7 +449,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     }
 
     protected void createAndCheckReport(ReportDefinition reportDefinition, Collection<String> attributeValues,
-            Collection<String> metricValues) throws InterruptedException {
+            Collection<String> metricValues) {
         createReport(reportDefinition, reportDefinition.getName());
 
         List<String> attributes = reportPage.getTableReport().getAttributeElements();
@@ -463,7 +463,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
                 "Incorrect metric values!");
     }
 
-    protected void checkReportAfterAddReferenceToDataset() throws InterruptedException {
+    protected void checkReportAfterAddReferenceToDataset() {
         prepareMetricToCheckNewAddedFields("number");
         ReportDefinition reportDefinition =
                 new ReportDefinition().withName("Report to check reference")

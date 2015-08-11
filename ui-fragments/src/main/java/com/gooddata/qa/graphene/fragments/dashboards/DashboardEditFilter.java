@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
@@ -66,12 +67,11 @@ public class DashboardEditFilter extends AbstractFragment{
      * delete filter in dashboard
      * 
      * @param timeOrAttribute
-     * @throws InterruptedException
      */
-    public void deleteFilter(String timeOrAttribute) throws InterruptedException {
+    public void deleteFilter(String timeOrAttribute) {
         WebElement filter = "time".equals(timeOrAttribute) ? getTimeFilter() : getAttributeFilter(timeOrAttribute);
         DashboardEditWidgetToolbarPanel.removeWidget(filter, browser);
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         Assert.assertFalse(isDashboardContainsFilter(timeOrAttribute));
     }
 

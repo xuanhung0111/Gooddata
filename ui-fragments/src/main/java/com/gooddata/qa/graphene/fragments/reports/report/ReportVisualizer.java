@@ -233,8 +233,7 @@ public class ReportVisualizer extends AbstractFragment {
         waitForElementVisible(By.id(reportVisualizationType.getContainerTabId()), browser);
     }
 
-    public void createSnDFolder(String metricOnFact, String folderName)
-            throws InterruptedException {
+    public void createSnDFolder(String metricOnFact, String folderName) {
         waitForElementVisible(whatButton).click();
         waitForElementVisible(createMetricButton).click();
         By selectedFactOption = By.xpath(selectedFactLocator.replace(

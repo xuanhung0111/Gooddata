@@ -41,7 +41,7 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
-    public void createReport() throws InterruptedException {
+    public void createReport() {
         initReportsPage();
         ReportDefinition rd = new ReportDefinition().withName(REPORT).withWhats(AMOUNT)
                 .withHows(STAGE_NAME, IS_WON);
@@ -50,7 +50,7 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void createFilterGroup() throws InterruptedException {
+    public void createFilterGroup() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(TEST_DASHBOARD);
 
@@ -92,7 +92,7 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createFilterGroup"})
-    public void testFilterGroup() throws InterruptedException {
+    public void testFilterGroup() {
         initDashboardsPage();
         dashboardsPage.selectDashboard(TEST_DASHBOARD);
         dashboardsPage.editDashboard();

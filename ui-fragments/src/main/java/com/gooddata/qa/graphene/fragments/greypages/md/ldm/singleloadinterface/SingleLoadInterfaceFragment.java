@@ -18,7 +18,7 @@ public class SingleLoadInterfaceFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement submit;
 
-    public JSONObject postDataset(String datasetName) throws JSONException, InterruptedException {
+    public JSONObject postDataset(String datasetName) throws JSONException {
         waitForElementVisible(this.dataset).sendKeys(datasetName);
         Graphene.guardHttp(submit).click();
         waitForElementVisible(BY_GP_LINK, browser);

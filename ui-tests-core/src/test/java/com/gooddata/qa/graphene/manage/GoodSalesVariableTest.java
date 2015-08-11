@@ -15,7 +15,7 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
-    public void createNumericVariableTest() throws InterruptedException {
+    public void createNumericVariableTest() {
         initVariablePage();
         variablePage.createVariable(new NumericVariable("Test variable" + System.currentTimeMillis())
                 .withDefaultNumber(1234)
@@ -23,14 +23,12 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
-    public void createAttributeVariableDefaultValueTest()
-            throws InterruptedException {
+    public void createAttributeVariableDefaultValueTest() {
         variablePage.createVariable(initAttributeVariable());
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
-    public void createAttributeVariableUserValueTest()
-            throws InterruptedException {
+    public void createAttributeVariableUserValueTest() {
         variablePage.createVariable(initAttributeVariable()
                 .withUserSpecificValues());
     }

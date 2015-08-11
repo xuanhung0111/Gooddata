@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 
 /**
  * This is a helper class to delete test projects from required GD host
@@ -24,29 +25,29 @@ public class DeleteTestProjects extends AbstractUITest {
     }
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllConnectorCheckProjects() throws InterruptedException {
+    public void deleteAllConnectorCheckProjects() {
         deleteProjects("Connector-test");
     }
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllGoodSalesCheckProjects() throws InterruptedException {
+    public void deleteAllGoodSalesCheckProjects() {
         deleteProjects("GoodSales-test");
     }
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllSimpleProjects() throws InterruptedException {
+    public void deleteAllSimpleProjects() {
         deleteProjects("SimpleProject-test");
     }
 
     @Test(dependsOnGroups = {"deleteProjectsInit"})
-    public void deleteAllDiscProjects() throws InterruptedException {
+    public void deleteAllDiscProjects() {
         deleteProjects("Disc-test");
     }
 
-    private void deleteProjects(String projectSubstring) throws InterruptedException {
+    private void deleteProjects(String projectSubstring) {
         openUrl(PAGE_PROJECTS);
         waitForElementVisible(projectsPage.getRoot());
-        Thread.sleep(5000);
+        sleepTight(5000);
         List<String> projectsToDelete = projectsPage.getProjectsIds(projectSubstring);
         System.out.println("Going to delete " + projectsToDelete.size() + " projects, " + projectsToDelete.toString());
         for (String projectToDelete : projectsToDelete) {

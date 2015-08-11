@@ -54,7 +54,7 @@ public class DashboardFilter extends AbstractFragment {
             By.cssSelector(".gdc-overlay-simple:not(.yui3-overlay-hidden) .c-label:not(.hidden)>span"); 
     private static final By BY_SHOW_DATE_ATTRIBUTES_BUTTON = By.cssSelector(".dateCheckbox .s-enabled input");
 
-    public void addListFilter(DashFilterTypes type, String name) throws InterruptedException {
+    public void addListFilter(DashFilterTypes type, String name) {
         if (type == DashFilterTypes.PROMPT) {
             waitForElementVisible(promptFilter).click();
             waitForElementVisible(lisPrompt);

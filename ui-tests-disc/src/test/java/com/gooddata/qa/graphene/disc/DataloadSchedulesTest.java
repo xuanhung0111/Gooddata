@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.*;
@@ -59,7 +60,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
-    public void createDataloadScheduleWithAllDatasets() throws JSONException, InterruptedException {
+    public void createDataloadScheduleWithAllDatasets() throws JSONException {
         try {
             openProjectDetailByUrl(testParams.getProjectId());
 
@@ -75,7 +76,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
-    public void createDataloadScheduleWithCustomDatasets() throws JSONException, InterruptedException {
+    public void createDataloadScheduleWithCustomDatasets() throws JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
 
@@ -93,7 +94,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     @Test(dependsOnMethods = {"createDataloadScheduleWithCustomDatasets"}, groups = {"schedule", "tests",
             "dataloadSchedulesTest"})
-    public void editDataloadScheduleWithCustomDatasets() throws JSONException, InterruptedException {
+    public void editDataloadScheduleWithCustomDatasets() throws JSONException {
         try {
             openProjectDetailPage(getWorkingProject());
 
@@ -116,7 +117,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = { "setUp" }, groups = { "schedule", "tests", "dataloadSchedulesTest" })
-    public void testSearchDataset() throws JSONException, InterruptedException {
+    public void testSearchDataset() throws JSONException {
         String fullKey = "opportunity";
         String partKey = "portu";
         String invalidKey = "!@#$%%";
@@ -231,7 +232,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})
-    public void checkDataloadDatasetsOverlap() throws JSONException, InterruptedException {
+    public void checkDataloadDatasetsOverlap() throws JSONException {
         ScheduleBuilder allDatasetsLoad = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                 .setCronTime(ScheduleCronTimes.CRON_15_MINUTES)
                 .setConfirmed(true).setHasDataloadProcess(true)
@@ -262,7 +263,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkManualDataloadOfAllDatasets() throws InterruptedException {
+    public void checkManualDataloadOfAllDatasets() {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
@@ -285,7 +286,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkManualDataloadOfOneDataset() throws InterruptedException {
+    public void checkManualDataloadOfOneDataset() {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
@@ -316,7 +317,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkAutoDataloadOfAllDatasets() throws InterruptedException {
+    public void checkAutoDataloadOfAllDatasets() {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
@@ -340,7 +341,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkAutoDataloadOfOneDataset() throws InterruptedException {
+    public void checkAutoDataloadOfOneDataset() {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
@@ -371,7 +372,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnGroups = {"dataloadSchedulesTest", "dataloadScheduleReportTest"}, groups = {"reference"}, alwaysRun = true)
-    public void autoCreationConnectingDatasets() throws InterruptedException, ParseException,
+    public void autoCreationConnectingDatasets() throws ParseException,
             JSONException, IOException {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/dropDefaultModel.txt"));
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES);
@@ -388,7 +389,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             schedule.setScheduleUrl(browser.getCurrentUrl());
             runManualAndCheckExecutionSuccessful("autoCreationConnectingDatasets");
 
-            Thread.sleep(3000); // Wait for project model updating
+            sleepTight(3000); // Wait for project model updating
             List<String> references = getReferencesOfDataset("track");
             System.out.println("References: " + references);
             assertTrue(references.contains("dataset.artist"), "Reference was not added automatically!");
@@ -579,7 +580,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
     }
     
-    private void checkReportOfAllDatasets() throws InterruptedException {
+    private void checkReportOfAllDatasets() {
         prepareMetricToCheckNewAddedFields("age", "price");
         createAndCheckReport(new ReportDefinition().withName("Opportunity dataset").withHows("name").withWhats("price [Sum]"),
                 Lists.newArrayList("A", "B", "C", "D", "E", "F"),

@@ -89,8 +89,7 @@ public class UploadColumns extends AbstractFragment {
         return columnTypes;
     }
 
-    public void assertColumnsType(List<Integer> columnIndexes, List<String> dataTypes)
-            throws InterruptedException {
+    public void assertColumnsType(List<Integer> columnIndexes, List<String> dataTypes) {
         int index = 0;
         for (int columnIndex : columnIndexes) {
             String dataType = dataTypes.get(index);
@@ -100,8 +99,7 @@ public class UploadColumns extends AbstractFragment {
         }
     }
 
-    public void assertColumnsName(List<Integer> columnIndexes, List<String> columnNames)
-            throws InterruptedException {
+    public void assertColumnsName(List<Integer> columnIndexes, List<String> columnNames) {
         int index = 0;
         for (int columnIndex : columnIndexes) {
             assertEquals(getColumnName(columnIndex), columnNames.get(index));

@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -502,7 +503,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"sanity"})
-    public void exportCustomDiscovery() throws InterruptedException {
+    public void exportCustomDiscovery() {
         initAnalysePage();
 
         String metric = doSafetyMetricAction(new MetricSafetyAction() {
@@ -537,7 +538,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
         Iterator<String> attributes = tableReport.getAttributeElements().iterator();
 
-        Thread.sleep(2000); // wait for metric values is calculated and loaded
+        sleepTightInSeconds(2); // wait for metric values is calculated and loaded
         Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
 
         List<List<String>> content = new ArrayList<List<String>>();

@@ -7,11 +7,11 @@ public class ObjectScheduledEmailFragment extends ObjectFragment {
 
     public final static int WRONG_ID = -1;
 
-    public boolean hasExecutionContext() throws JSONException, InterruptedException {
+    public boolean hasExecutionContext() throws JSONException {
         return !getDashboardAttachment().isNull("executionContext");
     }
 
-    public int getExecutionContextId() throws JSONException, InterruptedException {
+    public int getExecutionContextId() throws JSONException {
         if (hasExecutionContext()) {
             String executionContextUri = getDashboardAttachment().getString("executionContext");
             String[] uriParts = executionContextUri.split("/");
@@ -22,7 +22,7 @@ public class ObjectScheduledEmailFragment extends ObjectFragment {
         }
     }
 
-    private JSONObject getDashboardAttachment() throws JSONException, InterruptedException {
+    private JSONObject getDashboardAttachment() throws JSONException {
         JSONObject attachment = getObject()
                 .getJSONObject("scheduledMail")
                 .getJSONObject("content")

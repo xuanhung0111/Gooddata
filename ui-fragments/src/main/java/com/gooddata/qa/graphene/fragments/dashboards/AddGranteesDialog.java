@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.*;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class AddGranteesDialog extends AbstractFragment {
 
     @FindBy(css = ".s-btn-cancel")
     private WebElement cancelButton;
-    
+
     @FindBy(css = ".grantee-footer a")
     private WebElement userManagementLink;
 
@@ -33,7 +34,7 @@ public class AddGranteesDialog extends AbstractFragment {
 
     private static final By GRANTEES = By.cssSelector(".grantee-candidate");
 
-    public int getGranteesCount(final String searchText, boolean expectResult) throws InterruptedException {
+    public int getGranteesCount(final String searchText, boolean expectResult) {
         waitForElementVisible(root);
 
         waitForElementVisible(searchForGranteeInput).clear();
@@ -42,20 +43,20 @@ public class AddGranteesDialog extends AbstractFragment {
 
         searchForGranteeInput.clear();
         searchForGranteeInput.sendKeys(searchText);
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         if (expectResult) {
             return getNumberOfGrantees();
         } else {
-            String mesage = waitForElementVisible(By.cssSelector(NO_RESULTS_OUTPUT_LOCATOR),browser).getText();
+            String mesage = waitForElementVisible(By.cssSelector(NO_RESULTS_OUTPUT_LOCATOR), browser).getText();
             if (isSearchFieldContainString()) {
-                assertEquals(mesage, "No matching user name or email address exists in this project.");    
+                assertEquals(mesage, "No matching user name or email address exists in this project.");
             } else {
                 assertEquals(mesage, "This dashboard is already shared with all users.");
             }
             return 0;
         }
     }
-    
+
     private boolean isSearchFieldContainString() {
         waitForElementVisible(searchForGranteeInput);
         return searchForGranteeInput.findElement(BY_PARENT).findElements(By.cssSelector("span")).size() == 2;
@@ -66,19 +67,19 @@ public class AddGranteesDialog extends AbstractFragment {
     }
 
     public void selectItem(final String name) {
-    	final By loginSelector = By.cssSelector(".grantee-email");
-    	final By groupNameSelector = By.cssSelector(".grantee-name");
-    	final By groupSelector = By.cssSelector(".grantee-group");
-    	
-    	Iterables.find(waitForCollectionIsNotEmpty(getGrantees()), new Predicate<WebElement>() {
-			@Override
-			public boolean apply(WebElement e) {
-				boolean isGroup = e.findElements(groupSelector).size() > 0;
-				WebElement nameElement = e.findElement(isGroup ? groupNameSelector : loginSelector);
-				
-				return name.equals(nameElement.getText().trim());
-			}
-		}).click();
+        final By loginSelector = By.cssSelector(".grantee-email");
+        final By groupNameSelector = By.cssSelector(".grantee-name");
+        final By groupSelector = By.cssSelector(".grantee-group");
+
+        Iterables.find(waitForCollectionIsNotEmpty(getGrantees()), new Predicate<WebElement>() {
+            @Override
+            public boolean apply(WebElement e) {
+                boolean isGroup = e.findElements(groupSelector).size() > 0;
+                WebElement nameElement = e.findElement(isGroup ? groupNameSelector : loginSelector);
+
+                return name.equals(nameElement.getText().trim());
+            }
+        }).click();
     }
 
     public List<WebElement> getGrantees() {
@@ -99,7 +100,7 @@ public class AddGranteesDialog extends AbstractFragment {
     }
 
     public boolean isUserGroupLinkShown() {
-        return waitForElementVisible(By.className("grantee-footer"), browser).
-                findElements(By.cssSelector("a")).size() > 0;
+        return waitForElementVisible(By.className("grantee-footer"), browser).findElements(By.cssSelector("a"))
+                .size() > 0;
     }
 }

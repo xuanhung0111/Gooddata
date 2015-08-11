@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 
 @Test(groups = {"projectDashboardPerf"}, description = "Tests for performance of rendering dashboards of given project")
 public class ProjectPerfWalkthrough extends AbstractUITest {
@@ -73,19 +74,19 @@ public class ProjectPerfWalkthrough extends AbstractUITest {
     }
 
     @Test(dependsOnGroups = {"perfInit"})
-    public void dashboardsWalkthrough() throws InterruptedException, JSONException {
+    public void dashboardsWalkthrough() throws JSONException {
         openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
         verifyProjectDashboardsAndTabs(startDashboardIndex);
     }
 
-    protected void verifyProjectDashboardsAndTabs(int dashboardStartIndex) throws InterruptedException, JSONException {
+    protected void verifyProjectDashboardsAndTabs(int dashboardStartIndex) throws JSONException {
         waitForDashboardPageLoaded(browser);
-        Thread.sleep(5000);
+        sleepTight(5000);
         waitForElementVisible(dashboardsPage.getRoot());
         int dashboardsCount = dashboardsPage.getDashboardsCount();
         for (int i = dashboardStartIndex; i <= dashboardsCount; i++) {
             dashboardsPage.selectDashboard(i);
-            Thread.sleep(5000);
+            sleepTight(5000);
             System.out.println("Current dashboard index: " + i);
             singleDashboardWalkthrough(i, dashboardsPage.getDashboardName());
             if (singleDashboardComputation) {
@@ -154,6 +155,7 @@ public class ProjectPerfWalkthrough extends AbstractUITest {
                     FileUtils.writeStringToFile(outputFile, output, true);
                 }
             }
+            reader.close();
         } catch (FileNotFoundException e) {
             System.out.println("File not found...");
             throw new RuntimeException(e);

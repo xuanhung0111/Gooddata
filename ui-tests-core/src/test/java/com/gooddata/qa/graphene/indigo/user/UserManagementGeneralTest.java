@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.user;
 
 import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -112,7 +113,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = { "initData" }, groups = { "initialize", "sanity" })
-    public void prepareUserManagementAdminAndDashboard() throws InterruptedException,
+    public void prepareUserManagementAdminAndDashboard() throws 
             ParseException, IOException, JSONException {
         // Use another admin user (userManagementAdmin) for testing
         // The reason here is that user mangement page has no context (projectID)
@@ -181,7 +182,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement", "sanity" })
-    public void accessFromDashboardPage() throws InterruptedException {
+    public void accessFromDashboardPage() {
         initDashboardsPage();
         selectDashboard(DASHBOARD_TEST);
         publishDashboard(false);
@@ -190,7 +191,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
-    public void accessFromEmbeddedDashboardPage() throws InterruptedException{
+    public void accessFromEmbeddedDashboardPage() {
         initDashboardsPage();
         selectDashboard(DASHBOARD_TEST);
         publishDashboard(false);
@@ -198,13 +199,13 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         String uri = dialog.getPreviewURI();
         browser.get(uri);
         waitForElementVisible(dashboardsPage.getContent().getRoot());
-        Thread.sleep(2000);
+        sleepTight(2000);
         dashboardsPage.unlistedIconClick().openAddGranteePanel().openUserManagementPage();
         waitForFragmentVisible(userManagementPage);
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
-    public void checkEditorCannotAccessFromDashboardPage() throws InterruptedException, JSONException{
+    public void checkEditorCannotAccessFromDashboardPage() throws JSONException{
         initDashboardsPage();
         selectDashboard(DASHBOARD_TEST);
         publishDashboard(true);
@@ -221,7 +222,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
-    public void checkEditorCannotAccessFromEmbeddedDashboard() throws InterruptedException, JSONException{
+    public void checkEditorCannotAccessFromEmbeddedDashboard() throws JSONException{
         initDashboardsPage();
         selectDashboard(DASHBOARD_TEST);
         publishDashboard(false);
@@ -232,7 +233,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
             signIn(false, UserRoles.EDITOR);
             browser.get(uri);
             waitForElementVisible(dashboardsPage.getContent().getRoot());
-            Thread.sleep(2000);
+            sleepTight(2000);
             checkEditorCannotAccessUserGroupsLinkInDashboardPage(dashboardsPage.unlistedIconClick());
         } finally {
             logout();
@@ -653,12 +654,12 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnGroups = { "activeUser", "userManagement", "verifyUI", "initialize", "deleteGroup" },
             alwaysRun = true)
-    public void turnOffUserManagementFeature() throws InterruptedException, IOException, JSONException {
+    public void turnOffUserManagementFeature() throws IOException, JSONException {
         disableUserManagementFeature();
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) 
-            throws InterruptedException {
+            {
         permissionsDialog.publish(PublishType.SPECIFIC_USERS_CAN_ACCESS);
         AddGranteesDialog addGranteesDialog = permissionsDialog.openAddGranteePanel();
         assertFalse(addGranteesDialog.isUserGroupLinkShown(), "Editor user could see user group link");

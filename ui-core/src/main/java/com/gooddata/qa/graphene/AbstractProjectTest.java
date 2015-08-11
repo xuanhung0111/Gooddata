@@ -33,7 +33,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"createProject"})
-    public void createProject() throws JSONException, InterruptedException, IOException {
+    public void createProject() throws JSONException, IOException {
         if (testParams.isReuseProject()) {
             if (testParams.getProjectId() != null && !testParams.getProjectId().isEmpty()) {
                 System.out.println("Project will be re-used, id: " + testParams.getProjectId());

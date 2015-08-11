@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.disc;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertFalse;
@@ -134,11 +135,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     protected NotificationBuilder createAndAssertNotification(
             NotificationBuilder notificationBuilder) {
         createNotification(notificationBuilder);
-        try {
-            Thread.sleep(2000); // Wait for notification is completely saved!
-        } catch (InterruptedException e) {
-            fail("There is an interruption during waiting for created notification: " + e);
-        }
+        sleepTightInSeconds(2); // Wait for notification is completely saved!
         assertNotification(notificationBuilder);
 
         return notificationBuilder;
@@ -187,8 +184,6 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
                         testParams.getDwhDriver(), testParams.getProjectEnvironment(),
                         projectCreateCheckIterations));
             } catch (JSONException e) {
-                fail("There is problem when creating new project: " + e);
-            } catch (InterruptedException e) {
                 fail("There is problem when creating new project: " + e);
             }
         }

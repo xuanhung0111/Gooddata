@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.addMUFToUser;
 import static com.gooddata.qa.utils.http.RestUtils.createMUFObj;
@@ -9,7 +10,6 @@ import static com.gooddata.qa.utils.http.RestUtils.getJSONObjectFrom;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
-import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -104,7 +104,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
-    public void createVariable() throws InterruptedException {
+    public void createVariable() {
         initVariablePage();
 
         variablePage.createVariable(new AttributeVariable(F_STAGE_NAME).withAttribute(STAGE_NAME)
@@ -112,7 +112,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnMethods = {"initialization", "createVariable"}, groups = {"init"})
-    public void prepareMetricAndReports() throws InterruptedException, IOException, JSONException {
+    public void prepareMetricAndReports() throws IOException, JSONException {
         // *** create metric available ***
         metricAvailable = mdService.createObj(project, new Metric(METRIC_AVAILABLE,
                 buildFirstMetricExpression(amountMetricUri, stageName.getUri()), "#,##0.00"));
@@ -139,8 +139,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnMethods = {"prepareMetricAndReports"}, groups = {"init"})
-    public void createUseAvailableDashboardWithOneReport()
-            throws InterruptedException, IOException, JSONException {
+    public void createUseAvailableDashboardWithOneReport() throws IOException, JSONException {
         initDashboardsPage();
 
         dashboardsPage.addNewDashboard(USE_AVAILABLE_DASHBOARD_1);
@@ -160,8 +159,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnMethods = {"createUseAvailableDashboardWithOneReport"}, groups = {"init"})
-    public void createUseAvailableDashboardWithTwoReports() 
-            throws InterruptedException, IOException, JSONException {
+    public void createUseAvailableDashboardWithTwoReports() throws IOException, JSONException {
         initDashboardsPage();
 
         dashboardsPage.selectDashboard(USE_AVAILABLE_DASHBOARD_1);
@@ -183,7 +181,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void addUseAvailableForAttributeFilter() throws IOException, JSONException, InterruptedException {
+    public void addUseAvailableForAttributeFilter() throws IOException, JSONException {
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_1);
 
         try {
@@ -194,7 +192,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             assertTrue(isEqualCollection(filterPanel.getAllAtributeValues(), attributeValues));
 
             filter.changeAttributeFilterValue("Conviction");
-            sleep(2000);
+            sleepTightInSeconds(2);
             assertTrue(isEqualCollection(singleton("Conviction"), getAttributeValuesInFirstRow(REPORT_1)),
                     "Report1 doesnt apply StageName filter correctly!");
 
@@ -210,7 +208,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void addUseAvailableForPromptFilter() throws IOException, JSONException, InterruptedException {
+    public void addUseAvailableForPromptFilter() throws IOException, JSONException {
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
 
         try {
@@ -233,7 +231,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void connectFilterWithUseAvailable() throws InterruptedException {
+    public void connectFilterWithUseAvailable() {
         // *** create report 3 ***
         ReportDefinition definition = GridReportDefinitionContent.create(REPORT_3, singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri())),
@@ -268,7 +266,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void useAvailableWithSingleOptionFilter() throws InterruptedException {
+    public void useAvailableWithSingleOptionFilter() {
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
 
         try {
@@ -282,7 +280,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
             FilterWidget fStageNameFilter = dashboardContent.getFilterWidget(simplifyText(F_STAGE_NAME));
             fStageNameFilter.changeSelectionToOneValue();
             dashboardEditBar.saveDashboard();
-            sleep(2000);
+            sleepTightInSeconds(2);
 
             assertEquals(stageNameFilter.getCurrentValue(), "Short List",
                     "Current value of StageName filter is not correct!");
@@ -299,7 +297,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void filterOutUseAvailableEmptyFilter() throws IOException, JSONException, InterruptedException {
+    public void filterOutUseAvailableEmptyFilter() throws IOException, JSONException {
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
         String stageNameUri = stageName.getUri();
         editMetricExpression(buildSecondMetricExpression(amountMetricUri, stageNameUri));
@@ -334,7 +332,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     @Test(dependsOnGroups = {"init"}, priority = 1)
-    public void combineMufAndUseAvailable() throws IOException, JSONException, InterruptedException {
+    public void combineMufAndUseAvailable() throws IOException, JSONException {
         String stageNameUri = stageName.getUri();
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
         conditions.put(STAGE_NAME_ID, asList(RISK_ASSESSMENT_ID, CONVICTION_ID, NEGOTIATION_ID));
@@ -373,7 +371,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         }
     }
 
-    private void makeCopyFromDashboard(String dashboardName) throws InterruptedException {
+    private void makeCopyFromDashboard(String dashboardName) {
         initDashboardsPage();
 
         dashboardsPage.selectDashboard(dashboardName);

@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.dashboards;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.utils.http.RestUtils.setFeatureFlags;
 import static com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption.createFeatureClassOption;
@@ -114,7 +115,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnGroups = {"init-data"}, priority = 3)
-    public void createSavedFilterViewTest() throws InterruptedException {
+    public void createSavedFilterViewTest() {
         initNewDashboard_AddFilter_TurnOnSavedView(FIRST_DASHBOARD_NAME);
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
@@ -162,7 +163,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"createSavedFilterViewTest"})
-    public void renameSavedFilterViewTest() throws InterruptedException {
+    public void renameSavedFilterViewTest() {
         initDashboardsPage();
         // change filter value so Selenium can loads all saved views
         dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
@@ -203,7 +204,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
     
     @Test(dependsOnMethods = {"renameSavedFilterViewTest"})
-    public void filterViewNamingUniquenessTest() throws InterruptedException {
+    public void filterViewNamingUniquenessTest() {
         initDashboardsPage();
         // change filter value so Selenium can loads all saved views
         dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
@@ -232,7 +233,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"filterViewNamingUniquenessTest"})
-    public void deleteSavedFilterViewTest() throws InterruptedException {
+    public void deleteSavedFilterViewTest() {
         initDashboardsPage();
         // change filter value so Selenium can loads all saved views
         FilterWidget filter = dashboardsPage.getFilterWidget("date_dimension");
@@ -261,7 +262,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         waitForElementVisible(deleteConfirmDialog.getRoot());
         deleteConfirmDialog.deleteSavedView();
 
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         // disable checking because of bug: https://jira.intgdc.com/browse/CL-5800
         //assertTrue(savedViewWidget.isUnsavedViewButtonPresent(),
         //                  String.format("Saved view '%s' is not deleted!", PENULTIMATE_YEAR));
@@ -274,7 +275,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"deleteSavedFilterViewTest"})
-    public void savedFilterAfterSwitchBetweenDashboardsAndPagesTest() throws InterruptedException {
+    public void savedFilterAfterSwitchBetweenDashboardsAndPagesTest() {
         initDashboardsPage();
         // Add more saved view for first dashboard
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
@@ -292,7 +293,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         dashboardEditBar.saveDashboard();
 
         // Create saved view 1 "Abundant Foodz"
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         FilterWidget departmentFilter = dashboardsPage.getFilterWidget("department");
         departmentFilter.changeAttributeFilterValue("Abundant Foodz");
         savedViewWidget.openSavedViewMenu();
@@ -300,7 +301,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
         assertEquals(dashboardsPage.getFilterWidget("county").getCurrentValue(), "All",
                             "Value of 'County' is not 'All'!");
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         assertEquals(departmentFilter.getCurrentValue(), "Abundant Foodz",
                             "Value of 'Department' is not 'Abundant Foodz'!");
 
@@ -341,7 +342,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         initVariablePage();
         initDashboardsPage();
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
 
         assertEquals(waitForElementVisible(savedViewWidget.getRoot()).getText(),
                             PENULTIMATE_YEAR,
@@ -349,7 +350,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"savedFilterAfterSwitchBetweenDashboardsAndPagesTest"})
-    public void savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest() throws InterruptedException {
+    public void savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest() {
         initDashboardsPage();
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -363,7 +364,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnTimeFilterAfterEditGranularityTest"})
-    public void savedViewFilterDoNotApplyOnFiltersAfterRemovingTest() throws InterruptedException {
+    public void savedViewFilterDoNotApplyOnFiltersAfterRemovingTest() {
         try {
             initDashboardsPage();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -372,7 +373,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             dashboardEditFilter.deleteFilter("time");
             dashboardEditBar.saveDashboard();
     
-            Thread.sleep(1000);
+            sleepTightInSeconds(1);
             // disable checking because of bug: https://jira.intgdc.com/browse/CL-5708
             //assertEquals(waitForElementVisible(SavedViewWidget.SAVED_VIEW_BUTTON, browser).getText(),
             //                    PENULTIMATE_YEAR,
@@ -383,7 +384,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     }
 
     @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnFiltersAfterRemovingTest"})
-    public void dashboardHasManyFiltersInManyTabsTest() throws InterruptedException {
+    public void dashboardHasManyFiltersInManyTabsTest() {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
@@ -395,7 +396,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         dashboardsPage.getFilterWidget("firstname").changeAttributeFilterValue("Adam");
         dashboardsPage.getTabs().openTab(0);
         dashboardsPage.getFilterWidget("county").changeAttributeFilterValue("Austin");
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
 
         SavedViewWidget savedViewWidget = dashboardsPage.getSavedViewWidget();
         savedViewWidget.openSavedViewMenu();
@@ -418,7 +419,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
         waitForElementNotVisible(dashboardSaveActiveViewDialog.getRoot());
     }
 
-    private void initNewDashboard_AddFilter_TurnOnSavedView(String dashboardName) throws InterruptedException {
+    private void initNewDashboard_AddFilter_TurnOnSavedView(String dashboardName) {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(dashboardName);
 

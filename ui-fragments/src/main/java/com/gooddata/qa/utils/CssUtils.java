@@ -3,8 +3,6 @@
  */
 package com.gooddata.qa.utils;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 public class CssUtils {
 
     /**

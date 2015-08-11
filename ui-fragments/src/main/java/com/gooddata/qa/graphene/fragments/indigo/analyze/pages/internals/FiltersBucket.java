@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEm
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
@@ -43,9 +44,7 @@ public class FiltersBucket extends AbstractFragment {
     public void addFilter(WebElement filter) {
         int oldFiltersCount = filters.size();
         new Actions(browser).dragAndDrop(filter, waitForElementVisible(addFilterBucket)).perform();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {}
+        sleepTightInSeconds(2);
         assertEquals(filters.size(), oldFiltersCount + 1, "Filter is not added successfully");
 
         final WebElement newFilter = filters.get(filters.size() - 1);

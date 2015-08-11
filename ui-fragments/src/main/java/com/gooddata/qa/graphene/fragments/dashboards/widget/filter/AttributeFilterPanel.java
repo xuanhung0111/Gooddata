@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static java.lang.Thread.sleep;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +42,9 @@ public class AttributeFilterPanel extends FilterPanel {
         return this;
     }
 
-    public List<String> getAllAtributeValues() throws InterruptedException {
+    public List<String> getAllAtributeValues() {
         // wait for attribute values are loaded
-        sleep(3000);
+        sleepTightInSeconds(3);
         List<String> actualFilterElements = new ArrayList<String>();
         for (WebElement ele : listAttrValues) {
             actualFilterElements.add(waitForElementVisible(ele).getText());

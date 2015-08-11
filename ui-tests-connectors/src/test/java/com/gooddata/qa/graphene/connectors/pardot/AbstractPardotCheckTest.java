@@ -42,7 +42,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testConnectorIntegrationResource"})
-    public void testPardotIntegrationConfiguration() throws InterruptedException, JSONException {
+    public void testPardotIntegrationConfiguration() throws JSONException {
         openUrl(getIntegrationUri());
         // go to page with integration settings
         String settingsUrl = gotoIntegrationSettings();
@@ -69,7 +69,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testPardotIntegrationWithUploadUser"})
-    public void testPardotIntegration() throws InterruptedException, JSONException {
+    public void testPardotIntegration() throws JSONException {
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
         // process schedule
@@ -78,7 +78,7 @@ public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTes
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testPardotIntegration"})
-    public void testIncrementalSynchronization() throws JSONException, InterruptedException {
+    public void testIncrementalSynchronization() throws JSONException {
         scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
     }
 

@@ -41,7 +41,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void initialize() throws InterruptedException, JSONException {
+    public void initialize() throws JSONException {
         newName = "New Folder";
         unicodeName = "ພາສາລາວ résumé اللغة";
         description = "This is a description of folder";
@@ -61,7 +61,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = {"admin-tests"})
-    public void verifyFolderListTest() throws InterruptedException {
+    public void verifyFolderListTest() {
         for (String page : pages) {
             initDataPage(page);
             dataPage.getObjectFolder().verifyFolderList(page, getFolderList(page));
@@ -69,7 +69,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyFolderListTest"}, groups = {"admin-tests"})
-    public void addFolderTest() throws InterruptedException {
+    public void addFolderTest() {
         for (String page : pages) {
             initDataPage(page);
             initVariables(page);
@@ -78,7 +78,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
-    public void checkUnicodeNameTest() throws InterruptedException {
+    public void checkUnicodeNameTest() {
         for (String page : pages) {
             initDataPage(page);
             initVariables(page);
@@ -87,7 +87,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
-    public void checkUniqueNameTest() throws InterruptedException {
+    public void checkUniqueNameTest() {
         for (String page : pages) {
             initDataPage(page);
             initVariables(page);
@@ -97,7 +97,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"addFolderTest"}, groups = {"admin-tests"})
-    public void editFolderTest() throws InterruptedException {
+    public void editFolderTest() {
         for (String page : pages) {
             initDataPage(page);
             initVariables(page);
@@ -107,7 +107,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"editFolderTest"}, groups = {"admin-tests"})
-    public void deleteFolderTest() throws InterruptedException {
+    public void deleteFolderTest() {
         for (String page : pages) {
             initDataPage(page);
             initVariables(page);
@@ -117,7 +117,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyFolderListTest"}, groups = {"admin-tests"})
-    public void createSnDFolderTest() throws InterruptedException {
+    public void createSnDFolderTest() {
         createSnDFolder(sndFolder);
     }
 
@@ -132,31 +132,31 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
-    public void editorCreateMetricFolderTest() throws InterruptedException {
+    public void editorCreateMetricFolderTest() {
         initDataPage("metrics");
         dataPage.getObjectFolder().addFolder("metrics", "New Folder 1", null);
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
-    public void editorEditMetricFolderTest() throws InterruptedException {
+    public void editorEditMetricFolderTest() {
         initDataPage("metrics");
         dataPage.getObjectFolder().editFolder("Sales Figures",
                 "Sales Figures Renamed", "This is a description of folder");
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
-    public void editorDeleteMetricFolderTest() throws InterruptedException {
+    public void editorDeleteMetricFolderTest() {
         initDataPage("metrics");
         dataPage.getObjectFolder().deleteFolder("Sales Rep");
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
-    public void editorCreateSnDFolderTest() throws InterruptedException {
+    public void editorCreateSnDFolderTest() {
         createSnDFolder("Editor slide-n-dice folder");
     }
 
     @Test(dependsOnMethods = {"editorVerifyFolderListTest"}, groups = {"editor-tests"})
-    public void editorCannotEditAttributeAndFactFolderTest() throws InterruptedException {
+    public void editorCannotEditAttributeAndFactFolderTest() {
         for (String page : Arrays.asList("attributes", "facts")) {
             initDataPage(page);
             String folder;
@@ -203,7 +203,7 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void createSnDFolder(String folderName) throws InterruptedException {
+    private void createSnDFolder(String folderName) {
         initReportsPage();
         reportsPage.startCreateReport();
         waitForAnalysisPageLoaded(browser);

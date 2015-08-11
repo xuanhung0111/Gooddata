@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 public class FilterWidget extends AbstractFragment {
 
@@ -52,7 +53,7 @@ public class FilterWidget extends AbstractFragment {
         return null;
     }
 
-    public List<String> getAllAttributeValues() throws InterruptedException {
+    public List<String> getAllAttributeValues() {
         openPanel();
         return getPanel(AttributeFilterPanel.class).getAllAtributeValues();
     }    
@@ -95,13 +96,13 @@ public class FilterWidget extends AbstractFragment {
         return waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).getText();
     }
 
-    public void changeTitle(String title) throws InterruptedException {
+    public void changeTitle(String title) {
         if (!getRoot().getAttribute("class").contains("yui3-c-filterdashboardwidget-selected")) {
             getRoot().click();
         }
 
         waitForElementVisible(titleContainer).findElement(BY_TITLE_LABEL).click();
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         WebElement inputElement = titleContainer.findElement(BY_INPUT_LABEL);
         inputElement.clear();
         inputElement.sendKeys(title);

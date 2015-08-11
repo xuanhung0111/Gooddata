@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -46,7 +47,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
 
     @Test(dependsOnMethods = {"createProject"})
-    public void verifyReportsPage() throws InterruptedException {
+    public void verifyReportsPage() {
         initReportsPage();
         assertEquals(reportsPage.getReportsList().getNumberOfReports(), expectedGoodSalesReportsCount,
                 "Number of expected reports doesn't match");
@@ -56,7 +57,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"})
-    public void createComputedAttributesTabularReport() throws InterruptedException, IOException, JSONException {
+    public void createComputedAttributesTabularReport() throws IOException, JSONException {
 
         By includeArea = By.xpath("//div[@title='Include']");
         By excludeArea = By.xpath("//div[@title='Exclude']");
@@ -90,14 +91,14 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createHeadLineReport() throws InterruptedException {
+    public void createHeadLineReport() {
         List<String> what = new ArrayList<String>();
         what.add("# of Activities");
         prepareReport("Simple headline report", ReportTypes.HEADLINE, what, null);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createTabularReport() throws InterruptedException {
+    public void createTabularReport() {
         List<String> what = new ArrayList<String>();
         what.add("# of Activities");
         List<String> how = new ArrayList<String>();
@@ -109,7 +110,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createTabularReport"}, groups = {"tabular-report-exports"})
-    public void exportTabularReportToPDF() throws InterruptedException {
+    public void exportTabularReportToPDF() {
         exportReport("Simple tabular report", ExportFormat.PDF_PORTRAIT);
     }
 
@@ -119,7 +120,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createTabularReport2() throws InterruptedException {
+    public void createTabularReport2() {
         List<String> what = new ArrayList<String>();
         what.add("# of Won Opps.");
         List<String> how = new ArrayList<String>();
@@ -131,7 +132,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createTabularReport2"}, groups = {"tabular-report-exports"})
-    public void exportTabularReportToCSV() throws InterruptedException {
+    public void exportTabularReportToCSV() {
         exportReport("Simple tabular report - 2", ExportFormat.CSV);
     }
 
@@ -141,7 +142,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createTabularReport3() throws InterruptedException {
+    public void createTabularReport3() {
         List<String> what = new ArrayList<String>();
         what.add("# of Lost Opps.");
         List<String> how = new ArrayList<String>();
@@ -153,7 +154,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createTabularReport3"}, groups = {"tabular-report-exports"})
-    public void exportTabularReportToXLS() throws InterruptedException {
+    public void exportTabularReportToXLS() {
         exportReport("Simple tabular report - 3", ExportFormat.EXCEL_XLS);
     }
 
@@ -163,7 +164,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createTabularReport4() throws InterruptedException {
+    public void createTabularReport4() {
         List<String> what = new ArrayList<String>();
         what.add("# of Opportunities");
         List<String> how = new ArrayList<String>();
@@ -175,7 +176,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createTabularReport4"}, groups = {"tabular-report-exports"})
-    public void exportTabularReportToXLSX() throws InterruptedException {
+    public void exportTabularReportToXLSX() {
         exportReport("Simple tabular report - 4", ExportFormat.EXCEL_XLSX);
     }
 
@@ -185,7 +186,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createLineChartReport() throws InterruptedException {
+    public void createLineChartReport() {
         List<String> what = new ArrayList<String>();
         what.add("# of Activities");
         List<String> how = new ArrayList<String>();
@@ -195,7 +196,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createLineChartReport"}, groups = {"chart-exports"})
-    public void exportLineChartToPDF() throws InterruptedException {
+    public void exportLineChartToPDF() {
         exportReport("Simple line chart report", ExportFormat.PDF);
     }
 
@@ -205,7 +206,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createAreaChartReport() throws InterruptedException {
+    public void createAreaChartReport() {
         List<String> what = new ArrayList<String>();
         what.add("# of Activities");
         List<String> how = new ArrayList<String>();
@@ -215,7 +216,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createAreaChartReport"}, groups = {"chart-exports"})
-    public void exportAreaChartToPNG() throws InterruptedException {
+    public void exportAreaChartToPNG() {
         exportReport("Simple area chart report", ExportFormat.IMAGE_PNG);
     }
 
@@ -225,7 +226,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createStackedAreaChartReport() throws InterruptedException {
+    public void createStackedAreaChartReport() {
         List<String> what = new ArrayList<String>();
         what.add("# of Activities");
         List<String> how = new ArrayList<String>();
@@ -235,7 +236,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createStackedAreaChartReport"}, groups = {"chart-exports"})
-    public void exportStackedAreaChartToXLS() throws InterruptedException {
+    public void exportStackedAreaChartToXLS() {
         exportReport("Simple stacked area chart report", ExportFormat.EXCEL_XLS);
     }
 
@@ -246,7 +247,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createBarChartReport() throws InterruptedException {
+    public void createBarChartReport() {
         List<String> what = new ArrayList<String>();
         what.add("# of Activities");
         List<String> how = new ArrayList<String>();
@@ -256,7 +257,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createBarChartReport"}, groups = {"chart-exports"})
-    public void exportBarChartToCSV() throws InterruptedException {
+    public void exportBarChartToCSV() {
         exportReport("Simple bar chart report", ExportFormat.CSV);
     }
 
@@ -266,7 +267,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})
-    public void createStackedBarChartReport() throws InterruptedException {
+    public void createStackedBarChartReport() {
         List<String> what = new ArrayList<String>();
         what.add("# of Activities");
         List<String> how = new ArrayList<String>();
@@ -276,11 +277,11 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"goodsales-chart", "chart-exports", "tabular-report-exports"})
-    public void verifyCreatedReports() throws InterruptedException {
+    public void verifyCreatedReports() {
         initReportsPage();
         selectReportsDomainFolder("All");
         waitForReportsPageLoaded(browser);
-        Thread.sleep(5000);
+        sleepTightInSeconds(5);
         assertEquals(reportsPage.getReportsList().getNumberOfReports(),
                 expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
@@ -294,7 +295,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     }
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
-            throws InterruptedException {
+            {
         ReportDefinition reportDefinition = new ReportDefinition().withName(reportName)
                                                                   .withType(reportType);
 
@@ -320,7 +321,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         waitForElementVisible(reportPage.getRoot());
     }
 
-    private void exportReport(String reportName, ExportFormat format) throws InterruptedException {
+    private void exportReport(String reportName, ExportFormat format) {
         initReportPage(reportName);
         reportPage.exportReport(format);
         checkRedBar(browser);

@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
 

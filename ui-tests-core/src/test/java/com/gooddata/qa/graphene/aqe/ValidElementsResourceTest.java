@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.aqe;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertTrue;
 
@@ -46,7 +47,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void initialize() throws InterruptedException, JSONException {
+    public void initialize() throws JSONException {
         monthYearCreatedAttr = "Month/Year (Created)";
         departmentAttr = "Department";
         productAttr = "Product";
@@ -60,7 +61,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * filtered variable with some attribute elements
      */
     @Test(dependsOnMethods = {"initialize"})
-    public void checkForFilteredVariable() throws InterruptedException {
+    public void checkForFilteredVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("Test variable" + System.currentTimeMillis())
             .withAttribute(monthYearCreatedAttr)
@@ -72,7 +73,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * "AQE-1029 - Cascading filter: get 400 bad request when opening list value of child filter"
      */
     @Test(dependsOnMethods = {"initialize"})
-    public void checkForCascadingFilter() throws InterruptedException {
+    public void checkForCascadingFilter() {
         List<String> filteredValuesProduct =
                 asList("CompuSci", "Educationly", "Explorer", "Grammar Plus", "PhoenixSoft", "WonderKid");
         try {
@@ -94,7 +95,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                     productFilter.getAllAttributeValues()), "List of filter elements is not properly.");
 
             dashboardsPage.editDashboard();
-            Thread.sleep(5000);
+            sleepTightInSeconds(5);
             dashboardEditBar.setParentsFilter(productAttr, departmentAttr);// parentFilteName is Department
             dashboardEditBar.saveDashboard();
 
@@ -111,7 +112,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * "AQE-1030 - Get 400 bad request when filtering by Date"
      */
     @Test(dependsOnMethods = {"initialize"})
-    public void checkTimeFilter() throws InterruptedException {
+    public void checkTimeFilter() {
         String top5OpenByMoneyReport = "Top 5 Open (by $)";
         String top5WonByMoneyReport = "Top 5 Won (by $)";
         String top5LostByMoneyReport = "Top 5 Lost (by $)";
@@ -125,7 +126,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
         getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("01/01/2008", "12/30/2014");
         Screenshots.takeScreenshot(browser, "AQE-Check time filter", this.getClass());
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         checkRedBar(browser);
 
         TableReport dashboardTableReport = getDashboardTableReport(top5OpenByMoneyReport);
@@ -146,8 +147,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * "AQE-1031 - Get 500 internal server error when going to dashboard content variable status"
      */
     @Test(dependsOnMethods = {"initialize"})
-    public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException,
-            InterruptedException {
+    public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
         String top5OpenByMoney = "Top 5 Open (by $)";
         RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
                 testParams.getUser(), testParams.getPassword(), testParams.getEditorProfileUri(),
@@ -167,7 +167,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         assertTrue(CollectionUtils.isEqualCollection(getFilterWidget("Status").getAllAttributeValues(),
                 asList("Open")), "Variable filter is applied incorrecly");
         getFilterWidget("Close Quarter").changeTimeFilterByEnterFromAndToDate("10/01/2014", "12/31/2014");
-        Thread.sleep(5000);
+        sleepTightInSeconds(5);
 
         checkRedBar(browser);
         Screenshots.takeScreenshot(browser, "AQE-Check variable filter at dashboard", this.getClass());
@@ -183,7 +183,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     // This test is to cover the bug "AQE-1033 - Get 400 bad request when adding filter into report"
     @Test(dependsOnMethods = {"initialize"})
-    public void checkListElementsInReportFilter() throws InterruptedException{
+    public void checkListElementsInReportFilter() {
         initReportsPage();
         createReport(new ReportDefinition().withType(ReportTypes.TABLE)
                                            .withName("CheckListElementsReport")
@@ -214,7 +214,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
      * "AQE-1034 - Get 500 Internal Server Error when loading list element of attribute in analysis page"
      */
     @Test(dependsOnMethods = {"initialize"})
-    public void checkListElementsInChartReportFilter() throws InterruptedException {
+    public void checkListElementsInChartReportFilter() {
         initReportsPage();
         createReport(new ReportDefinition().withType(ReportTypes.FUNNEL)
                                            .withName("CheckListElementsInChartReport")
@@ -231,7 +231,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
 
     // This test is to cover the bug "VIZ-502 - Server side image rendering is broken"
     @Test(dependsOnMethods = {"initialize"})
-    public void checkServerSideImageRedering() throws InterruptedException {
+    public void checkServerSideImageRedering() {
         openDashboardTab(4); // "Activities" tab
         browser.get(browser.getCurrentUrl() + "&renderImgForce=true");
         waitForDashboardPageLoaded(browser);
@@ -260,7 +260,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         return null;
     }
 
-    private void openDashboardTab(int tabindex) throws InterruptedException {
+    private void openDashboardTab(int tabindex) {
         initDashboardsPage();
         browser.navigate().refresh();
         dashboardsPage.selectDashboard("Pipeline Analysis");

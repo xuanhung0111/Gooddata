@@ -3,8 +3,6 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class SourcesTable extends AbstractTable {
 

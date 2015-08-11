@@ -34,7 +34,7 @@ public class DashboardMenu extends SimpleMenu {
         }));
     }
 
-    public boolean selectDashboardByIndex(final int index) throws InterruptedException {
+    public boolean selectDashboardByIndex(final int index) {
         return selectDashboardByPredicate(new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement e) {

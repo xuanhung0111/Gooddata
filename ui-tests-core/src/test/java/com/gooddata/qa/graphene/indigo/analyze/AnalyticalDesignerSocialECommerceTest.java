@@ -66,7 +66,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
         filterOnAttribute(DEVICE + ": Mobile, Tablet", "Mobile", "Tablet");
     }
 
-    @SuppressWarnings("unchecked")
     @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
@@ -79,7 +78,6 @@ public class AnalyticalDesignerSocialECommerceTest extends AdLegacyAbstractTest 
                 Arrays.asList(ORDERS, "11%")));
     }
 
-    @SuppressWarnings("unchecked")
     @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()

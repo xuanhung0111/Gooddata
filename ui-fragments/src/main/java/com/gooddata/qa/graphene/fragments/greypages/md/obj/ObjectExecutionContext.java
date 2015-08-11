@@ -4,7 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ObjectExecutionContext extends ObjectFragment {
-    public String getType() throws JSONException, InterruptedException {
+    public String getType() throws JSONException {
         JSONObject content = getObject()
                 .getJSONObject("executionContext")
                 .getJSONObject("content");

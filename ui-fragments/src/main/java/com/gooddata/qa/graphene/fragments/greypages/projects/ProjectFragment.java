@@ -43,7 +43,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     private WebElement submit;
 
     public String createProject(String title, String summary, String template, String authorizationToken,
-            DWHDriver dwhDriver, ProjectEnvironment enviroment, int checkIterations) throws JSONException, InterruptedException {
+            DWHDriver dwhDriver, ProjectEnvironment enviroment, int checkIterations) throws JSONException {
         waitForElementVisible(this.title).sendKeys(title);
         if (summary != null && summary.length() > 0) this.summary.sendKeys(summary);
         if (template != null && template.length() > 0) this.projectTemplate.sendKeys(template);
@@ -62,7 +62,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         return waitForProjectStateEnabled(checkIterations);
     }
 
-    private String waitForProjectStateEnabled(int checkIterations) throws JSONException, InterruptedException {
+    private String waitForProjectStateEnabled(int checkIterations) throws JSONException {
         String projectUrl = browser.getCurrentUrl();
         logProjectUrl(projectUrl);
         System.out.println("Waiting for project enabled: " + projectUrl);

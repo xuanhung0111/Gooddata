@@ -43,7 +43,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnMethods = {"prepareDataForDLUI"}, groups = {"initialDataForDLUI"})
-    public void initialData() throws InterruptedException {
+    public void initialData() {
         selectedField = new Field("Trackname", FieldTypes.ATTRIBUTE);
         selectedDataset = new Dataset().withName(DATASET_NAME).withFields(selectedField);
 
@@ -53,7 +53,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"reference"})
     public void autoCreationConnectingDatasetsViaRestApi() throws IOException, JSONException,
-            ParseException, InterruptedException {
+            ParseException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES);
             createDataLoadProcess();
@@ -72,8 +72,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnMethods = {"autoCreationConnectingDatasetsViaRestApi"}, groups = {"reference"})
-    public void autoCreationConnectingDatasets() throws ParseException, JSONException, IOException,
-            InterruptedException {
+    public void autoCreationConnectingDatasets() throws ParseException, JSONException, IOException {
         try {
             updateFieldToSelected();
             addNewFieldWithAnnieDialog(dataSource);
@@ -90,7 +89,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnMethods = {"autoCreationConnectingDatasetsViaRestApi"}, groups = {"reference"})
-    public void checkAutoCreationReferenceWithEditorRole() throws InterruptedException,
+    public void checkAutoCreationReferenceWithEditorRole() throws 
             ParseException, JSONException, IOException {
         try {
             updateFieldToSelected();
@@ -111,7 +110,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"reference"}, alwaysRun = true)
-    public void autoCreationMultiConnectingDatasets() throws InterruptedException, ParseException,
+    public void autoCreationMultiConnectingDatasets() throws ParseException,
             JSONException, IOException {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/dropAllDatasetsOfReference.txt"));
         initialLdmMaqlFile = "create-ldm-multi-references.txt";

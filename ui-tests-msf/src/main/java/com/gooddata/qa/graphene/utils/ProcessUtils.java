@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.lang.String.format;
 import static org.testng.Assert.*;
 
@@ -141,11 +142,11 @@ public class ProcessUtils {
     }
 
     public static String waitForRunningExecutionByStatus(RestApiClient restApiClient,
-            String executionUri) throws InterruptedException {
+            String executionUri) {
         String status = getExecutionStatus(restApiClient, executionUri);
         while ("QUEUED".equals(status) || "RUNNING".equals(status)) {
             System.out.println("Current execution status is: " + status);
-            Thread.sleep(2000);
+            sleepTight(2000);
             status = getExecutionStatus(restApiClient, executionUri);
         }
 

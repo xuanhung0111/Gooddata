@@ -24,7 +24,7 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testConnectorIntegrationResource"})
-    public void testZendeskIntegrationConfiguration() throws InterruptedException, JSONException {
+    public void testZendeskIntegrationConfiguration() throws JSONException {
         openUrl(getIntegrationUri());
         String settingsUrl = openZendeskSettingsUrl();
         JSONObject json = loadJSON();
@@ -55,7 +55,7 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testZendeskIntegrationWithUploadUser"})
-    public void testZendeskIntegration() throws InterruptedException, JSONException {
+    public void testZendeskIntegration() throws JSONException {
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
         // process schedule

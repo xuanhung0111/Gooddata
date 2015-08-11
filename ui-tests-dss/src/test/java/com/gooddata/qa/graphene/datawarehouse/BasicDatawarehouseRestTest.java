@@ -123,7 +123,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
     }
 
     @Test(dependsOnMethods = {"gpInstanceFormsAvailable"})
-    public void createInstance() throws JSONException, InterruptedException {
+    public void createInstance() throws JSONException {
         waitForElementVisible(storageForm.getRoot());
         assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
         storageUrl = storageForm.createStorage(STORAGE_TITLE, STORAGE_DESCRIPTION, authorizationToken);
@@ -207,7 +207,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
      */
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addUserToInstance() throws JSONException, InterruptedException {
+    public void addUserToInstance() throws JSONException {
         openStorageUsersUrl();
         assertTrue(testUserId != null, "Missing test user ID - provide property 'dss.storage.test.user.id'");
         storageUsersForm.verifyValidAddUserForm();
@@ -260,7 +260,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
     }
 
     @Test(dependsOnMethods = {"removeUserFromInstance"})
-    public void addUserToInstanceByLogin() throws JSONException, InterruptedException {
+    public void addUserToInstanceByLogin() throws JSONException {
         openStorageUsersUrl();
         assertTrue(testUserId != null, "Missing test user ID - provide property 'dss.storage.test.user.id'");
         assertTrue(testUserLogin != null, "Missing test user login - provide property 'dss.storage.test.user.login'");
@@ -285,46 +285,46 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
      */
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addUserWithEmptyProfileAndLogin() throws JSONException, InterruptedException {
+    public void addUserWithEmptyProfileAndLogin() throws JSONException {
         invalidUserAssignment(null, null, NEW_USER_ROLE, "One (and only one) of 'profile' or 'login' must be " +
                 "provided.");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addUserWithBothProfileAndLogin() throws JSONException, InterruptedException {
+    public void addUserWithBothProfileAndLogin() throws JSONException {
         invalidUserAssignment(getTestUserProfileUri(), testUserLogin, NEW_USER_ROLE,
                 "One (and only one) of 'profile' or 'login' must be provided.");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addNonExistingUser() throws JSONException, InterruptedException {
+    public void addNonExistingUser() throws JSONException {
         invalidUserAssignment("/gdc/account/profile/nonexisting", null, NEW_USER_ROLE,
                 "User 'nonexisting' has not been found");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addUserWithInvalidURI() throws JSONException, InterruptedException {
+    public void addUserWithInvalidURI() throws JSONException {
         invalidUserAssignment("/invalid/uri", null, NEW_USER_ROLE, "Validation failed");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addUserWithInvalidLogin() throws JSONException, InterruptedException {
+    public void addUserWithInvalidLogin() throws JSONException {
         invalidUserAssignment(null, "asdfasdfa", NEW_USER_ROLE,
                 "must be a string matching the regular expression \".+@.+\\..+\"]]");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addUserWithInvalidURI2() throws JSONException, InterruptedException {
+    public void addUserWithInvalidURI2() throws JSONException {
         invalidUserAssignment("/gdc/account/profile", null, NEW_USER_ROLE, "Validation failed");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addUserWithInvalidURI3() throws JSONException, InterruptedException {
+    public void addUserWithInvalidURI3() throws JSONException {
         invalidUserAssignment("/gdc/account/profile/", null, NEW_USER_ROLE, "Validation failed");
     }
 
     @Test(dependsOnMethods = {"verifyInstanceEnabled"})
-    public void addExistingUserToStorage() throws JSONException, InterruptedException {
+    public void addExistingUserToStorage() throws JSONException {
         invalidUserAssignment(userCreatedByUrl, null, NEW_USER_ROLE, "User '" + userCreatedById + "' already exists");
     }
 
@@ -333,13 +333,13 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
      */
 
     @Test(dependsOnMethods = {"deleteInstance"})
-    public void verifyDeletedInstance() throws JSONException, InterruptedException {
+    public void verifyDeletedInstance() throws JSONException {
         openStorageUrl();
         verifyStorage(UPDATED_STORAGE_TITLE, UPDATED_STORAGE_DESCRIPTION, "DELETED");
     }
 
     @Test(dependsOnMethods = {"verifyDeletedInstance"})
-    public void deleteDeletedInstance() throws JSONException, InterruptedException {
+    public void deleteDeletedInstance() throws JSONException {
         openStorageUrl();
         waitForElementVisible(BY_GP_FORM_SECOND, browser);
         InstanceFragment storage = createPageFragment(InstanceFragment.class, browser.findElement(BY_GP_FORM_SECOND));
@@ -443,7 +443,7 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
     }
 
     private void invalidUserAssignment(String userProfile, String login, String role, String expectedErrorMessage)
-            throws JSONException, InterruptedException {
+            throws JSONException {
         openStorageUsersUrl();
         storageUsersForm.verifyValidAddUserForm();
         storageUsersForm.fillAddUserToStorageForm(role, userProfile, login, false);

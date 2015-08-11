@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -60,7 +61,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createTestingReport() throws InterruptedException {
+    public void createTestingReport() {
         initReportsPage();
         createReport(new ReportDefinition().withName(TESTING_REPORT).withWhats(AMOUNT).withHows(STAGE_NAME)
                 .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP)), TESTING_REPORT);
@@ -68,7 +69,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createTestingReport"})
-    public void testSingleOptionAttributeFilter() throws InterruptedException {
+    public void testSingleOptionAttributeFilter() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
             addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
@@ -93,7 +94,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createTestingReport"})
-    public void verifyFilterConnectedWithReport() throws InterruptedException {
+    public void verifyFilterConnectedWithReport() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
             addAttributeFilterToDashboard(STAGE_NAME, DashFilterTypes.ATTRIBUTE);
@@ -131,7 +132,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createTestingReport"})
-    public void timeFilter() throws InterruptedException {
+    public void timeFilter() {
         try {
             addReportToDashboard(TESTING_REPORT, DashboardWidgetDirection.LEFT);
 
@@ -170,7 +171,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void filterInheritAttributeName() throws InterruptedException {
+    public void filterInheritAttributeName() {
         try {
             initDashboardsPage();
             dashboardsPage.addNewDashboard(TEST_DASHBOAD_FILTERS);
@@ -207,7 +208,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createVariables() throws InterruptedException {
+    public void createVariables() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("FStageName").withAttribute(STAGE_NAME));
         variablePage.createVariable(new AttributeVariable("FQuarter/Year")
@@ -217,7 +218,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createVariables"})
-    public void createReportsWithVariableFilter() throws InterruptedException {
+    public void createReportsWithVariableFilter() {
         initReportsPage();
         ReportDefinition rd =
                 new ReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
@@ -241,7 +242,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createReportsWithVariableFilter"})
-    public void testVariableFilters() throws InterruptedException {
+    public void testVariableFilters() {
         try {
             addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
             addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
@@ -266,7 +267,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createReportsWithVariableFilter"})
-    public void testSingleOptionVariableFilter() throws InterruptedException {
+    public void testSingleOptionVariableFilter() {
         try {
             addReportToDashboard(REPORT_1, DashboardWidgetDirection.LEFT);
             addReportToCurrentDashboard(REPORT_2, DashboardWidgetDirection.RIGHT);
@@ -291,7 +292,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createVariables"})
-    public void testReportWithNumericalVariableInMetricSentence() throws InterruptedException {
+    public void testReportWithNumericalVariableInMetricSentence() {
         initVariablePage();
         variablePage.openVariableFromList("NVariable");
         variableDetailPage.setDefaultValue(2011);
@@ -330,7 +331,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void testDashboardFilterOverrideReportFilter() throws InterruptedException {
+    public void testDashboardFilterOverrideReportFilter() {
         initReportsPage();
         createReport(
                 new ReportDefinition()
@@ -351,12 +352,11 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         }
     }
 
-    private void addReportToDashboard(String name) throws InterruptedException {
+    private void addReportToDashboard(String name) {
         addReportToDashboard(name, DashboardWidgetDirection.NONE);
     }
 
-    private void addReportToDashboard(String name, DashboardWidgetDirection direction)
-            throws InterruptedException {
+    private void addReportToDashboard(String name, DashboardWidgetDirection direction) {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(TEST_DASHBOAD_FILTERS);
         addReportToCurrentDashboard(name, direction);
@@ -374,7 +374,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type,
-            DashboardWidgetDirection direction) throws InterruptedException {
+            DashboardWidgetDirection direction) {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
@@ -394,12 +394,12 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         checkRedBar(browser);
     }
 
-    private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type) throws InterruptedException {
+    private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type) {
         addAttributeFilterToDashboard(attribute, type, DashboardWidgetDirection.NONE);
     }
 
-    private Collection<WebElement> getRowElementsFrom(TableReport report) throws InterruptedException {
-        Thread.sleep(1000);
+    private Collection<WebElement> getRowElementsFrom(TableReport report) {
+        sleepTightInSeconds(1);
         return report.getRoot().findElements(By.cssSelector(".gridTile div.element.cell.rows span"));
     }
 
@@ -407,8 +407,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         return dashboardsPage.getContent().getFilterWidget(condition);
     }
 
-    private <T extends AbstractReport> T getReport(String name, Class<T> clazz) throws InterruptedException {
-        Thread.sleep(1000);
+    private <T extends AbstractReport> T getReport(String name, Class<T> clazz) {
+        sleepTightInSeconds(1);
         return dashboardsPage.getContent().getReport(name, clazz);
     }
 }

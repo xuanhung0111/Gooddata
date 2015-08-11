@@ -32,7 +32,7 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     
     @SuppressWarnings("unchecked")
     @Test(dependsOnMethods = {"createProject"})
-    public void checkLDMImageTest() throws InterruptedException, IOException, JSONException {
+    public void checkLDMImageTest() throws IOException, JSONException {
         File tmpImage = getLDMImageFromGrayPage();
         replaceContentInSVGFile(tmpImage, Pair.of(testParams.getHost(), HOST_NAME), 
                 Pair.of(testParams.getProjectId(), PROJECT_ID));

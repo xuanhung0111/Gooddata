@@ -242,7 +242,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     }
 
     @Test(dependsOnMethods = {"initGoodDataClient"}, description = "https://jira.intgdc.com/browse/CL-6942")
-    public void testCaseSensitiveSortInAttributeMetric() throws InterruptedException {
+    public void testCaseSensitiveSortInAttributeMetric() {
         initManagePage();
         String attribute = mdService.getObjUri(project, Attribute.class,
                 Restriction.identifier("attr.product.id"));
@@ -383,7 +383,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         }
     }
 
-    private void deleteMetric(String metric) throws InterruptedException {
+    private void deleteMetric(String metric) {
         initMetricPage();
         metricPage.openMetricDetailPage(metric);
         waitForFragmentVisible(metricDetailPage).deleteMetric();

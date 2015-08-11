@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static org.testng.Assert.assertEquals;
@@ -54,7 +55,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"},
             groups = {"dataloadProcessTest"}, priority = 0)
-    public void autoCreateDataloadProcess() throws IOException, JSONException, InterruptedException {
+    public void autoCreateDataloadProcess() throws IOException, JSONException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         assertTrue(isDataloadProcessCreated(), "DATALOAD process is not created!");
         Processes dataloadProcessList =
@@ -69,8 +70,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"},
             groups = {"dataloadProcessTest"}, priority = 1)
-    public void changeAdsInstanceWhenHavingDataloadProcess() throws IOException, JSONException,
-            InterruptedException {
+    public void changeAdsInstanceWhenHavingDataloadProcess() throws IOException, JSONException {
         createDataLoadProcess();
         String dataloadProcessId = getDataloadProcessId();
         ADSInstance newAdsInstance =
@@ -149,8 +149,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
     }
 
     @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
-    public void checkExecutionLogWithErrorMapping() throws ParseException, JSONException, IOException,
-            InterruptedException {
+    public void checkExecutionLogWithErrorMapping() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
         deleteDataloadProcessAndCreateNewOne();
 
@@ -163,8 +162,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
     }
 
     @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
-    public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException,
-            InterruptedException {
+    public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException {
         List<String> deleteFiles = new ArrayList<String>(Arrays.asList("f_opportunity.csv",
                 "dataset.opportunity.csv", "f_person.csv", "dataset.person.csv"));
 
@@ -186,7 +184,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
     public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException,
-            IOException, InterruptedException {
+            IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
         deleteDataloadProcessAndCreateNewOne();
 
@@ -268,8 +266,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
         return gdcFragment.getUserUploadsURL();
     }
 
-    private void deleteFilesFromWebdav(String webDavStructure, List<String> deleteUrls) throws IOException,
-            InterruptedException {
+    private void deleteFilesFromWebdav(String webDavStructure, List<String> deleteUrls) throws IOException {
         WebDavClient webDav = WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
 
         final int timeout = 2 * 60 * 1000; // 2 mins
@@ -291,7 +288,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
                     System.out.println("Time out for deleting files from webdav!");
                     break;
                 }
-                Thread.sleep(sleepTime);
+                sleepTight(sleepTime);
                 totalWaitingTime += sleepTime;
             }
         }

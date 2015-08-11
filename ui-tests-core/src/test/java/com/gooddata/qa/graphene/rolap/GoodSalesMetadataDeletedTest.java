@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -113,7 +114,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deleteScheduleEmail() throws InterruptedException, IOException, JSONException {
+    public void deleteScheduleEmail() throws IOException, JSONException {
         try {
             String dashboardSchedule = "dashboard";
             String reportSchedule = "report";
@@ -139,7 +140,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deleteComment() throws IOException, JSONException, InterruptedException {
+    public void deleteComment() throws IOException, JSONException {
         String[] objectLinks = {
             RestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
                     NEW_LOST_DRILL_IN_REPORT.reportDef),
@@ -162,7 +163,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deleteAttribute() throws InterruptedException, JSONException, IOException {
+    public void deleteAttribute() throws JSONException, IOException {
         String userFilterUri = createUserFilterFrom(IS_WON_ATTRIBUTE);
         String computedAttributeName = createComputedAttributeUsing(IS_WON_ATTRIBUTE);
         String filterVariableName = createFilterVariableUsingAttribute(IS_WON_ATTRIBUTE).getRight();
@@ -192,7 +193,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deleteFact() throws JSONException, InterruptedException, IOException {
+    public void deleteFact() throws JSONException, IOException {
         String metricName = createMetricUsing(VELOCITY_FACT, SimpleMetricTypes.SUM);
 
         dropObject(VELOCITY_FACT.identifier, DropStrategy.CASCADE);
@@ -201,7 +202,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deletePrompt() throws InterruptedException, JSONException, IOException {
+    public void deletePrompt() throws JSONException, IOException {
         dropObject(QUOTA_VARIABLE.identifier, DropStrategy.CASCADE);
         assertTrue(isObjectDeleted(QUOTA_VARIABLE.affectedMetric, Places.METRIC));
         assertTrue(isObjectDeleted(QUOTA_VARIABLE.affectedReport, Places.REPORT));
@@ -217,7 +218,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deleteMetric() throws InterruptedException, JSONException, IOException {
+    public void deleteMetric() throws JSONException, IOException {
         try {
             createDashboardWithGeoChart(NUMBER_OF_OPPORTUNITIES_METRIC.name);
 
@@ -233,7 +234,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deleteReport() throws InterruptedException, JSONException, IOException {
+    public void deleteReport() throws JSONException, IOException {
         String reportSchedule = null;
         try {
             addReportToNewDashboard(NEW_WON_DRILL_IN_REPORT.name, DASHBOARD_NAME);
@@ -249,7 +250,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
-    public void deleteDashboard() throws InterruptedException, IOException, JSONException {
+    public void deleteDashboard() throws IOException, JSONException {
         addReportToNewDashboard(NEW_LOST_DRILL_IN_REPORT.name, DASHBOARD_NAME);
 
         String url = browser.getCurrentUrl();
@@ -266,28 +267,25 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"group1"}, alwaysRun = true)
-    public void resetLDM() throws JSONException, InterruptedException, IOException {
+    public void resetLDM() throws JSONException, IOException {
         deleteProject(testParams.getProjectId());
         createProject();
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
-    public void deleteDomainWithNoReportUsageUsingCascadeStrategy() throws IOException, JSONException,
-            InterruptedException {
+    public void deleteDomainWithNoReportUsageUsingCascadeStrategy() throws IOException, JSONException {
         deleteDomainHelper(DropStrategy.CASCADE, MOVED_IN_PIPELINE_DRILL_IN_REPORT, NEW_PIPELINE_DRILL_IN_REPORT);
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
-    public void deleteDomainWithNoReportUsageUsingAllInStrategy() throws IOException, JSONException,
-            InterruptedException {
+    public void deleteDomainWithNoReportUsageUsingAllInStrategy() throws IOException, JSONException {
         String report1 = createReportUsing(new ReportDefinition().withName("Report1").withHows("Stage History"));
         String report2 = createReportUsing(new ReportDefinition().withName("Report2").withHows("Stage History"));
         deleteDomainHelper(DropStrategy.ALL_IN, report1, report2);
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
-    public void deleteDomainWithReportUsageUsingCascadeStrategy() throws IOException, JSONException,
-            InterruptedException {
+    public void deleteDomainWithReportUsageUsingCascadeStrategy() throws IOException, JSONException {
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();
@@ -305,8 +303,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"deleteDomainWithReportUsageUsingCascadeStrategy"}, groups = {"group2"})
-    public void deleteDomainWithReportUsageUsingAllInStrategy() throws IOException, JSONException,
-            InterruptedException {
+    public void deleteDomainWithReportUsageUsingAllInStrategy() throws IOException, JSONException {
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();
@@ -323,8 +320,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
-    public void deleteDatasetWithNoAttributeUsageUsingCascadeStrategy() throws IOException, JSONException,
-            InterruptedException {
+    public void deleteDatasetWithNoAttributeUsageUsingCascadeStrategy() throws IOException, JSONException {
         dropObject(PRODUCT_DATASET.identifier, DropStrategy.CASCADE);
         for (String attribute : PRODUCT_DATASET.attributes) {
             assertTrue(isObjectDeleted(attribute, Places.ATTRIBUTE));
@@ -332,8 +328,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
-    public void deleteDatasetWithAttributeUsageUsingCascadeStrategy() throws IOException, JSONException,
-            InterruptedException {
+    public void deleteDatasetWithAttributeUsageUsingCascadeStrategy() throws IOException, JSONException {
         try {
             createDashboardWithAttributeFilter(DashFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
 
@@ -348,7 +343,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
-    public void deleteDatasetWithAttributeUsageUsingAllInStrategy() throws InterruptedException, JSONException,
+    public void deleteDatasetWithAttributeUsageUsingAllInStrategy() throws JSONException,
             ParseException, IOException {
         try {
             createDashboardWithAttributeFilter(DashFilterTypes.ATTRIBUTE, STAGE_DATASET.attributes[0]);
@@ -360,8 +355,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"deleteDatasetWithAttributeUsageUsingAllInStrategy"}, groups = {"group2"})
-    public void deleteDatasetWithNoAttributeUsageUsingAllInStrategy() throws JSONException, InterruptedException,
-            IOException {
+    public void deleteDatasetWithNoAttributeUsageUsingAllInStrategy() throws JSONException, IOException {
         dropObject(ACCOUNT_DATASET.identifier, DropStrategy.CASCADE);
         for (String attribute : ACCOUNT_DATASET.attributes) {
             assertTrue(isObjectDeleted(attribute, Places.ATTRIBUTE));
@@ -369,17 +363,17 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"deleteDatasetWithNoAttributeUsageUsingAllInStrategy"}, groups = {"group2"})
-    public void deleteConnectedDataset() throws IOException, JSONException, InterruptedException {
+    public void deleteConnectedDataset() throws IOException, JSONException {
         assertFalse(isObjectDeleted(OPPORTUNITY_SNAPSHOT_DATASET, Places.DATASET));
     }
 
     @Test(dependsOnGroups = {"group2"})
-    public void deleteDatasetContinually() throws JSONException, InterruptedException {
+    public void deleteDatasetContinually() throws JSONException {
         dropObject(DATE_ACTIVITY_DATASET.identifier, DropStrategy.CASCADE);
         dropObject(DATE_CREATED_DATASET.identifier, DropStrategy.CASCADE);
     }
 
-    private void tryDeleteDashboard() throws InterruptedException {
+    private void tryDeleteDashboard() {
         try {
             initDashboardsPage();
             dashboardsPage.selectDashboard(DASHBOARD_NAME);
@@ -398,8 +392,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         emailSchedulesPage.deleteSchedule(scheduleName);
     }
 
-    private void deleteDomainHelper(DropStrategy strategy, String... reports) throws IOException, JSONException,
-            InterruptedException {
+    private void deleteDomainHelper(DropStrategy strategy, String... reports) throws IOException, JSONException {
         Pair<String, String> folderIdAndName = createNewReportFolder();
         String folderId = folderIdAndName.getLeft();
         String folderName = folderIdAndName.getRight();
@@ -420,7 +413,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         reportsPage.moveReportsToFolder(folder, reports);
     }
 
-    private Pair<String, String> createNewReportFolder() throws InterruptedException {
+    private Pair<String, String> createNewReportFolder() {
         String folderName = "New Folder";
         initReportsPage();
         reportsPage.addNewFolder(folderName);
@@ -432,7 +425,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         return Pair.of(folderId, folderName);
     }
 
-    private String createDashboardSchedule(String dashboard) throws InterruptedException {
+    private String createDashboardSchedule(String dashboard) {
         String subject = "Dashboard Schedule " + System.currentTimeMillis();
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewDahboardEmail(testParams.getUser(), subject, "body", dashboard);
@@ -440,7 +433,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         return subject;
     }
 
-    private String createReportSchedule(String report) throws InterruptedException {
+    private String createReportSchedule(String report) {
         String subject = "Report Schedule " + System.currentTimeMillis();
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), subject, "body", report, ExportFormat.ALL);
@@ -463,8 +456,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         return factDetailPage.createSimpleMetric(SimpleMetricTypes.SUM, fact.name);
     }
 
-    private boolean isObjectDeleted(String object, Places place) throws IOException, JSONException,
-            InterruptedException {
+    private boolean isObjectDeleted(String object, Places place) throws IOException, JSONException {
         switch (place) {
             case GREY_PAGE:
                 JSONObject json = RestUtils.getJSONObjectFrom(getRestApiClient(), object,
@@ -528,18 +520,18 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private void dropAllComments(String[] objectLinks, DropStrategy strategy) throws ParseException,
-        JSONException, IOException, InterruptedException {
+        JSONException, IOException {
         for (String link: objectLinks) {
             dropObject(getIdentifierFromObjLink(link, ObjectType.COMMENT), strategy);
         }
     }
 
-    private void dropObject(String identifier, DropStrategy strategy) throws JSONException, InterruptedException {
+    private void dropObject(String identifier, DropStrategy strategy) throws JSONException {
         postMAQL(strategy.getMaql(identifier), STATUS_POLLING_CHECK_ITERATIONS);
     }
 
     private void tryDropObject(final String identifier, final DropStrategy strategy) throws JSONException,
-            ParseException, IOException, InterruptedException {
+            ParseException, IOException {
         String pollingUri = RestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
                 strategy.getMaql(identifier));
         RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
@@ -564,7 +556,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void createDashboardWithGeoChart(String metric) throws InterruptedException {
+    private void createDashboardWithGeoChart(String metric) {
         try {
             initDashboardsPage();
         } catch (AssertionError e) {
@@ -582,7 +574,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private void createDashboardWithAttributeFilter(DashFilterTypes filterType, String attribute)
-            throws InterruptedException {
+            {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(DASHBOARD_NAME);
 
@@ -590,11 +582,11 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         dashboardsPage.editDashboard();
         dashboardEditBar.addListFilterToDashboard(filterType, attribute);
         dashboardEditBar.turnSavedViewOption(true);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         dashboardEditBar.saveDashboard();
     }
 
-    private String createSavedView(String... values) throws InterruptedException {
+    private String createSavedView(String... values) {
         dashboardsPage.selectDashboard(DASHBOARD_NAME);
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
@@ -607,7 +599,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         return name;
     }
 
-    private String createReportUsing(ReportDefinition reportDefinition) throws InterruptedException {
+    private String createReportUsing(ReportDefinition reportDefinition) {
         String name = reportDefinition.getName();
         initReportsPage();
         createReport(reportDefinition, name);
@@ -616,7 +608,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         return name;
     }
 
-    private String createMetricUsing(AttributeInfo attribute) throws InterruptedException {
+    private String createMetricUsing(AttributeInfo attribute) {
         String name = "Metric " + System.currentTimeMillis();
         initMetricPage();
         metricPage.createDifferentMetric(name, WIN_RATE_METRIC, attribute.dataset, attribute.name,
@@ -625,12 +617,11 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         return name;
     }
 
-    private Pair<String, String> createFilterVariableUsingAttribute(AttributeInfo attribute)
-            throws InterruptedException {
+    private Pair<String, String> createFilterVariableUsingAttribute(AttributeInfo attribute) {
         String name = "Filter variable " + System.currentTimeMillis();
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         waitForDataPageLoaded(browser);
-        Thread.sleep(5000);
+        sleepTightInSeconds(5);
         variablePage.createVariable(new AttributeVariable(name).withAttribute(attribute.name)
                 .withAttributeElements(attribute.elements[0].name));
 

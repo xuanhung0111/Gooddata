@@ -16,7 +16,7 @@ public class Manage2Fragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement submit;
 
-    public boolean postMAQL(String maql, int checkIterations) throws JSONException, InterruptedException {
+    public boolean postMAQL(String maql, int checkIterations) throws JSONException {
         waitForElementVisible(this.maql).sendKeys(maql);
         Graphene.guardHttp(submit).click();
         waitForElementVisible(BY_GP_LINK, browser);

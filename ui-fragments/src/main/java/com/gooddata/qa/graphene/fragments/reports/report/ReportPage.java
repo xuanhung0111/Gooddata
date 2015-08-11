@@ -334,7 +334,7 @@ public class ReportPage extends AbstractFragment {
         return number;
     }
 
-    public List<String> getFilters() throws InterruptedException {
+    public List<String> getFilters() {
         String textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCount = getNumber(textOnFilterButton);
         if (filterCount == 0)
@@ -342,7 +342,7 @@ public class ReportPage extends AbstractFragment {
 
         // Need to sleep here. If we go too fast, action click is still successful
         // but nothing happen
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         filterButton.click();
         waitForElementVisible(reportFilter.getRoot());
         return Lists.newArrayList(Collections2.transform(reportFilter.getRoot()

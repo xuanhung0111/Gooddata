@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +39,12 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
     private static final String widgetMetricLocator =
             "//div[contains(@class,'yui3-widget-stacked shelterPlugin-plugged')]//div[contains(@class,'yui3-c-picker-content')]//div[contains(@class,'yui3-c-simplecolumn')]//div[contains(@class,'c-label') and contains(@class,'s-enabled')]/span[text()='${metricLabel}']";
 
-    public void initWidget(WidgetTypes type) throws InterruptedException {
+    public void initWidget(WidgetTypes type) {
         By widgetType = By.xpath(widgetLocator.replace("${widgetLabel}", type.getLabel()));
         waitForElementVisible(widgetType, browser).click();
     }
 
-    public void initWidget(WidgetTypes type, String metricLabel) throws InterruptedException {
+    public void initWidget(WidgetTypes type, String metricLabel) {
         initWidget(type);
         // TODO fragments for widget config panel + metric selection can be used
         // - but better IDs and UI organization is required
@@ -51,10 +52,10 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
         waitForElementVisible(widgetConfigMetricButton).click();
         By metricInWidget = By.xpath(widgetMetricLocator.replace("${metricLabel}", metricLabel));
         waitForElementVisible(metricInWidget, browser).click();
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
     }
 
-    public void addWidget(WidgetTypes type, String metricLabel) throws InterruptedException {
+    public void addWidget(WidgetTypes type, String metricLabel) {
         initWidget(type, metricLabel);
         waitForElementVisible(widgetConfigApplyButton).click();
         waitForElementNotVisible(widgetConfigPanel);
@@ -68,8 +69,7 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
         return layersList;
     }
 
-    public void verifyLayersList(String metricLabel, List<String> layersList)
-            throws InterruptedException {
+    public void verifyLayersList(String metricLabel, List<String> layersList) {
         initWidget(WidgetTypes.GEO_CHART, metricLabel);
         waitForElementVisible(layers);
         List<String> actualLayersList = getGeoLayersList();
@@ -85,14 +85,14 @@ public class DashboardAddWidgetPanel extends AbstractFragment {
         }
     }
 
-    public void addGeoChart(String metricLabel, String attributeLayer) throws InterruptedException {
+    public void addGeoChart(String metricLabel, String attributeLayer) {
         initWidget(WidgetTypes.GEO_CHART, metricLabel);
         waitForElementVisible(layers);
 
         if (!listGeoLayerCheckbox.isEmpty()) {
             int i = 0;
             listGeoLayerCheckbox.get(0).click();
-            Thread.sleep(3000);
+            sleepTightInSeconds(3);
             for (WebElement element : listGeoLayerCheckbox) {
                 if (listGeoLayer.get(i).getText().equalsIgnoreCase(attributeLayer)) {
                     element.click();

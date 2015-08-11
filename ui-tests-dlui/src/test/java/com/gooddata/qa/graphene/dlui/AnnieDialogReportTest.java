@@ -21,14 +21,14 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "basicFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
             groups = {"annieDialogTest", "addOneField"})
     public void adminCheckReportWithBasicSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
             groups = {"annieDialogTest", "addOneField"})
     public void adminCheckReportWithSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
     }
 
@@ -50,14 +50,14 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser",
         "prepareMetricsToCheckReport"}, groups = {"annieDialogTest", "editorAddOneField"})
     public void editorCheckReportWithBasicSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser",
         "prepareMetricsToCheckReport"}, groups = {"annieDialogTest", "editorAddOneField"})
     public void editorCheckReportWithSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 

@@ -14,12 +14,12 @@ import org.testng.annotations.BeforeClass;
 public class EditModePermissionsTest extends DashboardsGeneralTest {
 
     @BeforeClass(alwaysRun = true)
-    public void before() throws InterruptedException {
+    public void before() {
         addUsersWithOtherRoles = true;
     }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
-    public void checkViewerCannotEditDashboard() throws JSONException, InterruptedException {
+    public void checkViewerCannotEditDashboard() throws JSONException {
         try {
             initDashboardsPage();
 
@@ -37,7 +37,7 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
     }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
-    public void checkEditorCanEditDashboard() throws JSONException, InterruptedException {
+    public void checkEditorCanEditDashboard() throws JSONException {
         try {
             initDashboardsPage();
 

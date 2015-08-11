@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
@@ -234,7 +235,7 @@ public class TableReport extends AbstractReport {
             @Override
             public boolean apply(WebDriver input) {
                 // wait for report idle when drill on metric values
-                try { Thread.sleep(1000); } catch(InterruptedException e) {}
+                sleepTightInSeconds(1);
 
                 try {
                     return !TableReport.this.getRoot().findElement(By.cssSelector(".c-report"))

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -73,12 +74,12 @@ public class AttributeDetailPage extends AbstractFragment {
         waitForElementVisible(clearExternalPageButton);
     }
 
-    public void selectLabelType(String labelType) throws InterruptedException {
+    public void selectLabelType(String labelType) {
         waitForElementVisible(labelEditButton).click();
         waitForElementVisible(labelTypeSelect);
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         labelTypeSelect.selectByVisibleText(labelType);
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         waitForElementVisible(labelSaveButton).click();
         waitForElementNotVisible(labelTitleInput);
     }
@@ -128,7 +129,7 @@ public class AttributeDetailPage extends AbstractFragment {
         return deleteButton.getAttribute("class").contains("disabled");
     }
     
-    public void deleteAttribute() throws InterruptedException {
+    public void deleteAttribute() {
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(confirmDeleteButtonLocator, browser).click();
         waitForDataPageLoaded(browser);

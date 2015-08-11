@@ -20,7 +20,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
-    public void dashboardsWalkthrough() throws InterruptedException, JSONException {
+    public void dashboardsWalkthrough() throws JSONException {
         openUrl(PAGE_UI_PROJECT_PREFIX.replace("#s", "#_keepLogs=1&s") + testParams.getProjectId() + "|projectDashboardPage");
         waitForDashboardPageLoaded(browser);
         for (int i = 1; i <= 10; i++) {
