@@ -33,7 +33,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
             Actions actions = new Actions(browser);
             actions.moveByOffset(-50, -50).build().perform();
 
-            assertFalse(row.getSelectOnly().isDisplayed(), "'Select only' link is displayed");
+            assertFalse(row.isSelectOnlyDisplayed(), "'Select only' link is displayed");
         }
     }
 
@@ -49,7 +49,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
             Actions actions = new Actions(browser);
             actions.moveToElement(row.getRoot()).build().perform();
 
-            assertTrue(row.getSelectOnly().isDisplayed(), "'Select only' link is displayed on hover");
+            assertTrue(row.isSelectOnlyDisplayed(), "'Select only' link is displayed on hover");
         }
     }
 
