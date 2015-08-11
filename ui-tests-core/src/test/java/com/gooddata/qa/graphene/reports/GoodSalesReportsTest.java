@@ -40,7 +40,10 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
     private static final long expectedTabularReportExportXLSXSize = 6600L;
     private static final long expectedTabularReportExportCSVSize = 1650L;
 
+    private static final String SIMPLE_CA_REPORT = "Simple CA report";
+
     private String regionLocator = "//div[@*[local-name() = 'gdc:region']='0,0,0,0']/span";
+
 
     @Test(dependsOnMethods = {"createProject"})
     public void verifyReportsPage() throws InterruptedException {
@@ -71,7 +74,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         List<String> how = new ArrayList<String>();
         how.add("Forecast Category");
 
-        prepareReport("Simple CA report", ReportTypes.TABLE, what, how);
+        prepareReport(SIMPLE_CA_REPORT, ReportTypes.TABLE, what, how);
         String bucketRegion = waitForElementPresent(includeArea, browser).getAttribute("gdc:region").replace('0', '1');
         String computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion)), browser).getText();
         Assert.assertEquals(computedAttr, expectedValue);
@@ -80,7 +83,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple-inv.txt");
         postMAQL(IOUtils.toString(maqlResource), 60);
 
-        initReportPage("Simple CA report");
+        initReportPage(SIMPLE_CA_REPORT);
         bucketRegion = waitForElementPresent(excludeArea, browser).getAttribute("gdc:region").replace('0', '1');
         computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion)), browser).getText();
         Assert.assertEquals(computedAttr, expectedValue);
@@ -281,6 +284,13 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         assertEquals(reportsPage.getReportsList().getNumberOfReports(),
                 expectedGoodSalesReportsCount + createdReportsCount, "Number of expected reports (all) doesn't match");
         Screenshots.takeScreenshot(browser, "GoodSales-reports", this.getClass());
+    }
+
+    @Test(dependsOnMethods = {"verifyCreatedReports"})
+    public void deleteReport() {
+        initReportPage(SIMPLE_CA_REPORT);
+        reportPage.deleteCurrentReport();
+        assertFalse(waitForFragmentVisible(reportsPage).isReportVisible(SIMPLE_CA_REPORT));
     }
 
     private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
