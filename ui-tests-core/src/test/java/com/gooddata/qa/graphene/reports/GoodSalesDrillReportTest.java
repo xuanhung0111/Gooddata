@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -47,7 +47,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createDrillReport() {
         initReportsPage();
-        ReportDefinition reportDefinition = new ReportDefinition()
+        UiReportDefinition reportDefinition = new UiReportDefinition()
             .withName(REPORT_NAME)
             .withWhats(new WhatItem("Amount", "Account"))
             .withWhats("Avg. Amount")
@@ -214,7 +214,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         attributeDetailPage.setDrillToExternalPage();
 
         initReportsPage();
-        ReportDefinition reportDefinition = new ReportDefinition()
+        UiReportDefinition reportDefinition = new UiReportDefinition()
             .withName("Drill-Opportunity")
             .withWhats("# of Opportunities")
             .withHows(new HowItem("Opportunity", "14 West > Explorer", "1-800 Postcards > Educationly",
@@ -299,7 +299,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
         attributeDetailPage.setDrillToAttribute("Activity Type");
 
         initReportsPage();
-        ReportDefinition reportDefinition = new ReportDefinition()
+        UiReportDefinition reportDefinition = new UiReportDefinition()
             .withName("Drill-Activity")
             .withWhats(new WhatItem("# of Activities", "Account"))
             .withHows(new HowItem("Activity", "Email with AirSplat on Apr-21-11"))

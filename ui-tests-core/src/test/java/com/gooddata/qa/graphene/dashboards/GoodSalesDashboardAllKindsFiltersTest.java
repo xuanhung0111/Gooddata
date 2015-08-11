@@ -27,7 +27,7 @@ import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
@@ -63,7 +63,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createProject"})
     public void createTestingReport() {
         initReportsPage();
-        createReport(new ReportDefinition().withName(TESTING_REPORT).withWhats(AMOUNT).withHows(STAGE_NAME)
+        createReport(new UiReportDefinition().withName(TESTING_REPORT).withWhats(AMOUNT).withHows(STAGE_NAME)
                 .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP)), TESTING_REPORT);
         checkRedBar(browser);
     }
@@ -220,8 +220,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createVariables"})
     public void createReportsWithVariableFilter() {
         initReportsPage();
-        ReportDefinition rd =
-                new ReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
+        UiReportDefinition rd =
+                new UiReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
                         .withHows(new HowItem(YEAR_SNAPSHOT, HowItem.Position.TOP));
         createReport(rd, REPORT_1);
         reportPage.addFilter(FilterItem.Factory.createVariableFilter("FStageName", "2010", "2011", "2012",
@@ -306,7 +306,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
 
         initReportsPage();
-        createReport(new ReportDefinition().withName("Report 4").withWhats(AMOUNT, metric)
+        createReport(new UiReportDefinition().withName("Report 4").withWhats(AMOUNT, metric)
                 .withHows(YEAR_SNAPSHOT), "Report 4");
 
         initDashboardsPage();
@@ -334,7 +334,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     public void testDashboardFilterOverrideReportFilter() {
         initReportsPage();
         createReport(
-                new ReportDefinition()
+                new UiReportDefinition()
                         .withName("Report 3")
                         .withWhats(AMOUNT)
                         .withHows(new HowItem(YEAR_SNAPSHOT, HowItem.Position.TOP),

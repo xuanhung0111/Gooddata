@@ -21,7 +21,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
@@ -171,9 +171,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 4)
     public void createReportWithComputedAttribute() {
-        createReport(
-                new ReportDefinition().withName(REPORT_NAME).withWhats("Amount").withHows(COMPUTED_ATTRIBUTE_NAME),
-                REPORT_NAME);
+        createReport(new UiReportDefinition().withName(REPORT_NAME).withWhats("Amount")
+                .withHows(COMPUTED_ATTRIBUTE_NAME), REPORT_NAME);
         reportPage.saveReport();
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute", this.getClass());
         List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
@@ -208,7 +207,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME).withAttribute("Stage Name")
                 .withAttributeElements("Closed Won", "Closed Lost"));
         createReport(
-                new ReportDefinition().withName(CA_VARIABLE_REPORT_NAME).withWhats("Amount")
+                new UiReportDefinition().withName(CA_VARIABLE_REPORT_NAME).withWhats("Amount")
                         .withHows(COMPUTED_ATTRIBUTE_NAME), CA_VARIABLE_REPORT_NAME);
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(VARIABLE_NAME, "Best", "Good", "Great",
                 "Poor"));

@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -169,7 +169,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         String filterVariableName = createFilterVariableUsingAttribute(IS_WON_ATTRIBUTE).getRight();
         String metricName = createMetricUsing(IS_WON_ATTRIBUTE);
         String reportName =
-                createReportUsing(new ReportDefinition().withName("Report " + System.currentTimeMillis())
+                createReportUsing(new UiReportDefinition().withName("Report " + System.currentTimeMillis())
                         .withHows(IS_WON_ATTRIBUTE.name));
         try {
             createDashboardWithAttributeFilter(DashFilterTypes.ATTRIBUTE, IS_WON_ATTRIBUTE.name);
@@ -279,8 +279,9 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"resetLDM"}, groups = {"group2"})
     public void deleteDomainWithNoReportUsageUsingAllInStrategy() throws IOException, JSONException {
-        String report1 = createReportUsing(new ReportDefinition().withName("Report1").withHows("Stage History"));
-        String report2 = createReportUsing(new ReportDefinition().withName("Report2").withHows("Stage History"));
+        String report1 = createReportUsing(new UiReportDefinition().withName("Report1").withHows("Stage History"));
+        String report2 = createReportUsing(new UiReportDefinition().withName("Report2").withHows("Stage History"));
+
         deleteDomainHelper(DropStrategy.ALL_IN, report1, report2);
     }
 
@@ -599,7 +600,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
         return name;
     }
 
-    private String createReportUsing(ReportDefinition reportDefinition) {
+    private String createReportUsing(UiReportDefinition reportDefinition) {
         String name = reportDefinition.getName();
         initReportsPage();
         createReport(reportDefinition, name);

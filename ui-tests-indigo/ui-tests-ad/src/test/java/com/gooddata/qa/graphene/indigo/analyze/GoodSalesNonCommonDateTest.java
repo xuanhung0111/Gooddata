@@ -13,7 +13,6 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.google.common.base.Predicate;
@@ -35,8 +34,9 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void applyOnFilter() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition()
-            .withMetrics(NUMBER_OF_ACTIVITIES, "_Snapshot [BOP]").withFilters(DATE));
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric("_Snapshot [BOP]")
+            .addFilter(DATE);
         assertEquals(analysisPage.getFilterText(ACTIVITY), ACTIVITY + ": All time");
         assertEquals(analysisPage.getChartReport().getTrackersCount(), 2);
 
@@ -58,7 +58,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void applyOnBucket() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(DATE);
         assertEquals(analysisPage.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
         analysisPage.changeGranularity("Month");
@@ -74,7 +74,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void applyOnBothFilterAndBucket() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withFilters(DATE));
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addFilter(DATE);
         assertEquals(analysisPage.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
         analysisPage.changeDimensionSwitchInFilter(ACTIVITY, CREATED);
@@ -106,8 +106,9 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void showPercent() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter("Last 90 days")
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+                    .addCategory(DATE)
+                    .configTimeFilter("Last 90 days")
                     .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
                     .turnOnShowInPercents()
                     .waitForReportComputing();
@@ -128,8 +129,9 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void periodOverPeriod() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter("Last 90 days")
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+                    .addCategory(DATE)
+                    .configTimeFilter("Last 90 days")
                     .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
                     .compareToSamePeriodOfYearBefore()
                     .waitForReportComputing();
@@ -145,8 +147,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void switchBetweenPresetsAndDataRange() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
-        analysisPage.configTimeFilter("Last 90 days");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(DATE).configTimeFilter("Last 90 days");
         analysisPage.waitForReportComputing();
 
         WebElement dateFilter = analysisPage.getFilter(ACTIVITY);
@@ -170,7 +171,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void undoRedoOnBucket() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(DATE);
         assertTrue(analysisPage.undo().isCategoryBucketEmpty());
         assertFalse(analysisPage.redo().isCategoryBucketEmpty());
 
@@ -184,7 +185,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void undoRedoOnFilter() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withFilters(DATE));
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addFilter(DATE);
         assertFalse(analysisPage.undo().isFilterVisible(ACTIVITY));
         assertTrue(analysisPage.redo().isFilterVisible(ACTIVITY));
 

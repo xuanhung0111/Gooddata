@@ -15,7 +15,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -36,7 +36,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void createDrillReportToExport() {
         initReportsPage();
-        ReportDefinition reportDefinition = new ReportDefinition()
+        UiReportDefinition reportDefinition = new UiReportDefinition()
             .withName(REPORT_NAME)
             .withWhats("Amount")
             .withHows("Stage Name");
@@ -69,7 +69,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
         try {
             String targetReportName = "Target Report";
             initReportsPage();
-            ReportDefinition reportDefinition = new ReportDefinition()
+            UiReportDefinition reportDefinition = new UiReportDefinition()
                 .withName(targetReportName)
                 .withWhats("# of Activities")
                 .withHows("Activity Type");

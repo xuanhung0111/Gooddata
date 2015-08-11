@@ -35,7 +35,6 @@ import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.project.Project;
-import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
@@ -147,8 +146,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void disableExportForUnexportableVisualization() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(AMOUNT));
-        ChartReport report = analysisPage.getChartReport();
+        ChartReport report = analysisPage.addMetric(AMOUNT).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertTrue(analysisPage.isExportToReportButtonEnabled());
 
@@ -165,8 +163,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void dontShowLegendWhenOnlyOneMetric() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(AMOUNT).withCategories(STAGE_NAME));
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.addMetric(AMOUNT).addCategory(STAGE_NAME).waitForReportComputing()
+                .getChartReport();
         assertEquals(report.getTrackersCount(), 8);
         assertFalse(report.isLegendVisible());
 
@@ -180,8 +178,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void testLegendsInChartHasManyMetrics() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(AMOUNT, NUMBER_OF_ACTIVITIES));
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.addMetric(AMOUNT).addMetric(NUMBER_OF_ACTIVITIES)
+                .waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsHorizontal());
     }
@@ -189,9 +187,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void testLegendsInStackBy() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
-                .withCategories(ACTIVITY_TYPE)).addStackBy(DEPARTMENT);
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(ACTIVITY_TYPE)
+                .addStackBy(DEPARTMENT).waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsVertical());
 
@@ -207,8 +204,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void showLegendForStackedChartWithOneSeries() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_WON_OPPS)).addStackBy(STAGE_NAME);
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.addMetric(NUMBER_OF_WON_OPPS).addStackBy(STAGE_NAME)
+                .waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         List<String> legends = report.getLegends();
         assertEquals(legends.size(), 1);
@@ -227,16 +224,12 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
         analysisPage.resetToBlankState();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
-                .withCategories(ACCOUNT));
-        analysisPage.waitForReportComputing();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(ACCOUNT).waitForReportComputing();
         assertTrue(analysisPage.isExplorerMessageVisible());
         assertEquals(analysisPage.getExplorerMessage(), "Too many data points to display");
         analysisPage.resetToBlankState();
 
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES)
-                .withCategories(STAGE_NAME));
-        analysisPage.waitForReportComputing();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(STAGE_NAME).waitForReportComputing();
         assertTrue(analysisPage.isExplorerMessageVisible());
         assertEquals(analysisPage.getExplorerMessage(), "Visualization cannot be displayed");
         analysisPage.resetToBlankState();
@@ -288,8 +281,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-6401")
     public void gridlinesShouldBeCheckedWhenExportBarChart() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(AMOUNT)
-                .withCategories(STAGE_NAME).withType(ReportType.BAR_CHART))
+        analysisPage.addMetric(AMOUNT)
+                .addCategory(STAGE_NAME)
+                .changeReportType(ReportType.BAR_CHART)
                 .waitForReportComputing()
                 .exportReport();
         String currentWindowHandle = browser.getWindowHandle();
@@ -371,7 +365,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                     .append("true\n");
             assertEquals(analysisPage.getAttributeDescription(xssAttribute), expected.toString());
 
-            analysisPage.createReport(new ReportDefinition().withMetrics(xssMetric).withCategories(xssAttribute))
+            analysisPage.addMetric(xssMetric).addCategory(xssAttribute)
                 .waitForReportComputing();
             assertEquals(analysisPage.getAllAddedMetricNames(), asList(xssMetric));
             assertEquals(analysisPage.getAllAddedCategoryNames(), asList(xssAttribute));
@@ -400,8 +394,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
         try {
             initAnalysePage();
-            analysisPage.createReport(new ReportDefinition().withMetrics(PERCENT_OF_GOAL)
-                    .withCategories(IS_WON))
+            analysisPage.addMetric(PERCENT_OF_GOAL)
+                  .addCategory(IS_WON)
                   .addStackBy(IS_WON)
                   .waitForReportComputing();
             ChartReport report = analysisPage.getChartReport();
@@ -468,8 +462,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withCategories(ACTIVITY_TYPE));
-        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
+        assertEquals(analysisPage.addCategory(ACTIVITY_TYPE).getExplorerMessage(),
+                "Now select a measure to display");
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 

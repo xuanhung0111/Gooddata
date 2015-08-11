@@ -30,7 +30,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
@@ -407,7 +407,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForDashboardPage();
     }
 
-    public void createReport(ReportDefinition reportDefinition, String screenshotName) {
+    public void createReport(UiReportDefinition reportDefinition, String screenshotName) {
         initReportCreation();
         reportPage.createReport(reportDefinition);
         takeScreenshot(browser, screenshotName + "-" + reportDefinition.getName() + "-" +

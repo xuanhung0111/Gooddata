@@ -37,7 +37,7 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.utils.CheckUtils;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -514,7 +514,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             List<List<String>> expectedResult) throws IOException {
         List<String> greatestLeastMetrics = createGreatestAndLeastMetric(STAGE_NAME, metrics);
 
-        ReportDefinition rd = new ReportDefinition().withName(reportName).withHows(STAGE_NAME);
+        UiReportDefinition rd = new UiReportDefinition().withName(reportName).withHows(STAGE_NAME);
         metrics.stream().forEach(metric -> rd.withWhats(metric));
         greatestLeastMetrics.stream().forEach(metric -> rd.withWhats(metric));
         createReport(rd, rd.getName());
@@ -580,7 +580,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.SUM, AGGREGATION);
 
-        ReportDefinition reportDefinition = new ReportDefinition()
+        UiReportDefinition reportDefinition = new UiReportDefinition()
                 .withName("Report-" + customMetricInfo.getName()).withWhats(customMetricInfo.getName());
         initReportCreation();
         ReportVisualizer visualiser = reportPage.getVisualiser();
@@ -615,7 +615,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.RUNSUM, AGGREGATION);
 
-        ReportDefinition reportDefinition = new ReportDefinition().withName("Report-" + metricName)
+        UiReportDefinition reportDefinition = new UiReportDefinition().withName("Report-" + metricName)
                 .withWhats(metricName).withHows(STAGE_NAME);
         createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
         reportPage.getTableReport().drillOnAttributeValue("Short List");
@@ -644,7 +644,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.BETWEEN, FILTER);
 
-        ReportDefinition reportDefinition = new ReportDefinition()
+        UiReportDefinition reportDefinition = new UiReportDefinition()
                 .withName("Report-" + customMetricInfo.getName()).withWhats(customMetricInfo.getName());
         createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
         waitForFragmentVisible(reportPage);
@@ -658,7 +658,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             List<String> attributeValues) {
         System.out.println("Verifying metric values of [" + metricName + "] in report");
 
-        ReportDefinition reportDefinition = new ReportDefinition();
+        UiReportDefinition reportDefinition = new UiReportDefinition();
         if (attributeName != null) {
             reportDefinition.withHows(attributeName);
         }

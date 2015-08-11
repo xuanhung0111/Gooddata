@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
@@ -57,15 +57,15 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     public void createReports() {
         // *** create report 1 ***
         initReportsPage();
-        ReportDefinition rd =
-                new ReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
+        UiReportDefinition rd =
+                new UiReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
                         .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP));
         createReport(rd, REPORT_1);
         reportPage.saveReport();
 
         // *** create report 2 ***
         initReportsPage();
-        rd = new ReportDefinition().withName(REPORT_2).withWhats(AMOUNT).withHows(STAGE_NAME);
+        rd = new UiReportDefinition().withName(REPORT_2).withWhats(AMOUNT).withHows(STAGE_NAME);
         createReport(rd, REPORT_2);
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(V_STAGE, "Interest", "Discovery",
                 "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won", "Closed Lost"));
