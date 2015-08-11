@@ -23,32 +23,32 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 public class UploadTest extends AbstractUploadTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-delimiter", "valid-delimiter"})
-    public void uploadDelimiterColon() throws InterruptedException {
+    public void uploadDelimiterColon() {
         uploadFileAndClean("delimiter-colon");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-delimiter", "valid-delimiter"})
-    public void uploadDelimiterComma() throws InterruptedException {
+    public void uploadDelimiterComma() {
         uploadFileAndClean("delimiter-comma");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-delimiter", "valid-delimiter"})
-    public void uploadDelimiterPipe() throws InterruptedException {
+    public void uploadDelimiterPipe() {
         uploadFileAndClean("delimiter-pipe");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-delimiter", "valid-delimiter"})
-    public void uploadDelimiterSemicolon() throws InterruptedException {
+    public void uploadDelimiterSemicolon() {
         uploadFileAndClean("delimiter-semicolon");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-delimiter", "valid-delimiter"})
-    public void uploadDelimiterTab() throws InterruptedException {
+    public void uploadDelimiterTab() {
         uploadFileAndClean("delimiter-tab");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-case"})
-    public void uploadSpecialUnicodeCharacterColumnName() throws InterruptedException {
+    public void uploadSpecialUnicodeCharacterColumnName() {
         try {
             selectFileToUpload("payroll");
             Screenshots.takeScreenshot(browser, "check-special-character-column-name", this.getClass());
@@ -74,7 +74,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-case"})
-    public void uploadNegativeNumber() throws InterruptedException {
+    public void uploadNegativeNumber() {
         try {
             selectFileToUpload("payroll-negative-number");
             Screenshots.takeScreenshot(browser, "payroll-negative-number-csv-upload", this.getClass());
@@ -110,7 +110,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-case"})
-    public void uploadNullNumber() throws InterruptedException {
+    public void uploadNullNumber() {
         try {
             this.selectFileToUpload("payroll-null-number");
             Screenshots.takeScreenshot(browser, "payroll-null-number-csv-upload", this.getClass());
@@ -144,7 +144,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-change-column-type"})
-    public void uploadChangeColumnType() throws InterruptedException {
+    public void uploadChangeColumnType() {
         try {
             Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
             columnIndexAndType.put(2, OptionDataType.TEXT);
@@ -173,7 +173,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-error"})
-    public void uploadCheckEmptyColumnName() throws InterruptedException {
+    public void uploadCheckEmptyColumnName() {
         this.selectFileToUpload("payroll");
         Screenshots.takeScreenshot(browser, "check-empty-field-csv-upload", this.getClass());
         UploadColumns uploadColumns = upload.getUploadColumns();
@@ -184,7 +184,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-error"})
-    public void uploadCheckUniqueColumnName() throws InterruptedException {
+    public void uploadCheckUniqueColumnName() {
         this.selectFileToUpload("payroll");
         Screenshots.takeScreenshot(browser, "check-unique-field-csv-upload", this.getClass());
         UploadColumns uploadColumns = upload.getUploadColumns();
@@ -197,20 +197,20 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-error"})
-    public void uploadIncorrectCSVFile() throws InterruptedException {
+    public void uploadIncorrectCSVFile() {
         uploadInvalidCSVFile("payroll-incorrect-header", "UNABLE TO IMPORT FILE. NUMBER OF COLUMNS MISMATCH.",
                 "Line 2 contains a different number of columns than the header.",
                 "See CSV formatting guidelines or contact Support if problems persist.");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-error"})
-    public void uploadTooLargeCSVFile() throws InterruptedException {
+    public void uploadTooLargeCSVFile() {
         uploadInvalidCSVFile("payroll-too-large", "THIS FILE IS TOO BIG TO UPLOAD.",
                 "The maximum upload size is 20MB.", null);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-kind-of-csv"})
-    public void uploadNoHeaderCSV() throws InterruptedException {
+    public void uploadNoHeaderCSV() {
         try {
             this.selectFileToUpload("payroll-no-header");
             Screenshots.takeScreenshot(browser, "no-header-csv-upload", this.getClass());
@@ -234,7 +234,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-kind-of-csv"})
-    public void uploadWithoutFactCSV() throws InterruptedException {
+    public void uploadWithoutFactCSV() {
         try {
             this.selectFileToUpload("payroll-without-fact");
             Screenshots.takeScreenshot(browser, "without-fact-csv-upload", this.getClass());
@@ -256,7 +256,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-kind-of-csv"})
-    public void uploadWithoutAttributeCSV() throws InterruptedException {
+    public void uploadWithoutAttributeCSV() {
         try {
             this.selectFileToUpload("without-attribute");
             Screenshots.takeScreenshot(browser, "without-attribute-csv-upload", this.getClass());
@@ -278,7 +278,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-kind-of-csv"})
-    public void uploadDateEUCSV() throws InterruptedException {
+    public void uploadDateEUCSV() {
         try {
             this.selectFileToUpload("payroll-Date-EU");
             Screenshots.takeScreenshot(browser, "payroll-Date-EU-csv-upload", this.getClass());
@@ -298,7 +298,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-kind-of-csv"})
-    public void uploadDateUSCSV() throws InterruptedException {
+    public void uploadDateUSCSV() {
         try {
             this.selectFileToUpload("payroll-Date-US");
             Screenshots.takeScreenshot(browser, "payroll-Date-US-csv-upload", this.getClass());
@@ -318,7 +318,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-special-kind-of-csv"})
-    public void uploadWithoutDateCSV() throws InterruptedException {
+    public void uploadWithoutDateCSV() {
         try {
             this.selectFileToUpload("without-Date");
             Screenshots.takeScreenshot(browser, "without-Date-csv-upload", this.getClass());
@@ -340,7 +340,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-different-date-formats"})
-    public void uploadDifferentDate1() throws InterruptedException {
+    public void uploadDifferentDate1() {
         try {
             uploadDifferentDateFormat("payroll-dd-mm-yy");
         } finally {
@@ -350,7 +350,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-different-date-formats"})
-    public void uploadDifferentDate2() throws InterruptedException {
+    public void uploadDifferentDate2() {
         try {
             uploadDifferentDateFormat("payroll-ddmmyy");
         } finally {
@@ -360,7 +360,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-different-date-formats"})
-    public void uploadDifferentDate3() throws InterruptedException {
+    public void uploadDifferentDate3() {
         try {
             uploadDifferentDateFormat("payroll-mm-dd-yy");
         } finally {
@@ -370,7 +370,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-different-date-formats"})
-    public void uploadDifferentDate4() throws InterruptedException {
+    public void uploadDifferentDate4() {
         try {
             uploadDifferentDateFormat("payroll-mmddyy");
         } finally {
@@ -380,7 +380,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-different-date-formats"})
-    public void uploadDifferentDate5() throws InterruptedException {
+    public void uploadDifferentDate5() {
         try {
             uploadDifferentDateFormat("payroll-yyyymmdd");
         } finally {
@@ -390,7 +390,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"auto-guessed-ID-column"})
-    public void uploadAutoGuessedID() throws InterruptedException {
+    public void uploadAutoGuessedID() {
         try {
             this.selectFileToUpload("auto-guessed-ID");
             Screenshots.takeScreenshot(browser, "auto-guessed-ID-csv-upload", this.getClass());
@@ -423,7 +423,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"auto-guessed-ID-column"})
-    public void uploadAutoGuessedManyID() throws InterruptedException {
+    public void uploadAutoGuessedManyID() {
         try {
             this.selectFileToUpload("many-column-ID");
             Screenshots.takeScreenshot(browser, "auto-guessed-many-ID-csv-upload", this.getClass());
@@ -462,7 +462,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"crazy-footer"})
-    public void uploadDataWithCrazyFooter() throws InterruptedException {
+    public void uploadDataWithCrazyFooter() {
         try {
             this.selectFileToUpload("data-with-crazy-footer");
             Screenshots.takeScreenshot(browser, "data-with-crazy-footer-csv-upload", this.getClass());
@@ -497,7 +497,7 @@ public class UploadTest extends AbstractUploadTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"upload-delimiter", "invalid-delimiter"})
-    public void uploadInvalidDelimiter() throws InterruptedException {
+    public void uploadInvalidDelimiter() {
         try {
             this.selectFileToUpload("delimiter-invalid");
             Screenshots.takeScreenshot(browser, "check-invalid-delimiter", this.getClass());

@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import com.gooddata.qa.graphene.utils.CheckUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

@@ -136,7 +136,7 @@ public class DashboardFilterVisualTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void testValuesAreFileteredCorrectly() throws InterruptedException {
+    public void testValuesAreFileteredCorrectly() {
         List<FilterPanelRow> rows = getProductFilterInFirstTab().getPanel(AttributeFilterPanel.class)
                 .search("on")
                 .waitForValuesToLoad()

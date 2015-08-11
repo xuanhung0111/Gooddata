@@ -59,7 +59,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void loadProject() throws JSONException, URISyntaxException, IOException, InterruptedException {
+    public void loadProject() throws JSONException, URISyntaxException, IOException {
         URL maqlResource = getClass().getResource("/etl/maql-simple.txt");
         postMAQL(IOUtils.toString(maqlResource), statusPollingCheckIterations);
 
@@ -79,7 +79,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"loadProject"})
-    public void sliManifestsCompare() throws JSONException, IOException, InterruptedException {
+    public void sliManifestsCompare() throws JSONException, IOException {
         HashSet<Object> sliParts = new HashSet<Object>();
 
         /** parse uploaded manifest first **/
@@ -113,7 +113,7 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"loadProject"}, dataProvider = "testExportCrossDataCenter")
     public void exportImportProject(boolean crossDataCenter)
-            throws JSONException, InterruptedException, IOException {
+            throws JSONException, IOException {
         String exportToken = exportProject(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
         String parentProjectId = testParams.getProjectId();
         boolean validationTimeoutOK = true;

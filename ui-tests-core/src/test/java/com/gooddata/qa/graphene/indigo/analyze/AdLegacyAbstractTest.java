@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -206,7 +207,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {CUSTOM_DISCOVERY_GROUP})
-    public void testAccessibilityGuidanceForAttributesMetrics() throws InterruptedException {
+    public void testAccessibilityGuidanceForAttributesMetrics() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
@@ -424,7 +425,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {EXPORT_GROUP})
-    public void exportCustomDiscovery() throws InterruptedException {
+    public void exportCustomDiscovery() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withType(ReportType.TABLE)
@@ -448,7 +449,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
 
         Iterator<String> attributes = tableReport.getAttributeElements().iterator();
 
-        Thread.sleep(2000); // wait for metric values is calculated and loaded
+        sleepTight(2000); // wait for metric values is calculated and loaded
         Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
 
         List<List<String>> content = new ArrayList<List<String>>();
@@ -632,7 +633,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {FILTER_GROUP})
-    public void allowDateFilterByRange() throws ParseException, InterruptedException {
+    public void allowDateFilterByRange() throws ParseException {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(attribute1)
@@ -868,7 +869,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
-    public void checkSeriesStateTransitions() throws InterruptedException {
+    public void checkSeriesStateTransitions() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(DATE))
@@ -883,7 +884,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.addMetric(metric2);
-        Thread.sleep(3000);
+        sleepTight(3000);
         assertEquals(report.getTrackersCount(), 6);
         assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
         assertFalse(analysisPage.isShowPercentConfigEnabled());
@@ -898,8 +899,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
-    public void checkMetricFormating() throws InterruptedException, org.apache.http.ParseException,
-        JSONException, IOException {
+    public void checkMetricFormating() throws org.apache.http.ParseException, JSONException, IOException {
         initMetricPage();
 
         waitForFragmentVisible(metricPage).openMetricDetailPage(metric1);
@@ -913,7 +913,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
             analysisPage.createReport(new ReportDefinition().withMetrics(metric1));
             ChartReport report = analysisPage.getChartReport();
             assertEquals(report.getTrackersCount(), 1);
-            Thread.sleep(2000);
+            sleepTight(2000);
             List<String> dataLabels = report.getDataLabels();
             assertEquals(dataLabels.size(), 1);
 
@@ -929,13 +929,13 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
-    public void checkReportContentWhenAdd3Metrics1Attribute() throws InterruptedException {
+    public void checkReportContentWhenAdd3Metrics1Attribute() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1, metric2, metric3)
                 .withCategories(attribute1).withType(ReportType.TABLE));
         TableReport report = analysisPage.getTableReport();
-        Thread.sleep(3000);
+        sleepTight(3000);
         List<List<String>> analysisContent = report.getContent();
 
         analysisPage.exportReport();
@@ -955,14 +955,14 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {DATA_COMBINATION})
-    public void checkShowPercentAndLegendColor() throws InterruptedException {
+    public void checkShowPercentAndLegendColor() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(metric1).withCategories(attribute1))
             .expandMetricConfiguration(metric1);
         analysisPage.turnOnShowInPercents();
         ChartReport report = analysisPage.getChartReport();
-        Thread.sleep(5000);
+        sleepTight(5000);
         assertTrue(report.getDataLabels().get(0).endsWith("%"));
 
         analysisPage.addMetric(metric2);

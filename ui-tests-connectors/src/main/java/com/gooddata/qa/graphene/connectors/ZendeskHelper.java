@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.connectors;
 
 import com.gooddata.qa.utils.http.RestApiClient;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
 public class ZendeskHelper {
@@ -53,19 +55,19 @@ public class ZendeskHelper {
         System.out.println("Initialized client for " + this.apiClient.getHttpHost());
     }
 
-    public int getNumberOfTickets() throws IOException, JSONException, InterruptedException {
+    public int getNumberOfTickets() throws IOException, JSONException {
         return getZendeskEntityCount(TICKETS_INC_URL, ZendeskObject.TICKET);
     }
 
-    public int getNumberOfUsers() throws IOException, JSONException, InterruptedException {
+    public int getNumberOfUsers() throws IOException, JSONException {
         return getZendeskEntityCount(USERS_INC_URL, ZendeskObject.USER);
     }
 
-    public int getNumberOfOrganizations() throws IOException, JSONException, InterruptedException {
+    public int getNumberOfOrganizations() throws IOException, JSONException {
         return getZendeskEntityCount(ORGANIZATIONS_INC_URL, ZendeskObject.ORGANIZATION);
     }
 
-    public int getNumberOfTicketEvents() throws IOException, JSONException, InterruptedException {
+    public int getNumberOfTicketEvents() throws IOException, JSONException {
         return getZendeskEntityCount(TICKET_EVENTS_INC_URL, ZendeskObject.TICKET_EVENT);
     }
 
@@ -114,12 +116,12 @@ public class ZendeskHelper {
     }
 
     private int getZendeskEntityCount(String url, ZendeskObject objectType)
-            throws JSONException, IOException, InterruptedException {
+            throws JSONException, IOException {
         return getSetOfActiveZendeskEntities(url, objectType, 1).size();
     }
 
     public Integer loadLastTicketEventId(int ticketId, DateTime startDateTime)
-            throws JSONException, IOException, InterruptedException {
+            throws JSONException, IOException {
         JSONObject ticketsEventsPageJson;
         JSONArray ticketEventsJson;
         long startTimestampInUTC = startDateTime.toDateTime(DateTimeZone.UTC).getMillis() / 1000L;
@@ -145,14 +147,14 @@ public class ZendeskHelper {
     }
 
     private JSONObject retrieveEntitiesJsonFromUrl(String url)
-            throws InterruptedException, IOException, JSONException {
+            throws IOException, JSONException {
         HttpRequestBase getRequest = apiClient.newGetMethod(url);
         try {
             HttpResponse getResponse = apiClient.execute(getRequest);
             int retryCounter = 0;
             while (getResponse.getStatusLine().getStatusCode() == 429 && retryCounter < 5) {
                 System.out.println("API limits reached, retrying ... ");
-                Thread.sleep(30000);
+                sleepTightInSeconds(30);
                 getRequest.releaseConnection();
                 getRequest = apiClient.newGetMethod(url);
                 getResponse = apiClient.execute(getRequest);
@@ -169,7 +171,7 @@ public class ZendeskHelper {
     }
 
     private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber)
-            throws JSONException, IOException, InterruptedException {
+            throws JSONException, IOException {
             JSONObject json = retrieveEntitiesJsonFromUrl(url);
             Set<Integer> nonDeletedObjects = new HashSet<Integer>();
             int count = json.getInt("count");

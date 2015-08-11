@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,13 +52,13 @@ public class DashboardScatterExplorer extends AbstractFragment {
     private static final String widgetMetricLocator =
             "//div[contains(@class, 'type-metric')]/span[text()='${propertyLabel}']";
 
-    public void initScatterWidget(Map<String, String> data) throws InterruptedException {
+    public void initScatterWidget(Map<String, String> data) {
         waitForElementVisible(BY_IFRAME_SCATTER, browser);
         browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
         waitForElementVisible(embeddedWidgetConfigAttributeButton, browser).click();
         WebElement propertySelectionDialogWebELement =
                 waitForElementVisible(propertySelectionDialogPanel, browser);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         waitForElementVisible(searchPropertyText, browser).sendKeys(data.get("dataPoint"));
         By attributeFolderWidget =
                 By.xpath(widgetPropertyFolderLocator.replace("${propertyFolderLabel}",
@@ -69,7 +70,7 @@ public class DashboardScatterExplorer extends AbstractFragment {
         waitForElementNotVisible(propertySelectionDialogWebELement);
         waitForElementVisible(embeddedWidgetConfigXAxisButton, browser).click();
         waitForElementVisible(searchPropertyText, browser).sendKeys(data.get("xAxisMetric"));
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         By xAxisFolderWidget =
                 By.xpath(widgetPropertyFolderLocator.replace("${propertyFolderLabel}",
                         data.get("xAxisMetricFolder")));
@@ -88,11 +89,10 @@ public class DashboardScatterExplorer extends AbstractFragment {
                 By.xpath(widgetMetricLocator.replace("${propertyLabel}", data.get("yAxisMetric")));
         waitForElementVisible(yAxisWidget, browser).click();
         waitForElementNotVisible(propertySelectionDialogWebELement);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
     }
 
-    public void addScatterWidget(Map<String, String> data, boolean invalidConfiguration)
-            throws InterruptedException {
+    public void addScatterWidget(Map<String, String> data, boolean invalidConfiguration) {
         String parentWindowHandle = browser.getWindowHandle();
         initScatterWidget(data);
         if (!invalidConfiguration) {
@@ -102,7 +102,7 @@ public class DashboardScatterExplorer extends AbstractFragment {
         browser.switchTo().window(parentWindowHandle);
     }
 
-    public void addColorToScatterWidget(Map<String, String> data) throws InterruptedException {
+    public void addColorToScatterWidget(Map<String, String> data) {
         String parentWindowHandle = browser.getWindowHandle();
         waitForElementVisible(BY_IFRAME_SCATTER, browser);
         browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
@@ -126,14 +126,14 @@ public class DashboardScatterExplorer extends AbstractFragment {
         waitForElementVisible(attributeWidget, browser).click();
         waitForElementNotVisible(propertySelectionDialogWebELement);
         // wait for a while for ScatterContainer updating version of chart
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         Assert.assertEquals(
                 Integer.parseInt(waitForElementVisible(scatterContainer, browser).getAttribute(
                         "data-highcharts-chart")), chartVersion + 1);
         browser.switchTo().window(parentWindowHandle);
     }
 
-    public void disableColorToScatterWidget() throws InterruptedException {
+    public void disableColorToScatterWidget() {
         String parentWindowHandle = browser.getWindowHandle();
         waitForElementVisible(BY_IFRAME_SCATTER, browser);
         browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
@@ -141,15 +141,14 @@ public class DashboardScatterExplorer extends AbstractFragment {
                 Integer.parseInt(waitForElementVisible(scatterContainer, browser).getAttribute(
                         "data-highcharts-chart"));
         waitForElementVisible(disableColorLink, browser).click();
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         Assert.assertEquals(
                 Integer.parseInt(waitForElementVisible(scatterContainer, browser).getAttribute(
                         "data-highcharts-chart")), chartVersion + 1);
         browser.switchTo().window(parentWindowHandle);
     }
 
-    public void addColumnsToScatterWidget(Map<String, ArrayList<HashMap<String, String>>> data)
-            throws InterruptedException {
+    public void addColumnsToScatterWidget(Map<String, ArrayList<HashMap<String, String>>> data) {
         String parentWindowHandle = browser.getWindowHandle();
         waitForElementVisible(BY_IFRAME_SCATTER, browser);
         browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
@@ -169,18 +168,17 @@ public class DashboardScatterExplorer extends AbstractFragment {
                 addOneColumnToScatterWidget(metric, "metric");
             }
         }
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         browser.switchTo().window(parentWindowHandle);
     }
 
-    private void addOneColumnToScatterWidget(HashMap<String, String> data, String type)
-            throws InterruptedException {
+    private void addOneColumnToScatterWidget(HashMap<String, String> data, String type) {
         waitForElementVisible(addAdditionalColumnLink, browser).click();
         waitForElementVisible(embeddedWidgetConfigAttributeMetricButton, browser).click();
         WebElement propertySelectionDialogWebELement =
                 waitForElementVisible(propertySelectionDialogPanel, browser);
         waitForElementVisible(searchPropertyText, browser).sendKeys(data.get("property"));
-        Thread.sleep(2000); // wait for illegal attribute/metric disabled.
+        sleepTightInSeconds(2); // wait for illegal attribute/metric disabled.
         By folderWiget =
                 By.xpath(widgetPropertyFolderLocator.replace("${propertyFolderLabel}",
                         data.get("propertyFolder")));
@@ -198,7 +196,7 @@ public class DashboardScatterExplorer extends AbstractFragment {
         waitForElementNotVisible(propertySelectionDialogWebELement);
     }
 
-    public void removeColumnsFromScatterWidget() throws InterruptedException {
+    public void removeColumnsFromScatterWidget()  {
         String parentWindowHandle = browser.getWindowHandle();
         waitForElementVisible(BY_IFRAME_SCATTER, browser);
         browser.switchTo().frame(browser.findElement(BY_IFRAME_SCATTER));
@@ -206,9 +204,9 @@ public class DashboardScatterExplorer extends AbstractFragment {
         while (removeIcons.size() > 0) {
             WebElement removeIcon = removeIcons.get(0);
             waitForElementVisible(removeIcon).click();
-            Thread.sleep(2000);
+            sleepTightInSeconds(2);
         }
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         browser.switchTo().window(parentWindowHandle);
     }
 }

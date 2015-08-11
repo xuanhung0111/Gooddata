@@ -34,7 +34,7 @@ public class DashboardGeoChart extends AbstractFragment {
     public void verifyGeoChart(String layerName, String metricLabel, float expectedStartValue,
             float expectedStopValue, List<Integer> indexList,
             List<String> expectedColorList, List<String> expectedSvgDataList,
-            List<String> expectedMetricValuesList, List<String> expectedAttrValuesList) throws InterruptedException {
+            List<String> expectedMetricValuesList, List<String> expectedAttrValuesList) {
         // Verify color rank based on metric values
         browser.navigate().refresh();
         waitForElementVisible(metricName); 

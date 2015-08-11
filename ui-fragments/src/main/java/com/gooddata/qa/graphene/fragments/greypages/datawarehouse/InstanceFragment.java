@@ -50,7 +50,7 @@ public class InstanceFragment extends AbstractDatawarehouseFragment {
         Graphene.guardHttp(submit).click();
     }
 
-    public String createStorage(String title, String description, String authorizationToken) throws JSONException, InterruptedException {
+    public String createStorage(String title, String description, String authorizationToken) throws JSONException {
         fillCreateStorageForm(title, description, authorizationToken);
         waitForElementNotVisible(this.title);
         waitForElementPresent(BY_GP_PRE_JSON, browser);
@@ -95,7 +95,7 @@ public class InstanceFragment extends AbstractDatawarehouseFragment {
         Graphene.guardHttp(waitForElementVisible(submit)).click();
     }
 
-    private String waitForStorageCreated(int checkIterations) throws JSONException, InterruptedException {
+    private String waitForStorageCreated(int checkIterations) throws JSONException {
         return waitTaskSucceed(checkIterations, "instance");
     }
 

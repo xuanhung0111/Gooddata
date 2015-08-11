@@ -31,7 +31,7 @@ public class InstanceUsersFragment extends AbstractDatawarehouseFragment {
         waitForElementVisible(submit);
     }
 
-    public void fillAddUserToStorageForm(final String role, final String profileUri, final String login, final boolean poll) throws JSONException, InterruptedException {
+    public void fillAddUserToStorageForm(final String role, final String profileUri, final String login, final boolean poll) throws JSONException {
         waitForElementVisible(this.role);
         waitForElementVisible(this.profile);
         waitForElementVisible(this.login);
@@ -57,7 +57,7 @@ public class InstanceUsersFragment extends AbstractDatawarehouseFragment {
         Graphene.guardHttp(submit).click();
     }
 
-    public void deleteUser() throws JSONException, InterruptedException {
+    public void deleteUser() throws JSONException {
         waitForElementVisible(submit);
         Graphene.guardHttp(submit).click();
         waitTaskFinished(10);
@@ -84,7 +84,7 @@ public class InstanceUsersFragment extends AbstractDatawarehouseFragment {
         assertEquals(submit.getAttribute("value"), "Delete", "Submit button is not 'Delete'");
     }
 
-    public String waitForUserAdded(int checkIterations) throws JSONException, InterruptedException {
+    public String waitForUserAdded(int checkIterations) throws JSONException {
         return waitTaskSucceed(checkIterations, "user");
     }
 }

@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
@@ -76,7 +77,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     protected static final List<String> variablesList = Arrays.asList("Quota", "Status");
 
     protected void createNewFolder(ObjectsTable objectsTable, ObjectTypes objectType,
-                                   String newFolderName) throws InterruptedException {
+                                   String newFolderName) {
         if (objectType == ObjectTypes.ATTRIBUTE) {
             dataPage.getAddDimensionButton().click();
             createNewFolderForObjects(dataPage.getDimensionList(), newFolderName);
@@ -89,12 +90,12 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void createNewFolderForObjects(WebElement listOfFoldersDimensions,
-                                             String newFolderName) throws InterruptedException {
+                                             String newFolderName) {
         waitForElementVisible(dataPage.getAddFolderDialog());
         dataPage.setNewFolderTitle(newFolderName);
         dataPage.getConfirmAddFolderButton().click();
         waitForElementVisible(listOfFoldersDimensions);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         Assert.assertTrue(dataPage.getFolderDimension(listOfFoldersDimensions, newFolderName)
                 .isDisplayed());
     }
@@ -137,7 +138,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void moveObjectsBetweenFolders(ObjectTypes objectType, ObjectsTable objectsTable,
                                              List<String> movedObjects, String targetFolderID1, String targetFolderName2)
-            throws InterruptedException {
+            {
         openObjectsTable(objectsTable, objectType);
         checkAllCheckboxes(objectsTable);
         checkNoneCheckboxes(objectsTable);
@@ -149,7 +150,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         assertMovedObjectsInTargetFolder(targetFolderName2, objectsTable, movedObjects);
     }
 
-    protected void deleteObjectsTable(ObjectsTable objectsTable, List<String> deletedObjectsList, List<String> defaultObjectsList, ObjectTypes objectType) throws InterruptedException {
+    protected void deleteObjectsTable(ObjectsTable objectsTable, List<String> deletedObjectsList, List<String> defaultObjectsList, ObjectTypes objectType) {
         List<String> remainedObjectsList = new ArrayList<String>();
         remainedObjectsList.addAll(defaultObjectsList);
         remainedObjectsList.removeAll(deletedObjectsList);
@@ -161,7 +162,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void checkDeleteConfirmDialog(ObjectTypes objectType, ObjectsTable objectsTable,
-                                            List<String> deletedObjects) throws InterruptedException {
+                                            List<String> deletedObjects) {
         dataPage.getDeleteObjectsButton().click();
         waitForElementVisible(dataPage.getDeleteConfirmDialog());
         String deleteConfirmDialogTitle = String.format("Delete %s(s)", objectType.getName());
@@ -177,7 +178,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void deleteObjects(ObjectTypes objectType, ObjectsTable objectsTable,
-                                 List<String> deletedObjects, List<String> existingObjects) throws InterruptedException {
+                                 List<String> deletedObjects, List<String> existingObjects) {
         checkDeleteConfirmDialog(objectType, objectsTable, deletedObjects);
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-before-deleting-selected-objects", this.getClass());
@@ -196,7 +197,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void cancelDeleteObjects(ObjectTypes objectType, ObjectsTable objectsTable,
                                        List<String> deletedObjects, List<String> defaultObjectsList)
-            throws InterruptedException {
+            {
         checkDeleteConfirmDialog(objectType, objectsTable, deletedObjects);
         dataPage.getCancelDeleteButton().click();
         this.assertRowTitles(objectsTable, defaultObjectsList);
@@ -205,7 +206,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected boolean assertMovedObjectsInTargetFolder(String targetFolderName, ObjectsTable objectsTable,
-                                                       List<String> movedObjects) throws InterruptedException {
+                                                       List<String> movedObjects) {
         dataPage.getFolder(targetFolderName).click();
         waitForElementVisible(objectsTable.getRoot());
         waitForDataPageLoaded(browser);
@@ -234,7 +235,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void viewObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType)
-            throws InterruptedException {
+            {
         openObjectsTable(objectsTable, objectType);
         objectsTable.assertTableHeader();
         objectsTable.assertCheckboxes(true, false);
@@ -243,7 +244,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
                 this.getClass());
     }
 
-    protected void viewSortObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType, List<String> defaultObjectsList) throws InterruptedException {
+    protected void viewSortObjectsTable(ObjectsTable objectsTable, ObjectTypes objectType, List<String> defaultObjectsList) {
         viewObjectsTable(objectsTable, objectType);
         createNewFolder(objectsTable, objectType, String.format("New %s folder", objectType.getName()));
         objectsTable.sortObjectsTable(ObjectsTable.SORT_DESC, defaultObjectsList);
@@ -257,7 +258,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void assertRowTitles(ObjectsTable objectsTable, List<String> rowTitles)
-            throws InterruptedException {
+            {
         int index = 0;
         for (WebElement row : objectsTable.getRows()) {
             Assert.assertTrue(row.getText().contains(rowTitles.get(index)));
@@ -268,7 +269,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
     }
 
     protected void addTagsToObject(ObjectsTable objectsTable, String objectName,
-                                   List<String> tagsList) throws InterruptedException {
+                                   List<String> tagsList) {
         objectsTable.selectObject(objectName);
         waitForObjectPageLoaded(browser);
         for (String tagName : tagsList) {
@@ -278,7 +279,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void filterObjectByTagCloud(ObjectsTable objectsTable,
                                           List<String> filteredObjectTitles, Map<String, List<String>> tagsCloud)
-            throws InterruptedException {
+            {
         if (dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as Cloud"))
             dataPage.getShowAsCloudButton().click();
         for (String tagName : tagsCloud.keySet()) {
@@ -293,7 +294,7 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void filterObjectByTagList(ObjectsTable objectsTable,
                                          List<String> filteredObjectTitles, Map<String, List<String>> tagsList)
-            throws InterruptedException {
+            {
         if (dataPage.getSwitchTagsDisplayedForm().getText().equals("Show as List"))
             dataPage.getShowAsListButton().click();
         for (String tagName : tagsList.keySet()) {
@@ -308,11 +309,11 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 
     protected void checkTagObjects(ObjectsTable objectsTable,
                                    Map<String, List<String>> taggedObjects, Map<String, List<String>> tagsMap,
-                                   List<String> filterObjectsList) throws InterruptedException {
+                                   List<String> filterObjectsList) {
         Set<String> objectNames = taggedObjects.keySet();
         for (String objectName : objectNames) {
             addTagsToObject(objectsTable, objectName, taggedObjects.get(objectName));
-            Thread.sleep(3000);
+            sleepTightInSeconds(3);
             objectDetailPage.getBackDataPageLink().click();
             waitForDataPageLoaded(browser);
         }
@@ -320,12 +321,12 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         this.filterObjectByTagCloud(objectsTable, filterObjectsList, tagsMap);
     }
 
-    protected void checkAllCheckboxes(ObjectsTable objectsTable) throws InterruptedException {
+    protected void checkAllCheckboxes(ObjectsTable objectsTable) {
         dataPage.getAllAction().click();
         objectsTable.assertCheckboxes(true, true);
     }
 
-    protected void checkNoneCheckboxes(ObjectsTable objectsTable) throws InterruptedException {
+    protected void checkNoneCheckboxes(ObjectsTable objectsTable) {
         dataPage.getNoneAction().click();
         objectsTable.assertCheckboxes(true, false);
     }

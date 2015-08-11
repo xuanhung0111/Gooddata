@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
-import java.util.ArrayList;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.testng.Assert.assertEquals;
@@ -608,13 +608,9 @@ public class RestUtils {
     }
 
     public static int waitingForAsyncTask(RestApiClient restApiClient, String pollingUri) {
-        try {
-            while (getAsyncTaskStatusCode(restApiClient, pollingUri) == HttpStatus.ACCEPTED.value()) {
-                System.out.println("Async task is running...");
-                Thread.sleep(2000);
-            }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException("There is an exeception when waiting for asyn task!", e);
+        while (getAsyncTaskStatusCode(restApiClient, pollingUri) == HttpStatus.ACCEPTED.value()) {
+            System.out.println("Async task is running...");
+            sleepTightInSeconds(2);
         }
 
         return getAsyncTaskStatusCode(restApiClient, pollingUri);

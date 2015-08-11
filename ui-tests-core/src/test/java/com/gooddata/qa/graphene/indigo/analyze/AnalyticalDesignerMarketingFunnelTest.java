@@ -67,7 +67,6 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
                 "Email Promotions", "Top Sellers Blog Series");
     }
 
-    @SuppressWarnings("unchecked")
     @Test(dependsOnGroups = {"init"}, groups = {CHART_REPORT_GROUP})
     public void verifyChartReport() {
         ReportDefinition reportDefinition = new ReportDefinition()
@@ -80,7 +79,6 @@ public class AnalyticalDesignerMarketingFunnelTest extends AdLegacyAbstractTest 
                 Arrays.asList(EMAIL_OPEN, "0.50")));
     }
 
-    @SuppressWarnings("unchecked")
     @Test(dependsOnGroups = {"init"}, groups = {TABLE_REPORT_GROUP})
     public void verifyTableReportContent() {
         ReportDefinition reportDefinition = new ReportDefinition()

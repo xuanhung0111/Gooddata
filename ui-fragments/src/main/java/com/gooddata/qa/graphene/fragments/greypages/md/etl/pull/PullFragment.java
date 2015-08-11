@@ -16,7 +16,7 @@ public class PullFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement submit;
 
-    public boolean invokePull(String container, int checkIterations) throws JSONException, InterruptedException {
+    public boolean invokePull(String container, int checkIterations) throws JSONException {
         waitForElementVisible(inputPull).sendKeys(container);
         Graphene.guardHttp(submit).click();
         waitForElementVisible(BY_GP_LINK, browser);

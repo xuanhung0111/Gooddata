@@ -39,7 +39,7 @@ public class LoginPageTest extends AbstractUITest {
     }
 
     @Test(dependsOnGroups = {"loginInit"})
-    public void gd_Login_002_SignInAndSignOut() throws InterruptedException, JSONException {
+    public void gd_Login_002_SignInAndSignOut() throws JSONException {
         waitForElementVisible(loginFragment.getRoot());
         signIn(false, UserRoles.ADMIN);
         logout();

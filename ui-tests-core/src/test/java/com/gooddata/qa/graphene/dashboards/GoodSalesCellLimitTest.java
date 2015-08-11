@@ -31,7 +31,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createTestingReports() throws InterruptedException {
+    public void createTestingReports() {
         initReportsPage();
         createReport(
                 new ReportDefinition()
@@ -56,7 +56,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
 
 
     @Test(dependsOnMethods = {"createTestingReports"})
-    public void tableCellLimitAndShowAnyway() throws InterruptedException {
+    public void tableCellLimitAndShowAnyway() {
         try {
             addReportToNewDashboard(TESTING_REPORT_TABLE, TEST_CELL_LIMIT + TESTING_REPORT_TABLE);
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -72,7 +72,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createTestingReports"})
-    public void chartCellLimitAndShowAnyway() throws InterruptedException {
+    public void chartCellLimitAndShowAnyway() {
         try {
             addReportToNewDashboard(TESTING_REPORT_CHART, TEST_CELL_LIMIT + TESTING_REPORT_CHART);
             ChartReport report = dashboardsPage.getContent().getLatestReport(ChartReport.class);

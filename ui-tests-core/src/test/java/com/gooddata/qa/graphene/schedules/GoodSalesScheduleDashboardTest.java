@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -40,9 +41,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -80,12 +81,12 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"prepareTests", "schedules"})
-    public void setFeatureFlags() throws JSONException, IOException, InterruptedException {
+    public void setFeatureFlags() throws JSONException, IOException {
         disableHideDashboardScheduleFlag();
         enableDashboardScheduleRecipientsFlag();
 
         // need time for system apply feature flags setting
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"prepareTests", "schedules"})
@@ -158,7 +159,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnGroups = {"schedules"}, alwaysRun = true)
-    public void verifyRecipientsOfSchedule() throws JSONException, InterruptedException, ParseException, IOException {
+    public void verifyRecipientsOfSchedule() throws JSONException, ParseException, IOException {
         loginAs(UserRoles.ADMIN);
         initEmailSchedulesPage();
 
@@ -207,7 +208,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnGroups = {"schedules"}, alwaysRun = true)
-    public void verifyScheduleButtonPresenceOnEmbeddedDashboard() throws InterruptedException, JSONException {
+    public void verifyScheduleButtonPresenceOnEmbeddedDashboard() throws JSONException {
         // get embed link as admin (not accessible for viewer)
         loginAs(UserRoles.ADMIN);
         initDashboardsPage();
@@ -232,7 +233,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnGroups = {"prepareTests"})
-    public void preparePublicAndPrivateSchedules() throws InterruptedException {
+    public void preparePublicAndPrivateSchedules() {
         initDashboardsPage();
         dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
         createDashboardSchedule(SCHEDULE_WITHOUT_RECIPIENTS, Collections.<String>emptyList());
@@ -267,7 +268,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnMethods = {"preparePublicAndPrivateSchedules"})
-    public void checkVariousCombinationsOfFeatureFlag() throws JSONException, InterruptedException, IOException {
+    public void checkVariousCombinationsOfFeatureFlag() throws JSONException, IOException {
         try {
             disableHideDashboardScheduleFlag();
             disableDashboardScheduleRecipientsFlag();
@@ -294,7 +295,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnGroups = {"prepareTests"})
-    public void createScheduleEmailsForPublicAndPrivateDashboard() throws InterruptedException, JSONException {
+    public void createScheduleEmailsForPublicAndPrivateDashboard() throws JSONException {
         String publicDashboard = "Public Dashboard Test";
         String privateDashboard = "Private Dashboard Test";
 
@@ -327,8 +328,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     @Test(dependsOnGroups = {"prepareTests"})
-    public void deleteUserOnPrivateScheduledEmails() throws ParseException, JSONException, IOException,
-            InterruptedException {
+    public void deleteUserOnPrivateScheduledEmails() throws ParseException, JSONException, IOException {
         String userA = "qa+test+scheduleA@gooddata.com";
         String userB = "qa+test+scheduleB@gooddata.com";
         String scheduleUserA = "Schedule with deleted bcc email";

@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -109,7 +110,7 @@ public class VariableDetailPage extends AbstractFragment {
     private static final String listOfElementLocator =
             "div.yui3-c-simpleColumn-underlay > div.c-checkBox.s-item-${label}:not(.gdc-hidden)";
 
-    public void createNumericVariable(NumericVariable var) throws InterruptedException {
+    public void createNumericVariable(NumericVariable var) {
         waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(var.getName());
         waitForElementVisible(okNameButton).click();
         waitForElementVisible(numericalVariable).click();
@@ -120,7 +121,7 @@ public class VariableDetailPage extends AbstractFragment {
         waitForElementVisible(dataLink).click();
     }
 
-    public void createFilterVariable(AttributeVariable var) throws InterruptedException {
+    public void createFilterVariable(AttributeVariable var) {
         waitForElementVisible(objectPropertiesPage.objectNameInput).sendKeys(var.getName());
         waitForElementVisible(okNameButton).click();
         waitForElementVisible(filterVariable).click();
@@ -161,7 +162,7 @@ public class VariableDetailPage extends AbstractFragment {
         waitForElementNotVisible(setButton);
     }
 
-    public void setUserValueNumericVariable(int number) throws InterruptedException {
+    public void setUserValueNumericVariable(int number) {
         waitForElementVisible(userSetButton).click();// note
         waitForElementVisible(userNumberSet).sendKeys(String.valueOf(number));
         waitForElementVisible(userOkButton).click();
@@ -209,16 +210,16 @@ public class VariableDetailPage extends AbstractFragment {
         waitForElementVisible(dataLink).click();
     }
 
-    public void deleteVariable() throws InterruptedException {
+    public void deleteVariable() {
         waitForElementVisible(deleteButton).click();
         waitForElementVisible(confirmDeleteButtonLocator, browser).click();
         waitForDataPageLoaded(browser);
     }
 
-    public void setDefaultValue(int value) throws InterruptedException {
+    public void setDefaultValue(int value) {
         waitForElementVisible(scalarValueInput).click();
         scalarValueInput.clear();
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         scalarValueInput.sendKeys(String.valueOf(value));
         // do not focus on scalarValueInput
         waitForElementVisible(numericalVariable).click();

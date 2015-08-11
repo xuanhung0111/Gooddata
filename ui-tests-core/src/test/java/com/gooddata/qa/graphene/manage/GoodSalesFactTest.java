@@ -16,7 +16,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })
-    public void initialize() throws InterruptedException, JSONException {
+    public void initialize() throws JSONException {
         name = "Amount";
         this.factFolder = "Stage History";
         description = "Graphene test on view and modify Fact";
@@ -24,7 +24,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = { "object-tests" })
-    public void factAggregationsTest() throws InterruptedException {
+    public void factAggregationsTest() {
         initObject(name);
         for (SimpleMetricTypes metricType : SimpleMetricTypes.values()) {
             factDetailPage.createSimpleMetric(metricType, name);
@@ -32,7 +32,7 @@ public class GoodSalesFactTest extends ObjectAbstractTest {
     }
 
     @Test(dependsOnMethods = {"initialize"}, groups = { "object-tests" })
-    public void changeFactFolderTest() throws InterruptedException {
+    public void changeFactFolderTest() {
         initObject(name);
         factDetailPage.changeFactFolder(factFolder);
     }

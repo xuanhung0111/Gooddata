@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.*;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createDrillReportToExport() throws InterruptedException {
+    public void createDrillReportToExport() {
         initReportsPage();
         ReportDefinition reportDefinition = new ReportDefinition()
             .withName(REPORT_NAME)
@@ -44,7 +45,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReportToExport"})
-    public void drillAcrossReportToExport() throws InterruptedException, IOException, JSONException {
+    public void drillAcrossReportToExport() throws IOException, JSONException {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
@@ -55,7 +56,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue();
-            Thread.sleep(4000);
+            sleepTight(4000);
             verifyReportExport(ExportFormat.CSV, "Interest", 6000);
             checkRedBar(browser);
         } finally {
@@ -64,7 +65,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReportToExport"})
-    public void changeSettingsInDrillReportToExport() throws InterruptedException, JSONException, IOException {
+    public void changeSettingsInDrillReportToExport() throws JSONException, IOException {
         try {
             String targetReportName = "Target Report";
             initReportsPage();
@@ -84,14 +85,14 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             setDrillReportTargetAsExport(ExportFormat.EXCEL_XLSX.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Discovery");
-            Thread.sleep(6000);
+            sleepTight(6000);
             verifyReportExport(ExportFormat.EXCEL_XLSX, "Discovery", 5510);
             checkRedBar(browser);
             
             setDrillReportTargetAsExport(ExportFormat.CSV.getName());
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Short List");
-            Thread.sleep(4000);
+            sleepTight(4000);
             verifyReportExport(ExportFormat.CSV, "Short List", 120);
             checkRedBar(browser);
             
@@ -102,7 +103,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
             dashboardEditBar.saveDashboard();
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnAttributeValue("Risk Assessment");
-            Thread.sleep(4000);
+            sleepTight(4000);
             verifyReportExport(ExportFormat.CSV, "Risk Assessment", 1295);
             checkRedBar(browser);
             
@@ -114,7 +115,7 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReportToExport"})
-    public void checkDrillToExportNotCached() throws InterruptedException, JSONException, IOException {
+    public void checkDrillToExportNotCached() throws JSONException, IOException {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();

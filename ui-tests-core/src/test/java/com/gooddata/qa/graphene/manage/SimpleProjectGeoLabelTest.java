@@ -41,7 +41,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initialize"})
-    public void changeAttributeToGeoStateTest() throws InterruptedException {
+    public void changeAttributeToGeoStateTest() {
         int i = 0;
         for (AttributeLabelTypes type : getGeoLabels()) {
             initAttributePage();
@@ -51,7 +51,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initialize"})
-    public void verifyGeoLayersTest() throws InterruptedException {
+    public void verifyGeoLayersTest() {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
@@ -62,7 +62,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initialize"})
-    public void verifyGeoChartTest() throws InterruptedException {
+    public void verifyGeoChartTest() {
         for (GeoAttributeLabels attributeLayer : GeoAttributeLabels.values()) {
             System.out.println("Verifying attribute " + attributeLayer + " ...");
             initDashboardsPage();

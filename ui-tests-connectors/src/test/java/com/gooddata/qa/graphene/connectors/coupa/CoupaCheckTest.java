@@ -57,7 +57,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testConnectorIntegrationResource"})
-    public void testCoupaIntegrationConfiguration() throws InterruptedException, JSONException {
+    public void testCoupaIntegrationConfiguration() throws JSONException {
         if (testParams.isReuseProject()) return;
         // verify empty Coupa dashboard
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId());
@@ -99,7 +99,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testCoupaIntegrationWithUploadUser"})
-    public void testCoupaIntegration() throws InterruptedException, JSONException {
+    public void testCoupaIntegration() throws JSONException {
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
         // process schedule
@@ -108,7 +108,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testCoupaIntegration"})
-    public void testIncrementalSynchronization() throws JSONException, InterruptedException {
+    public void testIncrementalSynchronization() throws JSONException {
         scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
     }
 }

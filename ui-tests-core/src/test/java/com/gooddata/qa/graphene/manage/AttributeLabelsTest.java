@@ -39,7 +39,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void initialize() throws InterruptedException, JSONException {
+    public void initialize() throws JSONException {
         hyperlinkAttr = "Hyperlink";
         hyperlinkReport = "Hyperlink Report";
     }
@@ -52,8 +52,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initialize"})
-    public void setSFDCCredentialsTest() throws InterruptedException,
-            JSONException {
+    public void setSFDCCredentialsTest() throws JSONException {
         openUrl(PAGE_GDC_PROJECTS + "/" + testParams.getProjectId() + "/credentials/sfdc");
         waitForElementVisible(sfdc.getRoot());
         sfdc.setSFDCCredentials(testParams.loadProperty("sfdc.email"),
@@ -61,13 +60,13 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initDataTest"})
-    public void changeAttributeToImageTest() throws InterruptedException {
+    public void changeAttributeToImageTest() {
         changeAttributeLabel("Image", AttributeLabelTypes.IMAGE);
         changeAttributeLabel("Image_SFDC", AttributeLabelTypes.IMAGE);
     }
 
     @Test(dependsOnMethods = {"changeAttributeToImageTest"})
-    public void verifyReportWithImageTest() throws InterruptedException {
+    public void verifyReportWithImageTest() {
         initReport("Image Top 5");
         ReportWithImage report = Graphene.createPageFragment(
                 ReportWithImage.class,
@@ -76,7 +75,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"setSFDCCredentialsTest", "changeAttributeToImageTest"})
-    public void verifyReportWithImageSFDCTest() throws InterruptedException {
+    public void verifyReportWithImageSFDCTest() {
         initReport("Image_SFDC Top 5");
         ReportWithImage report = Graphene.createPageFragment(
                 ReportWithImage.class,
@@ -86,20 +85,20 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"initDataTest"})
-    public void changeAttributeToHyperlinkTest() throws InterruptedException {
+    public void changeAttributeToHyperlinkTest() {
         changeAttributeLabel(hyperlinkAttr, AttributeLabelTypes.HYPERLINK);
         initAttributePage();
         attributePage.verifyHyperLink(hyperlinkAttr);
     }
 
     @Test(dependsOnMethods = {"changeAttributeToHyperlinkTest"})
-    public void configDrillToExternalPageTest() throws InterruptedException {
+    public void configDrillToExternalPageTest() {
         initAttributePage();
         attributePage.configureDrillToExternalPage(hyperlinkAttr);
     }
 
     @Test(dependsOnMethods = {"configDrillToExternalPageTest"})
-    public void createReportWithHyperlinkTest() throws InterruptedException {
+    public void createReportWithHyperlinkTest() {
         createReport(new ReportDefinition().withName(hyperlinkReport)
                                            .withWhats("Count of Image")
                                            .withHows(hyperlinkAttr), 
@@ -107,7 +106,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createReportWithHyperlinkTest"})
-    public void verifyReportWithHyperlinkTest() throws InterruptedException {
+    public void verifyReportWithHyperlinkTest() {
         initReport(hyperlinkReport);
         TableReport report = Graphene.createPageFragment(TableReport.class,
                 browser.findElement(By.id("gridContainerTab")));
@@ -120,8 +119,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
         waitForAnalysisPageLoaded(browser);
     }
 
-    private void changeAttributeLabel(String attribute, AttributeLabelTypes label)
-            throws InterruptedException {
+    private void changeAttributeLabel(String attribute, AttributeLabelTypes label) {
         initAttributePage();
         attributePage.configureAttributeLabel(attribute, label);
     }

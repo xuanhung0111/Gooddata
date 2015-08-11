@@ -25,7 +25,7 @@ public class ExportFragment extends AbstractGreyPagesFragment {
     private WebElement crossDataCenterExport;
 
     public String invokeExport(boolean expUsers, boolean expData, boolean crossDataCenter, int checkIterations)
-            throws JSONException, InterruptedException {
+            throws JSONException {
         if (expData) waitForElementVisible(exportData).click();
         if (expUsers) waitForElementVisible(exportUsers).click();
         if (crossDataCenter) waitForElementVisible(crossDataCenterExport).click();

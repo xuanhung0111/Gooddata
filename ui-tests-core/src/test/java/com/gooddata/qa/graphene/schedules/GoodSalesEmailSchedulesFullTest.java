@@ -18,7 +18,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;
 
@@ -224,7 +223,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
-    public void scheduleReportApplyFilteredVariable() throws InterruptedException {
+    public void scheduleReportApplyFilteredVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("FVariable")
             .withAttribute("Activity Type").withAttributeElements("Email"));
@@ -245,7 +244,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
-    public void scheduleReportApplyNumericVariable() throws InterruptedException {
+    public void scheduleReportApplyNumericVariable() {
         initVariablePage();
         String variableUri = variablePage.createVariable(new NumericVariable("NVariable").withDefaultNumber(2012));
 

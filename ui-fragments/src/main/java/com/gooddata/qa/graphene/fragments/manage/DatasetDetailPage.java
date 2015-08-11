@@ -15,7 +15,7 @@ public class DatasetDetailPage extends AbstractFragment {
 
     private static final By confirmDeleteButtonLocator = By.cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
 
-    public void deleteDataset() throws InterruptedException {
+    public void deleteDataset() {
         waitForElementVisible(datasetDeleteButton).click();
         waitForElementVisible(confirmDeleteButtonLocator, browser).click();
         waitForDataPageLoaded(browser);

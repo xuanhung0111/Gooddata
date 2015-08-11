@@ -20,7 +20,7 @@ public class ProjectWalktroughTest extends AbstractUITest {
     }
 
     @Test(dependsOnGroups = {"projectWalkthroughInit"})
-    public void verifyProject() throws InterruptedException {
+    public void verifyProject() {
         verifyProjectDashboardsAndTabs(false, null, true);
     }
 

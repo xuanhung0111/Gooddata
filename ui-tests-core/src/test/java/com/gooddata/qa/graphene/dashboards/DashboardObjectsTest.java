@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 
@@ -33,7 +34,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"})
-    public void createvariableTest() throws InterruptedException {
+    public void createvariableTest() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(variableName)
                 .withAttribute("Education")
@@ -41,13 +42,13 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"})
-    public void changeStateLabelTest() throws InterruptedException {
+    public void changeStateLabelTest() {
         initAttributePage();
         attributePage.configureAttributeLabel("State", AttributeLabelTypes.US_STATE_NAME);
     }
 
     @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"})
-    public void addDashboardObjectsTest() throws InterruptedException {
+    public void addDashboardObjectsTest() {
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         String dashboardName = "Test";
@@ -57,21 +58,21 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, this.variableName);
         dashboardEditBar.addTimeFilterToDashboard(0, "7 ago");
         dashboardEditBar.addReportToDashboard("Amount Overview table");
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         dashboardEditBar.addTextToDashboard(TextObject.HEADLINE, "Headline", "google.com");
         dashboardEditBar.addTextToDashboard(TextObject.SUB_HEADLINE, "Sub-Headline", "google.com");
         dashboardEditBar.addTextToDashboard(TextObject.DESCRIPTION, "Description", "google.com");
         dashboardEditBar.addLineToDashboard();
         dashboardEditBar.addWidgetToDashboard(WidgetTypes.KEY_METRIC, "Avg of Amount");
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         dashboardEditBar.addWidgetToDashboard(WidgetTypes.GEO_CHART, "Avg of Amount");
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         dashboardEditBar.addWebContentToDashboard();
         dashboardEditBar.saveDashboard();
     }
 
     @Test(dependsOnMethods = {"addDashboardObjectsTest"})
-    public void printDashboardTest() throws InterruptedException {
+    public void printDashboardTest() {
         initDashboardsPage();
         String exportedDashboardName = dashboardsPage.printDashboardTab(0);
         verifyDashboardExport(exportedDashboardName.replace(" ", "_"), expectedDashboardExportSize);

@@ -105,7 +105,7 @@ public class PermissionsDialog extends AbstractFragment {
         }
     }
 
-    public AddGranteesDialog openAddGranteePanel() throws InterruptedException {
+    public AddGranteesDialog openAddGranteePanel() {
         waitForElementVisible(addGranteesButton).click();
         return  waitForFragmentVisible(addGranteesDialog);
     }

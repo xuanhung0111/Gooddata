@@ -11,19 +11,19 @@ public abstract class ObjectAbstractTest extends GoodSalesAbstractTest {
     protected String tagName = "";
 
     @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
-    public void changeNameTest() throws InterruptedException {
+    public void changeNameTest() {
         initObject(name);
         name = objectDetailPage.changeObjectName(name + "changed");
     }
 
     @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
-    public void addDescriptionTest() throws InterruptedException {
+    public void addDescriptionTest() {
         initObject(name);
         objectDetailPage.addDescription(description);
     }
 
     @Test(dependsOnGroups = {"object-tests"}, groups = {"property-object-tests"})
-    public void addTagTest() throws InterruptedException {
+    public void addTagTest() {
         initObject(name);
         objectDetailPage.addTag(tagName);
         objectDetailPage.addTag("graphene test adding tag");

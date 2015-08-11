@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -246,19 +247,19 @@ public class SavedViewWidget extends AbstractFragment{
             }
         }
 
-        public void openContextMenuOfSavedView(String savedView) throws InterruptedException {
+        public void openContextMenuOfSavedView(String savedView) {
             for(WebElement view : savedViews) {
                 if (!savedView.equals(view.getText())) continue;
 
                 WebElement arrowButton = view.findElement(By.cssSelector(CSS_ARROW_ICON));
-                Thread.sleep(1000);
+                sleepTightInSeconds(1);
                 
                 Actions actionBuilder = new Actions(browser);
                 actionBuilder.moveToElement(view);
                 actionBuilder.moveToElement(arrowButton).build().perform();
                 arrowButton.sendKeys("something");
                 arrowButton.click();
-                Thread.sleep(1000);
+                sleepTightInSeconds(1);
 
                 waitForElementVisible(savedFiltersContextMenu.getRoot());
                 return;

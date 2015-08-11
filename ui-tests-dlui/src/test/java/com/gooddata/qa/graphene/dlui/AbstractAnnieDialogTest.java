@@ -65,8 +65,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     protected AnnieUIDialogFragment annieUIDialog;
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
-    public void prepareDataForDLUI() throws JSONException, ParseException, IOException,
-            InterruptedException {
+    public void prepareDataForDLUI() throws JSONException, ParseException, IOException {
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
 
@@ -366,20 +365,15 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
 
     private void checkReportAfterAddNewData(Field addedField,
             ReportWithAddedFields reportWithAddedFields) {
-        try {
-            if (addedField.getType() == FieldTypes.FACT) {
-                initFactPage();
-                factsTable.selectObject(addedField.getName());
-                waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM,
-                        addedField.getName());
-            }
-
-            createAndCheckReport(reportWithAddedFields.getReportDefinition(),
-                    reportWithAddedFields.getAttributeValues(),
-                    reportWithAddedFields.getMetricValues());
-        } catch (InterruptedException e) {
-            throw new IllegalStateException("There is exception when checking report!", e);
+        if (addedField.getType() == FieldTypes.FACT) {
+            initFactPage();
+            factsTable.selectObject(addedField.getName());
+            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, addedField.getName());
         }
+
+        createAndCheckReport(reportWithAddedFields.getReportDefinition(),
+                reportWithAddedFields.getAttributeValues(),
+                reportWithAddedFields.getMetricValues());
     }
 
     private void addDataFromAdsToLdmAndDropAfterTest(UserRoles role, String maqlFile,

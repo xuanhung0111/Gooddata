@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -44,7 +45,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createDrillReport() throws InterruptedException {
+    public void createDrillReport() {
         initReportsPage();
         ReportDefinition reportDefinition = new ReportDefinition()
             .withName(REPORT_NAME)
@@ -57,7 +58,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReport"})
-    public void drillOnDashboard() throws InterruptedException {
+    public void drillOnDashboard() {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
     
@@ -108,7 +109,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReport"})
-    public void modifyOnDrillingOverlay() throws InterruptedException {
+    public void modifyOnDrillingOverlay() {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
@@ -143,7 +144,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReport"})
-    public void verifyReportInfoOnDrillingOverlay() throws InterruptedException {
+    public void verifyReportInfoOnDrillingOverlay() {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
@@ -177,7 +178,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             browser.switchTo().window(currentWindowHandle);
 
             reportInfoPanel.downloadReportAsFormat(ExportFormat.PDF_PORTRAIT);
-            Thread.sleep(4000);
+            sleepTight(4000);
             verifyReportExport(ExportFormat.PDF_PORTRAIT, "2010", 30000L);
             checkRedBar(browser);
         } finally {
@@ -186,7 +187,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReport"})
-    public void verifyBreadcrumbInDrillingOverlay() throws InterruptedException {
+    public void verifyBreadcrumbInDrillingOverlay() {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
@@ -202,7 +203,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReport"})
-    public void drillAttribute() throws InterruptedException {
+    public void drillAttribute() {
         initAttributePage();
         attributePage.initAttribute("Opportunity");
         assertTrue(attributeDetailPage.isDrillToExternalPage());
@@ -230,7 +231,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
 
             String currentWindowHandle = browser.getWindowHandle();
             // wait for google window
-            Thread.sleep(1500);
+            sleepTight(1500);
             // switch to newest window handle
             for (String s : browser.getWindowHandles()) {
                 if (!s.equals(currentWindowHandle)) {
@@ -266,7 +267,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReport"})
-    public void drillAcrossReport() throws InterruptedException {
+    public void drillAcrossReport() {
         try {
             addReportToNewDashboard(REPORT_NAME, TEST_DASHBOAD_NAME);
 
@@ -292,7 +293,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createDrillReport"})
-    public void overrideDrilldownAndDrillIn() throws InterruptedException {
+    public void overrideDrilldownAndDrillIn() {
         initAttributePage();
         attributePage.initAttribute("Activity");
         attributeDetailPage.setDrillToAttribute("Activity Type");
@@ -351,7 +352,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"overrideDrilldownAndDrillIn"})
-    public void drillReportContainsFilter() throws InterruptedException {
+    public void drillReportContainsFilter() {
         try {
             addReportToNewDashboard("Drill-Activity", TEST_DASHBOAD_NAME);
 

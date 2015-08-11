@@ -116,7 +116,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnMethods = "signInWithGeorge", groups = {"george"})
-    public void failToLoadDataForNewField() throws InterruptedException {
+    public void failToLoadDataForNewField() {
 
         long requestTime = System.currentTimeMillis();
         try {
@@ -179,7 +179,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnMethods = "signInWithAnnie", groups = {"annie"})
-    public void failToLoadDataForNewFieldWithEdiorRole() throws InterruptedException {
+    public void failToLoadDataForNewFieldWithEdiorRole() {
         long requestTime = System.currentTimeMillis();
         try {
             Dataset selectedDataset =

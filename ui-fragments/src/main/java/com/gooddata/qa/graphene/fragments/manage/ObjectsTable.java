@@ -69,7 +69,7 @@ public class ObjectsTable extends AbstractTable {
         }
     }
 
-    public void checkOnCheckboxes(List<String> objectTitles) throws InterruptedException {
+    public void checkOnCheckboxes(List<String> objectTitles) {
         List<WebElement> tableRows = getRows();
         for (String objectName : objectTitles) {
             for (int i = 0; i < tableRows.size(); i++) {
@@ -91,8 +91,7 @@ public class ObjectsTable extends AbstractTable {
         assertTrue(tableHeaderAuthor.isDisplayed());
     }
 
-    public void sortObjectsTable(String sortType, List<String> defaultObjectsList)
-            throws InterruptedException {
+    public void sortObjectsTable(String sortType, List<String> defaultObjectsList) {
         WebElement table = getRoot();
         List<String> sortedObjectsList = new ArrayList<String>();
         sortedObjectsList.addAll(defaultObjectsList);

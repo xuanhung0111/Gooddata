@@ -12,7 +12,7 @@ import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ObjectElementsFragment extends AbstractGreyPagesFragment {
 
-    public ArrayList<Pair<String, Integer>> getObjectElements() throws JSONException, InterruptedException {
+    public ArrayList<Pair<String, Integer>> getObjectElements() throws JSONException {
         ArrayList<Pair<String, Integer>> pairs = new ArrayList<Pair<String, Integer>>();
 
         waitForElementVisible(BY_GP_PRE_JSON, browser);

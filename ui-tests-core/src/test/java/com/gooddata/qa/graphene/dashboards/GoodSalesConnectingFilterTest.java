@@ -47,14 +47,14 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
-    public void createVariable() throws InterruptedException {
+    public void createVariable() {
         initVariablePage();
 
         variablePage.createVariable(new AttributeVariable(V_STAGE).withAttribute(STAGE_NAME));
     }
 
     @Test(dependsOnMethods = {"createVariable"}, groups = {"init"})
-    public void createReports() throws InterruptedException {
+    public void createReports() {
         // *** create report 1 ***
         initReportsPage();
         ReportDefinition rd =
@@ -73,7 +73,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReports"}, groups = {"init"})
-    public void prepareDashboard() throws InterruptedException {
+    public void prepareDashboard() {
         initDashboardsPage();
 
         dashboardsPage.addNewDashboard(TEST_DASHBOARD);
@@ -86,7 +86,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void linkDashboardFilterBetweenTabs() throws InterruptedException {
+    public void linkDashboardFilterBetweenTabs() {
         makeCopyFromDashboard(TEST_DASHBOARD);
 
         try {
@@ -141,7 +141,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void disconnectBetweenSingleOptionAndMultipleFilter() throws InterruptedException {
+    public void disconnectBetweenSingleOptionAndMultipleFilter() {
         makeCopyFromDashboard(TEST_DASHBOARD);
 
         try {
@@ -175,7 +175,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testFilterInDuplicateTab() throws InterruptedException {
+    public void testFilterInDuplicateTab() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(TMP_DASHBOARD);
 
@@ -234,7 +234,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testFilterInCopyTab() throws InterruptedException {
+    public void testFilterInCopyTab() {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(DB1);
         dashboardsPage.addNewDashboard(DB2);
@@ -277,7 +277,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         }
     }
 
-    private void makeCopyFromDashboard(String dashboard) throws InterruptedException {
+    private void makeCopyFromDashboard(String dashboard) {
         initDashboardsPage();
 
         dashboardsPage.selectDashboard(dashboard);
@@ -286,7 +286,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
     }
 
     private void addReportsAndFilters(DashboardEditBar dashboardEditBar, String timeRange)
-            throws InterruptedException {
+            {
         addReportsAndFilters(dashboardEditBar);
 
         dashboardEditBar.addTimeFilterToDashboard(3, timeRange);
@@ -295,7 +295,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         DashboardWidgetDirection.DOWN.moveElementToRightPlace(filter);
     }
 
-    private void addReportsAndFilters(DashboardEditBar dashboardEditBar) throws InterruptedException {
+    private void addReportsAndFilters(DashboardEditBar dashboardEditBar) {
         dashboardEditBar.addReportToDashboard(REPORT_1);
         WebElement report = dashboardsPage.getContent().getLatestReport(TableReport.class).getRoot();
         DashboardWidgetDirection.LEFT.moveElementToRightPlace(report);

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
@@ -93,17 +94,17 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void greyOutMetricAttribute() throws InterruptedException {
+    public void greyOutMetricAttribute() {
         initAnalysePage();
 
         analysisPage.addCategory(DATE);
         // AD needs time to calculate not available attributes/metrics
-        Thread.sleep(3000);
+        sleepTight(3000);
         assertTrue(analysisPage.isInapplicableAttributeMetricInViewPort());
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void showPercent() throws InterruptedException {
+    public void showPercent() {
         initAnalysePage();
 
         analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE));
@@ -112,7 +113,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
                     .turnOnShowInPercents()
                     .waitForReportComputing();
         // wait for data labels rendered
-        Thread.sleep(2000);
+        sleepTight(2000);
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(Iterables.all(report.getDataLabels(), new Predicate<String>() {
@@ -215,11 +216,11 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void testUnusableFactGreyOut() throws InterruptedException {
+    public void testUnusableFactGreyOut() {
         initAnalysePage();
         analysisPage.addCategory(OPP_SNAPSHOT);
         // AD needs time to calculate not available attributes/metrics/facts
-        Thread.sleep(3000);
+        sleepTight(3000);
         analysisPage.searchBucketItem(ACTIVITY_DATE);
         analysisPage.isInapplicableAttributeMetricInViewPort();
     }

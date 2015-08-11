@@ -27,8 +27,7 @@ public class SaveAsDialog extends AbstractFragment {
     @FindBy(css = ".s-btn-cancel")
     private WebElement cancelButton;
 
-    public void saveAs(String dashboardName, boolean isSavedViews, PermissionType permissionType) 
-            throws InterruptedException {
+    public void saveAs(String dashboardName, boolean isSavedViews, PermissionType permissionType) {
         setDashboardName(dashboardName);
         setSavedViews(isSavedViews);
         setPermissionType(permissionType);

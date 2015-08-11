@@ -39,7 +39,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void testNumberFormatEditor() throws InterruptedException {
+    public void testNumberFormatEditor() {
         initMetricPage();
         waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
         waitForFragmentVisible(metricDetailPage).changeMetricFormatButDiscard(Formatter.BARS);
@@ -76,7 +76,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void editFormatInReportPage() throws InterruptedException {
+    public void editFormatInReportPage() {
         try {
             initReportPage();
             ReportVisualizer reportVisualizer = reportPage.getVisualiser();
@@ -110,7 +110,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void editFormatWhenCreatingNewMetric() throws InterruptedException {
+    public void editFormatWhenCreatingNewMetric() {
         initReportPage();
         reportPage.createSimpleMetric(SimpleMetricTypes.SUM, "Duration", null, false);
         WebElement editFormat = waitForElementVisible(METRIC_DETAIL_FORMAT_LOCATOR, browser);
@@ -129,7 +129,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"})
-    public void editExistFormatInSnDDialog() throws InterruptedException {
+    public void editExistFormatInSnDDialog() {
         try {
             initReportPage();
             ReportVisualizer reportVisualizer = reportPage.getVisualiser();

@@ -16,7 +16,7 @@ public class ImportFragment extends AbstractGreyPagesFragment {
     @FindBy
     private WebElement submit;
 
-    public boolean invokeImport(String exportToken, int checkIterations) throws JSONException, InterruptedException {
+    public boolean invokeImport(String exportToken, int checkIterations) throws JSONException {
         System.out.println("Using exportToken \""+exportToken+"\" to import project");
         waitForElementVisible(token).sendKeys(exportToken);
         Graphene.guardHttp(submit).click();

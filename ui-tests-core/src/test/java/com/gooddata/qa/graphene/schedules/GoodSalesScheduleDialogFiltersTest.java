@@ -78,7 +78,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     }
 
     @Test(dependsOnMethods = {"checkGreyPagesForScheduleExistence"}, groups = {"schedules"})
-    public void checkScheduleExecutionContext() throws JSONException, InterruptedException {
+    public void checkScheduleExecutionContext() throws JSONException {
         assertTrue(scheduleHasValidExecutionContext(customSubject));
     }
 
@@ -86,7 +86,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         mdBaseUri = PAGE_GDC_MD + "/" + testParams.getProjectId();
     }
 
-    private boolean scheduleHasValidExecutionContext(String title) throws JSONException, InterruptedException {
+    private boolean scheduleHasValidExecutionContext(String title) throws JSONException {
         int scheduleId = getScheduleId(title);
         int executionContextId = getExecutionContextId(scheduleId);
 
@@ -95,7 +95,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
         return executionContextFragments.getType().equals("email");
     }
 
-    private int getExecutionContextId(int scheduleId) throws JSONException, InterruptedException {
+    private int getExecutionContextId(int scheduleId) throws JSONException {
         initGreyPage("/obj/" + scheduleId, scheduledEmailFragment);
 
         assertTrue(scheduledEmailFragment.hasExecutionContext());
@@ -135,7 +135,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     }
 
     @AfterClass
-    private void deleteEmailScheduleAndExecutionContext() throws JSONException, InterruptedException {
+    private void deleteEmailScheduleAndExecutionContext() throws JSONException {
         int scheduleId = getScheduleId(customSubject);
         int executionContextId = getExecutionContextId(scheduleId);
 

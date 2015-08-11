@@ -114,8 +114,7 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addWidgetToDashboard(WidgetTypes widgetType, String metricLabel)
-            throws InterruptedException {
+    public void addWidgetToDashboard(WidgetTypes widgetType, String metricLabel) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(widgetMenuButton).click();
         waitForElementVisible(dashboardAddWidgetPanel.getRoot());
@@ -124,8 +123,7 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addScatterWidgetToDashboard(Map<String, String> data, boolean invalidConfiguration)
-            throws InterruptedException {
+    public void addScatterWidgetToDashboard(Map<String, String> data, boolean invalidConfiguration) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(widgetMenuButton).click();
         waitForElementVisible(dashboardAddWidgetPanel.getRoot());
@@ -135,48 +133,43 @@ public class DashboardEditBar extends AbstractFragment {
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1, "Widget wasn't added");
     }
 
-    public void addScatterWidgetToDashboard(Map<String, String> data)
-            throws InterruptedException {
+    public void addScatterWidgetToDashboard(Map<String, String> data) {
         addScatterWidgetToDashboard(data, false);
     }
 
-    public void addColorToScatterWidget(Map<String, String> data)
-            throws InterruptedException {
+    public void addColorToScatterWidget(Map<String, String> data) {
         waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
         dashboardScatterExplorer.addColorToScatterWidget(data);
     }
 
-    public void disableColorInScatterWidget()
-            throws InterruptedException {
+    public void disableColorInScatterWidget() {
         waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
         dashboardScatterExplorer.disableColorToScatterWidget();
     }
 
-    public void addColumnsToScatterWidget(Map<String, ArrayList<HashMap <String,String>>> data)
-            throws InterruptedException {
+    public void addColumnsToScatterWidget(Map<String, ArrayList<HashMap <String,String>>> data) {
         waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
         dashboardScatterExplorer.addColumnsToScatterWidget(data);
     }
 
-    public void removeColumnsFromScatterWidget()
-            throws InterruptedException {
+    public void removeColumnsFromScatterWidget() {
         waitForElementVisible(DashboardScatterExplorer.BY_IFRAME_SCATTER,browser);
         dashboardScatterExplorer.removeColumnsFromScatterWidget();
     }
 
-    public void verifyGeoLayersList(String metricLabel, List<String> layersList) throws InterruptedException{
+    public void verifyGeoLayersList(String metricLabel, List<String> layersList) {
         waitForElementVisible(widgetMenuButton).click();
         waitForElementVisible(dashboardAddWidgetPanel.getRoot());
         dashboardAddWidgetPanel.verifyLayersList(metricLabel, layersList);
     }
 
-    public void addGeoChart(String metricLabel, String attributeLayer) throws InterruptedException{
+    public void addGeoChart(String metricLabel, String attributeLayer) {
         waitForElementVisible(widgetMenuButton).click();
         waitForElementVisible(dashboardAddWidgetPanel.getRoot());
         dashboardAddWidgetPanel.addGeoChart(metricLabel, attributeLayer);
     }
 
-    public void addWebContentToDashboard() throws InterruptedException {
+    public void addWebContentToDashboard() {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addwebContent).click();
         waitForElementVisible(dashboardWebContent.getRoot());
@@ -185,8 +178,7 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addListFilterToDashboard(DashFilterTypes type, String name)
-            throws InterruptedException {
+    public void addListFilterToDashboard(DashFilterTypes type, String name) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addFilterMenu).click();
         waitForElementVisible(attributeFilter).click();
@@ -196,13 +188,12 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addTimeFilterToDashboard(int dateDimensionIndex, String dateRange)
-            throws InterruptedException {
+    public void addTimeFilterToDashboard(int dateDimensionIndex, String dateRange) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addFilterMenu).click();
         waitForElementVisible(dateFilter).click();
         waitForElementVisible(dashboardFilter.getRoot());
-        Thread.sleep(1000);
+        sleepTightInSeconds(1);
         dashboardFilter.addTimeFilter(dateDimensionIndex, dateRange);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
@@ -215,8 +206,7 @@ public class DashboardEditBar extends AbstractFragment {
                 waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
     }
 
-    public void addTextToDashboard(TextObject textObject, String text,
-                                   String link) throws InterruptedException {
+    public void addTextToDashboard(TextObject textObject, String text, String link) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addText).click();
         waitForElementVisible(dashboardTextObject.getRoot());
@@ -225,7 +215,7 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addLineToDashboard() throws InterruptedException {
+    public void addLineToDashboard() {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addLine).click();
         waitForElementVisible(dashboardLineObject.getRoot());
@@ -291,7 +281,7 @@ public class DashboardEditBar extends AbstractFragment {
         return savedViewDisabledNotification;
     }
 
-    public void initInteractiveReportWidget() throws InterruptedException {
+    public void initInteractiveReportWidget() {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(widgetMenuButton).click();
         waitForElementVisible(dashboardAddWidgetPanel.getRoot());

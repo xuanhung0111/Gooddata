@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertEquals;
@@ -183,14 +184,14 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "basicFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {
         "basicTest", "addOneField", "annieDialogTest"}, priority = 1)
     public void adminAddSingleBasicFieldFromADSToLDM(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewDataAddingAndCleanAddedData(UserRoles.ADMIN, addedField);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {
         "addOneField", "annieDialogTest"}, priority = 1)
     public void adminAddSingleFieldFromADSToLDM(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewDataAddingAndCleanAddedData(UserRoles.ADMIN, addedField);
     }
 
@@ -212,14 +213,14 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser"}, groups = {
         "basicTest", "editorAddOneField", "annieDialogTest"}, priority = 1)
     public void editorAddSingleBaiscFieldFromADSToLDM(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewDataAddingAndCleanAddedData(UserRoles.EDITOR, addedField);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser"}, groups = {
         "editorAddOneField", "annieDialogTest"}, priority = 1)
     public void editorAddSingleFieldFromADSToLDM(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException, InterruptedException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewDataAddingAndCleanAddedData(UserRoles.EDITOR, addedField);
     }
 
@@ -259,7 +260,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"})
-    public void checkConcurrentDataLoadWithAnnieDialog() throws InterruptedException {
+    public void checkConcurrentDataLoadWithAnnieDialog() {
         Dataset dataset =
                 new Dataset().withName("person").withFields(
                         new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
@@ -277,7 +278,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                     return ADDING_DATA_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline());
                 }
             });
-            Thread.sleep(500);
+            sleepTight(500);
             annieUIDialog.clickOnCloseButton();
             openAnnieDialog();
             Graphene.waitGui().until(new Predicate<WebDriver>() {
@@ -502,7 +503,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         deleteADSInstance(adsInstance);
     }
 
-    private void waitForAddingDataTask() throws InterruptedException {
+    private void waitForAddingDataTask() {
         while (true) {
             openAnnieDialog();
             if (!DATA_CAN_NOT_ADD_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline())
@@ -511,13 +512,13 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
                 break;
             }
             annieUIDialog.clickOnCloseButton();
-            Thread.sleep(2000);
+            sleepTight(2000);
         }
     }
 
-    private boolean isDatasourceVisible() throws InterruptedException {
+    private boolean isDatasourceVisible() {
         try {
-            Thread.sleep(1000);
+            sleepTight(1000);
             waitForElementVisible(AnnieUIDialogFragment.BY_DATASOURCES, browser);
             return true;
         } catch (TimeoutException e) {

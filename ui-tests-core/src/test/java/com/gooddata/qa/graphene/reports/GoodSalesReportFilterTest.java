@@ -24,7 +24,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createReportTest() throws InterruptedException {
+    public void createReportTest() {
         createReport(new ReportDefinition().withName(REPORT_NAME)
                         .withWhats("Amount")
                         .withHows("Stage Name"),
@@ -32,7 +32,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void createVariableTest() throws InterruptedException {
+    public void createVariableTest() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
                 .withAttribute("Stage Name")
@@ -40,7 +40,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReportTest"})
-    public void attributeFilterTest() throws InterruptedException {
+    public void attributeFilterTest() {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", "Interest",
                 "Discovery", "Short List", "Negotiation", "Closed Won", "Closed Lost"));
@@ -49,7 +49,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReportTest"})
-    public void rankingFilterTest() throws InterruptedException {
+    public void rankingFilterTest() {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createRankingFilter(ResultSize.TOP.withSize(3),
                 "Stage Name", "Amount"));
@@ -58,7 +58,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReportTest"})
-    public void rangeFilterTest() throws InterruptedException {
+    public void rangeFilterTest() {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createRangeFilter("Stage Name", "Amount",
                 Range.IS_GREATER_THAN_OR_EQUAL_TO.withNumber(100000)));
@@ -67,7 +67,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReportTest", "createVariableTest"})
-    public void promptFilterTest() throws InterruptedException {
+    public void promptFilterTest() {
         initReport();
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(VARIABLE_NAME,
                 "Interest", "Discovery", "Short List", "Negotiation"));

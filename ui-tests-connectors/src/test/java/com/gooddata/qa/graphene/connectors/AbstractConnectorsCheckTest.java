@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.connectors;
 
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 
@@ -77,7 +79,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      */
 
     @Test(groups = {"connectorInit"}, dependsOnMethods = {"createProject"})
-    public void createIntegration() throws JSONException, InterruptedException {
+    public void createIntegration() throws JSONException {
         // verify that connector resource exist
         openUrl(getConnectorUri());
         verifyConnectorResourceJSON();
@@ -100,7 +102,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     @Test(groups = {"connectorWalkthrough"}, dependsOnMethods = {"testConnectorProcessesResource"})
-    public void verifyProjectDashboards() throws InterruptedException {
+    public void verifyProjectDashboards() {
         // verify created project and count dashboard tabs
         verifyProjectDashboardsAndTabs(true, expectedDashboardsAndTabs, true);
     }
@@ -148,7 +150,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      * ------------------------
      */
 
-    public void initIntegration() throws JSONException, InterruptedException {
+    public void initIntegration() throws JSONException {
         openUrl(getConnectorUri());
         waitForElementPresent(BY_GP_PRE_JSON, browser);
         waitForElementPresent(connector.getRoot());
@@ -164,7 +166,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     protected void scheduleIntegrationProcess(int checkIterations, int expectedProcessesCount)
-            throws JSONException, InterruptedException {
+            throws JSONException {
         openUrl(getProcessesUri());
         JSONObject json = loadJSON();
         if (!testParams.isReuseProject()) {
@@ -177,7 +179,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     protected void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations)
-            throws JSONException, InterruptedException {
+            throws JSONException {
         String processUrl = browser.getCurrentUrl();
         System.out.println("Waiting for process synchronized: " + processUrl);
         int i = 0;
@@ -185,7 +187,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         while (!"SYNCHRONIZED".equals(status) && i < checkIterations) {
             System.out.println("Current process status is: " + status);
             assertNotEquals(status, "ERROR", "Error status appeared");
-            Thread.sleep(5000);
+            sleepTightInSeconds(5);
             browser.get(processUrl);
             status = getProcessStatus();
             i++;
@@ -260,7 +262,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
                 "self link is incorrect");
     }
 
-    protected void runConnectorProjectFullLoad() throws JSONException, InterruptedException, IOException {
+    protected void runConnectorProjectFullLoad() throws JSONException, IOException {
         getRestApiClient();
         HttpRequestBase postRequest = restApiClient.newPostMethod("/" + getProcessesUri(), PROCESS_FULL_LOAD_JSON);
         HttpResponse postResponse = restApiClient.execute(postRequest);

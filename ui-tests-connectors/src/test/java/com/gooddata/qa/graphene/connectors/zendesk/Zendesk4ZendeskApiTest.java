@@ -57,18 +57,18 @@ public class Zendesk4ZendeskApiTest extends AbstractGreyPageTest {
     }
 
     @Test(dependsOnMethods = {"initZendeskApiClient"}, groups = {"zendeskApiTests"})
-    public void testTicketsCount() throws IOException, JSONException, InterruptedException {
+    public void testTicketsCount() throws IOException, JSONException {
         zendeskHelper.getNumberOfTickets();
     }
 
     @Test(dependsOnMethods = {"initZendeskApiClient"}, groups = {"zendeskApiTests"})
-    public void testUsersCount() throws IOException, JSONException, InterruptedException {
+    public void testUsersCount() throws IOException, JSONException {
         zendeskHelper.getNumberOfUsers();
     }
 
     @Test(dependsOnMethods = {"initZendeskApiClient"},
             groups = {"zendeskApiTests"})
-    public void testOrganizationsCount() throws IOException, JSONException, InterruptedException {
+    public void testOrganizationsCount() throws IOException, JSONException {
         zendeskHelper.getNumberOfOrganizations();
     }
 

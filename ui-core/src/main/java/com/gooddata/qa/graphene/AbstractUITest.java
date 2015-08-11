@@ -1,26 +1,27 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
-import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
-import com.gooddata.qa.graphene.fragments.login.LoginFragment;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
-import com.gooddata.qa.graphene.fragments.disc.*;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
-import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
-import com.gooddata.qa.graphene.fragments.manage.*;
-import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
-import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
-import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
-import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
-import com.gooddata.qa.utils.graphene.Screenshots;
-import com.google.common.base.Predicate;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForProjectPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForProjectsPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForReportsPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForSchedulesPageLoaded;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -28,12 +29,49 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static org.testng.Assert.*;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
+import com.gooddata.qa.graphene.fragments.disc.DISCProjectsPage;
+import com.gooddata.qa.graphene.fragments.disc.DeployForm;
+import com.gooddata.qa.graphene.fragments.disc.NavigationBar;
+import com.gooddata.qa.graphene.fragments.disc.NotificationRulesDialog;
+import com.gooddata.qa.graphene.fragments.disc.OverviewProjects;
+import com.gooddata.qa.graphene.fragments.disc.OverviewStates;
+import com.gooddata.qa.graphene.fragments.disc.ProjectDetailPage;
+import com.gooddata.qa.graphene.fragments.disc.ProjectsList;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleForm;
+import com.gooddata.qa.graphene.fragments.disc.SchedulesTable;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
+import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
+import com.gooddata.qa.graphene.fragments.login.LoginFragment;
+import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.AttributePage;
+import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
+import com.gooddata.qa.graphene.fragments.manage.DataPage;
+import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
+import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
+import com.gooddata.qa.graphene.fragments.manage.MetricPage;
+import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
+import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
+import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
+import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
+import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
+import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
+import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
+import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
+import com.google.common.base.Predicate;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 
@@ -178,7 +216,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = "#app-dashboards")
     protected IndigoDashboardsPage indigoDashboardsPage;
-    
+
     /**
      * Help method which provides verification if login page is present a sign in a demo user if needed
      *
@@ -219,7 +257,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
         loginFragment.login(username, password, true);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
-        Screenshots.takeScreenshot(browser, "login-ui", this.getClass());
+        takeScreenshot(browser, "login-ui", this.getClass());
         System.out.println("Successful login with user: " + username);
     }
 
@@ -231,14 +269,14 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyProjectDashboardsAndTabs(boolean validation, Map<String, String[]> expectedDashboardsAndTabs,
-                                               boolean openPage) throws InterruptedException {
+            boolean openPage) {
         // sleep to avoid RED BAR - An error occurred while performing this operation.
-        Thread.sleep(5000);
+        sleepTightInSeconds(5);
         if (openPage) {
             initDashboardsPage();
         }
         waitForDashboardPageLoaded(browser);
-        Thread.sleep(5000);
+        sleepTightInSeconds(5);
         waitForElementVisible(dashboardsPage.getRoot());
         if (expectedDashboardsAndTabs == null || expectedDashboardsAndTabs.isEmpty()) {
             System.out.println("Going to check all dashboard & tabs");
@@ -246,7 +284,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             System.out.println("Dashboards count: " + dashboardsCount);
             for (int i = 1; i <= dashboardsCount; i++) {
                 dashboardsPage.selectDashboard(i);
-                Thread.sleep(5000);
+                sleepTightInSeconds(5);
                 System.out.println("Current dashboard index: " + i);
                 singleDashboardWalkthrough(validation, null, dashboardsPage.getDashboardName());
             }
@@ -254,9 +292,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
             System.out.println("Going to check expected dashboards & tabs");
             for (String dashboardName : expectedDashboardsAndTabs.keySet()) {
                 int dashboardsCount = dashboardsPage.getDashboardsCount();
-                assertEquals(dashboardsCount, expectedDashboardsAndTabs.size(), "Number of dashboards doesn't match");
+                assertEquals(dashboardsCount, expectedDashboardsAndTabs.size(),
+                        "Number of dashboards doesn't match");
                 dashboardsPage.selectDashboard(dashboardName);
-                Thread.sleep(5000);
+                sleepTightInSeconds(5);
                 String[] expectedTabs = expectedDashboardsAndTabs.get(dashboardName);
                 System.out.println("Current dashboard: " + dashboardName);
                 singleDashboardWalkthrough(validation, expectedTabs, dashboardName);
@@ -278,7 +317,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
             tabs.openTab(i);
             System.out.println("Switched to tab with index: " + i + ", label: " + tabs.getTabLabel(i));
             waitForDashboardPageLoaded(browser);
-            Screenshots.takeScreenshot(browser, dashboardName + "-tab-" + i + "-" + tabLabels.get(i), this.getClass());
+            takeScreenshot(browser, dashboardName + "-tab-" + i + "-" + tabLabels.get(i), this.getClass());
             assertTrue(tabs.isTabSelected(i), "Tab isn't selected");
             checkRedBar(browser);
         }
@@ -293,11 +332,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         System.out.println("Deleted project: " + projectId);
     }
 
-    public void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) throws InterruptedException {
+    public void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) {
         initDashboardsPage();
         assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
         waitForDashboardPageLoaded(browser);
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         DashboardTabs tabs = dashboardsPage.getTabs();
         int tabsCount = tabs.getNumberOfTabs();
         dashboardsPage.editDashboard();
@@ -313,28 +352,28 @@ public class AbstractUITest extends AbstractGreyPageTest {
         assertEquals(tabs.getNumberOfTabs(), tabsCount + 1, "New tab is not present after Save");
         assertTrue(tabs.isTabSelected(tabsCount), "New tab is not selected after Save");
         assertEquals(tabs.getTabLabel(tabsCount), tabName, "New tab has invalid label after Save");
-        Screenshots.takeScreenshot(browser, screenshotName, this.getClass());
+        takeScreenshot(browser, screenshotName, this.getClass());
     }
 
-    public void addReportToNewDashboard(String reportName, String dashboardName) throws InterruptedException {
+    public void addReportToNewDashboard(String reportName, String dashboardName) {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(dashboardName);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         dashboardEditBar.addReportToDashboard(reportName);
         // Need to sleep, if run too fast, saved dashboard will not contain the added report
-        Thread.sleep(3000);
+        sleepTightInSeconds(3);
         dashboardEditBar.saveDashboard();
         checkRedBar(browser);
     }
 
-    public void createDashboard(String name) throws InterruptedException {
+    public void createDashboard(String name) {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(name);
         initDashboardsPage();
     }
 
-    public void createDashboard(String name, boolean lock, boolean publish) throws InterruptedException {
+    public void createDashboard(String name, boolean lock, boolean publish) {
         createDashboard(name);
         lockDashboard(lock);
         publishDashboard(publish);
@@ -356,7 +395,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         }
     }
 
-    public void selectDashboard(String name) throws InterruptedException {
+    public void selectDashboard(String name) {
         initDashboardsPage();
         assertTrue(dashboardsPage.selectDashboard(name), 
                 String.format("Cannot select dashboard named: %s", name));
@@ -366,7 +405,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void createReport(ReportDefinition reportDefinition, String screenshotName) {
         initReportCreation();
         reportPage.createReport(reportDefinition);
-        Screenshots.takeScreenshot(browser, screenshotName + "-" + reportDefinition.getName() + "-" +
+        takeScreenshot(browser, screenshotName + "-" + reportDefinition.getName() + "-" +
                 reportDefinition.getType().getName(), this.getClass());
         checkRedBar(browser);
     }
@@ -381,25 +420,31 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void verifyDashboardExport(String dashboardName, long minimalSize) {
-        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName.replaceAll(" ", "_") + ".pdf");
+        File pdfExport = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
+                + dashboardName.replaceAll(" ", "_") + ".pdf");
         System.out.println("pdfExport = " + pdfExport);
-        System.out.println(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName + ".pdf");
+        System.out.println(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName
+                + ".pdf");
         long fileSize = pdfExport.length();
         System.out.println("File size: " + fileSize);
-        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is "
+                + fileSize + ", but minimum " + minimalSize + " was expected");
     }
 
     public void verifyReportExport(ExportFormat format, String reportName, long minimalSize) {
-        String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "." + format.getName();
+        String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + reportName + "."
+                + format.getName();
         File export = new File(fileURL);
         System.out.println("pdfExport = " + export);
         long fileSize = export.length();
         System.out.println("File size: " + fileSize);
-        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is " + fileSize + ", but minimum " + minimalSize + " was expected");
+        assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is "
+                + fileSize + ", but minimum " + minimalSize + " was expected");
         if (format == ExportFormat.IMAGE_PNG) {
             browser.get("file://" + fileURL);
-            Screenshots.takeScreenshot(browser, "export-report-" + reportName, this.getClass());
-            waitForElementPresent(By.xpath("//img[contains(@src, '" + testParams.getDownloadFolder() + "')]"), browser);
+            takeScreenshot(browser, "export-report-" + reportName, this.getClass());
+            waitForElementPresent(By.xpath("//img[contains(@src, '" + testParams.getDownloadFolder() + "')]"),
+                    browser);
         }
     }
 
@@ -411,25 +456,27 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType,
-                          String screenshotName) {
+            String screenshotName) {
         initProjectsPage();
         initEmptyDashboardsPage();
         initUploadPage();
         upload.uploadFile(filePath);
-        Screenshots.takeScreenshot(browser, screenshotName + "upload", this.getClass());
+        takeScreenshot(browser, screenshotName + "upload", this.getClass());
         UploadColumns uploadColumns = upload.getUploadColumns();
         if (columnsWithExpectedType != null) {
-            Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-before-changing-column-type", this.getClass());
+            takeScreenshot(browser, screenshotName + "-upload-definition-before-changing-column-type",
+                    this.getClass());
             for (int columnIndex : columnsWithExpectedType.keySet()) {
                 uploadColumns.setColumnType(columnIndex, columnsWithExpectedType.get(columnIndex));
             }
-            Screenshots.takeScreenshot(browser, screenshotName + "-upload-definition-after-changing-column-type", this.getClass());
+            takeScreenshot(browser, screenshotName + "-upload-definition-after-changing-column-type",
+                    this.getClass());
         }
-        Screenshots.takeScreenshot(browser, "upload-definition", this.getClass());
+        takeScreenshot(browser, "upload-definition", this.getClass());
         upload.confirmloadCsv();
         waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"), browser);
         waitForDashboardPageLoaded(browser);
-        Screenshots.takeScreenshot(browser, screenshotName + "-dashboard", this.getClass());
+        takeScreenshot(browser, screenshotName + "-dashboard", this.getClass());
     }
 
     private void waitForDashboardPage() {
@@ -548,5 +595,5 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForFragmentVisible(discProjectsPage);
     }
-    
+
 }

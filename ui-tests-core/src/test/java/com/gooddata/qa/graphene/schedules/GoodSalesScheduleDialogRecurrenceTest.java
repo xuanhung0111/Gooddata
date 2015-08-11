@@ -72,7 +72,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
-    public void setFeatureFlags() throws JSONException, IOException, InterruptedException {
+    public void setFeatureFlags() throws JSONException, IOException {
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
     }

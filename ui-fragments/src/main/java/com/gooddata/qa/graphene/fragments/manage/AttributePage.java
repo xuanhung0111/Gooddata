@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForObjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -29,13 +30,12 @@ public class AttributePage extends AbstractFragment {
     @FindBy(css = ".s-attributesAddButton")
     protected WebElement createAttributeButton;
 
-    public void configureAttributeLabel(String attributeName, AttributeLabelTypes attributeLabel)
-            throws InterruptedException {
+    public void configureAttributeLabel(String attributeName, AttributeLabelTypes attributeLabel) {
         initAttribute(attributeName);
         assertEquals(attributeDetailPage.getAttributeName(), attributeName,
                 "Invalid attribute name on detail page");
         attributeDetailPage.selectLabelType(attributeLabel.getlabel());
-        Thread.sleep(2000);
+        sleepTightInSeconds(2);
         assertEquals(attributeDetailPage.getAttributeLabelType(), attributeLabel.getlabel(),
                 "Label type not set properly");
     }
