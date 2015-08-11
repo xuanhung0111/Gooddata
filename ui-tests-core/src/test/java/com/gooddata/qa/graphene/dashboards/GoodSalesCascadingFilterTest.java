@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -26,10 +26,10 @@ import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.common.Sleeper;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.HowItem.Position;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -38,7 +38,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
@@ -101,8 +101,8 @@ public class GoodSalesCascadingFilterTest extends GoodSalesAbstractTest {
 
         // *** create report 3 ***
         initReportsPage();
-        com.gooddata.qa.graphene.entity.ReportDefinition rd =
-                new com.gooddata.qa.graphene.entity.ReportDefinition()
+        com.gooddata.qa.graphene.entity.report.ReportDefinition rd =
+                new com.gooddata.qa.graphene.entity.report.ReportDefinition()
                         .withName(REPORT_3)
                         .withWhats(AMOUNT)
                         .withHows(STAGE_NAME)

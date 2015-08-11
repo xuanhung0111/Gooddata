@@ -1,15 +1,15 @@
 package com.gooddata.qa.graphene.fragments.indigo.user;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.google.common.base.Joiner;

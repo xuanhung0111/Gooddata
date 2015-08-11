@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;

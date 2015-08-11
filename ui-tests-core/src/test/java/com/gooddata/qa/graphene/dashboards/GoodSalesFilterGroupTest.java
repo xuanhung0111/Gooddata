@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -12,17 +12,17 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-
-import com.gooddata.qa.graphene.common.Sleeper;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.GroupConfigPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
 

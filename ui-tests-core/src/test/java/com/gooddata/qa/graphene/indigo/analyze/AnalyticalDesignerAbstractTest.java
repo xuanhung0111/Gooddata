@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import org.openqa.selenium.By;

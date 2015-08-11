@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
@@ -38,7 +38,7 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;

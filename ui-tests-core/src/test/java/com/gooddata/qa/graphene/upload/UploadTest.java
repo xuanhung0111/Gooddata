@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.upload;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 import com.gooddata.qa.utils.graphene.Screenshots;

@@ -6,7 +6,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class LoginFragment extends AbstractFragment {
 

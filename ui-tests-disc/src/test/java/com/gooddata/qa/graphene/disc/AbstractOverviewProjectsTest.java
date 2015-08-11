@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProce
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess.OverviewSchedule;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;

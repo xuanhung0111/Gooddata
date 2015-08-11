@@ -11,7 +11,7 @@
     <dependencies>
         <dependency>
             <groupId>com.gooddata.qa</groupId>
-            <artifactId>ui-tests-core</artifactId>
+            <artifactId>ui-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

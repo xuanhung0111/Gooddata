@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.DashboardEditWidgetToolbarPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.DashboardEditWidgetToolbarPanel;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 

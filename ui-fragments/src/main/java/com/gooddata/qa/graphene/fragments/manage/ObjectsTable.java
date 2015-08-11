@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 

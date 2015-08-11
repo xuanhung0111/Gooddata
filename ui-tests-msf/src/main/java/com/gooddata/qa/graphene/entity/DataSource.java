@@ -12,7 +12,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class DataSource {
 

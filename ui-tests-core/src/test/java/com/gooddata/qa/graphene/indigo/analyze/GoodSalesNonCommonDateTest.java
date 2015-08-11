@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;

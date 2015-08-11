@@ -1,13 +1,11 @@
 package com.gooddata.qa.graphene.dlui;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-
-import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -21,7 +19,7 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;

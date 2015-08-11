@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -20,16 +20,16 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.common.Sleeper;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.entity.WhatItem;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
-import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.collect.Sets;
 
 @Test(groups = {"GoodSalesDrillReport"}, description = "Drill report placed on dashboard")

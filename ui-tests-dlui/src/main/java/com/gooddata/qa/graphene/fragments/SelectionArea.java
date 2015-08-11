@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import java.util.List;
 
 import org.openqa.selenium.By;

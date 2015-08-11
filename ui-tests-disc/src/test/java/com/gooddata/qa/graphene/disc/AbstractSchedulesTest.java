@@ -6,7 +6,7 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
 
 public abstract class AbstractSchedulesTest extends AbstractDISCTest {

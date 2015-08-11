@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import com.gooddata.qa.CssUtils;
-import com.gooddata.qa.graphene.enums.PublishType;
+import com.gooddata.qa.utils.CssUtils;
+import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
@@ -19,7 +19,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class DashboardsPage extends AbstractFragment {
     private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 

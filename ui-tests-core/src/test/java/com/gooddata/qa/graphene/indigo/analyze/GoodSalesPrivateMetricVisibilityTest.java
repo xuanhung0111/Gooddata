@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -12,7 +12,7 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbstractTest {
 

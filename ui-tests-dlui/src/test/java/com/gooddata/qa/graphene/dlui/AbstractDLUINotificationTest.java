@@ -15,7 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;

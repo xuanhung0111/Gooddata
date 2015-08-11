@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.utils.http.RestUtils.setFeatureFlags;
 import static com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption.createFeatureClassOption;
@@ -23,7 +23,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditFilter;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardSettingsDialog;

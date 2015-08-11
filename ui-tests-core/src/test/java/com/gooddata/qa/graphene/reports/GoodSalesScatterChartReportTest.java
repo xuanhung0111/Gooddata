@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
 
 import java.util.ArrayList;
@@ -14,10 +14,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.CssUtils;
+import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.common.Sleeper;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;

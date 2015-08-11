@@ -14,7 +14,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilt
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 public class FilterWidget extends AbstractFragment {
 

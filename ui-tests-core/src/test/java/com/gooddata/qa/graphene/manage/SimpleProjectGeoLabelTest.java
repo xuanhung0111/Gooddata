@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.util.Arrays.asList;

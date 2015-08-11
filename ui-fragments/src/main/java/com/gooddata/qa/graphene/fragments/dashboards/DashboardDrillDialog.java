@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
+import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;

@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.rolap;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -26,12 +26,12 @@ import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.CssUtils;
+import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
-import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;

@@ -5,7 +5,7 @@ import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class SchedulesTable extends AbstractTable {
 

@@ -7,22 +7,22 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.enums.ExportFormat;
-import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.testng.Assert;
 
 import java.io.IOException;
 import java.net.URL;
 
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 @Test(groups = {"GoodSalesReports"}, description = "Tests for GoodSales project (reports functionality) in GD platform")
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {
@@ -77,7 +77,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         prepareReport(SIMPLE_CA_REPORT, ReportTypes.TABLE, what, how);
         String bucketRegion = waitForElementPresent(includeArea, browser).getAttribute("gdc:region").replace('0', '1');
         String computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion)), browser).getText();
-        Assert.assertEquals(computedAttr, expectedValue);
+        assertEquals(computedAttr, expectedValue);
 
         /*** invert condition and check if it's reflected on report ***/
         maqlResource = getClass().getResource("/comp-attributes/ca-maql-simple-inv.txt");
@@ -86,7 +86,7 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         initReportPage(SIMPLE_CA_REPORT);
         bucketRegion = waitForElementPresent(excludeArea, browser).getAttribute("gdc:region").replace('0', '1');
         computedAttr = waitForElementPresent(By.xpath(regionLocator.replaceAll("\\d+,\\d+,\\d+,\\d+", bucketRegion)), browser).getText();
-        Assert.assertEquals(computedAttr, expectedValue);
+        assertEquals(computedAttr, expectedValue);
     }
 
     @Test(dependsOnMethods = {"verifyReportsPage"}, groups = {"goodsales-chart"})

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;

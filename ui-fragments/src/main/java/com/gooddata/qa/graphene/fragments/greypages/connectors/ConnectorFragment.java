@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.greypages.connectors;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

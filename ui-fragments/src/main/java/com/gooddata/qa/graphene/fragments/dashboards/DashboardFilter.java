@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class DashboardFilter extends AbstractFragment {

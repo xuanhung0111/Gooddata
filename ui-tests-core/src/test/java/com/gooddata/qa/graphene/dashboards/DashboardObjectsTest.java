@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 
@@ -10,9 +10,9 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
-import com.gooddata.qa.graphene.enums.TextObject;
-import com.gooddata.qa.graphene.enums.WidgetTypes;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.dashboard.TextObject;
+import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
 @Test(groups = {"dashboardObjects"},

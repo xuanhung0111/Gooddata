@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
 
 import java.io.IOException;
@@ -14,11 +14,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.http.RestUtils;
 
 @Test(groups = {"GoodSalesDrillReportToExport"}, description = "Drill report to export")

@@ -1,15 +1,15 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertTrue;

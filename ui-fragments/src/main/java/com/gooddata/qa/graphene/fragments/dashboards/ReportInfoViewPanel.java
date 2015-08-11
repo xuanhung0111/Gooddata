@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.beust.jcommander.internal.Lists;
-import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;

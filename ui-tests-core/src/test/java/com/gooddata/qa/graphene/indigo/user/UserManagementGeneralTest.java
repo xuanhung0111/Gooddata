@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.user;
 
 import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -18,7 +18,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
@@ -26,9 +26,9 @@ import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.graphene.enums.PublishType;
-import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.graphene.enums.UserStates;
+import com.gooddata.qa.graphene.enums.dashboard.PublishType;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;

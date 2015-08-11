@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -33,7 +33,7 @@ import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
@@ -530,9 +530,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
                 browser.switchTo().window(handel);
         }
 
-        com.gooddata.qa.graphene.fragments.reports.TableReport tableReport =
+        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
                 Graphene.createPageFragment(
-                        com.gooddata.qa.graphene.fragments.reports.TableReport.class,
+                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
                         waitForElementVisible(By.id("gridContainerTab"), browser));
 
         Iterator<String> attributes = tableReport.getAttributeElements().iterator();

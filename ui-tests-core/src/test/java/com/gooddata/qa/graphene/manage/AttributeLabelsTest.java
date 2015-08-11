@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 
@@ -16,11 +16,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
-import com.gooddata.qa.graphene.fragments.greypages.sfdccredentials.ConfigureSFDCCredentials;
-import com.gooddata.qa.graphene.fragments.reports.ReportWithImage;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.greypages.sfdc.ConfigureSFDCCredentials;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportWithImage;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 
 @Test(groups = {"projectSimpleAttribute"},

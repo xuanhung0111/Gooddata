@@ -1,22 +1,22 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.fragments.reports.InteractiveReportWidget.ChartType.BAR_CHART;
-import static com.gooddata.qa.graphene.fragments.reports.InteractiveReportWidget.ChartType.LINE_CHART;
-import static com.gooddata.qa.graphene.fragments.reports.InteractiveReportWidget.ChartType.AREA_CHART;
+import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.BAR_CHART;
+import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.LINE_CHART;
+import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.AREA_CHART;
 
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.reports.InteractiveReportWidget;
+import com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget;
 
 @Test(groups = {"interactiveReportTest"}, description = "Test Interactive Report on dashboard")
 public class GoodSalesInteractiveReportTest extends GoodSalesAbstractTest {

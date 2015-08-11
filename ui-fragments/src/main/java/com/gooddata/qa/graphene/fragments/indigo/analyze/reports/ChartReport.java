@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.ArrayList;
 import java.util.Arrays;

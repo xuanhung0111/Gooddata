@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -36,15 +35,15 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.common.CheckUtils;
-import com.gooddata.qa.graphene.common.Sleeper;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.utils.CheckUtils;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
-import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.fragments.reports.ReportVisualizer;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportVisualizer;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 @Test(groups = {"GoodSalesMetrics"},
         description = "Tests for GoodSales project (metric creation functionality) in GD platform")

@@ -10,15 +10,16 @@
     <url>https://confluence.intgdc.com/display/Quality/Graphene+UI+Tests</url>
 
     <modules>
+        <module>ui-fragments</module>
+        <module>ui-core</module>
         <module>ui-tests-core</module>
         <module>ui-tests-dss</module>
         <module>ui-tests-connectors</module>
-        <module>ui-tests-dashboards</module>
+        <module>ui-tests-perf</module>
         <module>ui-tests-tools</module>
-        <module>ui-fragments</module>
+        <module>ui-tests-msf</module>
         <module>ui-tests-disc</module>
         <module>ui-tests-dlui</module>
-        <module>ui-tests-msf</module>
         <module>ui-tests-csv-uploader</module>
   </modules>
 

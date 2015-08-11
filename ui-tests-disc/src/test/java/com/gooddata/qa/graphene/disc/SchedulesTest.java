@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -15,11 +15,11 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.common.Sleeper;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.CronTimeBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;

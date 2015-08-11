@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.Arrays;
 import java.util.List;

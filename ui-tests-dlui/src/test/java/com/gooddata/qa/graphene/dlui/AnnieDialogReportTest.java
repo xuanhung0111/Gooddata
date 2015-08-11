@@ -1,13 +1,10 @@
 package com.gooddata.qa.graphene.dlui;
 
-import java.util.Collection;
-
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.dlui.AbstractAnnieDialogTest.ReportWithAddedFields;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
 

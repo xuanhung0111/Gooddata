@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.addMUFToUser;
 import static com.gooddata.qa.utils.http.RestUtils.createMUFObj;
 import static com.gooddata.qa.utils.http.RestUtils.executePostRequest;
@@ -43,14 +43,14 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardContent;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.base.Function;
 
 public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstractTest {
@@ -129,8 +129,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         // *** create report 2 ***
         initReportsPage();
-        com.gooddata.qa.graphene.entity.ReportDefinition rd =
-                new com.gooddata.qa.graphene.entity.ReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
+        com.gooddata.qa.graphene.entity.report.ReportDefinition rd =
+                new com.gooddata.qa.graphene.entity.report.ReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
                         .withHows(STAGE_NAME).withHows(YEAR_SNAPSHOT);
         createReport(rd, REPORT_2);
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(F_STAGE_NAME, "Discovery", "2010", "2011",

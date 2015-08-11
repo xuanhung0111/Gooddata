@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.disc;
 
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.*;

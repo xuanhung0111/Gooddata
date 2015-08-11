@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class DashboardTabs extends AbstractFragment {
 

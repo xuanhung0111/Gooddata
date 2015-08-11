@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.CssUtils;
+import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;

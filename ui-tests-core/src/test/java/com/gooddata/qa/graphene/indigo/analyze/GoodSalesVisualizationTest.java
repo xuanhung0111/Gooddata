@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.http.RestUtils.changeMetricFormat;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -31,13 +31,13 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
-import com.gooddata.qa.graphene.enums.ReportTypes;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 

@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkGreenBar;
-import static com.gooddata.qa.graphene.common.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

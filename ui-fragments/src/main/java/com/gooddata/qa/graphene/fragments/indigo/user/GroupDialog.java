@@ -8,9 +8,9 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

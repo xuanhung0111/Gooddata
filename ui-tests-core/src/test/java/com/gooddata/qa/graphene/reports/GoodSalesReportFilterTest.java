@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
@@ -9,7 +9,7 @@ import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 
 @Test(groups = {"GoodSalesReportFilters"},
         description = "Tests for GoodSales project (report filters functionality)")

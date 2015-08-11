@@ -3,8 +3,8 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.common.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -19,7 +19,7 @@ import javax.mail.Part;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
 import com.gooddata.qa.utils.mail.ImapClient;

@@ -3,10 +3,6 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.BY_RED_BAR;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForSchedulesPageLoaded;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -19,6 +15,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -36,12 +39,8 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.UserRoles;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
-import com.gooddata.qa.utils.graphene.Screenshots;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;

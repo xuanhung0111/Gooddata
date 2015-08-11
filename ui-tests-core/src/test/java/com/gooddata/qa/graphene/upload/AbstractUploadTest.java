@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.upload;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
@@ -22,10 +22,10 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
-import com.gooddata.qa.graphene.enums.ReportTypes;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.utils.graphene.Screenshots;
 

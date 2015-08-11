@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
-import com.gooddata.qa.graphene.enums.DWHDriver;
-import com.gooddata.qa.graphene.enums.ProjectEnvironment;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 import org.apache.commons.io.FileUtils;
@@ -14,7 +14,7 @@ import org.openqa.selenium.support.FindBy;
 import java.io.File;
 import java.io.IOException;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
 

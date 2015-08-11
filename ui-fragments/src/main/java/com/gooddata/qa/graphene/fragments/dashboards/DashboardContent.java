@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-import com.gooddata.qa.graphene.fragments.reports.AbstractReport;
+import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;

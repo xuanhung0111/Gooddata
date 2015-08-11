@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import static com.gooddata.qa.CssUtils.simplifyText;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
@@ -9,21 +9,21 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.WebElement;
-import com.gooddata.qa.graphene.common.Sleeper;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.HowItem;
-import com.gooddata.qa.graphene.entity.HowItem.Position;
-import com.gooddata.qa.graphene.entity.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
+import com.gooddata.qa.graphene.entity.report.ReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
-import com.gooddata.qa.graphene.enums.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
-import com.gooddata.qa.graphene.fragments.reports.TableReport;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 

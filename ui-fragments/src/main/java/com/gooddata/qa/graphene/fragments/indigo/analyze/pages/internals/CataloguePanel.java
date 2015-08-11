@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collection;
