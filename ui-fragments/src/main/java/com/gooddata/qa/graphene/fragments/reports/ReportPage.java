@@ -381,6 +381,12 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
+    public void deleteCurrentReport() {
+        waitForAnalysisPageLoaded(browser);
+        openOptionsMenu().select("Delete");
+        waitForElementVisible(By.cssSelector(".c-confirmDeleteDialog .s-btn-delete"), browser).click();
+    }
+
     private void setReportVisibleSettings(boolean isVisible) {
         waitForAnalysisPageLoaded(browser);
         openOptionsMenu().select("Settings");
