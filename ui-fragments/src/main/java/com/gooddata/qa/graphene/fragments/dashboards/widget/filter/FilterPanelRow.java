@@ -22,6 +22,10 @@ public class FilterPanelRow extends AbstractFragment {
     public WebElement getSelectOnly() {
     	return waitForElementVisible(selectOnly);
     }
+    
+    public boolean isSelectOnlyDisplayed() {
+    	return selectOnly.isDisplayed();
+    }
 
     public WebElement getCheckbox() {
         return checkbox;
