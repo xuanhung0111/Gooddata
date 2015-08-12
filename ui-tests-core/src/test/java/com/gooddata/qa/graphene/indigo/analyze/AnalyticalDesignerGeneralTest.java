@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -15,6 +16,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -43,10 +47,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.Trending
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -74,56 +74,32 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void loadAttributes() {
-        Collection<String> allAttributes = Collections2.transform(mdService.find(project, Attribute.class),
-                new Function<Entry, String>() {
-            @Override
-            public String apply(Entry input) {
-                return input.getTitle();
-            }
-        });
+        Supplier<Stream<String>> allAttributes = () -> mdService.find(project, Attribute.class)
+                .stream()
+                .map(Entry::getTitle);
 
-        final Collection<String> dates = Lists.newArrayList(FluentIterable.from(allAttributes)
-                .filter(new Predicate<String>() {
-            @Override
-            public boolean apply(String input) {
-                return input.startsWith(DATE);
-            }
-        }).transform(new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                return input.replaceFirst(DATE, "").trim();
-            }
-        }));
+        Collection<String> dates = allAttributes.get()
+                .filter(attribute -> attribute.startsWith(DATE))
+                .map(attribute -> attribute.replaceFirst(DATE, "").trim())
+                .collect(toList());
 
-        attributes = Lists.newArrayList(Collections2.filter(allAttributes, new Predicate<String>() {
-            @Override
-            public boolean apply(String input) {
-                if (input.startsWith("Records of")) {
-                    return false;
-                }
-
-                for (String date: dates) {
-                    if (input.endsWith(date)) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }));
+        attributes = allAttributes.get()
+                .filter(attribute -> {
+                    if (attribute.startsWith("Records of")) return false;
+                    if (dates.stream().anyMatch(attribute::endsWith)) return false;
+                    return true;
+                })
+                .collect(toList());
 
         remainedAttributes = Lists.newArrayList(attributes);
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
     public void loadMetrics() {
-        metrics = Lists.newArrayList(Collections2.transform(mdService.find(project, Metric.class),
-                new Function<Entry, String>() {
-            @Override
-            public String apply(Entry input) {
-                return input.getTitle();
-            }
-        }));
+        metrics = mdService.find(project, Metric.class)
+                .stream()
+                .map(Entry::getTitle)
+                .collect(toList());
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
@@ -143,12 +119,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void testCustomDiscovery() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "testCustomDiscovery");
+        String metric = doSafetyMetricAction(analysisPage::addMetric, "testCustomDiscovery");
 
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -161,12 +132,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         analysisPage.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "testCustomDiscovery");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "testCustomDiscovery");
 
         assertTrue(report.getTrackersCount() >= 1);
         analysisPage.resetToBlankState();
@@ -197,13 +163,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void dragMetricToColumnChartShortcutPanel() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.dragAndDropMetricToShortcutPanel(metric,
-                        ShortcutPanel.AS_A_COLUMN_CHART);
-            }
-        }, "dragMetricToColumnChartShortcutPanel");
+        String metric = doSafetyMetricAction(
+                data -> analysisPage.dragAndDropMetricToShortcutPanel(data, ShortcutPanel.AS_A_COLUMN_CHART),
+                "dragMetricToColumnChartShortcutPanel");
 
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -216,12 +178,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         analysisPage.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "dragMetricToColumnChartShortcutPanel");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "dragMetricToColumnChartShortcutPanel");
 
         assertTrue(report.getTrackersCount() >= 1);
     }
@@ -230,12 +187,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void dragMetricToTrendShortcutPanel() {
         initAnalysePage();
 
-        doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.dragAndDropMetricToShortcutPanel(metric, ShortcutPanel.TRENDED_OVER_TIME);
-            }
-        }, "dragMetricToTrendShortcutPanel");
+        doSafetyMetricAction(
+                data -> analysisPage.dragAndDropMetricToShortcutPanel(data, ShortcutPanel.TRENDED_OVER_TIME),
+                "dragMetricToTrendShortcutPanel");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
@@ -251,19 +205,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void testSimpleContribution() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "testSimpleContribution");
+        String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleContribution");
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "testSimpleContribution");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleContribution");
 
         final ChartReport report = analysisPage.getChartReport();
         int oldTrackersCount = report.getTrackersCount();
@@ -279,12 +223,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "testSimpleContribution");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleContribution");
 
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertTrue(report.getTrackersCount() >= 1);
@@ -295,12 +234,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void testAnotherApproachToShowContribution() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "testAnotherApproachToShowContribution");
+        String metric = doSafetyMetricAction(analysisPage::addMetric, "testAnotherApproachToShowContribution");
 
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -337,12 +271,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void testSimpleComparison() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "testSimpleComparison");
+        String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleComparison");
 
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -353,12 +282,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
 
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        String attribute = doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "testSimpleComparison");
+        String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleComparison");
 
         analysisPage.resetToBlankState().addMetric(metric);
         waitForFragmentVisible(comparisonRecommendation);
@@ -368,12 +292,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        attribute = doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "testSimpleComparison");
+        attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleComparison");
 
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
         assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
@@ -395,19 +314,14 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             }
 
             while (true) {
-                metric = doSafetyMetricAction(new MetricSafetyAction() {
-                    @Override
-                    public void action(String metric) {
-                        analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-                    }
-                }, "supportParameter");
+                metric = doSafetyMetricAction(analysisPage::addMetric, "supportParameter");
 
                 if (!badMetrics.contains(metric)) {
                     break;
                 }
                 analysisPage.resetToBlankState();
             }
-    
+
             ChartReport report = analysisPage.getChartReport();
             assertEquals(report.getTrackersCount(), 1);
             RecommendationContainer recommendationContainer =
@@ -415,7 +329,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
                             waitForElementVisible(RecommendationContainer.LOCATOR, browser));
             assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
             assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
-    
+
             TrendingRecommendation trendingRecommendation =
                     recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
             trendingRecommendation.select("Month").apply();
@@ -426,7 +340,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             analysisPage.expandMetricConfiguration(metric);
             assertTrue(analysisPage.isShowPercentConfigEnabled());
             assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
-    
+
             if (!browser.findElements(RecommendationContainer.LOCATOR).isEmpty()) {
                 assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
                 assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -445,12 +359,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void displayInColumnChartWithOnlyMetric() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "displayInColumnChartWithOnlyMetric");
+        String metric = doSafetyMetricAction(analysisPage::addMetric, "displayInColumnChartWithOnlyMetric");
 
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -459,12 +368,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        doSafetyAttributeAction(metric, new SafetyActionAdapter() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addFilter(attribute);
-            }
-        }, "displayInColumnChartWithOnlyMetric");
+        doSafetyAttributeAction(metric, analysisPage::addFilter, "displayInColumnChartWithOnlyMetric");
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
@@ -474,12 +378,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "displayInColumnChartWithOnlyMetric");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "displayInColumnChartWithOnlyMetric");
 
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
@@ -488,12 +387,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
 
-        doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.dragAndDropMetricToShortcutPanel(metric, ShortcutPanel.TRENDED_OVER_TIME);
-            }
-        }, "displayWhenDraggingFirstMetric");
+        doSafetyMetricAction(
+                data -> analysisPage.dragAndDropMetricToShortcutPanel(data, ShortcutPanel.TRENDED_OVER_TIME),
+                "displayWhenDraggingFirstMetric");
 
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertTrue(analysisPage.isDateFilterVisible());
@@ -505,19 +401,11 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void exportCustomDiscovery() throws InterruptedException {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withType(ReportType.TABLE).withMetrics(metric));
-            }
-        }, "exportCustomDiscovery");
+        String metric = doSafetyMetricAction(
+                data -> analysisPage.addMetric(data).changeReportType(ReportType.TABLE),
+                "exportCustomDiscovery");
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "exportCustomDiscovery");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "exportCustomDiscovery");
 
         assertTrue(analysisPage.isExportToReportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
@@ -571,19 +459,11 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void filterOnDateAttribute() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(DATE));
-            }
-        }, "filterOnDateAttribute");
+        String metric = doSafetyMetricAction(
+                data -> analysisPage.addMetric(data).addFilter(DATE),
+                "filterOnDateAttribute");
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "filterOnDateAttribute");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "filterOnDateAttribute");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
@@ -597,12 +477,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void testDateInCategoryAndDateInFilter() {
         initAnalysePage();
 
-        doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withCategories(DATE));
-            }
-        }, "testDateInCategoryAndDateInFilter");
+        doSafetyMetricAction(
+                data -> analysisPage.addMetric(data).addCategory(DATE),
+                "testDateInCategoryAndDateInFilter");
 
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
@@ -614,12 +491,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(DATE));
-            }
-        }, "trendingRecommendationOverrideDateFilter");
+        String metric = doSafetyMetricAction(
+                data -> analysisPage.addMetric(data).addFilter(DATE),
+                "trendingRecommendationOverrideDateFilter");
 
         assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
 
@@ -653,30 +527,16 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void dragAndDropAttributeToFilterBucket() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "dragAndDropAttributeToFilterBucket");
+        String metric = doSafetyMetricAction(analysisPage::addMetric, "dragAndDropAttributeToFilterBucket");
 
-        String attribute = doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "dragAndDropAttributeToFilterBucket");
+        String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory,
+                "dragAndDropAttributeToFilterBucket");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
 
-        attribute = doSafetyAttributeAction(metric, new SafetyActionAdapter() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addFilter(attribute);
-            }
-        }, "dragAndDropAttributeToFilterBucket");
+        attribute = doSafetyAttributeAction(metric, analysisPage::addFilter, "dragAndDropAttributeToFilterBucket");
 
         assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
     }
@@ -685,19 +545,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void addFilterDoesNotHideRecommendation() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "addFilterDoesNotHideRecommendation");
+        String metric = doSafetyMetricAction(analysisPage::addMetric, "addFilterDoesNotHideRecommendation");
 
-        doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "addFilterDoesNotHideRecommendation");
+        doSafetyAttributeAction(metric, analysisPage::addCategory, "addFilterDoesNotHideRecommendation");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
@@ -707,12 +557,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        doSafetyAttributeAction(metric, new SafetyActionAdapter() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addFilter(attribute);
-            }
-        }, "addFilterDoesNotHideRecommendation");
+        doSafetyAttributeAction(metric, analysisPage::addFilter, "addFilterDoesNotHideRecommendation");
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -722,12 +567,9 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void testSimplePoP() {
         initAnalysePage();
 
-        final String metric1 = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.addMetric(metric).addCategory(DATE);
-            }
-        }, "testSimplePoP");
+        final String metric1 = doSafetyMetricAction(
+                data -> analysisPage.addMetric(data).addCategory(DATE),
+                "testSimplePoP");
 
         assertTrue(analysisPage.isDateFilterVisible());
         assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
@@ -743,24 +585,14 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         assertEquals(legends.size(), 2);
         assertTrue(isEqualCollection(legends, asList(metric1 + " - previous year", metric1)));
 
-        doSafetyMetricAction(new SafetyActionAdapter() {
-            @Override
-            public void action(String metric) {
-                analysisPage.replaceMetric(metric1, metric);
-            }
-        }, "testSimplePoP");
+        doSafetyMetricAction(data -> analysisPage.replaceMetric(metric1, data), "testSimplePoP");
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP})
     public void testAnotherApproachToShowPoP() {
         initAnalysePage();
 
-        doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric));
-            }
-        }, "testAnotherApproachToShowPoP");
+        doSafetyMetricAction(analysisPage::addMetric, "testAnotherApproachToShowPoP");
 
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -786,19 +618,12 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
     public void compararisonRecommendationOverrideDateFilter() {
         initAnalysePage();
 
-        String metric = doSafetyMetricAction(new MetricSafetyAction() {
-            @Override
-            public void action(String metric) {
-                analysisPage.createReport(new ReportDefinition().withMetrics(metric).withFilters(DATE));
-            }
-        }, "compararisonRecommendationOverrideDateFilter");
+        String metric = doSafetyMetricAction(
+                data -> analysisPage.addMetric(data).addFilter(DATE),
+                "compararisonRecommendationOverrideDateFilter");
 
-        String attribute = doSafetyAttributeAction(metric, new AttributeSafetyAction() {
-            @Override
-            public void action(String attribute) {
-                analysisPage.addCategory(attribute);
-            }
-        }, "compararisonRecommendationOverrideDateFilter");
+        String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory,
+                "compararisonRecommendationOverrideDateFilter");
 
         boolean timeFilterOk = false;
         for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
@@ -878,11 +703,11 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         return false;
     }
 
-    private String doSafetyMetricAction(SafetyAction metricAction, String screenshot) {
+    private String doSafetyMetricAction(Consumer<String> action, Consumer<String> failedAction, String screenshot) {
         String metric;
         while (true) {
             metric = getRandomMetric();
-            metricAction.action(metric);
+            action.accept(metric);
             analysisPage.waitForReportComputing();
             if (!analysisPage.isExplorerMessageVisible())
                 break;
@@ -892,19 +717,23 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             System.out.println(format("Report with metric [%s] shows message: %s", metric,
                     analysisPage.getExplorerMessage()));
             brokenMetrics.add(metric);
-            metricAction.actionWhenFailed(metric);
+            failedAction.accept(metric);
             continue;
         }
         System.out.println(format("Good metric [%s] to test", metric));
         return metric;
     }
 
-    private String doSafetyAttributeAction(String metric, SafetyAction attributeAction,
+    private String doSafetyMetricAction(Consumer<String> action, String screenshot) {
+        return doSafetyMetricAction(action, metric -> analysisPage.resetToBlankState(), screenshot);
+    }
+
+    private String doSafetyAttributeAction(String metric, Consumer<String> action, Consumer<String> failedAction,
             String screenshot) {
         String attribute;
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
-            attributeAction.action(attribute);
+            action.accept(attribute);
             analysisPage.waitForReportComputing();
             if (!analysisPage.isExplorerMessageVisible())
                 break;
@@ -914,7 +743,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
             System.out.println(format(
                     "Report with metric [%s] and attribute [%s] shows message: %s", metric,
                     attribute, analysisPage.getExplorerMessage()));
-            attributeAction.actionWhenFailed(attribute);
+            failedAction.accept(attribute);
             System.out.println("Try another pair to test");
             continue;
         }
@@ -922,32 +751,7 @@ public class AnalyticalDesignerGeneralTest extends AbstractUITest {
         return attribute;
     }
 
-    private static interface SafetyAction {
-        void action(String data);
-
-        void actionWhenFailed(String data);
-    }
-
-    private abstract class SafetyActionAdapter implements SafetyAction {
-        @Override
-        public void action(String data) {}
-
-        @Override
-        public void actionWhenFailed(String data) {
-        }
-    }
-
-    private abstract class MetricSafetyAction extends SafetyActionAdapter {
-        @Override
-        public void actionWhenFailed(String data) {
-            analysisPage.resetToBlankState();
-        }
-    }
-
-    private abstract class AttributeSafetyAction extends SafetyActionAdapter {
-        @Override
-        public void actionWhenFailed(String attribute) {
-            analysisPage.removeCategory(attribute);
-        }
+    private String doSafetyAttributeAction(String metric, Consumer<String> action, String screenshot) {
+        return doSafetyAttributeAction(metric, action, analysisPage::removeCategory, screenshot);
     }
 }
