@@ -125,6 +125,7 @@ public class ZendeskHelper {
         long startTimestampInUTC = startDateTime.toDateTime(DateTimeZone.UTC).getMillis() / 1000L;
         String jsonUrl = TICKET_EVENTS_INC_URL + "?start_time=" + startTimestampInUTC;
         int lastTicketEventId = 0;
+        long lastEventTimestamp = 0;
 
         do {
             ticketsEventsPageJson = retrieveEntitiesJsonFromUrl(jsonUrl);
@@ -135,8 +136,9 @@ public class ZendeskHelper {
                 JSONObject ticketEventJson = ticketEventsJson.getJSONObject(i);
 
                 if (ticketEventJson.getInt("ticket_id") == ticketId
-                        && ticketEventJson.getInt("id") > lastTicketEventId) {
+                        && ticketEventJson.getLong("timestamp") > lastEventTimestamp) {
                     lastTicketEventId = ticketEventJson.getInt("id");
+                    lastEventTimestamp = ticketEventJson.getLong("timestamp");
                 }
             }
         } while (ticketsEventsPageJson.getInt("count") == 1000 && jsonUrl != null);
