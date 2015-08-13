@@ -1,13 +1,18 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -19,9 +24,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -184,10 +187,9 @@ public class MetricsBucket extends AbstractFragment {
     public void addFilterMetric(String metric, String attribute, String... values) {
         getMetric(metric).findElement(BY_ADD_ATTRIBUTE_FILTER).click();
 
-        Graphene.createPageFragment(DropDown.class,
+        Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
-                .searchItem(attribute)
-                .tryToSelectItem(attribute);
+                .selectTextItem(attribute);
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
@@ -236,37 +238,65 @@ public class MetricsBucket extends AbstractFragment {
 
     public class AttributeFilterPicker extends AbstractFragment {
 
-        @FindBy(className = "s-btn-clear")
+        @FindBy(className = "searchfield-input")
+        private WebElement searchInput;
+
+        @FindBy(className = "s-clear")
         private WebElement clearButton;
 
-        @FindBy(css = ".ember-list-container > div > div")
+        @FindBy(css = ".gd-list-item")
         private List<WebElement> items;
 
         @FindBy(css = ".s-btn-apply:not(.disabled)")
         private WebElement applyButton;
+
+        private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
         public AttributeFilterPicker clear() {
             waitForElementVisible(clearButton).click();
             return this;
         }
 
+        public void selectTextItem(String element) {
+            searchItem(element);
+            items.stream()
+                .map(item -> item.findElement(cssSelector("span:last-child")))
+                .filter(item -> element.equals(item.getText()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element))
+                .click();
+        }
+
+        private void selectInputItem(String element) {
+            searchItem(element);
+            items.stream()
+                .filter(item -> element.equals(item.findElement(tagName("span")).getText()))
+                .findFirst()
+                .map(item -> item.findElement(tagName("input")))
+                .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element))
+                .click();
+        }
+
         public AttributeFilterPicker selectItems(String... items) {
-            findItem:
-            for (String item : items) {
-                for (WebElement row : this.items) {
-                    if (row.getAttribute("class").contains("s-" + CssUtils.simplifyText(item))) {
-                        row.findElement(By.tagName("input")).click();
-                        continue findItem;
-                    }
-                }
-                throw new NoSuchElementException("Cannot find attribute: " + item);
-            }
+            Stream.of(items).forEach(this::selectInputItem);
             return this;
         }
 
         public void apply() {
             waitForElementVisible(applyButton).click();
             waitForElementNotVisible(getRoot());
+        }
+
+        private void searchItem(String name) {
+            waitForElementVisible(this.getRoot());
+
+            waitForElementVisible(searchInput).clear();
+            searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+            waitForCollectionIsEmpty(items);
+
+            searchInput.clear();
+            searchInput.sendKeys(name);
+            waitForCollectionIsNotEmpty(items);
         }
     }
 }

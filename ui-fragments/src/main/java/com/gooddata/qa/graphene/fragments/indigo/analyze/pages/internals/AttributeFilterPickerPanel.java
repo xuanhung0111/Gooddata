@@ -1,25 +1,31 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.tagName;
+
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class AttributeFilterPickerPanel extends AbstractFragment {
 
-    public static final By LOCATOR = By.cssSelector(".adi-attr-filter-picker");
+    @FindBy(className = "searchfield-input")
+    private WebElement searchInput;
 
-    @FindBy(css = ".s-btn-select_all")
+    @FindBy(css = ".s-select_all")
     private WebElement selectAllButton;
 
-    @FindBy(css = ".s-btn-clear")
+    @FindBy(css = ".s-clear")
     private WebElement clearButton;
 
-    @FindBy(css = ".s-filter-item>div>span")
+    @FindBy(css = ".s-filter-item > div")
     private List<WebElement> items;
 
     @FindBy(css = ".s-btn-cancel")
@@ -28,7 +34,9 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".s-btn-apply")
     private WebElement applyButton;
 
-    private static final By BY_INPUT = By.cssSelector("input");
+    public static final By LOCATOR = cssSelector(".adi-attr-filter-picker");
+    private static final By BY_INPUT = cssSelector("input");
+    private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     public void select(String... values) {
         waitForCollectionIsNotEmpty(items);
@@ -36,15 +44,21 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
             selectAll();
             return;
         }
+
         waitForElementVisible(clearButton).click();
-        for (String value : values) {
-            for (WebElement e : items) {
-                if (value.equals(e.getText()))
-                    e.findElement(BY_INPUT).click();
-            }
-        }
+        Stream.of(values).forEach(this::selectItem);
         waitForElementVisible(applyButton).click();
         waitForFragmentNotVisible(this);
+    }
+
+    private void selectItem(String item) {
+        searchItem(item);
+        items.stream()
+            .filter(e -> item.equals(e.findElement(tagName("span")).getText()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find: " + item))
+            .findElement(BY_INPUT)
+            .click();
     }
 
     public void selectAll() {
@@ -63,5 +77,17 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
         waitForElementVisible(clearButton);
         waitForElementVisible(applyButton);
         waitForElementVisible(cancelButton);
+    }
+
+    private void searchItem(String name) {
+        waitForElementVisible(this.getRoot());
+
+        waitForElementVisible(searchInput).clear();
+        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        waitForCollectionIsEmpty(items);
+
+        searchInput.clear();
+        searchInput.sendKeys(name);
+        waitForCollectionIsNotEmpty(items);
     }
 }
