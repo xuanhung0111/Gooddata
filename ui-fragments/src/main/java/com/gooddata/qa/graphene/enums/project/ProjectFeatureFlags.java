@@ -6,7 +6,8 @@ public enum ProjectFeatureFlags {
     HIDE_DASHBOARD_SCHEDULE("hideDashboardSchedule"),
     DASHBOARD_SCHEDULE_RECIPIENTS("dashboardScheduleRecipients"),
     DISPLAY_USER_MANAGEMENT("displayUserManagement"),
-    NPS_STATUS("npsStatus");
+    NPS_STATUS("npsStatus"),
+    ANALYTICAL_DESIGNER("analyticalDesigner");
 
     private String featureFlag;
 
