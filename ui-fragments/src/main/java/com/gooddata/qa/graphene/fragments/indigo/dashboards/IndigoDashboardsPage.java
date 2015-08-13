@@ -1,17 +1,14 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.collect.Iterables;
-
+import org.jboss.arquillian.graphene.findby.ByJQuery;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
-
-import org.jboss.arquillian.graphene.findby.ByJQuery;
-import com.gooddata.qa.graphene.utils.Sleeper;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
@@ -42,6 +39,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = "dash-filters-date")
     private DateFilter dateFilter;
+
+    @FindBy(css = ".dash-filters-attribute.are-loaded")
+    private AttributeFiltersPanel attributeFiltersPanel;
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector(".s-save_button:not(.disabled)");
@@ -123,12 +123,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public String getValueFromKpi(final String name) {
-        return Iterables.find(kpis, new Predicate<Kpi>() {
-            @Override
-            public boolean apply(Kpi input) {
-                return name.equals(input.getHeadline());
-            }
-        }).getValue();
+        return Iterables.find(kpis, input -> name.equals(input.getHeadline())).getValue();
     }
 
     public Kpi getKpiByIndex(int index) {
@@ -141,26 +136,26 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage waitForAllKpiWidgetsLoaded(){
+    public IndigoDashboardsPage waitForAllKpiWidgetsLoaded() {
         waitForElementNotPresent(Kpi.IS_WIDGET_LOADING);
 
         return this;
     }
 
-    public IndigoDashboardsPage waitForAllKpiWidgetContentLoading(){
+    public IndigoDashboardsPage waitForAllKpiWidgetContentLoading() {
         waitForElementPresent(Kpi.IS_CONTENT_LOADING, browser);
 
         return this;
     }
 
-    public IndigoDashboardsPage waitForAllKpiWidgetContentLoaded(){
+    public IndigoDashboardsPage waitForAllKpiWidgetContentLoaded() {
         waitForAllKpiWidgetsLoaded();
         waitForElementNotPresent(Kpi.IS_CONTENT_LOADING);
 
         return this;
     }
 
-    public IndigoDashboardsPage waitForKpiEditable(){
+    public IndigoDashboardsPage waitForKpiEditable() {
         waitForElementNotPresent(Kpi.IS_NOT_EDITABLE);
 
         return this;
@@ -174,8 +169,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName) {
         clickAddWidget();
         configurationPanel
-            .selectMetricByName(metricName)
-            .selectDateDimensionByName(dateDimensionName);
+                .selectMetricByName(metricName)
+                .selectDateDimensionByName(dateDimensionName);
 
         return waitForAllKpiWidgetContentLoaded();
     }
@@ -187,5 +182,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public DateFilter waitForDateFilter() {
         return waitForFragmentVisible(dateFilter);
+    }
+
+    public AttributeFiltersPanel waitForAttributeFilters() {
+        return waitForFragmentVisible(attributeFiltersPanel);
     }
 }
