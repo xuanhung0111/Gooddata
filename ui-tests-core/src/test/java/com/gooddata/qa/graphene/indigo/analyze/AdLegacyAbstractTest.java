@@ -98,7 +98,7 @@ public abstract class AdLegacyAbstractTest extends AnalyticalDesignerAbstractTes
         put("You're ready.", "Go ahead. Start discovering what insights await in your data!");
     }};
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"turnOfWalkme"}, priority = 0)
+    @Test(dependsOnMethods = {"enableAnalyticalDesigner"}, groups = {"turnOfWalkme"}, priority = 0)
     public void testWalkme() {
         initAnalysePage();
 

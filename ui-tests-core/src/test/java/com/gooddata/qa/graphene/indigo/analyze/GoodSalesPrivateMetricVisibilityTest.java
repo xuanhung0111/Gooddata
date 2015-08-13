@@ -12,7 +12,11 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.UserRoles;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbstractTest {
 
@@ -53,13 +57,17 @@ public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbst
     }
 
     @Test(dependsOnMethods = {"createPrivateMetric"})
-    public void testPrivateMetricVisibility() throws JSONException {
+    public void testPrivateMetricVisibility() throws JSONException, IOException {
         try {
             initDashboardsPage();
 
             logout();
             signIn(false, UserRoles.EDITOR);
 
+            RestApiClient editorRestClient = getRestApiClient(testParams.getEditorUser(),
+                    testParams.getEditorPassword());
+            RestUtils.setFeatureFlags(editorRestClient, FeatureFlagOption.createFeatureClassOption(
+                    ProjectFeatureFlags.ANALYTICAL_DESIGNER.getFlagName(), true));
             initAnalysePage();
             assertFalse(analysisPage.searchBucketItem(RATIO_METRIC));
         } finally {
