@@ -55,7 +55,7 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
         assertEquals(reportsPage.getReportsList().getNumberOfReports(), 3);
 
         reportsPage.getDefaultFolders().openFolder(ALL_FOLDER);
-        reportsPage.deselectAllTags();
+        assertTrue(reportsPage.deselectAllTags().getReportsList().getNumberOfReports() > 1);
     }
 
     @Test(dependsOnMethods = {"verifyTagReport"})
