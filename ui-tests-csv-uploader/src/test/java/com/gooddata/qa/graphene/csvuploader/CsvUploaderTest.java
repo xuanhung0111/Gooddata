@@ -39,8 +39,6 @@ public class CsvUploaderTest extends AbstractMSFTest {
     private static final String CSV_FILE_NAME = CSV_DATASET_NAME + ".csv";
     /** This csv file has incorrect column count (one more than expected) on the line number 2. */
     private static final String BAD_CSV_FILE_NAME = CSV_DATASET_NAME + ".bad.csv";
-    /** This csv file is big enough to be canceled before upload ends */
-    private static final String TO_CANCEL_CSV_FILE_NAME = CSV_DATASET_NAME + ".to.cancel.csv";
 
     private static final String UPLOAD_DIALOG_NAME = "upload-dialog";
     private static final String DATA_PAGE_NAME = "data-page";
@@ -141,24 +139,6 @@ public class CsvUploaderTest extends AbstractMSFTest {
         final String sourceName = removeExtension(BAD_CSV_FILE_NAME);
         assertThat("Source with name '" + sourceName + "' should not be in sources list.",
                 sourcesListPage.getMySourcesTable().getSourceNames(),
-                not(hasItem(sourceName)));
-    }
-
-    @Test(dependsOnMethods = {"checkEmptyState"})
-    public void checkCsvUploadCanceledBeforeAnalysis() {
-        initDataUploadPage();
-
-        uploadFile(TO_CANCEL_CSV_FILE_NAME);
-
-        fileUploadProgressDialog.clickCancel();
-
-        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-canceled-upload", getClass());
-
-        waitForFragmentVisible(fileUploadDialog).clickCancelButton();
-
-        final String sourceName = removeExtension(TO_CANCEL_CSV_FILE_NAME);
-        assertThat("Source with name '" + sourceName + "' should not be in sources list.",
-                waitForFragmentVisible(sourcesListPage).getMySourcesTable().getSourceNames(),
                 not(hasItem(sourceName)));
     }
 
