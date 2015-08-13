@@ -7,6 +7,9 @@ import static com.gooddata.qa.graphene.common.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.common.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
+import java.io.IOException;
+
+import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -14,6 +17,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.enums.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest {
 
@@ -32,7 +38,13 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         projectCreateCheckIterations = 60; // 5 minutes
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"turnOfWalkme"}, priority = 1)
+    @Test(dependsOnGroups = {"createProject"})
+    public void enableAnalyticalDesigner() throws IOException, JSONException {
+        RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
+                ProjectFeatureFlags.ANALYTICAL_DESIGNER.getFlagName(), true));
+    }
+
+    @Test(dependsOnMethods = {"enableAnalyticalDesigner"}, groups = {"turnOfWalkme"}, priority = 1)
     public void turnOffWalkme() {
         if (isWalkmeTurnOff) {
             return;
