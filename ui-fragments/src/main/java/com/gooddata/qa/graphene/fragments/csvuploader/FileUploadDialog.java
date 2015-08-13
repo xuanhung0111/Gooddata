@@ -40,7 +40,7 @@ public class FileUploadDialog extends AbstractFragment {
     public List<String> getBackendValidationErrors() {
         waitForElementVisible(backendValidationErrorsList);
 
-        return backendValidationErrorsList.findElements(By.tagName("li"))
+        return backendValidationErrorsList.findElements(By.tagName("div"))
                 .stream()
                 .map(WebElement::getText)
                 .collect(toList());
