@@ -21,8 +21,7 @@
         <profile>
             <id>selenium</id>
             <properties>
-                <testng.suite.xml>testng-core-dummy.xml</testng.suite.xml>
-                <propertiesPath>${modulePropertiesPath}</propertiesPath>
+                <skipTests>true</skipTests>
             </properties>
         </profile>
     </profiles>
