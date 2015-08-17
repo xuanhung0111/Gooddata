@@ -613,7 +613,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         assertTrue(userManagementPage.isDeleteGroupLinkPresent(), "Delete group link does not show");
         DeleteGroupDialog dialog = userManagementPage.openDeleteGroupDialog();
         assertEquals(dialog.getTitle(), "Delete group " + group1, "Title of delete group dialog is wrong");
-        assertEquals(dialog.getBodyContent(), DELETE_GROUP_DIALOG_CONTENT, 
+        assertEquals(dialog.getBodyContent(), DELETE_GROUP_DIALOG_CONTENT,
                 "Content of delete group dialog is wrong");
         dialog.cancel();
         
