@@ -67,7 +67,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         sleepTightInSeconds(2);
         dashboardEditBar.addWidgetToDashboard(WidgetTypes.GEO_CHART, "Avg of Amount");
         sleepTightInSeconds(2);
-        dashboardEditBar.addWebContentToDashboard();
+        dashboardEditBar.addWebContentToDashboard("https://www.gooddata.com");
         dashboardEditBar.saveDashboard();
     }
 

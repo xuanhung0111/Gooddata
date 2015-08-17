@@ -169,11 +169,11 @@ public class DashboardEditBar extends AbstractFragment {
         dashboardAddWidgetPanel.addGeoChart(metricLabel, attributeLayer);
     }
 
-    public void addWebContentToDashboard() {
+    public void addWebContentToDashboard(String embedCode) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addwebContent).click();
         waitForElementVisible(dashboardWebContent.getRoot());
-        dashboardWebContent.addWebContent();
+        dashboardWebContent.addWebContent(embedCode);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
     }
