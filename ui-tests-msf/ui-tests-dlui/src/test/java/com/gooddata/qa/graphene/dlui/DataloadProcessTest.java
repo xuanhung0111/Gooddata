@@ -201,14 +201,11 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 2)
     public void addUsersToProjects() throws ParseException, IOException, JSONException {
-        RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
-                testParams.getUser(), testParams.getPassword(), technicalUserUri, UserRoles.ADMIN);
-        RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
-                testParams.getUser(), testParams.getPassword(), testParams.getEditorProfileUri(),
+        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, UserRoles.ADMIN);
+        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
                 UserRoles.EDITOR);
-        addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
-        addUserToAdsInstance(adsInstance, testParams.getEditorProfileUri(),
-                testParams.getEditorUser(), "dataAdmin");
+        addUserToAdsInstance(adsInstance, technicalUser, "dataAdmin");
+        addUserToAdsInstance(adsInstance, testParams.getEditorUser(), "dataAdmin");
     }
 
     @Test(dependsOnGroups = "dataloadProcessTest", alwaysRun = true)

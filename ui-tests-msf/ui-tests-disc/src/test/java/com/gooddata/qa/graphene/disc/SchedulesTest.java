@@ -1082,8 +1082,8 @@ public class SchedulesTest extends AbstractSchedulesTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkEffectiveUserOfSchedule() throws JSONException, ParseException, IOException {
         try {
-            addUserToProject(testParams.getEditorProfileUri(), UserRoles.ADMIN);
-            addUserToProject(testParams.getViewerProfileUri(), UserRoles.ADMIN);
+            addUserToProject(testParams.getEditorUser(), UserRoles.ADMIN);
+            addUserToProject(testParams.getViewerUser(), UserRoles.ADMIN);
 
             openProjectDetailByUrl(getWorkingProject().getProjectId());
 

@@ -74,7 +74,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private Project project;
     private MetadataService mdService;
-    private String currentAcountProfileUri;
 
     private Map<String, Message[]> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
@@ -104,7 +103,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         GoodData goodDataClient = getGoodDataClient();
         project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         mdService = goodDataClient.getMetadataService();
-        currentAcountProfileUri = goodDataClient.getAccountService().getCurrent().getUri();
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -278,7 +276,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
         conditions.put(product.getUri(), singletonList(explorerId));
         String mufUri = createMUFObj(getRestApiClient(), project.getId(), "Product user filter", conditions);
-        addMUFToUser(getRestApiClient(), project.getId(), currentAcountProfileUri, mufUri);
+        addMUFToUser(getRestApiClient(), project.getId(), testParams.getUser(), mufUri);
 
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(product.getDefaultDisplayForm().getUri())),

@@ -312,7 +312,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             String mufURI =
                     RestUtils.createMUFObj(restApiClient, testParams.getProjectId(), "Status User Filters",
                             buildConditions());
-            RestUtils.addMUFToUser(restApiClient, testParams.getProjectId(), testParams.getEditorProfileUri(),
+            RestUtils.addMUFToUser(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
                     mufURI);
             logout();
 

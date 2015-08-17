@@ -31,10 +31,8 @@ public class NotificationsTest extends AbstractNotificationTest {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
-        imapUserUri = testParams.loadProperty("imap.userUri");
-        userProfileId =
-                testParams.loadProperty("userProfileUri").substring(
-                        testParams.loadProperty("userProfileUri").lastIndexOf("/") + 1);
+        userProfileId = getGoodDataClient().getAccountService().getCurrent().getUri();
+        userProfileId = userProfileId.substring(userProfileId.lastIndexOf("/") + 1);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
@@ -459,7 +457,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
     public void checkRepeatedDataLoadingFailureNotification() throws ParseException, IOException, JSONException {
         try {
-            addUserToProject(imapUserUri, UserRoles.ADMIN);
+            addUserToProject(imapUser, UserRoles.ADMIN);
             logout();
 
             signInAtUI(imapUser, imapPassword);

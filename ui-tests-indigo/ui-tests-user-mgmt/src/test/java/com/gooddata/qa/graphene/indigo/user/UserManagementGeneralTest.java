@@ -50,6 +50,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private String group2;
     private String group3;
     private String userManagementAdmin;
+    private String userManagementPassword;
     private String editorUser;
     private String viewerUser;
     private String domainAdminUser;
@@ -76,9 +77,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     private static final String INVITED_EMAIL = "abc@mail.com";
 
-    private String userManagementPassword;
-    private String userManagementUri;
-
     @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
         projectTitle = "User-management-general" + System.currentTimeMillis();
@@ -98,7 +96,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
         userManagementAdmin = testParams.loadProperty("userManagementAdmin");
         userManagementPassword = testParams.loadProperty("userManagementPassword");
-        userManagementUri = testParams.loadProperty("userManagementUri");
 
         domainAdminUser = testParams.getUser();
         editorUser = testParams.getEditorUser();
@@ -118,8 +115,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         // Use another admin user (userManagementAdmin) for testing
         // The reason here is that user mangement page has no context (projectID)
         // the test will probably fail if the original admin user is used in parallel in many test executions
-        RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(), domainAdminUser,
-                testParams.getPassword(), userManagementUri, UserRoles.ADMIN);
+        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userManagementAdmin, 
+                UserRoles.ADMIN);
         logout();
         signInAtGreyPages(userManagementAdmin, userManagementPassword);
 

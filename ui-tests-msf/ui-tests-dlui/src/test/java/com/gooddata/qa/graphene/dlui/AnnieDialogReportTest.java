@@ -41,7 +41,7 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest")
     public void addEditorUser() {
         try {
-            addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
+            addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
         } catch (Exception e) {
             throw new IllegalStateException("There is exeception when adding user to project!", e);
         }
