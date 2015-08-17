@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gooddata.qa</groupId>
     <artifactId>ui-tests-graphene</artifactId>
@@ -21,7 +22,7 @@
         <module>ui-tests-disc</module>
         <module>ui-tests-dlui</module>
         <module>ui-tests-csv-uploader</module>
-  </modules>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -183,7 +184,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-		    <version>3.3</version>
+                    <version>3.3</version>
                     <configuration>
                         <source>${targetJdk}</source>
                         <target>${targetJdk}</target>
@@ -210,7 +211,7 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
-			    <version>3.3</version>
+                            <version>3.3</version>
                             <configuration>
                                 <source>${targetJdk}</source>
                                 <target>${targetJdk}</target>
@@ -298,7 +299,9 @@
         <profile>
             <id>windows</id>
             <activation>
-                <os><family>Windows</family></os>
+                <os>
+                    <family>Windows</family>
+                </os>
             </activation>
             <properties>
                 <file.separator>\\</file.separator>
