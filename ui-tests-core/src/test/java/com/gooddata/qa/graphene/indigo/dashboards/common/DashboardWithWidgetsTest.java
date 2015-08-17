@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import com.gooddata.qa.utils.indigo.IndigoRestUtils;
+import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import java.io.IOException;
 import org.json.JSONException;
 import org.testng.annotations.Test;

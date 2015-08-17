@@ -1,4 +1,4 @@
-package com.gooddata.qa.utils.indigo;
+package com.gooddata.qa.utils.http.indigo;
 
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
