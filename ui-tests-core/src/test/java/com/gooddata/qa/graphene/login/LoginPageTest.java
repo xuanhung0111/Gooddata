@@ -1,6 +1,7 @@
-package com.gooddata.qa.graphene.common;
+package com.gooddata.qa.graphene.login;
 
 import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 import org.json.JSONException;
