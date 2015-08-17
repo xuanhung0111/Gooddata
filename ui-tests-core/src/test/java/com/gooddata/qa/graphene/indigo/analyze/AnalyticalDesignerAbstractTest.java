@@ -38,13 +38,13 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         projectCreateCheckIterations = 60; // 5 minutes
     }
 
-    @Test(dependsOnGroups = {"createProject"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"enableAnalyticalDesigner"})
     public void enableAnalyticalDesigner() throws IOException, JSONException {
         RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
                 ProjectFeatureFlags.ANALYTICAL_DESIGNER.getFlagName(), true));
     }
 
-    @Test(dependsOnMethods = {"enableAnalyticalDesigner"}, groups = {"turnOfWalkme"}, priority = 1)
+    @Test(dependsOnGroups = {"enableAnalyticalDesigner"}, groups = {"turnOffWalkme"}, priority = 1)
     public void turnOffWalkme() {
         if (isWalkmeTurnOff) {
             return;
@@ -61,7 +61,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         }
     }
 
-    @Test(dependsOnGroups = {"turnOfWalkme"}, alwaysRun = true, groups = {"init"})
+    @Test(dependsOnGroups = {"turnOffWalkme"}, alwaysRun = true, groups = {"init"})
     public void prepareToTestAdAfterTurnOffWalkme() {
     }
 

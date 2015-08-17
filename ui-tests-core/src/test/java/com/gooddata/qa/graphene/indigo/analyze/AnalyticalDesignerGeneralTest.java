@@ -64,7 +64,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     private Project project;
     private MetadataService mdService;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
         shuffle(PROJECT_TEMPLATES);
         projectTemplate = PROJECT_TEMPLATES.get(0);
