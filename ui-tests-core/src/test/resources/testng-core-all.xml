@@ -8,19 +8,8 @@
             </run>
         </groups>
         <packages>
-            <package name="com.gooddata.qa.graphene.common.*"/>
+            <package name="com.gooddata.qa.graphene.login.*"/>
         </packages>
-    </test>
-
-    <test name="SimpleProjectTest">
-        <groups>
-            <run>
-                <exclude name="brokenTest"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.gooddata.qa.graphene.project.SimpleProjectTest"/>
-        </classes>
     </test>
 
     <test name="GoodSalesDashboardTest">

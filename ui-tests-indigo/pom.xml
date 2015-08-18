@@ -6,8 +6,21 @@
         <groupId>com.gooddata.qa</groupId>
         <artifactId>ui-tests-graphene</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>ui-tests-dss</artifactId>
+    <artifactId>ui-tests-indigo</artifactId>
+    <name>ui-tests-indigo</name>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>ui-tests-ad</module>
+        <module>ui-tests-dashboards</module>
+        <module>ui-tests-user-mgmt</module>
+    </modules>
+    
+    <properties>
+        <modulePropertiesPath>${basedir}${file.separator}..${file.separator}..${file.separator}${corePropertiesPath}</modulePropertiesPath>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -16,11 +29,12 @@
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
+
     <profiles>
         <profile>
             <id>selenium</id>
             <properties>
-                <testng.suite.xml>testng-dss.xml</testng.suite.xml>
+                <skipTests>true</skipTests>
                 <propertiesPath>${modulePropertiesPath}</propertiesPath>
             </properties>
         </profile>
