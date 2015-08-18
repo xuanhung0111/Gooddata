@@ -21,7 +21,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
     private static final String PRIORITY = "Priority";
     private static final String REGION = "Region";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Demo-Two-Attribute-Buckets-Test";
