@@ -48,7 +48,7 @@ public class IndigoRestUtils {
     static {
         try {
             KPI_WIDGET_BODY = new JSONObject() {{
-                put("kpiSimple", new JSONObject() {{
+                put("kpi", new JSONObject() {{
                     put("meta", new JSONObject() {{
                         put("title", "${title}");
                     }});
@@ -102,7 +102,7 @@ public class IndigoRestUtils {
         try {
             HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
             HttpEntity entity = postResponse.getEntity();
-            String uri =  new JSONObject(EntityUtils.toString(entity)).getJSONObject("kpiSimple")
+            String uri =  new JSONObject(EntityUtils.toString(entity)).getJSONObject("kpi")
                     .getJSONObject("meta").getString("uri");
             EntityUtils.consumeQuietly(entity);
             return uri;
