@@ -63,7 +63,7 @@ public class GoodSalesCustomDiscoveryAdTest extends AnalyticalDesignerAbstractTe
                 .getExplorerMessage(), "Now select a measure to display");
 
         TableReport report = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
-        assertThat(report.getHeaders(), equalTo(asList(ACTIVITY_TYPE.toUpperCase())));
+        assertThat(report.getHeaders(), equalTo(asList(ACTIVITY_TYPE)));
         checkingOpenAsReport("testWithAttribute");
     }
 

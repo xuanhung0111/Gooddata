@@ -377,7 +377,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             assertEquals(analysisPage.getAllAddedCategoryNames(), asList(xssAttribute));
             assertTrue(analysisPage.isFilterVisible(xssAttribute));
             assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
-                    asList(asList(IS_WON, "true"), asList(xssMetric, "1,160.9%")));
+                    asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
         } finally {
             initAttributePage();
             waitForFragmentVisible(attributePage).initAttribute(xssAttribute);
