@@ -4,16 +4,24 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.gooddata.qa</groupId>
-        <artifactId>ui-tests-graphene</artifactId>
+        <artifactId>ui-tests-msf</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>ui-tests-disc</artifactId>
+    <artifactId>ui-tests-dlui</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.gooddata.qa</groupId>
+            <artifactId>ui-msf-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
     <profiles>
         <profile>
             <id>selenium</id>
             <properties>
-                <testng.suite.xml>testng-disc.xml</testng.suite.xml>
-                <propertiesPath>${modulePropertiesPath}</propertiesPath>
+                <skipTests>false</skipTests>
+                <testng.suite.xml>testng-dlui.xml</testng.suite.xml>
             </properties>
             <build>
                 <testResources>
@@ -33,10 +41,14 @@
                         <filtering>false</filtering>
                     </testResource>
                     <testResource>
-                        <directory>${project.build.directory}/generated-resources</directory>
+                        <directory>
+                            ${project.build.directory}/generated-resources
+                        </directory>
                     </testResource>
                     <testResource>
-                        <directory>${project.build.directory}/msfResourcesLocation</directory>
+                        <directory>
+                            ${project.build.directory}/msfResourcesLocation
+                        </directory>
                     </testResource>
                 </testResources>
                 <plugins>
@@ -53,13 +65,17 @@
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>com.gooddata.qa</groupId>
-                                            <artifactId>ui-tests-msf</artifactId>
+                                            <artifactId>ui-msf-core</artifactId>
                                             <type>jar</type>
-                                            <outputDirectory>${project.build.directory}/msfResourcesLocation</outputDirectory>
+                                            <outputDirectory>
+                                                ${project.build.directory}/msfResourcesLocation
+                                            </outputDirectory>
                                             <excludes>**/*.class</excludes>
                                         </artifactItem>
                                     </artifactItems>
-                                    <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+                                    <outputDirectory>
+                                        ${project.build.directory}/generated-resources
+                                    </outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -68,11 +84,4 @@
             </build>
         </profile>
     </profiles>
-    <dependencies>
-        <dependency>
-            <groupId>com.gooddata.qa</groupId>
-            <artifactId>ui-tests-msf</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-    </dependencies>
 </project>
