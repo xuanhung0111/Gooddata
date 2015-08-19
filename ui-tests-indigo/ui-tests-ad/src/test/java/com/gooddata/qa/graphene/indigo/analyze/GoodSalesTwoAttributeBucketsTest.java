@@ -23,7 +23,6 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Demo-Two-Attribute-Buckets-Test";
     }
 

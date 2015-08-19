@@ -4,16 +4,22 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.http.RestUtils.changeMetricFormat;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -21,7 +27,6 @@ import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.GoodData;
@@ -31,13 +36,13 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -55,13 +60,88 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     private Project project;
     private MetadataService mdService;
 
-    private String percentOfGoalUri;
-    private String oldPercentOfGoalMetricFormat;
+    @SuppressWarnings("serial")
+    private static final Map<String, String> walkmeContents = new HashMap<String, String>() {{
+        put("Welcome to the Analytical Designer", "This interactive environment allows you to explore your data "
+                + "and create visualizations quickly and easily. Intelligent on-screen recommendations help you "
+                + "discover new and surprising insights. Let's get started!");
 
-    @BeforeClass
+        put("Begin by exploring your data", "Measures represent quantitative data (values).\n\n"
+                + "Attributes represent qualitative data (categories).\n\n"
+                + "Date is a special item which represents all the dates in your project.");
+
+        put("Create a new visualization", "Drag data from the list onto the canvas and watch as your "
+                + "visualization takes shape!");
+
+        put("Remove data", "Drag data items from these zones back to the list to remove them from your "
+                + "visualization.");
+
+        put("Change visualization type", "Choose how to visualize your data.");
+
+        put("Filter your visualization", "Drag the Date field or any attribute here.");
+
+        put("Save your visualization as a report", "When you are ready, open your visualization in the "
+                + "Report Editor. From there you can save it and add it to a dashboard.");
+
+        put("Clear your canvas", "Restart your exploration at any time.");
+
+        put("You're ready.", "Go ahead. Start discovering what insights await in your data!");
+    }};
+
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Demo-Visualization-Test";
+    }
+
+    @Test(dependsOnMethods = {"enableAnalyticalDesigner"}, groups = {"turnOfWalkme"}, priority = 0)
+    public void testWalkme() {
+        initAnalysePage();
+
+        final By title = By.className("walkme-custom-balloon-title");
+        final By content = By.className("walkme-custom-balloon-content");
+        final By nextBtn = By.className("walkme-action-next");
+        final By backBtn = By.className("walkme-action-back");
+        final By doneBtn = By.className("walkme-action-done");
+
+        waitForElementVisible(title, browser);
+        while (true) {
+            assertEquals(waitForElementVisible(content, browser).getText(),
+                    walkmeContents.get(waitForElementVisible(title, browser).getText()));
+
+            waitForElementVisible(nextBtn, browser).click();
+
+            if (!browser.findElements(doneBtn).isEmpty()) {
+                break;
+            }
+
+            waitForElementVisible(backBtn, browser).click();
+            assertEquals(waitForElementVisible(content, browser).getText(),
+                    walkmeContents.get(waitForElementVisible(title, browser).getText()));
+            waitForElementVisible(nextBtn, browser).click();
+        }
+        waitForElementVisible(doneBtn, browser).click();
+        isWalkmeTurnOff = true;
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testResetFunction() {
+        initAnalysePage();
+
+        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).getChartReport();
+        assertThat(report.getTrackersCount(), equalTo(1));
+        RecommendationContainer recommendationContainer =
+                Graphene.createPageFragment(RecommendationContainer.class,
+                        waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
+        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+
+        analysisPage.changeReportType(ReportType.BAR_CHART);
+        assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
+
+        analysisPage.addCategory(ACTIVITY_TYPE);
+        assertThat(report.getTrackersCount(), equalTo(4));
+
+        analysisPage.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -236,9 +316,6 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         GoodData goodDataClient = getGoodDataClient();
         project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         mdService = goodDataClient.getMetadataService();
-
-        percentOfGoalUri = mdService.getObjUri(project, Metric.class, Restriction.title(PERCENT_OF_GOAL));
-        oldPercentOfGoalMetricFormat = getMetricFormat(PERCENT_OF_GOAL);
     }
 
     @Test(dependsOnMethods = {"initGoodDataClient"}, description = "https://jira.intgdc.com/browse/CL-6942")
@@ -338,49 +415,95 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         }
     }
 
-    @DataProvider(name = "formattingProvider")
-    public Object[][] formattingProvider() {
-        return new Object[][] {
-            {Formatter.BARS, null, true},
-            {Formatter.GDC, "GDC11.61", false},
-            {Formatter.DEFAULT, "11.61", false},
-            {Formatter.TRUNCATE_NUMBERS, "$12", false},
-            {Formatter.COLORS, "$11.61", false},
-            {Formatter.UTF_8, Formatter.UTF_8.toString(), false}
-        };
+    @Test(dependsOnGroups = {"init"})
+    public void exportCustomDiscovery() {
+        initAnalysePage();
+
+        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+                .addCategory(ACTIVITY_TYPE)
+                .changeReportType(ReportType.TABLE)
+                .isExportToReportButtonEnabled());
+        TableReport analysisReport = analysisPage.getTableReport();
+        List<List<String>> analysisContent = analysisReport.getContent();
+        Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
+
+        analysisPage.exportReport();
+        String currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
+        }
+
+        com.gooddata.qa.graphene.fragments.reports.report.TableReport tableReport =
+                Graphene.createPageFragment(
+                        com.gooddata.qa.graphene.fragments.reports.report.TableReport.class,
+                        waitForElementVisible(By.id("gridContainerTab"), browser));
+
+        Iterator<String> attributes = tableReport.getAttributeElements().iterator();
+
+        sleepTight(2000); // wait for metric values is calculated and loaded
+        Iterator<String> metrics = tableReport.getRawMetricElements().iterator();
+
+        List<List<String>> content = new ArrayList<>();
+        while (attributes.hasNext() && metrics.hasNext()) {
+            content.add(asList(attributes.next(), metrics.next()));
+        }
+
+        assertThat(content, equalTo(analysisContent));
+
+        List<String> headers = tableReport.getAttributesHeader();
+        headers.addAll(tableReport.getMetricsHeader());
+        Iterator<String> reportheaders = headers.iterator();
+
+        while (analysisHeaders.hasNext() && reportheaders.hasNext()) {
+            assertThat(reportheaders.next().toLowerCase(), equalTo(analysisHeaders.next().toLowerCase()));
+        }
+        checkRedBar(browser);
+
+        browser.close();
+        browser.switchTo().window(currentWindowHandle);
     }
 
-    @Test(dependsOnMethods = {"initGoodDataClient"}, dataProvider = "formattingProvider")
-    public void testMetricNumberFormat(Formatter format, String expectedValue, boolean compareFormat)
-            throws ParseException, JSONException, IOException {
-        changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
+    @Test(dependsOnGroups = {"init"})
+    public void exportVisualizationWithOneAttributeInChart() {
+        initAnalysePage();
 
-        try {
-            verifyFormatInAdReport(format, expectedValue, compareFormat);
+        analysisPage.createReport(new ReportDefinition().withCategories(ACTIVITY_TYPE));
+        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
+        assertFalse(analysisPage.isExportToReportButtonEnabled());
+    }
 
-            analysisPage.exportReport();
-            String currentWindowHandle = browser.getWindowHandle();
-            for (String handle : browser.getWindowHandles()) {
-                if (!handle.equals(currentWindowHandle))
-                    browser.switchTo().window(handle);
-            }
-            waitForAnalysisPageLoaded(browser);
-            waitForFragmentVisible(reportPage);
-            checkRedBar(browser);
+    @Test(dependsOnGroups = {"init"})
+    public void exploreDate() {
+        initAnalysePage();
+        StringBuilder expected = new StringBuilder(DATE).append("\n")
+                .append("Represents all your dates in project. Can group by Day, Week, Month, Quarter & Year.\n")
+                .append("Field Type\n")
+                .append("Date\n");
+        assertEquals(analysisPage.getTimeDescription(DATE), expected.toString());
+    }
 
-            verifyFormatInReportPage(format, expectedValue, compareFormat);
+    @Test(dependsOnGroups = {"init"})
+    public void exploreAttribute() {
+        initAnalysePage();
+        StringBuilder expected = new StringBuilder(DEPARTMENT).append("\n")
+                .append("Field Type\n")
+                .append("Attribute\n")
+                .append("Values\n")
+                .append("Direct Sales\n")
+                .append("Inside Sales\n");
+        assertEquals(analysisPage.getAttributeDescription(DEPARTMENT), expected.toString());
+    }
 
-            String report = format.name() + " Report";
-            reportPage.setReportName(report).createReport();
-            sleepTightInSeconds(3);
-
-            verifyFormatInDashboard(report, format, expectedValue, compareFormat);
-
-            browser.close();
-            browser.switchTo().window(currentWindowHandle);
-        } finally {
-            changeMetricFormat(getRestApiClient(), percentOfGoalUri, oldPercentOfGoalMetricFormat);
-        }
+    @Test(dependsOnGroups = {"init"})
+    public void exploreMetric() {
+        initAnalysePage();
+        StringBuilder expected = new StringBuilder(NUMBER_OF_ACTIVITIES).append("\n")
+                .append("Field Type\n")
+                .append("Calculated Measure\n")
+                .append("Defined As\n")
+                .append("SELECT COUNT(Activity)\n");
+        assertEquals(analysisPage.getMetricDescription(NUMBER_OF_ACTIVITIES), expected.toString());
     }
 
     private void deleteMetric(String metric) {
@@ -388,69 +511,5 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         metricPage.openMetricDetailPage(metric);
         waitForFragmentVisible(metricDetailPage).deleteMetric();
         assertFalse(metricPage.isMetricVisible(metric));
-    }
-
-    private String getMetricFormat(String metric) {
-        initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(metric);
-        return waitForFragmentVisible(metricDetailPage).getMetricFormat();
-    }
-
-    private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
-        initAnalysePage();
-        List<List<String>> tooltip = analysisPage.addMetric(PERCENT_OF_GOAL)
-            .addCategory(IS_WON)
-            .waitForReportComputing()
-            .getChartReport()
-            .getTooltipTextOnTrackerByIndex(0);
-
-        assertEquals(tooltip.get(0), asList(IS_WON, "true"));
-        assertEquals(tooltip.get(1).get(0), PERCENT_OF_GOAL);
-        if (compareFormat) {
-            assertTrue(format.toString().contains(tooltip.get(1).get(1)));
-        } else {
-            assertEquals(tooltip.get(1).get(1), expectedValue);
-        }
-    }
-
-    private void verifyFormatInReportPage(Formatter format, String expectedValue, boolean compareFormat) {
-        reportPage.getVisualiser().selectReportVisualisation(ReportTypes.TABLE);
-        waitForAnalysisPageLoaded(browser);
-        String actualValue = Graphene.createPageFragment(TableReport.class,
-                waitForElementVisible(By.id("gridContainerTab"), browser)).getRawMetricElements().get(0);
-        if (compareFormat) {
-            assertTrue(format.toString().contains(actualValue));
-        } else {
-            assertEquals(actualValue, expectedValue);
-        }
-    }
-
-    private void verifyFormatInDashboard(String reportName, Formatter format, String expectedValue,
-            boolean compareFormat) {
-        String dashboard = format.name() + " Dashboard";
-
-        try {
-            initDashboardsPage();
-            dashboardsPage.addNewDashboard(dashboard);
-
-            try {
-                dashboardsPage.editDashboard();
-                dashboardsPage.getDashboardEditBar().addReportToDashboard(reportName);
-                dashboardsPage.getDashboardEditBar().saveDashboard();
-                String actualValue = dashboardsPage.getContent()
-                        .getLatestReport(TableReport.class).getRawMetricElements().get(0);
-                if (compareFormat) {
-                    assertTrue(format.toString().contains(actualValue));
-                } else {
-                    assertEquals(actualValue, expectedValue);
-                }
-            } finally {
-                dashboardsPage.selectDashboard(dashboard);
-                dashboardsPage.deleteDashboard();
-            }
-        } finally {
-            initReportsPage();
-            waitForFragmentVisible(reportsPage).deleteReports(reportName);
-        }
     }
 }

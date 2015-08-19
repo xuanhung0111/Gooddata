@@ -23,9 +23,8 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
 
     private static final String SUM_OF_AMOUNT = "Sum of " + AMOUNT;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Simple-Metric-Creation-Test";
     }
 
