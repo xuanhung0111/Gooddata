@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
@@ -20,6 +21,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.report.ReportDefinition;
@@ -116,6 +118,9 @@ public class ReportPage extends AbstractFragment {
     @FindBy(id = "p-analysisPage")
     private TableReport tableReport;
 
+    @FindBy(css = ".c-oneNumberReport")
+    private OneNumberReport headlineReport;
+
     @FindBy(css = ".s-unlistedIcon")
     private WebElement unlistedIcon;
 
@@ -124,6 +129,12 @@ public class ReportPage extends AbstractFragment {
 
     @FindBy(css = ".s-btn-__show_configuration:not(.gdc-hidden)")
     private WebElement showConfigurationButton;
+    
+    @FindBy(css = ".s-btn-embed")
+    private WebElement embedButton;
+    
+    @FindBy(css = ".unsavedWarning-share")
+    private WebElement unsavedWarningEmbed;
 
     private static final By CUSTOM_NUMBER_FORMAT_LOCATOR = By.className("s-btn-custom_number_formats");
     private static final By CUSTOM_METRIC_FORMAT_LOCATOR = By.className("customMetricFormatItem-format");
@@ -132,6 +143,10 @@ public class ReportPage extends AbstractFragment {
 
     private static final By TAG_INPUT_LOCATOR = By.cssSelector(".c-ipeEditorIn input");
     private static final By OK_BUTTON_LOCATOR = By.cssSelector(".c-ipeEditorControls .s-btn-add");
+    
+    private static final By EMBED_DIALOG_LOCATOR = By.cssSelector(".c-embedDialog");
+    private static final By SAVE_REPORT_TO_EMBED_LOCATOR = By.cssSelector(".unsavedWarning-share .save");
+    private static final By CLOSE_UNSAVED_WARNING_LOCATOR = By.cssSelector(".unsavedWarning-share .close");
 
     public ReportPage showConfiguration() {
         waitForElementVisible(showConfigurationButton).click();
@@ -171,6 +186,10 @@ public class ReportPage extends AbstractFragment {
     public TableReport getTableReport() {
         return tableReport;
     }
+    
+    public OneNumberReport getHeadlineReport() {
+        return waitForFragmentVisible(headlineReport);
+    }
 
     public ReportVisualizer getVisualiser() {
         return visualiser;
@@ -191,6 +210,11 @@ public class ReportPage extends AbstractFragment {
     }
 
     public void createReport(ReportDefinition reportDefinition) {
+        configReportDefinition(reportDefinition);
+        createReport();
+    }
+    
+    public void configReportDefinition(ReportDefinition reportDefinition) {
         // Wait to avoid red bar randomly
         // Red bar message: An error occurred while performing this operation.
         sleepTightInSeconds(3);
@@ -213,7 +237,6 @@ public class ReportPage extends AbstractFragment {
 
         visualiser.selectReportVisualisation(reportDefinition.getType());
         waitForAnalysisPageLoaded(browser);
-        createReport();
     }
 
     public void createReport() {
@@ -406,6 +429,37 @@ public class ReportPage extends AbstractFragment {
         waitForAnalysisPageLoaded(browser);
         openOptionsMenu().select("Delete");
         waitForElementVisible(By.cssSelector(".c-confirmDeleteDialog .s-btn-delete"), browser).click();
+    }
+    
+    public ReportEmbedDialog openReportEmbedDialog() {
+        new Actions(browser).moveToElement(embedButton).perform();
+        waitForElementVisible(embedButton).click();
+        return Graphene.createPageFragment(ReportEmbedDialog.class,
+                waitForElementVisible(EMBED_DIALOG_LOCATOR, browser));
+    }
+    
+    public WebElement embedUnsavedReport() {
+        waitForElementVisible(embedButton).click();
+        return waitForElementVisible(unsavedWarningEmbed);
+    }
+    
+    public void createReportFromUnsavedWarningEmbed() {
+        waitForElementVisible(SAVE_REPORT_TO_EMBED_LOCATOR, unsavedWarningEmbed).click();
+        waitForElementVisible(confirmDialogCreateButton).click();
+        waitForElementNotVisible(confirmDialogCreateButton);
+
+        Graphene.waitGui().until(new Predicate<WebDriver>() {
+            @Override
+            public boolean apply(WebDriver input) {
+                return "Saved".equals(createReportButton.getText().trim());
+            }
+        });
+        
+        sleepTightInSeconds(3);
+    }
+    
+    public void closeEmbedUnsavedWarning() {
+        waitForElementVisible(CLOSE_UNSAVED_WARNING_LOCATOR, unsavedWarningEmbed).click();
     }
 
     public int getVersionsCount() {
