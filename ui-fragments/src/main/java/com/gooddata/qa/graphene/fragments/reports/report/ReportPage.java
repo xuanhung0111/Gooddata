@@ -1,9 +1,14 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.id;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collections;
@@ -11,6 +16,8 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -310,7 +317,7 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    public void saveReport() {
+    public ReportPage saveReport() {
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(createReportButton).click();
         if (browser.findElements(By.xpath(confirmSaveDialogLocator)).size() > 0) {
@@ -318,6 +325,20 @@ public class ReportPage extends AbstractFragment {
         }
         sleepTightInSeconds(3);
         assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
+        return this;
+    }
+
+    public void cancelSaveUsedReport() {
+        waitForAnalysisPageLoaded(browser);
+        waitForElementVisible(createReportButton).click();
+        waitForElementVisible(cssSelector(".yui3-c-button-focused.s-btn-cancel"), browser).click();
+    }
+
+    public ReportPage saveAsReport() {
+        waitForAnalysisPageLoaded(browser);
+        openOptionsMenu().select("Save as...");
+        waitForElementVisible(className("s-btn-save_as"), browser).click();
+        return this;
     }
 
     public static float getNumber(String text) {
@@ -387,6 +408,55 @@ public class ReportPage extends AbstractFragment {
         waitForElementVisible(By.cssSelector(".c-confirmDeleteDialog .s-btn-delete"), browser).click();
     }
 
+    public int getVersionsCount() {
+        waitForAnalysisPageLoaded(browser);
+        openOptionsMenu().openSubMenu("Versions");
+        return getVersionsMenu().getItemsCount();
+    }
+
+    public boolean isReportTooLarge() {
+        return isElementPresent(id("tooBigReportHelp"), browser);
+    }
+
+    public ReportPage openVersion(int version) {
+        waitForAnalysisPageLoaded(browser);
+        openOptionsMenu().openSubMenu("Versions");
+        getVersionsMenu().select(e -> e.findElement(BY_LINK).getText().trim().startsWith("Version #" + version));
+        return this;
+    }
+
+    public ReportPage revertToCurrentVersion() {
+        if (!isElementPresent(BY_BLUE_BAR, browser)) {
+            System.out.println("Report is not in old version.");
+            return this;
+        }
+        browser.findElement(cssSelector(".restore > button")).click();
+        return this;
+    }
+
+    public boolean hasUnsavedVersion() {
+        openOptionsMenu().openSubMenu("Versions");
+        return getVersionsMenu().contains("Unsaved version");
+    }
+
+    public boolean tryCancelComputing() {
+        try {
+            waitForElementVisible(cssSelector("#executionProgress > .s-btn-cancel"), browser).click();
+            return true;
+        } catch (NoSuchElementException | TimeoutException e) {
+            return false;
+        }
+    }
+
+    public String getExecuteProgressStatus() {
+        return waitForElementVisible(cssSelector("#executionProgress > span"), browser).getText();
+    }
+
+    public ReportPage recompute() {
+        waitForElementVisible(cssSelector("#executionProgress > .s-btn-recompute"), browser).click();
+        return this;
+    }
+
     private void setReportVisibleSettings(boolean isVisible) {
         waitForAnalysisPageLoaded(browser);
         openOptionsMenu().select("Settings");
@@ -403,5 +473,9 @@ public class ReportPage extends AbstractFragment {
         SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
                 waitForElementVisible(SimpleMenu.LOCATOR, browser));
         return menu;
+    }
+
+    private SimpleMenu getVersionsMenu() {
+        return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(id("undefined"), browser));
     }
 }
