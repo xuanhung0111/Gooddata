@@ -15,6 +15,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkEditModeCancelNoChanges() {
         Kpi selectedKpi = initIndigoDashboardsPage()
+            .selectDateFilterByName(DATE_FILTER_ALL_TIME)
             .switchToEditMode()
             .selectKpi(0);
 

@@ -13,9 +13,9 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
         DateFilter dateFilter = initIndigoDashboardsPage().waitForDateFilter();
         String dateFilterSelection = dateFilter.getSelection();
 
-        takeScreenshot(browser, "checkDateFilterDefaultState-all-time", getClass());
+        takeScreenshot(browser, "checkDateFilterDefaultState-this-month", getClass());
 
-        assertEquals(dateFilterSelection, "All time");
+        assertEquals(dateFilterSelection, "This month");
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})

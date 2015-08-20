@@ -17,6 +17,8 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     public static final String DATE_ACTIVITY = "Date dimension (Activity)";
     public static final String DATE_SNAPSHOT = "Date dimension (Snapshot)";
 
+    public static final String DATE_FILTER_ALL_TIME = "All time";
+
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"dashboardWidgetsInit"})
     public void initDashboardWithWidgets() throws JSONException, IOException {
         IndigoRestUtils.prepareAnalyticalDashboardTemplate(getRestApiClient(), testParams.getProjectId());

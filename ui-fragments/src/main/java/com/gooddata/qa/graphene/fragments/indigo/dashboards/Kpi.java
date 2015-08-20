@@ -5,6 +5,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
 /**
@@ -69,7 +70,7 @@ public class Kpi extends AbstractFragment {
     }
 
     public String getValue() {
-        return waitForElementVisible(value).getText();
+        return waitForElementPresent(value).getText();
     }
 
     public String getMetric() {

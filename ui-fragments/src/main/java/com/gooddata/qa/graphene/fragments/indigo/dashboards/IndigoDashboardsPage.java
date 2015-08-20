@@ -190,6 +190,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForFragmentVisible(dateFilter);
     }
 
+    public IndigoDashboardsPage selectDateFilterByName(String dateFilterName) {
+        waitForAllKpiWidgetContentLoaded();
+
+        waitForFragmentVisible(dateFilter)
+            .selectByName(dateFilterName);
+
+        return waitForAllKpiWidgetContentLoaded();
+    }
+
     public AttributeFiltersPanel waitForAttributeFilters() {
         return waitForFragmentVisible(attributeFiltersPanel);
     }
