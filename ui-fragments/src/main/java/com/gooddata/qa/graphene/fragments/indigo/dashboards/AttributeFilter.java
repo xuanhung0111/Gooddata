@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -22,6 +23,12 @@ public class AttributeFilter extends ReactDropdownParent {
         return ".overlay .attributevalues-list";
     }
 
+    @Override
+    public boolean isDropdownOpen() {
+        waitForElementVisible(getDropdownButton());
+        return isElementPresent(By.cssSelector("button.is-loaded.icon-navigateup"), this.getRoot());
+    }
+
     public AttributeFilter selectByName(String name, boolean cleanSelection) {
         ensureDropdownOpen();
 
@@ -41,12 +48,6 @@ public class AttributeFilter extends ReactDropdownParent {
         By applyButton = cssSelector("button.s-apply_button");
         waitForElementVisible(applyButton, browser).click();
 
-        return this;
-    }
-
-    @Override
-    protected AttributeFilter toggleDropdown() {
-        waitForElementVisible(getRoot()).click();
         return this;
     }
 

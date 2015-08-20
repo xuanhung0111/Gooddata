@@ -11,7 +11,7 @@ import java.util.Objects;
  */
 public class AttributeFiltersPanel extends AbstractFragment {
 
-    @FindBy(css = "button.button-attribute-filter")
+    @FindBy(css = ".s-attribute-filter")
     private List<AttributeFilter> attributeFilters;
 
     public List<AttributeFilter> getAttributeFilters() {

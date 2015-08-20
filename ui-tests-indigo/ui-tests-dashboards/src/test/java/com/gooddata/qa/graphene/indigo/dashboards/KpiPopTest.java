@@ -16,10 +16,6 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         Assert.assertTrue(justAddedKpi.hasMetric());
 
-        String metricText = justAddedKpi.getMetric();
-        Assert.assertTrue(metricText.contains("change"));
-        Assert.assertTrue(metricText.contains("last month"));
-
         indigoDashboardsPage
             .saveEditMode();
 
@@ -27,10 +23,6 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .getLastKpi();
 
         Assert.assertTrue(lastKpi.hasMetric());
-
-        metricText = lastKpi.getMetric();
-        Assert.assertTrue(metricText.contains("change"));
-        Assert.assertTrue(metricText.contains("last month"));
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
