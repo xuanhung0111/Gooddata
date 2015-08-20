@@ -19,9 +19,9 @@ public class DashboardWebContent extends AbstractFragment {
     @FindBy(xpath = "//div[@class='c-projectdashboard-items']/div[contains(@class,'s-active-tab')]/div/div[contains(@class,'yui3-c-iframedashboardwidget')]")
     private WebElement iframeWidget;
 
-    public void addWebContent() {
+    public void addWebContent(String embedCode) {
         waitForElementVisible(addURL);
-        addURL.sendKeys("https://www.gooddata.com");
+        addURL.sendKeys(embedCode);
         waitForElementVisible(saveWebContentButton).click();
         waitForElementNotVisible(saveWebContentButton);
         sleepTightInSeconds(2);

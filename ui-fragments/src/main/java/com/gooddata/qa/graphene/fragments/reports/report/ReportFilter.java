@@ -266,6 +266,8 @@ public class ReportFilter extends AbstractFragment {
         waitForElementNotVisible(confirmApplyButton);
         waitForReportRendered();
         waitForElementVisible(hideFiltersButton).click();
+        if(lsPromptElements.isEmpty())
+            return;
         attrElementInGrid = report.getAttributeElements();
         Assert.assertEquals(attrElementInGrid, lsPromptElements, "Report isn't applied filter correctly");
     }
