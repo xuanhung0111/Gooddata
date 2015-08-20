@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
@@ -132,13 +133,14 @@ public class ReportVisualizer extends AbstractFragment {
         return null;
     }
 
-    public void selectHowArea(List<HowItem> how) {
+    public ReportVisualizer selectHowArea(List<HowItem> how) {
         waitForElementVisible(howButton).click();
 
         for (HowItem howItem : how) {
             WebElement attribute = selectAttributeWithPosition(howItem.getAttribute(), howItem.getPosition());
             filterHowAttribute(attribute, howItem);
         }
+        return this;
     }
 
     public void clickOnHow() {
@@ -249,6 +251,13 @@ public class ReportVisualizer extends AbstractFragment {
         By snDFolder = By.xpath(XPATH_SND_FOLDER.replace("${SnDFolderName}",
                 folderName));
         waitForElementVisible(snDFolder, browser);
+    }
+
+    public boolean verifyOldVersionState() {
+        return browser.findElement(BY_BLUE_BAR).getText().startsWith("You are currently viewing an older version")
+                && waitForElementVisible(whatButton).getAttribute("class").contains("disabled")
+                && waitForElementVisible(howButton).getAttribute("class").contains("disabled")
+                && waitForElementVisible(filterButton).getAttribute("class").contains("disabled");
     }
 
     private void searchAndWaitForItemReloaded(WebElement input, String searchItem,

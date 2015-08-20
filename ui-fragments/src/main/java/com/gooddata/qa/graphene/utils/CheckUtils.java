@@ -26,6 +26,7 @@ public final class CheckUtils {
 
     public static final By BY_RED_BAR = By.cssSelector(format(STATUS_BAR_SELECTOR, "error"));
     public static final By BY_RED_BAR_WARNING = By.cssSelector(format(STATUS_BAR_SELECTOR, "warning"));
+    public static final By BY_BLUE_BAR = By.cssSelector(format(STATUS_BAR_SELECTOR, "info"));
     public static final By BY_DISMISS_BUTTON = By.cssSelector("div#status .s-btn-dismiss");
 
     private CheckUtils() {
@@ -46,6 +47,10 @@ public final class CheckUtils {
 
     public static void checkGreenBar(SearchContext searchContext) {
         waitForElementVisible(BY_GREEN_BAR, searchContext);
+    }
+
+    public static void checkBlueBar(SearchContext searchContext) {
+        waitForElementVisible(BY_BLUE_BAR, searchContext);
     }
 
     public static void checkGreenBar(SearchContext searchContext, String desiredMessage) {
