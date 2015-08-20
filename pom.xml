@@ -19,9 +19,6 @@
         <module>ui-tests-perf</module>
         <module>ui-tests-tools</module>
         <module>ui-tests-msf</module>
-        <module>ui-tests-disc</module>
-        <module>ui-tests-dlui</module>
-        <module>ui-tests-csv-uploader</module>
         <module>ui-tests-indigo</module>
     </modules>
 
