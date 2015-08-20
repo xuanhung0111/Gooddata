@@ -21,6 +21,8 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     public static final String DATE_FILTER_ALL_TIME = "All time";
     public static final String DATE_FILTER_THIS_MONTH = "This month";
     public static final String DATE_FILTER_LAST_MONTH = "Last month";
+    public static final String DATE_FILTER_THIS_QUARTER = "This quarter";
+    public static final String DATE_FILTER_LAST_QUARTER = "Last quarter";
 
     public static final String COMPARISON_PREVIOUS_PERIOD = "Previous period";
     public static final String COMPARISON_LAST_YEAR = "Previous year";
