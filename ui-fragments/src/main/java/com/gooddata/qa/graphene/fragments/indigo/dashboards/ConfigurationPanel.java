@@ -21,6 +21,9 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(className = "s-dimension_select")
     private DateDimensionSelect dateDimensionSelect;
 
+    @FindBy(className = "s-compare_with_select")
+    private ComparisonSelect comparisonSelect;
+
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
         waitForElementVisible(dimensionSelectLoaded);
@@ -34,6 +37,11 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public ConfigurationPanel selectDateDimensionByName(String name) {
         waitForFragmentVisible(dateDimensionSelect).selectByName(name);
+        return this;
+    }
+
+    public ConfigurationPanel selectComparisonByName(String name) {
+        waitForFragmentVisible(comparisonSelect).selectByName(name);
         return this;
     }
 

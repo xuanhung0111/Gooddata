@@ -111,6 +111,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return selectKpi(kpis.size() - 1);
     }
 
+    public Kpi getLastKpi() {
+        return getKpiByIndex(kpis.size() - 1);
+    }
+
     public IndigoDashboardsPage deleteLastKpi() {
         selectLastKpi().deleteKpi();
 
@@ -177,6 +181,16 @@ public class IndigoDashboardsPage extends AbstractFragment {
         configurationPanel
                 .selectMetricByName(metricName)
                 .selectDateDimensionByName(dateDimensionName);
+
+        return waitForAllKpiWidgetContentLoaded();
+    }
+
+    public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName, String comparisonName) {
+        clickAddWidget();
+        configurationPanel
+                .selectMetricByName(metricName)
+                .selectDateDimensionByName(dateDimensionName)
+                .selectComparisonByName(comparisonName);
 
         return waitForAllKpiWidgetContentLoaded();
     }

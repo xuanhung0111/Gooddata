@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.dashboards.common;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import java.io.IOException;
+import java.util.UUID;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -18,6 +19,12 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     public static final String DATE_SNAPSHOT = "Date dimension (Snapshot)";
 
     public static final String DATE_FILTER_ALL_TIME = "All time";
+    public static final String DATE_FILTER_THIS_MONTH = "This month";
+    public static final String DATE_FILTER_LAST_MONTH = "Last month";
+
+    public static final String COMPARISON_PREVIOUS_PERIOD = "Previous period";
+    public static final String COMPARISON_LAST_YEAR = "Previous year";
+    public static final String COMPARISON_NO_COMPARISON = "No comparison";
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"dashboardWidgetsInit"})
     public void initDashboardWithWidgets() throws JSONException, IOException {
@@ -31,4 +38,8 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
         takeScreenshot(browser, "captureScreenshotForCurrentDashboardWithLoadedWidgets", getClass());
     }
 
+    protected String generateUniqueHeadlineTitle() {
+        // create unique headline title which fits into headline title (has limited size)
+        return UUID.randomUUID().toString().substring(0, 18);
+    }
 }

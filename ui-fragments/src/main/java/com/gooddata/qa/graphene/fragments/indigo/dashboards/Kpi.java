@@ -6,6 +6,7 @@ import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.By;
 /**
@@ -15,6 +16,7 @@ public class Kpi extends AbstractFragment {
     // TODO: when having more widget types, separate, keep "Add widget" in mind
     public static final String MAIN_CLASS = "dash-item";
     public static final String KPI_CSS_SELECTOR = "." + MAIN_CLASS + ":not(.is-placeholder)";
+    public static final String KPI_METRICS_CLASS = "kpi-metrics";
 
     public static final String WIDGET_LOADING_CLASS = "widget-loading";
     public static final String CONTENT_LOADING_CLASS = "content-loading";
@@ -38,7 +40,7 @@ public class Kpi extends AbstractFragment {
     @FindBy(css = ".kpi-value")
     private WebElement value;
 
-    @FindBy(css = ".kpi-metrics")
+    @FindBy(css = "." + KPI_METRICS_CLASS)
     private WebElement metric;
 
     @FindBy(className = CONTENT_LOADING_CLASS)
@@ -75,6 +77,11 @@ public class Kpi extends AbstractFragment {
 
     public String getMetric() {
         return waitForElementVisible(metric).getText();
+    }
+
+    public boolean hasMetric() {
+        By thisMetric = By.className(KPI_METRICS_CLASS);
+        return isElementPresent(thisMetric, root);
     }
 
     public void deleteKpi() {

@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import java.util.UUID;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -177,10 +176,5 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         assertEquals(kpisCount, indigoDashboardsPage.getKpisCount());
         assertEquals(kpisCount, initIndigoDashboardsPage().getKpisCount());
-    }
-
-    private String generateUniqueHeadlineTitle() {
-        // create unique headline title which fits into headline title (has limited size)
-        return UUID.randomUUID().toString().substring(0, 18);
     }
 }
