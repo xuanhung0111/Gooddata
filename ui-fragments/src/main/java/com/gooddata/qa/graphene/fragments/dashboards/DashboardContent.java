@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -31,6 +32,12 @@ public class DashboardContent extends AbstractFragment {
 
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-filterdashboardwidget")
     private List<WebElement> filters;
+    
+    @FindBy(css = ".yui3-selectionbox-resize-tl")
+    private WebElement topLeftWidgetResizeButton;
+    
+    @FindBy(css = ".yui3-selectionbox-resize-br")
+    private WebElement bottomRightWidgetResizeButton;
 
     private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
 
@@ -103,5 +110,18 @@ public class DashboardContent extends AbstractFragment {
         }
 
         return createPageFragment(FilterWidget.class, filter);
+    }
+
+    public void resizeWidgetTopLeft(int xOffset, int yOffset) {
+        resizeWidget(topLeftWidgetResizeButton, xOffset, yOffset);
+    }
+
+    public void resizeWidgetBottomRight(int xOffset, int yOffset) {
+        resizeWidget(bottomRightWidgetResizeButton, xOffset, yOffset);
+    }
+
+    private void resizeWidget(WebElement resizeButton, int xOffset, int yOffset) {
+        Actions action = new Actions(browser);
+        action.clickAndHold(resizeButton).moveByOffset(xOffset, yOffset).release().perform();
     }
 }

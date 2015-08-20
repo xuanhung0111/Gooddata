@@ -19,6 +19,9 @@ public class LoginFragment extends AbstractFragment {
 
     @FindBy(css = ".s-login-button")
     private WebElement signInButton;
+    
+    @FindBy(css = ".s-notAuthorized")
+    private WebElement notAuthorizedMessage;
 
     private static final String ERROR_CLASS = "has-error";
 
@@ -49,5 +52,9 @@ public class LoginFragment extends AbstractFragment {
     public void checkInvalidLogin() {
         checkEmailInvalid();
         checkPasswordInvalid();
+    }
+    
+    public String getNotAuthorizedMessage() {
+        return waitForElementVisible(notAuthorizedMessage).getText();
     }
 }
