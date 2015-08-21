@@ -149,8 +149,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"initialize"})
     public void checkVariableFilterDashboard() throws ParseException, IOException, JSONException {
         String top5OpenByMoney = "Top 5 Open (by $)";
-        RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
-                testParams.getUser(), testParams.getPassword(), testParams.getEditorProfileUri(),
+        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(),
                 UserRoles.ADMIN);
 
         initDashboardsPage();
@@ -244,8 +243,8 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
         List<String> reportsToCheck = asList("Activities by Type", "Activity Level", "Activity by Sales Rep");
         for(String report : reportsToCheck) {
             WebElement reportImg = dashboardsPage.getContent().getImageFromReport(report);
-            assertTrue(RestUtils.isValidImage(testParams.getHost(), testParams.getUser(),
-                    testParams.getPassword(), reportImg), "Image reports are not loaded properly");
+            assertTrue(RestUtils.isValidImage(getRestApiClient(), reportImg), 
+                    "Image reports are not loaded properly");
         }
     }
 

@@ -34,7 +34,6 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
         technicalUser = testParams.loadProperty("technicalUser");
         technicalUserPassword = testParams.loadProperty("technicalUserPassword");
-        technicalUserUri = testParams.loadProperty("technicalUserUri");
     }
 
     @DataProvider(name = "basicNotificationData")
@@ -216,8 +215,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     @Override
     protected void addUsersToProject() {
         try {
-            addUserToProject(technicalUserUri, UserRoles.ADMIN);
-            addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
+            addUserToProject(technicalUser, UserRoles.ADMIN);
+            addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
         } catch (Exception e) {
             throw new IllegalStateException("There is an exception when adding users to project!",
                     e);
@@ -226,7 +225,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Override
     protected void addUsersToAdsInstance() {
-        addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
+        addUserToAdsInstance(adsInstance, technicalUser, "dataAdmin");
     }
 
     private void failToAddData(DataSource dataSource, String screenshotName) {

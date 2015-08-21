@@ -147,7 +147,6 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     protected String failureProcessUri;
     protected String successfulScheduleId;
     protected String failedScheduleId;
-    protected String imapUserUri;
 
     @FindBy(tagName = "pre")
     protected ObjectFragment objectFragment;

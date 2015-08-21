@@ -44,14 +44,12 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = { "initialData" }, groups = { "DataloadResourcesPermissionTest" }, priority = 1)
     private void addUsersToProjects() throws ParseException, IOException, JSONException {
-        RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(), testParams.getUser(),
-                testParams.getPassword(), testParams.getEditorProfileUri(), UserRoles.EDITOR);
-        RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(), testParams.getUser(),
-                testParams.getPassword(), testParams.getViewerProfileUri(), UserRoles.VIEWER);
-        addUserToAdsInstance(adsInstance, testParams.getEditorProfileUri(), testParams.getEditorUser(),
-                "dataAdmin");
-        addUserToAdsInstance(adsInstance, testParams.getViewerProfileUri(), testParams.getViewerUser(),
-                "dataAdmin");
+        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
+                UserRoles.EDITOR);
+        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getViewerUser(), 
+                UserRoles.VIEWER);
+        addUserToAdsInstance(adsInstance, testParams.getEditorUser(), "dataAdmin");
+        addUserToAdsInstance(adsInstance, testParams.getViewerUser(), "dataAdmin");
     }
 
     @Test(dependsOnMethods = { "addUsersToProjects" },

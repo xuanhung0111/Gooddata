@@ -85,7 +85,6 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     private Metric metricAvailable;
     private Attribute stageName;
     private String amountMetricUri;
-    private String currentAcountProfileUri;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -97,10 +96,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         GoodData goodDataClient = getGoodDataClient();
         project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
         mdService = goodDataClient.getMetadataService();
-
         amountMetricUri = mdService.getObjUri(project, Metric.class, identifier("ah1EuQxwaCqs"));
         stageName = mdService.getObj(project, Attribute.class, identifier("attr.stage.name"));
-        currentAcountProfileUri = goodDataClient.getAccountService().getCurrent().getUri();
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
@@ -337,7 +334,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
         conditions.put(STAGE_NAME_ID, asList(RISK_ASSESSMENT_ID, CONVICTION_ID, NEGOTIATION_ID));
         String mufUri = createMUFObj(getRestApiClient(), project.getId(), "Stage Name user filter", conditions);
-        addMUFToUser(getRestApiClient(), project.getId(), currentAcountProfileUri, mufUri);
+        addMUFToUser(getRestApiClient(), project.getId(), testParams.getUser(), mufUri);
 
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
 
@@ -367,7 +364,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         } finally {
             dashboardsPage.deleteDashboard();
             editMetricExpression(buildFirstMetricExpression(amountMetricUri, stageNameUri));
-            addMUFToUser(getRestApiClient(), project.getId(), currentAcountProfileUri, "");
+            addMUFToUser(getRestApiClient(), project.getId(), testParams.getUser(), "");
         }
     }
 

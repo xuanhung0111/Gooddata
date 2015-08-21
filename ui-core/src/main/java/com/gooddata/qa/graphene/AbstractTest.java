@@ -124,10 +124,13 @@ public abstract class AbstractTest extends Arquillian {
 
     public GoodData getGoodDataClient() {
         if (goodDataClient == null) {
-            final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
-            goodDataClient = new GoodData(httpHost.getHostName(), testParams.getUser(), testParams.getPassword(),
-                    httpHost.getPort());
+            goodDataClient = getGoodDataClient(testParams.getUser(), testParams.getPassword());
         }
         return goodDataClient;
+    }
+    
+    public GoodData getGoodDataClient(final String userLogin, final String userPassword) {
+        final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
+        return new GoodData(httpHost.getHostName(), userLogin, userPassword, httpHost.getPort());
     }
 }

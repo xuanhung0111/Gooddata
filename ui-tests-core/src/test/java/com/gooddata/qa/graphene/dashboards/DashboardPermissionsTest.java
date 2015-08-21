@@ -35,12 +35,16 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     private String editorLogin;
     private String userGroup1Id;
     private String userGroup2Id;
+    private String editorProfileUri;
+    private String viewerProfileUri;
 
     @BeforeClass(alwaysRun = true)
     public void before() {
         addUsersWithOtherRoles = true;
         viewerLogin = testParams.getViewerUser();
         editorLogin = testParams.getEditorUser();
+        editorProfileUri = testParams.loadProperty("editorProfileUri");
+        viewerProfileUri = testParams.loadProperty("viewerProfileUri");
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"admin-tests", "sanity"}, priority = 0)
@@ -554,8 +558,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup1Id, testParams.getEditorProfileUri());
-        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup2Id, testParams.getViewerProfileUri());
+        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup1Id, editorProfileUri);
+        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup2Id, viewerProfileUri);
     }
 
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups", "sanity"})

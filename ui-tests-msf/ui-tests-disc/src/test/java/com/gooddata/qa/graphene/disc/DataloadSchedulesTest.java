@@ -209,9 +209,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             assertTrue(getScheduleDetail(schedule.getScheduleUrl()).contains(scheduleOwner),
                     "Schedule owner is not admin user");
 
-            RestUtils.addUserToProject(testParams.getHost(), testParams.getProjectId(),
-                    testParams.getUser(), testParams.getPassword(), technicalUserUri, UserRoles.ADMIN);
-            addUserToAdsInstance(adsInstance, technicalUserUri, technicalUser, "dataAdmin");
+            RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, 
+                    UserRoles.ADMIN);
+            addUserToAdsInstance(adsInstance, technicalUser, "dataAdmin");
 
             logout();
             signInAtGreyPages(technicalUser, technicalUserPassword);
