@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
@@ -25,7 +25,7 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void createReportTest() {
-        createReport(new ReportDefinition().withName(REPORT_NAME)
+        createReport(new UiReportDefinition().withName(REPORT_NAME)
                         .withWhats("Amount")
                         .withHows("Stage Name"),
                 "Simple filter report");

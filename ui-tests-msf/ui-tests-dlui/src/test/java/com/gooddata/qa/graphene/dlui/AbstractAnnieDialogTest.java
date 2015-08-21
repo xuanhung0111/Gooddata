@@ -28,7 +28,7 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
@@ -401,44 +401,44 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     }
 
     protected enum ReportWithAddedFields {
-        POSITION(new ReportDefinition().withName("Report with Position").withHows("Position")
+        POSITION(new UiReportDefinition().withName("Report with Position").withHows("Position")
                 .withWhats("age [Sum]"), Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6",
                 "J7"), Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00",
                 "13.00")),
-        POSITION_CONNECTION_POINT(new ReportDefinition().withName("Report with Position")
+        POSITION_CONNECTION_POINT(new UiReportDefinition().withName("Report with Position")
                 .withHows("Position").withWhats("age [Sum]"), Lists.newArrayList("A1", "B2", "C3",
                 "D4", "E5", "F6", "J7"), Lists.newArrayList("36.00", "34.00", "10.00", "8.00",
                 "2.00", "40.00", "13.00")),
         TOTALPRICE2(
-                new ReportDefinition().withName("Report with Totalprice2").withHows("name")
+                new UiReportDefinition().withName("Report with Totalprice2").withHows("name")
                         .withWhats("Totalprice2 [Sum]"),
                 Lists.newArrayList("A", "B", "C", "D", "E", "F"),
                 Lists.newArrayList("400.00", "400.00", "400.00", "400.00", "400.00", "400.00")),
-        LABEL(new ReportDefinition().withName("Report with Label").withHows("title")
+        LABEL(new UiReportDefinition().withName("Report with Label").withHows("title")
                 .withWhats("price [Sum]"), Lists.newArrayList("opportunityA", "opportunityB",
                 "opportunityC", "opportunityD", "opportunityE", "opportunityF"), Lists
                 .newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00")),
-        LABEL_OF_NEW_FIELD(new ReportDefinition().withName("Report with Label").withHows("Title2")
+        LABEL_OF_NEW_FIELD(new UiReportDefinition().withName("Report with Label").withHows("Title2")
                 .withWhats("price [Sum]"), Lists.newArrayList("opportunityA", "opportunityB",
                 "opportunityC", "opportunityD", "opportunityE", "opportunityF"), Lists
                 .newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00")),
-        DATE(new ReportDefinition().withName("Report with Date").withHows("Date (Date)")
+        DATE(new UiReportDefinition().withName("Report with Date").withHows("Date (Date)")
                 .withWhats("age [Sum]"), Lists.newArrayList("01/01/2006", "01/02/2006",
                 "01/02/2007", "01/02/2008", "07/02/2009"), Lists.newArrayList("34.00", "50.00",
                 "36.00", "13.00", "10.00"));
 
-        private ReportDefinition reportDefinition;
+        private UiReportDefinition reportDefinition;
         private Collection<String> attributeValues;
         private Collection<String> metricValues;
 
-        private ReportWithAddedFields(ReportDefinition reportDefinition,
+        private ReportWithAddedFields(UiReportDefinition reportDefinition,
                 Collection<String> attributeValues, Collection<String> metricValues) {
             this.reportDefinition = reportDefinition;
             this.attributeValues = attributeValues;
             this.metricValues = metricValues;
         }
 
-        public ReportDefinition getReportDefinition() {
+        public UiReportDefinition getReportDefinition() {
             return this.reportDefinition;
         }
 

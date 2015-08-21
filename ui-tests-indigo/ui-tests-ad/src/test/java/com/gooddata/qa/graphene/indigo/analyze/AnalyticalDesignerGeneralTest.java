@@ -35,7 +35,6 @@ import com.gooddata.md.Entry;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
-import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
@@ -114,7 +113,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "testCustomDiscovery");
-
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
@@ -137,8 +135,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String attribute = getRandomAttribute();
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withCategories(attribute));
-        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
+        assertEquals(analysisPage.addCategory(attribute).getExplorerMessage(), "Now select a measure to display");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART).getExplorerMessage(),
                 "Now select a measure to display");
@@ -200,7 +197,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleContribution");
-
         doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleContribution");
 
         final ChartReport report = analysisPage.getChartReport();
@@ -229,7 +225,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "testAnotherApproachToShowContribution");
-
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
@@ -266,7 +261,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleComparison");
-
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
@@ -309,7 +303,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
             while (true) {
                 metric = doSafetyMetricAction(analysisPage::addMetric, "supportParameter");
-
                 if (!badMetrics.contains(metric)) {
                     break;
                 }
@@ -354,7 +347,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "displayInColumnChartWithOnlyMetric");
-
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
@@ -398,7 +390,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric = doSafetyMetricAction(
                 data -> analysisPage.addMetric(data).changeReportType(ReportType.TABLE),
                 "exportCustomDiscovery");
-
         doSafetyAttributeAction(metric, analysisPage::addCategory, "exportCustomDiscovery");
 
         assertTrue(analysisPage.isExportToReportButtonEnabled());
@@ -444,8 +435,8 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
-        analysisPage.createReport(new ReportDefinition().withCategories(getRandomAttribute()));
-        assertEquals(analysisPage.getExplorerMessage(), "Now select a measure to display");
+        assertEquals(analysisPage.addCategory(getRandomAttribute()).getExplorerMessage(),
+                "Now select a measure to display");
         assertFalse(analysisPage.isExportToReportButtonEnabled());
     }
 
@@ -456,7 +447,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric = doSafetyMetricAction(
                 data -> analysisPage.addMetric(data).addFilter(DATE),
                 "filterOnDateAttribute");
-
         doSafetyAttributeAction(metric, analysisPage::addCategory, "filterOnDateAttribute");
 
         ChartReport report = analysisPage.getChartReport();
@@ -474,7 +464,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         doSafetyMetricAction(
                 data -> analysisPage.addMetric(data).addCategory(DATE),
                 "testDateInCategoryAndDateInFilter");
-
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
         assertTrue(isEqualCollection(analysisPage.getAllGranularities(),
@@ -488,7 +477,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric = doSafetyMetricAction(
                 data -> analysisPage.addMetric(data).addFilter(DATE),
                 "trendingRecommendationOverrideDateFilter");
-
         assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
 
         boolean timeFilterOk = false;
@@ -522,7 +510,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "dragAndDropAttributeToFilterBucket");
-
         String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory,
                 "dragAndDropAttributeToFilterBucket");
 
@@ -540,7 +527,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "addFilterDoesNotHideRecommendation");
-
         doSafetyAttributeAction(metric, analysisPage::addCategory, "addFilterDoesNotHideRecommendation");
 
         ChartReport report = analysisPage.getChartReport();
@@ -587,7 +573,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         doSafetyMetricAction(analysisPage::addMetric, "testAnotherApproachToShowPoP");
-
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
@@ -615,7 +600,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric = doSafetyMetricAction(
                 data -> analysisPage.addMetric(data).addFilter(DATE),
                 "compararisonRecommendationOverrideDateFilter");
-
         String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory,
                 "compararisonRecommendationOverrideDateFilter");
 

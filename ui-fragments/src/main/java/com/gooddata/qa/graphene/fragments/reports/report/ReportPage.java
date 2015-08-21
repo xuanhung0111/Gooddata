@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
@@ -209,12 +209,12 @@ public class ReportPage extends AbstractFragment {
         return reportName.getAttribute("title");
     }
 
-    public void createReport(ReportDefinition reportDefinition) {
+    public void createReport(UiReportDefinition reportDefinition) {
         configReportDefinition(reportDefinition);
         createReport();
     }
     
-    public void configReportDefinition(ReportDefinition reportDefinition) {
+    public void configReportDefinition(UiReportDefinition reportDefinition) {
         // Wait to avoid red bar randomly
         // Red bar message: An error occurred while performing this operation.
         sleepTightInSeconds(3);

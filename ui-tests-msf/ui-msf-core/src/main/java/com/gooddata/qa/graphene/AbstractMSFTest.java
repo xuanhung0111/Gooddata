@@ -38,7 +38,7 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
@@ -446,7 +446,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
         }
     }
 
-    protected void createAndCheckReport(ReportDefinition reportDefinition, Collection<String> attributeValues,
+    protected void createAndCheckReport(UiReportDefinition reportDefinition, Collection<String> attributeValues,
             Collection<String> metricValues) {
         createReport(reportDefinition, reportDefinition.getName());
 
@@ -463,8 +463,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected void checkReportAfterAddReferenceToDataset() {
         prepareMetricToCheckNewAddedFields("number");
-        ReportDefinition reportDefinition =
-                new ReportDefinition().withName("Report to check reference")
+        UiReportDefinition reportDefinition =
+                new UiReportDefinition().withName("Report to check reference")
                         .withHows("artistname").withWhats("number [Sum]");
         createAndCheckReport(reportDefinition, Lists.newArrayList("OOP1", "OOP2",
                 "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"), Lists.newArrayList("1,000.00",

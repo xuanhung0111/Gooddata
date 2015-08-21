@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
@@ -184,7 +184,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"initialize"})
     public void checkListElementsInReportFilter() {
         initReportsPage();
-        createReport(new ReportDefinition().withType(ReportTypes.TABLE)
+        createReport(new UiReportDefinition().withType(ReportTypes.TABLE)
                                            .withName("CheckListElementsReport")
                                            .withWhats("Amount")
                                            .withHows(new HowItem(productAttr, Position.LEFT))
@@ -215,7 +215,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"initialize"})
     public void checkListElementsInChartReportFilter() {
         initReportsPage();
-        createReport(new ReportDefinition().withType(ReportTypes.FUNNEL)
+        createReport(new UiReportDefinition().withType(ReportTypes.FUNNEL)
                                            .withName("CheckListElementsInChartReport")
                                            .withWhats("Amount")
                                            .withHows("Department"), "CheckListElementsInChartReport");

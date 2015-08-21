@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -43,7 +43,7 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
     public void createReport() {
         initReportsPage();
-        ReportDefinition rd = new ReportDefinition().withName(REPORT).withWhats(AMOUNT)
+        UiReportDefinition rd = new UiReportDefinition().withName(REPORT).withWhats(AMOUNT)
                 .withHows(STAGE_NAME, IS_WON);
         createReport(rd, REPORT);
         reportPage.saveReport();

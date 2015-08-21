@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
@@ -304,11 +304,11 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             scheduleDetail.assertSuccessfulExecution();
 
             prepareMetricToCheckNewAddedFields("age", "price");
-            createAndCheckReport(new ReportDefinition().withName("Opportunity dataset").withHows("name")
+            createAndCheckReport(new UiReportDefinition().withName("Opportunity dataset").withHows("name")
                     .withWhats("price [Sum]"), Lists.newArrayList("A", "B", "C", "D", "E", "F"),
                     Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00"));
             createAndCheckReport(
-                    new ReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
+                    new UiReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
                     Lists.newArrayList("(empty value)"), Lists.newArrayList(""));
         } finally {
             openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
@@ -359,10 +359,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             scheduleDetail.assertSuccessfulExecution();
 
             prepareMetricToCheckNewAddedFields("age", "price");
-            createAndCheckReport(new ReportDefinition().withName("Opportunity dataset").withHows("name")
+            createAndCheckReport(new UiReportDefinition().withName("Opportunity dataset").withHows("name")
                     .withWhats("price [Sum]"), Lists.newArrayList("(empty value)"), Lists.newArrayList(""));
             createAndCheckReport(
-                    new ReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
+                    new UiReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
                     Lists.newArrayList("A", "B", "C", "D", "E", "F", "J"),
                     Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00"));
         } finally {
@@ -582,10 +582,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     
     private void checkReportOfAllDatasets() {
         prepareMetricToCheckNewAddedFields("age", "price");
-        createAndCheckReport(new ReportDefinition().withName("Opportunity dataset").withHows("name").withWhats("price [Sum]"),
+        createAndCheckReport(new UiReportDefinition().withName("Opportunity dataset").withHows("name").withWhats("price [Sum]"),
                 Lists.newArrayList("A", "B", "C", "D", "E", "F"),
                 Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00"));
-        createAndCheckReport(new ReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
+        createAndCheckReport(new UiReportDefinition().withName("Person dataset").withHows("person").withWhats("age [Sum]"),
                 Lists.newArrayList("A", "B", "C", "D", "E", "F", "J"),
                 Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00", "13.00"));
     }

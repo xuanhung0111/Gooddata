@@ -15,6 +15,7 @@ import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.connectors.ZendeskHelper;
 import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
@@ -320,7 +321,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private void createTicketTagsReport(int ticketId) {
-        createReport(new com.gooddata.qa.graphene.entity.report.ReportDefinition().withName(TICKET_TAGS_REPORT_NAME)
+        createReport(new UiReportDefinition().withName(TICKET_TAGS_REPORT_NAME)
                                            .withHows(new HowItem("Ticket Tag", HowItem.Position.LEFT))
                                            .withHows(new HowItem("Ticket Tag Deleted Flag", HowItem.Position.LEFT))
                                            .withHows(new HowItem("Ticket Id", HowItem.Position.LEFT)),

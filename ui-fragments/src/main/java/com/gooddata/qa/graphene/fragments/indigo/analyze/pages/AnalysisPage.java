@@ -10,7 +10,6 @@ import java.util.List;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
@@ -49,31 +48,6 @@ public class AnalysisPage extends AbstractFragment {
         waitForFragmentVisible(mainEditor);
         waitForFragmentVisible(cataloguePanel);
         mainEditor.dragAndDropMetricToShortcutPanel(cataloguePanel.getFact(fact), shortcutPanel);
-        return this;
-    }
-
-    public AnalysisPage createReport(ReportDefinition reportDefinition) {
-        waitForFragmentVisible(bucketsPanel);
-        waitForFragmentVisible(cataloguePanel);
-        waitForFragmentVisible(mainEditor);
-
-        bucketsPanel.setReportType(reportDefinition.getType());
-
-        for (String metric : reportDefinition.getMetrics()) {
-            addMetric(metric);
-        }
-
-        for (String category : reportDefinition.getCategories()) {
-            addCategory(category);
-        }
-
-        for (String filter : reportDefinition.getFilters()) {
-            addFilter(filter);
-        }
-
-        if (reportDefinition.isShowInPercents())
-            bucketsPanel.turnOnShowInPercents();
-
         return this;
     }
 

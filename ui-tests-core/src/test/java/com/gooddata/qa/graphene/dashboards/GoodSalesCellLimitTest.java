@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.dashboards;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
@@ -34,7 +34,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
     public void createTestingReports() {
         initReportsPage();
         createReport(
-                new ReportDefinition()
+                new UiReportDefinition()
                     .withName(TESTING_REPORT_TABLE)
                     .withWhats(AMOUNT, QUOTA)
                     .withHows(
@@ -44,7 +44,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
                 TESTING_REPORT_TABLE
         );
         createReport(
-                new ReportDefinition()
+                new UiReportDefinition()
                         .withName(TESTING_REPORT_CHART)
                         .withWhats(AMOUNT)
                         .withHows(ACCOUNT)
