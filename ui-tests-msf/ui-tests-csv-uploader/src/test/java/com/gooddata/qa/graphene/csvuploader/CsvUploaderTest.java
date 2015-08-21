@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadProgressDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.SourceDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.SourcesListPage;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
@@ -29,6 +30,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.gooddata.warehouse.Warehouse;
+import com.google.common.base.Predicate;
 
 import java.util.function.Consumer;
 
@@ -200,19 +202,18 @@ public class CsvUploaderTest extends AbstractMSFTest {
     }
 
     private void waitForExpectedSourcesCount(int expectedSourcesCount) {
-        Graphene.waitGui(browser).until(
-                (WebDriver input) ->
-                        waitForFragmentVisible(sourcesListPage).getMySourcesCount() == expectedSourcesCount
-        );
+        Predicate<WebDriver> sourcesCountEqualsExpected = input ->
+            waitForFragmentVisible(sourcesListPage).getMySourcesCount() == expectedSourcesCount;
+
+        Graphene.waitGui(browser).until(sourcesCountEqualsExpected);
     }
 
     private void waitForSourceUploaded(final String sourceName) {
-        Graphene.waitGui(browser).until(
-                (WebDriver input) -> {
-                    final String sourceStatus = sourcesListPage.getMySourcesTable().getSourceStatus(sourceName);
-                    return isNotEmpty(sourceStatus) && sourceStatus.contains(SUCCESSFUL_STATUS_MESSAGE);
-                }
-        );
+        final String sourceStatus = sourcesListPage.getMySourcesTable().getSourceStatus(sourceName);
+        Predicate<WebDriver> sourceHasSuccessfulStatus = input ->
+            isNotEmpty(sourceStatus) && sourceStatus.contains(SUCCESSFUL_STATUS_MESSAGE);
+
+        Graphene.waitGui(browser).until(sourceHasSuccessfulStatus);
     }
 
     private String getCsvFileToUpload(String csvFileName) {
