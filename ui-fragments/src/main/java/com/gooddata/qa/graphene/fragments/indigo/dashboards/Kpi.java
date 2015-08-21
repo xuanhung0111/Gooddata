@@ -85,7 +85,7 @@ public class Kpi extends AbstractFragment {
         return waitForFragmentVisible(popSection);
     }
 
-    public void deleteKpi() {
+    public void clickKpiDeleteButton() {
         waitForElementVisible(deleteButton).click();
     }
 

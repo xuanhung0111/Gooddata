@@ -26,7 +26,7 @@ public class AttributeFilter extends ReactDropdownParent {
     @Override
     public boolean isDropdownOpen() {
         waitForElementVisible(getDropdownButton());
-        return isElementPresent(By.cssSelector("button.is-loaded.icon-navigateup"), this.getRoot());
+        return isElementPresent(By.cssSelector("button.is-loaded.is-dropdown-open"), this.getRoot());
     }
 
     public AttributeFilter selectByName(String name, boolean cleanSelection) {

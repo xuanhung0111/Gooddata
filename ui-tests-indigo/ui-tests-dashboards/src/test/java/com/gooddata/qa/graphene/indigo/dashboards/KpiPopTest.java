@@ -27,7 +27,12 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage
             .switchToEditMode()
-            .deleteLastKpi();
+            .clickLastKpiDeleteButton()
+            .waitForDialog()
+            .submitClick();
+
+        indigoDashboardsPage
+            .saveEditMode();
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -49,7 +54,12 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage
             .switchToEditMode()
-            .deleteLastKpi();
+            .clickLastKpiDeleteButton()
+            .waitForDialog()
+            .submitClick();
+
+        indigoDashboardsPage
+            .saveEditMode();
     }
 
     @DataProvider(name = "popProvider")
@@ -82,6 +92,11 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage
             .switchToEditMode()
-            .deleteLastKpi();
+            .clickLastKpiDeleteButton()
+            .waitForDialog()
+            .submitClick();
+
+        indigoDashboardsPage
+            .saveEditMode();
     }
 }

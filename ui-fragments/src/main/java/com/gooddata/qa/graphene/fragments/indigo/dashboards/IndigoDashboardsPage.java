@@ -115,14 +115,14 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return getKpiByIndex(kpis.size() - 1);
     }
 
-    public IndigoDashboardsPage deleteLastKpi() {
-        selectLastKpi().deleteKpi();
+    public IndigoDashboardsPage clickLastKpiDeleteButton() {
+        selectLastKpi().clickKpiDeleteButton();
 
         return this;
     }
 
     public IndigoDashboardsPage deleteKpi(int index) {
-        selectKpi(index).deleteKpi();
+        selectKpi(index).clickKpiDeleteButton();
 
         return this;
     }

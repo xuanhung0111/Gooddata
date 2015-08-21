@@ -150,7 +150,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage
             .switchToEditMode()
-            .deleteLastKpi()
+            .clickLastKpiDeleteButton()
             .waitForDialog()
             .submitClick();
 
