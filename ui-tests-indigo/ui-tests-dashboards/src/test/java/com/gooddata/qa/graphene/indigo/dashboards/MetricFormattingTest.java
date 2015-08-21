@@ -111,7 +111,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
             // Check that loading happened
             indigoDashboardsPage
-                .waitForAllKpiWidgetContentLoading()
+                .waitForAnyKpiWidgetContentLoading()
                 .waitForAllKpiWidgetContentLoaded();
             assertEquals(selectedKpi.getValue(), "<button>11.61</button>");
         } finally {
