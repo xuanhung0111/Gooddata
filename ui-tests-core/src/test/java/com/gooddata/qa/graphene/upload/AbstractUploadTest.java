@@ -24,7 +24,7 @@ import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
@@ -75,7 +75,7 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         waitForAnalysisPageLoaded(browser);
         waitForElementVisible(reportPage.getRoot());
         assertNotNull(reportPage, "Report page not initialized!");
-        ReportDefinition reportDefinition = new ReportDefinition().withName(reportName).withType(reportType);
+        UiReportDefinition reportDefinition = new UiReportDefinition().withName(reportName).withType(reportType);
         for (String attributeName : how) {
             reportDefinition.withHows(new HowItem(attributeName));
         }

@@ -16,7 +16,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.fragments.greypages.sfdc.ConfigureSFDCCredentials;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportWithImage;
@@ -99,7 +99,7 @@ public class AttributeLabelsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"configDrillToExternalPageTest"})
     public void createReportWithHyperlinkTest() {
-        createReport(new ReportDefinition().withName(hyperlinkReport)
+        createReport(new UiReportDefinition().withName(hyperlinkReport)
                                            .withWhats("Count of Image")
                                            .withHows(hyperlinkAttr), 
                      "Simple hyperlink report");

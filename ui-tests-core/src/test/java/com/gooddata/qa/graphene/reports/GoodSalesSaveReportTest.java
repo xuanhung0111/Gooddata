@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
@@ -58,7 +58,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void openUpToDateReport() {
-        createReport(new ReportDefinition().withName(VERSION_REPORT).withWhats(NUMBER_OF_ACTIVITIES),
+        createReport(new UiReportDefinition().withName(VERSION_REPORT).withWhats(NUMBER_OF_ACTIVITIES),
                 "openUpToDateReport");
         initPulsePage();
         waitForFragmentVisible(pulsePage).openUptoDateReport(VERSION_REPORT);
@@ -93,7 +93,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void saveTooLargeReport() {
-        createReport(new ReportDefinition().withName("R1").withWhats("Amount").withHows("Opp. Snapshot"),
+        createReport(new UiReportDefinition().withName("R1").withWhats("Amount").withHows("Opp. Snapshot"),
                 "saveTooLargeReport");
         waitForAnalysisPageLoaded(browser);
         assertTrue(waitForFragmentVisible(reportPage).isReportTooLarge());

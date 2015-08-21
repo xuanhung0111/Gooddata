@@ -20,7 +20,7 @@ import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.google.common.base.Predicate;
@@ -130,8 +130,8 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             checkRemainingAdditionalFields(dataSource);
 
             prepareMetricToCheckNewAddedFields("number");
-            ReportDefinition reportDefinition1 =
-                    new ReportDefinition().withName("Report to check reference 1")
+            UiReportDefinition reportDefinition1 =
+                    new UiReportDefinition().withName("Report to check reference 1")
                             .withHows("Trackname").withWhats("number [Sum]");
             createAndCheckReport(reportDefinition1, Lists.newArrayList("10 trackNameA",
                     "11 trackNameA", "12 trackNameA", "13 trackNameA", "14 trackNameA",
@@ -139,8 +139,8 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
                     "6 trackNameA", "7 trackNameA", "8 trackNameA", "9 trackNameA"),
                     Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00",
                             "100.00", "100.00", "100.00", "100.00", "100.00", "100.00"));
-            ReportDefinition reportDefinition2 =
-                    new ReportDefinition().withName("Report to check reference 2")
+            UiReportDefinition reportDefinition2 =
+                    new UiReportDefinition().withName("Report to check reference 2")
                             .withHows("authorid").withWhats("number [Sum]");
             createAndCheckReport(reportDefinition2, Lists.newArrayList("author1",
                     "author10", "author11", "author12", "author13", "author14", "author19",

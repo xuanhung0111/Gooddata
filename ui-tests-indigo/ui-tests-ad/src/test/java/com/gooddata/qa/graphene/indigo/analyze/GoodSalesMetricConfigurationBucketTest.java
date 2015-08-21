@@ -9,7 +9,6 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.indigo.ReportDefinition;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 
 public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAbstractTest {
@@ -81,7 +80,7 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
     @Test(dependsOnGroups = {"init"})
     public void showInPercentAndPop() {
         initAnalysePage();
-        analysisPage.createReport(new ReportDefinition().withMetrics(NUMBER_OF_ACTIVITIES).withCategories(DATE))
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(DATE)
             .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
 
         assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());

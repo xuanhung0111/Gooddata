@@ -42,6 +42,7 @@ import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashboardWidgetDirection;
@@ -126,9 +127,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
         // *** create report 2 ***
         initReportsPage();
-        com.gooddata.qa.graphene.entity.report.ReportDefinition rd =
-                new com.gooddata.qa.graphene.entity.report.ReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
-                        .withHows(STAGE_NAME).withHows(YEAR_SNAPSHOT);
+        UiReportDefinition rd = new UiReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
+                .withHows(STAGE_NAME).withHows(YEAR_SNAPSHOT);
         createReport(rd, REPORT_2);
         reportPage.addFilter(FilterItem.Factory.createVariableFilter(F_STAGE_NAME, "Discovery", "2010", "2011",
                 "2012", "Risk Assessment", "2010", "2011", "2012"));

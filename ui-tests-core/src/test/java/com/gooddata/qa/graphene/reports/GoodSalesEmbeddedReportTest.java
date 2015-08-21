@@ -17,7 +17,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
@@ -41,7 +41,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     private final static String METRIC_NAME = "Amount";
 
     private String additionalProjectId = "";
-    private ReportDefinition embeddedReportDef = new ReportDefinition().withName(EMBEDDED_REPORT_TITLE)
+    private UiReportDefinition embeddedReportDef = new UiReportDefinition().withName(EMBEDDED_REPORT_TITLE)
             .withHows(ATTRIBUTE_NAME).withWhats(METRIC_NAME);
     private String reportUrl;
     private String htmlEmbedCode;
@@ -175,8 +175,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareHeadlineReport() {
         String headlineReportTitle = "Embedded Headline Report";
-        ReportDefinition headlineReportDef =
-                new ReportDefinition().withName(headlineReportTitle).withWhats("Amount")
+        UiReportDefinition headlineReportDef =
+                new UiReportDefinition().withName(headlineReportTitle).withWhats("Amount")
                         .withType(ReportTypes.HEADLINE);
         createReport(headlineReportDef, "Headline-Report");
         OneNumberReport headlineReport = reportPage.getHeadlineReport();
@@ -207,8 +207,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void updateReportAfterSharing() {
         String reportTitle = "Update embedded report";
-        ReportDefinition reportDefinition =
-                new ReportDefinition().withName(reportTitle).withHows("Stage Name").withWhats("Amount");
+        UiReportDefinition reportDefinition =
+                new UiReportDefinition().withName(reportTitle).withHows("Stage Name").withWhats("Amount");
         createReport(reportDefinition, "Update-Report-After-Sharing");
         String reportUrl = browser.getCurrentUrl();
 
@@ -272,8 +272,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareEmptyReport() {
         String reportTitle = "Empty report";
-        ReportDefinition updateEmbeddedReport =
-                new ReportDefinition().withName(reportTitle).withHows("Status").withWhats("Lost");
+        UiReportDefinition updateEmbeddedReport =
+                new UiReportDefinition().withName(reportTitle).withHows("Status").withWhats("Lost");
         createReport(updateEmbeddedReport, "Update-Report-After-Sharing");
         reportPage.addFilter(FilterItem.Factory.createVariableFilter("Status"));
         reportPage.saveReport();
@@ -294,8 +294,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareChartReport() {
-        ReportDefinition reportDefinition =
-                new ReportDefinition().withName("Embedded Chart Report").withHows("Status").withWhats("Amount")
+        UiReportDefinition reportDefinition =
+                new UiReportDefinition().withName("Embedded Chart Report").withHows("Status").withWhats("Amount")
                         .withType(ReportTypes.BAR);
         createReport(reportDefinition, "Embedded-chart-report");
 
@@ -322,8 +322,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void filterEmbeddedReportWithUrlParameter() {
         String reportTitle = "Embedded report with url parameter";
-        ReportDefinition reportDefinition =
-                new ReportDefinition().withName(reportTitle).withHows("Stage Name").withWhats("Amount");
+        UiReportDefinition reportDefinition =
+                new UiReportDefinition().withName(reportTitle).withHows("Stage Name").withWhats("Amount");
         createReport(reportDefinition, "Update-Report-After-Sharing");
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
@@ -342,8 +342,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void drillEmbeddedReport() {
-        ReportDefinition reportDefinition =
-                new ReportDefinition().withName("Drill embeded report").withHows("Year (Created)")
+        UiReportDefinition reportDefinition =
+                new UiReportDefinition().withName("Drill embeded report").withHows("Year (Created)")
                         .withWhats(new WhatItem("Amount", "Status"));
         createReport(reportDefinition, "Drill-embedded-report");
 

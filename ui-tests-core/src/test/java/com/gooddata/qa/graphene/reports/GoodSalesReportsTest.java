@@ -7,7 +7,7 @@ import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.report.ReportDefinition;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
@@ -294,10 +294,8 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
         assertFalse(waitForFragmentVisible(reportsPage).isReportVisible(SIMPLE_CA_REPORT));
     }
 
-    private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how)
-            {
-        ReportDefinition reportDefinition = new ReportDefinition().withName(reportName)
-                                                                  .withType(reportType);
+    private void prepareReport(String reportName, ReportTypes reportType, List<String> what, List<String> how) {
+        UiReportDefinition reportDefinition = new UiReportDefinition().withName(reportName).withType(reportType);
 
         if (what != null) {
             for (String metric : what)
