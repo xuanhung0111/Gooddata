@@ -11,6 +11,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import org.openqa.selenium.TimeoutException;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = Kpi.KPI_CSS_SELECTOR)
@@ -142,8 +143,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage waitForAllKpiWidgetContentLoading() {
-        waitForElementPresent(Kpi.IS_CONTENT_LOADING, browser);
+    public IndigoDashboardsPage waitForAnyKpiWidgetContentLoading() {
+        int KPI_INITIATE_LOAD_TIMEOUT_SECONDS = 2;
+        // wait until the loading is initiated. If not, assume kpi widget
+        // was already reloaded, even before we started waiting
+        try {
+            waitForElementVisible(Kpi.IS_CONTENT_LOADING, browser, KPI_INITIATE_LOAD_TIMEOUT_SECONDS);
+        } catch (TimeoutException ex) { }
 
         return this;
     }
