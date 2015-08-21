@@ -18,7 +18,6 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Replace-Metric-Attribute-Test";
     }
 

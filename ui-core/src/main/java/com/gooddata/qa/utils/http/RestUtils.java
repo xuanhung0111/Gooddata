@@ -77,7 +77,7 @@ public class RestUtils {
                         put("status", "ENABLED");
                     }});
                     put("links", new JSONObject() {{
-                        put("self", "${self}");
+                        put("self", "/gdc/account/profile/${email}");
                     }});
                 }});
             }}.toString();
@@ -160,7 +160,7 @@ public class RestUtils {
                 put("userFilters", new JSONObject() {{
                     put("items", new JSONArray() {{
                         put(new JSONObject() {{
-                            put("user", "$UserProfileURI");
+                            put("user", "/gdc/account/profile/${email}");
                             put("userFilters", new JSONArray() {{
                                 put("$MUFExpression");
                             }});
@@ -206,40 +206,36 @@ public class RestUtils {
         }
     }
 
-    public static void addUserToProject(String host, String projectId, String domainUser,
-                                        String domainPassword, String inviteeProfile,
-                                        UserRoles role) throws ParseException, IOException, JSONException {
-
-        RestApiClient restApiClient = new RestApiClient(host, domainUser, domainPassword, true, false);
+    public static void addUserToProject(RestApiClient restApiClient, String projectId, String inviteeEmail,
+            UserRoles role) throws ParseException, IOException, JSONException {
         String usersUri = String.format(USERS_LINK, projectId);
         String roleUri = String.format(ROLE_LINK, projectId, role.getRoleId());
         String contentBody = ADD_USER_CONTENT_BODY.replace("${userRoles}", roleUri)
-                .replace("${self}", inviteeProfile);
+                .replace("${email}", inviteeEmail);
+        System.out.println("content of json: " + contentBody);
         HttpRequestBase postRequest = restApiClient.newPostMethod(usersUri, contentBody);
         try {
             HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
             JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
             assertFalse(json.getJSONObject("projectUsersUpdateResult").getString("successful").equals("[]"),
                     "User isn't assigned properly into the project");
-            System.out.println(format("Successfully assigned user %s to project %s by domain admin %s",
-                    inviteeProfile, projectId, domainUser));
+            System.out.println(format("Successfully assigned user %s to project %s", inviteeEmail, projectId));
 
             EntityUtils.consumeQuietly(postResponse.getEntity());
         } finally {
             postRequest.releaseConnection();
         }
     }
+    
 
     public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
             throws JSONException, IOException {
-        final String projectUri = "/gdc/projects/" + projectId;
-
         @SuppressWarnings("serial")
         JSONObject payload = new JSONObject(new HashMap<String, Object>() {{
             put("userGroup", new HashMap<String, Object>() {{
                 put("content", new HashMap<String, Object>() {{
                     put("name", name);
-                    put("project", projectUri);
+                    put("project", String.format("/gdc/projects/%s", projectId));
                 }});
             }});
         }});
@@ -303,9 +299,8 @@ public class RestUtils {
         }}.toString();
     }
 
-    public static String getLDMImageURI(String host, String projectId, String user, String password)
+    public static String getLDMImageURI(RestApiClient restApiClient, String projectId, String host)
             throws ParseException, IOException, JSONException {
-        RestApiClient restApiClient = new RestApiClient(host, user, password, true, false);
         String ldmUri = String.format(LDM_LINK, projectId);
         HttpRequestBase getRequest = restApiClient.newGetMethod(ldmUri);
         HttpResponse getResponse = restApiClient.execute(getRequest, HttpStatus.OK, "Invalid status code");
@@ -318,11 +313,10 @@ public class RestUtils {
         return uri;
     }
 
-    public static boolean isValidImage(String host, String user, String pass, WebElement ele) {
+    public static boolean isValidImage(RestApiClient restApiClient, WebElement ele) {
         String imgSrc = ele.getAttribute("src");
         if (imgSrc == null) return false;
 
-        RestApiClient restApiClient = new RestApiClient(host, user, pass, true, false);
         HttpResponse response = restApiClient.execute(restApiClient.newGetMethod(imgSrc));
         return response.getStatusLine().getStatusCode() == 200;
     }
@@ -433,10 +427,10 @@ public class RestUtils {
         return Joiner.on(" AND ").join(expressions);
     }
 
-    public static void addMUFToUser(final RestApiClient restApiClient, String projectURI, String userProfileURI,
+    public static void addMUFToUser(final RestApiClient restApiClient, String projectURI, String user,
             String mufURI) {
         String urserFilter = format(MUF_LINK, projectURI);
-        String contentBody = USER_FILTER.replace("$UserProfileURI", userProfileURI).replace("$MUFExpression",
+        String contentBody = USER_FILTER.replace("${email}", user).replace("$MUFExpression",
                 mufURI);
         HttpRequestBase postRequest = restApiClient.newPostMethod(urserFilter, contentBody);
 
@@ -812,5 +806,19 @@ public class RestUtils {
         HttpRequestBase request = restApiClient.newDeleteMethod(uri);
         HttpResponse response = restApiClient.execute(request);
         EntityUtils.consumeQuietly(response.getEntity());
+    }
+
+    public static String getLoginFromProfileUri(RestApiClient restApiClient, String profileUri) 
+            throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newGetMethod("/gdc/account/profile/" + profileUri);
+        String login = "";
+        try {
+            HttpResponse response = restApiClient.execute(request);
+            login = new JSONObject(EntityUtils.toString(response.getEntity())).
+                    getJSONObject("accountSetting").getString("login");
+        } finally {
+            request.releaseConnection();
+        }
+        return login;
     }
 }

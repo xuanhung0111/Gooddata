@@ -26,9 +26,8 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     private static final String ACTIVITY_DATE = "Activity (Date)";
     private static final String OPP_SNAPSHOT = "Opp. Snapshot";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Demo-Non-Common-Date-Test";
     }
 

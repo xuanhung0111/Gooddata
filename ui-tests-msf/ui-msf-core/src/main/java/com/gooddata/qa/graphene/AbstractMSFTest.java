@@ -87,7 +87,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected String dssAuthorizationToken;
     protected String technicalUser;
     protected String technicalUserPassword;
-    protected String technicalUserUri;
     protected String initialLdmMaqlFile = "create-ldm.txt";
 
     protected ProjectInfo workingProject;
@@ -101,7 +100,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
         technicalUser = testParams.loadProperty("technicalUser");
         technicalUserPassword = testParams.loadProperty("technicalUserPassword");
-        technicalUserUri = testParams.loadProperty("technicalUserUri");
     }
 
     protected ProjectInfo getWorkingProject() {
@@ -244,7 +242,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
         System.out.println("adsId: " + adsInstance.getId());
     }
 
-    protected void addUserToAdsInstance(ADSInstance adsInstance, String userUri, String user,
+    protected void addUserToAdsInstance(ADSInstance adsInstance, String user,
             String userRole) {
         openUrl(ADS_INSTANCES_URI + adsInstance.getId() + "/users");
         storageUsersForm.verifyValidAddUserForm();
@@ -255,8 +253,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
                     "There is an exeception when adding user to ads instance!", e);
         }
         takeScreenshot(browser, "datawarehouse-add-user-filled-form", this.getClass());
-        assertTrue(browser.getCurrentUrl().contains(userUri.replace("/gdc/account/profile/", "")),
-                "The user is not added to ads instance successfully!");
+        String login = getUserLoginFromDatawarehouseUsersLink(browser.getCurrentUrl());
+        assertEquals(login, user, "The user is not added to ads instance successfully!");
     }
 
     protected void deleteADSInstance(ADSInstance adsInstance) {
@@ -522,6 +520,18 @@ public class AbstractMSFTest extends AbstractProjectTest {
         }
 
         return pollingUri;
+    }
+    
+    private String getUserLoginFromDatawarehouseUsersLink(String userLink) {
+    	String[] parts = userLink.split("/");
+    	String profileUri = parts[parts.length-1];
+    	String login = "";
+    	try {
+    	    login = RestUtils.getLoginFromProfileUri(getRestApiClient(), profileUri);
+    	} catch (Exception e) {
+    	    throw new IllegalStateException("There is an exeception during parsing user link!", e); 
+    	}
+    	return login;
     }
 
     protected enum AdditionalDatasets {

@@ -14,9 +14,8 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Demo-Filter-Metrics-Test";
     }
 

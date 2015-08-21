@@ -215,22 +215,20 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     protected void addEditorUserToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getEditorProfileUri(), UserRoles.EDITOR);
+        addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
     }
 
     protected void addViewerUserToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getViewerProfileUri(), UserRoles.VIEWER);
+        addUserToProject(testParams.getViewerUser(), UserRoles.VIEWER);
     }
 
-    protected void addUserToProject(String profileUri, UserRoles userRole) throws ParseException, IOException, JSONException {
-        RestUtils.addUserToProject(testParams.getHost(),
-                testParams.getProjectId(), testParams.getUser(),
-                testParams.getPassword(), profileUri,
-                userRole);
+    protected void addUserToProject(String email, UserRoles userRole) throws ParseException, IOException, JSONException {
+        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), email, userRole);
     }
     
     private String getLDMImageFile() throws ParseException, IOException, JSONException {
-        String imageURI = RestUtils.getLDMImageURI(testParams.getHost(), testParams.getProjectId(), testParams.getUser(), testParams.getPassword());
+        String imageURI = RestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(), 
+                testParams.getHost());
         int indexSVG = imageURI.indexOf(".svg");
         String imageFileName = imageURI.substring(0, indexSVG+4);
         imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/")+1);

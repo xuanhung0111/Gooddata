@@ -317,9 +317,8 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
         List<ProjectInfo> additionalProjects = Lists.newArrayList();
         String secondAdmin = testParams.getEditorUser();
         String secondAdminPassword = testParams.getEditorPassword();
-        String secondAdminUri = testParams.getEditorProfileUri();
         try {
-            addUserToProject(secondAdminUri, UserRoles.ADMIN);
+            addUserToProject(secondAdmin, UserRoles.ADMIN);
             logout();
             signInAtUI(secondAdmin, secondAdminPassword);
 
