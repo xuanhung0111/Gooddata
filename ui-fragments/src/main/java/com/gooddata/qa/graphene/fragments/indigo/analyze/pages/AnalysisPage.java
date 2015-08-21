@@ -197,6 +197,10 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(cataloguePanel).getAttributeDescription(attribute);
     }
 
+    public String getAttributeDescriptionInMetricFilter(String metric, String attribute) {
+        return waitForFragmentVisible(bucketsPanel).getAttributeDescription(metric, attribute);
+    }
+
     public String getMetricDescription(String metric) {
         return waitForFragmentVisible(cataloguePanel).getMetricDescription(metric);
     }
