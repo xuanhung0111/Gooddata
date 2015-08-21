@@ -16,9 +16,8 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
 
     private static final String DURATION = "Duration";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Demo-Metric-Configuration-Bucket";
     }
 

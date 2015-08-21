@@ -29,7 +29,7 @@ public class MainEditor extends AbstractFragment {
 
     private static final String CSS_EXPLORER_MESSAGE = ".adi-canvas-message h2";
     private static final String CSS_REPORT = ".adi-chart-container:not(.invisible)";
-    private static final By BY_TABLE_REPORT = By.cssSelector(".dda-table-component");
+    private static final By BY_TABLE_REPORT = By.cssSelector(".dda-table-component-content");
     private static final By BY_CHART_REPORT = By.cssSelector(".switchable-visualization-component");
     private static final By BY_REPORT_COMPUTING = By.cssSelector(".adi-computing");
 

@@ -33,9 +33,10 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
 
     protected boolean isWalkmeTurnOff = false;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectCreateCheckIterations = 60; // 5 minutes
+        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"enableAnalyticalDesigner"})

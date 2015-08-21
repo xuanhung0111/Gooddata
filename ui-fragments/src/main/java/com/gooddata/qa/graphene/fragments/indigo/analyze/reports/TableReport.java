@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.className;
 
 import java.util.List;
 
@@ -9,52 +11,31 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 
 public class TableReport extends AbstractFragment {
 
-    @FindBy(css = ".ember-table-header-cell .ember-table-content")
+    @FindBy(css = ".public_fixedDataTable_header ." + CELL_CONTENT)
     private List<WebElement> headers;
 
-    @FindBy(css = ".ember-table-body-container .ember-table-table-row:not([style*='display:none'])>div")
+    @FindBy(css = ".fixedDataTableRowLayout_rowWrapper:not([data-reactid *= '$header'])")
     private List<WebElement> rows;
 
-    private static final By LEFT_CONTENT = By.cssSelector(".text-align-left>span");
-    private static final By RIGHT_CONTENT = By.cssSelector(".text-align-right");
+    private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
 
     public List<String> getHeaders() {
-        waitForCollectionIsNotEmpty(headers);
-        return Lists.newArrayList(Collections2.transform(headers,
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getText().trim();
-            }
-        }));
+        return waitForCollectionIsNotEmpty(headers).stream()
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
     public List<List<String>> getContent() {
-        waitForCollectionIsNotEmpty(rows);
-        List<List<String>> result = Lists.newArrayList();
-
-        for (WebElement row: rows) {
-            List<String> content = Lists.newArrayList();
-            if (!row.findElements(LEFT_CONTENT).isEmpty()) {
-                content.add(row.findElement(LEFT_CONTENT).getText().trim());
-            }
-
-            for (WebElement col: row.findElements(RIGHT_CONTENT)) {
-                content.add(col.findElement(By.tagName("span")).getText().trim());
-            }
-
-            result.add(content);
-        }
-
-        return result;
+        return waitForCollectionIsNotEmpty(rows).stream()
+            .map(e -> e.findElements(className(CELL_CONTENT)))
+            .map(es -> es.stream().map(WebElement::getText).collect(toList()))
+            .collect(toList());
     }
 
+    // TODO: has issue: https://jira.intgdc.com/browse/CL-8159 Value in table doesn't apply color format
     public String getFormatFromValue(String value) {
         waitForCollectionIsNotEmpty(rows);
         for (WebElement row: rows) {

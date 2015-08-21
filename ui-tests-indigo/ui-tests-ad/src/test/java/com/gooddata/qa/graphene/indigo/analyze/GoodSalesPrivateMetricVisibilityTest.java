@@ -24,9 +24,8 @@ public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbst
     private static final String NUMBER_OF_WON_OPPS = "# of Won Opps.";
     private static final String NUMBER_OF_OPEN_OPPS = "# of Open Opps.";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTemplate = "/projectTemplates/GoodSalesDemo/2";
         projectTitle = "Indigo-GoodSales-Demo-Private-Metric-Visibility-Test";
     }
 
