@@ -500,6 +500,23 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         assertEquals(analysisPage.getMetricDescription(NUMBER_OF_ACTIVITIES), expected.toString());
     }
 
+    @Test(dependsOnGroups = {"init"})
+    public void exploreAttributeInMetricFilter() {
+        initAnalysePage();
+        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
+
+        StringBuilder expected = new StringBuilder(DEPARTMENT).append("\n")
+                .append("Field Type\n")
+                .append("Attribute\n")
+                .append("Values\n")
+                .append("Direct Sales\n")
+                .append("Inside Sales\n");
+        assertEquals(analysisPage.getAttributeDescriptionInMetricFilter(NUMBER_OF_ACTIVITIES, DEPARTMENT),
+                expected.toString());
+    }
+
     private void deleteMetric(String metric) {
         initMetricPage();
         metricPage.openMetricDetailPage(metric);

@@ -25,6 +25,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -210,6 +211,12 @@ public class MetricsBucket extends AbstractFragment {
         getMetric(metric).findElement(BY_REMOVE_ATTRIBUTE_FILTER).click();
     }
 
+    public String getAttributeDescription(String metric, String attribute) {
+        getMetric(metric).findElement(BY_ADD_ATTRIBUTE_FILTER).click();
+        return Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser)).getDescription(attribute);
+    }
+
     private WebElement getMetric(final String name) {
         WebElement item = getItem(name);
         if (item == null) {
@@ -255,6 +262,19 @@ public class MetricsBucket extends AbstractFragment {
         public AttributeFilterPicker clear() {
             waitForElementVisible(clearButton).click();
             return this;
+        }
+
+        public String getDescription(String element) {
+            searchItem(element);
+            WebElement ele = items.stream()
+                    .map(item -> item.findElement(cssSelector("span:last-child")))
+                    .filter(item -> element.equals(item.getText()))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element));
+            new Actions(browser).moveToElement(ele).perform();
+
+            return Graphene.createPageFragment(DescriptionPanel.class,
+                    waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getAttributeDescription();
         }
 
         public void selectTextItem(String element) {

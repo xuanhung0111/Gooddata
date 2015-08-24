@@ -208,4 +208,8 @@ public class BucketsPanel extends AbstractFragment {
     public void removeAttributeFilterFromMetric(String metric) {
         waitForFragmentVisible(metricsBucket).removeAttributeFilterFromMetric(metric);
     }
+
+    public String getAttributeDescription(String metric, String attribute) {
+        return waitForFragmentVisible(metricsBucket).getAttributeDescription(metric, attribute);
+    }
 }
