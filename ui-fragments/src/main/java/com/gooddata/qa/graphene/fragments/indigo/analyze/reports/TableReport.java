@@ -5,8 +5,8 @@ import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 
 import java.util.List;
+import java.util.Objects;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -35,16 +35,14 @@ public class TableReport extends AbstractFragment {
             .collect(toList());
     }
 
-    // TODO: has issue: https://jira.intgdc.com/browse/CL-8159 Value in table doesn't apply color format
-    public String getFormatFromValue(String value) {
-        waitForCollectionIsNotEmpty(rows);
-        for (WebElement row: rows) {
-            WebElement ele = row.findElement(By.cssSelector(".text-align-right>span>span"));
-            if (value.equals(ele.getText())) {
-                return ele.getAttribute("style");
-            }
-        }
-        System.out.println("Cannot find value: " + value);
-        return "";
+    public String getFormatFromValue() {
+        return waitForCollectionIsNotEmpty(rows).stream()
+            .map(e -> e.findElements(className(CELL_CONTENT)))
+            .map(es -> es.stream().map(e -> e.getAttribute("style")).collect(toList()))
+            .flatMap(e -> e.stream())
+            .filter(Objects::nonNull)
+            .distinct()
+            .findAny()
+            .orElse("");
     }
 }
