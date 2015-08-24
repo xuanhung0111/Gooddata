@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -92,9 +93,11 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing()
             .getTableReport()
-            .getHeaders();
-        assertThat(headers, equalTo(asList("Short (Jan 2010) (Retaildate)".toUpperCase(),
-                "Sum of Number".toUpperCase())));
+            .getHeaders()
+            .stream()
+            .map(String::toLowerCase)
+            .collect(toList());
+        assertThat(headers, equalTo(asList("month/year (retaildate)", "sum of number")));
     }
 
     @Test(dependsOnGroups = {"init"})

@@ -88,7 +88,7 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
             assertEquals(dataLabels.size(), 1);
 
             TableReport tableReport = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
-            assertEquals(tableReport.getFormatFromValue(dataLabels.get(0)), "color: rgb(255, 0, 0);");
+            assertEquals(tableReport.getFormatFromValue(), "color: rgb(255, 0, 0);");
         } finally {
             RestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat);
             initMetricPage();
