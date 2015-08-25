@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
@@ -63,7 +64,8 @@ public class GoodSalesCustomDiscoveryAdTest extends AnalyticalDesignerAbstractTe
                 .getExplorerMessage(), "Now select a measure to display");
 
         TableReport report = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
-        assertThat(report.getHeaders(), equalTo(asList(ACTIVITY_TYPE)));
+        assertThat(report.getHeaders().stream().map(String::toLowerCase).collect(toList()),
+                equalTo(asList(ACTIVITY_TYPE.toLowerCase())));
         checkingOpenAsReport("testWithAttribute");
     }
 
