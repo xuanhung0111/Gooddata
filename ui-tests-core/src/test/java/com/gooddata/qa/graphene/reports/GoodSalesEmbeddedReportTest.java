@@ -41,8 +41,6 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
     private final static String METRIC_NAME = "Amount";
 
     private String additionalProjectId = "";
-    private UiReportDefinition embeddedReportDef = new UiReportDefinition().withName(EMBEDDED_REPORT_TITLE)
-            .withHows(ATTRIBUTE_NAME).withWhats(METRIC_NAME);
     private String reportUrl;
     private String htmlEmbedCode;
     private String embedUri;
@@ -62,7 +60,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void createReportToShare() {
-        createReport(embeddedReportDef, "Report-To-Share");
+        createReport(new UiReportDefinition().withName(EMBEDDED_REPORT_TITLE)
+                .withHows(ATTRIBUTE_NAME).withWhats(METRIC_NAME), "Report-To-Share");
         reportPage.setReportVisible();
         reportUrl = browser.getCurrentUrl();
 
@@ -238,19 +237,23 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createAdditionalProject"})
     public void shareUnsavedReport() {
-        initReportCreation();
         String reportTitle = "Embed unsaved report";
-        reportPage.configReportDefinition(embeddedReportDef.withName(reportTitle));
+
+        initReportCreation();
+        reportPage.initPage()
+            .setReportName(reportTitle)
+            .openWhatPanel()
+            .selectMetric(METRIC_NAME)
+            .openHowPanel()
+            .selectAttribute(ATTRIBUTE_NAME)
+            .doneSndPanel();
+
         WebElement unsavedReportWarning = reportPage.embedUnsavedReport();
         assertEquals(unsavedReportWarning.getText(), "Please first save the report before embeding. Close");
         reportPage.closeEmbedUnsavedWarning();
 
         reportPage.embedUnsavedReport();
         reportPage.createReportFromUnsavedWarningEmbed();
-
-        browser.navigate().refresh();
-        waitForFragmentVisible(reportPage);
-        reportPage.getTableReport().waitForReportLoading();
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         String htmlEmbedCode = embedDialog.getHtmlCode();

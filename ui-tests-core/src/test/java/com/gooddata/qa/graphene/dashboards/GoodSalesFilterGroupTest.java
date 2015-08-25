@@ -46,7 +46,6 @@ public class GoodSalesFilterGroupTest extends GoodSalesAbstractTest {
         UiReportDefinition rd = new UiReportDefinition().withName(REPORT).withWhats(AMOUNT)
                 .withHows(STAGE_NAME, IS_WON);
         createReport(rd, REPORT);
-        reportPage.saveReport();
     }
 
     @Test(dependsOnGroups = {"init"})
