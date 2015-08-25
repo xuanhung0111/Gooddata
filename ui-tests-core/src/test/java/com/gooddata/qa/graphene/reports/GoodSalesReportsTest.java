@@ -68,7 +68,9 @@ public class GoodSalesReportsTest extends GoodSalesAbstractTest {
 
         initReportsPage();
         reportsPage.startCreateReport();
-        reportPage.createSimpleMetric(SimpleMetricTypes.SUM, "Duration", null, true);
+        reportPage.initPage()
+            .openWhatPanel()
+            .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Duration");
 
         List<String> what = new ArrayList<String>();
         what.add("Duration [Sum]");

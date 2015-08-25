@@ -61,7 +61,6 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
                 new UiReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
                         .withHows(new HowItem(YEAR_SNAPSHOT, Position.TOP));
         createReport(rd, REPORT_1);
-        reportPage.saveReport();
 
         // *** create report 2 ***
         initReportsPage();

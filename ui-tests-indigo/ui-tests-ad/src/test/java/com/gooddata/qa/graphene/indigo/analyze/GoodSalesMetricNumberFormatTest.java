@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.http.RestUtils.changeMetricFormat;
@@ -14,9 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.http.ParseException;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -89,7 +86,8 @@ public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractT
             verifyFormatInReportPage(format, expectedValue, compareFormat);
 
             String report = format.name() + " Report";
-            reportPage.setReportName(report).createReport();
+            reportPage.setReportName(report)
+                .finishCreateReport();
             sleepTightInSeconds(3);
 
             verifyFormatInDashboard(report, format, expectedValue, compareFormat);
@@ -125,10 +123,9 @@ public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractT
     }
 
     private void verifyFormatInReportPage(Formatter format, String expectedValue, boolean compareFormat) {
-        reportPage.getVisualiser().selectReportVisualisation(ReportTypes.TABLE);
+        reportPage.selectReportVisualisation(ReportTypes.TABLE);
         waitForAnalysisPageLoaded(browser);
-        String actualValue = Graphene.createPageFragment(TableReport.class,
-                waitForElementVisible(By.id("gridContainerTab"), browser)).getRawMetricElements().get(0);
+        String actualValue = reportPage.getTableReport().getRawMetricElements().get(0);
         if (compareFormat) {
             assertTrue(format.toString().contains(actualValue));
         } else {

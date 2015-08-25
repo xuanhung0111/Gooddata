@@ -35,14 +35,12 @@ import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.utils.CheckUtils;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
-import com.gooddata.qa.graphene.fragments.reports.report.ReportVisualizer;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 @Test(groups = {"GoodSalesMetrics"},
@@ -580,28 +578,28 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         initMetricPage();
         createCustomMetric(customMetricInfo, MetricTypes.SUM, AGGREGATION);
 
-        UiReportDefinition reportDefinition = new UiReportDefinition()
-                .withName("Report-" + customMetricInfo.getName()).withWhats(customMetricInfo.getName());
         initReportCreation();
-        ReportVisualizer visualiser = reportPage.getVisualiser();
-        visualiser.selectWhatArea(reportDefinition.getWhats());
+        reportPage.initPage()
+            .openWhatPanel()
+            .selectMetric(customMetricInfo.getName())
+            .openHowPanel();
 
-        List<String> greyedOutAttribues = asList("Activity Type", "Date (Activity)", "Date (Timeline)",
-                STAGE_HISTORY);
+        asList("Activity Type", "Date (Activity)", "Date (Timeline)", STAGE_HISTORY).stream()
+            .forEach(attribute -> {
+                assertTrue(reportPage.searchAttribute(attribute)
+                    .isGreyedOutAttribute(attribute),
+                    format("Attribue %s is not unreachable", attribute));
+            });
 
-        List<String> nonGreyedOutAttribues = asList("Account", "Date (Created)", "Opp. Snapshot", "Opportunity",
-                DEPARTMENT, PRODUCT, STAGE_NAME, YEAR_CLOSE, MONTH_YEAR_SNAPSHOT);
-        visualiser.clickOnHow();
-        for(String attribute : greyedOutAttribues) {
-            assertTrue(visualiser.isGreyedOutAttribute(attribute),
-                    String.format("Attribue %s is not unreachable", attribute));
-        }
+        asList("Account", "Date (Created)", "Opp. Snapshot", "Opportunity", DEPARTMENT, PRODUCT, STAGE_NAME,
+                YEAR_CLOSE, MONTH_YEAR_SNAPSHOT).stream()
+                .forEach(attribute -> {
+                    assertFalse(reportPage.searchAttribute(attribute)
+                            .isGreyedOutAttribute(attribute),
+                            format("Attribue %s is unreachable", attribute));
+                });
 
-        for(String attribute : nonGreyedOutAttribues) {
-            assertFalse(visualiser.isGreyedOutAttribute(attribute),
-                    String.format("Attribue %s is unreachable", attribute));
-        }
-        visualiser.finishReportChanges();
+        reportPage.doneSndPanel();
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"aggregation-metric"})
@@ -648,8 +646,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 .withName("Report-" + customMetricInfo.getName()).withWhats(customMetricInfo.getName());
         createReport(reportDefinition, "screenshot-" + "report_" + customMetricInfo.getName());
         waitForFragmentVisible(reportPage);
-        CheckUtils.checkRedBar(browser);
-        assertEquals(reportPage.getVisualiser().getDataReportHelpMessage(), NO_DATA_MATCH_REPORT_MESSAGE,
+        checkRedBar(browser);
+        assertEquals(reportPage.getDataReportHelpMessage(), NO_DATA_MATCH_REPORT_MESSAGE,
                 "Report help message is incorrect!");
         reportPage.saveReport();
     }
