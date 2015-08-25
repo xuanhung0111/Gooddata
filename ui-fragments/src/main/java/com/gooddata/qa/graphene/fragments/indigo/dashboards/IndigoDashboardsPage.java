@@ -111,14 +111,18 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return selectKpi(kpis.size() - 1);
     }
 
-    public IndigoDashboardsPage deleteLastKpi() {
-        selectLastKpi().deleteKpi();
+    public Kpi getLastKpi() {
+        return getKpiByIndex(kpis.size() - 1);
+    }
+
+    public IndigoDashboardsPage clickLastKpiDeleteButton() {
+        selectLastKpi().clickKpiDeleteButton();
 
         return this;
     }
 
     public IndigoDashboardsPage deleteKpi(int index) {
-        selectKpi(index).deleteKpi();
+        selectKpi(index).clickKpiDeleteButton();
 
         return this;
     }
@@ -181,6 +185,16 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForAllKpiWidgetContentLoaded();
     }
 
+    public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName, String comparisonName) {
+        clickAddWidget();
+        configurationPanel
+                .selectMetricByName(metricName)
+                .selectDateDimensionByName(dateDimensionName)
+                .selectComparisonByName(comparisonName);
+
+        return waitForAllKpiWidgetContentLoaded();
+    }
+
     public boolean isEditButtonVisible() {
         ByJQuery buttonVisible = ByJQuery.selector(EDIT_BUTTON_VISIBLE_JQUERY_SELECTOR);
         return isElementPresent(buttonVisible, browser);
@@ -188,6 +202,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public DateFilter waitForDateFilter() {
         return waitForFragmentVisible(dateFilter);
+    }
+
+    public IndigoDashboardsPage selectDateFilterByName(String dateFilterName) {
+        waitForAllKpiWidgetContentLoaded();
+
+        waitForFragmentVisible(dateFilter)
+            .selectByName(dateFilterName);
+
+        return waitForAllKpiWidgetContentLoaded();
     }
 
     public AttributeFiltersPanel waitForAttributeFilters() {

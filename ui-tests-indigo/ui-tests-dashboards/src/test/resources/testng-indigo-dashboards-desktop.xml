@@ -117,6 +117,25 @@
         </classes>
     </test>
 
+    <test name="kpi-pop-test">
+        <groups>
+            <dependencies>
+                <group name="desktop" depends-on="projectInit" />
+            </dependencies>
+            <run>
+                <include name="desktop" />
+                <include name="dashboardWidgetsInit" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.KpiPopTest" />
+        </classes>
+    </test>
+
     <test name="attribute-filtering-tests">
         <groups>
             <dependencies>

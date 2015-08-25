@@ -44,7 +44,8 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
         try {
             RestUtils.changeMetricFormat(getRestApiClient(), uri, format.toString());
-            initIndigoDashboardsPage();
+            initIndigoDashboardsPage()
+                .selectDateFilterByName(DATE_FILTER_ALL_TIME);
             takeScreenshot(browser, screenshot, getClass());
 
             String kpiValue = indigoDashboardsPage.getValueFromKpi(NUMBER_OF_ACTIVITIES);
@@ -71,6 +72,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
         try {
             Kpi selectedKpi = initIndigoDashboardsPage()
+                .selectDateFilterByName(DATE_FILTER_ALL_TIME)
                 .switchToEditMode()
                 .addWidget(xssMetric, DATE_CREATED)
                 .selectLastKpi();
@@ -102,6 +104,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
         try {
             Kpi selectedKpi = initIndigoDashboardsPage()
+                .selectDateFilterByName(DATE_FILTER_ALL_TIME)
                 .switchToEditMode()
                 .selectKpi(0);
 

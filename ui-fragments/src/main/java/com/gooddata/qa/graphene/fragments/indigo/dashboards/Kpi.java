@@ -5,7 +5,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import org.openqa.selenium.By;
 /**
  * Kpi - key performance indicator widget
@@ -14,6 +17,7 @@ public class Kpi extends AbstractFragment {
     // TODO: when having more widget types, separate, keep "Add widget" in mind
     public static final String MAIN_CLASS = "dash-item";
     public static final String KPI_CSS_SELECTOR = "." + MAIN_CLASS + ":not(.is-placeholder)";
+    public static final String KPI_POP_SECTION_CLASS = "kpi-pop-section";
 
     public static final String WIDGET_LOADING_CLASS = "widget-loading";
     public static final String CONTENT_LOADING_CLASS = "content-loading";
@@ -37,8 +41,8 @@ public class Kpi extends AbstractFragment {
     @FindBy(css = ".kpi-value")
     private WebElement value;
 
-    @FindBy(css = ".kpi-metrics")
-    private WebElement metric;
+    @FindBy(className = KPI_POP_SECTION_CLASS)
+    private KpiPopSection popSection;
 
     @FindBy(className = CONTENT_LOADING_CLASS)
     private WebElement contentLoading;
@@ -69,14 +73,19 @@ public class Kpi extends AbstractFragment {
     }
 
     public String getValue() {
-        return waitForElementVisible(value).getText();
+        return waitForElementPresent(value).getText();
     }
 
-    public String getMetric() {
-        return waitForElementVisible(metric).getText();
+    public boolean hasPopSection() {
+        By thisMetric = By.className(KPI_POP_SECTION_CLASS);
+        return isElementPresent(thisMetric, root);
     }
 
-    public void deleteKpi() {
+    public KpiPopSection getPopSection() {
+        return waitForFragmentVisible(popSection);
+    }
+
+    public void clickKpiDeleteButton() {
         waitForElementVisible(deleteButton).click();
     }
 
