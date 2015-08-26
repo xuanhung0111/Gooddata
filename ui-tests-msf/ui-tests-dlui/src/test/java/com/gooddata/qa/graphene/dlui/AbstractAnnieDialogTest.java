@@ -347,7 +347,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
             }
         });
         if (isSuccessful) {
-            assertEquals(annieUIDialog.getAnnieDialogHeadline(), "Data added successfuly!",
+            assertEquals(annieUIDialog.getAnnieDialogHeadline(), "Data added successfully!",
                     "Incorrect dialog headline!");
             assertEquals(annieUIDialog.getIntegrationStatusMessages().get(0).getText(),
                     "Data has been added to your project.", "Incorrect successful message!");
