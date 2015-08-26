@@ -441,6 +441,11 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage addFilterMetricBySelectOnly(String metric, String attribute, String value) {
+        waitForFragmentVisible(bucketsPanel).addFilterMetricBySelectOnly(metric, attribute, value);
+        return this;
+    }
+
     public String getFilterMetricText(String metric) {
         return waitForFragmentVisible(bucketsPanel).getFilterMetricText(metric);
     }

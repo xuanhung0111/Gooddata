@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEm
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
 import static org.testng.Assert.assertEquals;
@@ -199,6 +200,20 @@ public class MetricsBucket extends AbstractFragment {
                 .apply();
     }
 
+    public void addFilterMetricBySelectOnly(String metric, String attribute, String value) {
+        getMetric(metric).findElement(BY_ADD_ATTRIBUTE_FILTER).click();
+
+        Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
+                .selectTextItem(attribute);
+
+        Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
+                .clear()
+                .selectOnly(value)
+                .apply();
+    }
+
     public String getFilterMetricText(String metric) {
         return getMetric(metric).findElement(BY_ATTRIBUTE_FILTER_BUTTON).getText();
     }
@@ -261,6 +276,17 @@ public class MetricsBucket extends AbstractFragment {
 
         public AttributeFilterPicker clear() {
             waitForElementVisible(clearButton).click();
+            return this;
+        }
+
+        public AttributeFilterPicker selectOnly(String element) {
+            searchItem(element);
+            WebElement ele = items.stream()
+                    .filter(item -> element.equals(item.findElement(tagName("span")).getText()))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element));
+            new Actions(browser).moveToElement(ele).perform();
+            waitForElementVisible(className("gd-list-item-only"), ele).click();
             return this;
         }
 
