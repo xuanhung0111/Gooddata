@@ -69,9 +69,8 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .addMetric(AMOUNT)
-            .expandMetricConfiguration(AMOUNT)
-            .searchBucketItem(""); // TODO: work around to avoid bug https://jira.intgdc.com/browse/CL-7854
-        
+            .expandMetricConfiguration(AMOUNT);
+
         ChartReport report = analysisPage.addFilterMetric(NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE, "Email")
             .addFilterMetric(AMOUNT, ACTIVITY_TYPE, "Phone Call", "Web Meeting")
             .waitForReportComputing()
@@ -84,13 +83,24 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
         checkingOpenAsReport("addAttributeFilterForMultipleMetrics");
     }
 
+    @Test(dependsOnGroups = {"init"})
+    public void searchOnlyAttributeElement() {
+        initAnalysePage();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .addFilterMetricBySelectOnly(NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE, "Email")
+            .waitForReportComputing();
+
+        ChartReport report = analysisPage.getChartReport();
+        assertEquals(report.getTrackersCount(), 1);
+        assertEquals(report.getYaxisTitle(), format("%s (%s: Email)", NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE));
+        assertEquals(analysisPage.getFilterMetricText(NUMBER_OF_ACTIVITIES), format("%s: Email", ACTIVITY_TYPE));
+    }
+
     private void addFilterToMetric() {
         initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
-
-        // TODO: work around to avoid bug https://jira.intgdc.com/browse/CL-7854
-        assertTrue(analysisPage.searchBucketItem(""));
 
         assertTrue(analysisPage.canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
         analysisPage.addFilterMetric(NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE, "Email", "Phone Call", "Web Meeting")
