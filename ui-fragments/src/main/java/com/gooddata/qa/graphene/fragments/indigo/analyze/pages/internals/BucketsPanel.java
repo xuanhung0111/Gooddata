@@ -197,6 +197,10 @@ public class BucketsPanel extends AbstractFragment {
         waitForFragmentVisible(metricsBucket).addFilterMetric(metric, attribute, values);
     }
 
+    public void addFilterMetricBySelectOnly(String metric, String attribute, String value) {
+        waitForFragmentVisible(metricsBucket).addFilterMetricBySelectOnly(metric, attribute, value);
+    }
+
     public String getFilterMetricText(String metric) {
         return waitForFragmentVisible(metricsBucket).getFilterMetricText(metric);
     }
