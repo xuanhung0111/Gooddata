@@ -44,6 +44,7 @@ import com.google.common.collect.Ordering;
 
 public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     protected static final String ANNIE_DIALOG_HEADLINE = "Add data";
+    protected static final String SUCCESSFUL_ANNIE_DIALOG_HEADLINE = "Data added successfully!";
 
     private static final String ANNIE_DIALOG_EMPTY_STATE_HEADING = "No additional data available.";
     private static final String ANNIE_DIALOG_EMPTY_STATE_MESSAGE =
@@ -347,7 +348,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
             }
         });
         if (isSuccessful) {
-            assertEquals(annieUIDialog.getAnnieDialogHeadline(), "Data added successfully!",
+            assertEquals(annieUIDialog.getAnnieDialogHeadline(), SUCCESSFUL_ANNIE_DIALOG_HEADLINE,
                     "Incorrect dialog headline!");
             assertEquals(annieUIDialog.getIntegrationStatusMessages().get(0).getText(),
                     "Data has been added to your project.", "Incorrect successful message!");

@@ -32,7 +32,6 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
     private DataSource dataSource;
     private Field selectedField;
 
-    private static final String DATA_ADDED_SUCCESSFULLY = "Data added successfuly!";
     private static final String DATASET_NAME = "track";
 
     @BeforeClass
@@ -164,7 +163,7 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver input) {
-                return DATA_ADDED_SUCCESSFULLY.equals(annieUIDialog.getAnnieDialogHeadline());
+                return SUCCESSFUL_ANNIE_DIALOG_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline());
             }
         });
         annieUIDialog.clickOnCloseButton();
