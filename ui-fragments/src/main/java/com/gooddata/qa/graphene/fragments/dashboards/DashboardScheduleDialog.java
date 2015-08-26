@@ -16,6 +16,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 public class DashboardScheduleDialog extends AbstractFragment {
 
+    public static final By LOCATOR = By.cssSelector(".s-mailScheduleDialog");
     private final String CSS_LIST_ITEM = ".ember-list-container .gd-list-view-item";
 
     @FindBy(css = ".s-btn-schedule")
@@ -112,9 +113,17 @@ public class DashboardScheduleDialog extends AbstractFragment {
         emailRecipientsInput.clear();
         emailRecipientsInput.sendKeys(Joiner.on(",").join(recipients));
     }
+    
+    public String getSelectedTab() {
+        return waitForElementVisible(tabsButton).getText();
+    }
 
     public void selectTabs(int[] indices) {
         selectMultiple(indices, tabsButton);
+    }
+    
+    public String getSelectedFrequency() {
+        return waitForElementVisible(frequencyButton).getText();
     }
 
     public void selectFrequency(int index) {

@@ -23,6 +23,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -430,6 +431,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
         System.out.println("pdfExport = " + pdfExport);
         System.out.println(testParams.getDownloadFolder() + testParams.getFolderSeparator() + dashboardName
                 + ".pdf");
+        Predicate<WebDriver> exportCompleted = browser -> pdfExport.length() > minimalSize;
+        Graphene.waitGui().pollingEvery(5, TimeUnit.SECONDS).until(exportCompleted);
         long fileSize = pdfExport.length();
         System.out.println("File size: " + fileSize);
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the PDF manually! Current size is "
@@ -441,6 +444,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 + format.getName();
         File export = new File(fileURL);
         System.out.println("pdfExport = " + export);
+        Predicate<WebDriver> exportCompleted = browser -> export.length() > minimalSize;
+        Graphene.waitGui().pollingEvery(5, TimeUnit.SECONDS).until(exportCompleted);
         long fileSize = export.length();
         System.out.println("File size: " + fileSize);
         assertTrue(fileSize > minimalSize, "Export is probably invalid, check the file manually! Current size is "

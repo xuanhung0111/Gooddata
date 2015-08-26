@@ -31,8 +31,9 @@ public class DashboardsPage extends AbstractFragment {
     private static final By BY_TAB_DROPDOWN_DUPLICATE_BUTTON = By.xpath("//li[contains(@class, 's-duplicate')]//a");
     private static final By BY_TAB_DROPDOWN_COPY_TO_BUTTON = By.xpath("//li[contains(@class, 's-copy_to')]//a");
     private static final By BY_PERMISSION_DIALOG_LOCATOR = By.className("s-permissionSettingsDialog");
+    private static final By BY_HIDDEN_TAB_BAR = By.cssSelector(".yui3-dashboardtabs-content.gdc-hidden");
 
-    @FindBy(xpath = "//div[@id='abovePage']/div[contains(@class,'yui3-dashboardtabs-content')]")
+    @FindBy(xpath = "//div[contains(@class,'yui3-dashboardtabs-content')]")
     private DashboardTabs tabs;
 
     @FindBy(css = ".q-dashboardSwitcher")
@@ -92,6 +93,10 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'savedFilters')]/button")
     private SavedViewWidget savedViewWidget;
     private By emptyTabPlaceholder = By.xpath("//div[contains(@class, 'yui3-c-projectdashboard-placeholder-visible')]");
+
+    public boolean isTabBarVisible() {
+        return getRoot().findElements(BY_HIDDEN_TAB_BAR).isEmpty();
+    }
 
     public DashboardTabs getTabs() {
         return tabs;
@@ -197,7 +202,7 @@ public class DashboardsPage extends AbstractFragment {
     public String printDashboardTab(int tabIndex) {
         tabs.openTab(tabIndex);
         waitForDashboardPageLoaded(browser);
-        String tabName = tabs.getTabLabel(0);
+        String tabName = tabs.getTabLabel(tabIndex);
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(printPdfButton).click();
         waitForElementVisible(BY_PRINTING_PANEL, browser);
@@ -206,6 +211,10 @@ public class DashboardsPage extends AbstractFragment {
         sleepTightInSeconds(3);
         System.out.println("Dashboard " + tabName + " printed to Pdf");
         return tabName;
+    }
+
+    public WebElement getPrintButton() {
+        return waitForElementPresent(printPdfButton);
     }
 
     public DashboardEmbedDialog embedDashboard() {
