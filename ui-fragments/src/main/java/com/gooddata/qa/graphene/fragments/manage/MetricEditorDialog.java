@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.extractAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.extractAttributeValue;
 import static java.lang.String.format;
@@ -33,8 +36,16 @@ public class MetricEditorDialog extends AbstractFragment {
 
     @FindBy(xpath = "//div[@class='listContainer']/div/ul[@class='elementList']/li[@class='category']")
     private WebElement customCategoryList;
+    
+    @FindBy(css = ".elementList .c-label:not(.gdc-hidden) span")
+    private List<WebElement> attributeElelements;
 
     private static final String SELECTED_ELEMENT_LOCATOR = "//ul[@class='elementList']/li[text()='${text}']";
+    private static final String SELECTED_ELEMENT_VALUE_LOCATOR = 
+            "//div[contains(@class,'elementList')]//span[text()='${text}']";
+    private static final By SEARCH_ELEMENT_VALUE_LOCATOR = 
+            By.xpath("//div[contains(@class,'elementList ')]//input");
+    
     private static final String METRIC_LINK_LOCATOR = "${metricType}";
     private static final String METRIC_TEMPLATE_TAB_LOCATOR = "//ul[@role='tablist']//em[text()='${tab}']";
 
@@ -46,6 +57,8 @@ public class MetricEditorDialog extends AbstractFragment {
             By.xpath(format(SELECTION_LOCATOR, "attributeElements"));
     private static final By FACT_SELECTION_LOCATOR = By.xpath(format(SELECTION_LOCATOR, "facts"));
     private static final By METRIC_SELECTION_LOCATOR = By.xpath(format(SELECTION_LOCATOR, "metrics"));
+    
+    private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     public void createShareMetric(String metricName, String usedMetric, String attrFolder, String attr) {
         waitForElementVisible(By.cssSelector("div.shareTemplate"), browser).click();
@@ -61,7 +74,7 @@ public class MetricEditorDialog extends AbstractFragment {
         selectElement(usedMetric);
         selectElement(attrFolder);
         selectElement(attr);
-        selectElement(attrValue);
+        selectElementValue(attrValue);
         enterMetricNameAndSubmit(metricName);
     }
 
@@ -153,7 +166,7 @@ public class MetricEditorDialog extends AbstractFragment {
                 .click();
             selectElement(attributeValueInfo.get(0));
             selectElement(attributeValueInfo.get(1));
-            selectElement(attributeValueInfo.get(2));
+            selectElementValue(attributeValueInfo.get(2));
             waitForElementVisible(addSelectedButton).click();
             waitForElementVisible(customCategoryList);
         }
@@ -176,9 +189,24 @@ public class MetricEditorDialog extends AbstractFragment {
             waitForElementVisible(customCategoryList);
         }
     }
-
+    
     private void selectElement(String element) {
         waitForElementVisible(By.xpath(SELECTED_ELEMENT_LOCATOR.replace("${text}", element)), browser).click();
+    }
+
+    private void selectElementValue(String element) {
+        WebElement input = waitForElementVisible(SEARCH_ELEMENT_VALUE_LOCATOR, browser);
+        waitForCollectionIsNotEmpty(attributeElelements);
+        input.clear();
+        input.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        sleepTightInSeconds(1);
+        waitForCollectionIsEmpty(attributeElelements);
+
+        input.clear();
+        input.sendKeys(element);
+        sleepTightInSeconds(1);
+        waitForCollectionIsNotEmpty(attributeElelements);
+        waitForElementVisible(By.xpath(SELECTED_ELEMENT_VALUE_LOCATOR.replace("${text}", element)), browser).click();
     }
 
     private void createTemplateMetricTab(MetricTypes metric) {
