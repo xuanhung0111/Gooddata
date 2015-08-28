@@ -5,7 +5,9 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
+
 import org.json.JSONException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -17,8 +19,11 @@ import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.utils.AdsHelper;
+import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.warehouse.Warehouse;
 
 public class NotificationTest extends AbstractDLUINotificationTest {
 
@@ -136,27 +141,26 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         checkFailedDataAddingEmail(requestTime, "Position");
     }
 
-    @Test(dependsOnGroups = "george", groups = {"annie", "basicTest"}, alwaysRun = true)
+    @Test(dependsOnGroups = "george", groups = {"basicTest"}, alwaysRun = true)
     public void signInWithAnnie() {
         logout();
         signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
     }
 
     @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithAnnie", groups = {
-        "annie", "basicTest"})
+        "basicTest"})
     public void checkBasicNotificationWithEditorRole(AddedFields addedField) throws JSONException {
         long requestTime = System.currentTimeMillis();
         addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
     }
 
-    @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithAnnie",
-            groups = {"annie"})
+    @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithAnnie")
     public void checkExtendedNotificationWithEditor(AddedFields addedField) throws JSONException {
         long requestTime = System.currentTimeMillis();
         addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
     }
 
-    @Test(dependsOnMethods = "signInWithAnnie", groups = {"annie"})
+    @Test(dependsOnMethods = "signInWithAnnie")
     public void failToAddNewFieldWithEditorRole() {
         long requestTime = System.currentTimeMillis();
         try {
@@ -177,7 +181,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         checkFailedDataAddingEmailForEditor(requestTime, "Position");
     }
 
-    @Test(dependsOnMethods = "signInWithAnnie", groups = {"annie"})
+    @Test(dependsOnMethods = "signInWithAnnie")
     public void failToLoadDataForNewFieldWithEdiorRole() {
         long requestTime = System.currentTimeMillis();
         try {
@@ -199,17 +203,17 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         checkFailedDataAddingEmailForEditor(requestTime, "Position");
     }
 
-    @Test(dependsOnGroups = {"george", "annie"}, alwaysRun = true)
+    @AfterClass
     public void cleanUp() {
         logout();
         signInAtUI(testParams.getUser(), testParams.getPassword());
-        deleteADSInstance(adsInstance);
+        deleteADSInstance(ads);
     }
 
     @Override
-    protected void setDefaultSchemaForOutputStage() {
-        setDefaultSchemaForOutputStage(getRestApiClient(technicalUser, technicalUserPassword),
-                adsInstance.getId());
+    protected void setDefaultSchemaForOutputStage(Warehouse ads) {
+        new AdsHelper(getGoodDataClient(), getRestApiClient(technicalUser, technicalUserPassword))
+                .associateAdsWithProject(ads, testParams.getProjectId());
     }
 
     @Override
@@ -225,7 +229,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Override
     protected void addUsersToAdsInstance() {
-        addUserToAdsInstance(adsInstance, technicalUser, "dataAdmin");
+        adsHelper.addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
     }
 
     private void failToAddData(DataSource dataSource, String screenshotName) {
@@ -247,7 +251,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
         Collection<ExecutionParameter> params =
                 prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
-                        "copyTableWithAdditionalFields_Drop_Person.txt", adsInstance);
+                        "copyTableWithAdditionalFields_Drop_Person.txt", ads.getId());
 
         String executionUri =
                 executeCloudConnectProcess(cloudconnectProcess,

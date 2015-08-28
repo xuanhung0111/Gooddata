@@ -5,11 +5,13 @@ import java.io.IOException;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 
@@ -32,7 +34,7 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
         viewerRestApi = getRestApiClient(testParams.getViewerUser(), testParams.getViewerPassword());
     }
 
-    @Test(dependsOnGroups = { "initialData" }, groups = { "DataloadResourcesPermissionTest" })
+    @Test(dependsOnGroups = { "initialData" })
     public void cannotAccessToProjectMappingResourceOfOtherUser()
             throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
@@ -42,18 +44,17 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
     }
 
-    @Test(dependsOnGroups = { "initialData" }, groups = { "DataloadResourcesPermissionTest" }, priority = 1)
+    @Test(dependsOnGroups = { "initialData" }, priority = 1)
     private void addUsersToProjects() throws ParseException, IOException, JSONException {
         RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
                 UserRoles.EDITOR);
         RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getViewerUser(), 
                 UserRoles.VIEWER);
-        addUserToAdsInstance(adsInstance, testParams.getEditorUser(), "dataAdmin");
-        addUserToAdsInstance(adsInstance, testParams.getViewerUser(), "dataAdmin");
+        adsHelper.addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
+        adsHelper.addUserToAdsInstance(ads, testParams.getViewerUser(), AdsRole.DATA_ADMIN);
     }
 
-    @Test(dependsOnMethods = { "addUsersToProjects" },
-            groups = { "DataloadResourcesPermissionTest" },priority = 2)
+    @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
     public void editorAccessToDataloadResources() throws ParseException, JSONException, IOException {
         deleteDataloadProcessAndCreateNewOne();
         RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
@@ -72,8 +73,7 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
                 HttpStatus.NO_CONTENT);
     }
 
-    @Test(dependsOnMethods = { "addUsersToProjects" },
-            groups = { "DataloadResourcesPermissionTest" }, priority = 2)
+    @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
     public void viewerCannotAccessToMappingResource() throws ParseException, JSONException, IOException {
         deleteDataloadProcessAndCreateNewOne();
         RestUtils.getResourceWithCustomAcceptHeader(viewerRestApi,
@@ -81,17 +81,16 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
     }
 
-    @Test(dependsOnMethods = { "addUsersToProjects" },
-            groups = { "DataloadResourcesPermissionTest" }, priority = 2)
+    @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
     public void allProjectMembersCanAccessToProjectModelView() throws ParseException, JSONException, IOException {
         accessToProjectModelView(getRestApiClient());
         accessToProjectModelView(editorRestApi);
         accessToProjectModelView(viewerRestApi);
     }
 
-    @Test(dependsOnGroups = "DataloadResourcesPermissionTest", alwaysRun = true)
+    @AfterClass
     public void cleanUp() {
-        deleteADSInstance(adsInstance);
+        deleteADSInstance(ads);
     }
 
     private void accessToProjectModelView(RestApiClient restApiClient) {

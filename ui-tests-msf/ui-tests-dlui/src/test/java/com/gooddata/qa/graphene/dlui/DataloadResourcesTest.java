@@ -14,13 +14,14 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
-import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
+import com.gooddata.warehouse.Warehouse;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -39,7 +40,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
         projectTitle = "Dataload-resources-test";
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"DataloadResourcesTest"})
+    @Test(dependsOnMethods = {"createProject"})
     public void checkResourcesWithoutADSInstance() throws IOException, JSONException {
         prepareLDMAndADSInstance();
 
@@ -58,7 +59,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
         setUpOutputStageAndCreateCloudConnectProcess();
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"})
+    @Test(dependsOnGroups = {"initialData"})
     public void generateLdmAndAdsDifference() throws IOException {
         assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                 readResourceFile(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE, DIFF_KEY));
@@ -73,45 +74,43 @@ public class DataloadResourcesTest extends AbstractMSFTest {
                 readAllLinesOfFile("mapping-valid-case.txt"));
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"}, priority = 1)
+    @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void  checkResourcesAfterChangeAdsInstance () throws IOException {
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
-        ADSInstance newInstance = new ADSInstance().withName("ADS Instance for DLUI test")
-                .withAuthorizationToken(dssAuthorizationToken);
-        createADSInstance(newInstance);
+        Warehouse newAds = adsHelper.createAds("ADS Instance for DLUI test", dssAuthorizationToken);
         try {
-            setDefaultSchemaForOutputStage(getRestApiClient(), newInstance.getId());
+            setDefaultSchemaForOutputStage(newAds);
 
             assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                     readResourceFile(DIFF_WITH_EMPTY_OUTPUT_STAGE_FILE,  DIFF_KEY));
             assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
                     readAllLinesOfFile(MAPPING_OUTPUT_STAGE_EMPTY_FILE));
 
-            setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
+            setDefaultSchemaForOutputStage(ads);
 
             assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                     "Diff content is incorrect, ADS and LDM not match!");
             assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
                     readAllLinesOfFile("mapping-valid-case.txt"));
         } finally {
-            setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
-            deleteADSInstance(newInstance);
+            setDefaultSchemaForOutputStage(ads);
+            deleteADSInstance(newAds);
         }
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"}, priority = 1)
+    @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void repairWrongMappingUsingDiffContent() throws IOException {
         createUpdateADSTableBySQLFiles("createTableWithErrorMapping_DiffTest.txt",
-                "copyTableWithErrorMapping_DiffTest.txt", adsInstance);
+                "copyTableWithErrorMapping_DiffTest.txt", ads);
 
-        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
+        setDefaultSchemaForOutputStage(ads);
 
         assertResourceContent(getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                 readResourceFile("diff-error-mapping.txt", DIFF_KEY));
         assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
                 readAllLinesOfFile("mapping-error-case.txt"));
 
-        createUpdateADSTableBySQLFiles("alterTableToFixDiffErrorMapping.txt", "copyTable.txt", adsInstance);
+        createUpdateADSTableBySQLFiles("alterTableToFixDiffErrorMapping.txt", "copyTable.txt", ads);
 
         assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                 "Diff content is incorrect, ADS and LDM not match!");
@@ -119,12 +118,10 @@ public class DataloadResourcesTest extends AbstractMSFTest {
                 readAllLinesOfFile("mapping-valid-case.txt"));
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"DataloadResourcesTest"}, priority = 2)
+    @Test(dependsOnGroups = {"initialData"}, priority = 2)
     public void checkResourcesWithAllCases() throws IOException, JSONException {
-        ADSInstance newInstance = new ADSInstance().withName("ADS Instance for DLUI test")
-              .withAuthorizationToken(dssAuthorizationToken);
-        createADSInstance(newInstance);
-        setDefaultSchemaForOutputStage(getRestApiClient(), newInstance.getId());
+        Warehouse newAds = adsHelper.createAds("ADS Instance for DLUI test", dssAuthorizationToken);
+        setDefaultSchemaForOutputStage(newAds);
         try {
             String dropTableFile = getResourceAsString("/" + MAQL_FILES + "/dropTablesOpportunityPerson.txt");
             String createDatasetFile = getResourceAsString("/" + MAQL_FILES + "/createDatasetWithAllCases.txt");
@@ -136,8 +133,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
             assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
                     readAllLinesOfFile("mapping-all-cases-error.txt"));
 
-            createUpdateADSTableBySQLFiles("createTableWithAllCases.txt", "copyTableWithAllCases.txt",
-                    newInstance);
+            createUpdateADSTableBySQLFiles("createTableWithAllCases.txt", "copyTableWithAllCases.txt", newAds);
 
             assertEquals(DIFF_WITH_MAPPING_MATCH_TEXT, getDiffResourceContent(getRestApiClient(), HttpStatus.OK),
                     "Diff content is incorrect, ADS and LDM not match!");
@@ -149,14 +145,14 @@ public class DataloadResourcesTest extends AbstractMSFTest {
             assertTrue(ProcessUtils.isExecutionSuccessful(restApiClient, execution),
                     "Process execution is not successful!");
         } finally {
-            setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
-            deleteADSInstance(newInstance);
+            setDefaultSchemaForOutputStage(ads);
+            deleteADSInstance(newAds);
         }
     }
 
-    @Test(dependsOnGroups = {"DataloadResourcesTest"}, alwaysRun = true)
+    @AfterClass
     public void cleanUp() {
-        deleteADSInstance(adsInstance);
+        deleteADSInstance(ads);
     }
 
     private List<String> readResourceFile(String file, String key) throws IOException {

@@ -20,18 +20,20 @@ import org.apache.commons.io.FileUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.dto.Processes;
-import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
+import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import com.gooddata.warehouse.Warehouse;
 import com.google.common.collect.Lists;
 
 public class DataloadProcessTest extends AbstractMSFTest {
@@ -53,8 +55,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
         setUpOutputStageAndCreateCloudConnectProcess();
     }
 
-    @Test(dependsOnGroups = {"initialData"},
-            groups = {"dataloadProcessTest"}, priority = 0)
+    @Test(dependsOnGroups = {"initialData"}, priority = 0)
     public void autoCreateDataloadProcess() throws IOException, JSONException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         assertTrue(isDataloadProcessCreated(), "DATALOAD process is not created!");
@@ -68,37 +69,31 @@ public class DataloadProcessTest extends AbstractMSFTest {
         executeDataloadProcessSuccessfully(getRestApiClient());
     }
 
-    @Test(dependsOnGroups = {"initialData"},
-            groups = {"dataloadProcessTest"}, priority = 1)
+    @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void changeAdsInstanceWhenHavingDataloadProcess() throws IOException, JSONException {
         createDataLoadProcess();
         String dataloadProcessId = getDataloadProcessId();
-        ADSInstance newAdsInstance =
-                new ADSInstance().withName("ADS Instance for DLUI test 2").withAuthorizationToken(
-                        testParams.loadProperty("dss.authorizationToken"));
-        createADSInstance(newAdsInstance);
-        setDefaultSchemaForOutputStage(getRestApiClient(), newAdsInstance.getId());
-
+        Warehouse newAds = adsHelper.createAds("ADS Instance for DLUI test 2", dssAuthorizationToken);
+        setDefaultSchemaForOutputStage(newAds);
         try {
             assertEquals(
                     ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
                             .getDataloadProcessCount(), 1);
             assertEquals(getDataloadProcessId(), dataloadProcessId);
         } finally {
-            setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
-            deleteADSInstance(newAdsInstance);
+            setDefaultSchemaForOutputStage(ads);
+            adsHelper.removeAds(newAds);
         }
     }
 
-    @Test(dependsOnGroups = {"initialData"},
-            groups = {"dataloadProcessTest"}, priority = 1)
+    @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void changeAdsInstanceAfterDeleteDataloadProcess() throws IOException, JSONException {
         createDataLoadProcess();
         ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
                 testParams.getProjectId());
         assertEquals(ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
                 .getDataloadProcessCount(), 0);
-        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
+        setDefaultSchemaForOutputStage(ads);
         Processes dataloadProcessList =
                 ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId());
         assertEquals(dataloadProcessList.getDataloadProcessCount(), 1);
@@ -106,7 +101,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
                 DEFAULT_DATAlOAD_PROCESS_NAME);
     }
 
-    @Test(dependsOnMethods = {"addUsersToProjects"}, groups = {"dataloadProcessTest"}, priority = 2)
+    @Test(dependsOnMethods = {"addUsersToProjects"}, priority = 2)
     public void checkProcessOwner() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         // Delete old dataload process and create new one to ensure that
@@ -140,7 +135,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
                 "Process owner of dataload is changed after executed process!");
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkSuccessfulExecutionLog() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
@@ -148,7 +143,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_successful.txt");
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkExecutionLogWithErrorMapping() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
         deleteDataloadProcessAndCreateNewOne();
@@ -161,7 +156,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_mapping.txt");
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException {
         List<String> deleteFiles = new ArrayList<String>(Arrays.asList("f_opportunity.csv",
                 "dataset.opportunity.csv", "f_person.csv", "dataset.person.csv"));
@@ -182,7 +177,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_etl.txt");
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 3)
+    @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException,
             IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
@@ -199,20 +194,20 @@ public class DataloadProcessTest extends AbstractMSFTest {
         assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
     }
 
-    @Test(dependsOnGroups = {"initialData"}, groups = {"dataloadProcessTest"}, priority = 2)
+    @Test(dependsOnGroups = {"initialData"}, priority = 2)
     public void addUsersToProjects() throws ParseException, IOException, JSONException {
         RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, UserRoles.ADMIN);
         RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
                 UserRoles.EDITOR);
-        addUserToAdsInstance(adsInstance, technicalUser, "dataAdmin");
-        addUserToAdsInstance(adsInstance, testParams.getEditorUser(), "dataAdmin");
+        adsHelper.addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
+        adsHelper.addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
     }
 
-    @Test(dependsOnGroups = "dataloadProcessTest", alwaysRun = true)
+    @AfterClass
     public void cleanUp() throws JSONException {
         logout();
         signIn(true, UserRoles.ADMIN);
-        deleteADSInstance(adsInstance);
+        deleteADSInstance(ads);
     }
 
     private void waitForExecutionInRunningState(String executionUri) throws ParseException, IOException,

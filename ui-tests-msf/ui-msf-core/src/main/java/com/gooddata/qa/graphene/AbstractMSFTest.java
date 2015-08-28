@@ -4,11 +4,9 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
-import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -32,7 +30,6 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 
-import com.gooddata.qa.graphene.entity.ADSInstance;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
@@ -41,21 +38,18 @@ import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
-import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
+import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.warehouse.Warehouse;
 import com.google.common.collect.Lists;
 
 public class AbstractMSFTest extends AbstractProjectTest {
 
-    private static final String ADS_INSTANCES_URI = "gdc/datawarehouse/instances/";
-    private static final String ADS_INSTANCE_SCHEMA_URI = "/" + ADS_INSTANCES_URI
-            + "%s/schemas/default";
-    private static final String ACCEPT_HEADER_VALUE_WITH_VERSION = "application/json; version=1";
     private static final String DATALOAD = "DATALOAD";
 
     protected static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
@@ -92,7 +86,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected ProjectInfo workingProject;
     protected ProcessInfo cloudconnectProcess;
     protected ProcessInfo dataloadProcess;
-    protected ADSInstance adsInstance;
+    protected Warehouse ads;
+    protected AdsHelper adsHelper;
 
     @BeforeClass(alwaysRun = true)
     public void initialProperties() {
@@ -112,16 +107,17 @@ public class AbstractMSFTest extends AbstractProjectTest {
         // Override this method in test class if it's necessary to add more users to project
         addUsersToProject();
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
-        adsInstance = new ADSInstance().withName("ADS Instance for DLUI test")
-                .withAuthorizationToken(dssAuthorizationToken);
-        createADSInstance(adsInstance);
+        
+        adsHelper = new AdsHelper(getGoodDataClient(), getRestApiClient());
+        ads = adsHelper.createAds("ADS Instance for DLUI test", dssAuthorizationToken);
+        
         // Override this method in test class if it's necessary to add more users to ads instance
         addUsersToAdsInstance();
     }
 
     protected void setUpOutputStageAndCreateCloudConnectProcess() {
         // Override this method in test class if using other user to set default schema for output stage
-        setDefaultSchemaForOutputStage();
+        setDefaultSchemaForOutputStage(ads);
         assertTrue(isDataloadProcessCreated(), "DATALOAD process is not created!");
 
         cloudconnectProcess = new ProcessInfo().withProjectId(testParams.getProjectId())
@@ -146,29 +142,27 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected void addUsersToAdsInstance() {}
 
-    protected void setDefaultSchemaForOutputStage() {
-        setDefaultSchemaForOutputStage(getRestApiClient(), adsInstance.getId());
+    protected void setDefaultSchemaForOutputStage(Warehouse ads) {
+        adsHelper.associateAdsWithProject(ads, testParams.getProjectId());
     }
 
-    protected void createUpdateADSTableBySQLFiles(String createTableFile, String copyTableFile, 
-            ADSInstance instance){
+    protected void createUpdateADSTableBySQLFiles(String createTableFile, String copyTableFile, Warehouse ads) {
         Collection<ExecutionParameter> params =
-                prepareParamsToUpdateADS(createTableFile, copyTableFile, instance);
+                prepareParamsToUpdateADS(createTableFile, copyTableFile, ads.getId());
 
         String executionUri =
-                executeCloudConnectProcess(cloudconnectProcess,
-                        DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params);
+                executeCloudConnectProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params);
         assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
     }
 
     protected Collection<ExecutionParameter> prepareParamsToUpdateADS(String createTableSqlFile,
-            String copyTableSqlFile, ADSInstance instance) {
+            String copyTableSqlFile, String adsId) {
         List<ExecutionParameter> params = Lists.newArrayList();
 
         params.add(new ExecutionParameter(ADS_USER_PARAM, testParams.getUser()));
         params.add(new ExecutionParameter(ADS_PASSWORD_PARAM, testParams.getPassword()));
-        params.add(new ExecutionParameter(ADS_URL_PARAM, ADS_URL.replace("${host}",
-                testParams.getHost()).replace("${adsId}", instance.getId())));
+        params.add(new ExecutionParameter(ADS_URL_PARAM, ADS_URL.replace("${host}", testParams.getHost()).replace(
+                "${adsId}", adsId)));
         String createTableSql = getResourceAsString("/" + SQL_FILES + "/" + createTableSqlFile);
         String copyTableSql = getResourceAsString("/" + SQL_FILES + "/" + copyTableSqlFile);
         params.add(new ExecutionParameter(CREATE_ADS_TABLE_PARAM, createTableSql));
@@ -223,73 +217,13 @@ public class AbstractMSFTest extends AbstractProjectTest {
             assertEquals(errorMessage, "The object (%s) doesn't exist.");
         }
     }
-
-    protected void createADSInstance(ADSInstance adsInstance) {
-        openUrl(ADS_INSTANCES_URI);
-        waitForElementVisible(storageForm.getRoot());
-        assertTrue(storageForm.verifyValidCreateStorageForm(), "Create form is invalid");
-        String adsUrl;
-        try {
-            adsUrl =
-                    storageForm.createStorage(adsInstance.getName(), adsInstance.getDescription(),
-                            adsInstance.getAuthorizationToken());
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an exception during creating new ads instance! ", e);
-        }
-
-        adsInstance.withId(adsUrl.substring(adsUrl.lastIndexOf("/") + 1));
-        System.out.println("adsId: " + adsInstance.getId());
+    
+    protected void createADS(Warehouse ads) {
+        adsHelper.createAds(ads.getTitle(), ads.getAuthorizationToken());
     }
 
-    protected void addUserToAdsInstance(ADSInstance adsInstance, String user,
-            String userRole) {
-        openUrl(ADS_INSTANCES_URI + adsInstance.getId() + "/users");
-        storageUsersForm.verifyValidAddUserForm();
-        try {
-            storageUsersForm.fillAddUserToStorageForm(userRole, null, user, true);
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "There is an exeception when adding user to ads instance!", e);
-        }
-        takeScreenshot(browser, "datawarehouse-add-user-filled-form", this.getClass());
-        String login = getUserLoginFromDatawarehouseUsersLink(browser.getCurrentUrl());
-        assertEquals(login, user, "The user is not added to ads instance successfully!");
-    }
-
-    protected void deleteADSInstance(ADSInstance adsInstance) {
-        openUrl(ADS_INSTANCES_URI + adsInstance.getId());
-        InstanceFragment storage =
-                createPageFragment(InstanceFragment.class,
-                        waitForElementVisible(BY_GP_FORM_SECOND, browser));
-        assertTrue(storage.verifyValidDeleteStorageForm(), "Delete form is invalid");
-        storage.deleteStorageSuccess();
-    }
-
-    protected void setDefaultSchemaForOutputStage(RestApiClient restApiClient, String adsId) {
-        String schemaUri = String.format(ADS_INSTANCE_SCHEMA_URI, adsId);
-        JSONObject outputStageObj = new JSONObject();
-        try {
-            outputStageObj.put("outputStage", new JSONObject().put("schema", schemaUri));
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is a problem with JSON object when set default schema for outputStage! ",
-                    e);
-        }
-
-        String putUri = String.format(OUTPUTSTAGE_URI, getWorkingProject().getProjectId());
-        String putBody = outputStageObj.toString();
-        HttpRequestBase putRequest = restApiClient.newPutMethod(putUri, putBody);
-        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
-
-        HttpResponse putResponse = restApiClient.execute(putRequest);
-        int responseStatusCode = putResponse.getStatusLine().getStatusCode();
-
-        System.out.println(putResponse.toString());
-        EntityUtils.consumeQuietly(putResponse.getEntity());
-        System.out.println("Response status: " + responseStatusCode);
-        assertEquals(responseStatusCode, HttpStatus.OK.value(),
-                "Default schema is not set successfully!");
+    protected void deleteADSInstance(Warehouse ads) {
+        adsHelper.removeAds(ads);
     }
 
     protected String uploadZipFileToWebDavWithoutWebContainer(String zipFileName) {
@@ -305,11 +239,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
         webDav.uploadFile(resourceFile);
 
         return webDav.getWebDavStructure();
-    }
-
-    protected String getAdsUrl(ADSInstance adsInstance) {
-        return ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}",
-                adsInstance.getId());
     }
 
     protected int createDataLoadProcess() {
@@ -367,7 +296,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     }
 
     protected void createUpdateADSTable(ADSTables adsTable) {
-        createUpdateADSTableBySQLFiles(adsTable.createTableSqlFile, adsTable.copyTableSqlFile, adsInstance);
+        createUpdateADSTableBySQLFiles(adsTable.createTableSqlFile, adsTable.copyTableSqlFile, ads);
     }
 
     protected void deleteOutputStageMetadata() {
@@ -520,18 +449,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
         }
 
         return pollingUri;
-    }
-    
-    private String getUserLoginFromDatawarehouseUsersLink(String userLink) {
-    	String[] parts = userLink.split("/");
-    	String profileUri = parts[parts.length-1];
-    	String login = "";
-    	try {
-    	    login = RestUtils.getLoginFromProfileUri(getRestApiClient(), profileUri);
-    	} catch (Exception e) {
-    	    throw new IllegalStateException("There is an exeception during parsing user link!", e); 
-    	}
-    	return login;
     }
 
     protected enum AdditionalDatasets {
