@@ -37,6 +37,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     private static final int DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT = 180; // 15 minutes
 
     private static final String PROCESS_FULL_LOAD_JSON = "{\"process\":{\"incremental\":false}}";
+    public static final String ANOTHER_PROCESS_IS_ALREADY_RUNNING = "Another process is already running.";
 
     protected int integrationProcessCheckLimit = DEFAULT_INTEGRATION_PROCESS_CHECK_LIMIT;
 
@@ -176,6 +177,34 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
 
         waitForIntegrationProcessSynchronized(browser, checkIterations);
+    }
+
+    /**
+     * Schedules (starts) new integration process over gray pages and waits till it's synchronized (finished).
+     * It also handles situation when process has already been started by scheduler and waits for this one.
+     *
+     * @param checkIterations how many iterations of checks should it do before it fails (there's a 5s pause between checks)
+     * @throws JSONException
+     */
+    protected void scheduleIntegrationProcess(int checkIterations) throws JSONException {
+        openUrl(getProcessesUri());
+        Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
+
+        handleAlreadyRunningProcess();
+
+        waitForIntegrationProcessSynchronized(browser, checkIterations);
+    }
+
+    private void handleAlreadyRunningProcess() throws JSONException {
+        final JSONObject afterClick = loadJSON();
+        if (afterClick.has("error") &&
+                ANOTHER_PROCESS_IS_ALREADY_RUNNING.equals(afterClick.getJSONObject("error").getString("message"))) {
+            openUrl(getProcessesUri());
+            final JSONObject processes = loadJSON();
+            final String processLink = processes.getJSONObject("processes").getJSONArray("items").getJSONObject(0)
+                    .getJSONObject("process").getJSONObject("links").getString("self");
+            openUrl(processLink);
+        }
     }
 
     protected void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations)
