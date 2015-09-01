@@ -59,7 +59,7 @@ public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTe
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
         // process schedule
-        scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
+        scheduleIntegrationProcess(integrationProcessCheckLimit);
     }
 
     public abstract String openZendeskSettingsUrl();

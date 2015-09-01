@@ -103,7 +103,7 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
         // process schedule
-        scheduleIntegrationProcess(integrationProcessCheckLimit, 0);
+        scheduleIntegrationProcess(integrationProcessCheckLimit);
     }
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
