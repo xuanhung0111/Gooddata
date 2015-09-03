@@ -4,13 +4,17 @@
         http://jboss.org/schema/arquillian
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
-    <!-- possible options are listed at https://docs.jboss.org/author/display/ARQ/Drone -->
     <extension qualifier="webdriver">
-        <property name="browser">${browser:firefox}</property>
-        <property name="remoteReusable">false</property>
-        <property name="remoteAddress">http://localhost:4444/wd/hub</property>
-        <property name="firefoxUserPreferences">target/test-classes/firefox-prefs.js</property>
-        <property name="chromeDriverBinary">${chromeDriverBinaryPath}</property>
+        <property name="browser">browserstack</property>
+        <property name="username">${browserstack.username:xxx}</property>
+        <property name="automate.key">${browserstack.automate.key:xxx}</property>
+        <property name="browserName">${browserstack.platform.browser:IE}</property>
+        <property name="browser_version">${browserstack.platform.browser.version:8.0}</property>
+        <property name="os">${browserstack.platform.os:Windows}</property>
+        <property name="os_version">${browserstack.platform.os.version:7}</property>
+        <property name="resolution">${browserstack.platform.resolution:1680x1050}</property>
+        <property name="acceptSslCerts">true</property>
+        <property name="browserstack.debug">true</property>
     </extension>
 
     <extension qualifier="graphene">

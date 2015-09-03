@@ -20,6 +20,11 @@
         <module>ui-tests-tools</module>
         <module>ui-tests-msf</module>
         <module>ui-tests-indigo</module>
+        <!--
+        Module for support of browserstack for Drone, will be removed and switched to regular dependency when the artifact is officially released
+        Content is taken and updated from https://github.com/MatousJobanek/arquillian-drone-browserstack-webdriver
+        -->
+        <module>arquillian-drone-browserstack-webdriver</module>
     </modules>
 
     <properties>
@@ -38,6 +43,11 @@
         <video.recording>false</video.recording>
 
         <testng.suite.xml>testng-basic.xml</testng.suite.xml>
+
+        <arquillian.xml>arquillian.xml</arquillian.xml>
+
+        <!-- possible values are: local/browserstack-mobile/browserstack-platform -->
+        <test.execution.env>local</test.execution.env>
 
         <corePropertiesPath>ui-tests-core${file.separator}src${file.separator}test${file.separator}resources${file.separator}variables-env-test.properties</corePropertiesPath>
         <propertiesPath>${basedir}${file.separator}${corePropertiesPath}</propertiesPath>
@@ -268,6 +278,10 @@
                                                 <name>file.separator</name>
                                                 <value>${file.separator}</value>
                                             </property>
+                                            <property>
+                                                <name>arquillian.xml</name>
+                                                <value>${arquillian.xml}</value>
+                                            </property>
                                         </systemProperties>
                                     </configuration>
                                 </execution>
@@ -276,6 +290,30 @@
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+        <profile>
+            <id>browserstack-mobile</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+            </properties>
         </profile>
         <profile>
             <id>video</id>
