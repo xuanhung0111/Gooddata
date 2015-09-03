@@ -209,9 +209,10 @@ public class CsvUploaderTest extends AbstractMSFTest {
     }
 
     private void waitForSourceUploaded(final String sourceName) {
-        final String sourceStatus = sourcesListPage.getMySourcesTable().getSourceStatus(sourceName);
-        Predicate<WebDriver> sourceHasSuccessfulStatus = input ->
-            isNotEmpty(sourceStatus) && sourceStatus.contains(SUCCESSFUL_STATUS_MESSAGE);
+        Predicate<WebDriver> sourceHasSuccessfulStatus = input -> {
+            final String sourceStatus = sourcesListPage.getMySourcesTable().getSourceStatus(sourceName);
+            return isNotEmpty(sourceStatus) && sourceStatus.contains(SUCCESSFUL_STATUS_MESSAGE);
+        };
 
         Graphene.waitGui(browser).until(sourceHasSuccessfulStatus);
     }
