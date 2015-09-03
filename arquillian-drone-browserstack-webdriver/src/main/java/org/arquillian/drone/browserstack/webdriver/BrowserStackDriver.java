@@ -30,5 +30,6 @@ public class BrowserStackDriver extends RemoteWebDriver {
 
     public BrowserStackDriver(URL url, Capabilities capabilities) {
         super(url, capabilities);
+        System.out.println("Using following browser capabilities: " + capabilities);
     }
 }
