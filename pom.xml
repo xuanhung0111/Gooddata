@@ -293,6 +293,10 @@
                                                 <value>${arquillian.xml}</value>
                                             </property>
                                             <property>
+                                                <name>test.execution.env</name>
+                                                <value>${test.execution.env}</value>
+                                            </property>
+                                            <property>
                                                 <name>browserstack.username</name>
                                                 <value>${browserstack.username}</value>
                                             </property>
