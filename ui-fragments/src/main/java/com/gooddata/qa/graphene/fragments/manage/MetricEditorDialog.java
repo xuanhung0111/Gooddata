@@ -42,7 +42,7 @@ public class MetricEditorDialog extends AbstractFragment {
 
     private static final String SELECTED_ELEMENT_LOCATOR = "//ul[@class='elementList']/li[text()='${text}']";
     private static final String SELECTED_ELEMENT_VALUE_LOCATOR = 
-            "//div[contains(@class,'elementList')]//span[text()='${text}']";
+            "//div[contains(@class,'elementList')]//div[not(contains(@class,'gdc-hidden'))]/span[text()='${text}']";
     private static final By SEARCH_ELEMENT_VALUE_LOCATOR = 
             By.xpath("//div[contains(@class,'elementList ')]//input");
     
