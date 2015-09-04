@@ -252,7 +252,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnGroups = {"newZendeskObjects"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testIncrementalSynchronization() throws JSONException {
-        scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
+        scheduleIntegrationProcess(integrationProcessCheckLimit);
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronization"}, groups = {"zendeskApiTests",
@@ -332,7 +332,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnGroups = {"updateZendeskObjects"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testIncrementalSynchronizationAfterObjectsUpdate() throws JSONException {
-        scheduleIntegrationProcess(integrationProcessCheckLimit, 2);
+        scheduleIntegrationProcess(integrationProcessCheckLimit);
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsUpdate"},
@@ -365,7 +365,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
 
     @Test(dependsOnGroups = {"deleteZendeskObjects"}, groups = {"zendeskApiTests", "connectorWalkthrough"})
     public void testIncrementalSynchronizationAfterObjectsDeletion() throws JSONException {
-        scheduleIntegrationProcess(integrationProcessCheckLimit, 3);
+        scheduleIntegrationProcess(integrationProcessCheckLimit);
     }
 
     @Test(dependsOnMethods = {"testIncrementalSynchronizationAfterObjectsDeletion"}, groups = {"zendeskApiTests",
