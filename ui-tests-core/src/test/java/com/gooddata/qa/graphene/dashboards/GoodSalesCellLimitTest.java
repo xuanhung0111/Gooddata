@@ -6,6 +6,8 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.ChartReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.graphene.utils.Sleeper;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -81,6 +83,7 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
             report.showAnyway();
 
             assertTrue(report.isChart());
+            Sleeper.sleepTightInSeconds(5);
         } finally {
             dashboardsPage.deleteDashboard();
         }
