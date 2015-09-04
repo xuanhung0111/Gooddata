@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import org.testng.Assert;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
@@ -23,6 +24,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             .waitForAlertsLoaded()
             .getLastKpi();
 
+        takeScreenshot(browser, "checkNewKpiDoesNotHaveAlertSet", getClass());
         Assert.assertFalse(kpi.hasSetAlert());
 
         indigoDashboardsPage
@@ -40,9 +42,11 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         Kpi kpi = initIndigoDashboardsPage()
             .getFirstKpi();
 
+        takeScreenshot(browser, "checkKpiAlertButtonVisibility-shouldNotBeVisible", getClass());
         kpi.waitForAlertButtonNotVisible()
             .hoverAndClickKpiAlertButton()
             .waitForAlertButtonVisible();
+        takeScreenshot(browser, "checkKpiAlertButtonVisibility-shouldBeVisible", getClass());
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -51,6 +55,8 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             .getFirstKpi();
 
         kpi.hoverAndClickKpiAlertButton();
+
+        takeScreenshot(browser, "checkKpiAlertDialog", getClass());
         Assert.assertTrue(kpi.hasAlertDialogOpen());
     }
 
@@ -60,6 +66,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             .getFirstKpi()
             .openAlertDialog();
 
+        takeScreenshot(browser, "checkKpiAlertDialogHeader", getClass());
         Assert.assertEquals(kpiAlertDialog.getDialogHeader(), KPI_ALERT_DIALOG_HEADER);
     }
 
@@ -83,6 +90,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             .waitForAlertsLoaded()
             .getLastKpi();
 
+        takeScreenshot(browser, "checkAddKpiAlert", getClass());
         assertTrue(kpi.hasSetAlert());
 
         indigoDashboardsPage
