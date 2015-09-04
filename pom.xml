@@ -358,8 +358,6 @@
                 <browserstack.mobile.device>Samsung Galaxy S5</browserstack.mobile.device>
             </properties>
         </profile>
-        <!--
-        iPhone/iPad does not work - discuss with browserstack support?
         <profile>
             <id>browserstack-mobile-iphone-5</id>
             <activation>
@@ -373,6 +371,21 @@
                 <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
                 <browserstack.mobile.device>iPhone 5</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-iphone-5s</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-iphone-5s</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPhone 5S</browserstack.mobile.device>
             </properties>
         </profile>
         <profile>
@@ -405,7 +418,21 @@
                 <browserstack.mobile.device>iPad mini Retina</browserstack.mobile.device>
             </properties>
         </profile>
-        -->
+        <profile>
+            <id>browserstack-mobile-ipad-4th-gen</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-ipad-4th-gen</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPad 4th Gen</browserstack.mobile.device>
+            </properties>
+        </profile>
         <profile>
             <id>browserstack-platform-windows-7-IE-8</id>
             <activation>

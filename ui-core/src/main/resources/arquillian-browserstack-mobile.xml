@@ -11,6 +11,8 @@
         <property name="browserName">${browserstack.mobile.browserName:android}</property>
         <property name="platform">${browserstack.mobile.platform:ANDROID}</property>
         <property name="device">${browserstack.mobile.device:Samsung Galaxy S5}</property>
+        <property name="deviceOrientation">${browserstack.mobile.device.orientation:portrait}</property> <!--portrait/landscape-->
+        <property name="emulator">true</property>
         <property name="acceptSslCerts">true</property>
         <property name="browserstack.debug">true</property>
     </extension>
