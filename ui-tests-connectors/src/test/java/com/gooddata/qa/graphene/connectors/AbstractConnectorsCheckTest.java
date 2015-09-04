@@ -166,17 +166,13 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
         return browser.getCurrentUrl();
     }
 
-    protected void scheduleIntegrationProcess(int checkIterations, int expectedProcessesCount)
-            throws JSONException {
-        openUrl(getProcessesUri());
-        JSONObject json = loadJSON();
-        if (!testParams.isReuseProject()) {
-            assertTrue(json.getJSONObject("processes").getJSONArray("items").length() == expectedProcessesCount,
-                    "There are no processes for new project yet");
-        }
-        Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
-
-        waitForIntegrationProcessSynchronized(browser, checkIterations);
+    /**
+     * Schedules (starts) new integration process over gray pages and waits till it's synchronized (finished).
+     * It waits for any already existing running processes and then tries to schedule fresh one. This step is repeated
+     * until fresh process is created by this test.
+     */
+    protected void scheduleIntegrationProcess(int checkIterations) throws JSONException {
+        while (scheduleIntegrationProcessOrUseExisting(checkIterations));
     }
 
     /**
@@ -184,18 +180,23 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      * It also handles situation when process has already been started by scheduler and waits for this one.
      *
      * @param checkIterations how many iterations of checks should it do before it fails (there's a 5s pause between checks)
+     * @return <code>true</code> if new process has been scheduled, <code>false</code> if existing one has been used
      * @throws JSONException
      */
-    protected void scheduleIntegrationProcess(int checkIterations) throws JSONException {
+    protected boolean scheduleIntegrationProcessOrUseExisting(int checkIterations) throws JSONException {
         openUrl(getProcessesUri());
         Graphene.guardHttp(waitForElementVisible(BY_GP_BUTTON_SUBMIT, browser)).click();
 
-        handleAlreadyRunningProcess();
+        final boolean alreadyRunningProcess = handleAlreadyRunningProcess();
 
         waitForIntegrationProcessSynchronized(browser, checkIterations);
+        return !alreadyRunningProcess;
     }
 
-    private void handleAlreadyRunningProcess() throws JSONException {
+    /**
+     * Returns <code>true</code> if there was running process, <code>false</code> otherwise
+     */
+    private boolean handleAlreadyRunningProcess() throws JSONException {
         final JSONObject afterClick = loadJSON();
         if (afterClick.has("error") &&
                 ANOTHER_PROCESS_IS_ALREADY_RUNNING.equals(afterClick.getJSONObject("error").getString("message"))) {
@@ -204,7 +205,9 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
             final String processLink = processes.getJSONObject("processes").getJSONArray("items").getJSONObject(0)
                     .getJSONObject("process").getJSONObject("links").getString("self");
             openUrl(processLink);
+            return true;
         }
+        return false;
     }
 
     protected void waitForIntegrationProcessSynchronized(WebDriver browser, int checkIterations)

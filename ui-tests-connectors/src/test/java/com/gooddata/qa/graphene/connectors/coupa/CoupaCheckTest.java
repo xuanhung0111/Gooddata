@@ -103,12 +103,12 @@ public class CoupaCheckTest extends AbstractConnectorsCheckTest {
         // sign in back with demo user
         signIn(true, UserRoles.ADMIN);
         // process schedule
-        scheduleIntegrationProcess(integrationProcessCheckLimit);
+        scheduleIntegrationProcessOrUseExisting(integrationProcessCheckLimit);
     }
 
     @Test(groups = {"connectorWalkthrough", "connectorIntegration"},
             dependsOnMethods = {"testCoupaIntegration"})
     public void testIncrementalSynchronization() throws JSONException {
-        scheduleIntegrationProcess(integrationProcessCheckLimit, 1);
+        scheduleIntegrationProcess(integrationProcessCheckLimit);
     }
 }
