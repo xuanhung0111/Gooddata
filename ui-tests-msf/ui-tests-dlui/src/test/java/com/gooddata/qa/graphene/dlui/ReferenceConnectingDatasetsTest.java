@@ -11,6 +11,7 @@ import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -151,9 +152,9 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
         }
     }
 
-    @Test(dependsOnMethods = "autoCreationMultiConnectingDatasets", alwaysRun = true)
+    @AfterClass
     public void cleanUp() {
-        deleteADSInstance(adsInstance);
+        deleteADSInstance(ads);
     }
 
     private void addNewFieldWithAnnieDialog(DataSource dataSource) {

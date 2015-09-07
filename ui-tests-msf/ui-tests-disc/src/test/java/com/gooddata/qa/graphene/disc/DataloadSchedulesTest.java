@@ -7,6 +7,7 @@ import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
+import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
@@ -211,7 +212,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, 
                     UserRoles.ADMIN);
-            addUserToAdsInstance(adsInstance, technicalUser, "dataAdmin");
+            adsHelper.addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
 
             logout();
             signInAtGreyPages(technicalUser, technicalUserPassword);
@@ -538,9 +539,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                 "Schedule is not deleted well!");
     }
 
-    @Test(dependsOnGroups = {"dataloadSchedulesTest", "dataloadScheduleReportTest", "reference"}, alwaysRun = true)
+    @AfterClass
     public void cleanUp() {
-        deleteADSInstance(adsInstance);
+        deleteADSInstance(ads);
     }
 
     private void assertConcurrentDataloadScheduleFailed() {
