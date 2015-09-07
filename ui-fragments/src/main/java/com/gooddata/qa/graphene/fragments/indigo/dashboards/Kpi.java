@@ -8,8 +8,11 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.interactions.Actions;
 /**
  * Kpi - key performance indicator widget
  */
@@ -18,6 +21,9 @@ public class Kpi extends AbstractFragment {
     public static final String MAIN_CLASS = "dash-item";
     public static final String KPI_CSS_SELECTOR = "." + MAIN_CLASS + ":not(.is-placeholder)";
     public static final String KPI_POP_SECTION_CLASS = "kpi-pop-section";
+    public static final String KPI_ALERT_BUTTON_CLASS = "dash-item-action-alert";
+    public static final String KPI_HAS_SET_ALERT_BUTTON = "has-set-alert";
+    public static final String KPI_ALERT_DIALOG_CLASS = "kpi-alert-dialog";
 
     public static final String WIDGET_LOADING_CLASS = "widget-loading";
     public static final String CONTENT_LOADING_CLASS = "content-loading";
@@ -25,9 +31,13 @@ public class Kpi extends AbstractFragment {
     public static final By IS_WIDGET_LOADING = By.cssSelector("." + MAIN_CLASS + " ." + WIDGET_LOADING_CLASS);
     public static final By IS_CONTENT_LOADING = By.cssSelector("." + MAIN_CLASS + " ." + CONTENT_LOADING_CLASS);
     public static final By IS_NOT_EDITABLE = By.cssSelector("." + MAIN_CLASS + " .kpi:not(.is-editable)");
+    public static final By ALERT_DIALOG = By.className(KPI_ALERT_DIALOG_CLASS);
 
-    @FindBy(css = ".dash-item-delete")
+    @FindBy(css = ".dash-item-action-delete")
     protected WebElement deleteButton;
+
+    @FindBy(className = KPI_ALERT_BUTTON_CLASS)
+    private WebElement alertButton;
 
     @FindBy(css = ".kpi-headline > h3")
     private WebElement headline;
@@ -87,6 +97,43 @@ public class Kpi extends AbstractFragment {
 
     public void clickKpiDeleteButton() {
         waitForElementVisible(deleteButton).click();
+    }
+
+    public Kpi waitForAlertButtonVisible() {
+        waitForElementVisible(alertButton);
+
+        return this;
+    }
+
+    public Kpi waitForAlertButtonNotVisible() {
+        waitForElementNotVisible(alertButton);
+
+        return this;
+    }
+
+    public boolean hasAlertDialogOpen() {
+        return isElementPresent(ALERT_DIALOG, browser);
+    }
+
+    public boolean hasSetAlert() {
+        By hasSetAlertButton = By.className(KPI_HAS_SET_ALERT_BUTTON);
+        return isElementPresent(hasSetAlertButton, this.getRoot());
+    }
+
+    public KpiAlertDialog openAlertDialog() {
+        if (!hasAlertDialogOpen()) {
+            hoverAndClickKpiAlertButton();
+        }
+
+        return Graphene.createPageFragment(KpiAlertDialog.class,
+                waitForElementVisible(KpiAlertDialog.LOCATOR, browser));
+    }
+
+    public Kpi hoverAndClickKpiAlertButton() {
+        Actions action = new Actions(browser);
+        action.moveToElement(value).moveToElement(alertButton).click().build().perform();
+
+        return this;
     }
 
     public void waitForLoading() {

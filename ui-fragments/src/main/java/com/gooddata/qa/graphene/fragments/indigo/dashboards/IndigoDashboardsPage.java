@@ -49,6 +49,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String EDIT_BUTTON_VISIBLE_JQUERY_SELECTOR = "." + EDIT_BUTTON_CLASS_NAME + ":visible";
+    private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
 
     public ConfigurationPanel getConfigurationPanel() {
         return configurationPanel;
@@ -109,6 +110,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public Kpi selectLastKpi() {
         return selectKpi(kpis.size() - 1);
+    }
+
+    public Kpi getFirstKpi() {
+        return getKpiByIndex(0);
     }
 
     public Kpi getLastKpi() {
@@ -215,5 +220,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public AttributeFiltersPanel waitForAttributeFilters() {
         return waitForFragmentVisible(attributeFiltersPanel);
+    }
+
+    public IndigoDashboardsPage waitForAlertsLoaded() {
+        waitForElementPresent(By.className(ALERTS_LOADED_CLASS_NAME), browser);
+        return this;
     }
 }
