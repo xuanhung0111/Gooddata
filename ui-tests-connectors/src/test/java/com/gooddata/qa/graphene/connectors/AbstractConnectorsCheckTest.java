@@ -172,7 +172,7 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
      * until fresh process is created by this test.
      */
     protected void scheduleIntegrationProcess(int checkIterations) throws JSONException {
-        while (scheduleIntegrationProcessOrUseExisting(checkIterations));
+        while (!scheduleIntegrationProcessOrUseExisting(checkIterations));
     }
 
     /**
