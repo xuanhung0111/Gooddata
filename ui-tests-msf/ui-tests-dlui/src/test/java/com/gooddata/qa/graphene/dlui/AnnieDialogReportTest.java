@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dlui;
 
 import org.json.JSONException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -13,22 +14,22 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
         projectTitle = "Dlui-annie-dialog-report-test";
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"annieDialogTest"})
+    @Test(dependsOnGroups = {"initialDataForDLUI"})
     public void prepareMetricsToCheckReport() throws JSONException {
         prepareMetricToCheckNewAddedFields("age", "price", "totalprice");
     }
 
     @Test(dataProvider = "basicFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
-            groups = {"annieDialogTest", "addOneField"})
+            groups = {"addOneField"})
     public void adminCheckReportWithBasicSingleField(AddedFields addedField,
             ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
-            groups = {"annieDialogTest", "addOneField"})
-    public void adminCheckReportWithSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException {
+            groups = {"addOneField"})
+    public void adminCheckReportWithSingleField(AddedFields addedField, ReportWithAddedFields reportWithAddedFields)
+            throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
     }
 
@@ -38,7 +39,7 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
         addMultiFieldsAndCheckReport(UserRoles.ADMIN);
     }
 
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = "annieDialogTest")
+    @Test(dependsOnGroups = {"initialDataForDLUI"})
     public void addEditorUser() {
         try {
             addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
@@ -47,28 +48,28 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
         }
     }
 
-    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser",
-        "prepareMetricsToCheckReport"}, groups = {"annieDialogTest", "editorAddOneField"})
+    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
+            groups = {"editorAddOneField"})
     public void editorCheckReportWithBasicSingleField(AddedFields addedField,
             ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
-    @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser",
-        "prepareMetricsToCheckReport"}, groups = {"annieDialogTest", "editorAddOneField"})
+    @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
+            groups = {"editorAddOneField"})
     public void editorCheckReportWithSingleField(AddedFields addedField,
             ReportWithAddedFields reportWithAddedFields) throws JSONException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
     @Test(dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
-            dependsOnGroups = {"editorAddOneField"}, groups = "annieDialogTest")
+            dependsOnGroups = {"editorAddOneField"})
     public void editorCheckReportWithMultiAddedFields() throws JSONException {
         addMultiFieldsAndCheckReport(UserRoles.EDITOR);
     }
 
-    @Test(dependsOnGroups = "annieDialogTest", alwaysRun = true)
+    @AfterClass
     public void cleanUp() {
-        deleteADSInstance(adsInstance);
+        deleteADSInstance(ads);
     }
 }
