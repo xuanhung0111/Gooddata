@@ -478,7 +478,13 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         assertTrue(json.getJSONObject("dssInstances").getJSONObject("links").getString("parent").endsWith("dss"),
                 "Parent link doesn't match");
         final String self = json.getJSONObject("dssInstances").getJSONObject("links").getString("self");
-        assertTrue(self.substring(1, self.indexOf('?')).equals(
+        final int endIndex;
+        if (self.contains("?")) {
+            endIndex = self.indexOf("?");
+        } else {
+            endIndex = self.length();
+        }
+        assertTrue(self.substring(1, endIndex).equals(
                 PAGE_DSS_INSTANCES), "DSS instances self link doesn't match");
     }
 
