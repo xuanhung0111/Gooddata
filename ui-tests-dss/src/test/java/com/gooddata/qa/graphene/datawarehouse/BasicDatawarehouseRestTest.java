@@ -488,7 +488,13 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         assertTrue(json.getJSONObject("instances").getJSONObject("links").getString("parent").endsWith("datawarehouse"),
                 "Parent link doesn't match");
         final String self = json.getJSONObject("instances").getJSONObject("links").getString("self");
-        assertTrue(self.substring(1, self.indexOf('?')).equals(
+        final int endIndex;
+        if (self.contains("?")) {
+            endIndex = self.indexOf("?");
+        } else {
+            endIndex = self.length();
+        }
+        assertTrue(self.substring(1, endIndex).equals(
                 PAGE_INSTANCES), "Instances self link doesn't match");
     }
 
