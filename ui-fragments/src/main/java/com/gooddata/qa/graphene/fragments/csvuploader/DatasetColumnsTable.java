@@ -8,17 +8,17 @@ import org.openqa.selenium.By;
 
 import java.util.List;
 
-public class SourceColumnsTable extends AbstractTable {
+public class DatasetColumnsTable extends AbstractTable {
 
-    private static final By BY_SOURCE_COLUMN_NAME = By.className("s-source-column-name");
-    private static final By BY_SOURCE_COLUMN_TYPE = By.className("s-source-column-type");
+    private static final By BY_DATASET_COLUMN_NAME = By.className("s-dataset-column-name");
+    private static final By BY_DATASET_COLUMN_TYPE = By.className("s-dataset-column-type");
 
     public List<String> getColumnNames() {
-        return getTableColumnValues(BY_SOURCE_COLUMN_NAME);
+        return getTableColumnValues(BY_DATASET_COLUMN_NAME);
     }
 
     public List<String> getColumnTypes() {
-        return getTableColumnValues(BY_SOURCE_COLUMN_TYPE);
+        return getTableColumnValues(BY_DATASET_COLUMN_TYPE);
     }
 
     private List<String> getTableColumnValues(By by) {
