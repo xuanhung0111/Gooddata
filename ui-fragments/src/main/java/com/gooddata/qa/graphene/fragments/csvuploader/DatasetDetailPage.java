@@ -9,30 +9,30 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-public class SourceDetailPage extends AbstractFragment {
+public class DatasetDetailPage extends AbstractFragment {
 
-    @FindBy(className = "s-source-name")
-    private WebElement sourceName;
+    @FindBy(className = "s-dataset-name")
+    private WebElement datasetName;
 
-    @FindBy(className = "s-source-detail-back-button")
+    @FindBy(className = "s-dataset-detail-back-button")
     private WebElement backButton;
 
-    @FindBy(className = "s-source-columns-table")
-    private SourceColumnsTable sourceColumns;
+    @FindBy(className = "s-dataset-columns-table")
+    private DatasetColumnsTable datasetColumns;
 
     public void clickBackButton() {
         waitForElementVisible(backButton).click();
     }
 
-    public String getSourceName() {
-        return waitForElementVisible(sourceName).getText();
+    public String getDatasetName() {
+        return waitForElementVisible(datasetName).getText();
     }
 
     public List<String> getColumnNames() {
-        return waitForFragmentVisible(sourceColumns).getColumnNames();
+        return waitForFragmentVisible(datasetColumns).getColumnNames();
     }
 
     public List<String> getColumnTypes() {
-        return waitForFragmentVisible(sourceColumns).getColumnTypes();
+        return waitForFragmentVisible(datasetColumns).getColumnTypes();
     }
 }
