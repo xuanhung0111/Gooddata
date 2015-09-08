@@ -27,6 +27,9 @@ public class KpiAlertDialog extends AbstractFragment {
     @FindBy(className = "s-save_button")
     private WebElement setAlertButton;
 
+    @FindBy(className = "s-delete_button")
+    private WebElement deleteAlertButton;
+
     public String getDialogHeader() {
         return waitForElementVisible(header).getText();
     }
@@ -36,6 +39,14 @@ public class KpiAlertDialog extends AbstractFragment {
             .selectByName(triggeredWhen);
 
         return this;
+    }
+
+    public String getTriggeredWhen() {
+        return waitForFragmentVisible(triggeredWhenSelect).getSelection();
+    }
+
+    public String getThreshold() {
+        return waitForElementVisible(kpiAlertThresholdInput).getAttribute("value");
     }
 
     public KpiAlertDialog setThreshold(String threshold) {
@@ -49,6 +60,12 @@ public class KpiAlertDialog extends AbstractFragment {
     public KpiAlertDialog setAlert() {
         waitForElementVisible(setAlertButton).click();
         waitForElementNotPresent(setAlertButton);
+        return this;
+    }
+
+    public KpiAlertDialog deleteAlert() {
+        waitForElementVisible(deleteAlertButton).click();
+        waitForElementNotPresent(deleteAlertButton);
         return this;
     }
 }
