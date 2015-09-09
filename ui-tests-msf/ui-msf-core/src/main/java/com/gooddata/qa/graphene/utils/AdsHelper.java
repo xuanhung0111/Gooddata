@@ -3,7 +3,9 @@ package com.gooddata.qa.graphene.utils;
 import static java.lang.String.format;
 import static org.apache.commons.lang.Validate.notNull;
 import static org.testng.Assert.assertEquals;
+
 import com.gooddata.GoodData;
+import com.gooddata.project.Environment;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.warehouse.Warehouse;
@@ -51,7 +53,12 @@ public final class AdsHelper {
     }
 
     public Warehouse createAds(String adsName, String adsToken) {
+        return createAds(adsName, adsToken, Environment.TESTING);
+    }
+
+    public Warehouse createAds(String adsName, String adsToken, Environment env) {
         final Warehouse adsInstance = new Warehouse(adsName, adsToken);
+        adsInstance.setEnvironment(env);
         return gdClient.getWarehouseService().createWarehouse(adsInstance).get();
     }
 
