@@ -11,7 +11,6 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -28,9 +27,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
-import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.utils.io.ResourceUtils;
-import com.gooddata.warehouse.Warehouse;
 import com.google.common.base.Predicate;
 
 import java.util.function.Consumer;
@@ -53,10 +50,6 @@ public class CsvUploaderTest extends AbstractMSFTest {
     private static final String SUCCESSFUL_STATUS_MESSAGE = "Data uploaded successfully";
     private static final String DELETING_STATUS_MESSAGE = "Deleting …";
 
-    private AdsHelper adsHelper;
-
-    private Warehouse ads;
-
     @FindBy(className = "s-datasets-list")
     private DatasetsListPage datasetsListPage;
 
@@ -78,13 +71,6 @@ public class CsvUploaderTest extends AbstractMSFTest {
     @BeforeClass
     public void initProperties() {
         projectTitle = "Csv-uploader-test";
-        adsHelper = new AdsHelper(getGoodDataClient(), getRestApiClient());
-        ads = adsHelper.createAds("CSV Uploader Test ADS", dssAuthorizationToken);
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDownOutputStage() {
-        adsHelper.removeAds(ads);
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -106,8 +92,6 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
     @Test(dependsOnMethods = {"checkEmptyState"})
     public void checkCsvUploadHappyPath() throws Exception {
-        adsHelper.associateAdsWithProject(ads, testParams.getProjectId());
-
         checkCsvUpload(CSV_FILE_NAME, this::uploadCsv, true);
 
 
