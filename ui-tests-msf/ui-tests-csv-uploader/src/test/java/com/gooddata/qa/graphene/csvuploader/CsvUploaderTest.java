@@ -48,7 +48,6 @@ public class CsvUploaderTest extends AbstractMSFTest {
     private static final String DELETE_DATASET_DIALOG_NAME = "delete-dataset-dialog";
 
     private static final String SUCCESSFUL_STATUS_MESSAGE = "Data uploaded successfully";
-    private static final String DELETING_STATUS_MESSAGE = "Deleting …";
 
     @FindBy(className = "s-datasets-list")
     private DatasetsListPage datasetsListPage;
@@ -133,10 +132,6 @@ public class CsvUploaderTest extends AbstractMSFTest {
         takeScreenshot(browser, DELETE_DATASET_DIALOG_NAME, getClass());
 
         waitForFragmentVisible(datasetDeleteDialog).clickDelete();
-
-        waitForDatasetStatus(CSV_DATASET_NAME, DELETING_STATUS_MESSAGE);
-
-        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "deleting-dataset", CSV_DATASET_NAME), getClass());
 
         checkForDatasetRemoved(CSV_DATASET_NAME);
 
