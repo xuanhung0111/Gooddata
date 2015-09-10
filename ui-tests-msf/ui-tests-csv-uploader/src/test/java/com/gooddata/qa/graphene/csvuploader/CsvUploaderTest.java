@@ -7,11 +7,9 @@ import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadProgressDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -19,9 +17,8 @@ import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.apache.commons.io.FilenameUtils.removeExtension;
+import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.apache.commons.lang.Validate.notEmpty;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -102,7 +99,7 @@ public class CsvUploaderTest extends AbstractMSFTest {
         initDataUploadPage();
         datasetsListPage.waitForEmptyStateLoaded();
 
-        takeScreenshot(browser, DATA_PAGE_NAME + "-empty", getClass());
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "empty"), getClass());
 
         System.out.println("Empty state message: " + datasetsListPage.getEmptyStateMessage());
     }
@@ -118,11 +115,11 @@ public class CsvUploaderTest extends AbstractMSFTest {
                 datasetsListPage.getMyDatasetsTable().getDatasetNames(),
                 hasItem(CSV_DATASET_NAME));
 
-        takeScreenshot(browser, DATA_PAGE_NAME + "-uploading-dataset-" + toScreenshotName(CSV_DATASET_NAME), getClass());
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", CSV_DATASET_NAME), getClass());
 
         waitForDatasetStatus(CSV_DATASET_NAME, SUCCESSFUL_STATUS_MESSAGE);
 
-        takeScreenshot(browser, DATA_PAGE_NAME + "-dataset-uploaded-" + toScreenshotName(CSV_DATASET_NAME), getClass());
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", CSV_DATASET_NAME), getClass());
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
@@ -155,11 +152,11 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
         waitForDatasetStatus(CSV_DATASET_NAME, DELETING_STATUS_MESSAGE);
 
-        takeScreenshot(browser, DATA_PAGE_NAME + "-deleting-dataset-" + toScreenshotName(CSV_DATASET_NAME), getClass());
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "deleting-dataset", CSV_DATASET_NAME), getClass());
 
         checkForDatasetRemoved(CSV_DATASET_NAME);
 
-        takeScreenshot(browser, DATA_PAGE_NAME + "-" + toScreenshotName(CSV_DATASET_NAME) + "-dataset-deleted", getClass());
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, CSV_DATASET_NAME, "dataset-deleted"), getClass());
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
@@ -194,7 +191,7 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
         waitForFragmentVisible(dataPreviewPage);
 
-        takeScreenshot(browser, DATA_PREVIEW_PAGE + "-" + csvFileName, getClass());
+        takeScreenshot(browser, toScreenshotName(DATA_PREVIEW_PAGE, csvFileName), getClass());
 
         dataPreviewPage.selectFact().triggerIntegration();
     }
@@ -207,7 +204,7 @@ public class CsvUploaderTest extends AbstractMSFTest {
         assertThat(waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors(),
                 contains("csv.validations.structural.incorrect-column-count"));
 
-        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-validation-errors-" + csvFileName, getClass());
+        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFileName), getClass());
 
         waitForFragmentVisible(fileUploadDialog).clickCancelButton();
     }
@@ -215,17 +212,17 @@ public class CsvUploaderTest extends AbstractMSFTest {
     private void uploadFile(String csvFileName) {
         waitForFragmentVisible(datasetsListPage).clickAddDataButton();
 
-        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-initial-state-" + csvFileName, getClass());
+        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "initial-state", csvFileName), getClass());
 
         waitForFragmentVisible(fileUploadDialog).pickCsvFile(getCsvFileToUpload(csvFileName));
 
-        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-csv-file-picked-" + csvFileName, getClass());
+        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "csv-file-picked", csvFileName), getClass());
 
         fileUploadDialog.clickUploadButton();
 
         waitForFragmentVisible(fileUploadProgressDialog);
 
-        takeScreenshot(browser, UPLOAD_DIALOG_NAME + "-upload-in-progress-" + csvFileName, getClass());
+        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFileName), getClass());
     }
 
     private void waitForExpectedDatasetsCount(final int expectedDatasetsCount) {
@@ -264,11 +261,5 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
     private String getCsvFileToUpload(String csvFileName) {
         return ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + csvFileName);
-    }
-
-    private String toScreenshotName(String datasetName) {
-        notEmpty(datasetName, "datasetName cannot be empty!");
-
-        return datasetName.toLowerCase().replaceAll("\\s", "-");
     }
 }
