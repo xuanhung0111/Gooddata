@@ -196,6 +196,10 @@ public abstract class AbstractUploadTest extends AbstractProjectTest {
         for (String dataset : datasets) {
             deleteDataset(dataset);
         }
+        makeSureDatasetEmpty();
+    }
+
+    protected void makeSureDatasetEmpty() {
         assertTrue(dataPage.getRoot().findElement(BY_EMPTY_DATASET).isDisplayed());
     }
 

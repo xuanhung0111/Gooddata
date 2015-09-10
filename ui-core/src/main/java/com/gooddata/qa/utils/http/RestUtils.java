@@ -510,6 +510,31 @@ public class RestUtils {
 
     }
 
+    public static void changeMetricExpression(final RestApiClient restApiClient, String metricUri,
+            String newExpression) throws ParseException, JSONException, IOException {
+        HttpRequestBase getRequest = null;
+        HttpRequestBase putRequest = null;
+
+        try {
+            getRequest = restApiClient.newGetMethod(metricUri);
+            HttpResponse response = restApiClient.execute(getRequest, HttpStatus.OK, "Invalid status code");
+            JSONObject json = new JSONObject(EntityUtils.toString(response.getEntity()));
+            JSONObject content = json.getJSONObject("metric").getJSONObject("content");
+            content.put("expression", newExpression);
+            EntityUtils.consumeQuietly(response.getEntity());
+            putRequest = restApiClient.newPutMethod(metricUri, json.toString());
+            response = restApiClient.execute(putRequest, HttpStatus.OK, "Invalid status code");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            if (getRequest != null) {
+                getRequest.releaseConnection();
+            }
+            if (putRequest != null) {
+                putRequest.releaseConnection();
+            }
+        }
+    }
+
     public static String executeMAQL(RestApiClient restApiClient, String projectId, String maql)
             throws ParseException, JSONException, IOException {
         String contentBody = MAQL_EXECUTION_BODY.replace("${maql}", maql);
