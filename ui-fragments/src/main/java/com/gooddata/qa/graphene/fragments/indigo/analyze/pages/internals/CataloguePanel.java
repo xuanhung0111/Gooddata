@@ -152,7 +152,7 @@ public class CataloguePanel extends AbstractFragment {
         searchInput.clear();
         searchInput.sendKeys(item);
 
-        List<WebElement> noItems = browser.findElements(By.className("adi-no-items"));
+        List<WebElement> noItems = browser.findElements(By.cssSelector(".adi-no-items > p:first-child"));
         if (noItems.isEmpty()) {
             waitForCollectionIsNotEmpty(items);
             return true;
