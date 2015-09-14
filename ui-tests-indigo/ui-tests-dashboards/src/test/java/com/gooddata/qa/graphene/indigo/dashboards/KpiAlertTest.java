@@ -16,24 +16,6 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI…";
 
-    private void setupKpi() {
-        initIndigoDashboardsPage()
-            .switchToEditMode()
-            .addWidget(AMOUNT, DATE_CREATED)
-            .saveEditMode();
-    }
-
-    private void teardownKpi() {
-        initIndigoDashboardsPage()
-            .switchToEditMode()
-            .clickLastKpiDeleteButton()
-            .waitForDialog()
-            .submitClick();
-
-        indigoDashboardsPage
-            .saveEditMode();
-    }
-
     private Kpi getLastKpiAfterAlertsLoaded() {
         return initIndigoDashboardsPage()
             .waitForAlertsLoaded()
@@ -42,7 +24,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkNewKpiDoesNotHaveAlertSet() {
-        setupKpi();
+        setupKpi(AMOUNT, DATE_CREATED);
 
         try {
             Kpi kpi = getLastKpiAfterAlertsLoaded();
@@ -89,7 +71,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkAddKpiAlert() {
-        setupKpi();
+        setupKpi(AMOUNT, DATE_CREATED);
 
         try {
             String threshold = "100"; // TODO: consider parsing value from KPI to avoid immediate alert trigger
@@ -112,7 +94,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkAddKpiAlertUpdate() {
-        setupKpi();
+        setupKpi(AMOUNT, DATE_CREATED);
 
         try {
             String threshold = "100";
@@ -165,7 +147,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiAlertDelete() {
-        setupKpi();
+        setupKpi(AMOUNT, DATE_CREATED);
 
         try {
             String threshold = "100";
