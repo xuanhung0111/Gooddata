@@ -3,205 +3,138 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
 import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
 import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 
 public class ReportPage extends AbstractFragment {
 
     @FindBy(id = "analysisReportTitle")
     private WebElement reportName;
 
-    @FindBy(xpath = "//input[@class='ipeEditor']")
-    private WebElement reportNameInput;
+    @FindBy(xpath = "//div[contains(@class, 'reportEditorWhatArea')]/button")
+    private WebElement whatButton;
 
-    @FindBy(xpath = "//div[@class='c-ipeEditorControls']/button")
-    private WebElement reportNameSaveButton;
-
-    @FindBy(xpath = "//div[@id='reportSaveButtonContainer']/button")
-    private WebElement createReportButton;
-
-    @FindBy(xpath = "//div[contains(@class, 's-saveReportDialog')]//footer[@class='buttons']//button[contains(@class, 's-btn-create')]")
-    private WebElement confirmDialogCreateButton;
-
-    @FindBy(id = "reportVisualizer")
-    private ReportVisualizer visualiser;
-
-    @FindBy(xpath = "//button[contains(@class, 'exportButton')]")
-    private WebElement exportButton;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-pdf')]//a")
-    private WebElement exportToPDF;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-pdf__portrait_')]//a")
-    private WebElement exportToPDFPortrait;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-pdf__landscape_')]//a")
-    private WebElement exportToPDFLandscape;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-image__png_')]//a")
-    private WebElement exportToPNG;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-excel_xls')]//a")
-    private WebElement exportToXLS;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-excel_xlsx')]//a")
-    private WebElement exportToXLSX;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-csv')]//a")
-    private WebElement exportToCSV;
-
-    @FindBy(xpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-raw_data__csv_')]//a")
-    private WebElement exportToRawCSV;
-
-    @FindBy(css = "div.report")
-    private List<WebElement> reportsList;
-
-    @FindBy(css = ".s-btn-save")
-    private WebElement saveReportButton;
-
-    @FindBy(css = ".s-btn-saved")
-    private WebElement alreadySavedButton;
-
-    @FindBy(xpath = "//div[contains(@class,'c-dashboardUsageWarningDialog')]")
-    private WebElement confirmSaveDialog;
-
-    private String confirmSaveDialogLocator = "//div[contains(@class,'c-dashboardUsageWarningDialog')]";
-
-    private static final By VISIBILITY_CHECKBOX_LOCATOR = By.id("settings-visibility");
-
-    private static final By REPORT_SETTINGS_SAVE_BUTTON_LOCATOR = By.cssSelector(".s-btn-save:not(.gdc-hidden)");
-
-    @FindBy(xpath = "//span[2]/button[3]")
-    private WebElement confirmSaveButton;
+    @FindBy(xpath = "//div[contains(@class, 'reportEditorHowArea')]/button")
+    private WebElement howButton;
 
     @FindBy(xpath = "//div[contains(@class, 'reportEditorFilterArea')]/button[not (@disabled)]")
     private WebElement filterButton;
 
-    @FindBy(xpath = "//div[@id='filtersContainer']")
-    private ReportFilter reportFilter;
+    @FindBy(xpath = "//div[@id='reportSaveButtonContainer']/button")
+    private WebElement createReportButton;
 
-    @FindBy(id = "p-analysisPage")
-    private TableReport tableReport;
-
-    @FindBy(css = ".c-oneNumberReport")
-    private OneNumberReport headlineReport;
-
-    @FindBy(css = ".s-unlistedIcon")
-    private WebElement unlistedIcon;
+    @FindBy(xpath = "//button[contains(@class, 'exportButton')]")
+    private WebElement exportButton;
 
     @FindBy(css = ".s-btn-options")
     private WebElement optionsButton;
 
-    @FindBy(css = ".s-btn-__show_configuration:not(.gdc-hidden)")
-    private WebElement showConfigurationButton;
-    
-    @FindBy(css = ".s-btn-embed")
-    private WebElement embedButton;
-    
-    @FindBy(css = ".unsavedWarning-share")
-    private WebElement unsavedWarningEmbed;
+    private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
-    private static final By CUSTOM_NUMBER_FORMAT_LOCATOR = By.className("s-btn-custom_number_formats");
-    private static final By CUSTOM_METRIC_FORMAT_LOCATOR = By.className("customMetricFormatItem-format");
+    private static final By METRIC_ATTRIBUTE_CONTAINER_LOCATOR =
+            cssSelector(".sndPanel1:not([style^='display: none']) .dataContainer .cell");
+
+    private static final By METRICS_LOCATOR = cssSelector(".sndMetric .metricName");
+
+    private static final By ATTRIBUTES_LOCATOR = cssSelector(".s-snd-AttributesContainer .element .metricName");
+
+    private static final By SHOW_CONFIGURATION_LOCATOR =
+            cssSelector(".s-btn-__show_configuration:not(.gdc-hidden)");
+
+    private static final By HIDE_CONFIGURATION_LOCATOR = className("s-btn-hide__");
+
+    private static final By CUSTOM_NUMBER_FORMAT_LOCATOR = className("s-btn-custom_number_formats");
+
+    private static final By CUSTOM_METRIC_FORMAT_LOCATOR = className("customMetricFormatItem-format");
+
     private static final By APPLY_CONFIG_FORMAT_LOCATOR = By.cssSelector(".s-btn-apply:not(.disabled)");
-    private static final By ADD_TAGS_BUTTON_LOCATOR = By.className("s-btn-add_tags");
 
-    private static final By TAG_INPUT_LOCATOR = By.cssSelector(".c-ipeEditorIn input");
-    private static final By OK_BUTTON_LOCATOR = By.cssSelector(".c-ipeEditorControls .s-btn-add");
-    
-    private static final By EMBED_DIALOG_LOCATOR = By.cssSelector(".c-embedDialog");
-    private static final By SAVE_REPORT_TO_EMBED_LOCATOR = By.cssSelector(".unsavedWarning-share .save");
-    private static final By CLOSE_UNSAVED_WARNING_LOCATOR = By.cssSelector(".unsavedWarning-share .close");
+    private static final String XPATH_REPORT_VISUALIZATION_TYPE =
+            "//div[contains(@class, 's-enabled')]/div[contains(@class, 'c-chartType') and"
+            + " ./span[@title='${type}']]";
 
-    public ReportPage showConfiguration() {
-        waitForElementVisible(showConfigurationButton).click();
+    private static final By REPORT_FILTER_LOCATOR = id("filtersContainer");
+
+    private static final By VISIBILITY_CHECKBOX_LOCATOR = id("settings-visibility");
+
+    private static final By REPORT_SETTINGS_SAVE_BUTTON_LOCATOR = cssSelector(".s-btn-save:not(.gdc-hidden)");
+
+    private static final By ADD_TAGS_BUTTON_LOCATOR = className("s-btn-add_tags");
+
+    private static final By EMBED_BUTTON_LOCATOR = cssSelector(".s-btn-embed:not(.disabled)");
+
+    private static final By UNSAVED_WARNING_EMBED_LOCATOR = cssSelector(".unsavedWarning-share");
+
+    private static final By ADD_SIMPLE_METRIC_LOCATOR = xpath("//button[contains(@class,'s-sme-addButton')]");
+
+    private static final By ADD_TO_GLOBAL_METRICS_LOCATOR = xpath("//input[contains(@class,'s-sme-global')]");
+
+    public ReportPage initPage() {
+        waitForAnalysisPageLoaded(browser);
+        waitForFragmentVisible(this);
+
+        // Wait to avoid red bar randomly
+        // Red bar message: An error occurred while performing this operation.
+        sleepTightInSeconds(3);
         return this;
     }
 
-    private ReportPage hideConfiguration() {
-        waitForElementVisible(By.className("s-btn-hide__"), browser).click();
-        return this;
-    }
+    public ReportPage setReportName(String name) {
+        waitForElementVisible(reportName).click();
 
-    public String getCustomNumberFormat() {
-        waitForElementVisible(CUSTOM_NUMBER_FORMAT_LOCATOR, browser).click();
-        return waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).getText();
-    }
+        WebElement reportNameInput = waitForElementVisible(xpath("//input[@class='ipeEditor']"), browser);
+        reportNameInput.clear();
+        reportNameInput.sendKeys(name);
 
-    public ReportPage changeNumberFormat(Formatter format) {
-        waitForElementVisible(CUSTOM_NUMBER_FORMAT_LOCATOR, browser).click();
-        waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
-        Graphene.createPageFragment(MetricFormatterDialog.class,
-                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(format);
-        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
-        hideConfiguration();
-        return this;
-    }
-
-    public ReportPage changeNumberFormatButDiscard(Formatter format) {
-        waitForElementVisible(CUSTOM_NUMBER_FORMAT_LOCATOR, browser).click();
-        waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
-        Graphene.createPageFragment(MetricFormatterDialog.class,
-                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
-        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
-        hideConfiguration();
-        return this;
-    }
-
-    public TableReport getTableReport() {
-        return tableReport;
-    }
-    
-    public OneNumberReport getHeadlineReport() {
-        return waitForFragmentVisible(headlineReport);
-    }
-
-    public ReportVisualizer getVisualiser() {
-        return visualiser;
-    }
-
-    public ReportPage setReportName(String reportName) {
-        waitForElementVisible(this.reportName).click();
-        waitForElementVisible(reportNameInput).clear();
-        reportNameInput.sendKeys(reportName);
-        waitForElementVisible(reportNameSaveButton).click();
+        waitForElementVisible(xpath("//div[@class='c-ipeEditorControls']/button"), browser).click();
         waitForElementNotVisible(reportNameInput);
-        assertEquals(this.reportName.getText(), reportName, "Report name wasn't updated");
+        assertEquals(getReportName(), name, "Report name wasn't updated");
         return this;
     }
 
@@ -209,58 +142,180 @@ public class ReportPage extends AbstractFragment {
         return reportName.getAttribute("title");
     }
 
-    public void createReport(UiReportDefinition reportDefinition) {
-        configReportDefinition(reportDefinition);
-        createReport();
-    }
-    
-    public void configReportDefinition(UiReportDefinition reportDefinition) {
-        // Wait to avoid red bar randomly
-        // Red bar message: An error occurred while performing this operation.
-        sleepTightInSeconds(3);
-
-        setReportName(reportDefinition.getName());
-
-        if (reportDefinition.shouldAddWhatToReport())
-            visualiser.selectWhatArea(reportDefinition.getWhats());
-
-        if (reportDefinition.shouldAddHowToReport())
-            visualiser.selectHowArea(reportDefinition.getHows());
-
-        visualiser.finishReportChanges();
-
-        if (reportDefinition.shouldAddFilterToReport()) {
-            for (FilterItem filter : reportDefinition.getFilters()) {
-                addFilter(filter);
-            }
-        }
-
-        visualiser.selectReportVisualisation(reportDefinition.getType());
-        waitForAnalysisPageLoaded(browser);
+    public ReportPage openWhatPanel() {
+        waitForElementVisible(whatButton).click();
+        return this;
     }
 
-    public void createReport() {
-        waitForElementVisible(createReportButton).click();
+    public ReportPage openHowPanel() {
+        waitForElementVisible(howButton).click();
+        return this;
+    }
+
+    public ReportPage openFilterPanel() {
+        waitForElementVisible(filterButton).click();
+        return this;
+    }
+
+    public ReportPage selectFolderLocation(String folder) {
+        waitForCollectionIsNotEmpty(browser.findElements(METRIC_ATTRIBUTE_CONTAINER_LOCATOR))
+            .stream()
+
+            // date dimension has title like this: Date dimension (Activity)-Date dimension (Activity)
+            // so using startsWith() instead of equals() for general case
+            .filter(e -> e.getAttribute("title").startsWith(folder))
+
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find folder: " + folder))
+            .click();
+        return this;
+    }
+
+    public ReportPage selectMetric(String metric) {
+        WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
+                browser);
+        List<WebElement> metrics = browser.findElements(METRICS_LOCATOR);
+
+        filterInput.clear();
+        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        sleepTightInSeconds(1);
+        waitForCollectionIsEmpty(metrics);
+
+        filterInput.clear();
+        filterInput.sendKeys(metric);
+        sleepTightInSeconds(1);
+        waitForCollectionIsNotEmpty(metrics);
+
+        metrics.stream()
+            .filter(e -> metric.equals(e.getText()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find metric: " + metric))
+            .click();
+        return this;
+    }
+
+    public ReportPage selectAttribute(String attribute) {
+        searchAttribute(attribute);
+        findAttribute(attribute).click();
+        return this;
+    }
+
+    public ReportPage searchAttribute(String attribute) {
+        WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndAttributeFilterLabel']/../input"),
+                browser);
+        List<WebElement> attributes = browser.findElements(ATTRIBUTES_LOCATOR);
+
+        filterInput.clear();
+        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        sleepTightInSeconds(1);
+        waitForCollectionIsEmpty(attributes);
+
+        filterInput.clear();
+        filterInput.sendKeys(attribute);
+        sleepTightInSeconds(1);
+        waitForCollectionIsNotEmpty(attributes);
+
+        return this;
+    }
+
+    public ReportPage doneSndPanel() {
+        // When webapp do a lot of CRUD things, its rendering job will work slowly,
+        // so need a short time to wait in case like this
+        sleepTightInSeconds(2);
+
+        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser)
+            .sendKeys(Keys.ENTER);
+        return this;
+    }
+
+    public ReportPage selectReportVisualisation(ReportTypes type) {
+        By icon = xpath(XPATH_REPORT_VISUALIZATION_TYPE.replace("${type}", type.getName()));
+        waitForElementVisible(icon, browser);
+        waitForElementVisible(id("reportVisualizationContainer"), browser).findElement(icon).click();
+        waitForElementVisible(id(type.getContainerTabId()), browser);
+        return this;
+    }
+
+    public ReportPage confirmCreateReportInDialog() {
+        WebElement confirmDialogCreateButton = waitForElementVisible(xpath(
+                "//div[contains(@class, 's-saveReportDialog')]//footer[@class='buttons']"
+                + "//button[contains(@class, 's-btn-create')]"), browser);
         waitForElementVisible(confirmDialogCreateButton).click();
         waitForElementNotVisible(confirmDialogCreateButton);
 
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return "Saved".equals(createReportButton.getText().trim());
-            }
-        });
-        // When Create button change its name to Saving, and then Saved, the create report process is not finished.
-        // Report have to refresh some parts, e.g. the What button have to enable, then disable, then enable.
-        // If we navigate to another url when create report is not finished, unsaved change dialog will appear.
-        // Use sleep here to make sure that process is finished
-        sleepTightInSeconds(1);
+        return this;
     }
 
-    public void createSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact, String metricName, boolean addToGlobal){
-        waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(this.getRoot());
-        visualiser.addSimpleMetric(metricOperation, metricOnFact, metricName, addToGlobal);
+    public ReportPage showConfiguration() {
+        waitForElementVisible(SHOW_CONFIGURATION_LOCATOR, browser).click();
+        return this;
+    }
+
+    public ReportPage hideConfiguration() {
+        waitForElementVisible(HIDE_CONFIGURATION_LOCATOR, browser).click();
+        return this;
+    }
+
+    public ReportPage showCustomNumberFormat() {
+        waitForElementVisible(CUSTOM_NUMBER_FORMAT_LOCATOR, browser).click();
+        return this;
+    }
+
+    public String getCustomNumberFormat() {
+        return waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).getText();
+    }
+
+    public ReportPage changeNumberFormat(Formatter format) {
+        waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
+        Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(format);
+        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
+        return this;
+    }
+
+    public ReportPage changeNumberFormatButDiscard(Formatter format) {
+        waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
+        Graphene.createPageFragment(MetricFormatterDialog.class,
+                waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
+        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
+        return this;
+    }
+
+    public TableReport getTableReport() {
+        return Graphene.createPageFragment(TableReport.class,
+                waitForElementVisible(id("gridContainerTab"), browser));
+    }
+
+    public OneNumberReport getHeadlineReport() {
+        return Graphene.createPageFragment(OneNumberReport.class,
+                waitForElementVisible(cssSelector(".c-oneNumberReport"), browser));
+    }
+
+    public ReportPage createSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact){
+        initSimpleMetric(metricOperation, metricOnFact);
+        waitForElementVisible(ADD_SIMPLE_METRIC_LOCATOR, browser).click();
+        return this;
+    }
+
+    public ReportPage createGlobalSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact) {
+        initSimpleMetric(metricOperation, metricOnFact);
+        waitForElementVisible(ADD_TO_GLOBAL_METRICS_LOCATOR, browser).click();
+        waitForElementVisible(ADD_SIMPLE_METRIC_LOCATOR, browser).click();
+        return this;
+    }
+
+    public ReportPage createGlobalSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact,
+            String folder) {
+        initSimpleMetric(metricOperation, metricOnFact);
+        waitForElementVisible(ADD_TO_GLOBAL_METRICS_LOCATOR, browser).click();
+        new Select(waitForElementVisible(xpath("//select[contains(@class,'s-sme-folder')]"), browser))
+            .selectByVisibleText("Create New Folder");
+        waitForElementVisible(xpath("//input[contains(@class,'newFolder')]"), browser).sendKeys(folder);
+
+        waitForElementVisible(ADD_SIMPLE_METRIC_LOCATOR, browser).click();
+        By snDFolder = By.xpath("//div[@title='${SnDFolderName}']".replace("${SnDFolderName}", folder));
+        waitForElementVisible(snDFolder, browser);
+        return this;
     }
 
     public String exportReport(ExportFormat format) {
@@ -270,50 +325,52 @@ public class ReportPage extends AbstractFragment {
 
         String reportName = getReportName();
         waitForElementVisible(exportButton).click();
-        WebElement currentExportLink = null;
+
+        String exportXpath = "//div[contains(@class, 'yui3-m-export')]//li[contains(@class, 's-%s')]//a";
         switch (format) {
             case PDF:
-                currentExportLink = exportToPDF;
+                exportXpath = format(exportXpath, "pdf");
                 break;
             case PDF_PORTRAIT:
-                currentExportLink = exportToPDFPortrait;
+                exportXpath = format(exportXpath, "pdf__portrait_");
                 break;
             case PDF_LANDSCAPE:
-                currentExportLink = exportToPDFLandscape;
+                exportXpath = format(exportXpath, "pdf__landscape_");
                 break;
             case IMAGE_PNG:
-                currentExportLink = exportToPNG;
+                exportXpath = format(exportXpath, "image__png_");
                 break;
             case EXCEL_XLS:
-                currentExportLink = exportToXLS;
+                exportXpath = format(exportXpath, "excel_xls");
                 break;
             case EXCEL_XLSX:
-                currentExportLink = exportToXLSX;
+                exportXpath = format(exportXpath, "excel_xlsx");
                 break;
             case CSV:
-                currentExportLink = exportToCSV;
+                exportXpath = format(exportXpath, "csv");
                 break;
             case RAW_CSV:
-                currentExportLink = exportToRawCSV;
+                exportXpath = format(exportXpath, "raw_data__csv_");
                 break;
             default:
                 break;
         }
-        waitForElementVisible(currentExportLink).click();
+        waitForElementVisible(xpath(exportXpath), browser).click();
+
         sleepTightInSeconds(5);
         // waitForElementVisible(BY_EXPORTING_STATUS); //this waiting is causing
         // some unexpected issues in tests when the export (xls/csv) is too fast
         waitForElementVisible(exportButton);
+
         sleepTightInSeconds(3);
-        System.out.println("Report " + reportName + " exported to "
-                + format.getName());
+        System.out.println("Report " + reportName + " exported to " + format.getName());
         return reportName;
     }
 
     public ReportPage addFilter(FilterItem filterItem) {
-        waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(filterButton).click();
-        waitForElementVisible(reportFilter.getRoot());
+        openFilterPanel();
+        ReportFilter reportFilter = Graphene.createPageFragment(ReportFilter.class,
+                waitForElementVisible(REPORT_FILTER_LOCATOR, browser));
         String textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountBefore = getNumber(textOnFilterButton);
 
@@ -341,84 +398,85 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage saveReport() {
-        waitForAnalysisPageLoaded(browser);
+        return clickSaveReport().waitForReportSaved();
+    }
+
+    public ReportPage finishCreateReport() {
+        return clickSaveReport().confirmCreateReportInDialog().waitForReportSaved();
+    }
+
+    public ReportPage clickSaveReport() {
         waitForElementVisible(createReportButton).click();
-        if (browser.findElements(By.xpath(confirmSaveDialogLocator)).size() > 0) {
-            waitForElementVisible(confirmSaveButton).click();
-        }
-        sleepTightInSeconds(3);
-        assertEquals(createReportButton.getText(), "Saved", "Report wasn't saved");
         return this;
     }
 
-    public void cancelSaveUsedReport() {
-        waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(createReportButton).click();
+    public ReportPage confirmSaveReport() {
+        waitForElementVisible(xpath("//span[2]/button[3]"), browser).click();
+        return this;
+    }
+
+    public ReportPage cancelSaveReport() {
         waitForElementVisible(cssSelector(".yui3-c-button-focused.s-btn-cancel"), browser).click();
+        return this;
+    }
+
+    public ReportPage waitForReportSaved() {
+        Predicate<WebDriver> createReportPredicate = input -> "Saved".equals(createReportButton.getText());
+        Graphene.waitGui().until(createReportPredicate);
+
+        // When Create button change its name to Saving, and then Saved, the create report process is not finished.
+        // Report have to refresh some parts, e.g. the What button have to enable, then disable, then enable.
+        // If we navigate to another url when create report is not finished, unsaved change dialog will appear.
+        // Use sleep here to make sure that process is finished
+        sleepTightInSeconds(1);
+        return this;
     }
 
     public ReportPage saveAsReport() {
-        waitForAnalysisPageLoaded(browser);
         openOptionsMenu().select("Save as...");
         waitForElementVisible(className("s-btn-save_as"), browser).click();
         return this;
-    }
-
-    public static float getNumber(String text) {
-        String tmp = "";
-        float number = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) > 44 && text.charAt(i) < 58 && text.charAt(i) != 47) {
-                tmp += text.charAt(i);
-            }
-        }
-        if (tmp.length() > 0) {
-            number = Float.parseFloat(tmp);
-        }
-        return number;
     }
 
     public List<String> getFilters() {
         String textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCount = getNumber(textOnFilterButton);
         if (filterCount == 0)
-            return Collections.emptyList();
+            return emptyList();
 
         // Need to sleep here. If we go too fast, action click is still successful
         // but nothing happen
         sleepTightInSeconds(3);
         filterButton.click();
-        waitForElementVisible(reportFilter.getRoot());
-        return Lists.newArrayList(Collections2.transform(reportFilter.getRoot()
-                .findElements(By.cssSelector(".filterLinesContainer li span.text")),
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement element) {
-                return element.getText().trim();
-            }
-        }));
+
+        return waitForElementVisible(REPORT_FILTER_LOCATOR, browser)
+            .findElements(cssSelector(".filterLinesContainer li span.text"))
+            .stream()
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
-    public void setReportVisible() {
+    public ReportPage setReportVisible() {
         setReportVisibleSettings(true);
+        return this;
     }
 
-    public void setReportInvisible() {
+    public ReportPage setReportInvisible() {
         setReportVisibleSettings(false);
+        return this;
     }
 
     public ReportPage addTag(String tag) {
-        waitForAnalysisPageLoaded(browser);
         openOptionsMenu().select("Settings");
 
         WebElement addTagButton = waitForElementVisible(ADD_TAGS_BUTTON_LOCATOR, browser);
         addTagButton.click();
         waitForElementNotVisible(addTagButton);
 
-        WebElement input = waitForElementVisible(TAG_INPUT_LOCATOR, browser);
+        WebElement input = waitForElementVisible(cssSelector(".c-ipeEditorIn input"), browser);
         input.clear();
         input.sendKeys(tag);
-        waitForElementVisible(OK_BUTTON_LOCATOR, browser).click();
+        waitForElementVisible(cssSelector(".c-ipeEditorControls .s-btn-add"), browser).click();
         waitForElementVisible(addTagButton);
 
         waitForElementVisible(REPORT_SETTINGS_SAVE_BUTTON_LOCATOR, browser).click();
@@ -426,40 +484,32 @@ public class ReportPage extends AbstractFragment {
     }
 
     public void deleteCurrentReport() {
-        waitForAnalysisPageLoaded(browser);
         openOptionsMenu().select("Delete");
-        waitForElementVisible(By.cssSelector(".c-confirmDeleteDialog .s-btn-delete"), browser).click();
+        waitForElementVisible(cssSelector(".c-confirmDeleteDialog .s-btn-delete"), browser).click();
     }
-    
+
     public ReportEmbedDialog openReportEmbedDialog() {
+        WebElement embedButton = browser.findElement(EMBED_BUTTON_LOCATOR);
         new Actions(browser).moveToElement(embedButton).perform();
         waitForElementVisible(embedButton).click();
         return Graphene.createPageFragment(ReportEmbedDialog.class,
-                waitForElementVisible(EMBED_DIALOG_LOCATOR, browser));
+                waitForElementVisible(cssSelector(".c-embedDialog"), browser));
     }
-    
-    public WebElement embedUnsavedReport() {
-        waitForElementVisible(embedButton).click();
-        return waitForElementVisible(unsavedWarningEmbed);
-    }
-    
-    public void createReportFromUnsavedWarningEmbed() {
-        waitForElementVisible(SAVE_REPORT_TO_EMBED_LOCATOR, unsavedWarningEmbed).click();
-        waitForElementVisible(confirmDialogCreateButton).click();
-        waitForElementNotVisible(confirmDialogCreateButton);
 
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return "Saved".equals(createReportButton.getText().trim());
-            }
-        });
-        
-        sleepTightInSeconds(3);
+    public WebElement embedUnsavedReport() {
+        waitForElementVisible(EMBED_BUTTON_LOCATOR, browser).click();
+        return waitForElementVisible(UNSAVED_WARNING_EMBED_LOCATOR, browser);
     }
-    
+
+    public void createReportFromUnsavedWarningEmbed() {
+        WebElement unsavedWarningEmbed = waitForElementVisible(UNSAVED_WARNING_EMBED_LOCATOR, browser);
+        waitForElementVisible(cssSelector(".unsavedWarning-share .save"), unsavedWarningEmbed).click();
+        confirmCreateReportInDialog().waitForReportSaved();
+    }
+
     public void closeEmbedUnsavedWarning() {
-        waitForElementVisible(CLOSE_UNSAVED_WARNING_LOCATOR, unsavedWarningEmbed).click();
+        WebElement unsavedWarningEmbed = waitForElementVisible(UNSAVED_WARNING_EMBED_LOCATOR, browser);
+        waitForElementVisible(cssSelector(".unsavedWarning-share .close"), unsavedWarningEmbed).click();
     }
 
     public int getVersionsCount() {
@@ -473,7 +523,6 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage openVersion(int version) {
-        waitForAnalysisPageLoaded(browser);
         openOptionsMenu().openSubMenu("Versions");
         getVersionsMenu().select(e -> e.findElement(BY_LINK).getText().trim().startsWith("Version #" + version));
         return this;
@@ -511,15 +560,134 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    private void setReportVisibleSettings(boolean isVisible) {
-        waitForAnalysisPageLoaded(browser);
-        openOptionsMenu().select("Settings");
-        WebElement visibleCheckbox = waitForElementVisible(VISIBILITY_CHECKBOX_LOCATOR, browser);
-        if (isVisible != visibleCheckbox.isSelected()) {
-            visibleCheckbox.click();
+    public ReportPage addDrillStep(String attribute) {
+        if (isNull(attribute)) {
+            return this;
         }
-        waitForElementVisible(REPORT_SETTINGS_SAVE_BUTTON_LOCATOR, browser).click();
-        waitForElementNotVisible(visibleCheckbox);
+
+        waitForElementVisible(cssSelector(".c-metricDetailDrillStep button"), browser).click();
+        WebElement popupElement = waitForElementVisible(SelectItemPopupPanel.LOCATOR, browser);
+        SelectItemPopupPanel popupPanel = Graphene.createPageFragment(SelectItemPopupPanel.class, popupElement);
+        popupPanel.searchAndSelectItem(attribute);
+        return this;
+    }
+
+    public void createReport(UiReportDefinition reportDefinition) {
+        initPage()
+        .setReportName(reportDefinition.getName())
+        .openWhatPanel()
+        .selectMetrics(reportDefinition.getWhats())
+        .openHowPanel()
+        .selectAttributes(reportDefinition.getHows())
+        .doneSndPanel()
+        .addFilters(reportDefinition.getFilters())
+        .selectReportVisualisation(reportDefinition.getType())
+        .finishCreateReport();
+    }
+
+    public boolean isGreyedOutAttribute(String attribute) {
+        return findAttribute(attribute).findElement(BY_PARENT)
+                .getAttribute("class").contains("sndUnReachable");
+    }
+
+    public String getDataReportHelpMessage() {
+        return waitForElementVisible(id("emptyDataReportHelp"), browser)
+                .findElement(By.className("alert")).getText();
+    }
+
+    public boolean verifyOldVersionState() {
+        return browser.findElement(BY_BLUE_BAR).getText().startsWith("You are currently viewing an older version")
+                && waitForElementVisible(whatButton).getAttribute("class").contains("disabled")
+                && waitForElementVisible(howButton).getAttribute("class").contains("disabled")
+                && waitForElementVisible(filterButton).getAttribute("class").contains("disabled");
+    }
+
+    public static float getNumber(String text) {
+        String tmp = "";
+        float number = 0;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) > 44 && text.charAt(i) < 58 && text.charAt(i) != 47) {
+                tmp += text.charAt(i);
+            }
+        }
+        if (tmp.length() > 0) {
+            number = Float.parseFloat(tmp);
+        }
+        return number;
+    }
+
+    private ReportPage addFilters(Collection<FilterItem> filters) {
+        filters.stream().forEach(this::addFilter);
+        return this;
+    }
+
+    private ReportPage selectMetrics(Collection<WhatItem> metrics) {
+        if (metrics.isEmpty()) {
+            return this;
+        }
+
+        metrics.stream().forEach(what -> {
+            selectMetric(what.getMetric()).addDrillStep(what.getDrillStep());
+        });
+        return this;
+    }
+
+    private ReportPage selectAttributes(Collection<HowItem> attributes) {
+        if (attributes.isEmpty()) {
+            return this;
+        }
+
+        attributes.stream().forEach(how -> {
+            selectAttribute(how.getAttribute().getName())
+            .selectAttributePosition(how)
+            .filterAttribute(how.getFilterValues());
+        });
+        return this;
+    }
+
+    private ReportPage selectAttributePosition(HowItem attribute) {
+        sleepTight(500);
+        WebElement attributeElement = findAttribute(attribute.getAttribute().getName());
+        sleepTightInSeconds(2);
+
+        WebElement attributePositionElement = waitForElementVisible(
+                attributeElement.findElement(cssSelector("div")));
+        String attributeClass =  attributePositionElement.getAttribute("class");
+
+        if (!attributeClass.contains(attribute.getPosition().getCssClass())) {
+            attributePositionElement.click();
+        }
+        return this;
+    }
+
+    private WebElement findAttribute(String attribute) {
+        return browser.findElements(ATTRIBUTES_LOCATOR).stream()
+                .filter(e -> attribute.equals(e.getText()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + attribute));
+    }
+
+    private ReportPage filterAttribute(Collection<String> values) {
+        if (values.isEmpty()) {
+            return this;
+        }
+
+        waitForElementVisible(cssSelector(".s-btn-filter_this_attribute"), browser).click();
+        SelectItemPopupPanel panel = Graphene.createPageFragment(SelectItemPopupPanel.class,
+                waitForElementVisible(cssSelector(".c-attributeElementsFilterEditor"), browser));
+        values.stream().forEach(panel::searchAndSelectEmbedItem);
+        return this;
+    }
+
+    private void initSimpleMetric(SimpleMetricTypes metricOperation, String metricOnFact) {
+        waitForElementVisible(xpath("//button[contains(@class,'sndCreateMetric')]"), browser).click();
+        new Select(waitForElementVisible(xpath("//select[contains(@class,'s-sme-fnSelect')]"), browser))
+            .selectByVisibleText(metricOperation.name());
+
+        Select operation = new Select(
+                waitForElementVisible(xpath("//select[contains(@class,'s-sme-objSelect')]"), browser));
+        waitForCollectionIsNotEmpty(operation.getOptions());
+        operation.selectByVisibleText(metricOnFact);
     }
 
     private SimpleMenu openOptionsMenu() {
@@ -527,6 +695,16 @@ public class ReportPage extends AbstractFragment {
         SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,
                 waitForElementVisible(SimpleMenu.LOCATOR, browser));
         return menu;
+    }
+
+    private void setReportVisibleSettings(boolean isVisible) {
+        openOptionsMenu().select("Settings");
+        WebElement visibleCheckbox = waitForElementVisible(VISIBILITY_CHECKBOX_LOCATOR, browser);
+        if (isVisible != visibleCheckbox.isSelected()) {
+            visibleCheckbox.click();
+        }
+        waitForElementVisible(REPORT_SETTINGS_SAVE_BUTTON_LOCATOR, browser).click();
+        waitForElementNotVisible(visibleCheckbox);
     }
 
     private SimpleMenu getVersionsMenu() {
