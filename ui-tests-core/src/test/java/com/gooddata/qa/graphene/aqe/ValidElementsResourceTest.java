@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -226,26 +225,6 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                 this.getClass());
         reportPage.saveReport();
         checkRedBar(browser);
-    }
-
-    // This test is to cover the bug "VIZ-502 - Server side image rendering is broken"
-    @Test(dependsOnMethods = {"initialize"})
-    public void checkServerSideImageRedering() {
-        openDashboardTab(4); // "Activities" tab
-        browser.get(browser.getCurrentUrl() + "&renderImgForce=true");
-        waitForDashboardPageLoaded(browser);
-        browser.navigate().refresh();
-        dashboardsPage.getContent().getFilterWidget(simplifyText("Comparison Quarter(s)"))
-            .changeTimeFilterByEnterFromAndToDate("01/01/2011", "06/30/2011");
-        dashboardsPage.getContent().getFilterWidget(simplifyText("Activity Date"))
-            .changeTimeFilterByEnterFromAndToDate("01/01/2011", "06/30/2011");
-
-        List<String> reportsToCheck = asList("Activities by Type", "Activity Level", "Activity by Sales Rep");
-        for(String report : reportsToCheck) {
-            WebElement reportImg = dashboardsPage.getContent().getImageFromReport(report);
-            assertTrue(RestUtils.isValidImage(getRestApiClient(), reportImg), 
-                    "Image reports are not loaded properly");
-        }
     }
 
     private FilterWidget getFilterWidget(String filterName) {
