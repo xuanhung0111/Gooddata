@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.By.cssSelector;
@@ -21,9 +20,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.report.WhatItem;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.google.common.base.Predicate;
@@ -71,10 +68,10 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     public void workWithOldVersion() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage).getVisualiser()
-            .selectHowArea(asList(new HowItem(ACTIVITY_TYPE)))
-            .finishReportChanges();
+        reportPage.initPage()
+            .openHowPanel()
+            .selectAttribute(ACTIVITY_TYPE)
+            .doneSndPanel();
         int versionsCount = waitForReportLoading().saveReport().getVersionsCount();
         takeScreenshot(browser, "workWithOldVersion - get versions", getClass());
         assertThat(versionsCount, equalTo(2));
@@ -82,7 +79,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportPage.openVersion(1);
         checkBlueBar(browser);
         waitForAnalysisPageLoaded(browser);
-        assertTrue(reportPage.getVisualiser().verifyOldVersionState());
+        assertTrue(reportPage.verifyOldVersionState());
         reportPage.setReportName(VERSION_REPORT_2);
         sleepTightInSeconds(3);
         reportPage.revertToCurrentVersion();
@@ -107,12 +104,10 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         int currentReportsCount = reportsPage.getReportsList().getNumberOfReports();
 
         reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage);
-        sleepTightInSeconds(3);
-        reportPage.getVisualiser()
-            .selectWhatArea(asList(new WhatItem(NUMBER_OF_ACTIVITIES)))
-            .finishReportChanges();
+        reportPage.initPage()
+            .openWhatPanel()
+            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .doneSndPanel();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -131,12 +126,10 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForReportsPageLoaded(browser);
 
         reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage);
-        sleepTightInSeconds(3);
-        reportPage.getVisualiser()
-            .selectWhatArea(asList(new WhatItem(NUMBER_OF_ACTIVITIES)))
-            .finishReportChanges();
+        reportPage.initPage()
+            .openWhatPanel()
+            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .doneSndPanel();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -150,9 +143,9 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
         waitForAnalysisPageLoaded(browser);
         int versionCount = waitForFragmentVisible(reportPage).getVersionsCount();
-        reportPage.getVisualiser()
-            .selectHowArea(asList(new HowItem(ACCOUNT)))
-            .finishReportChanges();
+        reportPage.openHowPanel()
+            .selectAttribute(ACCOUNT)
+            .doneSndPanel();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -171,14 +164,12 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         int currentReportsCount = reportsPage.getReportsList().getNumberOfReports();
 
         reportsPage.startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage);
-        sleepTightInSeconds(3);
         String reportName = "Leave & Save";
-        reportPage.setReportName(reportName);
-        reportPage.getVisualiser()
-            .selectWhatArea(asList(new WhatItem(NUMBER_OF_ACTIVITIES)))
-            .finishReportChanges();
+        reportPage.initPage()
+            .setReportName(reportName)
+            .openWhatPanel()
+            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .doneSndPanel();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -198,9 +189,9 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);
         waitForAnalysisPageLoaded(browser);
         int versionCount = waitForFragmentVisible(reportPage).getVersionsCount();
-        reportPage.getVisualiser()
-            .selectHowArea(asList(new HowItem(ACCOUNT)))
-            .finishReportChanges();
+        reportPage.openHowPanel()
+            .selectAttribute(ACCOUNT)
+            .doneSndPanel();
         waitForReportLoading();
 
         moveToAnotherPage();
@@ -216,19 +207,18 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     public void cancelComputingInNewReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).startCreateReport();
-        waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage);
-        sleepTightInSeconds(3);
-        reportPage.setReportName("R1");
-        reportPage.getVisualiser()
-            .selectWhatArea(asList(new WhatItem(NUMBER_OF_ACTIVITIES)))
-            .finishReportChanges();
+        reportPage.initPage()
+            .setReportName("R1")
+            .openWhatPanel()
+            .selectMetric(NUMBER_OF_ACTIVITIES)
+            .doneSndPanel();
 
         if (tryCancelReportComputing()) {
             assertThat(reportPage.getExecuteProgressStatus(), equalTo("Report computation canceled."));
 
             reportPage.recompute();
-            waitForReportLoading().createReport();
+            waitForReportLoading()
+                .finishCreateReport();
         }
     }
 
@@ -273,11 +263,11 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);
         waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage).getVisualiser()
-            .selectHowArea(asList(new HowItem(IS_WON)))
-            .finishReportChanges();
+        waitForFragmentVisible(reportPage).openHowPanel()
+            .selectAttribute(IS_WON)
+            .doneSndPanel();
         waitForReportLoading();
-        reportPage.saveReport();
+        reportPage.clickSaveReport().confirmSaveReport().waitForReportSaved();
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -285,9 +275,9 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(QTD_GOAL);
         waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage).getVisualiser()
-            .selectHowArea(asList(new HowItem(IS_WON)))
-            .finishReportChanges();
+        waitForFragmentVisible(reportPage).openHowPanel()
+            .selectAttribute(IS_WON)
+            .doneSndPanel();
         waitForReportLoading();
         reportPage.saveAsReport();
         sleepTightInSeconds(3);
@@ -303,11 +293,11 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder("All");
         reportsPage.getReportsList().openReport(TOTAL_WON);
         waitForAnalysisPageLoaded(browser);
-        waitForFragmentVisible(reportPage).getVisualiser()
-            .selectHowArea(asList(new HowItem(IS_WON)))
-            .finishReportChanges();
+        waitForFragmentVisible(reportPage).openHowPanel()
+            .selectAttribute(IS_WON)
+            .doneSndPanel();
         waitForReportLoading();
-        reportPage.cancelSaveUsedReport();
+        reportPage.clickSaveReport().cancelSaveReport();
     }
 
     private void moveToAnotherPage() {

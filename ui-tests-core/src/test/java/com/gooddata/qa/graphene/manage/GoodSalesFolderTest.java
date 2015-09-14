@@ -11,6 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
@@ -207,7 +208,9 @@ public class GoodSalesFolderTest extends GoodSalesAbstractTest {
         initReportsPage();
         reportsPage.startCreateReport();
         waitForAnalysisPageLoaded(browser);
-        reportPage.getVisualiser().createSnDFolder("Amount", folderName);
+        reportPage.initPage()
+            .openWhatPanel()
+            .createGlobalSimpleMetric(SimpleMetricTypes.SUM, "Amount", folderName);
         initDataPage("metrics");
         dataPage.getObjectFolder().checkFolderVisible(folderName);
     }
