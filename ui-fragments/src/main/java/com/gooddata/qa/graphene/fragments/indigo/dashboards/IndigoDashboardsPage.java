@@ -3,14 +3,17 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.collect.Iterables;
+
 import org.jboss.arquillian.graphene.findby.ByJQuery;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+
 import org.openqa.selenium.TimeoutException;
 
 public class IndigoDashboardsPage extends AbstractFragment {
@@ -138,6 +141,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public Kpi getKpiByIndex(int index) {
         return kpis.get(index);
+    }
+
+    public Kpi getKpiByHeadline(final String headline) {
+        return kpis.stream()
+            .filter(kpi -> headline.equals(kpi.getHeadline()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find Kpi with headline: " + headline));
     }
 
     public IndigoDashboardsPage waitForDashboardLoad() {

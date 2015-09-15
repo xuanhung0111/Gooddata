@@ -24,7 +24,7 @@ public abstract class ReactDropdownParent extends AbstractFragment {
 
     public boolean isDropdownOpen() {
         waitForElementVisible(dropdownButtonLoaded);
-        return isElementPresent(By.cssSelector("button.is-dropdown-open"), this.getRoot());
+        return isElementPresent(By.cssSelector("button.is-loaded.is-active"), this.getRoot());
     }
 
     public void ensureDropdownOpen() {

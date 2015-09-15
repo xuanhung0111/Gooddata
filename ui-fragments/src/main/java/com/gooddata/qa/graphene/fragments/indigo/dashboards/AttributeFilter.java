@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
+import java.util.stream.Stream;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -23,36 +24,15 @@ public class AttributeFilter extends ReactDropdownParent {
         return ".overlay .attributevalues-list";
     }
 
-    @Override
-    public boolean isDropdownOpen() {
-        waitForElementVisible(getDropdownButton());
-        return isElementPresent(By.cssSelector("button.is-loaded.is-dropdown-open"), this.getRoot());
-    }
-
-    public AttributeFilter selectByName(String name, boolean cleanSelection) {
-        ensureDropdownOpen();
-
-        if (cleanSelection) {
-            clearAllCheckedValues();
-        }
-
-        String nameSimplified = simplifyText(name);
-        // in case there is a search field, use it
-        if (this.hasSearchField()) {
-            this.searchForText(name);
-        }
-
-        By selectedItem = cssSelector(getDropdownCssSelector() + " .s-" + nameSimplified);
-        waitForElementVisible(selectedItem, browser).click();
-
-        By applyButton = cssSelector("button.s-apply_button");
-        waitForElementVisible(applyButton, browser).click();
-
+    public AttributeFilter selectByNames(String... names) {
+        Stream.of(names).forEach(this::selectByName);
         return this;
     }
 
-    public void clearAllCheckedValues() {
+    public AttributeFilter clearAllCheckedValues() {
+        ensureDropdownOpen();
         waitForElementVisible(cssSelector("button.s-clear"), browser).click();
+        return this;
     }
 
     public String getTitle() {
@@ -71,5 +51,23 @@ public class AttributeFilter extends ReactDropdownParent {
 
     public String getSelectedItemsCount() {
         return waitForElementVisible(buttonText.findElement(className("button-selected-items-count"))).getText();
+    }
+
+    private AttributeFilter selectByName(String name) {
+        ensureDropdownOpen();
+
+        String nameSimplified = simplifyText(name);
+        // in case there is a search field, use it
+        if (this.hasSearchField()) {
+            this.searchForText(name);
+        }
+
+        By selectedItem = cssSelector(getDropdownCssSelector() + " .s-" + nameSimplified);
+        waitForElementVisible(selectedItem, browser).click();
+
+        By applyButton = cssSelector("button.s-apply_button");
+        waitForElementVisible(applyButton, browser).click();
+
+        return this;
     }
 }

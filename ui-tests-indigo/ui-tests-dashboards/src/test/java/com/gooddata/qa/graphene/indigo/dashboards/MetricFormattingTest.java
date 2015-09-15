@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -25,14 +23,6 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
     private static final String PERCENT_OF_GOAL = "% of Goal";
     private static final String PERCENT_OF_GOAL_URI = "/gdc/md/%s/obj/8136";
     private static final String NUMBER_OF_ACTIVITIES_URI = "/gdc/md/%s/obj/14636";
-
-    private MetadataService getMdService() {
-        return getGoodDataClient().getMetadataService();
-    }
-
-    private Project getProject() {
-        return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
-    }
 
     @DataProvider(name = "formattingProvider")
     public Object[][] formattingProvider() {
