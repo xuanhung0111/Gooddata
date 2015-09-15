@@ -32,4 +32,14 @@ public class BrowserStackDriver extends RemoteWebDriver {
         super(url, capabilities);
         System.out.println("Using following browser capabilities: " + capabilities);
     }
+
+    @Override
+    public String getCurrentUrl() {
+        try {
+            return super.getCurrentUrl();
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return "";
+        }
+    }
 }
