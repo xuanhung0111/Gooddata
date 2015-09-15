@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static java.lang.String.format;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.collections.Sets;
 
@@ -85,6 +88,17 @@ public class TableReport extends AbstractReport {
                 return input.getText().trim();
             }
         }));
+    }
+
+    public void showOnly(String attributeValue) {
+        waitForReportLoading();
+        WebElement cell = attributeElementInGrid.stream()
+            .filter(e -> attributeValue.equals(e.getText().trim()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find attribute value: " + attributeValue));
+        new Actions(browser).contextClick(cell).perform();
+        waitForElementVisible(className(format("s-show_only__%s_", attributeValue)), browser).click();
+        waitForReportLoading();
     }
 
     public List<List<String>> getAttributeElementsByRow() {
