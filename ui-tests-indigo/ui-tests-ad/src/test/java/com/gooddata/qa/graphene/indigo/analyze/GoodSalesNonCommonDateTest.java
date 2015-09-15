@@ -92,7 +92,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         checkingOpenAsReport("applyOnBothFilterAndBucket");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, enabled = false, description = "https://jira.intgdc.com/browse/CL-7670")
     public void greyOutMetricAttribute() {
         initAnalysePage();
 
@@ -215,7 +215,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         assertEquals(analysisPage.getFactDescription(ACTIVITY_DATE), expected.toString());
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, enabled = false, description = "https://jira.intgdc.com/browse/CL-7670")
     public void testUnusableFactGreyOut() {
         initAnalysePage();
         analysisPage.addCategory(OPP_SNAPSHOT);

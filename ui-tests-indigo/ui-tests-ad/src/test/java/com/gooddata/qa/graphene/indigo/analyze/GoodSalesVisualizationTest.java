@@ -229,10 +229,13 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         assertEquals(analysisPage.getExplorerMessage(), "Too many data points to display");
         analysisPage.resetToBlankState();
 
+        // TODO: disable because of https://jira.intgdc.com/browse/CL-7670
+        /*
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(STAGE_NAME).waitForReportComputing();
         assertTrue(analysisPage.isExplorerMessageVisible());
         assertEquals(analysisPage.getExplorerMessage(), "Visualization cannot be displayed");
         analysisPage.resetToBlankState();
+        */
     }
 
     @Test(dependsOnGroups = {"init"})

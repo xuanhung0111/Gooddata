@@ -106,7 +106,7 @@ public class GoodSalesCustomDiscoveryAdTest extends AnalyticalDesignerAbstractTe
         checkingOpenAsReport("dragMetricToTrendShortcutPanel");
     }
 
-    @Test(dependsOnGroups = {"init"})
+    @Test(dependsOnGroups = {"init"}, enabled = false, description = "https://jira.intgdc.com/browse/CL-7670")
     public void testAccessibilityGuidanceForAttributesMetrics() {
         initAnalysePage();
 
