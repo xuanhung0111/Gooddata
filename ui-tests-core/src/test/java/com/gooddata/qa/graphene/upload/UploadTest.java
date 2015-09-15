@@ -4,6 +4,9 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoad
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -15,6 +18,7 @@ import java.util.Map;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -513,6 +517,35 @@ public class UploadTest extends AbstractUploadTest {
         } finally {
             List<String> datasets = Arrays.asList("delimiter-invalid");
             this.cleanDashboardAndDatasets(datasets);
+        }
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void testReportContainsAttributeValue0() {
+        try {
+            selectFileToUpload("data_0_1");
+            Screenshots.takeScreenshot(browser, "check-report-contains-attr-value-0", this.getClass());
+            upload.confirmloadCsv();
+            waitForElementVisible(BY_UPLOAD_DASHBOARD, browser);
+
+            initReportCreation();
+            TableReport report = reportPage.initPage()
+                .openWhatPanel()
+                .selectMetric("Sum of fact1")
+                .openHowPanel()
+                .selectAttribute("att1")
+                .doneSndPanel()
+                .getTableReport();
+
+            report.showOnly("0");
+            assertThat(report.getRawMetricElements().size(), equalTo(1));
+            assertThat(reportPage.getFilters(), equalTo(asList("att1 is 0")));
+        } finally {
+            openUrl(""); // dont save current report
+            waitForDashboardPageLoaded(browser);
+            dashboardsPage.deleteDashboard();
+            deleteDataset("data_0_1");
+            makeSureDatasetEmpty();
         }
     }
 }

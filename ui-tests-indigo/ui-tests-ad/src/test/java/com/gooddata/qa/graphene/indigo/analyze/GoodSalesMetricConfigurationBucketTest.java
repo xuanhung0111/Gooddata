@@ -88,6 +88,7 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
 
         analysisPage.turnOnShowInPercents()
             .compareToSamePeriodOfYearBefore()
+            .changeDimensionSwitchInBucket("Created")
             .waitForReportComputing()
             .addMetricFromFact(AMOUNT);
 

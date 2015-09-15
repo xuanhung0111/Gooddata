@@ -685,8 +685,18 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric;
         while (true) {
             metric = getRandomMetric();
-            action.accept(metric);
-            analysisPage.waitForReportComputing();
+
+            if (analysisPage.searchBucketItem(metric)) {
+                action.accept(metric);
+                analysisPage.waitForReportComputing();
+            } else {
+                Screenshots.takeScreenshot(browser, "[Inapplicable metric]" + screenshot +
+                        System.currentTimeMillis(), this.getClass());
+                System.out.println(format("Metric [%s] is not available!", metric));
+                brokenMetrics.add(metric);
+                continue;
+            }
+
             if (!analysisPage.isExplorerMessageVisible())
                 break;
 
@@ -711,8 +721,18 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String attribute;
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
-            action.accept(attribute);
-            analysisPage.waitForReportComputing();
+
+            if (analysisPage.searchBucketItem(attribute)) {
+                action.accept(attribute);
+                analysisPage.waitForReportComputing();
+            } else {
+                Screenshots.takeScreenshot(browser, "[Inapplicable attribute]" + screenshot +
+                        System.currentTimeMillis(), this.getClass());
+                System.out.println(format("Attribute [%s] is not available!", attribute));
+                cache.add(Pair.of(metric, attribute));
+                continue;
+            }
+
             if (!analysisPage.isExplorerMessageVisible())
                 break;
 

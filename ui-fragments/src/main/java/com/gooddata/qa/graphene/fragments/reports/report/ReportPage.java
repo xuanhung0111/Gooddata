@@ -17,11 +17,13 @@ import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.tagName;
 import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -172,31 +174,24 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage selectMetric(String metric) {
-        WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
-                browser);
-        List<WebElement> metrics = browser.findElements(METRICS_LOCATOR);
+        return selectMetric(metric, WebElement::click);
+    }
 
-        filterInput.clear();
-        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        sleepTightInSeconds(1);
-        waitForCollectionIsEmpty(metrics);
+    public ReportPage selectInapplicableMetric(String metric) {
+        return selectMetric(metric, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).perform());
+    }
 
-        filterInput.clear();
-        filterInput.sendKeys(metric);
-        sleepTightInSeconds(1);
-        waitForCollectionIsNotEmpty(metrics);
-
-        metrics.stream()
-            .filter(e -> metric.equals(e.getText()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Cannot find metric: " + metric))
-            .click();
-        return this;
+    public ReportPage selectInapplicableAttribute(String attribute) {
+        return selectAttribute(attribute, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).perform());
     }
 
     public ReportPage selectAttribute(String attribute) {
+        return selectAttribute(attribute, WebElement::click);
+    }
+
+    public ReportPage deselectAttribute(String attribute) {
         searchAttribute(attribute);
-        findAttribute(attribute).click();
+        findAttribute(attribute).findElement(tagName("input")).click();
         return this;
     }
 
@@ -242,6 +237,15 @@ public class ReportPage extends AbstractFragment {
                 + "//button[contains(@class, 's-btn-create')]"), browser);
         waitForElementVisible(confirmDialogCreateButton).click();
         waitForElementNotVisible(confirmDialogCreateButton);
+
+        return this;
+    }
+
+    public ReportPage cancelCreateReportInDialog() {
+        WebElement cancelDialogCreateButton = waitForElementVisible(cssSelector(
+                ".s-saveReportDialog .s-btn-cancel"), browser);
+        waitForElementVisible(cancelDialogCreateButton).click();
+        waitForElementNotVisible(cancelDialogCreateButton);
 
         return this;
     }
@@ -602,6 +606,34 @@ public class ReportPage extends AbstractFragment {
                 && waitForElementVisible(filterButton).getAttribute("class").contains("disabled");
     }
 
+    public String getInvalidDataReportMessage() {
+        return waitForElementVisible(cssSelector("#invalidDataReportHelp > em"), browser).getText().trim();
+    }
+
+    public ReportPage switchViewToTags() {
+        new Select(waitForElementVisible(cssSelector(".sndPanelTitle[style='display: inline;'] .sndViewSelector"),
+                browser)).selectByValue("tags");
+        return this;
+    }
+
+    public ReportPage changeDisplayLabel(String label) {
+        new Select(waitForElementVisible(cssSelector(".sndAttributeDetailDisplayLabelChangerContainer .selection"),
+                browser)).selectByVisibleText(label);
+        return this;
+    }
+
+    public List<String> loadAllViewGroups() {
+        return browser.findElements(cssSelector(".sndPanel1[style='display: block;'] .element > span")).stream()
+            .skip(1)
+            .map(WebElement::getText)
+            .collect(toList());
+    }
+
+    public String getTooltipMessageOfAttribute(String attribute) {
+        searchAttribute(attribute);
+        return findAttribute(attribute).findElement(BY_PARENT).getAttribute("title");
+    }
+
     public static float getNumber(String text) {
         String tmp = "";
         float number = 0;
@@ -614,6 +646,35 @@ public class ReportPage extends AbstractFragment {
             number = Float.parseFloat(tmp);
         }
         return number;
+    }
+
+    private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
+        WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
+                browser);
+        List<WebElement> metrics = browser.findElements(METRICS_LOCATOR);
+
+        filterInput.clear();
+        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        sleepTightInSeconds(1);
+        waitForCollectionIsEmpty(metrics);
+
+        filterInput.clear();
+        filterInput.sendKeys(metric);
+        sleepTightInSeconds(1);
+        waitForCollectionIsNotEmpty(metrics);
+
+        howToSelect.accept(metrics.stream()
+            .filter(e -> metric.equals(e.getText()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find metric: " + metric)));
+
+        return this;
+    }
+
+    private ReportPage selectAttribute(String attribute, Consumer<WebElement> howToSelect) {
+        searchAttribute(attribute);
+        howToSelect.accept(findAttribute(attribute));
+        return this;
     }
 
     private ReportPage addFilters(Collection<FilterItem> filters) {
