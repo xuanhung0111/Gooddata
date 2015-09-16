@@ -648,6 +648,18 @@ public class ReportPage extends AbstractFragment {
         return number;
     }
 
+    public ReportPage forceRenderChartReport() {
+        try {
+            WebElement renderChartButton = waitForElementVisible(
+                    cssSelector(".chartGenerationCancelDialog .s-btn-render_chart"), browser);
+            renderChartButton.click();
+            waitForElementNotVisible(renderChartButton);
+        } catch (Exception e) {
+            // do nothing
+        }
+        return this;
+    }
+
     private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
         WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
                 browser);
