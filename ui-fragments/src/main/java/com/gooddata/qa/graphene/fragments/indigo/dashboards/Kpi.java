@@ -23,6 +23,7 @@ public class Kpi extends AbstractFragment {
     public static final String KPI_POP_SECTION_CLASS = "kpi-pop-section";
     public static final String KPI_ALERT_BUTTON_CLASS = "dash-item-action-alert";
     public static final String KPI_HAS_SET_ALERT_BUTTON = "has-set-alert";
+    public static final String KPI_IS_EMPTY_VALUE = "is-empty-value";
     public static final String KPI_ALERT_DIALOG_CLASS = "kpi-alert-dialog";
 
     public static final String WIDGET_LOADING_CLASS = "widget-loading";
@@ -116,8 +117,11 @@ public class Kpi extends AbstractFragment {
     }
 
     public boolean hasSetAlert() {
-        By hasSetAlertButton = By.className(KPI_HAS_SET_ALERT_BUTTON);
-        return isElementPresent(hasSetAlertButton, this.getRoot());
+        return isElementPresent(By.className(KPI_HAS_SET_ALERT_BUTTON), this.getRoot());
+    }
+
+    public boolean isEmptyValue() {
+        return isElementPresent(By.className(KPI_IS_EMPTY_VALUE), this.getRoot());
     }
 
     public KpiAlertDialog openAlertDialog() {

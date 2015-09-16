@@ -1,13 +1,15 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.project.Project;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
 import java.io.IOException;
-
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.DataProvider;
@@ -23,6 +25,14 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
     private static final String PERCENT_OF_GOAL = "% of Goal";
     private static final String PERCENT_OF_GOAL_URI = "/gdc/md/%s/obj/8136";
     private static final String NUMBER_OF_ACTIVITIES_URI = "/gdc/md/%s/obj/14636";
+
+    private MetadataService getMdService() {
+        return getGoodDataClient().getMetadataService();
+    }
+
+    private Project getProject() {
+        return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
+    }
 
     @DataProvider(name = "formattingProvider")
     public Object[][] formattingProvider() {
@@ -121,4 +131,28 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
             RestUtils.changeMetricFormat(getRestApiClient(), uri, oldFormat);
         }
     }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void checkKpiStateWithNoDataMetric() {
+        String invalidMetricName = "No data metric";
+        String invalidMetricMaql = "SELECT 1 where 2 = 3";
+        Metric invalidMetric = getMdService().createObj(getProject(), new Metric(invalidMetricName, invalidMetricMaql, "#,##0.00"));
+
+        try {
+            setupKpi(invalidMetricName, DATE_CREATED);
+
+            Kpi lastKpi = initIndigoDashboardsPage()
+                .waitForAllKpiWidgetContentLoaded()
+                .getLastKpi();
+
+            takeScreenshot(browser, "checkKpiStateWithNoDataMetric", getClass());
+            assertTrue(lastKpi.isEmptyValue());
+
+        } finally {
+            teardownKpi();
+            getMdService().removeObj(invalidMetric);
+        }
+
+    }
+
 }

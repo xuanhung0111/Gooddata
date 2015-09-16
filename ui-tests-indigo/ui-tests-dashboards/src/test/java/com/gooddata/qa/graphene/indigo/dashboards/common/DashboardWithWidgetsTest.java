@@ -28,6 +28,24 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     public static final String COMPARISON_LAST_YEAR = "Previous year";
     public static final String COMPARISON_NO_COMPARISON = "No comparison";
 
+    protected void setupKpi(String metricName, String dateDimension) {
+        initIndigoDashboardsPage()
+            .switchToEditMode()
+            .addWidget(metricName, dateDimension)
+            .saveEditMode();
+    }
+
+    protected void teardownKpi() {
+        initIndigoDashboardsPage()
+            .switchToEditMode()
+            .clickLastKpiDeleteButton()
+            .waitForDialog()
+            .submitClick();
+
+        indigoDashboardsPage
+            .saveEditMode();
+    }
+
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"dashboardWidgetsInit"})
     public void initDashboardWithWidgets() throws JSONException, IOException {
         IndigoRestUtils.prepareAnalyticalDashboardTemplate(getRestApiClient(), testParams.getProjectId());
