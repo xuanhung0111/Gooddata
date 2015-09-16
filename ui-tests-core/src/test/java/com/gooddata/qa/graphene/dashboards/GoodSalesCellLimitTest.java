@@ -45,14 +45,18 @@ public class GoodSalesCellLimitTest extends GoodSalesAbstractTest {
                     ),
                 TESTING_REPORT_TABLE
         );
-        createReport(
-                new UiReportDefinition()
-                        .withName(TESTING_REPORT_CHART)
-                        .withWhats(AMOUNT)
-                        .withHows(ACCOUNT)
-                        .withType(ReportTypes.LINE),
-                TESTING_REPORT_CHART
-        );
+
+        initReportCreation();
+        reportPage.initPage()
+            .setReportName(TESTING_REPORT_CHART)
+            .openWhatPanel()
+            .selectMetric(AMOUNT)
+            .openHowPanel()
+            .selectAttribute(ACCOUNT)
+            .doneSndPanel()
+            .selectReportVisualisation(ReportTypes.LINE)
+            .forceRenderChartReport()
+            .finishCreateReport();
         checkRedBar(browser);
     }
 
