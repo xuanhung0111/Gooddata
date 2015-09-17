@@ -17,6 +17,7 @@
 package org.arquillian.drone.browserstack.webdriver;
 
 import java.net.URL;
+import java.util.logging.Logger;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -28,9 +29,12 @@ public class BrowserStackDriver extends RemoteWebDriver {
 
     public static final String READABLE_NAME = "browserstack";
 
+    private static final Logger log = Logger.getLogger(BrowserStackDriver.class.getName());
+
     public BrowserStackDriver(URL url, Capabilities capabilities) {
         super(url, capabilities);
-        System.out.println("Using following browser capabilities: " + capabilities);
+        log.info("Session ID: " + this.getSessionId());
+        log.info("Browser capabilities: " + capabilities);
     }
 
     @Override
