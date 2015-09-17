@@ -14,6 +14,8 @@
         <property name="deviceOrientation">${browserstack.mobile.device.orientation:portrait}</property> <!--portrait/landscape-->
         <property name="acceptSslCerts">true</property>
         <property name="browserstack.debug">true</property>
+        <property name="project">${browserstack.project:local}</property>
+        <property name="build">${browserstack.build:unknown}</property>
     </extension>
 
     <extension qualifier="graphene">

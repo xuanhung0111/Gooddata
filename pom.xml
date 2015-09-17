@@ -58,6 +58,8 @@
         <browserstack.platform.browser.version>xxx</browserstack.platform.browser.version>
         <browserstack.platform.os>xxx</browserstack.platform.os>
         <browserstack.platform.os.version>xxx</browserstack.platform.os.version>
+        <browserstack.project>local</browserstack.project>
+        <browserstack.build>unknown</browserstack.build>
 
         <corePropertiesPath>ui-tests-core${file.separator}src${file.separator}test${file.separator}resources${file.separator}variables-env-test.properties</corePropertiesPath>
         <propertiesPath>${basedir}${file.separator}${corePropertiesPath}</propertiesPath>
@@ -331,6 +333,14 @@
                                             <property>
                                                 <name>browserstack.platform.browser.version</name>
                                                 <value>${browserstack.platform.browser.version}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.project</name>
+                                                <value>${browserstack.project}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.build</name>
+                                                <value>${browserstack.build}</value>
                                             </property>
                                         </systemProperties>
                                     </configuration>

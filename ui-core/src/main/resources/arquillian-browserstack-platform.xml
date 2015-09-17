@@ -15,6 +15,8 @@
         <property name="resolution">${browserstack.platform.resolution:1600x1200}</property>
         <property name="acceptSslCerts">true</property>
         <property name="browserstack.debug">true</property>
+        <property name="project">${browserstack.project:local}</property>
+        <property name="build">${browserstack.build:unknown}</property>
     </extension>
 
     <extension qualifier="graphene">
