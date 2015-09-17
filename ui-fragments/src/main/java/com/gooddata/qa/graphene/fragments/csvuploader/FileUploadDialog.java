@@ -23,6 +23,9 @@ public class FileUploadDialog extends AbstractFragment {
 
     @FindBy(className = "s-backend-validation-errors")
     private WebElement backendValidationErrorsList;
+    
+    @FindBy(css = ".gd-message.error")
+    private WebElement validationError;
 
     public FileUploadDialog pickCsvFile(String csvFilePath) {
         waitForElementVisible(pickFileButton).sendKeys(csvFilePath);
@@ -44,5 +47,9 @@ public class FileUploadDialog extends AbstractFragment {
                 .stream()
                 .map(WebElement::getText)
                 .collect(toList());
+    }
+    
+    public String getValidationErrorMessage() {
+        return waitForElementVisible(validationError).getText();
     }
 }
