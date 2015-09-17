@@ -46,8 +46,8 @@
 
         <arquillian.xml>arquillian.xml</arquillian.xml>
 
-        <!-- possible values are: local/browserstack-mobile-*/browserstack-platform-* -->
-        <test.execution.env>local</test.execution.env>
+        <!-- possible values are: local-firefox/local-chrome/browserstack-mobile-*/browserstack-platform-* -->
+        <test.execution.env>local-firefox</test.execution.env>
 
         <browserstack.username>xxx</browserstack.username>
         <browserstack.automate.key>xxx</browserstack.automate.key>
@@ -342,6 +342,33 @@
             </build>
         </profile>
 
+        <profile>
+            <id>local-firefox</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>local-firefox</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian.xml</arquillian.xml>
+                <browser>firefox</browser>
+            </properties>
+        </profile>
+        <profile>
+            <id>local-chrome</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>local-chrome</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-local-chrome.xml</arquillian.xml>
+                <browser>chrome</browser>
+            </properties>
+        </profile>
+
         <!-- browserstack profiles -->
         <profile>
             <id>browserstack-mobile-android-samsung-galaxy-s5</id>
@@ -352,7 +379,7 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
                 <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
                 <browserstack.mobile.device>Samsung Galaxy S5</browserstack.mobile.device>
@@ -367,7 +394,7 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
                 <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
                 <browserstack.mobile.device>iPhone 5</browserstack.mobile.device>
@@ -382,7 +409,7 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
                 <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
                 <browserstack.mobile.device>iPhone 5S</browserstack.mobile.device>
@@ -397,7 +424,7 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
                 <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
                 <browserstack.mobile.device>iPad Air</browserstack.mobile.device>
@@ -412,7 +439,7 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
                 <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
                 <browserstack.mobile.device>iPad mini Retina</browserstack.mobile.device>
@@ -427,7 +454,7 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.xml>arquillian-browserstack-mobile.xml</arquillian.xml>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
                 <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
                 <browserstack.mobile.device>iPad 4th Gen</browserstack.mobile.device>
