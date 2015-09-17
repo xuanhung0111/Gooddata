@@ -181,7 +181,7 @@ public class CsvUploaderTest extends AbstractMSFTest {
 
         // the processing should not go any further but display validation error directly in File Upload Dialog
         assertThat(waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors(),
-                contains("csv.validations.structural.incorrect-column-count"));
+                contains("Failed to upload the " + csvFileName + " file. Some rows contain more column than the others. Upload a different CSV file."));
 
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFileName), getClass());
 
