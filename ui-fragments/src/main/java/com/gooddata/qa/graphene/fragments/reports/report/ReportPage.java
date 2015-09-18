@@ -586,8 +586,9 @@ public class ReportPage extends AbstractFragment {
         .selectAttributes(reportDefinition.getHows())
         .doneSndPanel()
         .addFilters(reportDefinition.getFilters())
-        .selectReportVisualisation(reportDefinition.getType())
-        .finishCreateReport();
+        .selectReportVisualisation(reportDefinition.getType());
+        waitForAnalysisPageLoaded(browser);
+        finishCreateReport();
     }
 
     public boolean isGreyedOutAttribute(String attribute) {
