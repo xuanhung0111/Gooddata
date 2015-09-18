@@ -6,10 +6,12 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 
 @Test(groups = {"GoodSalesReportFilters"},
         description = "Tests for GoodSales project (report filters functionality)")
@@ -78,5 +80,6 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     private void initReport() {
         initReportsPage();
         reportsPage.getReportsList().openReport(REPORT_NAME);
+        waitForAnalysisPageLoaded(browser);
     }
 }
