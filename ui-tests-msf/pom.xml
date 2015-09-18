@@ -21,6 +21,7 @@
         <modulePropertiesPath>
             ${basedir}${file.separator}..${file.separator}..${file.separator}${corePropertiesPath}
         </modulePropertiesPath>
+        <moduleCorePath>${basedir}${file.separator}..${file.separator}..${file.separator}${coreModuleName}</moduleCorePath>
     </properties>
 
     <dependencies>

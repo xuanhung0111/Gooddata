@@ -61,6 +61,10 @@
         <browserstack.project>local</browserstack.project>
         <browserstack.build>${user.name}</browserstack.build>
 
+        <coreModuleName>ui-core</coreModuleName>
+        <corePath>${moduleCorePath}</corePath>
+        <moduleCorePath>${basedir}${file.separator}..${file.separator}${coreModuleName}</moduleCorePath>
+
         <corePropertiesPath>ui-tests-core${file.separator}src${file.separator}test${file.separator}resources${file.separator}variables-env-test.properties</corePropertiesPath>
         <propertiesPath>${basedir}${file.separator}${corePropertiesPath}</propertiesPath>
         <modulePropertiesPath>${basedir}${file.separator}..${file.separator}${corePropertiesPath}</modulePropertiesPath>
@@ -277,6 +281,10 @@
                                             <property>
                                                 <name>propertiesPath</name>
                                                 <value>${propertiesPath}</value>
+                                            </property>
+                                            <property>
+                                                <name>corePath</name>
+                                                <value>${corePath}</value>
                                             </property>
                                             <property>
                                                 <name>browserDownloadFolder</name>
