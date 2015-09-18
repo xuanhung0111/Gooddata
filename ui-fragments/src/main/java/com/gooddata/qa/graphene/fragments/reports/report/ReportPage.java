@@ -5,11 +5,13 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
@@ -84,7 +86,7 @@ public class ReportPage extends AbstractFragment {
 
     private static final By METRICS_LOCATOR = cssSelector(".sndMetric .metricName");
 
-    private static final By ATTRIBUTES_LOCATOR = cssSelector(".s-snd-AttributesContainer .element .metricName");
+    private static final By ATTRIBUTES_CONTAINER_LOCATOR = cssSelector(".s-snd-AttributesContainer .gridTile");
 
     private static final By SHOW_CONFIGURATION_LOCATOR =
             cssSelector(".s-btn-__show_configuration:not(.gdc-hidden)");
@@ -198,17 +200,16 @@ public class ReportPage extends AbstractFragment {
     public ReportPage searchAttribute(String attribute) {
         WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndAttributeFilterLabel']/../input"),
                 browser);
-        List<WebElement> attributes = browser.findElements(ATTRIBUTES_LOCATOR);
 
         filterInput.clear();
         filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
         sleepTightInSeconds(1);
-        waitForCollectionIsEmpty(attributes);
+        waitForElementNotPresent(ATTRIBUTES_CONTAINER_LOCATOR);
 
         filterInput.clear();
         filterInput.sendKeys(attribute);
         sleepTightInSeconds(1);
-        waitForCollectionIsNotEmpty(attributes);
+        waitForElementVisible(ATTRIBUTES_CONTAINER_LOCATOR, browser);
 
         return this;
     }
@@ -734,10 +735,9 @@ public class ReportPage extends AbstractFragment {
     }
 
     private WebElement findAttribute(String attribute) {
-        return browser.findElements(ATTRIBUTES_LOCATOR).stream()
-                .filter(e -> attribute.equals(e.getText()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + attribute));
+        WebElement attributesContainer = waitForElementVisible(ATTRIBUTES_CONTAINER_LOCATOR, browser);
+        return waitForElementVisible(cssSelector(".s-grid-" + simplifyText(attribute) + " .metricName"),
+                attributesContainer);
     }
 
     private ReportPage filterAttribute(Collection<String> values) {
