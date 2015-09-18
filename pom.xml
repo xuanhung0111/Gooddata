@@ -59,7 +59,7 @@
         <browserstack.platform.os>xxx</browserstack.platform.os>
         <browserstack.platform.os.version>xxx</browserstack.platform.os.version>
         <browserstack.project>local</browserstack.project>
-        <browserstack.build>unknown</browserstack.build>
+        <browserstack.build>${user.name}</browserstack.build>
 
         <corePropertiesPath>ui-tests-core${file.separator}src${file.separator}test${file.separator}resources${file.separator}variables-env-test.properties</corePropertiesPath>
         <propertiesPath>${basedir}${file.separator}${corePropertiesPath}</propertiesPath>
