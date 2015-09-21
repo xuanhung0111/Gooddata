@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
@@ -10,7 +11,11 @@ import org.openqa.selenium.support.FindBy;
 
 public class KpiAlertDialog extends AbstractFragment {
 
-    public static final By LOCATOR = By.className("kpi-alert-dialog");
+    private static final String MAIN_CLASS = "kpi-alert-dialog";
+    private static final String ALERT_DIALOG_MESSAGE_CLASS = "gd-message";
+
+    private static final By ALERT_DIALOG_MESSAGE = By.cssSelector("." + MAIN_CLASS + " ." + ALERT_DIALOG_MESSAGE_CLASS);
+    public static final By LOCATOR = By.className(MAIN_CLASS);
 
     public static final String TRIGGERED_WHEN_GOES_ABOVE = "goes above";
     public static final String TRIGGERED_WHEN_DROPS_BELOW = "drops below";
@@ -24,11 +29,20 @@ public class KpiAlertDialog extends AbstractFragment {
     @FindBy(tagName = "input")
     private WebElement kpiAlertThresholdInput;
 
+    @FindBy(className = "text-info")
+    private WebElement kpiAlertDialogTextInfo;
+
+    @FindBy(className = ALERT_DIALOG_MESSAGE_CLASS)
+    private WebElement kpiAlertDialogMessage;
+
     @FindBy(className = "s-save_button")
     private WebElement setAlertButton;
 
     @FindBy(className = "s-delete_button")
     private WebElement deleteAlertButton;
+
+    @FindBy(className = "s-apply-alert-filters")
+    private WebElement applyAlertFiltersButton;
 
     public String getDialogHeader() {
         return waitForElementVisible(header).getText();
@@ -66,6 +80,23 @@ public class KpiAlertDialog extends AbstractFragment {
     public KpiAlertDialog deleteAlert() {
         waitForElementVisible(deleteAlertButton).click();
         waitForElementNotPresent(deleteAlertButton);
+        return this;
+    }
+
+    public String getAlertDialogText() {
+        return waitForElementVisible(kpiAlertDialogTextInfo).getText();
+    }
+
+    public boolean hasAlertMessage() {
+        return isElementPresent(ALERT_DIALOG_MESSAGE, browser);
+    }
+
+    public String getAlertMessageText() {
+        return waitForElementVisible(kpiAlertDialogMessage).getText();
+    }
+
+    public KpiAlertDialog applyAlertFilters() {
+        waitForElementVisible(applyAlertFiltersButton).click();
         return this;
     }
 }

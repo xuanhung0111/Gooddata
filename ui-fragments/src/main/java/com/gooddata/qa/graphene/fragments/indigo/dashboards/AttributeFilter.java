@@ -31,7 +31,7 @@ public class AttributeFilter extends ReactDropdownParent {
 
     public AttributeFilter clearAllCheckedValues() {
         ensureDropdownOpen();
-        waitForElementVisible(cssSelector("button.s-clear"), browser).click();
+        waitForElementVisible(cssSelector(".s-clear"), browser).click();
         return this;
     }
 
