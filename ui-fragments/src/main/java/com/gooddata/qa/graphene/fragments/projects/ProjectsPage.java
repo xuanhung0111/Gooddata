@@ -1,7 +1,8 @@
 package com.gooddata.qa.graphene.fragments.projects;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -19,7 +20,7 @@ public class ProjectsPage extends AbstractFragment {
     @FindBy(xpath = "//ul[@id='demoProjects']/li")
     private List<WebElement> demoProjects;
 
-    private static final By BY_SPAN_PROJECT_TITLE = By.xpath("span[@class='projectTitle']");
+    private static final By BY_PROJECT_TITLE = By.cssSelector(".projectTitle");
 
     public List<WebElement> getProjectsElements() {
         return projects;
@@ -30,21 +31,14 @@ public class ProjectsPage extends AbstractFragment {
     }
 
     public List<String> getProjectsIds() {
-        return getProjectsIds(null);
+        return getProjectsIds("");
     }
 
     public List<String> getProjectsIds(String projectSubstringFilter) {
-        List<String> projectIds = new ArrayList<String>();
-        boolean filter = projectSubstringFilter != null && projectSubstringFilter.length() > 0;
-        for (WebElement elem : projects) {
-            if (filter) {
-                if (!elem.findElement(BY_SPAN_PROJECT_TITLE).getText()
-                        .contains(projectSubstringFilter))
-                    continue;
-            }
-            projectIds.add(getProjectIdFrom(elem));
-        }
-        return projectIds;
+        return Stream.concat(demoProjects.stream(), projects.stream())
+                .filter(e -> e.findElement(BY_PROJECT_TITLE).getText().contains(projectSubstringFilter))
+                .map(this::getProjectIdFrom)
+                .collect(Collectors.toList());
     }
 
     public void goToProject(final String projectId) {

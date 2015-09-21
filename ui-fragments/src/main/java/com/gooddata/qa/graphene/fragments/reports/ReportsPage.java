@@ -20,7 +20,9 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
+import com.gooddata.qa.graphene.entity.account.PersonalInfo;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 
 public class ReportsPage extends AbstractFragment {
 
@@ -182,5 +184,13 @@ public class ReportsPage extends AbstractFragment {
                     .getFolderWebElement(folderName);
         }
         return folder.orElseThrow(() -> new NoSuchElementException("Cannot find folder: " + folderName));
+    }
+
+    public PersonalInfo getReportOwnerInfoFrom(String reportName) {
+        return waitForFragmentVisible(reportsList).getReportOwnerInfoFrom(reportName);
+    }
+
+    public UserProfilePage openReportOwnerProfilePageFrom(String reportName) {
+        return waitForFragmentVisible(reportsList).openReportOwnerProfilePageFrom(reportName);
     }
 }

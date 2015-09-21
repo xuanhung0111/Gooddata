@@ -114,6 +114,16 @@ public final class CheckUtils {
         waitForElementVisible(By.xpath("//div[@id='p-objectPage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
+    public static void waitForAccountPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By
+                .xpath("//div[@id='p-accountPage' and contains(@class,'s-displayed')]"), searchContext);
+    }
+
+    public static void waitForUserProfilePageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By
+                .xpath("//div[@id='p-profilePage' and contains(@class,'s-displayed')]"), searchContext);
+    }
+    
     public static WebElement waitForElementVisible(By byElement, SearchContext searchContext) {
         Graphene.waitGui().until().element(byElement).is().visible();
         return searchContext.findElement(byElement);
