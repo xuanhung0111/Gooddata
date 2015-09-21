@@ -93,7 +93,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
-    public void checkAddKpiAlertUpdate() {
+    public void checkKpiAlertUpdate() {
         setupKpi(AMOUNT, DATE_CREATED);
 
         try {
