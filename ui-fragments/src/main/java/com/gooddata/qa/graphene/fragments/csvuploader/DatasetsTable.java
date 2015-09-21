@@ -18,6 +18,7 @@ public class DatasetsTable extends AbstractTable {
     private static final By BY_DATASET_STATUS = By.className("s-dataset-status");
     private static final By BY_DATASET_DELETE_BUTTON = By.className("s-dataset-delete-button");
     private static final By BY_DATASET_DETAIL_BUTTON = By.className("s-dataset-detail-button");
+    private static final By BY_DATASET_REFRESH_BUTTON = By.className("s-dataset-update-button");
 
     public List<String> getDatasetNames() {
         return getRows().stream()
@@ -48,6 +49,10 @@ public class DatasetsTable extends AbstractTable {
     
     public WebElement getDatasetDetailButton(String datasetName) {
         return getDatasetRowCell(datasetName, BY_DATASET_DETAIL_BUTTON);
+    }
+
+    public WebElement getDatasetRefreshButton(String datasetName) {
+        return getDatasetRowCell(datasetName, BY_DATASET_REFRESH_BUTTON);
     }
 
     public int getNumberOfDatasets() {
