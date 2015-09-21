@@ -26,11 +26,8 @@ public class DatasetsListPage extends AbstractFragment {
     @FindBy(className = "others-datasets")
     private DatasetsTable othersDatasetsTable;
 
-    @FindBy(className = "s-dataset-detail-button")
-    private WebElement datasetDetailButton;
-
-    public void clickDatasetDetailButton() {
-        waitForElementVisible(datasetDetailButton).click();
+    public void clickDatasetDetailButton(String datasetName) {
+        getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
     }
 
     public void clickAddDataButton() {

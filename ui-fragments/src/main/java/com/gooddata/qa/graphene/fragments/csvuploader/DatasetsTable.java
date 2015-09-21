@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.Validate.notEmpty;
@@ -11,7 +10,6 @@ import org.openqa.selenium.WebElement;
 import org.springframework.util.CollectionUtils;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
-
 import java.util.List;
 
 public class DatasetsTable extends AbstractTable {
@@ -19,6 +17,7 @@ public class DatasetsTable extends AbstractTable {
     private static final By BY_DATASET_NAME = By.className("s-dataset-name");
     private static final By BY_DATASET_STATUS = By.className("s-dataset-status");
     private static final By BY_DATASET_DELETE_BUTTON = By.className("s-dataset-delete-button");
+    private static final By BY_DATASET_DETAIL_BUTTON = By.className("s-dataset-detail-button");
 
     public List<String> getDatasetNames() {
         return getRows().stream()
@@ -45,6 +44,10 @@ public class DatasetsTable extends AbstractTable {
 
     public WebElement getDatasetDeleteButton(String datasetName) {
         return getDatasetRowCell(datasetName, BY_DATASET_DELETE_BUTTON);
+    }
+    
+    public WebElement getDatasetDetailButton(String datasetName) {
+        return getDatasetRowCell(datasetName, BY_DATASET_DETAIL_BUTTON);
     }
 
     public int getNumberOfDatasets() {
