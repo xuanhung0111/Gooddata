@@ -37,7 +37,7 @@ public abstract class ReactDropdown extends ReactDropdownParent {
     public Collection<String> getValues() {
         ensureDropdownOpen();
 
-        String itemSelector = getDropdownCssSelector() + " .gd-list-item";
+        String itemSelector = getDropdownCssSelector() + " .gd-list-item:not(.is-header)";
         return getElementTexts(cssSelector(itemSelector), browser);
     }
 

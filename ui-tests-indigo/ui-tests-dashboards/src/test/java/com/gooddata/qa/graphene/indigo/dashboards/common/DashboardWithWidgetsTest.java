@@ -1,15 +1,22 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+
+import com.gooddata.md.MetadataService;
+import com.gooddata.project.Project;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
+
 import java.io.IOException;
 import java.util.UUID;
+
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
 public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
 
     public static final String AMOUNT = "Amount";
+    public static final String ACCOUNT = "Account";
+    public static final String STAT_REGION = "stat_region";
     public static final String LOST = "Lost";
     public static final String NUMBER_OF_ACTIVITIES = "# of Activities";
 
@@ -61,5 +68,13 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     protected String generateUniqueHeadlineTitle() {
         // create unique headline title which fits into headline title (has limited size)
         return UUID.randomUUID().toString().substring(0, 18);
+    }
+
+    protected MetadataService getMdService() {
+        return getGoodDataClient().getMetadataService();
+    }
+
+    protected Project getProject() {
+        return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 }

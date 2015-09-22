@@ -1,12 +1,20 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.testng.Assert.assertEquals;
+
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.join;
-import static org.testng.Assert.assertEquals;
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Fact;
+import com.gooddata.md.Metric;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
 public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
@@ -17,8 +25,8 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "checkAttributeFilterDefaultState-All", getClass());
 
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 2);
-        assertEquals(attributeFiltersPanel.getAttributeFilter("stat_region").getSelection(), "All");
-        assertEquals(attributeFiltersPanel.getAttributeFilter("Account").getSelection(), "All");
+        assertEquals(attributeFiltersPanel.getAttributeFilter(STAT_REGION).getSelection(), "All");
+        assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelection(), "All");
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
@@ -31,19 +39,88 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
         AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPage().waitForAttributeFilters();
 
-        attributeFiltersPanel.getAttributeFilter("stat_region").selectByName(attributeFilterWestCoast, true);
+        attributeFiltersPanel.getAttributeFilter(STAT_REGION)
+            .clearAllCheckedValues()
+            .selectByNames(attributeFilterWestCoast);
 
-        attributeFiltersPanel.getAttributeFilter("Account").selectByName(attributeFilterSourceConsulting, true);
-        attributeFiltersPanel.getAttributeFilter("Account").selectByName(attributeFilterAgileThought, false);
-        attributeFiltersPanel.getAttributeFilter("Account").selectByName(attributeFilterVideo, false);
-        attributeFiltersPanel.getAttributeFilter("Account").selectByName(attributeFilterShoppingCart, false);
+        attributeFiltersPanel.getAttributeFilter(ACCOUNT)
+            .clearAllCheckedValues()
+            .selectByNames(attributeFilterSourceConsulting, attributeFilterAgileThought, attributeFilterVideo,
+                    attributeFilterShoppingCart);
 
         takeScreenshot(browser, "checkAttributeFilterDefaultState-West_Coast", getClass());
 
         assertEquals(attributeFiltersPanel.getAttributeFilters().size(), 2);
-        assertEquals(attributeFiltersPanel.getAttributeFilter("stat_region").getSelection(), attributeFilterWestCoast);
-        assertEquals(attributeFiltersPanel.getAttributeFilter("Account").getSelectedItems(), join(", ", attributeFilterSourceConsulting, attributeFilterVideo, attributeFilterShoppingCart, attributeFilterAgileThought));
-        assertEquals(attributeFiltersPanel.getAttributeFilter("Account").getSelectedItemsCount(), "(4)");
+        assertEquals(attributeFiltersPanel.getAttributeFilter(STAT_REGION).getSelection(),
+                attributeFilterWestCoast);
+        assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), join(", ",
+                attributeFilterSourceConsulting, attributeFilterVideo, attributeFilterShoppingCart,
+                attributeFilterAgileThought));
+        assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItemsCount(), "(4)");
     }
 
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = "desktop")
+    public void testFilterBySuggestedAttributes() {
+        String attribute14West = "14 West";
+        String attribute123Exteriors = "123 Exteriors";
+
+        String accountFilterMetricName = createAccountFilterMetric();
+
+        setupKpi(accountFilterMetricName, DATE_CREATED);
+
+        try {
+            indigoDashboardsPage.waitForDateFilter()
+                .selectByName(DATE_FILTER_ALL_TIME);
+            AttributeFiltersPanel attributeFiltersPanel = indigoDashboardsPage.waitForAllKpiWidgetContentLoaded()
+                .waitForAttributeFilters();
+
+            takeScreenshot(browser, "testFilterBySuggestedAttributes-account-all", getClass());
+            assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
+                    equalTo("12,318,347"));
+            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), equalTo("All"));
+
+            attributeFiltersPanel.getAttributeFilter(ACCOUNT)
+                .clearAllCheckedValues()
+                .selectByNames(attribute14West, attribute123Exteriors);
+            indigoDashboardsPage.waitForAllKpiWidgetContentLoaded();
+            takeScreenshot(browser, "testFilterBySuggestedAttributes-account-westAndExteriors", getClass());
+            assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
+                    equalTo("9,258,347"));
+            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(),
+                    equalTo(join(", ", attribute123Exteriors, attribute14West)));
+
+            attributeFiltersPanel.getAttributeFilter(ACCOUNT)
+                .clearAllCheckedValues()
+                .selectByNames(attribute14West);
+            indigoDashboardsPage.waitForAllKpiWidgetContentLoaded();
+            takeScreenshot(browser, "testFilterBySuggestedAttributes-account-west", getClass());
+            assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
+                    equalTo("8,264,747"));
+            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(),
+                    equalTo(attribute14West));
+
+            initReportsPage();
+            initIndigoDashboardsPage();
+            takeScreenshot(browser, "testFilterBySuggestedAttributes-refresh", getClass());
+            assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), equalTo("All"));
+        } finally {
+            teardownKpi();
+        }
+    }
+
+    private String createAccountFilterMetric() {
+        String element14WestId = "/elements?id=961042";
+        String elementExteriorsId = "/elements?id=961040";
+        String elementFinancialId = "/elements?id=958077";
+
+        String accountFilterMetricName = "Account filter metric";
+        String amountUri = getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT));
+        String accountUri = getMdService().getObjUri(getProject(), Attribute.class, title(ACCOUNT));
+        String expression = format("SELECT SUM([%s]) WHERE [%s] IN ([%s],[%s],[%s])",
+                amountUri, accountUri, accountUri + elementExteriorsId,
+                accountUri + element14WestId, accountUri + elementFinancialId);
+
+        getMdService().createObj(getProject(), new Metric(accountFilterMetricName, expression, "#,##0"));
+        return accountFilterMetricName;
+    }
 }
