@@ -4,9 +4,9 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.util.Collections;
@@ -155,8 +155,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         // the processing should not go any further but display validation error directly in File Upload Dialog
         assertThat(waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors(),
-                contains("Failed to upload the " + csvFile.getFileName()
-                        + " file. Some rows contain more column than the others. Upload a different CSV file."));
+                hasItem("Failed to upload the " + csvFile.getFileName() + " file."));
 
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFile.getFileName()), getClass());
 
