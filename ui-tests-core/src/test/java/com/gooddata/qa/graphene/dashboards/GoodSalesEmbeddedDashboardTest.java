@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dashboards;
 
 import java.io.IOException;
 import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -11,8 +12,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.*;
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -25,9 +29,13 @@ import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.EmbeddedDashboardWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.StyleConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.WidgetConfigPanel.Tab;
 import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.graphene.utils.frame.InFrameAction;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
@@ -168,6 +176,66 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
                 embeddedDashboarWidgetWithoutIframe.downloadEmbeddedDashboard(OTHER_WIDGETS_TAB_INDEX);
         verifyDashboardExport(exportedDashboardName.replace(" ", "_"), EXPECTED_EXPORT_DASHBOARD_SIZE);
         checkRedBar(browser);
+    }
+
+    @Test(dependsOnMethods = "createAdditionalProject")
+    public void configReportTitleVisibilityWithIframe() {
+        String dashboardName = "Config Report Title On Embedded Dashboard";
+        embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, dashboardName);
+
+        final TableReport report = embeddedDashboardWidget.openTabInFrame(TABULAR_REPORT_TAB_INDEX)
+            .editDashboardInFrame()
+            .getReportInFrame(tabularReportDef.getName(), TableReport.class);
+
+        InFrameAction.Utils.doActionInFrame(embeddedDashboardWidget.getRoot(), (InFrameAction<?>) (() -> {
+            takeScreenshot(browser, "configReportTitleVisibilityWithIframe - report title is visible", getClass());
+            assertTrue(report.isReportTitleVisible());
+
+            WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(report.getRoot(), browser);
+            configPanel.getTab(Tab.STYLE, StyleConfigPanel.class).setTitleHidden();
+            sleepTightInSeconds(2);
+            configPanel.saveConfiguration();
+            takeScreenshot(browser, "configReportTitleVisibilityWithIframe - report title is invisible",
+                    getClass());
+
+            WebElement saveButton = waitForElementVisible(className("s-btn-save"), browser);
+            saveButton.click();
+            waitForElementNotVisible(saveButton);
+
+            return 0;
+        }), browser);
+
+        final TableReport report2 = embeddedDashboardWidget.
+                getReportInFrame(tabularReportDef.getName(), TableReport.class);
+
+        InFrameAction.Utils.doActionInFrame(embeddedDashboardWidget.getRoot(), (InFrameAction<?>) (() -> {
+            assertFalse(report2.isReportTitleVisible());
+            return 0;
+        }), browser);
+    }
+
+    @Test(dependsOnMethods = "createDashboardToShare")
+    public void configReportTitleVisibilityWithoutIframe() {
+        browser.get(embedUri);
+        waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
+
+        TableReport report = embeddedDashboarWidgetWithoutIframe.openTab(TABULAR_REPORT_TAB_INDEX)
+            .editDashboard()
+            .getReport(tabularReportDef.getName(), TableReport.class);
+        takeScreenshot(browser, "configReportTitleVisibilityWithoutIframe - report title is visible", getClass());
+        assertTrue(report.isReportTitleVisible());
+
+        setReportTitleVisibility(report, true);
+
+        try {
+            report = embeddedDashboarWidgetWithoutIframe.getReport(tabularReportDef.getName(), TableReport.class);
+            takeScreenshot(browser, "configReportTitleVisibilityWithoutIframe - report title is invisible",
+                    getClass());
+            assertFalse(report.isReportTitleVisible());
+        } finally {
+            setReportTitleVisibility(embeddedDashboarWidgetWithoutIframe.editDashboard()
+                .getReport(tabularReportDef.getName(), TableReport.class), false);
+        }
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
@@ -387,7 +455,6 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         deleteProject(additionalProjectId);
     }
 
-
     private void assertHeadlineReportInFrame(String reportTitle, String expectedDescription, String expectedValue) {
         assertEquals(embeddedDashboardWidget.getHeadlineReportDescriptionInFrame(reportTitle),
                 expectedDescription, "Incorrect headline description on embedded report!");
@@ -443,5 +510,20 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         browser.navigate().refresh();
         waitForFragmentVisible(dashboardsPage);
         waitForFragmentVisible(embeddedDashboardWidget);
+    }
+
+    private void setReportTitleVisibility(TableReport report, boolean isHidden) {
+        WidgetConfigPanel configPanel = WidgetConfigPanel.openConfigurationPanelFor(report.getRoot(), browser);
+        StyleConfigPanel stylePanel = configPanel.getTab(Tab.STYLE, StyleConfigPanel.class);
+        if (isHidden) {
+            stylePanel.setTitleHidden();
+        } else {
+            stylePanel.setTitleVisible();
+        }
+        sleepTightInSeconds(2);
+        configPanel.saveConfiguration();
+        embeddedDashboarWidgetWithoutIframe.getDashboardsPage()
+            .getDashboardEditBar()
+            .saveDashboard();
     }
 }

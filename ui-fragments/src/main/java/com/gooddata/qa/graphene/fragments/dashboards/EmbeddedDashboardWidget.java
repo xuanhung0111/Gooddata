@@ -30,7 +30,16 @@ public class EmbeddedDashboardWidget extends AbstractFragment {
             return this;
         });
     }
-    
+
+    public EmbeddedDashboardWidget editDashboard() {
+        waitForElementVisible(EDIT_EMBEDDED_DASHBOARD_BUTTON_LOCATOR, browser).click();
+        return this;
+    }
+
+    public EmbeddedDashboardWidget editDashboardInFrame() {
+        return doActionInFrame(() -> editDashboard());
+    }
+
     public EmbeddedDashboardWidget setCustomRecipientsInFrame(List<String> recipients) {
         return doActionInFrame(() -> setCustomRecipients(recipients));
     }
@@ -291,6 +300,14 @@ public class EmbeddedDashboardWidget extends AbstractFragment {
 
     public <T extends AbstractReport> T getReport(final String name, Class<T> clazz) {
         return getDashboardsPage().getContent().getReport(name, clazz);
+    }
+
+    public <T extends AbstractReport> T getReportInFrame(final String name, Class<T> clazz) {
+        return doActionInFrame(() -> getReport(name, clazz));
+    }
+
+    public boolean isReportTitleVisibleInFrame(final TableReport report) {
+        return doActionInFrame(() -> report.isReportTitleVisible());
     }
 
     public int getNumberOfTabsInFrame() {

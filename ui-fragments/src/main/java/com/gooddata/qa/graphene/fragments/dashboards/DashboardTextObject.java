@@ -1,12 +1,16 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 
 public class DashboardTextObject extends AbstractFragment {
     
@@ -34,5 +38,14 @@ public class DashboardTextObject extends AbstractFragment {
         waitForElementVisible(By.xpath(textWidgetLocator.replace("${textWidgetType}", textObject.getLabel())),
                 browser);
         sleepTightInSeconds(2);
+    }
+
+    public void addVariableStatus(String variable) {
+        waitForElementVisible(By.xpath(textLabelLocator.replace("${textLabel}",
+                TextObject.VARIABLE_STATUS.getName())), browser).click();
+        WebElement container = waitForElementVisible(className("c-mdObjectsPicker"), browser);
+        waitForElementVisible(cssSelector(".s-item-" + simplifyText(variable) + " > span"), browser).click();
+        waitForElementVisible(className("s-btn-select"), browser).click();
+        waitForElementNotVisible(container);
     }
 }

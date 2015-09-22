@@ -5,16 +5,21 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoad
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
+import static org.openqa.selenium.By.className;
 
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.VariableStatusWidget;
 import com.gooddata.qa.graphene.fragments.reports.report.AbstractReport;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -118,6 +123,15 @@ public class DashboardContent extends AbstractFragment {
 
     public void resizeWidgetBottomRight(int xOffset, int yOffset) {
         resizeWidget(bottomRightWidgetResizeButton, xOffset, yOffset);
+    }
+
+    public VariableStatusWidget getVariableStatus(final String variable) {
+        return browser.findElements(className(TextObject.VARIABLE_STATUS.getLabel()))
+            .stream()
+            .map(e -> Graphene.createPageFragment(VariableStatusWidget.class, e))
+            .filter(widget -> variable.equals(widget.getLabel()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find variable status: " + variable));
     }
 
     private void resizeWidget(WebElement resizeButton, int xOffset, int yOffset) {
