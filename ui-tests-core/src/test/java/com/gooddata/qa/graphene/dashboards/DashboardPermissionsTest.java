@@ -173,13 +173,9 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
     public void checkPermissionDialogInDashboardEditMode() {
         createDashboard("Check Permission in Edit Mode");
 
-        setDashboardPublish();
-        DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        dashboardEditBar.cancelDashboard();
-        assertTrue(dashboardsPage.isUnlisted());
-
-        setDashboardPublish();
-        dashboardEditBar.saveDashboard();
+        PermissionsDialog permissionsDialog = dashboardsPage.unlistedIconClick();
+        permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
+        permissionsDialog.submit();
         assertFalse(dashboardsPage.isUnlisted());
     }
 
@@ -686,13 +682,6 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
             logout();
             signIn(false, UserRoles.ADMIN);
         }
-    }
-
-    private void setDashboardPublish() {
-        dashboardsPage.editDashboard();
-        PermissionsDialog permissionsDialog = dashboardsPage.unlistedIconClick();
-        permissionsDialog.publish(PublishType.EVERYONE_CAN_ACCESS);
-        permissionsDialog.submit();
     }
 
     private void selectCandidatesAndShare(AddGranteesDialog addGranteesDialog, String... candidates) {
