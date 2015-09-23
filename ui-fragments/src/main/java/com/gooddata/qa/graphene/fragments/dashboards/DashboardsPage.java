@@ -69,7 +69,7 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(className = "yui3-c-projectdashboard-content")
     private DashboardContent content;
 
-    @FindBy(css = ".s-unlistedIcon")
+    @FindBy(css = ".s-unlistedIcon:not(.disabled)")
     private WebElement unlistedIcon;
 
     @FindBy(css = ".s-lockIcon")
