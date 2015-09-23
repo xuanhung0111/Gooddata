@@ -304,6 +304,10 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(cataloguePanel).searchBucketItem(item);
     }
 
+    public int getUnrelatedItemsHiddenCount() {
+        return waitForFragmentVisible(cataloguePanel).getUnrelatedItemsHiddenCount();
+    }
+
     public AnalysisPage undo() {
         waitForFragmentVisible(pageHeader).undo();
         return this;
