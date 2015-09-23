@@ -38,87 +38,79 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, dataProvider = "formattingProvider", groups = {"desktop"})
     public void testCustomMetricFormatting(Formatter format, String expectedValue, boolean compareFormat) throws ParseException, JSONException, IOException {
-        String screenshot = "testCustomMetricFormatting-" + format.name();
-        String uri = format(NUMBER_OF_ACTIVITIES_URI, testParams.getProjectId());
-        initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
+        String customFormatMetricName = "Custom format metric";
+        String customFormatMetricMaql = "SELECT 154271";
+        Metric customFormatMetric = getMdService().createObj(getProject(), new Metric(customFormatMetricName, customFormatMetricMaql, format.toString()));
+
+        setupKpi(customFormatMetricName, DATE_CREATED);
+
         try {
-            RestUtils.changeMetricFormat(getRestApiClient(), uri, format.toString());
-            initIndigoDashboardsPage()
-                .selectDateFilterByName(DATE_FILTER_ALL_TIME);
+            Kpi lastKpi = initIndigoDashboardsPage()
+                .waitForAllKpiWidgetContentLoaded()
+                .getLastKpi();
+
+            String screenshot = "testCustomMetricFormatting-" + format.name();
             takeScreenshot(browser, screenshot, getClass());
 
-            String kpiValue = indigoDashboardsPage.getValueFromKpi(NUMBER_OF_ACTIVITIES);
+            String kpiValue = lastKpi.getValue();
             if (compareFormat) {
                 assertTrue(format.toString().contains(kpiValue));
             } else {
                 assertEquals(kpiValue, expectedValue);
             }
+
         } finally {
-            initMetricPage();
-            waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
-            waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
-            assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
+            teardownKpi();
+            getMdService().removeObj(customFormatMetric);
         }
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkXssInMetricName() {
-        String xssMetric = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssHeadline = "<script>alert('Hi')</script>";
-        initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);
-        waitForFragmentVisible(metricDetailPage).renameMetric(xssMetric);
+
+        String xssMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
+        String xssMetricMaql = "SELECT 1";
+        Metric xssMetric = getMdService().createObj(getProject(), new Metric(xssMetricName, xssMetricMaql, "#,##0.00"));
+        setupKpi(xssMetricName, DATE_CREATED);
 
         try {
-            Kpi selectedKpi = initIndigoDashboardsPage()
-                .selectDateFilterByName(DATE_FILTER_ALL_TIME)
+            Kpi lastKpi = initIndigoDashboardsPage()
+                .waitForAllKpiWidgetContentLoaded()
+                .getLastKpi();
+
+            assertEquals(lastKpi.getHeadline(), xssMetricName);
+
+            Kpi selectedKpi = indigoDashboardsPage
                 .switchToEditMode()
-                .addWidget(xssMetric, DATE_CREATED)
                 .selectLastKpi();
-
-            indigoDashboardsPage
-                .getConfigurationPanel()
-                .selectMetricByName(xssMetric);
-
-            assertEquals(selectedKpi.getHeadline(), xssMetric);
 
             selectedKpi.setHeadline(xssHeadline);
             assertEquals(selectedKpi.getHeadline(), xssHeadline);
 
         } finally {
-            initMetricPage();
-            waitForFragmentVisible(metricPage).openMetricDetailPage(xssMetric);
-            waitForFragmentVisible(metricDetailPage).renameMetric(PERCENT_OF_GOAL);
+            teardownKpi();
+            getMdService().removeObj(xssMetric);
         }
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkXssInMetricFormat() throws ParseException, JSONException, IOException {
-        initMetricPage();
-        waitForFragmentVisible(metricPage).openMetricDetailPage(PERCENT_OF_GOAL);
-        String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
-
-        String uri = format(PERCENT_OF_GOAL_URI, testParams.getProjectId());
-        RestUtils.changeMetricFormat(getRestApiClient(), uri, "<button>#,##0.00</button>");
+        String xssFormatMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
+        String xssFormatMetricMaql = "SELECT 1";
+        Metric xssFormatMetric = getMdService().createObj(getProject(), new Metric(xssFormatMetricName, xssFormatMetricMaql, "<button>#,##0.00</button>"));
+        setupKpi(xssFormatMetricName, DATE_CREATED);
 
         try {
-            Kpi selectedKpi = initIndigoDashboardsPage()
-                .selectDateFilterByName(DATE_FILTER_ALL_TIME)
-                .switchToEditMode()
-                .selectKpi(0);
+            Kpi lastKpi = initIndigoDashboardsPage()
+                .waitForAllKpiWidgetContentLoaded()
+                .getLastKpi();
 
-            indigoDashboardsPage
-                .getConfigurationPanel()
-                .selectMetricByName(PERCENT_OF_GOAL);
+            assertEquals(lastKpi.getValue(), "<button>1.00</button>");
 
-            // Check that loading happened
-            indigoDashboardsPage
-                .waitForAnyKpiWidgetContentLoading()
-                .waitForAllKpiWidgetContentLoaded();
-            assertEquals(selectedKpi.getValue(), "<button>11.61</button>");
         } finally {
-            RestUtils.changeMetricFormat(getRestApiClient(), uri, oldFormat);
+            teardownKpi();
+            getMdService().removeObj(xssFormatMetric);
         }
     }
 
