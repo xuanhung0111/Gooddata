@@ -25,15 +25,22 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             .getLastKpi();
     }
 
+    private void setAlertForLastKpi(String triggeredWhen, String threshold) {
+        initIndigoDashboardsPage()
+            .getLastKpi()
+            .openAlertDialog()
+            .selectTriggeredWhen(triggeredWhen)
+            .setThreshold(threshold)
+            .setAlert();
+    }
+
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkNewKpiDoesNotHaveAlertSet() {
         setupKpi(AMOUNT, DATE_CREATED);
 
         try {
-            Kpi kpi = getLastKpiAfterAlertsLoaded();
-
             takeScreenshot(browser, "checkNewKpiDoesNotHaveAlertSet", getClass());
-            Assert.assertFalse(kpi.hasSetAlert());
+            Assert.assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
             teardownKpi();
         }
@@ -78,17 +85,10 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
         try {
 
-            initIndigoDashboardsPage()
-                .getLastKpi()
-                .openAlertDialog()
-                .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
-                .setThreshold(KPI_ALERT_THRESHOLD)
-                .setAlert();
-
-            Kpi kpi = getLastKpiAfterAlertsLoaded();
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             takeScreenshot(browser, "checkAddKpiAlert", getClass());
-            assertTrue(kpi.hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
             teardownKpi();
         }
@@ -100,20 +100,11 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
         try {
             String updatedThreshold = "200";
-            Kpi kpi;
             KpiAlertDialog kpiAlertDialog;
 
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
-            initIndigoDashboardsPage()
-                .getLastKpi()
-                .openAlertDialog()
-                .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
-                .setThreshold(KPI_ALERT_THRESHOLD)
-                .setAlert();
-
-            kpi = getLastKpiAfterAlertsLoaded();
-
-            assertTrue(kpi.hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
             kpiAlertDialog = initIndigoDashboardsPage()
                 .getLastKpi()
@@ -123,16 +114,9 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             assertEquals(kpiAlertDialog.getTriggeredWhen(), TRIGGERED_WHEN_GOES_ABOVE);
             assertEquals(kpiAlertDialog.getThreshold(), KPI_ALERT_THRESHOLD);
 
-            initIndigoDashboardsPage()
-                .getLastKpi()
-                .openAlertDialog()
-                .selectTriggeredWhen(TRIGGERED_WHEN_DROPS_BELOW)
-                .setThreshold(updatedThreshold)
-                .setAlert();
+            setAlertForLastKpi(TRIGGERED_WHEN_DROPS_BELOW, updatedThreshold);
 
-            kpi = getLastKpiAfterAlertsLoaded();
-
-            assertTrue(kpi.hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
             kpiAlertDialog = initIndigoDashboardsPage()
                 .getLastKpi()
@@ -151,8 +135,6 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(AMOUNT, DATE_CREATED);
 
         try {
-            Kpi kpi;
-
             KpiAlertDialog kpiAlertDialog = initIndigoDashboardsPage()
                 .selectDateFilterByName(DATE_FILTER_LAST_MONTH)
                 .getLastKpi()
@@ -160,16 +142,9 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
             assertFalse(kpiAlertDialog.hasAlertMessage());
 
-            initIndigoDashboardsPage()
-                .getLastKpi()
-                .openAlertDialog()
-                .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
-                .setThreshold(KPI_ALERT_THRESHOLD)
-                .setAlert();
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
-            kpi = getLastKpiAfterAlertsLoaded();
-
-            assertTrue(kpi.hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
             String alertMessageText = initIndigoDashboardsPage()
                 .selectDateFilterByName(DATE_FILTER_LAST_MONTH)
@@ -189,12 +164,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(AMOUNT, DATE_CREATED);
 
         try {
-            initIndigoDashboardsPage()
-                .getLastKpi()
-                .openAlertDialog()
-                .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
-                .setThreshold(KPI_ALERT_THRESHOLD)
-                .setAlert();
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             initIndigoDashboardsPage()
                 .selectDateFilterByName(DATE_FILTER_THIS_QUARTER)
@@ -219,12 +189,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         try {
             String alertDialogInfoText = "in current month";
 
-            initIndigoDashboardsPage()
-                .getLastKpi()
-                .openAlertDialog()
-                .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
-                .setThreshold(KPI_ALERT_THRESHOLD)
-                .setAlert();
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             Kpi kpi = getLastKpiAfterAlertsLoaded();
             assertTrue(kpi.hasSetAlert());
@@ -253,29 +218,18 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(AMOUNT, DATE_CREATED);
 
         try {
-            Kpi kpi;
-
-            initIndigoDashboardsPage()
-                .getLastKpi()
-                .openAlertDialog()
-                .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
-                .setThreshold(KPI_ALERT_THRESHOLD)
-                .setAlert();
-
-            kpi = getLastKpiAfterAlertsLoaded();
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             takeScreenshot(browser, "checkKpiAlertDelete_before", getClass());
-            assertTrue(kpi.hasSetAlert());
+            assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
             initIndigoDashboardsPage()
                 .getLastKpi()
                 .openAlertDialog()
                 .deleteAlert();
 
-            kpi = getLastKpiAfterAlertsLoaded();
-
             takeScreenshot(browser, "checkKpiAlertDelete_after", getClass());
-            assertFalse(kpi.hasSetAlert());
+            assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
             teardownKpi();
         }
