@@ -4,9 +4,9 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.util.Collections;
@@ -155,8 +155,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         // the processing should not go any further but display validation error directly in File Upload Dialog
         assertThat(waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors(),
-                contains("Failed to upload the " + csvFile.getFileName() 
-                        + " file. Some rows contain more column than the others. Upload a different CSV file."));
+                hasItem("Failed to upload the " + csvFile.getFileName() + " file."));
 
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFile.getFileName()), getClass());
 
@@ -164,20 +163,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     }
     
     protected void uploadFile(CsvFile csvFile) {
-        String csvFileName = csvFile.getFileName();
         waitForFragmentVisible(datasetsListPage).clickAddDataButton();
 
-        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "initial-state", csvFileName), getClass());
-
-        waitForFragmentVisible(fileUploadDialog).pickCsvFile(csvFile.getCsvFileToUpload());
-
-        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "csv-file-picked", csvFileName), getClass());
-
-        fileUploadDialog.clickUploadButton();
-
-        waitForFragmentVisible(fileUploadProgressDialog);
-
-        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFileName), getClass());
+        doUploadFromDialog(csvFile);
     }
 
     protected void waitForExpectedDatasetsCount(final int expectedDatasetsCount) {
@@ -213,10 +201,24 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 .withMessage("Dataset '" + csvDatasetName + "' has not been removed from the dataset list.")
                 .until(datasetSuccessfullyRemoved);
     }
-    
+
+    protected void doUploadFromDialog(CsvFile csvFile) {
+        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "initial-state", csvFile.getFileName()), getClass());
+
+        waitForFragmentVisible(fileUploadDialog).pickCsvFile(csvFile.getCsvFileToUpload());
+
+        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "csv-file-picked", csvFile.getFileName()), getClass());
+
+        fileUploadDialog.clickUploadButton();
+
+        waitForFragmentVisible(fileUploadProgressDialog);
+
+        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFile.getFileName()), getClass());
+    }
+
     public class UploadHistory {
         private CsvFile csvFile;
-        private Map<String, Boolean> datasetNames = new HashMap<String, Boolean>();
+        private Map<String, Boolean> datasetNames = new HashMap<>();
         
         public UploadHistory(CsvFile csvFile) {
             this.csvFile = csvFile;
@@ -260,6 +262,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         PAYROLL_CHECK_NOT_SYNC_DATA("payroll.not.sync.data"),
         PAYROLL_UPLOAD_MULTIPLE_TIMES("payroll.upload.multiple.times"),
         PAYROLL_UPLOAD_AFTER_DELETE_DATASET("payroll.upload.after.delete.dataset"),
+        PAYROLL_REFRESH("payroll.refresh"),
+        PAYROLL_REFRESH_BAD("payroll.refresh.bad"),
         /** This csv file has incorrect column count (one more than expected) on the line number 2. */
         BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList()),
         NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES),

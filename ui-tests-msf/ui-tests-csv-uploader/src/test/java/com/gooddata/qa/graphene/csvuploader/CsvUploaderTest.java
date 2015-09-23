@@ -9,6 +9,9 @@ import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
 
 public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
@@ -69,7 +72,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(datasetsListPage);
     }
 
-    @Test(dependsOnMethods = {"checkCsvDatasetDetail"})
+    @Test(dependsOnMethods = {"checkCsvRefreshFromDetail"})
     public void checkDeleteCsvDataset() throws Exception {
         initDataUploadPage();
 
@@ -90,5 +93,52 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         assertThat("Dataset with name '" + datasetName + "' should not be in datasets list.",
                 datasetsListPage.getMyDatasetsTable().getDatasetNames(),
                 not(hasItem(datasetName)));
+    }
+
+    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    public void checkCsvRefreshFromList() {
+        initDataUploadPage();
+
+        datasetsListPage.getMyDatasetsTable().getDatasetRefreshButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
+
+        refreshCsv(CsvFile.PAYROLL_REFRESH);
+
+        waitForDatasetStatus(CsvFile.PAYROLL.getDatasetNameOfFirstUpload(), SUCCESSFUL_STATUS_MESSAGE);
+    }
+
+    @Test(dependsOnMethods = {"checkCsvDatasetDetail"})
+    public void checkCsvRefreshFromDetail() {
+        initDataUploadPage();
+
+        datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
+
+        waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
+
+        refreshCsv(CsvFile.PAYROLL_REFRESH);
+
+        waitForFragmentVisible(csvDatasetDetailPage);
+    }
+
+    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    public void checkCsvRefreshWithIncorrectMetadata() {
+        initDataUploadPage();
+
+        datasetsListPage.getMyDatasetsTable().getDatasetRefreshButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
+
+        doUploadFromDialog(CsvFile.PAYROLL_REFRESH_BAD);
+
+        final List<String> validationErrors = waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+
+        assertTrue(!validationErrors.isEmpty(), "Missing validation error for refresh with incorrect metadata.");
+    }
+
+    private void refreshCsv(CsvFile refreshData) {
+        doUploadFromDialog(refreshData);
+
+        waitForFragmentVisible(dataPreviewPage);
+
+        takeScreenshot(browser, toScreenshotName(DATA_PREVIEW_PAGE, refreshData.getFileName()), getClass());
+
+        dataPreviewPage.triggerIntegration();
     }
 }

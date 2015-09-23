@@ -20,8 +20,15 @@ public class DatasetDetailPage extends AbstractFragment {
     @FindBy(className = "s-dataset-columns-table")
     private DatasetColumnsTable datasetColumns;
 
+    @FindBy(className = "s-dataset-update-ds-from-file-button")
+    private WebElement refreshDatasetButton;
+
     public void clickBackButton() {
         waitForElementVisible(backButton).click();
+    }
+
+    public void clickRefreshButton() {
+        waitForElementVisible(refreshDatasetButton).click();
     }
 
     public String getDatasetName() {
