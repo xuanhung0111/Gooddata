@@ -51,7 +51,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", PAYROLL_DATASET_NAME), getClass());
 
-        waitForDatasetStatus(PAYROLL_DATASET_NAME, SUCCESSFUL_STATUS_MESSAGE);
+        waitForDatasetStatus(PAYROLL_DATASET_NAME, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", PAYROLL_DATASET_NAME), getClass());
     }
@@ -103,7 +103,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
         refreshCsv(CsvFile.PAYROLL_REFRESH);
 
-        waitForDatasetStatus(CsvFile.PAYROLL.getDatasetNameOfFirstUpload(), SUCCESSFUL_STATUS_MESSAGE);
+        waitForDatasetStatus(CsvFile.PAYROLL.getDatasetNameOfFirstUpload(), SUCCESSFUL_STATUS_MESSAGE_REGEX);
     }
 
     @Test(dependsOnMethods = {"checkCsvDatasetDetail"})
