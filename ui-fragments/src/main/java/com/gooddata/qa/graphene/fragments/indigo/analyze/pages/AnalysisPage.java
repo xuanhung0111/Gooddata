@@ -352,6 +352,10 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(cataloguePanel).isInapplicableAttributeMetricInViewPort();
     }
 
+    public boolean isDataApplicable(String data) {
+        return waitForFragmentVisible(cataloguePanel).isDataApplicable(data);
+    }
+
     public AnalysisPage addStackBy(String category) {
         waitForFragmentVisible(cataloguePanel);
         waitForFragmentVisible(bucketsPanel).addStackBy(cataloguePanel.getCategory(category));
