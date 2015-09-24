@@ -174,6 +174,12 @@ public class CataloguePanel extends AbstractFragment {
         return items;
     }
 
+    public boolean isDataApplicable(final String data) {
+        return items.stream()
+            .map(WebElement::getText)
+            .anyMatch(text -> data.equals(text.trim()));
+    }
+
     private void waitForItemLoaded() {
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             public boolean apply(WebDriver input) {
