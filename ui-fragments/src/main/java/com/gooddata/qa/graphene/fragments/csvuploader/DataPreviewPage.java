@@ -8,6 +8,9 @@ import org.openqa.selenium.support.FindBy;
 
 public class DataPreviewPage extends AbstractFragment {
 
+    @FindBy(className = "s-preview-page-error")
+    private WebElement previewPageError;
+
     @FindBy(css = ".new-load.data-table")
     private DataPreviewTable dataPreviewTable;
 
@@ -17,7 +20,11 @@ public class DataPreviewPage extends AbstractFragment {
     public void triggerIntegration() {
         waitForElementVisible(triggerIntegrationButton).click();
     }
-    
+
+    public String getPreviewPageErrorMassage() {
+        return waitForElementVisible(previewPageError).getText();
+    }
+
     public DataPreviewTable getDataPreviewTable() {
         return waitForFragmentVisible(dataPreviewTable);
     }

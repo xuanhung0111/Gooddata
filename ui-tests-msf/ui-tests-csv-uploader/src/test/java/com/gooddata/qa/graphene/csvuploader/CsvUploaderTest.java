@@ -1,11 +1,13 @@
 package com.gooddata.qa.graphene.csvuploader;
 
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -93,6 +95,24 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         assertThat("Dataset with name '" + datasetName + "' should not be in datasets list.",
                 datasetsListPage.getMyDatasetsTable().getDatasetNames(),
                 not(hasItem(datasetName)));
+    }
+
+    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    public void checkNoFactAndNumericColumnNameCsvConfig() throws Exception {
+        initDataUploadPage();
+        uploadFile(PAYROLL_FILE);
+        waitForFragmentVisible(dataPreviewPage);
+
+        final String factColumnName = "Amount";
+        final String numericColumnName = "42";
+
+        dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
+        assertThat(dataPreviewPage.getPreviewPageErrorMassage(),
+                containsString("At least one column must contain numbers"));
+
+        dataPreviewPage.getDataPreviewTable().changeColumnName(factColumnName, numericColumnName);
+        assertThat(dataPreviewPage.getDataPreviewTable().getColumnError(numericColumnName),
+                containsString("The column name cannot begin with a numerical character"));
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})

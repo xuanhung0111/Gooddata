@@ -22,6 +22,9 @@ public class DataPreviewTable extends AbstractTable {
     @FindBy(css = ".s-data-type-picker select")
     private List<Select> columnTypes;
 
+    @FindBy(className = "s-error-detail")
+    private List<WebElement> columnErrors;
+
     public List<String> getColumnNames() {
         waitForCollectionIsNotEmpty(columnNames);
         return columnNames.stream()
@@ -33,6 +36,11 @@ public class DataPreviewTable extends AbstractTable {
         return columnTypes.stream()
                 .map(type -> type.getFirstSelectedOption().getText())
                 .collect(toList());
+    }
+
+    public String getColumnError(String columnName) {
+        final int columnIndex = getColumnNames().indexOf(columnName);
+        return columnErrors.get(columnIndex).getText();
     }
     
     public void changeColumnType(String columnName, ColumnType type) {
@@ -49,6 +57,14 @@ public class DataPreviewTable extends AbstractTable {
                 .withMessage(
                         "Expected type is not selected: " + selectedColumnType.getFirstSelectedOption().getText())
                 .until(typeIsSelected);
+    }
+
+    public void changeColumnName(String oldColumnName, String newColumnName) {
+        final int columnIndex = getColumnNames().indexOf(oldColumnName);
+        final WebElement columnName = columnNames.get(columnIndex);
+
+        columnName.clear();
+        columnName.sendKeys(newColumnName);
     }
 
     public enum ColumnType {
