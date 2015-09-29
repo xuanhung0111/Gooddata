@@ -287,7 +287,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         WITHOUT_FACT("payroll.without.fact"),
         CRAZY_DATA("crazy.data"),
         TOO_MANY_COLUMNS("too.many.columns"),
-        TOO_LONG_FIELD("payroll.too.long.field");
+        TOO_LONG_FIELD("payroll.too.long.field"),
+        PAYROLL_TOO_LONG_FACT_VALUE("payroll.too.long.fact.value");
     
         private final String name;
         private final List<String> columnNames = Lists.newArrayList();
