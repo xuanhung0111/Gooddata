@@ -46,7 +46,11 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected static final String DATA_PREVIEW_PAGE = "data-preview";
     protected static final String DELETE_DATASET_DIALOG_NAME = "delete-dataset-dialog";
 
-    protected static final String SUCCESSFUL_STATUS_MESSAGE = "Data uploaded successfully";
+    /**
+     * Successful load contains information about number of rows and columns,
+     * so status message of such load should match the following regular expression.
+     */
+    protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = ".*rows.*columns.*";
 
     private static final List<String> PAYROLL_COLUMN_TYPES = Lists.newArrayList("Attribute", "Attribute",
             "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Date", "Measure");
@@ -178,16 +182,16 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 .until(datasetsCountEqualsExpected);
     }
 
-    protected void waitForDatasetStatus(final String datasetName, final String expectedStatusMessage) {
+    protected void waitForDatasetStatus(final String datasetName, final String expectedStatusMessageRegex) {
         Predicate<WebDriver> datasetHasSuccessfulStatus = input -> {
             final String datasetStatus =
                     waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetStatus(datasetName);
-            return isNotEmpty(datasetStatus) && datasetStatus.contains(expectedStatusMessage);
+            return isNotEmpty(datasetStatus) && datasetStatus.matches(expectedStatusMessageRegex);
         };
 
         Graphene.waitGui(browser)
                 .withMessage("Dataset '" + datasetName + "' has incorrect status. "
-                        + "Expected: '" + expectedStatusMessage
+                        + "Expected: '" + expectedStatusMessageRegex
                         + "', but was: '" + datasetsListPage.getMyDatasetsTable().getDatasetStatus(datasetName)
                         + "'.")
                 .until(datasetHasSuccessfulStatus);

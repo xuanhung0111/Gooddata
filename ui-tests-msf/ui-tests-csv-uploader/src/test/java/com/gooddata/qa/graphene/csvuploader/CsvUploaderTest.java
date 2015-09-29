@@ -1,11 +1,13 @@
 package com.gooddata.qa.graphene.csvuploader;
 
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,7 +53,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", PAYROLL_DATASET_NAME), getClass());
 
-        waitForDatasetStatus(PAYROLL_DATASET_NAME, SUCCESSFUL_STATUS_MESSAGE);
+        waitForDatasetStatus(PAYROLL_DATASET_NAME, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", PAYROLL_DATASET_NAME), getClass());
     }
@@ -96,6 +98,24 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    public void checkNoFactAndNumericColumnNameCsvConfig() throws Exception {
+        initDataUploadPage();
+        uploadFile(PAYROLL_FILE);
+        waitForFragmentVisible(dataPreviewPage);
+
+        final String factColumnName = "Amount";
+        final String numericColumnName = "42";
+
+        dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
+        assertThat(dataPreviewPage.getPreviewPageErrorMassage(),
+                containsString("At least one column must contain numbers"));
+
+        dataPreviewPage.getDataPreviewTable().changeColumnName(factColumnName, numericColumnName);
+        assertThat(dataPreviewPage.getDataPreviewTable().getColumnError(numericColumnName),
+                containsString("The column name cannot begin with a numerical character"));
+    }
+
+    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshFromList() {
         initDataUploadPage();
 
@@ -103,7 +123,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
         refreshCsv(CsvFile.PAYROLL_REFRESH);
 
-        waitForDatasetStatus(CsvFile.PAYROLL.getDatasetNameOfFirstUpload(), SUCCESSFUL_STATUS_MESSAGE);
+        waitForDatasetStatus(CsvFile.PAYROLL.getDatasetNameOfFirstUpload(), SUCCESSFUL_STATUS_MESSAGE_REGEX);
     }
 
     @Test(dependsOnMethods = {"checkCsvDatasetDetail"})
