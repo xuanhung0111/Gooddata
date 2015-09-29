@@ -91,7 +91,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
-    protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/#/p/";
+    protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
 
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
     protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
@@ -579,8 +579,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForFragmentVisible(userManagementPage);
     }
 
+    public String getIndigoDashboardsPageUri() {
+        return PAGE_INDIGO_DASHBOARDS + "#/p/" + testParams.getProjectId();
+    }
+
     public IndigoDashboardsPage initIndigoDashboardsPage() {
-        openUrl(PAGE_INDIGO_DASHBOARDS + testParams.getProjectId());
+        openUrl(getIndigoDashboardsPageUri());
         waitForFragmentVisible(indigoDashboardsPage);
 
         return indigoDashboardsPage

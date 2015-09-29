@@ -26,7 +26,6 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             logout();
             signIn(false, UserRoles.VIEWER);
 
-            initDashboardsPage();
             initIndigoDashboardsPage();
 
             assertFalse(indigoDashboardsPage.isEditButtonVisible());
@@ -44,7 +43,6 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             logout();
             signIn(false, UserRoles.EDITOR);
 
-            initDashboardsPage();
             initIndigoDashboardsPage();
 
             assertTrue(indigoDashboardsPage.isEditButtonVisible());
@@ -60,7 +58,7 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             initDashboardsPage();
 
             logout();
-            openUrl(PAGE_INDIGO_DASHBOARDS);
+            openUrl(getIndigoDashboardsPageUri());
             Graphene.waitGui().until(new Predicate<WebDriver>() {
                 @Override
                 public boolean apply(WebDriver browser) {

@@ -147,7 +147,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
             String alertMessageText = initIndigoDashboardsPage()
-                .selectDateFilterByName(DATE_FILTER_LAST_MONTH)
+                .selectDateFilterByName(DATE_FILTER_ALL_TIME)
                 .getLastKpi()
                 .openAlertDialog()
                 .getAlertMessageText();

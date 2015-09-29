@@ -40,6 +40,5 @@ public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
     @Parameters({"windowSize"})
     public void initDashboardTests(@Optional("maximize") String windowSize) {
         adjustWindowSize(windowSize);
-        initDashboardsPage();
     }
 }
