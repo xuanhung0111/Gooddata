@@ -445,6 +445,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String myDatasetName = getNewDataset(fileToUpload);
 
+        waitForDatasetName(myDatasetName);
         List<String> myDatasetNames = datasetsListPage.getMyDatasetsTable().getDatasetNames();
         assertThat(myDatasetNames, hasItem(myDatasetName));
         assertThat(myDatasetNames, contains(myDatasetNames.stream().sorted().toArray()));
@@ -456,7 +457,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnGroups = {"myData"}, alwaysRun = true)
     public void addOtherAdminToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(technicalUser, UserRoles.ADMIN);
+        addUserToProject(testParams.getAdminUser(), UserRoles.ADMIN);
     }
 
     @Test(dependsOnMethods = {"addOtherAdminToProject"})
@@ -466,7 +467,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
             List<String> projectOwnerDatasetNames = datasetsListPage.getMyDatasetsTable().getDatasetNames();
 
             logout();
-            signInAtGreyPages(technicalUser, technicalUserPassword);
+            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
 
             initDataUploadPage();
             datasetsListPage.waitForMyDatasetsEmptyStateLoaded();
@@ -488,7 +489,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
             List<String> projectOwnerDatasetNames = datasetsListPage.getMyDatasetsTable().getDatasetNames();
 
             logout();
-            signInAtGreyPages(technicalUser, technicalUserPassword);
+            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
 
             initDataUploadPage();
 
@@ -499,6 +500,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
             checkCsvUpload(fileToUpload, this::uploadCsv, true);
             String myDatasetName = getNewDataset(fileToUpload);
 
+            waitForDatasetName(myDatasetName);
             assertThat(datasetsListPage.getMyDatasetsTable().getDatasetNames(), hasItem(myDatasetName));
             waitForDatasetStatus(myDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
             takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", myDatasetName),
