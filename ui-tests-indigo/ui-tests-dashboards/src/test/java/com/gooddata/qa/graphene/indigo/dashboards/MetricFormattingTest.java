@@ -2,9 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.md.Metric;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import java.io.IOException;
@@ -16,13 +14,10 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
     private static final String PERCENT_OF_GOAL = "% of Goal";
-    private static final String PERCENT_OF_GOAL_URI = "/gdc/md/%s/obj/8136";
-    private static final String NUMBER_OF_ACTIVITIES_URI = "/gdc/md/%s/obj/14636";
 
     @DataProvider(name = "formattingProvider")
     public Object[][] formattingProvider() {
