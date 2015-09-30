@@ -143,7 +143,7 @@ public class MetricsBucket extends AbstractFragment {
         assertTrue(compareToSamePeriod.isSelected());
     }
 
-    public String getStackByMessage() {
+    public String getMetricMessage() {
         return waitForElementVisible(BY_STACK_WARNING, getRoot()).getText().trim();
     }
 

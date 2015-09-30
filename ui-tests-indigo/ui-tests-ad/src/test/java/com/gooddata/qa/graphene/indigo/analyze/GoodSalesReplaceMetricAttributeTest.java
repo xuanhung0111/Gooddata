@@ -14,7 +14,6 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstractTest {
 
     private static final String EXPECTED = "Expected";
-    private static final String QUOTA = "Quota";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
