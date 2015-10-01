@@ -524,7 +524,7 @@ public class ReportPage extends AbstractFragment {
     }
 
     public boolean isReportTooLarge() {
-        return isElementPresent(id("tooBigReportHelp"), browser);
+        return isElementPresent(cssSelector("#tooBigReportHelp:not([style*='display: none'])"), browser);
     }
 
     public ReportPage openVersion(int version) {
@@ -610,6 +610,10 @@ public class ReportPage extends AbstractFragment {
 
     public String getInvalidDataReportMessage() {
         return waitForElementVisible(cssSelector("#invalidDataReportHelp > em"), browser).getText().trim();
+    }
+
+    public boolean isInvalidDataReportMessageVisible() {
+        return isElementPresent(cssSelector("#invalidDataReportHelp:not([style*='display: none'])"), browser);
     }
 
     public ReportPage switchViewToTags() {
