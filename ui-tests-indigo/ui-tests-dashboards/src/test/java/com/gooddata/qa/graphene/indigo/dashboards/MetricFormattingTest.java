@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 
 public class MetricFormattingTest extends DashboardWithWidgetsTest {
@@ -37,7 +38,11 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         String customFormatMetricMaql = "SELECT 154271";
         Metric customFormatMetric = getMdService().createObj(getProject(), new Metric(customFormatMetricName, customFormatMetricMaql, format.toString()));
 
-        setupKpi(customFormatMetricName, DATE_CREATED);
+        setupKpi(new KpiConfiguration.Builder()
+            .metric(customFormatMetricName)
+            .dateDimension(DATE_CREATED)
+            .build()
+        );
 
         try {
             Kpi lastKpi = initIndigoDashboardsPage()
@@ -63,11 +68,16 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkXssInMetricName() {
         String xssHeadline = "<script>alert('Hi')</script>";
-
         String xssMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssMetricMaql = "SELECT 1";
         Metric xssMetric = getMdService().createObj(getProject(), new Metric(xssMetricName, xssMetricMaql, "#,##0.00"));
-        setupKpi(xssMetricName, DATE_CREATED);
+
+        setupKpi(
+            new KpiConfiguration.Builder()
+                .metric(xssMetricName)
+                .dateDimension(DATE_CREATED)
+                .build()
+        );
 
         try {
             Kpi lastKpi = initIndigoDashboardsPage()
@@ -94,7 +104,12 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         String xssFormatMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssFormatMetricMaql = "SELECT 1";
         Metric xssFormatMetric = getMdService().createObj(getProject(), new Metric(xssFormatMetricName, xssFormatMetricMaql, "<button>#,##0.00</button>"));
-        setupKpi(xssFormatMetricName, DATE_CREATED);
+
+        setupKpi(new KpiConfiguration.Builder()
+            .metric(xssFormatMetricName)
+            .dateDimension(DATE_CREATED)
+            .build()
+        );
 
         try {
             Kpi lastKpi = initIndigoDashboardsPage()
@@ -116,7 +131,11 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         Metric invalidMetric = getMdService().createObj(getProject(), new Metric(invalidMetricName, invalidMetricMaql, "#,##0.00"));
 
         try {
-            setupKpi(invalidMetricName, DATE_CREATED);
+            setupKpi(new KpiConfiguration.Builder()
+                .metric(invalidMetricName)
+                .dateDimension(DATE_CREATED)
+                .build()
+            );
 
             Kpi lastKpi = initIndigoDashboardsPage()
                 .waitForAllKpiWidgetContentLoaded()

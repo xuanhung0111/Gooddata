@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.collect.Iterables;
@@ -11,6 +12,7 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import java.util.HashMap;
 
 import org.openqa.selenium.TimeoutException;
 
@@ -32,9 +34,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = "kpi-placeholder")
     private WebElement addWidget;
-
-    @FindBy(className = "dashboard")
-    private WebElement dashboard;
 
     @FindBy(xpath = "//*[contains(concat(' ', normalize-space(@class), ' '), ' s-dialog ')]")
     private ConfirmDialog dialog;
@@ -132,6 +131,12 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public IndigoDashboardsPage deleteKpi(Kpi kpi) {
+        kpi.clickKpiDeleteButton();
+
+        return this;
+    }
+
     public String getValueFromKpi(final String name) {
         return Iterables.find(kpis, input -> name.equals(input.getHeadline())).getValue();
     }
@@ -188,22 +193,19 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName) {
+    public IndigoDashboardsPage addWidget(KpiConfiguration config) {
         clickAddWidget();
         configurationPanel
-                .selectMetricByName(metricName)
-                .selectDateDimensionByName(dateDimensionName);
+            .selectMetricByName(config.getMetric())
+            .selectDateDimensionByName(config.getDateDimension());
 
-        return waitForAllKpiWidgetContentLoaded();
-    }
+        if (config.hasComparison()) {
+            configurationPanel.selectComparisonByName(config.getComparison().toString());
+        }
 
-    public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName,
-            Kpi.ComparisonType comparisonName) {
-        clickAddWidget();
-        configurationPanel
-                .selectMetricByName(metricName)
-                .selectDateDimensionByName(dateDimensionName)
-                .selectComparisonByName(comparisonName.toString());
+        if (config.hasDrillTo()) {
+            configurationPanel.selectDrillToByName(config.getDrillTo());
+        }
 
         return waitForAllKpiWidgetContentLoaded();
     }

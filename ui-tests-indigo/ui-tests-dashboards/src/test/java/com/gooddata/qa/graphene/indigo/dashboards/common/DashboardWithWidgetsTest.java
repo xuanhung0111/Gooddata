@@ -4,6 +4,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import com.gooddata.md.MetadataService;
 import com.gooddata.project.Project;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 
 import java.io.IOException;
@@ -31,10 +32,14 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     public static final String DATE_FILTER_THIS_QUARTER = "This quarter";
     public static final String DATE_FILTER_LAST_QUARTER = "Last quarter";
 
-    protected void setupKpi(String metricName, String dateDimension) {
+    public static final String DRILL_TO_OUTLOOK = "Outlook";
+    public static final String DRILL_TO_WHATS_CHANGED = "What's Changed";
+    public static final String DRILL_TO_WATERFALL_ANALYSIS = "Waterfall Analysis";
+
+    protected void setupKpi(KpiConfiguration config) {
         initIndigoDashboardsPage()
             .switchToEditMode()
-            .addWidget(metricName, dateDimension)
+            .addWidget(config)
             .saveEditMode();
     }
 
