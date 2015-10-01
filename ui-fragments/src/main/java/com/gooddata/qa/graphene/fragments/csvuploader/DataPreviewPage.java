@@ -17,8 +17,17 @@ public class DataPreviewPage extends AbstractFragment {
     @FindBy(className = "s-integration-button")
     private WebElement triggerIntegrationButton;
 
-    public void triggerIntegration() {
+    @FindBy(className = "s-select-header-button")
+    private WebElement selectHeaderButton;
+
+    public DataPreviewPage triggerIntegration() {
         waitForElementVisible(triggerIntegrationButton).click();
+        return this;
+    }
+
+    public DataPreviewPage selectHeader() {
+        waitForElementVisible(selectHeaderButton).click();
+        return this;
     }
 
     public String getPreviewPageErrorMassage() {

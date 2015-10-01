@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
 
+import org.apache.commons.lang.StringUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -38,9 +39,11 @@ public class DataPreviewTable extends AbstractTable {
                 .collect(toList());
     }
 
-    public String getColumnError(String columnName) {
-        final int columnIndex = getColumnNames().indexOf(columnName);
-        return columnErrors.get(columnIndex).getText();
+    public List<String> getColumnErrors() {
+        return columnErrors.stream()
+                .map(WebElement::getText)
+                .filter(StringUtils::isNotBlank)
+                .collect(toList());
     }
     
     public void changeColumnType(String columnName, ColumnType type) {
@@ -57,14 +60,6 @@ public class DataPreviewTable extends AbstractTable {
                 .withMessage(
                         "Expected type is not selected: " + selectedColumnType.getFirstSelectedOption().getText())
                 .until(typeIsSelected);
-    }
-
-    public void changeColumnName(String oldColumnName, String newColumnName) {
-        final int columnIndex = getColumnNames().indexOf(oldColumnName);
-        final WebElement columnName = columnNames.get(columnIndex);
-
-        columnName.clear();
-        columnName.sendKeys(newColumnName);
     }
 
     public enum ColumnType {
