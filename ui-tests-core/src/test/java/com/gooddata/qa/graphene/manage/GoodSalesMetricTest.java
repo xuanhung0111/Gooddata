@@ -7,8 +7,11 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -23,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.prefs.CsvPreference;
 import org.testng.annotations.BeforeClass;
@@ -42,6 +47,7 @@ import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.http.RestUtils;
 
 @Test(groups = {"GoodSalesMetrics"},
         description = "Tests for GoodSales project (metric creation functionality) in GD platform")
@@ -49,6 +55,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     private static final String DATE_DIMENSION_SNAPSHOT = "Date dimension (Snapshot)";
     private static final String YEAR_SNAPSHOT = "Year (Snapshot)";
+    private static final String DATE_SNAPSHOT = "Date (Snapshot)";
     private static final String QUARTER_YEAR_SNAPSHOT = "Quarter/Year (Snapshot)";
     private static final String QUARTER_YEAR_CREATED = "Quarter/Year (Created)";
     private static final String QUARTER_YEAR_CLOSED = "Quarter/Year (Closed)";
@@ -92,6 +99,9 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String FILTER = "Filters";
 
     private static final String NO_DATA_MATCH_REPORT_MESSAGE = "No data match the filtering criteria";
+
+    private static final Object REPORT_NOT_COMPUTABLE_MESSAGE =
+            "Report not computable due to improper metric definition";
 
     private static final List<String> PRODUCT_VALUES = asList("CompuSci", "Educationly", "Explorer",
             "Grammar Plus", "PhoenixSoft", "WonderKid");
@@ -533,6 +543,62 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         assertEquals(actualResult, expectedResult);
     }
 
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
+    public void testRollingWindowMetrics() throws ParseException, JSONException, IOException {
+        String amountUri = mdService.getObjUri(project, Metric.class, Restriction.title(AMOUNT));
+        String yearUri = mdService.getObjUri(project, Attribute.class, Restriction.title(YEAR_SNAPSHOT));
+
+        Metric m1 = mdService.createObj(project, new Metric("M1",
+                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW",
+                DEFAULT_METRIC_NUMBER_FORMAT));
+
+        mdService.createObj(project, new Metric("M2",
+                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING",
+                DEFAULT_METRIC_NUMBER_FORMAT));
+
+        mdService.createObj(project, new Metric("M3",
+                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND 1 FOLLOWING",
+                DEFAULT_METRIC_NUMBER_FORMAT));
+
+        mdService.createObj(project, new Metric("M4",
+                "SELECT RUNSUM( [" + amountUri + "] ) WITHIN ([" + yearUri + "])"
+                        + " ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+                DEFAULT_METRIC_NUMBER_FORMAT));
+
+        String reportName = "RollingMetric - Date";
+        UiReportDefinition rd = new UiReportDefinition().withName(reportName).withHows(DATE_SNAPSHOT)
+                .withWhats(AMOUNT, "M1", "M2", "M3", "M4");
+        createReport(rd, rd.getName());
+        openReport(reportName);
+        checkReportRenderedWell(reportName);
+
+        reportName = "RollingMetric - Month_Year";
+        rd = new UiReportDefinition().withName(reportName).withHows(MONTH_YEAR_SNAPSHOT)
+                .withWhats(AMOUNT, "M1", "M2", "M3", "M4");
+        createReport(rd, rd.getName());
+        openReport(reportName);
+        checkReportRenderedWell(reportName);
+
+        List<String> firstRow;
+        try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
+                reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
+            reader.getHeader(true);
+            firstRow = reader.read();
+        }
+        assertNull(firstRow.get(3));
+
+        RestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
+                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW");
+        try {
+            openReport(reportName);
+            takeScreenshot(browser, "checkReportRenderedWell - report not computable", getClass());
+            assertThat(reportPage.getInvalidDataReportMessage(), equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
+        } finally {
+            RestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
+                    "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW");
+        }
+    }
+
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
     public void initializeGoodDataSDK() {
         mdService = getGoodDataClient().getMetadataService();
@@ -943,5 +1009,18 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             results.add(asList("40334", "41054", "41048", "41054", "40334"));
         }
         return results;
+    }
+
+    private void openReport(String reportName) {
+        initReportsPage();
+        waitForFragmentVisible(reportsPage).getReportsList().openReport(reportName);
+        waitForAnalysisPageLoaded(browser);
+    }
+
+    private void checkReportRenderedWell(String reportName) {
+        takeScreenshot(browser, "checkReportRenderedWell - " + reportName, getClass());
+        checkRedBar(browser);
+        assertFalse(waitForFragmentVisible(reportPage).isReportTooLarge());
+        assertFalse(reportPage.isInvalidDataReportMessageVisible());
     }
 }
