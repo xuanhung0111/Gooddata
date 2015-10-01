@@ -242,7 +242,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     public void testFilteringFieldsInCatalog() {
         initAnalysePage();
         analysisPage.searchBucketItem("am");
-        analysisPage.filterCatalog(CatalogFilterType.METRICS_N_FACTS);
+        analysisPage.filterCatalog(CatalogFilterType.MEASURES);
         assertTrue(Iterables.all(analysisPage.getAllCatalogFieldsInViewPort(), new Predicate<WebElement>() {
             @Override
             public boolean apply(WebElement input) {
@@ -264,7 +264,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void testCreateReportWithFieldsInCatalogFilter() {
         initAnalysePage();
-        analysisPage.filterCatalog(CatalogFilterType.METRICS_N_FACTS)
+        analysisPage.filterCatalog(CatalogFilterType.MEASURES)
             .addMetric(AMOUNT)
             .filterCatalog(CatalogFilterType.ATTRIBUTES)
             .addCategory(STAGE_NAME)
@@ -518,6 +518,28 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .append("Inside Sales\n");
         assertEquals(analysisPage.getAttributeDescriptionInMetricFilter(NUMBER_OF_ACTIVITIES, DEPARTMENT),
                 expected.toString());
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testHiddenUnrelatedObjects() {
+        initAnalysePage();
+        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addCategory(ACTIVITY_TYPE)
+            .searchBucketItem(""));
+        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(48));
+
+        assertThat(analysisPage.filterCatalog(CatalogFilterType.MEASURES)
+            .getUnrelatedItemsHiddenCount(), equalTo(39));
+        assertThat(analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
+                .getUnrelatedItemsHiddenCount(), equalTo(9));
+
+        assertFalse(analysisPage.filterCatalog(CatalogFilterType.ALL)
+                .searchBucketItem("Amo"));
+        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(4));
+        assertThat(analysisPage.filterCatalog(CatalogFilterType.MEASURES)
+                .getUnrelatedItemsHiddenCount(), equalTo(4));
+        assertThat(analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
+                .getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
     private void deleteMetric(String metric) {

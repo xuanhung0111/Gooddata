@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
@@ -45,8 +46,23 @@ public class CataloguePanel extends AbstractFragment {
     private Actions actions;
 
     private static final By BY_INLINE_HELP = By.cssSelector(".inlineBubbleHelp");
+    private static final By BY_NO_ITEMS = By.className("adi-no-items");
+    private static final By BY_UNRELATED_ITEMS_HIDDEN = By.cssSelector("footer > div");
+    private static final By BY_UNAVAILABLE_ITEMS_MATCHED = By.className("s-unavailable-items-matched");
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
+
+    public int getUnrelatedItemsHiddenCount() {
+        By locator = isElementPresent(BY_NO_ITEMS, browser) ?
+                BY_UNAVAILABLE_ITEMS_MATCHED : BY_UNRELATED_ITEMS_HIDDEN;
+
+        if (!isElementPresent(locator, getRoot())) {
+            return 0;
+        }
+
+        String unrelatedItemsHiddenMessage = waitForElementVisible(locator, getRoot()).getText().trim();
+        return Integer.parseInt(unrelatedItemsHiddenMessage.split(" ")[0]);
+    }
 
     public void filterCatalog(CatalogFilterType type) {
         WebElement filter;
@@ -54,7 +70,7 @@ public class CataloguePanel extends AbstractFragment {
             case ALL:
                 filter = filterAll;
                 break;
-            case METRICS_N_FACTS:
+            case MEASURES:
                 filter = filterMetrics;
                 break;
             case ATTRIBUTES:
@@ -152,12 +168,12 @@ public class CataloguePanel extends AbstractFragment {
         searchInput.clear();
         searchInput.sendKeys(item);
 
-        List<WebElement> noItems = browser.findElements(By.cssSelector(".adi-no-items > p:first-child"));
-        if (noItems.isEmpty()) {
+        if (!isElementPresent(BY_NO_ITEMS, browser)) {
             waitForCollectionIsNotEmpty(items);
             return true;
         }
-        assertEquals(noItems.get(0).getText().trim(), "No data matching\n\"" + item + "\"");
+        WebElement noItem = browser.findElement(BY_NO_ITEMS).findElement(By.cssSelector("p:first-child"));
+        assertEquals(noItem.getText().trim(), "No data matching\n\"" + item + "\"");
         return false;
     }
 
