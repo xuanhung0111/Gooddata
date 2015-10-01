@@ -43,8 +43,11 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     }
 
     protected void teardownKpi() {
+        if (initIndigoDashboardsPage().isEditButtonVisible()) {
+            initIndigoDashboardsPage()
+                .switchToEditMode();
+        }
         initIndigoDashboardsPage()
-            .switchToEditMode()
             .clickLastKpiDeleteButton()
             .waitForDialog()
             .submitClick();
