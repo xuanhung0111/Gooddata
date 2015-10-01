@@ -39,7 +39,8 @@
         <!-- can be used to multiply the timeout on a specific test places (currently the only place is the validation on vertica DM) -->
         <extendedTimeoutMultiple>10</extendedTimeoutMultiple>
         <file.separator>/</file.separator>
-        <browserDownloadFolder>${project.build.directory}${file.separator}downloads</browserDownloadFolder>
+        <test.module>.</test.module>
+        <browserDownloadFolder>${user.dir}${file.separator}${test.module}${file.separator}target${file.separator}downloads</browserDownloadFolder>
         <video.recording>false</video.recording>
 
         <testng.suite.xml>testng-basic.xml</testng.suite.xml>
@@ -289,6 +290,10 @@
                                             <property>
                                                 <name>browserDownloadFolder</name>
                                                 <value>${browserDownloadFolder}</value>
+                                            </property>
+                                            <property>
+                                                <name>test.module</name>
+                                                <value>${test.module}</value>
                                             </property>
                                             <property>
                                                 <name>user.home</name>
