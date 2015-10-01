@@ -579,8 +579,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForFragmentVisible(userManagementPage);
     }
 
+    public String getIndigoDashboardsPageUri() {
+        return PAGE_INDIGO_DASHBOARDS + "#/p/" + testParams.getProjectId();
+    }
+
     public IndigoDashboardsPage initIndigoDashboardsPage() {
-        openUrl(PAGE_INDIGO_DASHBOARDS);
+        openUrl(getIndigoDashboardsPageUri());
         waitForFragmentVisible(indigoDashboardsPage);
 
         return indigoDashboardsPage
