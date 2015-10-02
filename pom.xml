@@ -20,6 +20,11 @@
         <module>ui-tests-tools</module>
         <module>ui-tests-msf</module>
         <module>ui-tests-indigo</module>
+        <!--
+        Module for support of browserstack for Drone, will be removed and switched to regular dependency when the artifact is officially released
+        Content is taken and updated from https://github.com/MatousJobanek/arquillian-drone-browserstack-webdriver
+        -->
+        <module>arquillian-drone-browserstack-webdriver</module>
     </modules>
 
     <properties>
@@ -34,10 +39,32 @@
         <!-- can be used to multiply the timeout on a specific test places (currently the only place is the validation on vertica DM) -->
         <extendedTimeoutMultiple>10</extendedTimeoutMultiple>
         <file.separator>/</file.separator>
-        <browserDownloadFolder>${project.build.directory}${file.separator}downloads</browserDownloadFolder>
+        <test.module>.</test.module>
+        <browserDownloadFolder>${user.dir}${file.separator}${test.module}${file.separator}target${file.separator}downloads</browserDownloadFolder>
         <video.recording>false</video.recording>
 
         <testng.suite.xml>testng-basic.xml</testng.suite.xml>
+
+        <arquillian.xml>arquillian.xml</arquillian.xml>
+
+        <!-- possible values are: local-firefox/local-chrome/browserstack-mobile-*/browserstack-platform-* -->
+        <test.execution.env>local-firefox</test.execution.env>
+
+        <browserstack.username>xxx</browserstack.username>
+        <browserstack.automate.key>xxx</browserstack.automate.key>
+        <browserstack.mobile.browserName>xxx</browserstack.mobile.browserName>
+        <browserstack.mobile.platform>xxx</browserstack.mobile.platform>
+        <browserstack.mobile.device>xxx</browserstack.mobile.device>
+        <browserstack.platform.browser>xxx</browserstack.platform.browser>
+        <browserstack.platform.browser.version>xxx</browserstack.platform.browser.version>
+        <browserstack.platform.os>xxx</browserstack.platform.os>
+        <browserstack.platform.os.version>xxx</browserstack.platform.os.version>
+        <browserstack.project>local</browserstack.project>
+        <browserstack.build>${user.name}</browserstack.build>
+
+        <coreModuleName>ui-core</coreModuleName>
+        <corePath>${moduleCorePath}</corePath>
+        <moduleCorePath>${basedir}${file.separator}..${file.separator}${coreModuleName}</moduleCorePath>
 
         <corePropertiesPath>ui-tests-core${file.separator}src${file.separator}test${file.separator}resources${file.separator}variables-env-test.properties</corePropertiesPath>
         <propertiesPath>${basedir}${file.separator}${corePropertiesPath}</propertiesPath>
@@ -257,8 +284,16 @@
                                                 <value>${propertiesPath}</value>
                                             </property>
                                             <property>
+                                                <name>corePath</name>
+                                                <value>${corePath}</value>
+                                            </property>
+                                            <property>
                                                 <name>browserDownloadFolder</name>
                                                 <value>${browserDownloadFolder}</value>
+                                            </property>
+                                            <property>
+                                                <name>test.module</name>
+                                                <value>${test.module}</value>
                                             </property>
                                             <property>
                                                 <name>user.home</name>
@@ -267,6 +302,58 @@
                                             <property>
                                                 <name>file.separator</name>
                                                 <value>${file.separator}</value>
+                                            </property>
+                                            <property>
+                                                <name>arquillian.xml</name>
+                                                <value>${arquillian.xml}</value>
+                                            </property>
+                                            <property>
+                                                <name>test.execution.env</name>
+                                                <value>${test.execution.env}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.username</name>
+                                                <value>${browserstack.username}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.automate.key</name>
+                                                <value>${browserstack.automate.key}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.mobile.browserName</name>
+                                                <value>${browserstack.mobile.browserName}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.mobile.platform</name>
+                                                <value>${browserstack.mobile.platform}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.mobile.device</name>
+                                                <value>${browserstack.mobile.device}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.platform.os</name>
+                                                <value>${browserstack.platform.os}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.platform.os.version</name>
+                                                <value>${browserstack.platform.os.version}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.platform.browser</name>
+                                                <value>${browserstack.platform.browser}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.platform.browser.version</name>
+                                                <value>${browserstack.platform.browser.version}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.project</name>
+                                                <value>${browserstack.project}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.build</name>
+                                                <value>${browserstack.build}</value>
                                             </property>
                                         </systemProperties>
                                     </configuration>
@@ -277,6 +364,190 @@
                 </pluginManagement>
             </build>
         </profile>
+
+        <profile>
+            <id>local-firefox</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>local-firefox</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian.xml</arquillian.xml>
+                <browser>firefox</browser>
+            </properties>
+        </profile>
+        <profile>
+            <id>local-chrome</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>local-chrome</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-local-chrome.xml</arquillian.xml>
+                <browser>chrome</browser>
+            </properties>
+        </profile>
+
+        <!-- browserstack profiles -->
+        <profile>
+            <id>browserstack-mobile-android-samsung-galaxy-s5</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-samsung-galaxy-s5</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Samsung Galaxy S5</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-iphone-5</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-iphone-5</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPhone 5</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-iphone-5s</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-iphone-5s</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPhone 5S</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-ipad-air</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-ipad-air</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPad Air</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-ipad-mini-retina</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-ipad-mini-retina</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPad mini Retina</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-ipad-4th-gen</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-ipad-4th-gen</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPad 4th Gen</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-windows-7-IE-8</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-windows-7-IE-8</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>IE</browserstack.platform.browser>
+                <browserstack.platform.browser.version>8.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>Windows</browserstack.platform.os>
+                <browserstack.platform.os.version>7</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-windows-8.1-IE-11</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-windows-8.1-IE-11</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>IE</browserstack.platform.browser>
+                <browserstack.platform.browser.version>11.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>Windows</browserstack.platform.os>
+                <browserstack.platform.os.version>8.1</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-os-x-yosemite-firefox-40</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-os-x-yosemite-firefox-40</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Firefox</browserstack.platform.browser>
+                <browserstack.platform.browser.version>40.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>OS X</browserstack.platform.os>
+                <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-os-x-yosemite-firefox-35</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-os-x-yosemite-firefox-35</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Firefox</browserstack.platform.browser>
+                <browserstack.platform.browser.version>35.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>OS X</browserstack.platform.os>
+                <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
+            </properties>
+        </profile>
+
         <profile>
             <id>video</id>
             <activation>

@@ -27,21 +27,6 @@
                     ${basedir}${file.separator}src${file.separator}test${file.separator}resources${file.separator}geochart-csv
                 </csvFilePath>
             </properties>
-            <build>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                        <filtering>true</filtering>
-                        <includes>
-                            <include>**/firefox-prefs.js</include>
-                        </includes>
-                    </testResource>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                        <filtering>false</filtering>
-                    </testResource>
-                </testResources>
-            </build>
         </profile>
     </profiles>
 </project>
