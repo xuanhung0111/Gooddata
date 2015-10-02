@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.validate;
 
 import com.gooddata.qa.graphene.enums.project.Validation;
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -39,11 +38,9 @@ public class ValidateFragment extends AbstractGreyPagesFragment {
     private WebElement submit;
 
     public String validate(int timeout) {
-        waitForElementVisible(submit);
-        Graphene.guardHttp(submit).click();
+        waitForElementVisible(submit).click();
         waitForElementNotVisible(submit, timeout);
-        waitForElementVisible(BY_GP_LINK, browser, timeout);
-        Graphene.guardHttp(browser.findElement(BY_GP_LINK)).click();
+        waitForElementVisible(BY_GP_LINK, browser, timeout).click();
         waitForElementNotPresent(BY_GP_PRE_JSON, timeout);
         return waitForElementVisible(By.xpath(LOCATOR_SPAN_STATUS), browser, timeout).getText();
     }

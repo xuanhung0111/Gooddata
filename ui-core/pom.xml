@@ -15,6 +15,11 @@
             <artifactId>ui-fragments</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-drone-browserstack-webdriver</artifactId>
+            <version>1.0-alpha-1-gd</version>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -23,6 +28,21 @@
             <properties>
                 <skipTests>true</skipTests>
             </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>**/firefox-prefs.js</include>
+                        </includes>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>false</filtering>
+                    </resource>
+                </resources>
+            </build>
         </profile>
     </profiles>
 </project>
