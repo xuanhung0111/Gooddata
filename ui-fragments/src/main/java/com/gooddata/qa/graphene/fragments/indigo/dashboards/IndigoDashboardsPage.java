@@ -3,8 +3,6 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.collect.Iterables;
-
-import org.jboss.arquillian.graphene.findby.ByJQuery;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -51,7 +49,6 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector(".s-save_button:not(.disabled)");
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
-    private static final String EDIT_BUTTON_VISIBLE_JQUERY_SELECTOR = "." + EDIT_BUTTON_CLASS_NAME + ":visible";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
 
     public ConfigurationPanel getConfigurationPanel() {
@@ -211,7 +208,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public boolean isEditButtonVisible() {
-        ByJQuery buttonVisible = ByJQuery.selector(EDIT_BUTTON_VISIBLE_JQUERY_SELECTOR);
+        By buttonVisible = By.className(EDIT_BUTTON_CLASS_NAME);
         return isElementPresent(buttonVisible, browser);
     }
 

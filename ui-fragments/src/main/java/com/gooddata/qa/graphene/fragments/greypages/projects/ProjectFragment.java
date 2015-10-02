@@ -5,7 +5,6 @@ import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 import org.apache.commons.io.FileUtils;
-import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -56,9 +55,9 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
 
         selectEnviroment(enviroment);
         this.authorizationToken.sendKeys(authorizationToken);
-        Graphene.guardHttp(submit).click();
+        waitForElementVisible(submit).click();
         waitForElementNotVisible(this.title);
-        Graphene.guardHttp(waitForElementVisible(BY_GP_LINK, browser)).click();
+        waitForElementVisible(BY_GP_LINK, browser).click();
         return waitForProjectStateEnabled(checkIterations);
     }
 

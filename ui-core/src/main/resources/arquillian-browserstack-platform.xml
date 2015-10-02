@@ -1,0 +1,37 @@
+<arquillian xmlns="http://jboss.org/schema/arquillian"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="
+        http://jboss.org/schema/arquillian
+        http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+
+    <extension qualifier="webdriver">
+        <property name="browser">browserstack</property>
+        <property name="username">${browserstack.username:xxx}</property>
+        <property name="automate.key">${browserstack.automate.key:xxx}</property>
+        <property name="browserName">${browserstack.platform.browser:IE}</property>
+        <property name="browser_version">${browserstack.platform.browser.version:8.0}</property>
+        <property name="os">${browserstack.platform.os:Windows}</property>
+        <property name="os_version">${browserstack.platform.os.version:7}</property>
+        <property name="resolution">${browserstack.platform.resolution:1600x1200}</property>
+        <property name="acceptSslCerts">true</property>
+        <property name="browserstack.debug">true</property>
+        <property name="project">${browserstack.project:local}</property>
+        <property name="build">${browserstack.build:unknown}</property>
+    </extension>
+
+    <extension qualifier="graphene">
+        <property name="waitModelInterval">${timeout:90}</property>
+        <property name="waitGuiInterval">${timeout:90}</property>
+        <property name="waitAjaxInterval">${timeout:90}</property>
+        <property name="waitGuardInterval">${timeout:90}</property>
+    </extension>
+
+    <extension qualifier="screenRecorder">
+        <property name="rootFolder">target/media</property>
+        <property name="videoFolder">video</property>
+        <property name="videoName">testVideo</property>
+        <property name="video">test</property>
+        <property name="screenshot">none</property>
+    </extension>
+
+</arquillian>
