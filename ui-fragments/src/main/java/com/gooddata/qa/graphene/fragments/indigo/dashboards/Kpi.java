@@ -7,9 +7,12 @@ import org.openqa.selenium.support.FindBy;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
+
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
@@ -142,5 +145,49 @@ public class Kpi extends AbstractFragment {
 
     public void waitForLoading() {
         waitForElementVisible(contentLoading);
+    }
+
+    public enum ComparisonType {
+        NO_COMPARISON("none", "No comparison"),
+        LAST_YEAR("lastYear", "Previous year"),
+        PREVIOUS_PERIOD("previousPeriod", "Previous period");
+
+        private String jsonKey;
+        private String uiText;
+
+        private ComparisonType(String jsonKey, String uiText) {
+            this.jsonKey = jsonKey;
+            this.uiText = uiText;
+        }
+
+        public String getJsonKey() {
+            return jsonKey;
+        }
+
+        @Override
+        public String toString() {
+            return uiText;
+        }
+    }
+
+    public enum ComparisonDirection {
+        NONE,
+        GOOD("growIsGood"),
+        BAD("growIsBad");
+
+        private String text;
+
+        private ComparisonDirection(String text) {
+            this.text = text;
+        }
+
+        private ComparisonDirection() {
+            text = "";
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
     }
 }

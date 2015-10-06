@@ -197,12 +197,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForAllKpiWidgetContentLoaded();
     }
 
-    public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName, String comparisonName) {
+    public IndigoDashboardsPage addWidget(String metricName, String dateDimensionName,
+            Kpi.ComparisonType comparisonName) {
         clickAddWidget();
         configurationPanel
                 .selectMetricByName(metricName)
                 .selectDateDimensionByName(dateDimensionName)
-                .selectComparisonByName(comparisonName);
+                .selectComparisonByName(comparisonName.toString());
 
         return waitForAllKpiWidgetContentLoaded();
     }

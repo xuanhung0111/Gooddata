@@ -31,10 +31,6 @@ public abstract class DashboardWithWidgetsTest extends DashboardsGeneralTest {
     public static final String DATE_FILTER_THIS_QUARTER = "This quarter";
     public static final String DATE_FILTER_LAST_QUARTER = "Last quarter";
 
-    public static final String COMPARISON_PREVIOUS_PERIOD = "Previous period";
-    public static final String COMPARISON_LAST_YEAR = "Previous year";
-    public static final String COMPARISON_NO_COMPARISON = "No comparison";
-
     protected void setupKpi(String metricName, String dateDimension) {
         initIndigoDashboardsPage()
             .switchToEditMode()
