@@ -56,6 +56,22 @@ public class ProjectsPage extends AbstractFragment {
         }).click();
     }
 
+    public String getProjectNameFrom(String projectId) {
+        return projects.stream()
+                .filter(e -> e.getAttribute("gdc:link").contains(projectId))
+                .map(e -> e.findElement(By.cssSelector(".projectTitle")))
+                .map(WebElement::getText)
+                .findFirst()
+                .get();
+    }
+
+    public boolean isProjectDisplayed(String projectId) {
+        return projects.stream()
+                .filter(e -> e.getAttribute("gdc:link").contains(projectId))
+                .findFirst()
+                .isPresent();
+    }
+
     private String getProjectIdFrom(WebElement project) {
         String gdcLink = project.getAttribute("gdc:link");
         return gdcLink.substring(gdcLink.lastIndexOf("/") + 1);

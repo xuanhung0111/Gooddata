@@ -1,8 +1,12 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
-import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
@@ -10,10 +14,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.io.File;
-import java.io.IOException;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
 
@@ -59,6 +62,14 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         waitForElementNotVisible(this.title);
         waitForElementVisible(BY_GP_LINK, browser).click();
         return waitForProjectStateEnabled(checkIterations);
+    }
+
+    public String getDwhDriverSelected() {
+        return Stream.of(vertica, mysql, pg)
+                .filter(e -> Objects.nonNull(e.getAttribute("checked")))
+                .map(e -> e.getAttribute("value"))
+                .findFirst()
+                .get();
     }
 
     private String waitForProjectStateEnabled(int checkIterations) throws JSONException {

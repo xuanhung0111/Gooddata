@@ -82,4 +82,8 @@ public class ApplicationHeaderBar extends AbstractFragment {
         projectSelector.searchItem(idOrName);
         projectSelector.selectFirstItem();
     }
+
+    public static String getCurrentProjectName(WebDriver browser) {
+        return waitForElementVisible(getInstance(browser).navigationPicker).getText();
+    } 
 }
