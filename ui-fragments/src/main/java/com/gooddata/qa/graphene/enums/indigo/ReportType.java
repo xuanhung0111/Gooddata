@@ -7,7 +7,19 @@ public enum ReportType {
 
     TABLE("table"),
     COLUMN_CHART("column"),
-    LINE_CHART("line"),
+
+    LINE_CHART("line") {
+        @Override
+        public String getMetricMessage() {
+            return "TO ADD ADDITIONAL SERIES, REMOVE FROM SEGMENT BY";
+        }
+
+        @Override
+        public String getStackByMessage() {
+            return "TO SEGMENT BY, A VISUALIZATION CAN HAVE ONLY ONE SERIES";
+        }
+    },
+
     BAR_CHART("bar");
 
     private String label;
@@ -20,8 +32,16 @@ public enum ReportType {
         return By.cssSelector(".vis-type-" + label);
     }
 
+    public String getMetricMessage() {
+        return "TO ADD ADDITIONAL SERIES, REMOVE FROM STACK BY";
+    }
+
+    public String getStackByMessage() {
+        return "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE SERIES";
+    }
+
     @Override
     public String toString() {
         return WordUtils.capitalize(label) + (this == TABLE ? "" : " chart");
-    };
+    }
 }
