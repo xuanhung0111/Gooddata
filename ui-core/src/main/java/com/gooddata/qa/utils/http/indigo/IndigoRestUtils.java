@@ -1,13 +1,18 @@
 package com.gooddata.qa.utils.http.indigo;
 
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
+
 import java.io.IOException;
+
 import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -53,7 +58,7 @@ public class IndigoRestUtils {
                         put("title", "${title}");
                     }});
                     put("content", new JSONObject() {{
-                        put("comparisonType", "none");
+                        put("comparisonType", "${comparisonType}");
                         put("metric", "${metric}");
                         put("dateDimension", "${dateDimension}");
                     }});
@@ -91,13 +96,31 @@ public class IndigoRestUtils {
 
     private static String createKpiWidget(RestApiClient restApiClient, String projectId,
             String title, String metricUri, String dateDimensionUri) throws JSONException, IOException {
-        String content = KPI_WIDGET_BODY
-            .replace("${title}", title)
-            .replace("${metric}", metricUri)
-            .replace("${dateDimension}", dateDimensionUri);
+        return createKpiWidget(restApiClient, projectId, title, metricUri, dateDimensionUri,
+                Kpi.ComparisonType.NO_COMPARISON, Kpi.ComparisonDirection.NONE);
+    }
 
-        HttpRequestBase postRequest = restApiClient.newPostMethod(format(RestUtils.CREATE_AND_GET_OBJ_LINK, projectId),
-                content);
+    private static String createKpiWidget(RestApiClient restApiClient, String projectId,
+            String title, String metricUri, String dateDimensionUri, Kpi.ComparisonType comparisonType,
+            Kpi.ComparisonDirection comparisonDirection) throws JSONException, IOException {
+        String content = KPI_WIDGET_BODY
+                .replace("${title}", title)
+                .replace("${metric}", metricUri)
+                .replace("${dateDimension}", dateDimensionUri)
+                .replace("${comparisonType}", comparisonType.getJsonKey());
+
+        if (comparisonType != Kpi.ComparisonType.NO_COMPARISON) {
+            JSONObject contentJson = new JSONObject(content);
+
+            contentJson.getJSONObject("kpi")
+                .getJSONObject("content")
+                .put("comparisonDirection", comparisonDirection.toString());
+
+            content = contentJson.toString();
+        }
+
+        HttpRequestBase postRequest = restApiClient.newPostMethod(format(RestUtils.CREATE_AND_GET_OBJ_LINK,
+                projectId), content);
 
         try {
             HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
@@ -140,7 +163,8 @@ public class IndigoRestUtils {
     }
 
 
-    public static void prepareAnalyticalDashboardTemplate(RestApiClient restApiClient, String projectId) throws JSONException, IOException {
+    public static void prepareAnalyticalDashboardTemplate(RestApiClient restApiClient, String projectId)
+            throws JSONException, IOException {
         // delete all dashboards, if some exist
         for (String dashboardLink: getAnalyticalDashboards(restApiClient, projectId)) {
             RestUtils.deleteObject(restApiClient, dashboardLink);
@@ -151,9 +175,13 @@ public class IndigoRestUtils {
         String numOfActivitiesUri = getObjectUri(projectId, NUM_OF_ACTIVITIES_OBJ_ID);
         String dateDimensionUri = getObjectUri(projectId, DATE_DIM_CREATED_OBJ_ID);
 
-        String amountWidget = createKpiWidget(restApiClient, projectId, "Amount", amountMetricUri, dateDimensionUri);
-        String lostWidget = createKpiWidget(restApiClient, projectId, "Lost", lostMetricUri, dateDimensionUri);
-        String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, "# of Activities", numOfActivitiesUri, dateDimensionUri);
+        String amountWidget = createKpiWidget(restApiClient, projectId, "Amount", amountMetricUri,
+                dateDimensionUri);
+        String lostWidget = createKpiWidget(restApiClient, projectId, "Lost", lostMetricUri, dateDimensionUri,
+                Kpi.ComparisonType.LAST_YEAR, Kpi.ComparisonDirection.BAD);
+        String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, "# of Activities",
+                numOfActivitiesUri, dateDimensionUri, Kpi.ComparisonType.PREVIOUS_PERIOD,
+                Kpi.ComparisonDirection.GOOD);
 
         List<String> widgetUris = Arrays.asList(amountWidget, lostWidget, numOfActivitiesWidget);
         createAnalyticalDashboard(restApiClient, projectId, widgetUris);

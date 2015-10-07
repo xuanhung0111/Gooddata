@@ -2,12 +2,14 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -32,13 +34,18 @@ public class CategoriesBucket extends AbstractFragment {
     @FindBy(className = "s-date-dimension-switch")
     private Select dimensionSwitch;
 
+    private static final By BY_BUCKET_INVITATION = By.cssSelector(".adi-bucket-invitation");
     private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
     private static final By BY_HEADER = By.className("adi-bucket-item-header");
     private static final String EMPTY = "s-bucket-empty";
 
     public void addCategory(WebElement category) {
-        new Actions(browser).dragAndDrop(category, waitForElementVisible(getRoot()))
-                .perform();
+        WebElement invitation = waitForElementVisible(BY_BUCKET_INVITATION, getRoot());
+        ((JavascriptExecutor) browser).executeScript("arguments[0].scrollIntoView(true);", invitation);
+        sleepTightInSeconds(1);
+
+        new Actions(browser).dragAndDrop(category, waitForElementVisible(BY_BUCKET_INVITATION, getRoot()))
+            .perform();
         assertEquals(items.get(items.size() - 1).findElement(BY_HEADER).getText(), category.getText());
     }
 

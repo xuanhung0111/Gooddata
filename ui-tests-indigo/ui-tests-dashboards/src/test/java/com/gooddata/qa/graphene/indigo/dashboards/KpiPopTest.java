@@ -2,12 +2,36 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import org.testng.Assert;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class KpiPopTest extends DashboardWithWidgetsTest {
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    public void checkKpiPopInMobile() {
+        Kpi amount = initIndigoDashboardsPage().getKpiByHeadline(AMOUNT);
+        assertFalse(amount.hasPopSection());
+
+        Kpi lost = initIndigoDashboardsPage().getKpiByHeadline(LOST);
+        assertTrue(lost.hasPopSection());
+        assertEquals(lost.getPopSection().getChangeTitle(), "change");
+        assertEquals(lost.getPopSection().getPeriodTitle(), "prev. year");
+
+        Kpi numberOfActivities = initIndigoDashboardsPage().getKpiByHeadline(NUMBER_OF_ACTIVITIES);
+        assertTrue(numberOfActivities.hasPopSection());
+        assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
+        assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. month");
+
+        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_ALL_TIME);
+        takeScreenshot(browser, "checkKpiPopInMobile-allTime", getClass());
+        assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. period");
+    }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkNewlyAddedKpiHasPopSection() {
@@ -16,7 +40,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .addWidget(AMOUNT, DATE_CREATED)
             .selectLastKpi();
 
-        Assert.assertTrue(justAddedKpi.hasPopSection());
+        assertTrue(justAddedKpi.hasPopSection());
 
         indigoDashboardsPage
             .saveEditMode();
@@ -25,7 +49,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .getLastKpi();
 
         takeScreenshot(browser, "checkNewlyAddedKpiHasPopSection", getClass());
-        Assert.assertTrue(lastKpi.hasPopSection());
+        assertTrue(lastKpi.hasPopSection());
 
         indigoDashboardsPage
             .switchToEditMode()
@@ -41,10 +65,10 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
     public void checkKpiWithoutComparison() {
         Kpi kpi = initIndigoDashboardsPage()
             .switchToEditMode()
-            .addWidget(AMOUNT, DATE_CREATED, COMPARISON_NO_COMPARISON)
+            .addWidget(AMOUNT, DATE_CREATED, Kpi.ComparisonType.NO_COMPARISON)
             .selectLastKpi();
 
-        Assert.assertFalse(kpi.hasPopSection());
+        assertFalse(kpi.hasPopSection());
 
         indigoDashboardsPage
             .saveEditMode();
@@ -53,7 +77,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .getLastKpi();
 
         takeScreenshot(browser, "checkKpiWithoutComparison", getClass());
-        Assert.assertFalse(lastKpi.hasPopSection());
+        assertFalse(lastKpi.hasPopSection());
 
         indigoDashboardsPage
             .switchToEditMode()
@@ -69,17 +93,17 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
     public Object[][] popProvider() {
         return new Object[][] {
             // comparison type, date filter, prev. title for the date filter
-            {COMPARISON_LAST_YEAR, DATE_FILTER_THIS_MONTH, "prev. year"},
-            {COMPARISON_PREVIOUS_PERIOD, DATE_FILTER_THIS_MONTH, "prev. month"},
-            {COMPARISON_LAST_YEAR, DATE_FILTER_THIS_QUARTER, "prev. year"},
-            {COMPARISON_PREVIOUS_PERIOD, DATE_FILTER_THIS_QUARTER, "prev. quarter"},
-            {COMPARISON_LAST_YEAR, DATE_FILTER_ALL_TIME, "prev. year"},
-            {COMPARISON_PREVIOUS_PERIOD, DATE_FILTER_ALL_TIME, "prev. period"}
+            {Kpi.ComparisonType.LAST_YEAR, DATE_FILTER_THIS_MONTH, "prev. year"},
+            {Kpi.ComparisonType.PREVIOUS_PERIOD, DATE_FILTER_THIS_MONTH, "prev. month"},
+            {Kpi.ComparisonType.LAST_YEAR, DATE_FILTER_THIS_QUARTER, "prev. year"},
+            {Kpi.ComparisonType.PREVIOUS_PERIOD, DATE_FILTER_THIS_QUARTER, "prev. quarter"},
+            {Kpi.ComparisonType.LAST_YEAR, DATE_FILTER_ALL_TIME, "prev. year"},
+            {Kpi.ComparisonType.PREVIOUS_PERIOD, DATE_FILTER_ALL_TIME, "prev. period"}
         };
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, dataProvider = "popProvider", groups = {"desktop"})
-    public void checkKpiPopSection(String comparisonType, String dateFilter, String expectedPeriodTitle) {
+    public void checkKpiPopSection(Kpi.ComparisonType comparisonType, String dateFilter, String expectedPeriodTitle) {
         initIndigoDashboardsPage()
             .switchToEditMode()
             .addWidget(AMOUNT, DATE_CREATED, comparisonType)
@@ -91,8 +115,8 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage.selectDateFilterByName(dateFilter);
 
         takeScreenshot(browser, "checkKpiPopSection-" + comparisonType + "-" + dateFilter + "-" + expectedPeriodTitle, getClass());
-        Assert.assertEquals(kpi.getPopSection().getChangeTitle(), "change");
-        Assert.assertEquals(kpi.getPopSection().getPeriodTitle(), expectedPeriodTitle);
+        assertEquals(kpi.getPopSection().getChangeTitle(), "change");
+        assertEquals(kpi.getPopSection().getPeriodTitle(), expectedPeriodTitle);
 
         indigoDashboardsPage
             .switchToEditMode()

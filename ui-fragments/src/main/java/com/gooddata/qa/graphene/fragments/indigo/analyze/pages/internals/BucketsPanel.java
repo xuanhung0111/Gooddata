@@ -147,7 +147,7 @@ public class BucketsPanel extends AbstractFragment {
     }
 
     public String getMetricMessage() {
-        return waitForFragmentVisible(metricsBucket).getStackByMessage();
+        return waitForFragmentVisible(metricsBucket).getMetricMessage();
     }
 
     public String getAddedStackByName() {

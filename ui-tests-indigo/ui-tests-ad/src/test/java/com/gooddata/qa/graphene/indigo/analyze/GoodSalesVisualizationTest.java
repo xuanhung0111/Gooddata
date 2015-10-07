@@ -5,11 +5,13 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoade
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.changeMetricFormat;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -542,10 +545,200 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
+    @Test(dependsOnGroups = {"init"})
+    public void createReportWithManyAttributes() {
+        initAnalysePage();
+        List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
+            .addCategory(ACTIVITY_TYPE)
+            .addCategory(DEPARTMENT)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing()
+            .getTableReport()
+            .getContent();
+
+        assertEquals(adReportContent, getTableReportContentInReportPage());
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void filterReportIncludeManyAttributes() {
+        initAnalysePage();
+        List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
+            .addCategory(ACTIVITY_TYPE)
+            .addCategory(DEPARTMENT)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .configAttributeFilter(ACTIVITY_TYPE, "Email")
+            .configAttributeFilter(DEPARTMENT, "Direct Sales")
+            .waitForReportComputing()
+            .getTableReport()
+            .getContent();
+
+        assertEquals(adReportContent, getTableReportContentInReportPage());
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void switchReportHasOneMetricManyAttributes() {
+        initAnalysePage();
+        analysisPage.changeReportType(ReportType.TABLE)
+            .addCategory(ACTIVITY_TYPE)
+            .addCategory(DEPARTMENT)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
+                assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
+                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+                assertEquals(analysisPage.getMetricMessage(), type.getMetricMessage());
+                analysisPage.undo();
+        });
+
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+            .changeReportType(ReportType.TABLE);
+        takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
+        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE, DEPARTMENT));
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void switchReportHasManyMetricsManyAttributes() {
+        initAnalysePage();
+        analysisPage.changeReportType(ReportType.TABLE)
+            .addCategory(ACTIVITY_TYPE)
+            .addCategory(DEPARTMENT)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(QUOTA)
+            .waitForReportComputing();
+
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
+                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+                assertEquals(analysisPage.getStackByMessage(), type.getStackByMessage());
+                analysisPage.undo();
+        });
+
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+            .changeReportType(ReportType.TABLE);
+        takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
+        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void switchReportWithDateAttributes() {
+        initAnalysePage();
+        analysisPage.changeReportType(ReportType.TABLE)
+            .addCategory(DATE)
+            .addCategory(ACTIVITY_TYPE)
+            .addCategory(DEPARTMENT);
+
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
+                assertEquals(analysisPage.getAddedStackByName(), ACTIVITY_TYPE);
+                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(DATE));
+                analysisPage.undo();
+        });
+
+        analysisPage.resetToBlankState()
+            .changeReportType(ReportType.TABLE)
+            .addCategory(ACTIVITY_TYPE)
+            .addCategory(DATE)
+            .addCategory(DEPARTMENT);
+
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
+                assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
+                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+                analysisPage.undo();
+        });
+
+        analysisPage.changeReportType(ReportType.LINE_CHART);
+        takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + ReportType.LINE_CHART.name(),
+                getClass());
+        assertEquals(analysisPage.getAddedStackByName(), ACTIVITY_TYPE);
+        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(DATE));
+
+        analysisPage.resetToBlankState()
+            .changeReportType(ReportType.TABLE)
+            .addCategory(ACTIVITY_TYPE)
+            .addCategory(DEPARTMENT)
+            .addCategory(DATE);
+
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
+                assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
+                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+                analysisPage.undo();
+        });
+
+        analysisPage.changeReportType(ReportType.LINE_CHART);
+        takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + ReportType.LINE_CHART.name(),
+                getClass());
+        assertEquals(analysisPage.getAddedStackByName(), ACTIVITY_TYPE);
+        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(DATE));
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void testAttributeLimitationInTableReport() {
+        initAttributePage();
+        waitForFragmentVisible(attributePage).createAttribute();
+        waitForFragmentVisible(createAttributePage).selectAttribute("Sales Rep");
+        createAttributePage.selectMetric("# of Won Opps.");
+        createAttributePage.setComputedAttributeName("20th attribute");
+        createAttributePage.submit();
+        waitForElementVisible(className("s-attributeBucketName"), browser);
+        takeScreenshot(browser, "testAttributeLimitationInTableReport-create20thAttribute", getClass());
+
+        initAnalysePage();
+        analysisPage.changeReportType(ReportType.TABLE)
+            .filterCatalog(CatalogFilterType.ATTRIBUTES);
+        Stream.of(ACCOUNT, ACTIVITY_TYPE, "Activity", DEPARTMENT, "Forecast Category", "Is Active?", "Is Closed?",
+                "Is Task?", "Is Won?", "Opp. Snapshot", "Opportunity", "Priority", "Product", "Region", "Status",
+                "Sales Rep", "Stage History", "Stage Name", DATE, "20th attribute")
+                .forEach(analysisPage::addCategory);
+        takeScreenshot(browser, "testAttributeLimitationInTableReport-finishAdding20Attributes", getClass());
+
+        assertEquals(analysisPage.getAllAddedCategoryNames().size(), 20);
+    }
+
     private void deleteMetric(String metric) {
         initMetricPage();
         metricPage.openMetricDetailPage(metric);
         waitForFragmentVisible(metricDetailPage).deleteMetric();
         assertFalse(metricPage.isMetricVisible(metric));
+    }
+
+    private List<List<String>> getTableReportContentInReportPage() {
+        analysisPage.exportReport();
+
+        String currentWindowHandle = browser.getWindowHandle();
+        for (String handle : browser.getWindowHandles()) {
+            if (!handle.equals(currentWindowHandle))
+                browser.switchTo().window(handle);
+        }
+        waitForAnalysisPageLoaded(browser);
+        waitForFragmentVisible(reportPage);
+
+        try {
+            com.gooddata.qa.graphene.fragments.reports.report.TableReport report = reportPage.getTableReport();
+            List<List<String>> attributesByRow = report.getAttributeElementsByRow();
+            List<String> metrics = report.getRawMetricElements();
+
+            for (int i = 0; i < metrics.size(); i++) {
+                attributesByRow.get(i).add(metrics.get(i));
+            }
+
+            return attributesByRow;
+        } finally {
+            browser.close();
+            browser.switchTo().window(currentWindowHandle);
+        }
     }
 }
