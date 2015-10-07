@@ -34,7 +34,7 @@
             "columnName" : "tab_Inv.inv_date_id",
             "constraints" : { "date" : "yyyy-MM-dd" },
             "populates" : [
-               "dt_invoice.date.eddmmyyyy"
+               "dt_invoice.date.mmddyyyy"
             ],
             "mode" : "FULL",
             "referenceKey" : 1
