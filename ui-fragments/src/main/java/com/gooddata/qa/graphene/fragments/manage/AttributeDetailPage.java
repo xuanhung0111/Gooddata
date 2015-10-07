@@ -98,9 +98,10 @@ public class AttributeDetailPage extends AbstractFragment {
         return waitForElementPresent(By.cssSelector(".link.option"), browser).getAttribute("style").contains("display: inline");
     }
 
-    public void clearDrillingSetting() {
+    public AttributeDetailPage clearDrillingSetting() {
         waitForElementVisible(clearExternalPageButton).click();
         waitForElementNotVisible(clearExternalPageButton);
+        return this;
     }
 
     public void setDrillToAttribute(String attribute) {

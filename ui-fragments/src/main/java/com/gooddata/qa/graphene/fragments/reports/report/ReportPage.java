@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
@@ -663,6 +664,27 @@ public class ReportPage extends AbstractFragment {
         } catch (Exception e) {
             // do nothing
         }
+        return this;
+    }
+
+    public ReportPage removeDrillStepInConfigPanel(final String metric, final String attribute) {
+        waitForElementVisible(className("s-btn-drill_in_settings"), browser).click();
+        WebElement container = waitForElementVisible(className("drillAcrossStepContainer"), browser);
+        container.findElements(className("drillAcrossStep"))
+            .stream()
+            .filter(e -> metric.equals(e.findElement(className("metricTitle")).getText()))
+            .map(e -> e.findElement(className("s-remove-" + simplifyText(attribute))))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find metric: " + metric))
+            .click();
+        return this;
+    }
+
+    public ReportPage waitForReportExecutionProgress() {
+        sleepTightInSeconds(1);
+        final WebElement progress = waitForElementPresent(id("progressOverlay"), browser);
+        Predicate<WebDriver> waitForProgress = browser -> progress.getCssValue("display").equals("none");
+        Graphene.waitGui().until(waitForProgress);
         return this;
     }
 
