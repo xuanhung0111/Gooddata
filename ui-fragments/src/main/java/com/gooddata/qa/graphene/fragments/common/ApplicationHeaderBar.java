@@ -66,10 +66,6 @@ public class ApplicationHeaderBar extends AbstractFragment {
         waitForElementVisible(getInstance(browser).usersLink).click();
     }
 
-    public static void goToSearchPage(WebDriver browser) {
-        waitForElementVisible(getInstance(browser).searchLink).click();
-    }
-
     public static String getSearchLinkText(WebDriver browser) {
         return waitForElementVisible(getInstance(browser).searchLink).getText();
     }
