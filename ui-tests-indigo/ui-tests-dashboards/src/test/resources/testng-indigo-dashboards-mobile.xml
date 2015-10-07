@@ -59,4 +59,23 @@
         </classes>
     </test>
 
+    <test name="kpi-pop-test">
+        <groups>
+            <dependencies>
+                <group name="mobile" depends-on="projectInit" />
+            </dependencies>
+            <run>
+                <include name="mobile" />
+                <include name="dashboardWidgetsInit" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.KpiPopTest" />
+        </classes>
+    </test>
+
 </suite>
