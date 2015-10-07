@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -37,7 +38,10 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
     public void checkNewlyAddedKpiHasPopSection() {
         Kpi justAddedKpi = initIndigoDashboardsPage()
             .switchToEditMode()
-            .addWidget(AMOUNT, DATE_CREATED)
+            .addWidget(new KpiConfiguration.Builder()
+                .metric(AMOUNT)
+                .dateDimension(DATE_CREATED)
+                .build())
             .selectLastKpi();
 
         assertTrue(justAddedKpi.hasPopSection());
@@ -65,7 +69,11 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
     public void checkKpiWithoutComparison() {
         Kpi kpi = initIndigoDashboardsPage()
             .switchToEditMode()
-            .addWidget(AMOUNT, DATE_CREATED, Kpi.ComparisonType.NO_COMPARISON)
+            .addWidget(new KpiConfiguration.Builder()
+                .metric(AMOUNT)
+                .dateDimension(DATE_CREATED)
+                .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
+                .build())
             .selectLastKpi();
 
         assertFalse(kpi.hasPopSection());
@@ -106,7 +114,11 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
     public void checkKpiPopSection(Kpi.ComparisonType comparisonType, String dateFilter, String expectedPeriodTitle) {
         initIndigoDashboardsPage()
             .switchToEditMode()
-            .addWidget(AMOUNT, DATE_CREATED, comparisonType)
+            .addWidget(new KpiConfiguration.Builder()
+                .metric(AMOUNT)
+                .dateDimension(DATE_CREATED)
+                .comparison(comparisonType.toString())
+                .build())
             .saveEditMode();
 
         Kpi kpi = initIndigoDashboardsPage()

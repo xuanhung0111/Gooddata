@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -142,7 +143,10 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage
             .switchToEditMode()
-            .addWidget(AMOUNT, DATE_CREATED)
+            .addWidget(new KpiConfiguration.Builder()
+                .metric(AMOUNT)
+                .dateDimension(DATE_CREATED)
+                .build())
             .saveEditMode();
 
         assertEquals(kpisCountAfterAdd, indigoDashboardsPage.getKpisCount());

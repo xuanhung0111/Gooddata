@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -30,7 +31,10 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"createEmptyMetric"}, groups = {"desktop"})
     public void testEmptyMetricWithoutConditionalFormat() {
-        setupKpi(errorMetric.getTitle(), DATE_CREATED);
+        setupKpi(new KpiConfiguration.Builder()
+            .metric(errorMetric.getTitle())
+            .dateDimension(DATE_CREATED)
+            .build());
 
         Kpi lastKpi = initIndigoDashboardsPage()
                 .waitForAllKpiWidgetContentLoaded()

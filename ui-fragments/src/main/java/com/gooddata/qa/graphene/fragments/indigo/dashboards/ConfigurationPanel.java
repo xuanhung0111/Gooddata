@@ -24,6 +24,12 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(className = "s-compare_with_select")
     private ComparisonSelect comparisonSelect;
 
+    @FindBy(className = "s-drill_to_select")
+    private DrillToSelect drillToSelect;
+
+    @FindBy(className = "s-button-remove-drill-to")
+    private WebElement removeDrillToButton;
+
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
         waitForElementVisible(dimensionSelectLoaded);
@@ -42,6 +48,20 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public ConfigurationPanel selectComparisonByName(String name) {
         waitForFragmentVisible(comparisonSelect).selectByName(name);
+        return this;
+    }
+
+    public ConfigurationPanel selectDrillToByName(String name) {
+        waitForFragmentVisible(drillToSelect).selectByName(name);
+        return this;
+    }
+
+    public String getDrillToValue() {
+        return waitForFragmentVisible(drillToSelect).getDropdownButton().getText();
+    }
+
+    public ConfigurationPanel clickRemoveDrillToButton() {
+        waitForElementVisible(removeDrillToButton).click();
         return this;
     }
 

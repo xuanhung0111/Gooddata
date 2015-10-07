@@ -13,6 +13,7 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
 public class DateFilteringTest extends DashboardWithWidgetsTest {
@@ -47,9 +48,21 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
         String timeMacrosMetric = createTimeMacrosMetric();
         String filteredOutMetric = createFilteredOutMetric();
 
-        setupKpi(attributeFilterMetric, DATE_CREATED);
-        setupKpi(timeMacrosMetric, DATE_SNAPSHOT);
-        setupKpi(filteredOutMetric, DATE_SNAPSHOT);
+        setupKpi(new KpiConfiguration.Builder()
+            .metric(attributeFilterMetric)
+            .dateDimension(DATE_CREATED)
+            .build()
+        );
+        setupKpi(new KpiConfiguration.Builder()
+            .metric(timeMacrosMetric)
+            .dateDimension(DATE_SNAPSHOT)
+            .build()
+        );
+        setupKpi(new KpiConfiguration.Builder()
+            .metric(filteredOutMetric)
+            .dateDimension(DATE_SNAPSHOT)
+            .build()
+        );
 
         try {
             DateFilter dateFilter = indigoDashboardsPage.waitForDateFilter();

@@ -95,8 +95,15 @@ public class Kpi extends AbstractFragment {
         return waitForElementPresent(value).getAttribute("title");
     }
 
+    public Kpi clickKpiValue() {
+        waitForElementPresent(value).click();
+
+        return this;
+    }
+
     public boolean hasPopSection() {
         By thisMetric = By.className(KPI_POP_SECTION_CLASS);
+
         return isElementPresent(thisMetric, root);
     }
 
