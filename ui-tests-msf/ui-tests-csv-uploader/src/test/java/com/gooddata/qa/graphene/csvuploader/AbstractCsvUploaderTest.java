@@ -182,6 +182,18 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 .until(datasetsCountEqualsExpected);
     }
 
+    protected void waitForDatasetName(final String expectedDatasetName) {
+        Predicate<WebDriver> datasetHasExpectedName = input -> {
+            final List<String> datasetNames = waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetNames();
+            return datasetNames.contains(expectedDatasetName);
+        };
+
+        Graphene.waitGui(browser)
+                .withMessage(String.format("Expected dataset in list is missing. Expected: %s, but was: %s.",
+                        expectedDatasetName, datasetsListPage.getMyDatasetsTable().getDatasetNames()))
+                .until(datasetHasExpectedName);
+    }
+
     protected void waitForDatasetStatus(final String datasetName, final String expectedStatusMessageRegex) {
         Predicate<WebDriver> datasetHasSuccessfulStatus = input -> {
             final String datasetStatus =

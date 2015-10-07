@@ -48,9 +48,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(PAYROLL_FILE, this::uploadCsv, true);
         PAYROLL_DATASET_NAME = getNewDataset(PAYROLL_FILE);
 
-        assertThat("Dataset with name '" + PAYROLL_DATASET_NAME + "' wasn't found in datasets list.",
-                datasetsListPage.getMyDatasetsTable().getDatasetNames(),
-                hasItem(PAYROLL_DATASET_NAME));
+        waitForDatasetName(PAYROLL_DATASET_NAME);
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", PAYROLL_DATASET_NAME), getClass());
 
