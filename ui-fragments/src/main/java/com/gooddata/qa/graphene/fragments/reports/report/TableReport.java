@@ -2,8 +2,10 @@ package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
@@ -184,7 +186,7 @@ public class TableReport extends AbstractReport {
         }
     }
 
-    public void drillOnMetricValue() throws IllegalArgumentException {
+    public void drillOnMetricValue() {
         waitForReportLoading();
         String cssClass = null;
         for (WebElement e : drillableElements) {
@@ -199,11 +201,15 @@ public class TableReport extends AbstractReport {
         throw new IllegalArgumentException("No metric value to drill on");
     }
 
-    public void drillOnMetricValue(String value) throws IllegalArgumentException {
+    public void drillOnMetricValue(String value) {
+        getMetricElement(value).click();
+    }
+
+    public WebElement getMetricElement(String value) {
         waitForReportLoading();
         String cssClass = null;
         WebElement spanElement = null;
-        for (WebElement e : drillableElements) {
+        for (WebElement e : metricValuesInGrid) {
             cssClass = e.getAttribute("class");
 
             if (!cssClass.contains("even") && !cssClass.contains("odd"))
@@ -212,13 +218,12 @@ public class TableReport extends AbstractReport {
             spanElement = e.findElement(By.cssSelector("span"));
             if (!value.equals(spanElement.getText()))
                 continue;
-            spanElement.click();
-            return;
+            return spanElement;
         }
-        throw new IllegalArgumentException(String.format("No metric value %s to drill on", value));
+        throw new IllegalArgumentException("Cannot find metric value " + value);
     }
 
-    public void drillOnAttributeValue() throws IllegalArgumentException {
+    public void drillOnAttributeValue() {
         waitForReportLoading();
         for (WebElement e : attributeElementInGrid) {
             if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
@@ -230,7 +235,11 @@ public class TableReport extends AbstractReport {
         throw new IllegalArgumentException("No attribute value to drill on");
     }
 
-    public void drillOnAttributeValue(String value) throws IllegalArgumentException {
+    public void drillOnAttributeValue(String value) {
+        getAttributeValueElement(value).click();
+    }
+
+    public WebElement getAttributeValueElement(String value) {
         waitForReportLoading();
         for (WebElement e : attributeElementInGrid) {
             if (!e.findElement(BY_PARENT).getAttribute("class").contains("rows"))
@@ -238,10 +247,9 @@ public class TableReport extends AbstractReport {
 
             if (!value.equals(e.getText()))
                 continue;
-            e.click();
-            return;
+            return e;
         }
-        throw new IllegalArgumentException(String.format("No attribute value %s to drill on", value));
+        throw new IllegalArgumentException("Cannot find attribute value " + value);
     }
 
     public void waitForReportLoading() {
@@ -269,6 +277,16 @@ public class TableReport extends AbstractReport {
     public boolean isNotComputed() {
         return waitForElementVisible(reportMessage.findElement(By.tagName("p"))).getText()
                                                                .contains(REPORT_NOT_COMPUTABLE);
+    }
+
+    public void changeAttributeDisplayLabelByRightClick(final String attribute, String label) {
+        WebElement header = attributesHeader.stream()
+            .filter(e -> attribute.equals(e.getText()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find attribute header: " + attribute));
+
+        new Actions(browser).contextClick(header).perform();
+        waitForElementVisible(cssSelector("#ctxMenu .s-" + simplifyText(label) +" > a"), browser).click();
     }
 
     private Pair<Integer, Integer> getPossitionFromRegion(String region) {
