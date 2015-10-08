@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.analyze;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.shuffle;
@@ -25,7 +26,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -197,7 +197,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleContribution");
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleContribution");
+        final String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleContribution");
 
         final ChartReport report = analysisPage.getChartReport();
         int oldTrackersCount = report.getTrackersCount();
@@ -213,7 +213,8 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleContribution");
+        doSafetyAttributeAction(metric, attr -> analysisPage.replaceCategory(attribute, attr),
+                "testSimpleContribution");
 
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertTrue(report.getTrackersCount() >= 1);
@@ -278,7 +279,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleComparison");
+        final String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleComparison");
 
         analysisPage.resetToBlankState().addMetric(metric);
         waitForFragmentVisible(comparisonRecommendation);
@@ -288,10 +289,11 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleComparison");
+        String newAttribute = doSafetyAttributeAction(metric,
+                attr -> analysisPage.replaceCategory(attribute, attr), "testSimpleComparison");
 
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
-        assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
+        assertTrue(analysisPage.getAllAddedCategoryNames().contains(newAttribute));
+        assertEquals(analysisPage.getFilterText(newAttribute), newAttribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
@@ -663,7 +665,8 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
     private String getRandomAttribute() {
         if (remainedAttributes.isEmpty()) {
-            throw new NoSuchElementException("Could not find any attributes to test this case!");
+            System.out.println("Could not find any different attributes to test this case! Reuse old attributes");
+            remainedAttributes = newArrayList(attributes);
         }
         String attribute =  remainedAttributes.get(random.nextInt(remainedAttributes.size()));
         remainedAttributes.remove(attribute);

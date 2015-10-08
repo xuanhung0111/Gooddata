@@ -372,9 +372,9 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
-    public AnalysisPage replaceCategory(String category) {
+    public AnalysisPage replaceCategory(String oldCategory, String newCategory) {
         waitForFragmentVisible(cataloguePanel);
-        waitForFragmentVisible(bucketsPanel).replaceCategory(cataloguePanel.getCategory(category));
+        waitForFragmentVisible(bucketsPanel).replaceCategory(oldCategory, cataloguePanel.getCategory(newCategory));
         return this;
     }
 

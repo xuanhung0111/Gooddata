@@ -142,7 +142,7 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
         assertFalse(analysisPage.isShowPercentConfigEnabled());
         assertFalse(analysisPage.isShowPercentConfigSelected());
 
-        assertEquals(report.getLegendColors(), asList("rgb(13, 103, 178)", "rgb(76, 178, 72)"));
+        assertEquals(report.getLegendColors(), asList("rgb(0, 131, 255)", "rgb(0, 192, 142)"));
         checkingOpenAsReport("checkShowPercentAndLegendColor");
     }
 
