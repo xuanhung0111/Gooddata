@@ -4,8 +4,10 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -70,8 +72,18 @@ public class CategoriesBucket extends AbstractFragment {
         assertEquals(items.size(), oldItemsCount - 1, "Category is not removed yet!");
     }
 
-    public void replaceCategory(WebElement category) {
-        addCategory(category);
+    public void replaceCategory(String oldCategory, WebElement newCategory) {
+        Optional<WebElement> oldAttributeElement = getCategory(oldCategory);
+
+        if (oldAttributeElement.isPresent()) {
+            new Actions(browser).dragAndDrop(newCategory, oldAttributeElement.get()).perform();
+            assertTrue(getItemNames().contains(newCategory.getText().trim()));
+            return;
+        }
+
+        System.out.println("Cannot find current attribute: " + oldCategory);
+        System.out.println("Try to add new one!");
+        addCategory(newCategory);
     }
 
     public boolean isEmpty() {
@@ -117,5 +129,11 @@ public class CategoriesBucket extends AbstractFragment {
 
     public WebElement getFirstItem() {
         return items.get(0);
+    }
+
+    private Optional<WebElement> getCategory(final String category) {
+        return items.stream()
+                .filter(e -> category.equals(e.findElement(BY_HEADER).getText()))
+                .findFirst();
     }
 }

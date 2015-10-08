@@ -130,8 +130,8 @@ public class BucketsPanel extends AbstractFragment {
         waitForFragmentVisible(metricsBucket).replaceMetric(oldMetric, newMetric);
     }
 
-    public void replaceCategory(WebElement category) {
-        waitForFragmentVisible(categoriesBucket).replaceCategory(category);
+    public void replaceCategory(String oldCategory, WebElement newCategory) {
+        waitForFragmentVisible(categoriesBucket).replaceCategory(oldCategory, newCategory);
     }
 
     public void replaceStackBy(WebElement category) {

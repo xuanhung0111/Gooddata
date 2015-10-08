@@ -41,7 +41,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
     public void dropThirdAttributeToBucket() {
         dropAttributeToReportHaveOneMetric();
 
-        analysisPage.replaceCategory(PRIORITY);
+        analysisPage.replaceCategory(ACTIVITY_TYPE, PRIORITY);
         Collection<String> addedAttributes = analysisPage.getAllAddedCategoryNames();
         assertTrue(addedAttributes.contains(PRIORITY));
         assertFalse(addedAttributes.contains(ACTIVITY_TYPE));
@@ -123,7 +123,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.addStackBy(DEPARTMENT);
         assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
 
-        analysisPage.replaceCategory(REGION);
+        analysisPage.replaceCategory(ACTIVITY_TYPE, REGION);
         assertFalse(analysisPage.isFilterVisible(ACTIVITY_TYPE));
         assertTrue(analysisPage.isFilterVisible(REGION));
         checkingOpenAsReport("attributesInFilterMenu");
@@ -160,7 +160,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertTrue(analysisPage.isDateFilterVisible());
 
-        analysisPage.addCategory(ACTIVITY_TYPE);
+        analysisPage.replaceCategory(DATE, ACTIVITY_TYPE);
         assertFalse(analysisPage.isDateFilterVisible());
         assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
     }
@@ -188,7 +188,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.compareToSamePeriodOfYearBefore();
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
-        analysisPage.addCategory(ACTIVITY_TYPE);
+        analysisPage.replaceCategory(DATE, ACTIVITY_TYPE);
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
         assertFalse(analysisPage.isCompareSamePeriodConfigSelected());
