@@ -136,6 +136,8 @@
         </classes>
     </test>
 
+    <!-- temporarily commented due to https://jira.intgdc.com/browse/CL-8325 -->
+    <!--
     <test name="attribute-filtering-tests">
         <groups>
             <dependencies>
@@ -154,6 +156,7 @@
             <class name="com.gooddata.qa.graphene.indigo.dashboards.AttributeFilteringTest" />
         </classes>
     </test>
+    -->
 
     <test name="kpi-alert-tests">
         <groups>
