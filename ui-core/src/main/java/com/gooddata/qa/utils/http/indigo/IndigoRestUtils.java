@@ -1,6 +1,9 @@
 package com.gooddata.qa.utils.http.indigo;
 
+import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 
@@ -94,27 +97,33 @@ public class IndigoRestUtils {
         }
     }
 
-    private static String createKpiWidget(RestApiClient restApiClient, String projectId,
-            String title, String metricUri, String dateDimensionUri) throws JSONException, IOException {
-        return createKpiWidget(restApiClient, projectId, title, metricUri, dateDimensionUri,
-                Kpi.ComparisonType.NO_COMPARISON, Kpi.ComparisonDirection.NONE);
-    }
-
-    private static String createKpiWidget(RestApiClient restApiClient, String projectId,
-            String title, String metricUri, String dateDimensionUri, Kpi.ComparisonType comparisonType,
-            Kpi.ComparisonDirection comparisonDirection) throws JSONException, IOException {
+    private static String createKpiWidget(RestApiClient restApiClient, String projectId, KpiMDConfiguration kpiConfig)
+            throws JSONException, IOException {
         String content = KPI_WIDGET_BODY
-                .replace("${title}", title)
-                .replace("${metric}", metricUri)
-                .replace("${dateDimension}", dateDimensionUri)
-                .replace("${comparisonType}", comparisonType.getJsonKey());
+                .replace("${title}", kpiConfig.getTitle())
+                .replace("${metric}", kpiConfig.getMetric())
+                .replace("${dateDimension}", kpiConfig.getDateDimension())
+                .replace("${comparisonType}", kpiConfig.getComparisonType().getJsonKey());
 
-        if (comparisonType != Kpi.ComparisonType.NO_COMPARISON) {
+        if (kpiConfig.hasComparison()) {
             JSONObject contentJson = new JSONObject(content);
 
             contentJson.getJSONObject("kpi")
                 .getJSONObject("content")
-                .put("comparisonDirection", comparisonDirection.toString());
+                .put("comparisonDirection", kpiConfig.getComparisonDirection().toString());
+
+            content = contentJson.toString();
+        }
+
+        if (kpiConfig.hasDrillTo()) {
+            JSONObject contentJson = new JSONObject(content);
+
+            contentJson.getJSONObject("kpi")
+                .getJSONObject("content")
+                .put("drillTo", new JSONObject() {{
+                    put("projectDashboard", kpiConfig.getDrillToDashboard());
+                    put("projectDashboardTab", kpiConfig.getDrillToDashboardTab());
+                }});
 
             content = contentJson.toString();
         }
@@ -175,15 +184,38 @@ public class IndigoRestUtils {
         String numOfActivitiesUri = getObjectUri(projectId, NUM_OF_ACTIVITIES_OBJ_ID);
         String dateDimensionUri = getObjectUri(projectId, DATE_DIM_CREATED_OBJ_ID);
 
-        String amountWidget = createKpiWidget(restApiClient, projectId, "Amount", amountMetricUri,
-                dateDimensionUri);
-        String lostWidget = createKpiWidget(restApiClient, projectId, "Lost", lostMetricUri, dateDimensionUri,
-                Kpi.ComparisonType.LAST_YEAR, Kpi.ComparisonDirection.BAD);
-        String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, "# of Activities",
-                numOfActivitiesUri, dateDimensionUri, Kpi.ComparisonType.PREVIOUS_PERIOD,
-                Kpi.ComparisonDirection.GOOD);
+        String amountWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+                .title("Amount")
+                .metric(amountMetricUri)
+                .dateDimension(dateDimensionUri)
+                .comparisonType(ComparisonType.NO_COMPARISON)
+                .comparisonDirection(ComparisonDirection.NONE)
+                .build());
+        String lostWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+                .title("Lost")
+                .metric(lostMetricUri)
+                .dateDimension(dateDimensionUri)
+                .comparisonType(Kpi.ComparisonType.LAST_YEAR)
+                .comparisonDirection(Kpi.ComparisonDirection.BAD)
+                .build());
+        String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+                .title("# of Activities")
+                .metric(numOfActivitiesUri)
+                .dateDimension(dateDimensionUri)
+                .comparisonType(Kpi.ComparisonType.PREVIOUS_PERIOD)
+                .comparisonDirection(Kpi.ComparisonDirection.GOOD)
+                .build());
+        String drillToWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+                .title("DrillTo")
+                .metric(amountMetricUri)
+                .dateDimension(dateDimensionUri)
+                .comparisonType(ComparisonType.NO_COMPARISON)
+                .comparisonDirection(ComparisonDirection.NONE)
+                .drillToDashboard("/gdc/md/p8aqohkx4htbrau1wpk6k68crltlojig/obj/916")
+                .drillToDashboardTab("adzD7xEmdhTx")
+                .build());
 
-        List<String> widgetUris = Arrays.asList(amountWidget, lostWidget, numOfActivitiesWidget);
+        List<String> widgetUris = Arrays.asList(amountWidget, lostWidget, numOfActivitiesWidget, drillToWidget);
         createAnalyticalDashboard(restApiClient, projectId, widgetUris);
     }
 

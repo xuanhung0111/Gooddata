@@ -162,6 +162,42 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         }
     }
 
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    public void checkKpiWithDrillToRedirects() {
+        initIndigoDashboardsPage();
+
+        takeScreenshot(browser, "checkKpiWithDrillToRedirects-beforeKpiValueClick", getClass());
+
+        String currentUrl = browser.getCurrentUrl();
+
+        indigoDashboardsPage
+            .getLastKpi()
+            .clickKpiValue();
+
+        waitForDashboardPageLoaded(browser);
+
+        takeScreenshot(browser, "checkKpiWithDrillToRedirects-afterKpiValueClick", getClass());
+
+        assertNotEquals(browser.getCurrentUrl(), currentUrl);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    public void checkKpiWithoutDrillToDoesNotRedirect() {
+        initIndigoDashboardsPage();
+
+        takeScreenshot(browser, "checkKpiWithoutDrillToDoesNotRedirect-beforeKpiValueClick", getClass());
+
+        String currentUrl = browser.getCurrentUrl();
+
+        indigoDashboardsPage
+            .getFirstKpi()
+            .clickKpiValue();
+
+        takeScreenshot(browser, "checkKpiWithoutDrillToDoesNotRedirect-afterKpiValueClick", getClass());
+
+        checkNoNewBrowserTabOrWindowNorRedirected(currentUrl);
+    }
+
     private void checkNoNewBrowserTabOrWindowNorRedirected(String currentUrl) {
         assertTrue(browser.getWindowHandles().size() == 1);
         assertEquals(browser.getCurrentUrl(), currentUrl);
