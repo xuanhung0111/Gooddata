@@ -60,7 +60,7 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
         assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(STAGE_NAME)));
         assertTrue(analysisPage.isFilterVisible(STAGE_NAME));
 
-        analysisPage.replaceCategory(ACTIVITY_TYPE);
+        analysisPage.replaceCategory(STAGE_NAME, ACTIVITY_TYPE);
         assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE)));
         assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
         assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));

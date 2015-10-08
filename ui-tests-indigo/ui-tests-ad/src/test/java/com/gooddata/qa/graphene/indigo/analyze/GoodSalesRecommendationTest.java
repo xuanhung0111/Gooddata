@@ -100,7 +100,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         assertTrue(analysisPage.isShowPercentConfigEnabled());
         assertTrue(analysisPage.isShowPercentConfigSelected());
 
-        analysisPage.addCategory(DEPARTMENT);
+        analysisPage.replaceCategory(ACTIVITY_TYPE, DEPARTMENT);
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(analysisPage.isShowPercentConfigEnabled());
@@ -146,7 +146,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPage.addCategory(DEPARTMENT);
+        analysisPage.replaceCategory(ACTIVITY_TYPE, DEPARTMENT);
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DEPARTMENT));
         assertEquals(analysisPage.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
         assertEquals(report.getTrackersCount(), 2);
@@ -190,7 +190,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
 
-        analysisPage.addCategory(DEPARTMENT);
+        analysisPage.replaceCategory(ACTIVITY_TYPE, DEPARTMENT);
         assertEquals(analysisPage.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
