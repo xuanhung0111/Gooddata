@@ -54,17 +54,6 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void openUpToDateReport() {
-        createReport(new UiReportDefinition().withName(VERSION_REPORT).withWhats(NUMBER_OF_ACTIVITIES),
-                "openUpToDateReport");
-        initPulsePage();
-        waitForFragmentVisible(pulsePage).openUptoDateReport(VERSION_REPORT);
-        int versionsCount = waitForFragmentVisible(reportPage).getVersionsCount();
-        takeScreenshot(browser, "openUpToDateReport - get versions", getClass());
-        assertThat(versionsCount, equalTo(1));
-    }
-
-    @Test(dependsOnMethods = {"openUpToDateReport"})
     public void workWithOldVersion() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
@@ -137,7 +126,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportPage);
     }
 
-    @Test(dependsOnMethods = {"openUpToDateReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void leaveAndDontSaveOldReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
@@ -183,7 +172,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportsPage.getReportsList().openReport(reportName);
     }
 
-    @Test(dependsOnMethods = {"openUpToDateReport"})
+    @Test(dependsOnMethods = {"createProject"})
     public void leaveAndSaveOldReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);

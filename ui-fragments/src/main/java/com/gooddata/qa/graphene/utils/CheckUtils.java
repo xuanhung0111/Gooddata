@@ -94,10 +94,6 @@ public final class CheckUtils {
         waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"), searchContext);
     }
 
-    public static void waitForPulsePageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='p-pulsePage' and contains(@class,'s-displayed')]"), searchContext);
-    }
-
     public static void waitForProjectsPageLoaded(SearchContext searchContext) {
         waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"), searchContext);
     }

@@ -11,7 +11,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForProjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForProjectsPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForPulsePageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForSchedulesPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -66,7 +65,6 @@ import com.gooddata.qa.graphene.fragments.manage.MetricPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
 import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
-import com.gooddata.qa.graphene.fragments.manage.PulsePage;
 import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
 import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
@@ -95,7 +93,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
     protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
-    
+
     /**
      * ----- UI fragmnets -----
      */
@@ -117,9 +115,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(id = "p-emailSchedulePage")
     protected EmailSchedulePage emailSchedulesPage;
-
-    @FindBy(id = "p-pulsePage")
-    protected PulsePage pulsePage;
 
     @FindBy(id = "projectsCentral")
     protected ProjectsPage projectsPage;
@@ -403,7 +398,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void selectDashboard(String name) {
         initDashboardsPage();
-        assertTrue(dashboardsPage.selectDashboard(name), 
+        assertTrue(dashboardsPage.selectDashboard(name),
                 String.format("Cannot select dashboard named: %s", name));
         waitForDashboardPage();
     }
@@ -513,12 +508,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initDashboardsPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
         waitForDashboardPage();
-    }
-
-    public void initPulsePage() {
-        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|pulsePage");
-        waitForPulsePageLoaded(browser);
-        waitForFragmentVisible(pulsePage);
     }
 
     public void initReportsPage() {
