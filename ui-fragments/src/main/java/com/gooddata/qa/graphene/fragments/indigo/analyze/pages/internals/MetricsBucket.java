@@ -214,6 +214,20 @@ public class MetricsBucket extends AbstractFragment {
                 .apply();
     }
 
+    public void addFilterMetricWithLargeNumberValues(String metric, String attribute, String... unselectedValues) {
+        getMetric(metric).findElement(BY_ADD_ATTRIBUTE_FILTER).click();
+
+        Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
+                .selectTextItem(attribute);
+
+        Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
+                .selectAll()
+                .selectItems(unselectedValues)
+                .apply();
+    }
+
     public String getFilterMetricText(String metric) {
         return getMetric(metric).findElement(BY_ATTRIBUTE_FILTER_BUTTON).getText();
     }
@@ -266,6 +280,9 @@ public class MetricsBucket extends AbstractFragment {
         @FindBy(className = "s-clear")
         private WebElement clearButton;
 
+        @FindBy(className = "s-select_all")
+        private WebElement selectAllButton;
+
         @FindBy(css = ".gd-list-item")
         private List<WebElement> items;
 
@@ -276,6 +293,11 @@ public class MetricsBucket extends AbstractFragment {
 
         public AttributeFilterPicker clear() {
             waitForElementVisible(clearButton).click();
+            return this;
+        }
+
+        public AttributeFilterPicker selectAll() {
+            waitForElementVisible(selectAllButton).click();
             return this;
         }
 
