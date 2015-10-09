@@ -454,6 +454,13 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage addFilterMetricWithLargeNumberValues(String metric, String attribute,
+            String... unselectedValues) {
+        waitForFragmentVisible(bucketsPanel).addFilterMetricWithLargeNumberValues(metric, attribute,
+                unselectedValues);
+        return this;
+    }
+
     public String getFilterMetricText(String metric) {
         return waitForFragmentVisible(bucketsPanel).getFilterMetricText(metric);
     }

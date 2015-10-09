@@ -1,8 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -95,6 +99,21 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email)", NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE));
         assertEquals(analysisPage.getFilterMetricText(NUMBER_OF_ACTIVITIES), format("%s: Email", ACTIVITY_TYPE));
+    }
+
+    @Test(dependsOnGroups = {"init"}, description = "Cover issue: https://jira.intgdc.com/browse/CL-7952")
+    public void checkReportWhenFilterContainManyCharacters() {
+        String unselectedValue = "14 West";
+
+        initAnalysePage();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .addFilterMetricWithLargeNumberValues(NUMBER_OF_ACTIVITIES, ACCOUNT, unselectedValue)
+            .waitForReportComputing();
+
+        takeScreenshot(browser, "checkReportWhenFilterContainManyCharacters", getClass());
+        ChartReport report = analysisPage.getChartReport();
+        assertThat(report.getYaxisTitle(), not(containsString("14 West")));
     }
 
     private void addFilterToMetric() {
