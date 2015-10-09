@@ -109,6 +109,7 @@ public class DashboardDrillDialog extends AbstractFragment {
                     .findElement(By.cssSelector("span")).getAttribute("title").trim()))
                 continue;
             e.click();
+            return;
         }
     }
 
