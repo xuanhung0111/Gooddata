@@ -21,7 +21,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
@@ -127,9 +126,6 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             drillDialog.changeChartType("Pie chart");
             tableReport.waitForReportLoading();
             checkRedBar(browser);
-
-            // avoid exception: Element is no longer attached to the DOM 
-            Sleeper.sleepTightInSeconds(3);
 
             drillDialog.changeChartType("Table");
             tableReport.waitForReportLoading();
@@ -258,6 +254,8 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             assertEquals(tableReport.getAttributesHeader(), Arrays.asList("Account"));
             drillDialog.closeDialog();
         } finally {
+            initDashboardsPage();
+            dashboardsPage.selectDashboard(TEST_DASHBOAD_NAME);
             dashboardsPage.deleteDashboard();
             initAttributePage();
             attributePage.initAttribute("Opportunity");
