@@ -409,6 +409,66 @@
             </properties>
         </profile>
         <profile>
+            <id>browserstack-mobile-android-samsung-galaxy-s5-mini</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-samsung-galaxy-s5-mini</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Samsung Galaxy S5 Mini</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-android-htc-one-m8</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-htc-one-m8</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>HTC One M8</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-android-google-nexus-5</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-google-nexus-5</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Google Nexus 5</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-android-samsung-galaxy-tab-4-10-1</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-android-samsung-galaxy-tab-4-10-1</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-android.xml</arquillian.xml>
+                <browserstack.mobile.browserName>android</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>ANDROID</browserstack.mobile.platform>
+                <browserstack.mobile.device>Samsung Galaxy Tab 4 10.1</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
             <id>browserstack-mobile-iphone-5</id>
             <activation>
                 <property>
@@ -481,38 +541,6 @@
                 <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
                 <browserstack.mobile.device>iPad 4th Gen</browserstack.mobile.device>
-            </properties>
-        </profile>
-        <profile>
-            <id>browserstack-platform-windows-7-IE-8</id>
-            <activation>
-                <property>
-                    <name>test.execution.env</name>
-                    <value>browserstack-platform-windows-7-IE-8</value>
-                </property>
-            </activation>
-            <properties>
-                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
-                <browserstack.platform.browser>IE</browserstack.platform.browser>
-                <browserstack.platform.browser.version>8.0</browserstack.platform.browser.version>
-                <browserstack.platform.os>Windows</browserstack.platform.os>
-                <browserstack.platform.os.version>7</browserstack.platform.os.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>browserstack-platform-windows-8.1-IE-11</id>
-            <activation>
-                <property>
-                    <name>test.execution.env</name>
-                    <value>browserstack-platform-windows-8.1-IE-11</value>
-                </property>
-            </activation>
-            <properties>
-                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
-                <browserstack.platform.browser>IE</browserstack.platform.browser>
-                <browserstack.platform.browser.version>11.0</browserstack.platform.browser.version>
-                <browserstack.platform.os>Windows</browserstack.platform.os>
-                <browserstack.platform.os.version>8.1</browserstack.platform.os.version>
             </properties>
         </profile>
         <profile>
