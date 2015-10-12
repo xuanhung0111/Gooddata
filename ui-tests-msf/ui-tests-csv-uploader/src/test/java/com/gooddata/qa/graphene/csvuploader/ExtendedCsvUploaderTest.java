@@ -9,7 +9,6 @@ import org.testng.annotations.Test;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,6 +58,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         String datasetName = getNewDataset(fileToUpload);
         waitForExpectedDatasetsCount(datasetCountBeforeUpload + 1);
         takeScreenshot(browser, DATA_PAGE_NAME + "-uploading-dataset-" + datasetName, getClass());
+        waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, DATA_PAGE_NAME + "-dataset-uploaded-" + datasetName, getClass());
 
@@ -76,8 +76,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
 
-        assertThat("Dataset with name '" + datasetName + "' wasn't found in datasets list.", datasetsListPage
-                .getMyDatasetsTable().getDatasetNames(), hasItem(datasetName));
+        waitForDatasetName(datasetName);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", datasetName), getClass());
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
@@ -116,6 +115,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         String datasetName = getNewDataset(fileToUpload);
         waitForExpectedDatasetsCount(datasetCountBeforeUpload + 1);
+        waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "-changed-type-dataset-uploaded-", datasetName),
                 getClass());
@@ -133,6 +133,8 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         CsvFile fileToUploadFirst = CsvFile.PAYROLL_CHECK_NOT_SYNC_DATA;
         checkCsvUpload(fileToUploadFirst, this::uploadCsv, true);
         String firstDatasetUploadName = getNewDataset(fileToUploadFirst);
+        waitForDatasetName(firstDatasetUploadName);
+        waitForDatasetStatus(firstDatasetUploadName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
         initManagePage();
         datasetsTable.selectObject(firstDatasetUploadName);
@@ -140,7 +142,9 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         CsvFile secondFileUpload = CsvFile.PAYROLL_CHECK_SYNC_DATA;
         checkCsvUpload(secondFileUpload, this::uploadCsv, true);
-        getNewDataset(secondFileUpload);
+        String secondDatasetUploadName = getNewDataset(secondFileUpload);
+        waitForDatasetName(secondDatasetUploadName);
+        waitForDatasetStatus(secondDatasetUploadName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
         initManagePage();
         datasetsTable.selectObject(firstDatasetUploadName);
@@ -180,14 +184,14 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String firstDatasetName = getNewDataset(fileToUpload);
 
-        assertThat(datasetsListPage.getMyDatasetsTable().getDatasetNames(), hasItem(firstDatasetName));
+        waitForDatasetName(firstDatasetName);
         waitForDatasetStatus(firstDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", firstDatasetName), getClass());
 
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String secondDatasetName = getNewDataset(fileToUpload);
 
-        assertThat(datasetsListPage.getMyDatasetsTable().getDatasetNames(), hasItem(secondDatasetName));
+        waitForDatasetName(secondDatasetName);
         waitForDatasetStatus(secondDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", secondDatasetName),
                 getClass());
@@ -200,7 +204,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String firstDatasetName = getNewDataset(fileToUpload);
 
-        assertThat(datasetsListPage.getMyDatasetsTable().getDatasetNames(), hasItem(firstDatasetName));
+        waitForDatasetName(firstDatasetName);
         waitForDatasetStatus(firstDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", firstDatasetName), getClass());
 
@@ -216,7 +220,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String secondDatasetName = getNewDataset(fileToUpload);
 
-        assertThat(datasetsListPage.getMyDatasetsTable().getDatasetNames(), hasItem(secondDatasetName));
+        waitForDatasetName(secondDatasetName);
         waitForDatasetStatus(secondDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", secondDatasetName),
                 getClass());
