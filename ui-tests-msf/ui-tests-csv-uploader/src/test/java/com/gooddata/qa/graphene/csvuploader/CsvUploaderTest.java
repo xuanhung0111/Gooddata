@@ -9,6 +9,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
@@ -47,9 +48,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(PAYROLL_FILE, this::uploadCsv, true);
         PAYROLL_DATASET_NAME = getNewDataset(PAYROLL_FILE);
 
-        assertThat("Dataset with name '" + PAYROLL_DATASET_NAME + "' wasn't found in datasets list.",
-                datasetsListPage.getMyDatasetsTable().getDatasetNames(),
-                hasItem(PAYROLL_DATASET_NAME));
+        waitForDatasetName(PAYROLL_DATASET_NAME);
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", PAYROLL_DATASET_NAME), getClass());
 
@@ -98,21 +97,23 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
-    public void checkNoFactAndNumericColumnNameCsvConfig() throws Exception {
+    public void checkNoFactAndNumericColumnNameCsvConfig() {
         initDataUploadPage();
         uploadFile(PAYROLL_FILE);
         waitForFragmentVisible(dataPreviewPage);
 
         final String factColumnName = "Amount";
-        final String numericColumnName = "42";
 
         dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
-        assertThat(dataPreviewPage.getPreviewPageErrorMassage(),
-                containsString("At least one column must contain numbers"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMassage(), containsString("At least one column must contain numbers"));
+        dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.FACT);
 
-        dataPreviewPage.getDataPreviewTable().changeColumnName(factColumnName, numericColumnName);
-        assertThat(dataPreviewPage.getDataPreviewTable().getColumnError(numericColumnName),
-                containsString("The column name cannot begin with a numerical character"));
+        dataPreviewPage.selectHeader().getDataPreviewTable().getRow(3).click(); // select data row as header
+        final List<String> columnErrors = dataPreviewPage.triggerIntegration().getDataPreviewTable().getColumnErrors();
+
+        assertThat(columnErrors.size(), is(2));
+        assertThat(columnErrors.get(0), containsString("The column name cannot begin with a numerical character"));
+        assertThat(columnErrors.get(1), containsString("The column name cannot begin with a numerical character"));
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
