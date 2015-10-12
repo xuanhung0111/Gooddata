@@ -45,7 +45,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         );
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPage()
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
@@ -80,7 +80,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         );
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPage()
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
@@ -112,7 +112,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
         );
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPage()
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
@@ -137,7 +137,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
                 .build()
             );
 
-            Kpi lastKpi = initIndigoDashboardsPage()
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 

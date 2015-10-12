@@ -36,7 +36,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
             .dateDimension(DATE_CREATED)
             .build());
 
-        Kpi lastKpi = initIndigoDashboardsPage()
+        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
@@ -52,7 +52,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
         RestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "[=NULL]empty;#,##0.00");
 
         try {
-            Kpi lastKpi = initIndigoDashboardsPage()
+            Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
                     .waitForAllKpiWidgetContentLoaded()
                     .getLastKpi();
 
@@ -70,7 +70,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
         RestUtils.changeMetricExpression(getRestApiClient(), errorMetric.getUri(),
                 "SELECT [" + accountUri + "] WHERE 2 = 1");
 
-        Kpi lastKpi = initIndigoDashboardsPage()
+        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
@@ -80,7 +80,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
         assertEquals(lastKpi.getTooltipOfValue(),
                 "KPI cannot be displayed. Contact your administrator to fix the KPI definition.");
 
-        initIndigoDashboardsPage()
+        initIndigoDashboardsPageWithWidgets()
             .switchToEditMode();
         assertEquals(lastKpi.getTooltipOfValue(),
                 "KPI cannot be displayed. Check if the measure definition is properly defined.");

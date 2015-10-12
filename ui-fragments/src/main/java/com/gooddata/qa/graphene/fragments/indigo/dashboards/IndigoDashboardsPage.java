@@ -12,13 +12,15 @@ import org.openqa.selenium.support.FindBy;
 import java.util.List;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import java.util.HashMap;
 
 import org.openqa.selenium.TimeoutException;
 
 public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = Kpi.KPI_CSS_SELECTOR)
     private List<Kpi> kpis;
+
+    @FindBy(className = "splashscreen")
+    private SplashScreen splashScreen;
 
     @FindBy(className = EDIT_BUTTON_CLASS_NAME)
     private WebElement editButton;
@@ -50,6 +52,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
 
+    public SplashScreen getSplashScreen() {
+        return waitForFragmentVisible(splashScreen);
+    }
+
     public ConfigurationPanel getConfigurationPanel() {
         return configurationPanel;
     }
@@ -72,9 +78,18 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
-    public IndigoDashboardsPage saveEditMode() {
+    public IndigoDashboardsPage saveEditModeWithKpis() {
         waitForElementVisible(saveButton).click();
         waitForElementVisible(editButton);
+
+        return this;
+    }
+
+    public IndigoDashboardsPage saveEditModeWithoutKpis() {
+        waitForElementVisible(saveButton).click();
+        this.waitForDialog()
+                .submitClick();
+        waitForFragmentVisible(splashScreen);
 
         return this;
     }
@@ -83,7 +98,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage leaveEditMode() {
         boolean isSaveEnabled = isElementPresent(SAVE_BUTTON_ENABLED, browser);
         if (isSaveEnabled) {
-            return saveEditMode();
+            return saveEditModeWithKpis();
         }
 
         return cancelEditMode();
@@ -200,7 +215,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
             .selectDateDimensionByName(config.getDateDimension());
 
         if (config.hasComparison()) {
-            configurationPanel.selectComparisonByName(config.getComparison().toString());
+            configurationPanel.selectComparisonByName(config.getComparison());
         }
 
         if (config.hasDrillTo()) {
