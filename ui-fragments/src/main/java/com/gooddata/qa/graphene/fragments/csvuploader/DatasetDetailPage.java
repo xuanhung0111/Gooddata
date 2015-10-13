@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -22,6 +21,20 @@ public class DatasetDetailPage extends AbstractFragment {
 
     @FindBy(className = "s-dataset-update-ds-from-file-button")
     private WebElement refreshDatasetButton;
+    
+    @FindBy(xpath = "//.[@class='datasets-sidebar']//a")
+    private WebElement latestCsvFileUpload;
+    
+    @FindBy(css = ".file-detail")
+    private WebElement createdDateTime;
+    
+    public void downloadTheLatestCsvFileUpload() {
+        waitForElementVisible(latestCsvFileUpload).click();
+    }
+    
+    public String getCreatedDateTime() {
+        return waitForElementVisible(createdDateTime).getText();
+    }
 
     public void clickBackButton() {
         waitForElementVisible(backButton).click();

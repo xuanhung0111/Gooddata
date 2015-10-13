@@ -2,8 +2,11 @@ package com.gooddata.qa.graphene.csvuploader;
 
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
+import com.google.common.base.Predicate;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -20,13 +23,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
+
+    private static final long PAYROLL_FILE_SIZE_MINIMUM = 476L;
+    private String downloadFolder;
 
     @BeforeClass
     public void initProperties() {
         projectTitle = "Csv-uploader-test";
+        downloadFolder = testParams.loadProperty("browserDownloadFolder") + testParams.getFolderSeparator();
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -348,6 +358,42 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
                 toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
 
         checkButtonOnErrorUploadDialog();
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkDatasetDetailPage() {
+        CsvFile fileToUpload = CsvFile.PAYROLL;
+
+        checkCsvUpload(fileToUpload, this::uploadCsv, true);
+        String datasetName = getNewDataset(fileToUpload);
+
+        waitForDatasetName(datasetName);
+        waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
+
+        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        takeScreenshot(browser, toScreenshotName(DATASET_DETAIL_PAGE_NAME, datasetName), getClass());
+
+        checkCsvDatasetDetail(fileToUpload, datasetName);
+
+        waitForFragmentVisible(csvDatasetDetailPage).downloadTheLatestCsvFileUpload();
+        final File downloadedCsvFile = new File(downloadFolder + fileToUpload.getFileName());
+        Predicate<WebDriver> fileDownloadComplete =
+                browser -> downloadedCsvFile.length() > PAYROLL_FILE_SIZE_MINIMUM;
+        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
+                .until(fileDownloadComplete);
+        System.out.println("Download file size: " + downloadedCsvFile.length());
+        System.out.println("Download file path: " + downloadedCsvFile.getPath());
+        System.out.println("Download file name: " + downloadedCsvFile.getName());
+
+        String createdDateTime =
+                csvDatasetDetailPage.getCreatedDateTime().replace("Created on ", "").replace("at ", "");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy h:mm a");
+        try {
+            formatter.parse(createdDateTime);
+        } catch (DateTimeParseException e) {
+            throw new IllegalStateException("Incorrect format of created date time: " + createdDateTime, e);
+        }
     }
 
     private void checkButtonOnErrorUploadDialog() {
