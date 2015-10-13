@@ -473,4 +473,16 @@ public class AnalysisPage extends AbstractFragment {
         waitForFragmentVisible(bucketsPanel).removeAttributeFilterFromMetric(metric);
         return this;
     }
+
+    public boolean isAddDataLinkVisible() {
+        return waitForFragmentVisible(cataloguePanel).isAddDataLinkVisible();
+    }
+
+    public String getDataLinkBubbleMessage() {
+        return waitForFragmentVisible(cataloguePanel).getDataLinkBubbleMessage();
+    }
+
+    public void goToDataSectionPage() {
+        waitForFragmentVisible(cataloguePanel).goToDataSectionPage();
+    }
 }

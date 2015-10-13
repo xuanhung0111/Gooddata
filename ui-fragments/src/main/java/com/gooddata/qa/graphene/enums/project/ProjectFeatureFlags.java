@@ -7,7 +7,8 @@ public enum ProjectFeatureFlags {
     DASHBOARD_SCHEDULE_RECIPIENTS("dashboardScheduleRecipients"),
     DISPLAY_USER_MANAGEMENT("displayUserManagement"),
     NPS_STATUS("npsStatus"),
-    ANALYTICAL_DESIGNER("analyticalDesigner");
+    ANALYTICAL_DESIGNER("analyticalDesigner"),
+    ENABLE_CSV_UPLOADER("enableCsvUploader");
 
     private String featureFlag;
 
