@@ -2,15 +2,19 @@ package com.gooddata.qa.graphene.csvuploader;
 
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
+
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
@@ -25,21 +29,41 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         projectTitle = "Csv-uploader-test";
     }
 
-    // There is a known issue for now:
-    // Missing input validation before upload csv file (e.g empty field name...)
     @Test(dependsOnMethods = {"createProject"})
     public void checkNoHeaderCsvFile() {
         initDataUploadPage();
+
+        int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
 
         CsvFile fileToUpload = CsvFile.NO_HEADER;
         uploadFile(fileToUpload);
 
         checkDataPreview(fileToUpload);
+        List<String> errors = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().getColumnErrors();
+        takeScreenshot(browser,
+                toScreenshotName(DATA_PAGE_NAME, "empty-column-name-in", fileToUpload.getFileName()), getClass());
+        assertThat(errors.size(), is(PAYROLL_COLUMN_NAMES.size()));
+        errors.stream().allMatch(error -> error.equals("Column name can't be empty"));
 
-        /* * Todo: - Try to click on confirmation button on preview page - Check that file is not
-         * uploaded (No progress is shown) - An error message will be shown - Fill in field names
-         * with correct values - Check that the file is uploaded well
-         */
+        waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().setColumnsName(PAYROLL_COLUMN_NAMES);
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "set-column-names", fileToUpload.getFileName()),
+                getClass());
+        assertThat(waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().getColumnErrors(), empty());
+        dataPreviewPage.triggerIntegration();
+
+        String datasetName = getNewDataset(fileToUpload);
+        waitForExpectedDatasetsCount(datasetCountBeforeUpload + 1);
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", datasetName), getClass());
+        waitForDatasetName(datasetName);
+        waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
+
+        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
+        checkCsvDatasetDetail(datasetName, PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES);
+
+        csvDatasetDetailPage.clickBackButton();
+        waitForFragmentVisible(datasetsListPage);
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -170,7 +194,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
             takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFileName),
                     getClass());
 
-            waitForFragmentVisible(fileUploadDialog).clickCancelButton();
+            checkButtonOnErrorUploadDialog();
         } finally {
             file.setLength(0);
             file.close();
@@ -224,5 +248,111 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         waitForDatasetStatus(secondDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", secondDatasetName),
                 getClass());
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void uploadCsvFileWithoutFact() {
+        CsvFile fileToUpload = CsvFile.WITHOUT_FACT;
+
+        initDataUploadPage();
+        uploadFile(fileToUpload);
+
+        List<String> backendValidationErrors =
+                waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+        assertThat(
+                backendValidationErrors,
+                hasItems(
+                        "Failed to upload the " + fileToUpload.getFileName() + " file.",
+                        "We haven’t found at least one numeric value (measurable data) on first 20 rows. "
+                                + "We skipped further processing as it seems the file doesn’t contain numeric data for analysis. "
+                                + "Upload a different CSV file."));
+        takeScreenshot(browser,
+                toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
+
+        checkButtonOnErrorUploadDialog();
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void uploadCsvFileWithIncorrectHeader() {
+        CsvFile fileToUpload = CsvFile.BAD_STRUCTURE;
+
+        initDataUploadPage();
+        uploadFile(fileToUpload);
+
+        List<String> backendValidationErrors =
+                waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+        assertThat(
+                backendValidationErrors,
+                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
+                        "Row 2 contains more columns than the header row."));
+        takeScreenshot(browser,
+                toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
+
+        checkButtonOnErrorUploadDialog();
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void uploadCsvFileWithMultipleError() {
+        CsvFile fileToUpload = CsvFile.CRAZY_DATA;
+
+        initDataUploadPage();
+        uploadFile(fileToUpload);
+
+        List<String> backendValidationErrors =
+                waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+        assertThat(
+                backendValidationErrors,
+                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
+                        "There are 5 rows containing less columns than the header row: 44-48.",
+                        "There are 5 rows without at least one numeric value (measurable data): 44-48. "
+                                + "Each row must contain numeric data for analysis."));
+        takeScreenshot(browser,
+                toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
+
+        checkButtonOnErrorUploadDialog();
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void uploadCsvFileWithTooManyColumns() {
+        CsvFile fileToUpload = CsvFile.TOO_MANY_COLUMNS;
+
+        initDataUploadPage();
+        uploadFile(fileToUpload);
+
+        List<String> backendValidationErrors =
+                waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+        assertThat(backendValidationErrors,
+                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
+                        "Load failed and stopped on row 1. Some cell value at this row exceeds 255 characters, "
+                                + "or the number of columns exceeds 250."));
+        takeScreenshot(browser,
+                toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
+
+        checkButtonOnErrorUploadDialog();
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void uploadCsvFileWithTooLongField() {
+        CsvFile fileToUpload = CsvFile.TOO_LONG_FIELD;
+
+        initDataUploadPage();
+        uploadFile(fileToUpload);
+
+        List<String> backendValidationErrors =
+                waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+        assertThat(backendValidationErrors,
+                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
+                        "Load failed and stopped on row 2. Some cell value at this row exceeds 255 characters, "
+                                + "or the number of columns exceeds 250."));
+        takeScreenshot(browser,
+                toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
+
+        checkButtonOnErrorUploadDialog();
+    }
+
+    private void checkButtonOnErrorUploadDialog() {
+        assertThat(waitForFragmentVisible(fileUploadDialog).isUploadButtonDisabled(), is(true));
+        waitForFragmentVisible(fileUploadDialog).clickCancelButton();
+        waitForFragmentNotVisible(fileUploadDialog);
     }
 }

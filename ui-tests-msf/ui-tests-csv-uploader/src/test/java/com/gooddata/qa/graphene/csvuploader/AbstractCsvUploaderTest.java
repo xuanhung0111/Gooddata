@@ -52,9 +52,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
      */
     protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = ".*rows.*columns.*";
 
-    private static final List<String> PAYROLL_COLUMN_TYPES = Lists.newArrayList("Attribute", "Attribute",
+    protected static final List<String> PAYROLL_COLUMN_TYPES = Lists.newArrayList("Attribute", "Attribute",
             "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Date", "Measure");
-    private static final List<String> PAYROLL_COLUMN_NAMES = Lists.newArrayList("Lastname", "Firstname",
+    protected static final List<String> PAYROLL_COLUMN_NAMES = Lists.newArrayList("Lastname", "Firstname",
             "Education", "Position", "Department", "State", "County", "Paydate", "Amount");
     
     protected List<UploadHistory> uploadHistory = Lists.newArrayList();
@@ -283,7 +283,11 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         /** This csv file has incorrect column count (one more than expected) on the line number 2. */
         BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList()),
         NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES),
-        TOO_LARGE_FILE("payroll.too.large");
+        TOO_LARGE_FILE("payroll.too.large"),
+        WITHOUT_FACT("payroll.without.fact"),
+        CRAZY_DATA("crazy.data"),
+        TOO_MANY_COLUMNS("too.many.columns"),
+        TOO_LONG_FIELD("payroll.too.long.field");
     
         private final String name;
         private final List<String> columnNames = Lists.newArrayList();

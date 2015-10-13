@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import java.util.List;
+
 import static java.util.stream.Collectors.toList;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +45,10 @@ public class DataPreviewTable extends AbstractTable {
                 .map(WebElement::getText)
                 .filter(StringUtils::isNotBlank)
                 .collect(toList());
+    }
+
+    public void setColumnsName(final List<String> names) {
+        names.stream().forEach(name -> columnNames.get(names.indexOf(name)).sendKeys(name));
     }
     
     public void changeColumnType(String columnName, ColumnType type) {
