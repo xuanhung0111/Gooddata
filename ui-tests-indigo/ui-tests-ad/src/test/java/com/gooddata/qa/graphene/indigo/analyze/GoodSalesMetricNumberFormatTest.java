@@ -29,9 +29,6 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String PERCENT_OF_GOAL = "% of Goal";
-    private static final String IS_WON = "Is Won?";
-
     private Project project;
     private MetadataService mdService;
 
