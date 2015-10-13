@@ -67,6 +67,17 @@ public class DataPreviewTable extends AbstractTable {
                 .until(typeIsSelected);
     }
 
+    public void changeColumnName(int fieldIndex, String columnName) {
+        final WebElement editedColumn = columnNames.get(fieldIndex);
+        editedColumn.clear();
+        editedColumn.sendKeys(columnName);
+        final Predicate<WebDriver> columnNameUpdated =
+                input -> columnName.equals(editedColumn.getAttribute("value"));
+        Graphene.waitGui(browser)
+                .withMessage(String.format("Expected name '%s' is not updated: '%s'", columnName, editedColumn.getAttribute("value")))
+                .until(columnNameUpdated);
+    }
+
     public enum ColumnType {
         ATTRIBUTE("Attribute"),
         FACT("Measure"),
