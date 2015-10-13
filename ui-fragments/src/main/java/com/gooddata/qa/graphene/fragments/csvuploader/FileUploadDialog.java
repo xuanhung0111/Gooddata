@@ -12,6 +12,8 @@ import java.util.List;
 
 public class FileUploadDialog extends AbstractFragment {
 
+    private static final By DISABLED_UPLOAD_BUTTON = By.cssSelector(".s-upload-file.disabled");
+
     @FindBy(className = "s-file-picker")
     private WebElement pickFileButton;
 
@@ -30,6 +32,10 @@ public class FileUploadDialog extends AbstractFragment {
     public FileUploadDialog pickCsvFile(String csvFilePath) {
         waitForElementVisible(pickFileButton).sendKeys(csvFilePath);
         return this;
+    }
+
+    public boolean isUploadButtonDisabled() {
+        return !getRoot().findElements(DISABLED_UPLOAD_BUTTON).isEmpty();
     }
 
     public void clickUploadButton() {
