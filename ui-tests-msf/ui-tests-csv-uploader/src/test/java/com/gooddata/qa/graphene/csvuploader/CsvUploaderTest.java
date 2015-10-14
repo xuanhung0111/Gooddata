@@ -132,6 +132,8 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         dataPreviewTable.changeColumnName(0, columnName);
         dataPreviewTable.changeColumnName(1, columnName);
 
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNameValidationErrors"), getClass());
+
         List<String> columnErrors = dataPreviewPage.getDataPreviewTable().getColumnErrors();
 
         // the error should appear for both columns
@@ -139,8 +141,11 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         assertThat(columnErrors.get(0), containsString(expectedErrorMessage));
         assertThat(columnErrors.get(1), containsString(expectedErrorMessage));
 
+
         // fix it by editing the first column
         dataPreviewTable.changeColumnName(0, RandomStringUtils.randomAlphabetic(20));
+
+        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNamesValid"), getClass());
 
         columnErrors = dataPreviewPage.getDataPreviewTable().getColumnErrors();
 
@@ -148,7 +153,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         assertThat(columnErrors.isEmpty(), is(true));
     }
 
-    @Test(/*FIXME*/enabled = false, dependsOnMethods = {"checkCsvUploadHappyPath"})
+    @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshFromList() {
         initDataUploadPage();
 
