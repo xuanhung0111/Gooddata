@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -117,6 +118,37 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
+    public void checkCsvDuplicateColumnNames() {
+
+        String columnName = "the same";
+        String expectedErrorMessage = String.format("A column with the \"%s\" already exists. Use a different unique name.", columnName);
+
+        initDataUploadPage();
+        uploadFile(PAYROLL_FILE);
+        waitForFragmentVisible(dataPreviewPage);
+
+        // set up the same names
+        DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
+        dataPreviewTable.changeColumnName(0, columnName);
+        dataPreviewTable.changeColumnName(1, columnName);
+
+        List<String> columnErrors = dataPreviewPage.getDataPreviewTable().getColumnErrors();
+
+        // the error should appear for both columns
+        assertThat(columnErrors.size(), is(2));
+        assertThat(columnErrors.get(0), containsString(expectedErrorMessage));
+        assertThat(columnErrors.get(1), containsString(expectedErrorMessage));
+
+        // fix it by editing the first column
+        dataPreviewTable.changeColumnName(0, RandomStringUtils.randomAlphabetic(20));
+
+        columnErrors = dataPreviewPage.getDataPreviewTable().getColumnErrors();
+
+        // there should be no errors
+        assertThat(columnErrors.isEmpty(), is(true));
+    }
+
+    @Test(/*FIXME*/enabled = false, dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshFromList() {
         initDataUploadPage();
 
