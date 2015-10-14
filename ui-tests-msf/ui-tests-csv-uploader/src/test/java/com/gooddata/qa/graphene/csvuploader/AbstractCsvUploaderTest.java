@@ -309,12 +309,12 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     
         public String getDatasetNameOfFirstUpload() {
             String datasetName = this.name.replace(".", " ");
-            return "Csv " + WordUtils.capitalize(datasetName);
+            return WordUtils.capitalize(datasetName);
         }
         
         public String getDatasetName(long datasetIndex) {
             assertThat(datasetIndex > 0, is(true));
-            return getDatasetNameOfFirstUpload() + String.valueOf(datasetIndex);
+            return String.format("%s (%s)", getDatasetNameOfFirstUpload(), datasetIndex);
         }
     
         public List<String> getColumnNames() {
