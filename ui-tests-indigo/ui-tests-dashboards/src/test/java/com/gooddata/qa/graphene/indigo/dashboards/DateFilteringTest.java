@@ -20,7 +20,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void checkDateFilterDefaultState() {
-        DateFilter dateFilter = initIndigoDashboardsPage().waitForDateFilter();
+        DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
         String dateFilterSelection = dateFilter.getSelection();
 
         takeScreenshot(browser, "checkDateFilterDefaultState-this-month", getClass());
@@ -30,7 +30,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void checkDateFilterChangeValue() {
-        DateFilter dateFilter = initIndigoDashboardsPage().waitForDateFilter();
+        DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
         String dateFilterThisYear = "This year";
 
         dateFilter.selectByName(dateFilterThisYear);

@@ -51,7 +51,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
             checkNoNewBrowserTabOrWindowNorRedirected(currentUrl);
 
-            initIndigoDashboardsPage()
+            initIndigoDashboardsPageWithWidgets()
                 .getLastKpi()
                 .clickKpiValue();
 
@@ -164,7 +164,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
     public void checkKpiWithDrillToRedirects() {
-        initIndigoDashboardsPage();
+        initIndigoDashboardsPageWithWidgets();
 
         takeScreenshot(browser, "checkKpiWithDrillToRedirects-beforeKpiValueClick", getClass());
 
@@ -183,7 +183,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
     public void checkKpiWithoutDrillToDoesNotRedirect() {
-        initIndigoDashboardsPage();
+        initIndigoDashboardsPageWithWidgets();
 
         takeScreenshot(browser, "checkKpiWithoutDrillToDoesNotRedirect-beforeKpiValueClick", getClass());
 

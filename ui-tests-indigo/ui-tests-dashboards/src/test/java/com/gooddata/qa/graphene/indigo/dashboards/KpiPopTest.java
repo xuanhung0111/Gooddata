@@ -16,15 +16,15 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
     public void checkKpiPopInMobile() {
-        Kpi amount = initIndigoDashboardsPage().getKpiByHeadline(AMOUNT);
+        Kpi amount = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(AMOUNT);
         assertFalse(amount.hasPopSection());
 
-        Kpi lost = initIndigoDashboardsPage().getKpiByHeadline(LOST);
+        Kpi lost = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(LOST);
         assertTrue(lost.hasPopSection());
         assertEquals(lost.getPopSection().getChangeTitle(), "change");
         assertEquals(lost.getPopSection().getPeriodTitle(), "prev. year");
 
-        Kpi numberOfActivities = initIndigoDashboardsPage().getKpiByHeadline(NUMBER_OF_ACTIVITIES);
+        Kpi numberOfActivities = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(NUMBER_OF_ACTIVITIES);
         assertTrue(numberOfActivities.hasPopSection());
         assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
         assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. month");
@@ -36,7 +36,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkNewlyAddedKpiHasPopSection() {
-        Kpi justAddedKpi = initIndigoDashboardsPage()
+        Kpi justAddedKpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
@@ -47,9 +47,9 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
         assertTrue(justAddedKpi.hasPopSection());
 
         indigoDashboardsPage
-            .saveEditMode();
+            .saveEditModeWithKpis();
 
-        Kpi lastKpi = initIndigoDashboardsPage()
+        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
             .getLastKpi();
 
         takeScreenshot(browser, "checkNewlyAddedKpiHasPopSection", getClass());
@@ -62,12 +62,12 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .submitClick();
 
         indigoDashboardsPage
-            .saveEditMode();
+            .saveEditModeWithKpis();
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiWithoutComparison() {
-        Kpi kpi = initIndigoDashboardsPage()
+        Kpi kpi = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
@@ -79,9 +79,9 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
         assertFalse(kpi.hasPopSection());
 
         indigoDashboardsPage
-            .saveEditMode();
+            .saveEditModeWithKpis();
 
-        Kpi lastKpi = initIndigoDashboardsPage()
+        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
             .getLastKpi();
 
         takeScreenshot(browser, "checkKpiWithoutComparison", getClass());
@@ -94,7 +94,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .submitClick();
 
         indigoDashboardsPage
-            .saveEditMode();
+            .saveEditModeWithKpis();
     }
 
     @DataProvider(name = "popProvider")
@@ -112,16 +112,16 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, dataProvider = "popProvider", groups = {"desktop"})
     public void checkKpiPopSection(Kpi.ComparisonType comparisonType, String dateFilter, String expectedPeriodTitle) {
-        initIndigoDashboardsPage()
+        initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
                 .dateDimension(DATE_CREATED)
                 .comparison(comparisonType.toString())
                 .build())
-            .saveEditMode();
+            .saveEditModeWithKpis();
 
-        Kpi kpi = initIndigoDashboardsPage()
+        Kpi kpi = initIndigoDashboardsPageWithWidgets()
             .getLastKpi();
 
         indigoDashboardsPage.selectDateFilterByName(dateFilter);
@@ -137,6 +137,6 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .submitClick();
 
         indigoDashboardsPage
-            .saveEditMode();
+            .saveEditModeWithKpis();
     }
 }

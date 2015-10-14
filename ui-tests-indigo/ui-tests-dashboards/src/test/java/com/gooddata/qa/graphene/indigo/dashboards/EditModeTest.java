@@ -10,7 +10,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkEditButtonPresent() {
-        initIndigoDashboardsPage();
+        initIndigoDashboardsPageWithWidgets();
 
         takeScreenshot(browser, "checkEditButtonPresent", getClass());
 
@@ -19,7 +19,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
     public void checkEditButtonMissing() {
-        initIndigoDashboardsPage();
+        initIndigoDashboardsPageWithWidgets();
 
         takeScreenshot(browser, "checkEditButtonMissing", getClass());
 

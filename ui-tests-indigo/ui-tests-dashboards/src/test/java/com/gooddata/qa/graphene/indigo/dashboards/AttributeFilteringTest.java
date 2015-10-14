@@ -21,7 +21,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void checkAttributeFilterDefaultState() {
-        final AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPage().waitForAttributeFilters();
+        final AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPageWithWidgets().waitForAttributeFilters();
 
         takeScreenshot(browser, "checkAttributeFilterDefaultState-All", getClass());
 
@@ -38,7 +38,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         String attributeFilterVideo = "1st in Video - Music World";
         String attributeFilterShoppingCart = "3dCart Shopping Cart Software";
 
-        AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPage().waitForAttributeFilters();
+        AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPageWithWidgets().waitForAttributeFilters();
 
         attributeFiltersPanel.getAttributeFilter(STAT_REGION)
             .clearAllCheckedValues()
@@ -105,7 +105,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
                     equalTo(attribute14West));
 
             initReportsPage();
-            initIndigoDashboardsPage();
+            initIndigoDashboardsPageWithWidgets();
             takeScreenshot(browser, "testFilterBySuggestedAttributes-refresh", getClass());
             assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), equalTo("All"));
         } finally {

@@ -14,7 +14,7 @@ public class DateDimensionTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkAvailableDateDimensions() {
-        ConfigurationPanel cp = initIndigoDashboardsPage()
+        ConfigurationPanel cp = initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .clickAddWidget()
             .getConfigurationPanel();
@@ -36,7 +36,7 @@ public class DateDimensionTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkDateDimensionConfigured() {
-        initIndigoDashboardsPage()
+        initIndigoDashboardsPageWithWidgets()
             .switchToEditMode()
             .selectKpi(0);
 

@@ -26,9 +26,10 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             logout();
             signIn(false, UserRoles.VIEWER);
 
-            initIndigoDashboardsPage();
+            initIndigoDashboardsPage()
+                    .getSplashScreen()
+                    .waitForCreateKpiDashboardButtonMissing();
 
-            assertFalse(indigoDashboardsPage.isEditButtonVisible());
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);
@@ -43,9 +44,10 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
             logout();
             signIn(false, UserRoles.EDITOR);
 
-            initIndigoDashboardsPage();
+            initIndigoDashboardsPage()
+                    .getSplashScreen()
+                    .waitForCreateKpiDashboardButtonVisible();
 
-            assertTrue(indigoDashboardsPage.isEditButtonVisible());
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);
@@ -59,12 +61,7 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
 
             logout();
             openUrl(getIndigoDashboardsPageUri());
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-                @Override
-                public boolean apply(WebDriver browser) {
-                    return browser.getCurrentUrl().contains(ACCOUNT_PAGE);
-                }
-            });
+            Graphene.waitGui().until((WebDriver driver) -> driver.getCurrentUrl().contains(ACCOUNT_PAGE));
         } finally {
             signIn(true, UserRoles.ADMIN);
         }
