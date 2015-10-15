@@ -40,6 +40,9 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
     protected static final String FROM = "noreply@gooddata.com";
 
+    protected static final String CANNOT_DELETE_DASHBOARD_MESSAGE = "Dashboard cannot be deleted"
+            + " because it is linked from a scheduled email or KPI dashboard. Remove all links and retry.";
+
     protected File attachmentsDirectory;
 
     @BeforeClass
