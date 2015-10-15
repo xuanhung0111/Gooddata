@@ -136,8 +136,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                     return browser.findElements(BY_RED_BAR).size() != 0;
                 }
             });
-            assertEquals(browser.findElement(BY_RED_BAR).getText(),
-                    "Report or dashboard cannot be deleted. Please remove it from its scheduled distribution first.");
+            assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
             dashboardsPage.getDashboardEditBar().cancelDashboard();
         } finally {
