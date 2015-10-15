@@ -9,6 +9,7 @@ import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.D
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DRILL_TO_OUTLOOK;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import org.testng.annotations.Test;
 
 public class SplashScreenTest extends DashboardsTest {
@@ -87,6 +88,41 @@ public class SplashScreenTest extends DashboardsTest {
                 .saveEditModeWithoutKpis()
                 .getSplashScreen();
     }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void checkDeleteDashboardWithCancelAndConfirm() {
+        setupKpiFromSplashScreen(kpi);
+
+        indigoDashboardsPage
+                .switchToEditMode()
+                .deleteDashboard(false);
+
+        indigoDashboardsPage
+                .waitForEditingControls()
+                .waitForSplashscreenMissing();
+
+        takeScreenshot(browser, "checkDeleteDashboardWithCancelAndConfirm-cancel", getClass());
+
+        indigoDashboardsPage
+                .deleteDashboard(true);
+
+        indigoDashboardsPage.getSplashScreen();
+
+        takeScreenshot(browser, "checkDeleteDashboardWithCancelAndConfirm-confirm", getClass());
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void checkDeleteDashboardButtonMissingOnUnsavedDashboard() {
+        initIndigoDashboardsPage()
+                .getSplashScreen()
+                .startEditingWidgets();
+
+        indigoDashboardsPage.waitForEditingControls();
+        assertFalse(indigoDashboardsPage.isDeleteButtonVisible());
+
+        takeScreenshot(browser, "checkDeleteDashboardButtonMissingOnUnsavedDashboard", getClass());
+    }
+
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"mobile"})
     public void checkCreateNewKpiDashboardNotAvailableOnMobile() {
