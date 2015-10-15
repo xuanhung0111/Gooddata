@@ -54,6 +54,12 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
+    public void createReport() {
+        createReport(new UiReportDefinition().withName(VERSION_REPORT).withWhats(NUMBER_OF_ACTIVITIES),
+                "openUpToDateReport");
+    }
+
+    @Test(dependsOnMethods = {"createReport"})
     public void workWithOldVersion() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
@@ -126,7 +132,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportPage);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createReport"})
     public void leaveAndDontSaveOldReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(VERSION_REPORT);
@@ -172,7 +178,7 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
         reportsPage.getReportsList().openReport(reportName);
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createReport"})
     public void leaveAndSaveOldReport() {
         initReportsPage();
         waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);
@@ -250,7 +256,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void saveReportPlacedOnDashboard() {
         initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(TOTAL_LOST);
+        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder("All");
+        reportsPage.getReportsList().openReport(TOTAL_LOST);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage).openHowPanel()
             .selectAttribute(IS_WON)
@@ -262,7 +269,8 @@ public class GoodSalesSaveReportTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"})
     public void saveAsReportPlacedOnDashboard() {
         initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(QTD_GOAL);
+        waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder("All");
+        reportsPage.getReportsList().openReport(QTD_GOAL);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage).openHowPanel()
             .selectAttribute(IS_WON)
