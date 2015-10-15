@@ -396,6 +396,39 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         }
     }
 
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkBasicUploadProgress() {
+        CsvFile fileToUpload = CsvFile.PAYROLL;
+
+        checkCsvUpload(fileToUpload, this::uploadCsv, true);
+        String datasetName = getNewDataset(fileToUpload);
+
+        assertThat(datasetsListPage.waitForProgressMessageBar().getText(),
+                is(String.format("Adding data from %s to the project ...", fileToUpload.getFileName())));
+        takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
+
+        assertThat(datasetsListPage.waitForSuccessMessageBar().getText(),
+                is(String.format("Data in %s has been updated successfully. Happy analyzing!", datasetName)));
+        takeScreenshot(browser, toScreenshotName("Successful-upload-data-to-dataset", datasetName), getClass());
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void failedToUploadCsvFile() {
+        CsvFile fileToUpload = CsvFile.PAYROLL_TOO_LONG_FACT_VALUE;
+
+        checkCsvUpload(fileToUpload, this::uploadCsv, true);
+
+        assertThat(datasetsListPage.waitForProgressMessageBar().getText(),
+                is(String.format("Adding data from %s to the project ...", fileToUpload.getFileName())));
+        takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
+
+        // The error message should be improved in MSF-9476
+        assertThat(datasetsListPage.waitForErrorMessageBar().getText(),
+                is(String.format("Failed to add data from %s due to internal error", fileToUpload.getFileName()
+                        .replace(".csv", ""))));
+        takeScreenshot(browser, toScreenshotName("Failed-upload-from", fileToUpload.getFileName()), getClass());
+    }
+
     private void checkButtonOnErrorUploadDialog() {
         assertThat(waitForFragmentVisible(fileUploadDialog).isUploadButtonDisabled(), is(true));
         waitForFragmentVisible(fileUploadDialog).clickCancelButton();
