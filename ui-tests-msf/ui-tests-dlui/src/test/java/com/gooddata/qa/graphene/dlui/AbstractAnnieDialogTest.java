@@ -8,6 +8,10 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -59,7 +63,9 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     private static final String GOODDATA_SUPPORT_LINK =
             "https://support.gooddata.com/?utm_source=de&utm_campaign=error_message&utm_medium=dialog";
 
-    @FindBy(css = ".s-btn-add_data")
+    private static final String ADD_DATA_BUTTON_CSS_LOCATOR = ".s-btn-add_data";
+
+    @FindBy(css = ADD_DATA_BUTTON_CSS_LOCATOR)
     private WebElement addDataButton;
 
     @FindBy(css = ".annie-dialog-main")
@@ -67,6 +73,9 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
     public void prepareDataForDLUI() throws JSONException, ParseException, IOException {
+        initManagePage();
+        assertThat(browser.findElements(By.cssSelector(ADD_DATA_BUTTON_CSS_LOCATOR)), is(empty()));
+        
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
 
