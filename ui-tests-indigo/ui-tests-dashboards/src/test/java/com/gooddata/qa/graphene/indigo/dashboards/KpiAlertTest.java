@@ -2,15 +2,22 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
+
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
+
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+
 import org.testng.Assert;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class KpiAlertTest extends DashboardWithWidgetsTest {
@@ -23,22 +30,6 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
     private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI…";
     private static final String KPI_ALERT_FILTERS_DIFFER_MESSAGE = "Alert and current dashboard filters differ. Apply alert filters";
     private static final String KPI_ALERT_THRESHOLD = "100"; // TODO: consider parsing value from KPI to avoid immediate alert trigger
-
-    private Kpi getLastKpiAfterAlertsLoaded() {
-        return initIndigoDashboardsPageWithWidgets()
-            .waitForAllKpiWidgetContentLoaded()
-            .waitForAlertsLoaded()
-            .getLastKpi();
-    }
-
-    private void setAlertForLastKpi(String triggeredWhen, String threshold) {
-        initIndigoDashboardsPageWithWidgets()
-            .getLastKpi()
-            .openAlertDialog()
-            .selectTriggeredWhen(triggeredWhen)
-            .setThreshold(threshold)
-            .setAlert();
-    }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkNewKpiDoesNotHaveAlertSet() {
@@ -188,12 +179,32 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
-    public void checkKpiAlertMessageWithDateFilter() {
+    @DataProvider(name = "dateFilterProvider")
+    public Object[][] dateFilterProvider() {
+        return new Object[][] {
+            {DATE_FILTER_ALL_TIME, ""},
+            {"Last 7 days", "in trailing 7 days"},
+            {"Last 30 days", "in trailing 30 days"},
+            {"Last 90 days", "in trailing 90 days"},
+            {DATE_FILTER_THIS_MONTH, "in current month"},
+            {DATE_FILTER_LAST_MONTH, "in previous month"},
+            {"Last 12 months", "in previous 12 months"},
+            {DATE_FILTER_THIS_QUARTER, "in current quarter"},
+            {DATE_FILTER_LAST_QUARTER, "in previous quarter"},
+            {"Last 4 quarters", "in previous 4 quarters"},
+            {"This year", "in current year"},
+            {"Last year", "in previous year"}
+        };
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"},
+            dataProvider = "dateFilterProvider")
+    public void checkKpiAlertMessageWithDateFilter(String dateFilter, String alertDialogInfoText) {
         setupKpi(kpiConfig);
 
         try {
-            String alertDialogInfoText = "in current month";
+            initIndigoDashboardsPageWithWidgets()
+                .selectDateFilterByName(dateFilter);
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
@@ -204,10 +215,13 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
                 .openAlertDialog()
                 .getAlertDialogText();
 
+            takeScreenshot(browser, "checkKpiAlertMessageWithDateFilter-" + dateFilter, getClass());
             assertEquals(kpiAlertDialogTextBefore, alertDialogInfoText);
 
+            String anotherDateFilter =
+                    dateFilter.equals(DATE_FILTER_LAST_MONTH) ? DATE_FILTER_THIS_MONTH : DATE_FILTER_LAST_MONTH;
             String kpiAlertDialogTextAfter = initIndigoDashboardsPageWithWidgets()
-                .selectDateFilterByName(DATE_FILTER_LAST_MONTH)
+                .selectDateFilterByName(anotherDateFilter)
                 .getLastKpi()
                 .openAlertDialog()
                 .getAlertDialogText();
@@ -239,5 +253,41 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         } finally {
             teardownKpi();
         }
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void checkKpiAlertValidationNumber() {
+        setupKpi(kpiConfig);
+
+        try {
+            KpiAlertDialog dialog = initIndigoDashboardsPageWithWidgets()
+                .getLastKpi()
+                .openAlertDialog();
+
+            String message = dialog.selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
+                .setThreshold("1-")
+                .getAlertMessageText();
+            assertEquals(message, "This number is not valid.\nDouble-check it and try again.");
+
+            dialog.discardAlert();
+        } finally {
+            teardownKpi();
+        }
+    }
+
+    private Kpi getLastKpiAfterAlertsLoaded() {
+        return initIndigoDashboardsPageWithWidgets()
+            .waitForAllKpiWidgetContentLoaded()
+            .waitForAlertsLoaded()
+            .getLastKpi();
+    }
+
+    private void setAlertForLastKpi(String triggeredWhen, String threshold) {
+        initIndigoDashboardsPageWithWidgets()
+            .getLastKpi()
+            .openAlertDialog()
+            .selectTriggeredWhen(triggeredWhen)
+            .setThreshold(threshold)
+            .setAlert();
     }
 }

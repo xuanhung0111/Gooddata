@@ -1,10 +1,13 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -43,6 +46,9 @@ public class KpiAlertDialog extends AbstractFragment {
 
     @FindBy(className = "s-apply-alert-filters")
     private WebElement applyAlertFiltersButton;
+
+    @FindBy(className = "s-cancel")
+    private WebElement discardAlertButton;
 
     public String getDialogHeader() {
         return waitForElementVisible(header).getText();
@@ -83,8 +89,14 @@ public class KpiAlertDialog extends AbstractFragment {
         return this;
     }
 
+    public KpiAlertDialog discardAlert() {
+        waitForElementVisible(discardAlertButton).click();
+        waitForElementNotPresent(discardAlertButton);
+        return this;
+    }
+
     public String getAlertDialogText() {
-        return waitForElementVisible(kpiAlertDialogTextInfo).getText();
+        return waitForElementPresent(kpiAlertDialogTextInfo).getText();
     }
 
     public boolean hasAlertMessage() {
