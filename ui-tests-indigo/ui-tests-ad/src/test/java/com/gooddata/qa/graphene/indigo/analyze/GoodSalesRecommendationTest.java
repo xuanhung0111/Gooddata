@@ -24,8 +24,6 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String SNAPSHOT_BOP = "_Snapshot [BOP]";
-
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle = "Indigo-GoodSales-Demo-Recommendation-Test";
