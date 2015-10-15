@@ -75,15 +75,15 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
             .addMetric(AMOUNT)
             .expandMetricConfiguration(AMOUNT);
 
-        ChartReport report = analysisPage.addFilterMetric(NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE, "Email")
-            .addFilterMetric(AMOUNT, ACTIVITY_TYPE, "Phone Call", "Web Meeting")
+        ChartReport report = analysisPage.addFilterMetric(NUMBER_OF_ACTIVITIES, DEPARTMENT, "Direct Sales")
+            .addFilterMetric(AMOUNT, DEPARTMENT, "Inside Sales")
             .waitForReportComputing()
             .getChartReport();
 
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(isEqualCollection(report.getLegends(),
-                asList(format("%s (%s: Email)", NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE),
-                        format("%s (%s: Phone Call, Web Meeting)", AMOUNT, ACTIVITY_TYPE))));
+                asList(format("%s (%s: Direct Sales)", NUMBER_OF_ACTIVITIES, DEPARTMENT),
+                        format("%s (%s: Inside Sales)", AMOUNT, DEPARTMENT))));
         checkingOpenAsReport("addAttributeFilterForMultipleMetrics");
     }
 
