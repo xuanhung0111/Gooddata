@@ -49,6 +49,7 @@ public class CataloguePanel extends AbstractFragment {
     private static final By BY_NO_ITEMS = By.className("adi-no-items");
     private static final By BY_UNRELATED_ITEMS_HIDDEN = By.cssSelector("footer > div");
     private static final By BY_UNAVAILABLE_ITEMS_MATCHED = By.className("s-unavailable-items-matched");
+    private static final By BY_ADD_DATA = By.cssSelector(".csv-link-section .s-btn-add_data");
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
@@ -194,6 +195,24 @@ public class CataloguePanel extends AbstractFragment {
         return items.stream()
             .map(WebElement::getText)
             .anyMatch(text -> data.equals(text.trim()));
+    }
+
+    public boolean isAddDataLinkVisible() {
+        if (!isElementPresent(BY_ADD_DATA, getRoot())) {
+            return false;
+        }
+
+        waitForElementVisible(BY_ADD_DATA, getRoot());
+        return true;
+    }
+
+    public String getDataLinkBubbleMessage() {
+        new Actions(browser).moveToElement(waitForElementVisible(BY_ADD_DATA, getRoot())).perform();
+        return waitForElementVisible(By.cssSelector(".bubble-content .content"), browser).getText();
+    }
+
+    public void goToDataSectionPage() {
+        waitForElementVisible(BY_ADD_DATA, getRoot()).click();
     }
 
     private void waitForItemLoaded() {

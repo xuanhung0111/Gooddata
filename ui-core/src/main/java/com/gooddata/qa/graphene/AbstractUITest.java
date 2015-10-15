@@ -94,6 +94,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
     protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
 
+    protected static final String DATA_UPLOAD_PAGE_URI_TEMPLATE = "data/#/projects/%s/datasets";
+
     /**
      * ----- UI fragmnets -----
      */
