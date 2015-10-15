@@ -21,8 +21,6 @@ import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbstractTest {
 
     private static final String RATIO_METRIC = "Ratio metric";
-    private static final String NUMBER_OF_WON_OPPS = "# of Won Opps.";
-    private static final String NUMBER_OF_OPEN_OPPS = "# of Open Opps.";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {

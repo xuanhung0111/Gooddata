@@ -30,9 +30,6 @@ import com.google.common.collect.Lists;
 
 public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String QUOTA = "Quota";
-    private static final String SNAPSHOT_BOP = "_Snapshot [BOP]";
-
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle = "Indigo-GoodSales-Demo-Basic-Data-Combination-Test";

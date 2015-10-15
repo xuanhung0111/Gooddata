@@ -9,6 +9,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.changeMetricFormat;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.openqa.selenium.By.className;
@@ -49,10 +50,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
-
-    private static final String NUMBER_OF_WON_OPPS = "# of Won Opps.";
-    private static final String PERCENT_OF_GOAL = "% of Goal";
-    private static final String IS_WON = "Is Won?";
 
     private static final String EXPORT_ERROR_MESSAGE = "Visualization is not compatible with Report Editor. "
             + "\"Stage Name\" is in configuration twice. Remove one attribute to Open as Report.";
@@ -706,6 +703,62 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         takeScreenshot(browser, "testAttributeLimitationInTableReport-finishAdding20Attributes", getClass());
 
         assertEquals(analysisPage.getAllAddedCategoryNames().size(), 20);
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void createTableReportWithMoreThan3Metrics() {
+        initAnalysePage();
+        List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
+            .addMetric(NUMBER_OF_LOST_OPPS)
+            .addMetric(NUMBER_OF_OPEN_OPPS)
+            .addMetric(NUMBER_OF_OPPORTUNITIES)
+            .addMetric(NUMBER_OF_WON_OPPS)
+            .addCategory(DEPARTMENT)
+            .addCategory(PRODUCT)
+            .waitForReportComputing()
+            .getTableReport()
+            .getHeaders()
+            .stream()
+            .map(String::toLowerCase)
+            .collect(toList());
+        assertEquals(headers, Stream.of(DEPARTMENT, PRODUCT, NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS,
+                NUMBER_OF_OPPORTUNITIES, NUMBER_OF_WON_OPPS).map(String::toLowerCase).collect(toList()));
+        checkingOpenAsReport("createReportWithMoreThan3Metrics-tableReport");
+
+        Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
+            .forEach(type -> {
+                analysisPage.changeReportType(type);
+                takeScreenshot(browser, "createReportWithMoreThan3Metrics-switchFromTableTo-" + type.name(),
+                        getClass());
+                assertFalse(analysisPage.waitForReportComputing()
+                    .isExplorerMessageVisible());
+                analysisPage.undo();
+            });
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void createChartReportWithMoreThan3Metrics() {
+        initAnalysePage();
+        List<String> legends = analysisPage.addMetric(NUMBER_OF_LOST_OPPS)
+                .addMetric(NUMBER_OF_OPEN_OPPS)
+                .addMetric(NUMBER_OF_OPPORTUNITIES)
+                .addMetric(NUMBER_OF_WON_OPPS)
+                .waitForReportComputing()
+                .getChartReport()
+                .getLegends();
+        assertEquals(legends, asList(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS, NUMBER_OF_OPPORTUNITIES,
+                NUMBER_OF_WON_OPPS));
+        checkingOpenAsReport("createReportWithMoreThan3Metrics-chartReport");
+
+        List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
+            .waitForReportComputing()
+            .getTableReport()
+            .getHeaders()
+            .stream()
+            .map(String::toLowerCase)
+            .collect(toList());
+        assertEquals(headers, Stream.of(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS,
+                NUMBER_OF_OPPORTUNITIES, NUMBER_OF_WON_OPPS).map(String::toLowerCase).collect(toList()));
     }
 
     private void deleteMetric(String metric) {
