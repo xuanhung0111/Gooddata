@@ -38,8 +38,6 @@ import com.google.common.collect.Lists;
 
 public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
-    private static final String DATA_UPLOAD_PAGE_URI = "data/#/projects/%s/datasets";
-
     protected static final String UPLOAD_DIALOG_NAME = "upload-dialog";
     protected static final String DATA_PAGE_NAME = "data-page";
     protected static final String DATASET_DETAIL_PAGE_NAME = "dataset-detail";
@@ -112,7 +110,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     }
 
     protected void initDataUploadPage() {
-        openUrl(String.format(DATA_UPLOAD_PAGE_URI, testParams.getProjectId()));
+        openUrl(String.format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
         waitForFragmentVisible(datasetsListPage);
     }
     
