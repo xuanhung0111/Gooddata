@@ -22,6 +22,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "splashscreen")
     private SplashScreen splashScreen;
 
+    @FindBy(className = "gd-header")
+    private Header header;
+
     @FindBy(className = EDIT_BUTTON_CLASS_NAME)
     private WebElement editButton;
 
@@ -283,5 +286,11 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForElementVisible(saveButton);
         waitForElementVisible(cancelButton);
         return this;
+    }
+
+    public void logout() {
+        waitForFragmentVisible(header);
+
+        header.logout();
     }
 }

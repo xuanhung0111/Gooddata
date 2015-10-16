@@ -215,6 +215,11 @@ public final class CheckUtils {
         return items;
     }
 
+    public static void waitForStringInUrl(final String url) {
+        Predicate<WebDriver> containsString = driver -> driver.getCurrentUrl().contains(url);
+        Graphene.waitGui().until(containsString);
+    }
+
     /**
      * Check if element is currently present in DOM
      * @see http://stackoverflow.com/questions/7991522/selenium-webdriver-test-if-element-is-present
