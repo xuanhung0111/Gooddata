@@ -4,9 +4,6 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
-import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.AMOUNT;
-import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_CREATED;
-import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DRILL_TO_OUTLOOK;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -23,7 +20,7 @@ public class SplashScreenTest extends DashboardsTest {
         .drillTo(DRILL_TO_OUTLOOK)
         .build();
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
     public void checkNewProjectWithoutKpisFallsToSplashCreen() {
         initIndigoDashboardsPage()
                 .getSplashScreen();
@@ -31,7 +28,7 @@ public class SplashScreenTest extends DashboardsTest {
         takeScreenshot(browser, "checkNewProjectWithoutKpisFallsToSplashCreen", getClass());
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
     public void checkCreateNewKpiDashboard() {
         setupKpiFromSplashScreen(kpi);
 
@@ -40,13 +37,15 @@ public class SplashScreenTest extends DashboardsTest {
         teardownKpiWithDashboardDelete();
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnMethods = {"checkDeleteDashboardButtonMissingOnUnsavedDashboard"},
+            groups = {"desktop","empty-state"})
     public void checkEnterCreateNewKpiDashboardAndCancel() {
         initIndigoDashboardsPage()
                 .getSplashScreen()
                 .startEditingWidgets();
 
         indigoDashboardsPage
+                .waitForDashboardLoad()
                 .addWidget(kpi)
                 .cancelEditMode()
                 .waitForDialog()
@@ -61,7 +60,7 @@ public class SplashScreenTest extends DashboardsTest {
         assertEquals(indigoDashboardsPage.getKpisCount(), 0);
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
     public void checkCreateNewKpiDashboardRemoveAndCreateAgain() {
         setupKpiFromSplashScreen(kpi);
         teardownKpiWithDashboardDelete();
@@ -89,7 +88,7 @@ public class SplashScreenTest extends DashboardsTest {
                 .getSplashScreen();
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
     public void checkDeleteDashboardWithCancelAndConfirm() {
         setupKpiFromSplashScreen(kpi);
 
@@ -111,7 +110,7 @@ public class SplashScreenTest extends DashboardsTest {
         takeScreenshot(browser, "checkDeleteDashboardWithCancelAndConfirm-confirm", getClass());
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnMethods = {"checkNewProjectWithoutKpisFallsToSplashCreen"}, groups = {"desktop", "empty-state"})
     public void checkDeleteDashboardButtonMissingOnUnsavedDashboard() {
         initIndigoDashboardsPage()
                 .getSplashScreen()
