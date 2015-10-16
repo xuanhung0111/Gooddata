@@ -1,6 +1,8 @@
 package com.gooddata.qa.utils.http;
 
 import com.gooddata.qa.graphene.enums.DatasetElements;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.google.common.base.Function;
@@ -32,6 +34,7 @@ import java.util.NoSuchElementException;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.testng.Assert.assertEquals;
@@ -67,6 +70,8 @@ public class RestUtils {
     private static final String CREATE_COMMENT_CONTENT_BODY;
     public static final String TARGET_POPUP = "pop-up";
     public static final String TARGET_EXPORT = "export";
+    private static final String PROJECT_LINK = "/gdc/projects/";
+    private static final String CREATE_PROJECT_CONTENT_BODY;
 
     static {
         try {
@@ -171,6 +176,27 @@ public class RestUtils {
         } catch (JSONException e) {
             throw new IllegalStateException(
                     "There is an exception during json object initialization! ", e);
+        }
+    }
+
+    static {
+        try {
+            CREATE_PROJECT_CONTENT_BODY = new JSONObject() {{
+                put("project", new JSONObject() {{
+                    put("content", new JSONObject() {{
+                        put("guidedNavigation", 1);
+                        put("driver", "${driver}");
+                        put("authorizationToken", "${authorizationToken}");
+                        put("environment", "${environment}");
+                    }});
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                        put("summary", "${summary}");
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
     }
 
@@ -845,5 +871,71 @@ public class RestUtils {
             request.releaseConnection();
         }
         return login;
+    }
+
+    public static String createBlankProject(RestApiClient restApiClient, String title, String summary,
+            String authorizationToken, DWHDriver dwhDriver, ProjectEnvironment enviroment)
+                    throws ParseException, JSONException, IOException {
+        return createProject(restApiClient, title, summary, null, authorizationToken, dwhDriver, enviroment);
+    }
+
+    public static String createProject(RestApiClient restApiClient, String title, String summary,
+            String template, String authorizationToken, DWHDriver dwhDriver, ProjectEnvironment enviroment)
+                    throws ParseException, JSONException, IOException {
+        String contentBody = CREATE_PROJECT_CONTENT_BODY;
+        
+        if(nonNull(template)){
+            JSONObject contentBodyJsonObject = new JSONObject(contentBody);
+            contentBodyJsonObject.getJSONObject("project")
+                .getJSONObject("meta")
+                .put("projectTemplate", template);
+            contentBody = contentBodyJsonObject.toString();
+        }
+
+        contentBody = contentBody.replace("${title}", title)
+                .replace("${summary}", summary)
+                .replace("${driver}", dwhDriver.getValue())
+                .replace("${authorizationToken}", authorizationToken)
+                .replace("${environment}", enviroment.toString());
+
+        HttpRequestBase request = restApiClient.newPostMethod(PROJECT_LINK, contentBody);
+        String projectId = null;
+        try {
+            HttpResponse response = restApiClient.execute(request);
+            String projectUri = new JSONObject(EntityUtils.toString(response.getEntity())).getString("uri");
+            projectId = projectUri.substring(projectUri.lastIndexOf("/") + 1);
+        } finally {
+            request.releaseConnection();
+        }
+
+        waitForProjectCreated(restApiClient, projectId);
+        return projectId;
+    }
+
+    private static void waitForProjectCreated(RestApiClient restApiClient, String projectId)
+            throws ParseException, JSONException, IOException {
+        String currentStatus = "";
+        while (!"ENABLED".equals((currentStatus = getProjectState(restApiClient, projectId)))) {
+            System.out.println("Current status: " + currentStatus);
+            sleepTightInSeconds(5);
+        }
+    }
+
+    private static String getProjectState(RestApiClient restApiClient, String projectId)
+            throws ParseException, JSONException, IOException {
+        return getProjectInfo(restApiClient, projectId).getJSONObject("project")
+                .getJSONObject("content")
+                .getString("state");
+    }
+
+    private static JSONObject getProjectInfo(RestApiClient restApiClient, String projectId)
+            throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newGetMethod(PROJECT_LINK + projectId);
+        try {
+            HttpResponse response = restApiClient.execute(request, HttpStatus.OK, "Cannot get project info!");
+            return new JSONObject(EntityUtils.toString(response.getEntity()));
+        } finally {
+            request.releaseConnection();
+        }
     }
 }
