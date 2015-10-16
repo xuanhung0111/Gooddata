@@ -43,6 +43,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "dash-filters-date")
     private DateFilter dateFilter;
 
+    @FindBy(className = DELETE_BUTTON_CLASS_NAME)
+    private WebElement deleteButton;
+
     @FindBy(css = ".dash-filters-attribute.are-loaded")
     private AttributeFiltersPanel attributeFiltersPanel;
 
@@ -50,6 +53,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector(".s-save_button:not(.disabled)");
 
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
+    private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
 
     public SplashScreen getSplashScreen() {
@@ -249,6 +253,35 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public IndigoDashboardsPage waitForAlertsLoaded() {
         waitForElementPresent(By.className(ALERTS_LOADED_CLASS_NAME), browser);
+        return this;
+    }
+
+    public IndigoDashboardsPage deleteDashboard(boolean confirm) {
+        waitForElementVisible(deleteButton).click();
+        ConfirmDialog deleteConfirmDialog = waitForDialog();
+
+        if (confirm) {
+            deleteConfirmDialog.submitClick();
+            waitForElementNotPresent(deleteButton);
+        } else {
+            deleteConfirmDialog.cancelClick();
+        }
+
+        return this;
+    }
+
+    public boolean isDeleteButtonVisible() {
+        return isElementPresent(By.className(DELETE_BUTTON_CLASS_NAME), this.getRoot());
+    }
+
+    public IndigoDashboardsPage waitForSplashscreenMissing() {
+        waitForFragmentNotVisible(splashScreen);
+        return this;
+    }
+
+    public IndigoDashboardsPage waitForEditingControls() {
+        waitForElementVisible(saveButton);
+        waitForElementVisible(cancelButton);
         return this;
     }
 }
