@@ -30,14 +30,19 @@ public class GoodSalesAccessDataSectionTest extends AnalyticalDesignerAbstractTe
         RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
                 ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), true));
 
-        initAnalysePage();
-        assertTrue(analysisPage.isAddDataLinkVisible());
-        assertEquals(analysisPage.getDataLinkBubbleMessage(), DATA_LINK_BUBBLE_MESSAGE);
-        analysisPage.goToDataSectionPage();
+        try {
+            initAnalysePage();
+            assertTrue(analysisPage.isAddDataLinkVisible());
+            assertEquals(analysisPage.getDataLinkBubbleMessage(), DATA_LINK_BUBBLE_MESSAGE);
+            analysisPage.goToDataSectionPage();
 
-        BrowserUtils.switchToLastTab(browser);
-        assertEquals(browser.getCurrentUrl(),
-                getRootUrl() + format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
+            BrowserUtils.switchToLastTab(browser);
+            assertEquals(browser.getCurrentUrl(),
+                    getRootUrl() + format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
+        } finally {
+            RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
+                    ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), false));
+        }
     }
 
     @Test(dependsOnGroups = {"init"})
