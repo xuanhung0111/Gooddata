@@ -2,7 +2,9 @@ package com.gooddata.qa.browser;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class BrowserUtils {
     public static List<String> getWindowHandles(WebDriver browser) {
@@ -18,5 +20,9 @@ public class BrowserUtils {
     public static void switchToFirstTab(WebDriver browser) {
         List<String> windowHandles = BrowserUtils.getWindowHandles(browser);
         browser.switchTo().window(windowHandles.get(0));
+    }
+
+    public static boolean isIE(WebDriver browser) {
+        return "internet explorer".equals(((RemoteWebDriver) browser).getCapabilities().getBrowserName());
     }
 }

@@ -575,6 +575,22 @@
                 <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
             </properties>
         </profile>
+        <profile>
+            <id>browserstack-platform-windows-8-1-IE-11</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-windows-8-1-IE-11</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>IE</browserstack.platform.browser>
+                <browserstack.platform.browser.version>11.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>Windows</browserstack.platform.os>
+                <browserstack.platform.os.version>8.1</browserstack.platform.os.version>
+            </properties>
+        </profile>
 
         <profile>
             <id>video</id>

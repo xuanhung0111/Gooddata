@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -42,32 +44,41 @@ public abstract class AbstractProjectTest extends AbstractUITest {
                 System.out.println("Project reuse is expected, but projectId is missing, new project will be created...");
             }
         }
-        openUrl(PAGE_GDC_PROJECTS);
-        waitForElementVisible(gpProject.getRoot());
 
-        projectTitle += "-" + testParams.getDwhDriver().name();
-        if (projectTemplate.isEmpty()) {
-            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                    testParams.getAuthorizationToken(), testParams.getDwhDriver(),
-                    testParams.getProjectEnvironment(), projectCreateCheckIterations));
+        if (BrowserUtils.isIE(browser)) {
+            System.out.println("Browser agent is IE. User REST api to create project.");
+            testParams.setProjectId(RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
+                    projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG,
+                    testParams.getProjectEnvironment()));
+
         } else {
-            testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
-                    testParams.getAuthorizationToken(), DWHDriver.PG, testParams.getProjectEnvironment(),
-                    projectCreateCheckIterations));
+            openUrl(PAGE_GDC_PROJECTS);
+            waitForElementVisible(gpProject.getRoot());
 
-            if (testParams.getDwhDriver().equals(DWHDriver.VERTICA)) {
-                String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
-                deleteProject(testParams.getProjectId());
-
-                openUrl(PAGE_GDC_PROJECTS);
-                waitForElementVisible(gpProject.getRoot());
+            projectTitle += "-" + testParams.getDwhDriver().name();
+            if (projectTemplate.isEmpty()) {
                 testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                        testParams.getAuthorizationToken2(), testParams.getDwhDriver(),
+                        testParams.getAuthorizationToken(), testParams.getDwhDriver(),
                         testParams.getProjectEnvironment(), projectCreateCheckIterations));
-                importProject(exportToken, projectCreateCheckIterations * 5);
+            } else {
+                testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
+                        testParams.getAuthorizationToken(), DWHDriver.PG, testParams.getProjectEnvironment(),
+                        projectCreateCheckIterations));
+
+                if (testParams.getDwhDriver().equals(DWHDriver.VERTICA)) {
+                    String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
+                    deleteProject(testParams.getProjectId());
+
+                    openUrl(PAGE_GDC_PROJECTS);
+                    waitForElementVisible(gpProject.getRoot());
+                    testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
+                            testParams.getAuthorizationToken2(), testParams.getDwhDriver(),
+                            testParams.getProjectEnvironment(), projectCreateCheckIterations));
+                    importProject(exportToken, projectCreateCheckIterations * 5);
+                }
             }
+            Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
         }
-        Screenshots.takeScreenshot(browser, projectTitle + "-created", this.getClass());
 
         if (addUsersWithOtherRoles) addUsersWithOtherRolesToProject();
     }
@@ -81,8 +92,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         System.out.println("Going to validate project after tests...");
         // TODO remove when ATP-1520, ATP-1519, ATP-1822 are fixed
         String testName = this.getClass().getSimpleName();
-        if (testName.contains("Coupa") || testName.contains("Pardot") || testName.contains("Zendesk4")) {
-            System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects");
+        if (BrowserUtils.isIE(browser) || testName.contains("Coupa") || testName.contains("Pardot")
+                ||testName.contains("Zendesk4")) {
+            System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects or running in IE");
             return;
         }
         assertEquals(validateProject(), "OK");
