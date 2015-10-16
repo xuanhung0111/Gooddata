@@ -1,12 +1,25 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE_USER_DIALOG_LOCATOR;
+import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.mail.MessagingException;
+
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
+import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.utils.mail.ImapClient;
 
 public class ProjectAndUsersPage extends AbstractFragment {
 
@@ -25,12 +38,20 @@ public class ProjectAndUsersPage extends AbstractFragment {
     @FindBy(css = ".projectNameIpe")
     private WebElement projectNameTag;
 
+    @FindBy(css = ".item.user")
+    private List<WebElement> users;
+
+    @FindBy(css = ".s-btn-invite_users")
+    private WebElement inviteUserButton;
+
     private static final By BY_PROJECTS_LIST = By.className("userProjects");
     private static final By BY_LEAVE_PROJECT_DIALOG_BUTTON = By.cssSelector("form .s-btn-leave");
     private static final By PROJECT_NAME_INPUT_LOCATOR = By.cssSelector(".ipeEditor");
     private static final By SAVE_BUTTON_LOCATOR = By.cssSelector(".s-ipeSaveButton");
     private static final By CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR = By
             .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .s-btn-cancel");
+
+    private static final By EMAILING_DASHBOARDS_TAB_LOCATOR = By.cssSelector(".s-menu-schedulePage");
 
     public void deteleProject() {
         waitForElementVisible(deleteProjectButton).click();
@@ -72,4 +93,35 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR, browser).click();
     }
 
+    public String inviteUsersWithBlankMessage(ImapClient imapClient, String emailSubject,
+            UserRoles role, String...emails) throws MessagingException, IOException {
+        return inviteUsers(imapClient, emailSubject, role, null, emails);
+    }
+
+    public boolean isEmailingDashboardsTabDisplayed() {
+        return isElementPresent(EMAILING_DASHBOARDS_TAB_LOCATOR, browser);
+    }
+
+    public UserProfilePage openUserProfile(final String userEmail) {
+        users.stream()
+                .filter(e -> e.findElement(By.cssSelector(".email")).getText().equals(userEmail))
+                .map(e -> e.findElement(By.cssSelector(".name")))
+                .findFirst()
+                .get()
+                .click();
+        return Graphene.createPageFragment(UserProfilePage.class,
+                waitForElementVisible(USER_PROFILE_PAGE_LOCATOR, browser));
+    }
+
+    public void clickInviteUserButton() {
+        waitForElementVisible(inviteUserButton).click();
+    }
+
+    private String inviteUsers(ImapClient imapClient, String emailSubject,
+            UserRoles role, String message, String...emails) throws MessagingException, IOException {
+        waitForElementVisible(inviteUserButton).click();
+        InviteUserDialog inviteUserDialog = Graphene.createPageFragment(InviteUserDialog.class,
+                waitForElementVisible(INVITE_USER_DIALOG_LOCATOR, browser));
+        return inviteUserDialog.inviteUsers(imapClient, emailSubject, role, message, emails);
+    }
 }

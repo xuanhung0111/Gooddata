@@ -996,17 +996,10 @@ public class RestUtils {
         }
     }
 
-    public static JSONObject getCurrentUserProfile(RestApiClient restApiClient)
-            throws ParseException, JSONException, IOException {
-        HttpRequestBase request = restApiClient.newGetMethod(USER_PROFILE_LINK + "current");
-        try {
-            HttpResponse response = restApiClient.execute(request);
-            return new JSONObject(EntityUtils.toString(response.getEntity()))
-                    .getJSONObject("accountSetting");
-
-        } finally {
-            request.releaseConnection();
-        }
+    public static JSONObject getCurrentUserProfile(RestApiClient restApiClient) 
+            throws JSONException, IOException {
+        return getJSONObjectFrom(restApiClient, USER_PROFILE_LINK + "current")
+                .getJSONObject("accountSetting");
     }
 
     public static void updateCurrentUserPassword(RestApiClient restApiClient, String oldPassword,
@@ -1025,6 +1018,20 @@ public class RestUtils {
             EntityUtils.consumeQuietly(response.getEntity());
         } finally {
             request.releaseConnection();
+        }
+    }
+
+    public static JSONObject getUserProfileByEmail(RestApiClient restApiClient, String email)
+            throws ParseException, JSONException, IOException {
+        String userUri = DOMAIN_USER_LINK + "?login=" + email.replace("@", "%40");
+        try {
+            return getJSONObjectFrom(restApiClient, userUri).getJSONObject("accountSettings")
+                    .getJSONArray("items")
+                    .getJSONObject(0)
+                    .getJSONObject("accountSetting");
+
+        } catch (JSONException e) {
+            return null;
         }
     }
 

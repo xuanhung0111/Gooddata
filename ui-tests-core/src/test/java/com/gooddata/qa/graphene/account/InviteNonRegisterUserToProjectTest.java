@@ -1,0 +1,154 @@
+package com.gooddata.qa.graphene.account;
+
+import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static java.lang.String.format;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import java.io.IOException;
+import java.util.Objects;
+
+import javax.mail.MessagingException;
+
+import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.By;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.account.RegistrationForm;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
+import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.mail.ImapClient;
+
+public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
+
+    private static final String INVITATION_USER = "gd.accregister@gmail.com";
+    private static final String INVITATION_USER_PASSWORD = "changeit";
+
+    private static final By INVITATION_PAGE_LOCATOR = By.cssSelector(".s-invitationPage");
+
+    private static final String USER_PROFILE_PAGE_URL = PAGE_UI_PROJECT_PREFIX + "%s|profilePage|%s";
+
+    private static final String INVITATION_SUCCESS_MESSAGE = "Invitation was successfully sent.";
+
+    private static final String JOINED_PROJECT_SUCCESS_MESSAGE = "CONGRATULATIONS!"
+            + "\nYou have successfully joined the project. Please log in below.";
+
+    private RegistrationForm registrationForm;
+    private ImapClient imapClient;
+
+    @BeforeClass
+    public void setProjectTitle() {
+        projectTitle = "Invite-non-register-user-to-project-test";
+    }
+
+    @Test(dependsOnMethods = "createProject")
+    public void initData() {
+        String registrationString = String.valueOf(System.currentTimeMillis());
+
+        imapHost = testParams.loadProperty("imap.host");
+        imapUser = INVITATION_USER;
+        imapPassword = INVITATION_USER_PASSWORD;
+
+        imapClient = new ImapClient(imapHost, imapUser, imapPassword);
+
+        registrationForm = new RegistrationForm()
+                .withFirstName("FirstName " + registrationString)
+                .withLastName("LastName " + registrationString)
+                .withEmail(INVITATION_USER)
+                .withPassword(INVITATION_USER_PASSWORD)
+                .withPhone(registrationString)
+                .withCompany("Company " + registrationString)
+                .withJobTitle("Title " + registrationString)
+                .withIndustry("Tech");
+    }
+
+    @Test(dependsOnMethods = "initData")
+    public void confirmInvitationRegistrationForm() throws MessagingException, IOException, JSONException {
+        deleteUserIfExist(getRestApiClient(), INVITATION_USER);
+
+        initProjectsAndUsersPage();
+        String invitationLink = projectAndUsersPage.inviteUsersWithBlankMessage(imapClient,
+                projectTitle + " Invitation", UserRoles.EDITOR, INVITATION_USER);
+        checkGreenBar(browser, INVITATION_SUCCESS_MESSAGE);
+
+        logout();
+        openUrl(invitationLink);
+        RegistrationPage invitationPage = Graphene.createPageFragment(RegistrationPage.class,
+                waitForElementVisible(INVITATION_PAGE_LOCATOR, browser));
+        assertFalse(invitationPage.isEmailFieldEditable(), "Email is editable");
+        assertFalse(invitationPage.isCaptchaFieldPresent(), "Captcha field is present");
+
+        invitationPage.registerNewUser(registrationForm);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+        assertThat(browser.getCurrentUrl(), containsString(testParams.getProjectId()));
+    }
+
+    @Test(dependsOnMethods = "initData")
+    public void inviteUnverifiedUserToProject()
+            throws ParseException, JSONException, IOException, MessagingException {
+        deleteUserIfExist(getRestApiClient(), INVITATION_USER);
+
+        initRegistrationPage();
+        registrationPage.registerNewUser(registrationForm);
+        assertEquals(waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).getText(),
+                registrationForm.getFirstName() + " " + registrationForm.getLastName());
+
+        logout();
+        signIn(false, UserRoles.ADMIN);
+
+        initProjectsAndUsersPage();
+        String invitationLink = projectAndUsersPage.inviteUsersWithBlankMessage(imapClient,
+                projectTitle + " Invitation", UserRoles.EDITOR, INVITATION_USER);
+        checkGreenBar(browser, INVITATION_SUCCESS_MESSAGE);
+
+        logout();
+        openUrl(invitationLink);
+        waitForElementVisible(loginFragment.getRoot());
+        assertEquals(loginFragment.getNotificationMessage(), JOINED_PROJECT_SUCCESS_MESSAGE);
+
+        loginFragment.login(INVITATION_USER, INVITATION_USER_PASSWORD, true);
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
+
+        RestApiClient restApiClientInvitedUser = getRestApiClient(INVITATION_USER, INVITATION_USER_PASSWORD);
+        UserProfilePage userProfilePage = openUserProfileInProject(restApiClientInvitedUser,
+                testParams.getProjectId());
+        assertEquals(userProfilePage.getUserRole(), UserRoles.EDITOR.getName());
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDown() throws ParseException, JSONException, IOException {
+        deleteUserIfExist(getRestApiClient(), INVITATION_USER);
+    }
+
+    private UserProfilePage openUserProfileInProject(RestApiClient restApiClient, String projectId)
+            throws ParseException, JSONException, IOException {
+        String userProfileUri = RestUtils.getCurrentUserProfile(restApiClient)
+                .getJSONObject("links")
+                .getString("self");
+        openUrl(format(USER_PROFILE_PAGE_URL, projectId, userProfileUri));
+        return Graphene.createPageFragment(UserProfilePage.class,
+                waitForElementVisible(USER_PROFILE_PAGE_LOCATOR, browser));
+    }
+
+    private void deleteUserIfExist(RestApiClient restApiClient, String userEmail)
+            throws ParseException, JSONException, IOException {
+        JSONObject userProfile = RestUtils.getUserProfileByEmail(restApiClient, userEmail);
+        if (Objects.nonNull(userProfile)) {
+            String userProfileUri = userProfile.getJSONObject("links").getString("self");
+            RestUtils.deleteUser(restApiClient, userProfileUri);
+        }
+    }
+}

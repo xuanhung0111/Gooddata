@@ -37,6 +37,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
+import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -94,6 +95,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
     protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
     protected static final String PAGE_LOST_PASSWORD = "account.html#/lostPassword";
+    protected static final String PAGE_REGISTRATION = 
+            "account.html#/registration/projectTemplate/urn%3Agooddata%3AOnboardingWalkMe";
 
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
     protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
@@ -182,6 +185,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(className = LostPasswordPage.LOST_PASSWORD_PAGE_CLASS_NAME)
     protected LostPasswordPage lostPasswordPage;
+
+    @FindBy(css = ".s-registrationPage")
+    protected RegistrationPage registrationPage;
 
     /**
      * ----- DISC fragments -----
@@ -634,4 +640,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForFragmentVisible(lostPasswordPage);
     }
 
+    public void initRegistrationPage() {
+        openUrl(PAGE_REGISTRATION);
+        waitForFragmentVisible(registrationPage);
+    }
 }

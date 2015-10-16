@@ -42,7 +42,7 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(css = ".menuArrow")
     private WebElement dashboardSwitcherArrowMenu;
 
-    @FindBy(xpath = "//button[@title='Edit, Embed or Export']")
+    @FindBy(css = ".s-actionsButton")
     private WebElement editExportEmbedButton;
 
     @FindBy(xpath = "//button[@title='Download PDF']")

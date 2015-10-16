@@ -17,6 +17,10 @@ public class AccountPage extends AbstractFragment {
     private static final By REGIONAL_NUMBER_FORMATTING_DIALOG_LOCATOR = By
             .cssSelector(".c-regionalNumberFormattingDialog");
 
+    private static final By CONFIRM_DELETE_ACCOUNT_BUTTON_LOCATOR = By.cssSelector(".s-btn-delete");
+    private static final By CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR = By
+            .cssSelector(".s-btn-cancel.yui3-c-button-showInline");
+
     @FindBy(css = ".personalInformation a")
     private WebElement personalInformationLink;
 
@@ -28,6 +32,9 @@ public class AccountPage extends AbstractFragment {
 
     @FindBy(css = ".projects a")
     private WebElement activeProjectsLink;
+
+    @FindBy(css = ".deleteAccount a")
+    private WebElement deleteYourAccountLink;
 
     public PersonalInfoDialog openPersonalInfoDialog() {
         waitForElementVisible(personalInformationLink).click();
@@ -50,6 +57,16 @@ public class AccountPage extends AbstractFragment {
     public void openActiveProjectsPage() {
         waitForElementVisible(activeProjectsLink).click();
         waitForProjectsPageLoaded(browser);
+    }
+
+    public void deleteAccount() {
+        waitForElementVisible(deleteYourAccountLink).click();
+        waitForElementVisible(CONFIRM_DELETE_ACCOUNT_BUTTON_LOCATOR, browser).click();
+    }
+
+    public void tryDeleteAccountButDiscard() {
+        waitForElementVisible(deleteYourAccountLink).click();
+        waitForElementVisible(CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR, browser).click();
     }
 
 }
