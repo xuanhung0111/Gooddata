@@ -181,4 +181,21 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         assertEquals(kpisCount, indigoDashboardsPage.getKpisCount());
         assertEquals(kpisCount, initIndigoDashboardsPageWithWidgets().getKpisCount());
     }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void testCancelAddingWidget() {
+        int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
+
+        indigoDashboardsPage
+            .switchToEditMode()
+            .addWidget(new KpiConfiguration.Builder()
+                .metric(AMOUNT)
+                .dateDimension(DATE_CREATED)
+                .build())
+            .cancelEditMode()
+            .waitForDialog()
+            .submitClick();
+
+        assertEquals(indigoDashboardsPage.getKpisCount(), kpisCount);
+    }
 }
