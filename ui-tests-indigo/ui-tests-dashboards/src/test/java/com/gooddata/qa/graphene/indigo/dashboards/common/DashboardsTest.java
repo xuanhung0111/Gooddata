@@ -31,6 +31,7 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
                 .startEditingWidgets();
 
         indigoDashboardsPage
+                .waitForDashboardLoad()
                 .addWidget(config)
                 .saveEditModeWithKpis();
     }
