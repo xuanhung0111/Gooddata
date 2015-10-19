@@ -9,6 +9,22 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,23 +39,6 @@ import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriTemplate;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static java.lang.String.format;
-import static java.util.Objects.nonNull;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 public class RestUtils {
 
@@ -883,12 +882,12 @@ public class RestUtils {
             String template, String authorizationToken, DWHDriver dwhDriver, ProjectEnvironment enviroment)
                     throws ParseException, JSONException, IOException {
         String contentBody = CREATE_PROJECT_CONTENT_BODY;
-        
+
         if(nonNull(template)){
             JSONObject contentBodyJsonObject = new JSONObject(contentBody);
             contentBodyJsonObject.getJSONObject("project")
-                .getJSONObject("meta")
-                .put("projectTemplate", template);
+                    .getJSONObject("meta")
+                    .put("projectTemplate", template);
             contentBody = contentBodyJsonObject.toString();
         }
 
@@ -912,12 +911,14 @@ public class RestUtils {
         return projectId;
     }
 
-    private static void waitForProjectCreated(RestApiClient restApiClient, String projectId)
-            throws ParseException, JSONException, IOException {
-        String currentStatus = "";
-        while (!"ENABLED".equals((currentStatus = getProjectState(restApiClient, projectId)))) {
-            System.out.println("Current status: " + currentStatus);
-            sleepTightInSeconds(5);
+    public static void deleteProject(RestApiClient restApiClient, String projectId)
+                    throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newDeleteMethod(PROJECT_LINK + projectId);
+        try {
+            HttpResponse response = restApiClient.execute(request, HttpStatus.OK, "Project is not deleted!");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            request.releaseConnection();
         }
     }
 
@@ -936,6 +937,15 @@ public class RestUtils {
             return new JSONObject(EntityUtils.toString(response.getEntity()));
         } finally {
             request.releaseConnection();
+        }
+    }
+
+    private static void waitForProjectCreated(RestApiClient restApiClient, String projectId)
+            throws ParseException, JSONException, IOException {
+        String currentStatus = "";
+        while (!"ENABLED".equals((currentStatus = getProjectState(restApiClient, projectId)))) {
+            System.out.println("Current status: " + currentStatus);
+            sleepTightInSeconds(5);
         }
     }
 }
