@@ -10,6 +10,8 @@ import org.openqa.selenium.WebElement;
 import org.springframework.util.CollectionUtils;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
+import com.gooddata.qa.graphene.utils.Sleeper;
+
 import java.util.List;
 
 public class DatasetsTable extends AbstractTable {
@@ -21,6 +23,8 @@ public class DatasetsTable extends AbstractTable {
     private static final By BY_DATASET_REFRESH_BUTTON = By.className("s-dataset-update-button");
 
     public List<String> getDatasetNames() {
+        // To get the correct number in both cases: empty and non-empty list
+        Sleeper.sleepTightInSeconds(3);
         return getRows().stream()
                 .map(row -> waitForElementVisible(BY_DATASET_NAME, row).getText())
                 .collect(toList());
@@ -56,6 +60,8 @@ public class DatasetsTable extends AbstractTable {
     }
 
     public int getNumberOfDatasets() {
+        // To get the correct number in both cases: empty and non-empty list
+        Sleeper.sleepTightInSeconds(3);
         return getNumberOfRows();
     }
 
