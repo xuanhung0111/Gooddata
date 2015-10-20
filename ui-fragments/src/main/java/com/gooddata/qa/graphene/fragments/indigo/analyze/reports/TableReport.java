@@ -7,6 +7,7 @@ import static org.openqa.selenium.By.className;
 import java.util.List;
 import java.util.Objects;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -44,5 +45,14 @@ public class TableReport extends AbstractFragment {
             .distinct()
             .findAny()
             .orElse("");
+    }
+
+    public TableReport sortBaseOnHeader(final String name) {
+        waitForCollectionIsNotEmpty(headers).stream()
+            .filter(e -> name.equalsIgnoreCase(e.getText()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find table header: " + name))
+            .click();
+        return this;
     }
 }

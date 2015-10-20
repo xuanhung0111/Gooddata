@@ -761,6 +761,61 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 NUMBER_OF_OPPORTUNITIES, NUMBER_OF_WON_OPPS).map(String::toLowerCase).collect(toList()));
     }
 
+    @Test(dependsOnGroups = {"init"})
+    public void orderDataInTableReport() {
+        initAnalysePage();
+
+        List<List<String>> content = sortReportBaseOnHeader(
+                analysisPage.changeReportType(ReportType.TABLE)
+                    .addMetric(NUMBER_OF_ACTIVITIES)
+                    .waitForReportComputing()
+                    .getTableReport(),
+                NUMBER_OF_ACTIVITIES);
+        assertEquals(content, asList(asList("154,271")));
+
+        content = sortReportBaseOnHeader(
+                analysisPage.addMetric(QUOTA)
+                    .waitForReportComputing()
+                    .getTableReport(),
+                QUOTA);
+        assertEquals(content, asList(asList("154,271", "$3,300,000")));
+
+        content = sortReportBaseOnHeader(
+                analysisPage.resetToBlankState()
+                    .changeReportType(ReportType.TABLE)
+                    .addCategory(ACTIVITY_TYPE)
+                    .waitForReportComputing()
+                    .getTableReport(),
+                ACTIVITY_TYPE);
+        assertEquals(content, asList(asList("Web Meeting"), asList("Phone Call"), asList("In Person Meeting"),
+                asList("Email")));
+
+        content = sortReportBaseOnHeader(
+                analysisPage.addCategory(DEPARTMENT)
+                    .waitForReportComputing()
+                    .getTableReport(),
+                DEPARTMENT);
+        assertEquals(content, asList(asList("Email", "Inside Sales"), asList("In Person Meeting", "Inside Sales"),
+                asList("Phone Call", "Inside Sales"), asList("Web Meeting", "Inside Sales"),
+                asList("Email", "Direct Sales"), asList("In Person Meeting", "Direct Sales"),
+                asList("Phone Call", "Direct Sales"), asList("Web Meeting", "Direct Sales")));
+
+        content = sortReportBaseOnHeader(
+                analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+                    .addMetric(QUOTA)
+                    .waitForReportComputing()
+                    .getTableReport(),
+                NUMBER_OF_ACTIVITIES);
+        assertEquals(content, asList(asList("Phone Call", "Direct Sales", "33,420", "$3,300,000"),
+                asList("Web Meeting", "Direct Sales", "23,931", "$3,300,000"),
+                asList("In Person Meeting", "Direct Sales", "22,088", "$3,300,000"),
+                asList("Email", "Direct Sales", "21,615", "$3,300,000"),
+                asList("Phone Call", "Inside Sales", "17,360", "$3,300,000"),
+                asList("In Person Meeting", "Inside Sales", "13,887", "$3,300,000"),
+                asList("Email", "Inside Sales", "12,305", "$3,300,000"),
+                asList("Web Meeting", "Inside Sales", "9,665", "$3,300,000")));
+    }
+
     private void deleteMetric(String metric) {
         initMetricPage();
         metricPage.openMetricDetailPage(metric);
@@ -793,5 +848,11 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             browser.close();
             browser.switchTo().window(currentWindowHandle);
         }
+    }
+
+    private List<List<String>> sortReportBaseOnHeader(TableReport report, String name) {
+        report.sortBaseOnHeader(name);
+        analysisPage.waitForReportComputing();
+        return report.getContent();
     }
 }
