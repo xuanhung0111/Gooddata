@@ -46,7 +46,11 @@ public class GoodSalesAccessDataSectionTest extends AnalyticalDesignerAbstractTe
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void cannotAccessDataSectionIfNotEnableFlag() {
+    public void cannotAccessDataSectionIfNotEnableFlag() throws IOException, JSONException {
+        // make sure csv uploader flag is disabled
+        RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
+                ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), false));
+
         initAnalysePage();
         assertFalse(analysisPage.isAddDataLinkVisible());
     }
