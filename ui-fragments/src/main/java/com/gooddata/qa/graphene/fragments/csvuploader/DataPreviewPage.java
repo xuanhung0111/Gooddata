@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
+import com.gooddata.qa.graphene.fragments.AbstractTable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -15,15 +16,18 @@ public class DataPreviewPage extends AbstractFragment {
     @FindBy(className = "s-preview-page-error")
     private WebElement previewPageError;
 
-    @FindBy(css = ".new-load.data-table")
+    @FindBy(className = "data-table")
     private DataPreviewTable dataPreviewTable;
+
+    @FindBy(css = ".new-load.data-table")
+    private AbstractTable rowSelectionTable;
 
     @FindBy(className = "s-integration-button")
     private WebElement triggerIntegrationButton;
 
     @FindBy(className = "s-select-header-button")
     private WebElement selectHeaderButton;
-    
+
     public boolean isIntegrationButtonDisabled() {
         return !getRoot().findElements(DISABLED_INTEGRATION_BUTTON).isEmpty();
     }
@@ -44,5 +48,9 @@ public class DataPreviewPage extends AbstractFragment {
 
     public DataPreviewTable getDataPreviewTable() {
         return waitForFragmentVisible(dataPreviewTable);
+    }
+
+    public AbstractTable getRowSelectionTable() {
+        return waitForFragmentVisible(rowSelectionTable);
     }
 }
