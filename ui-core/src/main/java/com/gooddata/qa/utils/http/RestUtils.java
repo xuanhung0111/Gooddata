@@ -9,6 +9,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -919,6 +920,31 @@ public class RestUtils {
             EntityUtils.consumeQuietly(response.getEntity());
         } finally {
             request.releaseConnection();
+        }
+    }
+
+    public static void deleteDashboardTab(RestApiClient restApiClient, String dashboardUri, String tabName)
+            throws IOException, JSONException {
+        JSONObject dashboard = getJSONObjectFrom(restApiClient, dashboardUri);
+        JSONArray tabs = dashboard.getJSONObject("projectDashboard").getJSONObject("content").getJSONArray("tabs");
+
+        JSONArray newTabs = new JSONArray();
+        for (int i = 0, n = tabs.length(); i < n; i++) {
+            JSONObject tab = tabs.getJSONObject(i);
+            if (!tabName.equals(tab.getString("title"))) {
+                newTabs.put(tab);
+            }
+        }
+
+        dashboard.getJSONObject("projectDashboard").getJSONObject("content").put("tabs", newTabs);
+
+        HttpRequestBase postRequest = restApiClient.newPostMethod(dashboardUri + "?mode=edit",
+                dashboard.toString());
+
+        try {
+            restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
+        } finally {
+            postRequest.releaseConnection();
         }
     }
 
