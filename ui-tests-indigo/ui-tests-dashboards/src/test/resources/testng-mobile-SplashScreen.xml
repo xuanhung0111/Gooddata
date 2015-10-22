@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <parameter name="windowSize" value="maximize" />
+
+    <test name="splash-screen-tests">
+        <groups>
+            <dependencies>
+                <group name="mobile" depends-on="projectInit" />
+            </dependencies>
+            <run>
+                <include name="mobile" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.SplashScreenTest" />
+        </classes>
+    </test>
+
+</suite>
