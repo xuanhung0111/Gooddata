@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <parameter name="windowSize" value="maximize" />
+
+    <test name="permissions-tests">
+        <groups>
+            <dependencies>
+                <group name="desktop" depends-on="projectInit" />
+            </dependencies>
+            <run>
+                <include name="desktop" />
+                <include name="dashboardWidgetsInit" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.EditModePermissionsTest" />
+        </classes>
+    </test>
+
+</suite>
