@@ -6,6 +6,8 @@ import com.google.common.base.Predicate;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForStringInUrl;
 import static org.testng.Assert.assertFalse;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertTrue;
@@ -61,7 +63,7 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
 
             logout();
             openUrl(getIndigoDashboardsPageUri());
-            Graphene.waitGui().until((WebDriver driver) -> driver.getCurrentUrl().contains(ACCOUNT_PAGE));
+            waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
             signIn(true, UserRoles.ADMIN);
         }
