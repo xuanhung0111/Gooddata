@@ -1,14 +1,13 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
 import java.util.List;
+import static java.util.stream.Collectors.toList;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
-
-import static org.testng.Assert.*;
 
 public class ExecutablesTable extends AbstractTable {
 
@@ -19,12 +18,17 @@ public class ExecutablesTable extends AbstractTable {
     private final static By BY_EXECUTABLE_NEW_SCHEDULE_LINK = By
             .cssSelector(".ait-process-executable-list-item-new-schedule-btn");
 
-    public void assertExecutableList(List<Executables> executables) {
-        for (int i = 0; i < this.getNumberOfRows(); i++) {
-            assertEquals(getRow(i).findElement(BY_EXECUTABLE_PATH).getText()
-                    + getRow(i).findElement(BY_EXECUTABLE).getText(), executables.get(i)
-                    .getExecutablePath());
-        }
+    public boolean isCorrectExecutableList(List<Executables> executables) {
+        List<String> expectedExecutablePaths =
+                executables.stream().map(executable -> executable.getExecutablePath()).collect(toList());
+        return expectedExecutablePaths.containsAll(getExecutablePaths());
+    }
+
+    public List<String> getExecutablePaths() {
+        return getRows()
+                .stream()
+                .map(row -> row.findElement(BY_EXECUTABLE_PATH).getText()
+                        + row.findElement(BY_EXECUTABLE).getText()).collect(toList());
     }
 
     public WebElement getExecutableListItem(String executableName) {
@@ -40,7 +44,6 @@ public class ExecutablesTable extends AbstractTable {
     }
 
     public String getExecutableScheduleNumber(String executableName) {
-        return getExecutableListItem(executableName).findElement(BY_EXECUTABLE_SCHEDULE_NUMBER)
-                .getText();
+        return getExecutableListItem(executableName).findElement(BY_EXECUTABLE_SCHEDULE_NUMBER).getText();
     }
 }

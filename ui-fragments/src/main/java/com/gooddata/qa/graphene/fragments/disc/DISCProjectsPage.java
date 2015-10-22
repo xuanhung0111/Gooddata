@@ -2,25 +2,17 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
-import static org.testng.Assert.*;
 
 public class DISCProjectsPage extends AbstractFragment {
 
@@ -60,19 +52,10 @@ public class DISCProjectsPage extends AbstractFragment {
 
     @FindBy(css = ".searching-progress")
     private WebElement searchingProgress;
-
-    public void checkProjectFilterOptions() {
+    
+    public Select getProjectFilterSelect() {
         waitForElementVisible(projectFilter);
-        Select select = new Select(projectFilter);
-        List<WebElement> options = select.getOptions();
-        System.out.println("Check filter options list...");
-        assertEquals(ProjectStateFilters.ALL.getOption(), options.get(0).getText());
-        assertEquals(ProjectStateFilters.FAILED.getOption(), options.get(1).getText());
-        assertEquals(ProjectStateFilters.RUNNING.getOption(), options.get(2).getText());
-        assertEquals(ProjectStateFilters.SCHEDULED.getOption(), options.get(3).getText());
-        assertEquals(ProjectStateFilters.SUCCESSFUL.getOption(), options.get(4).getText());
-        assertEquals(ProjectStateFilters.UNSCHEDULED.getOption(), options.get(5).getText());
-        assertEquals(ProjectStateFilters.DISABLED.getOption(), options.get(6).getText());
+        return new Select(projectFilter);
     }
 
     public WebElement getSelectedFilterOption() {
@@ -81,177 +64,47 @@ public class DISCProjectsPage extends AbstractFragment {
         return select.getFirstSelectedOption();
     }
 
-    public void checkProjectFilter(final ProjectStateFilters filterOption,
-            List<ProjectInfo> projects) {
-        List<ProjectStateFilters> filters =
-                Arrays.asList(ProjectStateFilters.DISABLED, ProjectStateFilters.FAILED,
-                        ProjectStateFilters.RUNNING, ProjectStateFilters.SCHEDULED,
-                        ProjectStateFilters.SUCCESSFUL, ProjectStateFilters.UNSCHEDULED);
-        Iterable<ProjectStateFilters> filterOutOptions =
-                Iterables.filter(filters, new Predicate<ProjectStateFilters>() {
-
-                    @Override
-                    public boolean apply(ProjectStateFilters filter) {
-                        if (filter == filterOption)
-                            return false;
-                        if (filterOption == ProjectStateFilters.DISABLED)
-                            return filter != ProjectStateFilters.UNSCHEDULED;
-                        return true;
-                    }
-                });
-
-        checkFilteredProjects(filterOption, projects);
-        if (filterOption == ProjectStateFilters.DISABLED)
-            checkFilteredProjects(ProjectStateFilters.UNSCHEDULED, projects);
-
-        for (ProjectStateFilters filterOutOption : filterOutOptions) {
-            checkFilteredOutProjects(filterOutOption, projects);
-        }
-    }
-
-    public void checkProjectsPagingOptions() {
+    public Select getProjectsPerPageSelect() {
         waitForElementVisible(projectsPerPageOptions);
-        Select select = new Select(projectsPerPageOptions);
-        List<WebElement> pagingOptions = select.getOptions();
-        System.out.println("Check paging options list...");
-        assertEquals("20", pagingOptions.get(0).getText());
-        assertEquals("50", pagingOptions.get(1).getText());
-        assertEquals("100", pagingOptions.get(2).getText());
-        assertEquals("200", pagingOptions.get(3).getText());
-        assertEquals("500", pagingOptions.get(4).getText());
-        assertEquals("1000", pagingOptions.get(5).getText());
-        assertEquals("2000", pagingOptions.get(6).getText());
-        assertEquals("5000", pagingOptions.get(7).getText());
-        assertEquals("20", select.getFirstSelectedOption().getText());
+        return new Select(projectsPerPageOptions);
     }
 
-    public void checkPagingProjectsPage(String selectedProjectsPerPageOption) {
-        waitForElementVisible(projectsPerPageOptions);
-        Select select = new Select(projectsPerPageOptions);
-        select.selectByVisibleText(selectedProjectsPerPageOption);
-        assertEquals(selectedProjectsPerPageOption, select.getFirstSelectedOption().getText());
-        waitForElementVisible(discProjectsList.getRoot());
-        int projectsPerPageNumber = Integer.parseInt(selectedProjectsPerPageOption);
-        assertEquals(projectsPerPageNumber, discProjectsList.getNumberOfRows());
-        String pagingBarLabelSubString = String.format("Showing 1-%d", projectsPerPageNumber);
-        System.out.println("Paging bar label: " + pagingBarLabelSubString);
-        assertTrue(pagingBarLabel.getText().contains(pagingBarLabelSubString), "Paging bar label:"
-                + pagingBarLabel.getText());
-        assertTrue(prevPageButton.getAttribute("class").contains("disabled"));
-        assertFalse(nextPageButton.getAttribute("class").contains("disabled"));
-        assertTrue(projectPageNumber.get(0).getAttribute("class").contains("active-cell"));
-        System.out.println("Click on Next button...");
-        nextPageButton.click();
-        waitForElementVisible(discProjectsList.getRoot());
-        assertFalse(projectPageNumber.get(0).getAttribute("class").contains("active-cell"));
-        assertTrue(projectPageNumber.get(1).getAttribute("class").contains("active-cell"));
-        assertFalse(prevPageButton.getAttribute("class").contains("disabled"));
-        System.out.println("Click on Prev button...");
-        prevPageButton.click();
-        waitForElementVisible(discProjectsList.getRoot());
-        assertFalse(projectPageNumber.get(1).getAttribute("class").contains("active-cell"));
-        assertTrue(projectPageNumber.get(0).getAttribute("class").contains("active-cell"));
-        assertTrue(prevPageButton.getAttribute("class").contains("disabled"));
-        for (int i = 1; i < projectPageNumber.size() && i < 4; i++) {
-            System.out.println("Click on page " + i);
-            projectPageNumber.get(i).click();
-            waitForElementVisible(discProjectsList.getRoot());
-            assertTrue(projectPageNumber.get(i).getAttribute("class").contains("active-cell"));
-            if (i != projectPageNumber.size() - 1)
-                assertEquals(projectsPerPageNumber, discProjectsList.getNumberOfRows());
-            else
-                assertFalse(
-                        discProjectsList.getNumberOfRows() > projectsPerPageNumber,
-                        "The project number in the last page: "
-                                + discProjectsList.getNumberOfRows());
-        }
+    public String getPagingBarLabel() {
+        return waitForElementVisible(pagingBarLabel).getText();
+    }
+    
+    public WebElement getPrevPageButton() {
+        return waitForElementVisible(prevPageButton);
+    }
+    
+    public WebElement getNextPageButton() {
+        return waitForElementVisible(nextPageButton);
+    }
+    
+    public List<WebElement> getProjectPageNumber() {
+        return projectPageNumber;
     }
 
-    public void checkDefaultSearchBox() {
-        waitForElementVisible(searchBox);
-        assertTrue(searchBox.getAttribute("value").isEmpty());
-        assertEquals(searchBox.getAttribute("placeholder"), "Search in project names and ids ...");
+    public WebElement getSearchBox() {
+        return waitForElementVisible(searchBox);
     }
-
-    public void checkDeleteSearchKey(String noResultSearchKey) {
-        enterSearchKey(noResultSearchKey);
-        System.out.println("Empty state message: " + discProjectsList.getEmptyStateMessage());
+    
+    public void deleteSearchKey() {
         waitForElementVisible(deleteSearchKeyButton).click();
-        assertTrue(searchBox.getAttribute("value").isEmpty());
-        waitForElementVisible(discProjectsList.getRoot());
     }
 
-    public void searchProjectByName(String searchKey) {
-        enterSearchKey(searchKey);
-        waitForSearchingProgress();
-        waitForElementVisible(discProjectsList.getRoot());
-        discProjectsList.assertSearchProjectsByName(searchKey);
+    public WebElement getAllProjectLinkInEmptyState() {
+        return discProjectsList.getEmptyState().findElement(BY_ALL_PROJECTS_LINK);
     }
 
-    public void searchProjectByUnicodeName(String unicodeSearchKey) {
-        enterSearchKey(unicodeSearchKey);
-        waitForSearchingProgress();
-        waitForElementVisible(discProjectsList.getRoot());
-        discProjectsList.assertSearchProjectByUnicodeName(unicodeSearchKey);
-    }
-
-    public void searchProjectById(ProjectInfo project) {
-        enterSearchKey(project.getProjectId());
-        waitForElementVisible(discProjectsList.getRoot());
-        try {
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return discProjectsList.getNumberOfRows() == 1;
-                }
-            });
-        } catch (TimeoutException e) {
-            fail("Incorrect number of projects in search result: "
-                    + discProjectsList.getNumberOfRows());
-        }
-        assertNotNull(discProjectsList.selectProjectWithAdminRole(project));
-    }
-
-    public void checkEmptySearchResult(String searchKey) {
-        for (ProjectStateFilters projectFilter : ProjectStateFilters.values()) {
-            selectFilterOption(projectFilter);
-            String expectedEmptySearchResultMessage =
-                    projectFilter.getEmptySearchResultMessage().replace("${searchKey}", searchKey);
-            enterSearchKey(searchKey);
-            System.out.println("Empty Search Result Message: "
-                    + discProjectsList.getEmptyStateMessage().trim());
-            String actualEmptySearchResultMessage = discProjectsList.getEmptyStateMessage();
-            if (projectFilter.equals(ProjectStateFilters.ALL))
-                assertEquals(actualEmptySearchResultMessage.trim(),
-                        expectedEmptySearchResultMessage);
-            else {
-                assertTrue(actualEmptySearchResultMessage
-                        .contains(expectedEmptySearchResultMessage));
-                String emtySearchResultMessageInSpecificState = "Search in all projects";
-                assertTrue(actualEmptySearchResultMessage
-                        .contains(emtySearchResultMessageInSpecificState));
-                discProjectsList.getEmptyState().findElement(BY_ALL_PROJECTS_LINK).click();
-                assertEquals(ProjectStateFilters.ALL.getOption(), getSelectedFilterOption()
-                        .getText());
-            }
-        }
-    }
-
-    public void searchProjectInSpecificState(ProjectStateFilters projectFilter, ProjectInfo project) {
-        selectFilterOption(projectFilter);
-        searchProjectByName(project.getProjectName());
-        searchProjectById(project);
-    }
-
-    private void enterSearchKey(String searchKey) {
+    public void enterSearchKey(String searchKey) {
         waitForElementVisible(searchBox).clear();
         waitForElementVisible(searchBox).sendKeys(searchKey);
         System.out.println("Enter search key: " + searchBox.getAttribute("value"));
         waitForElementVisible(searchButton).click();
     }
 
-    private void selectFilterOption(ProjectStateFilters option) {
+    public void selectFilterOption(ProjectStateFilters option) {
         waitForElementVisible(projectFilter);
         Select select = new Select(projectFilter);
         select.selectByVisibleText(option.getOption());
@@ -265,32 +118,7 @@ public class DISCProjectsPage extends AbstractFragment {
         System.out.println("Selected filter option:" + option);
     }
 
-    private void checkFilteredOutProjects(ProjectStateFilters filterOutOption,
-            List<ProjectInfo> filteredOutProjects) {
-        selectFilterOption(filterOutOption);
-        waitForElementVisible(discProjectsList.getRoot());
-        for (ProjectInfo filteredOutProject : filteredOutProjects) {
-            assertNull(discProjectsList.selectProjectWithAdminRole(filteredOutProject),
-                    "Project isn't filtered out!");
-            System.out.println("Project " + filteredOutProject.getProjectName() + "(id = "
-                    + filteredOutProject.getProjectId() + ") is filtered out.");
-        }
-    }
-
-    private void checkFilteredProjects(ProjectStateFilters filterOption,
-            List<ProjectInfo> filteredProjects) {
-        System.out.println("Check filter option:" + filterOption);
-        selectFilterOption(filterOption);
-        waitForElementVisible(discProjectsList.getRoot());
-        for (ProjectInfo filteredProject : filteredProjects) {
-            assertNotNull(discProjectsList.selectProjectWithAdminRole(filteredProject),
-                    "Project doesn't present in filtered list!");
-            System.out.println("Project " + filteredProject.getProjectName() + " (id = "
-                    + filteredProject.getProjectId() + ") is in filtered list.");
-        }
-    }
-
-    private void waitForSearchingProgress() {
+    public void waitForSearchingProgress() {
         try {
             waitForElementVisible(searchingProgress);
         } catch (NoSuchElementException ex) {

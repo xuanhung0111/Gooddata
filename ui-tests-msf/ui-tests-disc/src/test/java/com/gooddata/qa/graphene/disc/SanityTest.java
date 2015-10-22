@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.disc;
 
+import static org.testng.Assert.assertTrue;
+
 import java.util.Calendar;
 
 import org.testng.annotations.BeforeClass;
@@ -88,8 +90,9 @@ public class SanityTest extends AbstractOverviewProjectsTest {
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
-            scheduleDetail.assertManualRunExecution();
+            assertSuccessfulExecution();
+            assertLastExecutionDetail();
+            assertTrue(scheduleDetail.isLastExecutionManualIconDisplay());
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -108,8 +111,8 @@ public class SanityTest extends AbstractOverviewProjectsTest {
                             .setMinuteInHour("${minute}");
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
-            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
-            scheduleDetail.assertSuccessfulExecution();
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()), "Schedule is not run automatically well!");
+            assertSuccessfulExecution();
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -139,7 +142,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
                             .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR);
             createSchedule(scheduleBuilder);
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
 
             final ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
             AbstractNotificationTest.getNotification(imapClient, subject);

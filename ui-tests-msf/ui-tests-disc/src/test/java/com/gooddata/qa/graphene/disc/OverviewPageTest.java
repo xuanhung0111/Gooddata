@@ -15,7 +15,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess;
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess.OverviewSchedule;
@@ -32,21 +31,9 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     public void initProperties() {
         // Created time is used to identify the working project in case user has no admin role
         projectTitle = "Disc-test-overview-page-" + System.currentTimeMillis();
-        startPageContext = new StartPageContext() {
-
-            @Override
-            public void waitForStartPageLoaded() {
-                waitForFragmentVisible(discOverview);
-            }
-
-            @Override
-            public String getStartPage() {
-                return DISC_OVERVIEW_PAGE;
-            }
-        };
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void afterTest(Method m) {
         cleanWorkingProjectAfterTest(m);
     }
@@ -113,7 +100,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
         initDISCOverviewPage();
         discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
-        discOverview.assertOverviewStateNumber(OverviewProjectStates.SCHEDULED,
+        assertOverviewStateNumber(OverviewProjectStates.SCHEDULED,
                 discOverviewProjects.getOverviewProjectNumber());
     }
 
@@ -128,7 +115,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
                 .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
                 .setMinuteInHour("59"));
         scheduleDetail.manualRun();
-        scheduleDetail.assertFailedExecution(Executables.FAILED_GRAPH);
+        assertFailedExecution(Executables.FAILED_GRAPH);
         scheduleDetail.clickOnCloseScheduleButton();
 
         createSchedule(new ScheduleBuilder().setProcessName(processName)
@@ -136,14 +123,14 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
                 .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
                 .setMinuteInHour("59"));
         scheduleDetail.manualRun();
-        scheduleDetail.assertSuccessfulExecution();
+        assertSuccessfulExecution();
 
         initDISCOverviewPage();
         discOverview.selectOverviewState(OverviewProjectStates.FAILED);
-        discOverview.assertOverviewStateNumber(OverviewProjectStates.FAILED,
+        assertOverviewStateNumber(OverviewProjectStates.FAILED,
                 discOverviewProjects.getOverviewProjectNumber());
         discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
-        discOverview.assertOverviewStateNumber(OverviewProjectStates.SUCCESSFUL,
+        assertOverviewStateNumber(OverviewProjectStates.SUCCESSFUL,
                 discOverviewProjects.getOverviewProjectNumber());
         checkFilteredOutOverviewProject(OverviewProjectStates.RUNNING, getWorkingProject());
         /*
@@ -166,7 +153,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         prepareDataForCheckingOverviewState(OverviewProjectStates.FAILED, overviewProject);
         initDISCOverviewPage();
         waitForElementVisible(discOverviewProjects.getRoot());
-        discOverviewProjects.assertOverviewProject(OverviewProjectStates.FAILED, overviewProject);
+        assertOverviewProject(OverviewProjectStates.FAILED, overviewProject);
 
         checkOtherOverviewStates(OverviewProjectStates.FAILED, getWorkingProject());
     }
@@ -186,7 +173,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         waitForElementVisible(discOverview.getRoot());
         discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
         waitForElementVisible(discOverviewProjects.getRoot());
-        discOverviewProjects.assertOverviewProject(OverviewProjectStates.SUCCESSFUL,
+        assertOverviewProject(OverviewProjectStates.SUCCESSFUL,
                 overviewProject);
 
         checkOtherOverviewStates(OverviewProjectStates.SUCCESSFUL, getWorkingProject());
@@ -211,7 +198,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
             waitForElementVisible(discOverview.getRoot());
             discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
             waitForElementVisible(discOverviewProjects.getRoot());
-            discOverviewProjects.assertOverviewProject(OverviewProjectStates.SCHEDULED,
+            assertOverviewProject(OverviewProjectStates.SCHEDULED,
                     overviewProject);
             checkOtherOverviewStates(OverviewProjectStates.SCHEDULED, getWorkingProject());
         } finally {
@@ -234,7 +221,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         waitForElementVisible(discOverview.getRoot());
         discOverview.selectOverviewState(OverviewProjectStates.RUNNING);
         waitForElementVisible(discOverviewProjects.getRoot());
-        discOverviewProjects.assertOverviewProject(OverviewProjectStates.RUNNING, overviewProject);
+        assertOverviewProject(OverviewProjectStates.RUNNING, overviewProject);
 
         checkOtherOverviewStates(OverviewProjectStates.RUNNING, getWorkingProject());
     }
@@ -250,7 +237,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
                 .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
                 .setMinuteInHour("59"));
         scheduleDetail.manualRun();
-        scheduleDetail.assertFailedExecution(Executables.FAILED_GRAPH);
+        assertFailedExecution(Executables.FAILED_GRAPH);
         scheduleDetail.clickOnCloseScheduleButton();
 
         createSchedule(new ScheduleBuilder().setProcessName(processName)
@@ -258,7 +245,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
                 .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
                 .setMinuteInHour("59"));
         scheduleDetail.manualRun();
-        scheduleDetail.assertSuccessfulExecution();
+        assertSuccessfulExecution();
 
         accessWorkingProjectDetail(OverviewProjectStates.SUCCESSFUL);
         accessWorkingProjectDetail(OverviewProjectStates.FAILED);
@@ -314,7 +301,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         browser.get(overviewSchedule.getScheduleUrl());
         waitForElementVisible(scheduleDetail.getRoot());
         assertTrue(scheduleDetail.isStarted());
-        scheduleDetail.assertSuccessfulExecution();
+        assertSuccessfulExecution();
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -345,7 +332,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
         browser.get(overviewSchedule.getScheduleUrl());
         waitForElementVisible(scheduleDetail.getRoot());
-        scheduleDetail.assertManualStoppedExecution();
+        assertManualStoppedExecution();
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -379,7 +366,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
             initDISCOverviewPage();
             discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
-            discOverview.assertOverviewStateNumber(OverviewProjectStates.SCHEDULED,
+            assertOverviewStateNumber(OverviewProjectStates.SCHEDULED,
                     discOverviewProjects.getOverviewProjectNumber());
             discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
             waitForElementVisible(discOverviewProjects.getRoot());
@@ -407,7 +394,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
             initDISCOverviewPage();
             discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
-            discOverview.assertOverviewStateNumber(OverviewProjectStates.SCHEDULED,
+            assertOverviewStateNumber(OverviewProjectStates.SCHEDULED,
                     discOverviewProjects.getOverviewProjectNumber());
             discOverviewProjects.checkAllProjects();
             discOverviewProjects.bulkAction(OverviewProjectStates.SCHEDULED);
@@ -415,7 +402,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
             browser.get(overviewSchedule.getScheduleUrl());
             waitForElementVisible(scheduleDetail.getRoot());
-            scheduleDetail.assertManualStoppedExecution();
+            assertManualStoppedExecution();
         } finally {
             deleteProjects(additionalProjects);
         }

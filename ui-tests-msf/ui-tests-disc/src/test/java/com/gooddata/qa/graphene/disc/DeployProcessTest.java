@@ -5,6 +5,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
@@ -98,8 +99,10 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
         deployForm.tryToDeployProcess("", ProcessTypes.DEFAULT, "");
-        deployForm.assertInvalidPackageError();
-        deployForm.assertInvalidProcessNameError();
+        assertTrue(deployForm.inputFileHasError(), "Error is not shown for file input!");
+        assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
+        assertTrue(deployForm.inputProcessNameHasError(), "Error is not shown for process name input!");
+        assertTrue(deployForm.isCorrectInvalidProcessNameError(), "Incorrect process name validation error!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -109,7 +112,8 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
 
         String filePath = getFilePathFromResource("/" + ZIP_FILES + "/not-zip-file.7z");
         deployForm.tryToDeployProcess(filePath, ProcessTypes.DEFAULT, "Not zip file");
-        deployForm.assertInvalidPackageError();
+        assertTrue(deployForm.inputFileHasError(), "Error is not shown for file input!");
+        assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -119,7 +123,8 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
 
         String filePath = getFilePathFromResource("/" + ZIP_FILES + "/too-large-file.zip");
         deployForm.tryToDeployProcess(filePath, ProcessTypes.DEFAULT, "Too large file");
-        deployForm.assertInvalidPackageError();
+        assertTrue(deployForm.inputFileHasError(), "Error is not shown for file input!");
+        assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
