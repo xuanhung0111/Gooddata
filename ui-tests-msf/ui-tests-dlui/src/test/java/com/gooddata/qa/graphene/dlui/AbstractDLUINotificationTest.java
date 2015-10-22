@@ -30,6 +30,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
             "New data is ready to use in the %s project";
 
     private static final String GD_PROJECT_LINK = "https://%s/#s=/gdc/projects/%s";
+    private static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit";
     private static final String GD_SUPPORT_LINK = "https://support.gooddata.com";
 
     protected String imapEditorUser;
@@ -97,8 +98,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
         String exploreNewData = "Explore the newly added data.";
         String receivedTimeText = "You requested the fields at ";
         String expectedExploreNewDataLink =
-                String.format(GD_PROJECT_LINK + "|analysisPage|empty-report|empty-report",
-                        testParams.getHost(), getWorkingProject().getProjectId());
+                String.format(AD_REPORT_LINK, testParams.getHost(), getWorkingProject().getProjectId());
 
         assertEquals(getElementLink(message, exploreNewData), expectedExploreNewDataLink,
                 "Incorrect empty report link in email content!");
