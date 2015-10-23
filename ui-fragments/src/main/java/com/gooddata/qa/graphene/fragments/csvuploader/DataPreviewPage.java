@@ -42,7 +42,7 @@ public class DataPreviewPage extends AbstractFragment {
         return this;
     }
 
-    public String getPreviewPageErrorMassage() {
+    public String getPreviewPageErrorMessage() {
         return waitForElementVisible(previewPageError).getText();
     }
 

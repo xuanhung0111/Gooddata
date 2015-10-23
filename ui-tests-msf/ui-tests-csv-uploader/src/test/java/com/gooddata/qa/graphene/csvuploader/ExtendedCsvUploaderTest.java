@@ -58,7 +58,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkDataPreview(fileToUpload);
         takeScreenshot(browser,
                 toScreenshotName(DATA_PAGE_NAME, "empty-column-name-in", fileToUpload.getFileName()), getClass());
-        assertThat(dataPreviewPage.getPreviewPageErrorMassage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be disabled when column names are invalid");
 
         waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().setColumnsName(PAYROLL_COLUMN_NAMES);

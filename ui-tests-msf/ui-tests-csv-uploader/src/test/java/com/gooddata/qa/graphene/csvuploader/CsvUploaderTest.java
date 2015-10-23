@@ -106,12 +106,12 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         final String factColumnName = "Amount";
 
         dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
-        assertThat(dataPreviewPage.getPreviewPageErrorMassage(), containsString("At least one column must contain numbers"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("At least one column must contain numbers"));
         dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.FACT);
 
         dataPreviewPage.selectHeader().getRowSelectionTable().getRow(3).click(); // select data row as header
         dataPreviewPage.triggerIntegration();                                    // confirm header row
-        assertThat(dataPreviewPage.getPreviewPageErrorMassage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when column names start with numbers");
     }
@@ -132,7 +132,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNameValidationErrors"), getClass());
 
-        assertThat(dataPreviewPage.getPreviewPageErrorMassage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when columns have the same names");
 
