@@ -278,6 +278,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         PAYROLL_UPLOAD_AFTER_DELETE_DATASET("payroll.upload.after.delete.dataset"),
         PAYROLL_REFRESH("payroll.refresh"),
         PAYROLL_REFRESH_BAD("payroll.refresh.bad"),
+        PAYROLL_BY_PROJECT_OWNER("payroll.by.project.owner"),
+        PAYROLL_BY_OTHER_ADMIN("payroll.by.other.admin"),
         /** This csv file has incorrect column count (one more than expected) on the line number 2. */
         BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList()),
         NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES),
