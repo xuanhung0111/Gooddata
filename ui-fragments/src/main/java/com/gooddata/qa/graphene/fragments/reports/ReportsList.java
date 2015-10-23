@@ -1,22 +1,33 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForUserProfilePageLoaded;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
+import com.gooddata.qa.graphene.entity.account.PersonalInfo;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.account.AccountCard;
+import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 
 public class ReportsList extends AbstractFragment {
 
     private static final By BY_REPORT_LABEL = By.xpath("h3/a");
     private static final By BY_REPORT_CHECKBOX = By.tagName("input");
     private static final By BY_FAVORITE = By.className("favorite");
+    private static final By BY_USER_LABEL = By.xpath("p//a");
+    public static final By ACCOUNT_CARD_LOCATOR = By.cssSelector(".bd_container div.userInfo");
+    public static final By USER_PROFILE_LOCATOR = By.cssSelector("#p-profilePage");
 
     @FindBy(css = "div.report")
     private List<WebElement> reports;
@@ -117,8 +128,25 @@ public class ReportsList extends AbstractFragment {
                 .findFirst();
     }
 
+    public PersonalInfo getReportOwnerInfoFrom(String reportName) {
+        new Actions(browser).moveToElement(getReportOwner(reportName)).perform();
+        AccountCard accountCard = Graphene.createPageFragment(AccountCard.class,
+                waitForElementVisible(ACCOUNT_CARD_LOCATOR, browser));
+        return accountCard.getUserInfo();
+    }
+
+    public UserProfilePage openReportOwnerProfilePageFrom(String reportName) {
+        getReportOwner(reportName).click();
+        waitForUserProfilePageLoaded(browser);
+        return Graphene.createPageFragment(UserProfilePage.class,
+                waitForElementVisible(USER_PROFILE_LOCATOR, browser));
+    }
+
+    private WebElement getReportOwner(String reportName) {
+        return getReportWebElement(reportName).get().findElement(BY_USER_LABEL);
+    }
+
     private WebElement getReportWebElement(int i) {
         return reports.get(i);
     }
-
 }

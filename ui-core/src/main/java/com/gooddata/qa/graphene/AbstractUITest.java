@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAccountPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
@@ -34,6 +35,7 @@ import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -171,6 +173,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(id = "p-objectPage")
     protected CreateAttributePage createAttributePage;
+
+    @FindBy(id = "accountSettingsMenu")
+    protected AccountPage accountPage;
 
     /**
      * ----- DISC fragments -----
@@ -539,6 +544,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         ApplicationHeaderBar.goToAnalysisPage(browser);
     }
 
+    public void initAccountPage() {
+        openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|accountPage|");
+        waitForAccountPageLoaded(browser);
+    }
 
     public void initVariablePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
