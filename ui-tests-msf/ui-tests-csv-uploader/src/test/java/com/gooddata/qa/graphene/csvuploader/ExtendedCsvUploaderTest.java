@@ -428,9 +428,10 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
 
         // The error message should be improved in MSF-9476
-        assertThat(datasetsListPage.waitForErrorMessageBar().getText(),
-                is(String.format("Failed to add data from %s due to internal error", fileToUpload.getFileName()
-                        .replace(".csv", ""))));
+        assertThat(
+                datasetsListPage.waitForErrorMessageBar().getText(),
+                is(String.format("Failed to add data from %s due to internal error",
+                        fileToUpload.getDatasetNameOfFirstUpload())));
         takeScreenshot(browser, toScreenshotName("Failed-upload-from", fileToUpload.getFileName()), getClass());
     }
 
