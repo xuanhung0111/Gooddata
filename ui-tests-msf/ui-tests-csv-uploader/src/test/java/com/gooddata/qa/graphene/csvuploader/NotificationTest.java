@@ -28,8 +28,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private static final String GOODDATA_SUPPORT_URL = "https://support.gooddata.com";
 
     private static final String MANAGE_DATASETS_PAGE_URL = "https://%s/#s=/gdc/projects/%s|dataPage|dataSets";
-    private static final String EMPTY_REPORT_URL =
-            "https://%s/#s=/gdc/projects/%s|analysisPage|empty-report|empty-report";
+    private static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit";
     private static final String PROJECT_PAGE_URL = "https://%s/#s=/gdc/projects/%s";
     private static final String DATA_SECTION_PAGE_URL = "https://%s/data/#/projects/%s/datasets";
 
@@ -105,7 +104,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     }
 
     private void checkSuccessfulNotification(Document message) {
-        String emptyReportUrl = String.format(EMPTY_REPORT_URL, testParams.getHost(), testParams.getProjectId());
+        String emptyReportUrl = String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId());
         assertThat(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"),
                 is(emptyReportUrl));
     }
