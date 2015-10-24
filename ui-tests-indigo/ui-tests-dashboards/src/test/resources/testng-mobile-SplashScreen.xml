@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="GD_UI_Selenium_Tests">
-    <parameter name="windowSize" value="maximize" />
+<suite name="GD_UI_Selenium_Tests_mobile">
+    <parameter name="windowSize" value="600,800" />
 
     <test name="splash-screen-tests">
         <groups>
