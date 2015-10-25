@@ -17,7 +17,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.gooddata.qa.graphene.indigo.dashboards.DateFilteringTest" />
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.EditModeTest" />
         </classes>
     </test>
 
