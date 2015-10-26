@@ -17,13 +17,15 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisibl
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,16 +56,15 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         uploadFile(fileToUpload);
 
         checkDataPreview(fileToUpload);
-        List<String> errors = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().getColumnErrors();
         takeScreenshot(browser,
                 toScreenshotName(DATA_PAGE_NAME, "empty-column-name-in", fileToUpload.getFileName()), getClass());
-        assertThat(errors.size(), is(PAYROLL_COLUMN_NAMES.size()));
-        errors.stream().allMatch(error -> error.equals("Column name can't be empty"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertTrue(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be disabled when column names are invalid");
 
         waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().setColumnsName(PAYROLL_COLUMN_NAMES);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "set-column-names", fileToUpload.getFileName()),
                 getClass());
-        assertThat(waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().getColumnErrors(), empty());
+        assertFalse(waitForFragmentVisible(dataPreviewPage).isIntegrationButtonDisabled(), "Add data button should be enabled");
         dataPreviewPage.triggerIntegration();
 
         String datasetName = getNewDataset(fileToUpload);
@@ -428,10 +429,8 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
 
         // The error message should be improved in MSF-9476
-        assertThat(
-                datasetsListPage.waitForErrorMessageBar().getText(),
-                is(String.format("Failed to add data from %s due to internal error",
-                        fileToUpload.getDatasetNameOfFirstUpload())));
+        assertThat(datasetsListPage.waitForErrorMessageBar().getText(),
+                is(String.format("Failed to add data from %s due to internal error", fileToUpload.getDatasetNameOfFirstUpload())));
         takeScreenshot(browser, toScreenshotName("Failed-upload-from", fileToUpload.getFileName()), getClass());
     }
 
