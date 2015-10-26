@@ -31,6 +31,7 @@ import static org.testng.Assert.assertNotEquals;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -49,9 +50,10 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         .build();
 
     @BeforeClass(alwaysRun = true)
-    public void before() {
+    public void before(ITestContext context) {
         super.before();
-        addUsersWithOtherRoles = true;
+        boolean isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
+        addUsersWithOtherRoles = !isMobileRunning;
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})

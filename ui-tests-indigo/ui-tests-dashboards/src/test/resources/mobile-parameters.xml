@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameter name="windowSize" value="600,800" />
+<parameter name="isMobileRunning" value="true" />

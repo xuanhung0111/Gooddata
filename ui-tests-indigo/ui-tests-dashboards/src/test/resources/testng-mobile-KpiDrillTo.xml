@@ -1,6 +1,6 @@
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" [<!ENTITY parent SYSTEM "src/test/resources/mobile-parameters.xml">]>
 <suite name="GD_UI_Selenium_Tests_mobile">
-    <parameter name="windowSize" value="600,800" />
+    <parameters>&parent;</parameters>
 
     <test name="kpi-drill-to-tests">
         <groups>
