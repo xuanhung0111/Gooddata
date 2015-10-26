@@ -469,6 +469,36 @@
             </properties>
         </profile>
         <profile>
+            <id>browserstack-mobile-iphone-6</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-iphone-6</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPhone 6</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-mobile-iphone-6-plus</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-mobile-iphone-6-plus</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
+                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
+                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
+                <browserstack.mobile.device>iPhone 6 Plus</browserstack.mobile.device>
+            </properties>
+        </profile>
+        <profile>
             <id>browserstack-mobile-iphone-5</id>
             <activation>
                 <property>
@@ -514,18 +544,18 @@
             </properties>
         </profile>
         <profile>
-            <id>browserstack-mobile-ipad-mini-retina</id>
+            <id>browserstack-mobile-ipad-mini-2</id>
             <activation>
                 <property>
                     <name>test.execution.env</name>
-                    <value>browserstack-mobile-ipad-mini-retina</value>
+                    <value>browserstack-mobile-ipad-mini-2</value>
                 </property>
             </activation>
             <properties>
                 <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
                 <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
-                <browserstack.mobile.device>iPad mini Retina</browserstack.mobile.device>
+                <browserstack.mobile.device>iPad Mini 2</browserstack.mobile.device>
             </properties>
         </profile>
         <profile>
