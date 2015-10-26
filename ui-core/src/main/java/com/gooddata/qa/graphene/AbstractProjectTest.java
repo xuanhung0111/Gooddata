@@ -25,6 +25,8 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
 
     protected boolean addUsersWithOtherRoles = false;
+    // validations are enabled by default on any child class
+    protected boolean validateAfterClass = true;
 
     @Test(groups = {PROJECT_INIT_GROUP})
     public void init() throws JSONException {
@@ -89,15 +91,19 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        System.out.println("Going to validate project after tests...");
-        // TODO remove when ATP-1520, ATP-1519, ATP-1822 are fixed
-        String testName = this.getClass().getSimpleName();
-        if (BrowserUtils.isIE(browser) || testName.contains("Coupa") || testName.contains("Pardot")
-                ||testName.contains("Zendesk4")) {
-            System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects or running in IE");
-            return;
+        if (validateAfterClass) {
+            System.out.println("Going to validate project after tests...");
+            // TODO remove when ATP-1520, ATP-1519, ATP-1822 are fixed
+            String testName = this.getClass().getSimpleName();
+            if (BrowserUtils.isIE(browser) || testName.contains("Coupa") || testName.contains("Pardot")
+                    ||testName.contains("Zendesk4")) {
+                System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects or running in IE");
+                return;
+            }
+            assertEquals(validateProject(), "OK");
+        } else {
+            System.out.println("Validations were skipped at this test class...");
         }
-        assertEquals(validateProject(), "OK");
     }
 
     @AfterClass(dependsOnMethods = {"validateProjectTearDown"}, alwaysRun = true)
