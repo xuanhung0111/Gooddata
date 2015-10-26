@@ -10,9 +10,9 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
@@ -106,22 +106,20 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         final String factColumnName = "Amount";
 
         dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
-        assertThat(dataPreviewPage.getPreviewPageErrorMassage(), containsString("At least one column must contain numbers"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("At least one column must contain numbers"));
         dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.FACT);
 
-        dataPreviewPage.selectHeader().getDataPreviewTable().getRow(3).click(); // select data row as header
-        final List<String> columnErrors = dataPreviewPage.triggerIntegration().getDataPreviewTable().getColumnErrors();
-
-        assertThat(columnErrors.size(), is(2));
-        assertThat(columnErrors.get(0), containsString("The column name cannot begin with a numerical character"));
-        assertThat(columnErrors.get(1), containsString("The column name cannot begin with a numerical character"));
+        dataPreviewPage.selectHeader().getRowSelectionTable().getRow(3).click(); // select data row as header
+        dataPreviewPage.triggerIntegration();                                    // confirm header row
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
+                "Add data button should be disabled when column names start with numbers");
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvDuplicateColumnNames() {
 
         String columnName = "the same";
-        String expectedErrorMessage = String.format("A column with the \"%s\" already exists. Use a different unique name.", columnName);
 
         initDataUploadPage();
         uploadFile(PAYROLL_FILE);
@@ -134,23 +132,16 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNameValidationErrors"), getClass());
 
-        List<String> columnErrors = dataPreviewPage.getDataPreviewTable().getColumnErrors();
-
-        // the error should appear for both columns
-        assertThat(columnErrors.size(), is(2));
-        assertThat(columnErrors.get(0), containsString(expectedErrorMessage));
-        assertThat(columnErrors.get(1), containsString(expectedErrorMessage));
-
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
+                "Add data button should be disabled when columns have the same names");
 
         // fix it by editing the first column
         dataPreviewTable.changeColumnName(0, RandomStringUtils.randomAlphabetic(20));
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNamesValid"), getClass());
 
-        columnErrors = dataPreviewPage.getDataPreviewTable().getColumnErrors();
-
-        // there should be no errors
-        assertThat(columnErrors.isEmpty(), is(true));
+        assertFalse(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be enabled");
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})

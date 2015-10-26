@@ -6,26 +6,22 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-import org.apache.commons.lang.StringUtils;
+import com.gooddata.qa.graphene.fragments.FixedDataTable;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.google.common.base.Predicate;
 
-public class DataPreviewTable extends AbstractTable {
+public class DataPreviewTable extends FixedDataTable {
 
     @FindBy(className = "input-text")
     private List<WebElement> columnNames;
 
     @FindBy(css = ".s-data-type-picker select")
     private List<Select> columnTypes;
-
-    @FindBy(className = "s-error-detail")
-    private List<WebElement> columnErrors;
 
     public List<String> getColumnNames() {
         waitForCollectionIsNotEmpty(columnNames);
@@ -37,13 +33,6 @@ public class DataPreviewTable extends AbstractTable {
     public List<String> getColumnTypes() {
         return columnTypes.stream()
                 .map(type -> type.getFirstSelectedOption().getText())
-                .collect(toList());
-    }
-
-    public List<String> getColumnErrors() {
-        return columnErrors.stream()
-                .map(WebElement::getText)
-                .filter(StringUtils::isNotBlank)
                 .collect(toList());
     }
 
