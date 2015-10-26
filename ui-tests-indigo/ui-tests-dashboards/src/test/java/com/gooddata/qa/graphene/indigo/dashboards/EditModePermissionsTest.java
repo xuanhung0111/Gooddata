@@ -17,6 +17,7 @@ public class EditModePermissionsTest extends DashboardsGeneralTest {
 
     @BeforeClass(alwaysRun = true)
     public void before() {
+        super.before();
         addUsersWithOtherRoles = true;
     }
 

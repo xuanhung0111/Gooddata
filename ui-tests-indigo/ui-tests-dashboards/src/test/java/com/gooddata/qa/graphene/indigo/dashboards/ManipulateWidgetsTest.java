@@ -6,11 +6,19 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     private static final String TEST_HEADLINE = "Test headline";
+
+    @BeforeClass(alwaysRun = true)
+    public void before() {
+        super.before();
+        validateAfterClass = true;
+    }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkEditModeCancelNoChanges() {

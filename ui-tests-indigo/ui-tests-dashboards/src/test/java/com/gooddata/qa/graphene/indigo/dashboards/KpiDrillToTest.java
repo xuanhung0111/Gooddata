@@ -50,6 +50,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
     @BeforeClass(alwaysRun = true)
     public void before() {
+        super.before();
         addUsersWithOtherRoles = true;
     }
 
