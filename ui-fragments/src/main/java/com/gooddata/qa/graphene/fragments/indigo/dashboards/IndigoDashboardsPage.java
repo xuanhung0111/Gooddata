@@ -250,6 +250,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return waitForAllKpiWidgetContentLoaded();
     }
 
+    public String getDateFilterSelection() {
+        return waitForFragmentVisible(dateFilter).getSelection();
+    }
+
     public AttributeFiltersPanel waitForAttributeFilters() {
         return waitForFragmentVisible(attributeFiltersPanel);
     }
