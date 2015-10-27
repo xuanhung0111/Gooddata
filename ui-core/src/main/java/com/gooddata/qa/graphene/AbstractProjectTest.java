@@ -33,7 +33,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         browser.manage().window().maximize();
 
         // sign in with admin user
-        signIn(false, UserRoles.ADMIN);
+        signIn(true, UserRoles.ADMIN);
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"createProject"})
@@ -89,7 +89,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     public void validateProjectTearDown() throws JSONException {
         //it is necessary to login admin to validate project on afterClass
         logout();
-        signIn(false, UserRoles.ADMIN);
+        signIn(true, UserRoles.ADMIN);
 
         if (validateAfterClass) {
             System.out.println("Going to validate project after tests...");
