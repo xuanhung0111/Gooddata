@@ -467,7 +467,6 @@ public class BasicDSSRestTest extends AbstractDSSTest {
         if (storagesItems.length() > 0) {
             JSONObject firstStorage = storagesItems.getJSONObject(0).getJSONObject("dssInstance");
             assertTrue(firstStorage.has("title"), "DSS instance title isn't present");
-            assertTrue(firstStorage.has("authorizationToken"), "DSS instance authorizationToken isn't present");
             assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_DSS_INSTANCES),
                     "DSS instance parent link doesn't match");
             assertTrue(firstStorage.getJSONObject("links").has("self"), "DSS instance self link isn't present");
