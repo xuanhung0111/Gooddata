@@ -570,7 +570,7 @@
                 <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
                 <browserstack.mobile.browserName>iPad</browserstack.mobile.browserName>
                 <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
-                <browserstack.mobile.device>iPad 4th Gen</browserstack.mobile.device>
+                <browserstack.mobile.device>iPad 4th</browserstack.mobile.device>
             </properties>
         </profile>
         <profile>
