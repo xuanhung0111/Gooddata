@@ -475,7 +475,6 @@ public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {
         if (storagesItems.length() > 0) {
             JSONObject firstStorage = storagesItems.getJSONObject(0).getJSONObject("instance");
             assertTrue(firstStorage.has("title"), "Instance title isn't present");
-            assertTrue(firstStorage.has("authorizationToken"), "Instance authorizationToken isn't present");
             assertTrue(firstStorage.getJSONObject("links").getString("parent").substring(1).equals(PAGE_INSTANCES),
                     "Instance parent link doesn't match");
             assertTrue(firstStorage.getJSONObject("links").has("self"), "Instance self link isn't present");
