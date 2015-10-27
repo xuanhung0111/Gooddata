@@ -303,11 +303,10 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
                 indigoDashboardsPage.cancelEditMode()
                     .getLastKpi()
                     .clickKpiValue();
-                Graphene.waitGui().until(redBarAppear);
+                waitForDashboardPageLoaded(browser);
 
-                assertEquals(browser.findElement(BY_RED_BAR).getText(),
-                        "The dashboard tab you are looking for no longer exists.");
-                waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
+                DashboardTabs tabs = dashboardsPage.getTabs();
+                assertThat(tabs.getAllTabNames(), not(contains(newTab)));
             } finally {
                 teardownKpi();
             }
