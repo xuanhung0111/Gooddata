@@ -28,9 +28,10 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private static final String GOODDATA_SUPPORT_URL = "https://support.gooddata.com";
 
     private static final String MANAGE_DATASETS_PAGE_URL = "https://%s/#s=/gdc/projects/%s|dataPage|dataSets";
-    private static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit";
     private static final String PROJECT_PAGE_URL = "https://%s/#s=/gdc/projects/%s";
     private static final String DATA_SECTION_PAGE_URL = "https://%s/data/#/projects/%s/datasets";
+
+    private static String adReportLink = AD_REPORT_LINK;
 
     @BeforeClass
     public void initProperties() {
@@ -50,6 +51,10 @@ public class NotificationTest extends AbstractCsvUploaderTest {
                 toScreenshotName("Upload-csv-file-to-check-successful-notification", fileToUpload.getFileName()),
                 getClass());
 
+        String datasetName = getNewDataset(fileToUpload);
+        adReportLink =
+                String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
+                        getDatasetId(datasetName));
         checkNotification(getSuccessfulNotification(), this::checkSuccessfulNotification);
     }
 
@@ -104,9 +109,8 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     }
 
     private void checkSuccessfulNotification(Document message) {
-        String emptyReportUrl = String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId());
         assertThat(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"),
-                is(emptyReportUrl));
+                is(adReportLink));
     }
 
     private void checkFailedNotification(Document message) {
