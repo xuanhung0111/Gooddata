@@ -25,4 +25,7 @@
         <property name="screenshot">none</property>
     </extension>
 
+    <extension qualifier="drone">
+        <property name="instantiationTimeoutInSeconds">120</property>
+    </extension>
 </arquillian>
