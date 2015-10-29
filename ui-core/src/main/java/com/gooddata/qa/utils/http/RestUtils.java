@@ -12,12 +12,12 @@ import com.google.common.collect.Lists;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -72,6 +72,8 @@ public class RestUtils {
     public static final String TARGET_EXPORT = "export";
     private static final String PROJECT_LINK = "/gdc/projects/";
     private static final String CREATE_PROJECT_CONTENT_BODY;
+    private static final String USER_PROFILE_LINK = "/gdc/account/profile/";
+    private static final String UPDATE_USER_INFO_CONTENT_BODY;
 
     static {
         try {
@@ -197,6 +199,23 @@ public class RestUtils {
             }}.toString();
         } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    }
+
+    static {
+        try {
+            UPDATE_USER_INFO_CONTENT_BODY = new JSONObject() {{
+                put("accountSetting", new JSONObject() {{
+                    put("firstName", "${firstName}");
+                    put("lastName", "${lastName}");
+                    put("old_password", "${old_password}");
+                    put("password", "${password}");
+                    put("verifyPassword", "${verifyPassword}");
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException(
+                    "There is an exception during json object initialization! ", e);
         }
     }
 
@@ -945,6 +964,38 @@ public class RestUtils {
             restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
         } finally {
             postRequest.releaseConnection();
+        }
+    }
+
+    public static JSONObject getCurrentUserProfile(RestApiClient restApiClient) 
+            throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newGetMethod(USER_PROFILE_LINK + "current");
+        try {
+            HttpResponse response = restApiClient.execute(request);
+            return new JSONObject(EntityUtils.toString(response.getEntity()))
+                    .getJSONObject("accountSetting");
+
+        } finally {
+            request.releaseConnection();
+        }
+    }
+
+    public static void updateCurrentUserPassword(RestApiClient restApiClient, String oldPassword,
+            String newPassword) throws ParseException, JSONException, IOException {
+        JSONObject userProfile = getCurrentUserProfile(restApiClient);
+        String userProfileUri = userProfile.getJSONObject("links").getString("self");
+        String content = UPDATE_USER_INFO_CONTENT_BODY
+                .replace("${firstName}", userProfile.get("firstName").toString())
+                .replace("${lastName}", userProfile.get("lastName").toString())
+                .replace("${old_password}", oldPassword)
+                .replace("${password}", newPassword)
+                .replace("${verifyPassword}", newPassword);
+        HttpRequestBase request = restApiClient.newPutMethod(userProfileUri, content);
+        try {
+            HttpResponse response = restApiClient.execute(request, HttpStatus.OK, "Invalid status code");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            request.releaseConnection();
         }
     }
 

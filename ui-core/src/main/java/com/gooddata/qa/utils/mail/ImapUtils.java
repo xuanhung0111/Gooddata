@@ -53,7 +53,7 @@ public class ImapUtils {
         return getMessageWithExpectedReceivedTime(imapClient, from, subject, receivedTime);
     }
 
-    private static Collection<Message> getMessageWithExpectedReceivedTime(
+    public static Collection<Message> getMessageWithExpectedReceivedTime(
             final ImapClient imapClient, final GDEmails from, final String subject,
             final long receivedTime) {
         Collection<Message> messages =
