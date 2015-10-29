@@ -8,6 +8,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -31,7 +32,7 @@ public class CataloguePanel extends AbstractFragment {
     @FindBy(css = ".searchfield-input")
     private WebElement searchInput;
 
-    @FindBy(css = ".catalogue-container .adi-catalogue-item")
+    @FindBy(css = ".catalogue-list .adi-catalogue-item")
     private List<WebElement> items;
 
     @FindBy(className = "s-filter-all")
@@ -163,11 +164,13 @@ public class CataloguePanel extends AbstractFragment {
     public boolean searchBucketItem(String item) {
         waitForItemLoaded();
         waitForElementVisible(searchInput).clear();
-        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        // TODO: work around to pass orchestrator, need to fix soon
+        Stream.of(WEIRD_STRING_TO_CLEAR_ALL_ITEMS.split("")).forEach(searchInput::sendKeys);
         waitForCollectionIsEmpty(items);
 
         searchInput.clear();
-        searchInput.sendKeys(item);
+        // TODO: work around to pass orchestrator, need to fix soon
+        Stream.of(item.split("")).forEach(searchInput::sendKeys);
 
         if (!isElementPresent(BY_NO_ITEMS, browser)) {
             waitForCollectionIsNotEmpty(items);

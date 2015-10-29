@@ -65,7 +65,7 @@ public class GoodSalesDashboardWidgetManipulationTest extends GoodSalesAbstractT
         assertThat(filterZIndex, equalTo(3));
         configPanel.discardConfiguration();
 
-        new Actions(browser).keyDown(Keys.SHIFT).click(report).perform();
+        new Actions(browser).keyDown(Keys.SHIFT).click(report).keyUp(Keys.SHIFT).perform();
         waitForElementVisible(className("yui3-toolbar-icon-config"), browser).click();
         configPanel = Graphene.createPageFragment(WidgetConfigPanel.class,
                 waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));

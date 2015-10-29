@@ -181,11 +181,13 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage selectInapplicableMetric(String metric) {
-        return selectMetric(metric, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).perform());
+        return selectMetric(metric, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).keyUp(Keys.SHIFT).
+                perform());
     }
 
     public ReportPage selectInapplicableAttribute(String attribute) {
-        return selectAttribute(attribute, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).perform());
+        return selectAttribute(attribute, e -> new Actions(browser).keyDown(Keys.SHIFT).click(e).keyUp(Keys.SHIFT).
+                perform());
     }
 
     public ReportPage selectAttribute(String attribute) {
