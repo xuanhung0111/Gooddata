@@ -79,7 +79,12 @@ public class AttributeFilterFragment extends AbstractFilterFragment {
     }
 
     public AttributeFilterFragment searchAndSelectAttributeValues(Collection<String> values) {
-        waitForFragmentVisible(valuesPanel).searchAndSelectItems(values);
+        values.stream().forEach(this::searchAndSelectAttributeValue);
+        return this;
+    }
+
+    public AttributeFilterFragment searchAndSelectAttributeValue(String value) {
+        waitForFragmentVisible(valuesPanel).searchAndSelectEmbedItem(value);
         return this;
     }
 

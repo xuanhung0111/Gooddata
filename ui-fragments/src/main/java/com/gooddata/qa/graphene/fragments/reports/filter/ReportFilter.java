@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.filter;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.openqa.selenium.By.id;
 
@@ -8,26 +9,21 @@ import java.util.Optional;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
-import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
 import com.gooddata.qa.graphene.entity.filter.AttributeFilterItem;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.PromptFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
 
 public class ReportFilter extends AbstractFragment {
 
     public static final By REPORT_FILTER_LOCATOR = id("filtersContainer");
-    public static final By ATTRIBUTE_FILTER_FRAGMENT_LOCATOR = By.cssSelector(".c-attributeFilterLineEditor");
-
-    private static final By RANK_FILTER_FRAGMENT_LOCATOR = By.cssSelector(".c-rankFilterLineEditor");
-    private static final By RANGE_FILTER_FRAGMENT_LOCATOR = By.cssSelector(".c-rangeFilterLineEditor");
-    private static final By PROMPT_FILTER_FRAGMENT_LOCATOR = By.cssSelector(".c-promptFilterLineEditor");
+    private static final By DELETE_FILTER_BUTTON_LOCATOR = By.className("s-btn-delete");
 
     @FindBy(css = ".s-attributeFilter")
     private WebElement attributeFilterLink;
@@ -74,39 +70,81 @@ public class ReportFilter extends AbstractFragment {
         return this;
     }
 
-    public void openExistingFilter(final String filterName) {
-        Predicate<WebDriver> addFilterButtonEnabled = browser -> !waitForElementVisible(addFilterButton)
-                .getAttribute("class")
-                .contains("disabled");
-        Graphene.waitGui().until(addFilterButtonEnabled);
+    @SuppressWarnings("unchecked")
+    public <T extends AbstractFilterFragment> T openExistingFilter(String filterName,
+            FilterFragment returnFragment) {
 
-        existingFilters.stream()
-                .map(e -> e.findElement(By.cssSelector(".text")))
-                .filter(e -> filterName.equals(e.getText()))
-                .findFirst()
-                .get()
-                .click();
+        getFilterElement(filterName).click();
+
+        return (T) Graphene.createPageFragment(returnFragment.getFragmentClass(),
+                waitForElementVisible(returnFragment.getLocator(), browser));
+    }
+
+    public boolean hoverMouseToFilter(String filterName) {
+        WebElement existingFilter = getFilterElement(filterName);
+
+        new Actions(browser).moveToElement(existingFilter).perform();
+        return isElementPresent(By.xpath("./ancestor::div[contains(@class,'filterLine_hover')]"), existingFilter);
+    }
+
+    public void deleteFilter(String filterName) {
+        hoverMouseToFilter(filterName);
+        waitForElementVisible(DELETE_FILTER_BUTTON_LOCATOR, browser).click();
     }
 
     public AttributeFilterFragment openAttributeFilterFragment() {
-        return openFilterFragment(attributeFilterLink, ATTRIBUTE_FILTER_FRAGMENT_LOCATOR,
-                AttributeFilterFragment.class);
+        return openFilterFragment(attributeFilterLink, FilterFragment.ATTRIBUTE_FILTER);
+    }
+
+    public PromptFilterFragment openPromptFilterFragment() {
+        return openFilterFragment(promptFilterLink, FilterFragment.PROMPT_FILTER);
     }
 
     private RankingFilterFragment openRankingFilterFragment() {
-        return openFilterFragment(rankFilterLink, RANK_FILTER_FRAGMENT_LOCATOR, RankingFilterFragment.class);
+        return openFilterFragment(rankFilterLink, FilterFragment.RANKING_FILTER);
     }
 
     private RangeFilterFragment openRangeFilterFragment() {
-        return openFilterFragment(rangeFilterLink, RANGE_FILTER_FRAGMENT_LOCATOR, RangeFilterFragment.class);
+        return openFilterFragment(rangeFilterLink, FilterFragment.RANGE_FILTER);
     }
 
-    private PromptFilterFragment openPromptFilterFragment() {
-        return openFilterFragment(promptFilterLink, PROMPT_FILTER_FRAGMENT_LOCATOR, PromptFilterFragment.class);
-    }
+    @SuppressWarnings("unchecked")
+    private <T extends AbstractFilterFragment> T openFilterFragment(WebElement link,
+            FilterFragment returnFragment) {
 
-    private <T extends AbstractFilterFragment> T openFilterFragment(WebElement link, By locator, Class<T> clazz) {
         waitForElementVisible(link).click();
-        return Graphene.createPageFragment(clazz, waitForElementVisible(locator, browser));
+        return (T) Graphene.createPageFragment(returnFragment.getFragmentClass(),
+                waitForElementVisible(returnFragment.getLocator(), browser));
+    }
+
+    private WebElement getFilterElement(final String filterName) {
+        return existingFilters.stream()
+                .map(e -> e.findElement(By.className("text")))
+                .filter(e -> filterName.equals(e.getText()))
+                .findFirst()
+                .get();
+    }
+
+    public enum FilterFragment {
+        ATTRIBUTE_FILTER(AttributeFilterFragment.class, ".c-attributeFilterLineEditor"),
+        RANKING_FILTER(RankingFilterFragment.class, ".c-rankFilterLineEditor"),
+        RANGE_FILTER(RangeFilterFragment.class, ".c-rangeFilterLineEditor"),
+        PROMPT_FILTER(PromptFilterFragment.class, ".c-promptFilterLineEditor");
+
+        private Class<? extends AbstractFilterFragment> fragmentClass;
+        private String locator;
+
+        private FilterFragment(Class<? extends AbstractFilterFragment> fragmentClass, String locator) {
+            this.fragmentClass = fragmentClass;
+            this.locator = locator;
+        }
+
+        public Class<? extends AbstractFilterFragment> getFragmentClass() {
+            return fragmentClass;
+        }
+
+        public By getLocator() {
+            return By.cssSelector(locator);
+        }
     }
 }
