@@ -222,7 +222,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         openReport(reportUrl);
         String[] filteredValues =
                 {"Interest", "Discovery", "Short List", "Negotiation", "Closed Won", "Closed Lost"};
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", filteredValues));
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter("Stage Name", filteredValues));
         reportPage.saveReport();
 
         browser.get(dashboardUrl);
@@ -278,7 +278,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         UiReportDefinition updateEmbeddedReport =
                 new UiReportDefinition().withName(reportTitle).withHows("Status").withWhats("Lost");
         createReport(updateEmbeddedReport, "Update-Report-After-Sharing");
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter("Status"));
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter("Status"));
         reportPage.saveReport();
 
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();

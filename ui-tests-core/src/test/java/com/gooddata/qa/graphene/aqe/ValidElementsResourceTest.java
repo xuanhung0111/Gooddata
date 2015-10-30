@@ -190,11 +190,11 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                                            .withHows(new HowItem(departmentAttr, Position.TOP)),
                                            "CheckListElementsInReport");
 
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter(productAttr,
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(productAttr,
                 "CompuSci", "Educationly", "Explorer", "WonderKid"));
         checkRedBar(browser);
 
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter(departmentAttr, "Direct Sales"));
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(departmentAttr, "Direct Sales"));
         Screenshots.takeScreenshot(browser, "AQE-Check list elements in report filter", this.getClass());
         checkRedBar(browser);
 
@@ -219,7 +219,7 @@ public class ValidElementsResourceTest extends GoodSalesAbstractTest {
                                            .withWhats("Amount")
                                            .withHows("Department"), "CheckListElementsInChartReport");
 
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter(productAttr, "CompuSci",
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(productAttr, "CompuSci",
                 "Educationly", "Explorer", "WonderKid"));
         Screenshots.takeScreenshot(browser, "AQE-Check list elements in chart report filter",
                 this.getClass());

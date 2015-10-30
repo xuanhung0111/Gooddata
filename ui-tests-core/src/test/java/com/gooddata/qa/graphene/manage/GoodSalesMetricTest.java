@@ -735,7 +735,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         createReport(reportDefinition, "screenshot-" + "report_" + metricName);
 
         if (metricName.contains("WITHOUT_PF")) {
-            reportPage.addFilter(FilterItem.Factory.createListValuesFilter(MONTH_YEAR_SNAPSHOT, "Apr 2012"))
+            reportPage.addFilter(FilterItem.Factory.createAttributeFilter(MONTH_YEAR_SNAPSHOT, "Apr 2012"))
                     .saveReport();
         }
         List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricElements();
@@ -790,7 +790,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
     private void addFilterAndCheckReport(Collection<String> attributeValues, Collection<Float> metricValues,
             String filter, String... filterValues) {
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter(filter, filterValues))
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter(filter, filterValues))
                 .saveReport();
         TableReport report = reportPage.getTableReport();
         assertTrue(CollectionUtils.isEqualCollection(report.getMetricElements(), metricValues),

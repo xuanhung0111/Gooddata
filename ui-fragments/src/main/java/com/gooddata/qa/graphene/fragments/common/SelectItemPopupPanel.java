@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEm
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -69,9 +70,10 @@ public class SelectItemPopupPanel extends AbstractFragment {
         selectItem(item, false);
     }
 
-    public void searchAndSelectItem(String item) {
+    public SelectItemPopupPanel searchAndSelectItem(String item) {
         searchItem(item);
         selectItem(item);
+        return this;
     }
 
     public void searchAndSelectEmbedItem(String item) {
@@ -97,6 +99,11 @@ public class SelectItemPopupPanel extends AbstractFragment {
     public void submitPanel() {
         waitForElementVisible(addButton).click();
         waitForPanelNotVisible();
+    }
+
+    public SelectItemPopupPanel searchAndSelectItems(Collection<String> items) {
+        items.stream().forEach(this::searchAndSelectEmbedItem);
+        return this;
     }
 
     private void selectCheckboxItem(String item) {

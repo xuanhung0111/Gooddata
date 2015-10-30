@@ -189,7 +189,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         initReportsPage();
         reportsPage.getReportsList().openReport(REPORT_NAME);
         reportPage.initPage()
-            .addFilter(FilterItem.Factory.createListValuesFilter("Year (Created)", "2011"));
+            .addFilter(FilterItem.Factory.createAttributeFilter("Year (Created)", "2011"));
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute-and-applied-list-filter",
                 this.getClass());
         List<String> attributeHeaders = reportPage.getTableReport().getAttributesHeader();
@@ -209,7 +209,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         createReport(
                 new UiReportDefinition().withName(CA_VARIABLE_REPORT_NAME).withWhats("Amount")
                         .withHows(COMPUTED_ATTRIBUTE_NAME), CA_VARIABLE_REPORT_NAME);
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter(VARIABLE_NAME, "Best", "Good", "Great",
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter(VARIABLE_NAME, "Best", "Good", "Great",
                 "Poor"));
         reportPage.saveReport();
         Screenshots.takeScreenshot(browser, "report-created-with-computed-attribute-and-applied-variable-filter",

@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class VariableFilterItem extends FilterItem {
+public class PromptFilterItem extends FilterItem {
 
     private String variable;
     private List<String> promptElements;
 
-    VariableFilterItem(String variable, String... prompts) {
+    PromptFilterItem(String variable, String... prompts) {
         this.variable = variable;
         this.promptElements = new ArrayList<String>(Arrays.asList(prompts));
     }

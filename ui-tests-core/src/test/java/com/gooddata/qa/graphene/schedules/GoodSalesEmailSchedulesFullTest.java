@@ -231,7 +231,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         UiReportDefinition rd = new UiReportDefinition().withName("Filtered variable report")
                 .withHows("Activity Type").withWhats("# of Activities");
         createReport(rd, "Filtered variable report");
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter("FVariable", "Email"));
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter("FVariable", "Email"));
         reportPage.saveReport();
 
         initEmailSchedulesPage();

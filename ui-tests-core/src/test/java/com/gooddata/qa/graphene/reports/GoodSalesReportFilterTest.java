@@ -1,17 +1,22 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
-import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
-import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static org.testng.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.AttributeFilterItem;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.filter.PromptFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RangeFilterItem.RangeType;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 
 @Test(groups = {"GoodSalesReportFilters"},
         description = "Tests for GoodSales project (report filters functionality)")
@@ -44,8 +49,15 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"})
     public void attributeFilterTest() {
         initReport();
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Stage Name", "Interest",
-                "Discovery", "Short List", "Negotiation", "Closed Won", "Closed Lost"));
+
+        AttributeFilterItem filterItem = FilterItem.Factory
+                .createAttributeFilter("Stage Name", "Interest", "Discovery", "Short List",
+                        "Negotiation", "Closed Won", "Closed Lost");
+
+        reportPage.addFilter(filterItem);
+        assertTrue(reportPage.isReportContains(filterItem.getValues()),
+                "Attribute filter is not apply successfully");
+
         reportPage.saveReport();
         checkRedBar(browser);
     }
@@ -53,8 +65,12 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"})
     public void rankingFilterTest() {
         initReport();
-        reportPage.addFilter(FilterItem.Factory.createRankingFilter(ResultSize.TOP.withSize(3),
-                "Stage Name", "Amount"));
+
+        reportPage.addFilter(FilterItem.Factory.createRankingFilter("Amount", "Stage Name"));
+        assertTrue(reportPage.isRankingFilterApplied(Arrays.
+                asList(4249027.88f, 5612062.60f, 18447266.14f)),
+                "Ranking filter is not applied successfully");
+
         reportPage.saveReport();
         checkRedBar(browser);
     }
@@ -62,8 +78,14 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest"})
     public void rangeFilterTest() {
         initReport();
-        reportPage.addFilter(FilterItem.Factory.createRangeFilter("Stage Name", "Amount",
-                Range.IS_GREATER_THAN_OR_EQUAL_TO.withNumber(100000)));
+
+        RangeFilterItem filterItem = FilterItem.Factory
+                .createRangeFilter(RangeType.IS_GREATER_THAN_OR_EQUAL_TO, 100000, "Amount", "Stage Name");
+
+        reportPage.addFilter(filterItem);
+        assertTrue(reportPage.isRangeFilterApplied(filterItem),
+                "Range filter is not applied successfully");
+
         reportPage.saveReport();
         checkRedBar(browser);
     }
@@ -71,8 +93,14 @@ public class GoodSalesReportFilterTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createReportTest", "createVariableTest"})
     public void promptFilterTest() {
         initReport();
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter(VARIABLE_NAME,
-                "Interest", "Discovery", "Short List", "Negotiation"));
+
+        PromptFilterItem filterItem = FilterItem.Factory.createPromptFilter(VARIABLE_NAME,
+                "Interest", "Discovery", "Short List", "Negotiation");
+
+        reportPage.addFilter(filterItem);
+        assertTrue(reportPage.isReportContains(filterItem.getPromptElements()),
+                "Prompt filter is not applied successfully");
+
         reportPage.saveReport();
         checkRedBar(browser);
     }
