@@ -32,7 +32,7 @@ public class CataloguePanel extends AbstractFragment {
     @FindBy(css = ".searchfield-input")
     private WebElement searchInput;
 
-    @FindBy(css = ".catalogue-list .adi-catalogue-item")
+    @FindBy(css = ".adi-catalogue-item")
     private List<WebElement> items;
 
     @FindBy(className = "s-filter-all")
