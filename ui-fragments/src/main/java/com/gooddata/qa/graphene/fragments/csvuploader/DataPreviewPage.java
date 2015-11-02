@@ -28,6 +28,9 @@ public class DataPreviewPage extends AbstractFragment {
     @FindBy(className = "s-select-header-button")
     private WebElement selectHeaderButton;
 
+    @FindBy(className = "s-row-count-message")
+    private WebElement rowCountMessage;
+
     public boolean isIntegrationButtonDisabled() {
         return !getRoot().findElements(DISABLED_INTEGRATION_BUTTON).isEmpty();
     }
@@ -52,5 +55,9 @@ public class DataPreviewPage extends AbstractFragment {
 
     public AbstractTable getRowSelectionTable() {
         return waitForFragmentVisible(rowSelectionTable);
+    }
+
+    public String getRowCountMessage() {
+        return waitForElementVisible(rowCountMessage).getText();
     }
 }

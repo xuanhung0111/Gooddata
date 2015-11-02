@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,7 +56,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
             "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Date", "Measure");
     protected static final List<String> PAYROLL_COLUMN_NAMES = Lists.newArrayList("Lastname", "Firstname",
             "Education", "Position", "Department", "State", "County", "Paydate", "Amount");
-    
+
+    private static final long PAYROLL_DATA_ROW_COUNT = 3876;
+
     protected List<UploadHistory> uploadHistory = Lists.newArrayList();
 
     @FindBy(className = "s-datasets-list")
@@ -75,6 +78,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     @FindBy(className = "s-dataset-delete-dialog")
     protected DatasetDeleteDialog datasetDeleteDialog;
+
     protected void checkDataPreview(CsvFile csvFile) {
         checkDataPreview(csvFile.getColumnNames(), csvFile.getColumnTypes());
     }
@@ -85,7 +89,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         assertThat(dataPreviewTable.getColumnNames(), containsInAnyOrder(expectedColumnNames.toArray()));
         assertThat(dataPreviewTable.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
     }
-    
+
     protected void checkCsvDatasetDetail(CsvFile csvFile, String datasetName) {
         checkCsvDatasetDetail(datasetName, csvFile.getColumnNames(), csvFile.getColumnTypes());
     }
@@ -98,7 +102,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         assertThat(csvDatasetDetailPage.getColumnNames(), containsInAnyOrder(expectedColumnNames.toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
     }
-    
+
     protected void checkCsvUpload(CsvFile csvFile, Consumer<CsvFile> uploadCsvFunction, boolean newDatasetExpected) {
         initDataUploadPage();
 
@@ -113,17 +117,18 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         openUrl(String.format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
         waitForFragmentVisible(datasetsListPage);
     }
-    
+
     protected void uploadCsv(CsvFile csvFile) {
         uploadFile(csvFile);
 
         waitForFragmentVisible(dataPreviewPage);
+        assertThat(dataPreviewPage.getRowCountMessage(), containsString(Long.toString(csvFile.getDataRowCount())));
 
         takeScreenshot(browser, toScreenshotName(DATA_PREVIEW_PAGE, csvFile.getFileName()), getClass());
 
         dataPreviewPage.triggerIntegration();
     }
-    
+
     protected String getNewDataset(CsvFile csvFile) {
         Optional<UploadHistory> fileUpload = uploadHistory.stream()
                 .filter(upload -> upload.getCsvFile() == csvFile)
@@ -135,23 +140,20 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     }
 
     protected String getDatasetId(String datasetName) {
-        String newDatasetId =
-                "dataset.csv_"
-                        + WordUtils.uncapitalize(datasetName).replace(" ", "_").replace("_(", "").replace(")", "");
-
-        return newDatasetId;
+        return "dataset.csv_"
+                + WordUtils.uncapitalize(datasetName).replace(" ", "_").replace("_(", "").replace(")", "");
     }
-    
+
     protected void removeDataset(CsvFile csvFile, String datasetName) {
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
-        
+
         datasetsListPage.getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
         takeScreenshot(browser, DELETE_DATASET_DIALOG_NAME, getClass());
         waitForFragmentVisible(datasetDeleteDialog).clickDelete();
-        
+
         waitForExpectedDatasetsCount(datasetCountBeforeDelete - 1);
     }
-    
+
     protected void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
         Optional<UploadHistory> fileUpload = uploadHistory.stream()
                 .filter(upload -> upload.getCsvFile() == csvFile)
@@ -159,7 +161,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         assertThat(fileUpload.isPresent(), is(true));
         fileUpload.get().removeDatasetName(datasetName);
     }
-    
+
     protected void uploadBadCsv(CsvFile csvFile) {
         uploadFile(csvFile);
 
@@ -171,7 +173,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         waitForFragmentVisible(fileUploadDialog).clickCancelButton();
     }
-    
+
     protected void uploadFile(CsvFile csvFile) {
         waitForFragmentVisible(datasetsListPage).clickAddDataButton();
 
@@ -241,16 +243,16 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     public class UploadHistory {
         private CsvFile csvFile;
         private Map<String, Boolean> datasetNames = new HashMap<>();
-        
+
         public UploadHistory(CsvFile csvFile) {
             this.csvFile = csvFile;
             datasetNames.put(csvFile.getDatasetNameOfFirstUpload(), true);
         }
-        
+
         public CsvFile getCsvFile() {
             return csvFile;
         }
-        
+
         public String addDatasetName() {
             for (Entry<String, Boolean> entry : datasetNames.entrySet()) {
                 if (!entry.getValue()) {
@@ -258,16 +260,16 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                     return entry.getKey();
                 }
             }
-            
+
             String newDatasetName = csvFile.getDatasetName(getUploadTime());
             datasetNames.put(newDatasetName, true);
             return newDatasetName;
         }
-        
+
         public long getUploadTime() {
             return datasetNames.size();
         }
-        
+
         public void removeDatasetName(String datasetName) {
             for (Entry<String, Boolean> entry : datasetNames.entrySet()) {
                 if (entry.getKey().equals(datasetName)) {
@@ -289,27 +291,30 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         PAYROLL_BY_PROJECT_OWNER("payroll.by.project.owner"),
         PAYROLL_BY_OTHER_ADMIN("payroll.by.other.admin"),
         /** This csv file has incorrect column count (one more than expected) on the line number 2. */
-        BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList()),
-        NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES),
+        BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList(), 0),
+        NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT),
         TOO_LARGE_FILE("payroll.too.large"),
         WITHOUT_FACT("payroll.without.fact"),
         CRAZY_DATA("crazy.data"),
         TOO_MANY_COLUMNS("too.many.columns"),
         TOO_LONG_FIELD("payroll.too.long.field"),
         PAYROLL_TOO_LONG_FACT_VALUE("payroll.too.long.fact.value");
-    
+
         private final String name;
         private final List<String> columnNames = Lists.newArrayList();
         private final List<String> columnTypes = Lists.newArrayList();
+        //number of rows with data (rows with facts)
+        private final long dataRowCount;
     
         private CsvFile(String fileName) {
-            this(fileName, PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES);
+            this(fileName, PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT);
         }
     
-        private CsvFile(String fileName, List<String> columnNames, List<String> columnTypes) {
+        private CsvFile(String fileName, List<String> columnNames, List<String> columnTypes, long dataRowCount) {
             this.name = fileName;
             this.columnNames.addAll(columnNames);
             this.columnTypes.addAll(columnTypes);
+            this.dataRowCount = dataRowCount;
         }
     
         public String getFileName() {
@@ -343,6 +348,10 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         public String getCsvFileToUpload() {
             return ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + this.getFileName());
+        }
+
+        public long getDataRowCount() {
+            return dataRowCount;
         }
     }
 }
