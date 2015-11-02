@@ -165,7 +165,7 @@ public class Kpi extends AbstractFragment {
 
     public enum ComparisonType {
         NO_COMPARISON("none", "No comparison"),
-        LAST_YEAR("lastYear", "Previous year"),
+        LAST_YEAR("lastYear", "Same period in previous year"),
         PREVIOUS_PERIOD("previousPeriod", "Previous period");
 
         private String jsonKey;

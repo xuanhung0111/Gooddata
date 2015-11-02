@@ -20,8 +20,8 @@ public class KpiAlertDialog extends AbstractFragment {
     private static final By ALERT_DIALOG_MESSAGE = By.cssSelector("." + MAIN_CLASS + " ." + ALERT_DIALOG_MESSAGE_CLASS);
     public static final By LOCATOR = By.className(MAIN_CLASS);
 
-    public static final String TRIGGERED_WHEN_GOES_ABOVE = "goes above";
-    public static final String TRIGGERED_WHEN_DROPS_BELOW = "drops below";
+    public static final String TRIGGERED_WHEN_GOES_ABOVE = "above";
+    public static final String TRIGGERED_WHEN_DROPS_BELOW = "below";
 
     @FindBy(className = "kpi-alert-dialog-text")
     protected WebElement header;

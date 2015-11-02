@@ -27,8 +27,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         .dateDimension(DATE_CREATED)
         .build();
 
-    private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI…";
-    private static final String KPI_ALERT_FILTERS_DIFFER_MESSAGE = "Alert and current dashboard filters differ. Apply alert filters";
+    private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI is";
     private static final String KPI_ALERT_THRESHOLD = "100"; // TODO: consider parsing value from KPI to avoid immediate alert trigger
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -143,13 +142,13 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
-            String alertMessageText = initIndigoDashboardsPageWithWidgets()
+            boolean isAlertMessageDisplayed = initIndigoDashboardsPageWithWidgets()
                 .selectDateFilterByName(DATE_FILTER_ALL_TIME)
                 .getLastKpi()
                 .openAlertDialog()
-                .getAlertMessageText();
+                .hasAlertMessage();
 
-            assertEquals(alertMessageText, KPI_ALERT_FILTERS_DIFFER_MESSAGE);
+            assertTrue(isAlertMessageDisplayed);
 
         } finally {
             teardownKpi();
