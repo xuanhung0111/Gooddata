@@ -1,7 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests">
-    <parameter name="windowSize" value="maximize" />
-
     <test name="metric-formatting-tests">
         <groups>
             <dependencies>

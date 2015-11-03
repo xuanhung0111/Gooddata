@@ -1,12 +1,18 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+
+import org.json.JSONException;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class SplashScreenTest extends DashboardsTest {
@@ -19,6 +25,13 @@ public class SplashScreenTest extends DashboardsTest {
         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
         .drillTo(DRILL_TO_OUTLOOK)
         .build();
+
+    @BeforeClass(alwaysRun = true)
+    public void before(ITestContext context) {
+        super.before();
+        boolean isMobileRunning = Boolean.parseBoolean(context.getCurrentXmlTest().getParameter("isMobileRunning"));
+        addUsersWithOtherRoles = !isMobileRunning;
+    }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
     public void checkNewProjectWithoutKpisFallsToSplashCreen() {
@@ -122,7 +135,6 @@ public class SplashScreenTest extends DashboardsTest {
         takeScreenshot(browser, "checkDeleteDashboardButtonMissingOnUnsavedDashboard", getClass());
     }
 
-
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"mobile"})
     public void checkCreateNewKpiDashboardNotAvailableOnMobile() {
         SplashScreen splashScreen = initIndigoDashboardsPage().getSplashScreen();
@@ -132,5 +144,41 @@ public class SplashScreenTest extends DashboardsTest {
         splashScreen.waitForCreateKpiDashboardButtonMissing();
 
         takeScreenshot(browser, "checkCreateNewKpiDashboardNotAvailableOnMobile", getClass());
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
+    public void checkViewerCannotCreateDashboard() throws JSONException {
+        try {
+            initDashboardsPage();
+
+            logout();
+            signIn(true, UserRoles.VIEWER);
+
+            initIndigoDashboardsPage()
+                .getSplashScreen()
+                .waitForCreateKpiDashboardButtonMissing();
+
+        } finally {
+            logout();
+            signIn(true, UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
+    public void checkEditorCanCreateDashboard() throws JSONException {
+        try {
+            initDashboardsPage();
+
+            logout();
+            signIn(true, UserRoles.EDITOR);
+
+            initIndigoDashboardsPage()
+                .getSplashScreen()
+                .waitForCreateKpiDashboardButtonVisible();
+
+        } finally {
+            logout();
+            signIn(true, UserRoles.ADMIN);
+        }
     }
 }
