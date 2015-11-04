@@ -3,8 +3,12 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
@@ -46,13 +50,13 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             initDashboardsPage();
 
             logout();
-            signIn(true, UserRoles.VIEWER);
+            signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
             assertFalse(initIndigoDashboardsPageWithWidgets().isEditButtonVisible());
 
         } finally {
             logout();
-            signIn(true, UserRoles.ADMIN);
+            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 
@@ -62,13 +66,13 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             initDashboardsPage();
 
             logout();
-            signIn(true, UserRoles.EDITOR);
+            signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             assertTrue(initIndigoDashboardsPageWithWidgets().isEditButtonVisible());
 
         } finally {
             logout();
-            signIn(true, UserRoles.ADMIN);
+            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 
@@ -81,7 +85,12 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             openUrl(getIndigoDashboardsPageUri());
             waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
-            signIn(true, UserRoles.ADMIN);
+            if (canAccessGreyPage(browser)) {
+                signIn(true, UserRoles.ADMIN);
+            } else {
+                waitForFragmentVisible(loginFragment).login(testParams.getUser(), testParams.getPassword(), true);
+                waitForElementVisible(className("gd-header-account"), browser);
+            }
         }
     }
 }

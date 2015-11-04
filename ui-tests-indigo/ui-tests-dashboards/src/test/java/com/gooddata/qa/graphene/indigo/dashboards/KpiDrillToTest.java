@@ -15,6 +15,7 @@ import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
@@ -232,7 +233,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
             try {
                 logout();
-                signIn(false, UserRoles.EDITOR);
+                signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
                 initDashboardsPage();
                 assertThat(dashboardsPage.getDashboardsNames(), not(contains(personalDashboard)));
@@ -253,7 +254,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
                 assertEquals(tabs.getTabLabel(tabs.getSelectedTabIndex()), personalTab);
             } finally {
                 logout();
-                signIn(false, UserRoles.ADMIN);
+                signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
 
                 teardownKpi();
             }

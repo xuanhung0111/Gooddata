@@ -392,7 +392,7 @@
             </properties>
         </profile>
 
-        <!-- browserstack profiles -->
+        <!-- browserstack mobile profiles -->
         <profile>
             <id>browserstack-mobile-android-samsung-galaxy-s5</id>
             <activation>
@@ -499,21 +499,6 @@
             </properties>
         </profile>
         <profile>
-            <id>browserstack-mobile-iphone-5</id>
-            <activation>
-                <property>
-                    <name>test.execution.env</name>
-                    <value>browserstack-mobile-iphone-5</value>
-                </property>
-            </activation>
-            <properties>
-                <arquillian.xml>arquillian-browserstack-mobile-mac.xml</arquillian.xml>
-                <browserstack.mobile.browserName>iPhone</browserstack.mobile.browserName>
-                <browserstack.mobile.platform>MAC</browserstack.mobile.platform>
-                <browserstack.mobile.device>iPhone 5</browserstack.mobile.device>
-            </properties>
-        </profile>
-        <profile>
             <id>browserstack-mobile-iphone-5s</id>
             <activation>
                 <property>
@@ -573,36 +558,86 @@
                 <browserstack.mobile.device>iPad 4th</browserstack.mobile.device>
             </properties>
         </profile>
+
+        <!-- browserstack platform profiles -->
         <profile>
-            <id>browserstack-platform-os-x-yosemite-firefox-40</id>
+            <id>browserstack-platform-os-x-yosemite-chrome-45</id>
             <activation>
                 <property>
                     <name>test.execution.env</name>
-                    <value>browserstack-platform-os-x-yosemite-firefox-40</value>
+                    <value>browserstack-platform-os-x-yosemite-chrome-45</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Chrome</browserstack.platform.browser>
+                <browserstack.platform.browser.version>45.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>OS X</browserstack.platform.os>
+                <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-os-x-yosemite-firefox-41</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-os-x-yosemite-firefox-41</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Firefox</browserstack.platform.browser>
+                <browserstack.platform.browser.version>41.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>OS X</browserstack.platform.os>
+                <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-os-x-yosemite-safari-8</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-os-x-yosemite-safari-8</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Safari</browserstack.platform.browser>
+                <browserstack.platform.browser.version>8.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>OS X</browserstack.platform.os>
+                <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-windows-8-1-chrome-45</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-windows-8-1-chrome-45</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Chrome</browserstack.platform.browser>
+                <browserstack.platform.browser.version>45.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>Windows</browserstack.platform.os>
+                <browserstack.platform.os.version>8.1</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-windows-8-1-firefox-40</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-windows-8-1-firefox-40</value>
                 </property>
             </activation>
             <properties>
                 <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
                 <browserstack.platform.browser>Firefox</browserstack.platform.browser>
                 <browserstack.platform.browser.version>40.0</browserstack.platform.browser.version>
-                <browserstack.platform.os>OS X</browserstack.platform.os>
-                <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>browserstack-platform-os-x-yosemite-firefox-35</id>
-            <activation>
-                <property>
-                    <name>test.execution.env</name>
-                    <value>browserstack-platform-os-x-yosemite-firefox-35</value>
-                </property>
-            </activation>
-            <properties>
-                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
-                <browserstack.platform.browser>Firefox</browserstack.platform.browser>
-                <browserstack.platform.browser.version>35.0</browserstack.platform.browser.version>
-                <browserstack.platform.os>OS X</browserstack.platform.os>
-                <browserstack.platform.os.version>Yosemite</browserstack.platform.os.version>
+                <browserstack.platform.os>Windows</browserstack.platform.os>
+                <browserstack.platform.os.version>8.1</browserstack.platform.os.version>
             </properties>
         </profile>
         <profile>
@@ -619,6 +654,38 @@
                 <browserstack.platform.browser.version>11.0</browserstack.platform.browser.version>
                 <browserstack.platform.os>Windows</browserstack.platform.os>
                 <browserstack.platform.os.version>8.1</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-windows-10-chrome-46</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-windows-10-chrome-46</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Chrome</browserstack.platform.browser>
+                <browserstack.platform.browser.version>46.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>Windows</browserstack.platform.os>
+                <browserstack.platform.os.version>10</browserstack.platform.os.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>browserstack-platform-windows-10-firefox-41</id>
+            <activation>
+                <property>
+                    <name>test.execution.env</name>
+                    <value>browserstack-platform-windows-10-firefox-41</value>
+                </property>
+            </activation>
+            <properties>
+                <arquillian.xml>arquillian-browserstack-platform.xml</arquillian.xml>
+                <browserstack.platform.browser>Firefox</browserstack.platform.browser>
+                <browserstack.platform.browser.version>41.0</browserstack.platform.browser.version>
+                <browserstack.platform.os>Windows</browserstack.platform.os>
+                <browserstack.platform.os.version>10</browserstack.platform.os.version>
             </properties>
         </profile>
 
