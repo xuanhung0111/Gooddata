@@ -23,6 +23,10 @@ public class BrowserUtils {
     }
 
     public static boolean isIE(WebDriver browser) {
-        return "internet explorer".equals(((RemoteWebDriver) browser).getCapabilities().getBrowserName());
+        return "internet explorer".equals(getCurrentBrowserAgent(browser));
+    }
+
+    public static String getCurrentBrowserAgent(WebDriver browser) {
+        return ((RemoteWebDriver) browser).getCapabilities().getBrowserName();
     }
 }
