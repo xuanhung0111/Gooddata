@@ -30,7 +30,12 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP})
     public void init() throws JSONException {
-        browser.manage().window().maximize();
+        String executionEnv = System.getProperty("test.execution.env");
+        if (executionEnv != null && executionEnv.contains("browserstack-mobile")) {
+            System.out.println("Maximizing window is ignored for execution on mobile devices at Browserstack.");
+        } else {
+            browser.manage().window().maximize();
+        }
 
         // sign in with admin user
         signIn(true, UserRoles.ADMIN);
