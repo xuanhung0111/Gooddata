@@ -3,6 +3,7 @@ package com.gooddata.qa.browser;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -27,7 +28,8 @@ public class BrowserUtils {
     }
 
     public static String getCurrentBrowserAgent(WebDriver browser) {
-        System.out.println(((RemoteWebDriver) browser).getCapabilities().getCapability("platform"));
-        return ((RemoteWebDriver) browser).getCapabilities().getBrowserName();
+        Capabilities capabilities = ((RemoteWebDriver) browser).getCapabilities();
+        String platform = capabilities.getCapability("platform").toString().toUpperCase();
+        return capabilities.getBrowserName() + " - " + platform;
     }
 }
