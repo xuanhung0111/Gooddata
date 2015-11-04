@@ -66,6 +66,16 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>selenium</id>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+    </profiles>
+
+
     <!-- no tests by default (running remotely) -->
     <build>
         <pluginManagement>
