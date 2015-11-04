@@ -33,6 +33,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadProgressDialog;
+import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -45,6 +46,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected static final String DATA_PREVIEW_PAGE = "data-preview";
     protected static final String DELETE_DATASET_DIALOG_NAME = "delete-dataset-dialog";
     protected static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit?dataset=%s";
+
+    protected static final String CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE = DATA_UPLOAD_PAGE_URI_TEMPLATE + "/%s";
 
     /**
      * Successful load contains information about number of rows and columns,
@@ -78,6 +81,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     @FindBy(className = "s-dataset-delete-dialog")
     protected DatasetDeleteDialog datasetDeleteDialog;
+
+    @FindBy(className = "s-insufficient-access-rights")
+    protected InsufficientAccessRightsPage insufficientAccessRightsPage;
 
     protected void checkDataPreview(CsvFile csvFile) {
         checkDataPreview(csvFile.getColumnNames(), csvFile.getColumnTypes());

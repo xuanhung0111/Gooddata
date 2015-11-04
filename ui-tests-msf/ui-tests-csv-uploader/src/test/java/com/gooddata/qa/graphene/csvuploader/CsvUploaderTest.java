@@ -6,6 +6,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -179,6 +180,52 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         final List<String> validationErrors = waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
 
         assertTrue(!validationErrors.isEmpty(), "Missing validation error for refresh with incorrect metadata.");
+    }
+
+    @Test
+    public void navigateToProjectsPageWhenInvalidProjectId() throws Exception {
+        openUrl(String.format(DATA_UPLOAD_PAGE_URI_TEMPLATE, "nonExistingProjectIdL123321"));
+
+        waitForStringInUrl("/projects.html#status=notAuthorized");
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void showErrorOnUploadsPageWhenInvalidDatasetId() throws Exception {
+        openUrl(String.format(CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE, testParams.getProjectId(), "nonExistingDataset"));
+
+        final String errorMessage = waitForFragmentVisible(datasetsListPage).waitForErrorMessageBar().getText();
+
+        takeScreenshot(browser, "invalid-dataset-id", getClass());
+
+        assertThat(errorMessage, containsString("The dataset you are looking for no longer exists."));
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void showUploadsPageWhenBadUrlAfterExistingProjectId() throws Exception {
+        openUrl(String.format(CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/this/is/bad/url", testParams.getProjectId()));
+
+        waitForFragmentVisible(datasetsListPage);
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void redirectToErrorPageWhenInsufficientAccessRights() throws Exception {
+        addViewerUserToProject();
+
+        try {
+            logout();
+            signInAtGreyPages(testParams.getViewerUser(), testParams.getViewerPassword());
+
+            openUrl(String.format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
+
+            final String insufficientAccessHeader = waitForFragmentVisible(insufficientAccessRightsPage).getHeader1();
+
+            takeScreenshot(browser, "insufficient-access-rights", getClass());
+
+            assertThat(insufficientAccessHeader, containsString("you do not have access to the Load section."));
+        } finally {
+            logout();
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        }
     }
 
     private void refreshCsv(CsvFile refreshData) {
