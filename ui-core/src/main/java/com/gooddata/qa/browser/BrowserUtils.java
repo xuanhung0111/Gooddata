@@ -27,6 +27,7 @@ public class BrowserUtils {
     }
 
     public static String getCurrentBrowserAgent(WebDriver browser) {
+        System.out.println(((RemoteWebDriver) browser).getCapabilities().getCapability("browserName"));
         return ((RemoteWebDriver) browser).getCapabilities().getBrowserName();
     }
 }

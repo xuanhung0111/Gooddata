@@ -56,7 +56,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }
 
         if (BrowserUtils.isIE(browser)) {
-            System.out.println("User REST api to create project.");
+            System.out.println("Use REST api to create project.");
             testParams.setProjectId(RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
                     projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG,
                     testParams.getProjectEnvironment()));
