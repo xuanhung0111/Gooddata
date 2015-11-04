@@ -19,7 +19,9 @@ package org.arquillian.drone.browserstack.webdriver;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
@@ -30,6 +32,8 @@ public class BrowserStackDriver extends RemoteWebDriver {
     public static final String READABLE_NAME = "browserstack";
 
     private static final Logger log = Logger.getLogger(BrowserStackDriver.class.getName());
+
+    private static final long DECREASE_TEST_SPEED_IN_MILISECONDS = 200;
 
     public BrowserStackDriver(URL url, Capabilities capabilities) {
         super(url, capabilities);
@@ -45,5 +49,17 @@ public class BrowserStackDriver extends RemoteWebDriver {
             log.info(e.getMessage());
             return "";
         }
+    }
+
+    @Override
+    public WebElement findElement(By by) {
+        // decrease test speed when running in browserstack to make sure tests are more stable
+        try {
+            Thread.sleep(DECREASE_TEST_SPEED_IN_MILISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return super.findElement(by);
     }
 }
