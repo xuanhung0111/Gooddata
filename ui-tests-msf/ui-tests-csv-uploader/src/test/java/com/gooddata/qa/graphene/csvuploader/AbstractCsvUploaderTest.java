@@ -53,7 +53,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
      * Successful load contains information about number of rows and columns,
      * so status message of such load should match the following regular expression.
      */
-    protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = ".*rows.*columns.*";
+    protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = ".*rows.*data\\s+fields.*";
 
     protected static final List<String> PAYROLL_COLUMN_TYPES = Lists.newArrayList("Attribute", "Attribute",
             "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Date", "Measure");
