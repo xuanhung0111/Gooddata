@@ -30,6 +30,9 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP})
     public void init() throws JSONException {
+        System.out.println("Current browser agent is: " +
+                BrowserUtils.getCurrentBrowserAgent(browser).toUpperCase());
+
         String executionEnv = System.getProperty("test.execution.env");
         if (executionEnv != null && executionEnv.contains("browserstack-mobile")) {
             System.out.println("Maximizing window is ignored for execution on mobile devices at Browserstack.");
@@ -53,7 +56,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         }
 
         if (BrowserUtils.isIE(browser)) {
-            System.out.println("Browser agent is IE. User REST api to create project.");
+            System.out.println("Use REST api to create project.");
             testParams.setProjectId(RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
                     projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG,
                     testParams.getProjectEnvironment()));
