@@ -348,7 +348,7 @@ public class ProjectDetailPage extends AbstractFragment {
 
     private Optional<WebElement> tryToFindProcess(final String processName) {
         Optional<WebElement> existingProcess = Iterables.tryFind(processes, new Predicate<WebElement>() {
-    
+
             @Override
             public boolean apply(WebElement process) {
                 return activeProcess(process).getProcessTitle().equals(processName);

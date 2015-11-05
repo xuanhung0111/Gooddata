@@ -93,15 +93,13 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails();
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Scheduled State Number");
-        OverviewSchedule overviewSchedule =
-                overviewProcess.newSchedule().setScheduleName("Scheduled schedule");
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Scheduled schedule");
         prepareDataForOverviewScheduledStateTests(getProjects(),
                 overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule)));
 
         initDISCOverviewPage();
         discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
-        assertOverviewStateNumber(OverviewProjectStates.SCHEDULED,
-                discOverviewProjects.getOverviewProjectNumber());
+        assertOverviewStateNumber(OverviewProjectStates.SCHEDULED, discOverviewProjects.getOverviewProjectNumber());
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -110,25 +108,21 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-        createSchedule(new ScheduleBuilder().setProcessName(processName)
-                .setExecutable(Executables.FAILED_GRAPH)
-                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                .setMinuteInHour("59"));
+        createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
+                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59"));
         scheduleDetail.manualRun();
         assertFailedExecution(Executables.FAILED_GRAPH);
         scheduleDetail.clickOnCloseScheduleButton();
 
         createSchedule(new ScheduleBuilder().setProcessName(processName)
-                .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                .setMinuteInHour("59"));
+                .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                .setHourInDay("23").setMinuteInHour("59"));
         scheduleDetail.manualRun();
         assertSuccessfulExecution();
 
         initDISCOverviewPage();
         discOverview.selectOverviewState(OverviewProjectStates.FAILED);
-        assertOverviewStateNumber(OverviewProjectStates.FAILED,
-                discOverviewProjects.getOverviewProjectNumber());
+        assertOverviewStateNumber(OverviewProjectStates.FAILED, discOverviewProjects.getOverviewProjectNumber());
         discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
         assertOverviewStateNumber(OverviewProjectStates.SUCCESSFUL,
                 discOverviewProjects.getOverviewProjectNumber());
@@ -142,12 +136,10 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkOverviewFailedProjects() {
-        OverviewProjectDetails overviewProject =
-                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Overview Failed Project");
-        OverviewSchedule overviewSchedule =
-                overviewProcess.newSchedule().setScheduleName("Failed Schedule");
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Failed Schedule");
         overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
 
         prepareDataForCheckingOverviewState(OverviewProjectStates.FAILED, overviewProject);
@@ -160,12 +152,10 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkOverviewSuccessfulProject() {
-        OverviewProjectDetails overviewProject =
-                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Overview Successful Project");
-        OverviewSchedule overviewSchedule =
-                overviewProcess.newSchedule().setScheduleName("Successful Schedule");
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Successful Schedule");
         overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
 
         prepareDataForCheckingOverviewState(OverviewProjectStates.SUCCESSFUL, overviewProject);
@@ -173,8 +163,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         waitForElementVisible(discOverview.getRoot());
         discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
         waitForElementVisible(discOverviewProjects.getRoot());
-        assertOverviewProject(OverviewProjectStates.SUCCESSFUL,
-                overviewProject);
+        assertOverviewProject(OverviewProjectStates.SUCCESSFUL, overviewProject);
 
         checkOtherOverviewStates(OverviewProjectStates.SUCCESSFUL, getWorkingProject());
     }
@@ -198,8 +187,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
             waitForElementVisible(discOverview.getRoot());
             discOverview.selectOverviewState(OverviewProjectStates.SCHEDULED);
             waitForElementVisible(discOverviewProjects.getRoot());
-            assertOverviewProject(OverviewProjectStates.SCHEDULED,
-                    overviewProject);
+            assertOverviewProject(OverviewProjectStates.SCHEDULED, overviewProject);
             checkOtherOverviewStates(OverviewProjectStates.SCHEDULED, getWorkingProject());
         } finally {
             deleteProjects(additionalProjects);
@@ -208,12 +196,10 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkOverviewRunningProject() {
-        OverviewProjectDetails overviewProject =
-                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Overview Running Project");
-        OverviewSchedule overviewSchedule =
-                overviewProcess.newSchedule().setScheduleName("Running Schedule");
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Running Schedule");
         overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
 
         prepareDataForCheckingOverviewState(OverviewProjectStates.RUNNING, overviewProject);
@@ -225,25 +211,22 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
         checkOtherOverviewStates(OverviewProjectStates.RUNNING, getWorkingProject());
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void accessProjectDetailFromOverviewPage() {
         String processName = "Check Access Project Detail Page";
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
-        createSchedule(new ScheduleBuilder().setProcessName(processName)
-                .setExecutable(Executables.FAILED_GRAPH)
-                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                .setMinuteInHour("59"));
+        createSchedule(new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
+                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59"));
         scheduleDetail.manualRun();
         assertFailedExecution(Executables.FAILED_GRAPH);
         scheduleDetail.clickOnCloseScheduleButton();
 
         createSchedule(new ScheduleBuilder().setProcessName(processName)
-                .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                .setMinuteInHour("59"));
+                .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                .setHourInDay("23").setMinuteInHour("59"));
         scheduleDetail.manualRun();
         assertSuccessfulExecution();
 
@@ -253,12 +236,10 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void restartFailedProjects() {
-        OverviewProjectDetails overviewProject =
-                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Overview Failed Project");
-        OverviewSchedule overviewSchedule =
-                overviewProcess.newSchedule().setScheduleName("Failed Schedule");
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Failed Schedule");
         overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
         bulkActionsProjectInOverviewPage(OverviewProjectStates.FAILED, overviewProject);
 
@@ -288,13 +269,10 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void runSuccessfulProjects() {
-        OverviewProjectDetails overviewProject =
-                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
-                overviewProject.newProcess()
-                        .setProcessName("Check Run Overview Successful Project");
-        OverviewSchedule overviewSchedule =
-                overviewProcess.newSchedule().setScheduleName("Successful Schedule");
+                overviewProject.newProcess().setProcessName("Check Run Overview Successful Project");
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Successful Schedule");
         overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
         bulkActionsProjectInOverviewPage(OverviewProjectStates.SUCCESSFUL, overviewProject);
 
@@ -321,12 +299,10 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void stopRunningProjects() {
-        OverviewProjectDetails overviewProject =
-                new OverviewProjectDetails().setProjectInfo(getWorkingProject());
+        OverviewProjectDetails overviewProject = new OverviewProjectDetails().setProjectInfo(getWorkingProject());
         OverviewProcess overviewProcess =
                 overviewProject.newProcess().setProcessName("Check Stop Overview Running Project");
-        OverviewSchedule overviewSchedule =
-                overviewProcess.newSchedule().setScheduleName("Running Schedule");
+        OverviewSchedule overviewSchedule = overviewProcess.newSchedule().setScheduleName("Running Schedule");
         overviewProject.addProcess(overviewProcess.addSchedule(overviewSchedule));
         bulkActionsProjectInOverviewPage(OverviewProjectStates.RUNNING, overviewProject);
 
@@ -422,7 +398,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     public void checkProjectsNotAdminInRunningState() {
         checkOverviewProjectWithoutAdminRole(OverviewProjectStates.RUNNING);
     }
-    
+
     private void accessWorkingProjectDetail(OverviewProjectStates state) {
         initDISCOverviewPage();
         discOverview.selectOverviewState(state);

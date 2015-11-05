@@ -123,13 +123,13 @@ public class ScheduleForm extends AbstractFragment {
     public void setCustomScheduleName(ScheduleBuilder scheduleBuilder) {
         if (scheduleBuilder.getScheduleName() == null)
             return;
-    
+
         if (scheduleBuilder.getScheduleName().equals(scheduleNameInput.getAttribute("value")))
             return;
-    
+
         waitForElementVisible(scheduleNameInput).clear();
         Graphene.waitGui().until(new Predicate<WebDriver>() {
-    
+
             @Override
             public boolean apply(WebDriver arg0) {
                 return scheduleNameInput.getText().isEmpty();

@@ -52,7 +52,7 @@ public class DISCProjectsPage extends AbstractFragment {
 
     @FindBy(css = ".searching-progress")
     private WebElement searchingProgress;
-    
+
     public Select getProjectFilterSelect() {
         waitForElementVisible(projectFilter);
         return new Select(projectFilter);
@@ -72,15 +72,15 @@ public class DISCProjectsPage extends AbstractFragment {
     public String getPagingBarLabel() {
         return waitForElementVisible(pagingBarLabel).getText();
     }
-    
+
     public WebElement getPrevPageButton() {
         return waitForElementVisible(prevPageButton);
     }
-    
+
     public WebElement getNextPageButton() {
         return waitForElementVisible(nextPageButton);
     }
-    
+
     public List<WebElement> getProjectPageNumber() {
         return projectPageNumber;
     }
@@ -88,7 +88,7 @@ public class DISCProjectsPage extends AbstractFragment {
     public WebElement getSearchBox() {
         return waitForElementVisible(searchBox);
     }
-    
+
     public void deleteSearchKey() {
         waitForElementVisible(deleteSearchKeyButton).click();
     }
@@ -109,11 +109,9 @@ public class DISCProjectsPage extends AbstractFragment {
         Select select = new Select(projectFilter);
         select.selectByVisibleText(option.getOption());
 
-        Graphene.waitGui()
-                .until()
-                .element(
-                        By.xpath(XPATH_SELECTED_OPTION.replace("${selectedOption}",
-                                option.getOption()))).is().selected();
+        Graphene.waitGui().until()
+                .element(By.xpath(XPATH_SELECTED_OPTION.replace("${selectedOption}", option.getOption()))).is()
+                .selected();
 
         System.out.println("Selected filter option:" + option);
     }
@@ -122,8 +120,7 @@ public class DISCProjectsPage extends AbstractFragment {
         try {
             waitForElementVisible(searchingProgress);
         } catch (NoSuchElementException ex) {
-            System.out
-                    .println("Searching progress doesn't display, please check the search result...");
+            System.out.println("Searching progress doesn't display, please check the search result...");
         }
     }
 }

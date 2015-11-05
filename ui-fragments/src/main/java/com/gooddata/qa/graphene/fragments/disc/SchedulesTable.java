@@ -9,8 +9,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class SchedulesTable extends AbstractTable {
 
-    private final static By BY_SCHEDULE_TITLE = By
-            .cssSelector(".ait-process-schedule-list-item-title");
+    private final static By BY_SCHEDULE_TITLE = By.cssSelector(".ait-process-schedule-list-item-title");
     private final static By BY_SCHEDULE_CRON = By.cssSelector(".schedule-cron-cell");
 
     public WebElement getScheduleTitle(String scheduleName) {

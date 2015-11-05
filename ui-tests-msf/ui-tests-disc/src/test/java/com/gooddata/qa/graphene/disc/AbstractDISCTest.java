@@ -394,7 +394,8 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
             if (i == okGroupIndex) {
                 WebElement scheduleExecutionItem = scheduleDetail.getExecutionItem(i);
                 WebElement executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
-                assertTrue(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(), "OK icon is not shown for OK execution group!");
+                assertTrue(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
+                        "OK icon is not shown for OK execution group!");
                 System.out.println("Execution description at " + i + " index: " + executionDescription.getText());
                 assertThat(executionDescription.getText(), containsString(groupDescription));
                 assertFalse(scheduleDetail.isExecutionLogPresent(scheduleExecutionItem),
@@ -410,7 +411,8 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
                 WebElement executionDate = scheduleDetail.getExecutionDate(scheduleExecutionItem);
                 WebElement executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
 
-                assertFalse(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(), "OK icon is shown for executions in group!");
+                assertFalse(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
+                        "OK icon is shown for executions in group!");
                 System.out.println("Execution description at " + i + " index: " + executionDescription.getText());
                 assertTrue(executionDescription.isDisplayed(), "Execution description is not shown!");
                 System.out.println("Execution description at " + i + " index: " + executionRunTime.getText());

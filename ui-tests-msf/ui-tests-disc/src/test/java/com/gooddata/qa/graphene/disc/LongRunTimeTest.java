@@ -20,7 +20,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             "This schedule has been automatically disabled following its %dth consecutive failure. If you addressed the issue, you can enable it.";
     private static final String AUTO_DISABLED_SCHEDULE_MORE_INFO =
             "For more information read Automatic Disabling of Failed Schedules article at our support portal.";
-    
+
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectTitle = "Disc-test-long-time-running-schedule";
@@ -33,13 +33,12 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
 
             String processName = "Check Auto Run Schedule";
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
-                            .setMinuteInHour("${minute}");
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()), "Schedule is not run automatically well!");
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
             assertSuccessfulExecution();
         } finally {
             cleanProcessesInWorkingProject();
@@ -53,13 +52,12 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
 
             String processName = "Check Error Execution of Schedule";
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
-                            .setMinuteInHour("${minute}");
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()), "Schedule is not run automatically well!");
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
             assertFailedExecution(scheduleBuilder.getExecutable());
         } finally {
             cleanProcessesInWorkingProject();
@@ -73,19 +71,19 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
 
             String processName = "Check Retry Schedule";
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
-                            .setMinuteInHour("${minute}");
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.FAILED_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
             scheduleBuilder.setRetryDelayInMinute(15);
             scheduleDetail.addValidRetry(String.valueOf(scheduleBuilder.getRetryDelay()),
                     Confirmation.SAVE_CHANGES);
             assertEquals(scheduleDetail.getRescheduleTime(), String.valueOf(scheduleBuilder.getRetryDelay()));
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()), "Schedule is not run automatically well!");
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
             assertFailedExecution(scheduleBuilder.getExecutable());
-            assertTrue(scheduleDetail.waitForRetrySchedule(scheduleBuilder), "Schedule is not re-run automatically well!");
+            assertTrue(scheduleDetail.waitForRetrySchedule(scheduleBuilder),
+                    "Schedule is not re-run automatically well!");
             assertFailedExecution(scheduleBuilder.getExecutable());
         } finally {
             cleanProcessesInWorkingProject();
@@ -101,11 +99,11 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.LONG_TIME_RUNNING_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
-                            .setMinuteInHour("${minute}");
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()), "Schedule is not run automatically well!");
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
             /*
              * Wait for schedule execution is in running state for a few seconds to make sure that
              * the runtime field will be shown well
@@ -144,8 +142,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
 
             String processName = "Disable Schedule";
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
@@ -154,7 +151,8 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             scheduleDetail.manualRun();
             assertSuccessfulExecution();
             scheduleDetail.enableSchedule();
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()), "Schedule is not run automatically well!");
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
             assertSuccessfulExecution();
         } finally {
             cleanProcessesInWorkingProject();
@@ -173,9 +171,9 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
-//            scheduleDetail.checkRepeatedFailureSchedule(scheduleBuilder.getCronTimeBuilder(),
-//                    scheduleBuilder.getExecutable());
-            
+            // scheduleDetail.checkRepeatedFailureSchedule(scheduleBuilder.getCronTimeBuilder(),
+            // scheduleBuilder.getExecutable());
+
             repeatManualRunFailedSchedule(5, scheduleBuilder.getExecutable());
             System.out.println("Schedule failed for the 5th time...");
             assertEquals(
@@ -205,8 +203,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
 
             manualRunTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
             assertFailedExecution(triggerScheduleBuilder.getExecutable());
-            int dependentScheduleExecutionNumber =
-                    waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            int dependentScheduleExecutionNumber = waitForAutoRunDependentSchedule(dependentScheduleBuilder);
             assertEquals(dependentScheduleExecutionNumber, 0);
         } finally {
             cleanProcessesInWorkingProject();
@@ -219,18 +216,16 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             String processName1 = "Check Schedule With Trigger Schedule 1";
 
             ScheduleBuilder triggerScheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Trigger schedule").setExecutable(
-                            Executables.SUCCESSFUL_GRAPH);
+                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Trigger schedule")
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH);
             ScheduleBuilder dependentScheduleBuilder1 =
-                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Dependent schedule 1").setExecutable(
-                            Executables.SUCCESSFUL_GRAPH);
+                    new ScheduleBuilder().setProcessName(processName1).setScheduleName("Dependent schedule 1")
+                            .setExecutable(Executables.SUCCESSFUL_GRAPH);
             prepareDataForTriggerScheduleTest(triggerScheduleBuilder, dependentScheduleBuilder1);
 
             String processName2 = "Check Schedule With Trigger Schedule 2";
             ScheduleBuilder dependentScheduleBuilder2 =
-                    new ScheduleBuilder()
-                            .setProcessName(processName2)
-                            .setExecutable(Executables.FAILED_GRAPH)
+                    new ScheduleBuilder().setProcessName(processName2).setExecutable(Executables.FAILED_GRAPH)
                             .setCronTime(ScheduleCronTimes.AFTER)
                             .setTriggerScheduleGroup(dependentScheduleBuilder1.getProcessName())
                             .setTriggerScheduleOption(dependentScheduleBuilder1.getScheduleName());
@@ -263,8 +258,7 @@ public class LongRunTimeTest extends AbstractSchedulesTest {
             scheduleDetail.disableSchedule();
 
             runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
-            int dependentScheduleExecutionNumber =
-                    waitForAutoRunDependentSchedule(dependentScheduleBuilder);
+            int dependentScheduleExecutionNumber = waitForAutoRunDependentSchedule(dependentScheduleBuilder);
             assertEquals(dependentScheduleExecutionNumber, 1);
         } finally {
             cleanProcessesInWorkingProject();

@@ -51,11 +51,11 @@ public class ProjectsList extends AbstractTable {
     public String getProcessesLabel(ProjectInfo project) {
         return selectProjectWithAdminRole(project).findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText();
     }
-    
+
     public void clickOnProjectWithNonAdminRole(WebElement selectedProject) {
         selectedProject.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).click();
     }
-    
+
     public String getLastSuccessfulExecutionInfo(ProjectInfo project) {
         return waitForElementPresent(BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION,
                 selectProjectWithAdminRole(project)).getText();
@@ -67,15 +67,14 @@ public class ProjectsList extends AbstractTable {
             @Override
             public boolean apply(WebElement row) {
                 return row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-                        && row.findElement(BY_DISC_PROJECT_NAME).getText()
-                                .equals(project.getProjectName())
+                        && row.findElement(BY_DISC_PROJECT_NAME).getText().equals(project.getProjectName())
                         && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href")
                                 .contains(project.getProjectId());
             }
         };
         return selectProject(predicate);
     }
-    
+
     public boolean isCorrectSearchResultByName(String searchKey) {
         for (WebElement project : getRows()) {
             if (project.findElement(BY_PROJECT_CHECKBOX).isEnabled()) {
@@ -143,12 +142,11 @@ public class ProjectsList extends AbstractTable {
 
     public WebElement selectProjectWithNonAdminRole(final String projectName) {
         Predicate<WebElement> predicate = new Predicate<WebElement>() {
-    
+
             @Override
             public boolean apply(WebElement row) {
                 return !row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-                        && row.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText()
-                                .equals(projectName);
+                        && row.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText().equals(projectName);
             }
         };
         return selectProject(predicate);

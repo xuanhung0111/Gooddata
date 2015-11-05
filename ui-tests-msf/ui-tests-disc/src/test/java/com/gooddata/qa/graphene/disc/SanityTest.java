@@ -30,8 +30,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"deploy"})
     public void deployCloudConnectInProjectsPage() {
         try {
-            deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT,
-                    "CloudConnect - Projects List Page");
+            deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page");
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -41,8 +40,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     public void deployCloudConnectInProjectDetailPage() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
-            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT,
-                    "CloudConnect - Project Detail Page");
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Project Detail Page");
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -68,8 +66,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
             String processName = "Create Schedule with Custom Input";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.DWHS2)
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.DWHS2)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
             createAndAssertSchedule(scheduleBuilder);
         } finally {
@@ -84,8 +81,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
 
             String processName = "Check Manual Execution";
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
                             .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
@@ -105,13 +101,12 @@ public class SanityTest extends AbstractOverviewProjectsTest {
 
             String processName = "Check Auto Run Schedule";
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR)
-                            .setMinuteInHour("${minute}");
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}");
             prepareScheduleWithBasicPackage(scheduleBuilder);
 
-            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()), "Schedule is not run automatically well!");
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
             assertSuccessfulExecution();
         } finally {
             cleanProcessesInWorkingProject();
@@ -129,16 +124,14 @@ public class SanityTest extends AbstractOverviewProjectsTest {
             String message = "Notification message.";
 
             NotificationBuilder notificationInfo =
-                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser)
-                            .setSubject(subject).setMessage(message)
-                            .setEvent(NotificationEvents.SUCCESS);
+                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser).setSubject(subject)
+                            .setMessage(message).setEvent(NotificationEvents.SUCCESS);
             createAndAssertNotification(notificationInfo);
 
             openProjectDetailByUrl(getWorkingProject().getProjectId());
             browser.navigate().refresh();
             ScheduleBuilder scheduleBuilder =
-                    new ScheduleBuilder().setProcessName(processName)
-                            .setExecutable(Executables.SUCCESSFUL_GRAPH)
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.SUCCESSFUL_GRAPH)
                             .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR);
             createSchedule(scheduleBuilder);
             scheduleDetail.manualRun();
