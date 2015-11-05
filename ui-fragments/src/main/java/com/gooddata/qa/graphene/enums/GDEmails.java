@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.enums;
 
 public enum GDEmails {
     NO_REPLY("no-reply@gooddata.com", 3),
+    NOREPLY("noreply@gooddata.com", 5),
     INVITATION("invitation@gooddata.com", 10),
     REGISTRATION("registration@gooddata.com", 10);
 
@@ -16,7 +17,7 @@ public enum GDEmails {
     public String getEmailAddress() {
         return this.emailAddress;
     }
-    
+
     public int getMaxWaitingTimeInMinute() {
         return this.maxWaitingTimeInMinute;
     }

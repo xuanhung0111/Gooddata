@@ -74,6 +74,7 @@ public class RestUtils {
     private static final String CREATE_PROJECT_CONTENT_BODY;
     private static final String USER_PROFILE_LINK = "/gdc/account/profile/";
     private static final String UPDATE_USER_INFO_CONTENT_BODY;
+    private static final String QUERY_FACTS_URI = "/gdc/md/${projectId}/query/facts";
 
     static {
         try {
@@ -271,7 +272,7 @@ public class RestUtils {
             postRequest.releaseConnection();
         }
     }
-    
+
 
     public static String addUserGroup(RestApiClient restApiClient, String projectId,final String name)
             throws JSONException, IOException {
@@ -374,6 +375,34 @@ public class RestUtils {
         } finally {
             request.releaseConnection();
         }
+    }
+
+    public static JSONObject getFacts(final RestApiClient restApiClient, final String projectId)
+            throws JSONException, IOException {
+        String uri = QUERY_FACTS_URI.replace("${projectId}", projectId);
+        HttpRequestBase request = restApiClient.newGetMethod(uri);
+        HttpResponse response;
+        try {
+            response = restApiClient.execute(request, HttpStatus.OK, "Invalid status code");
+            return new JSONObject(EntityUtils.toString(response.getEntity()));
+        } finally {
+            request.releaseConnection();
+        }
+    }
+
+    public static String getFactUriByName(final RestApiClient restApiClient, final String projectId, final String name)
+            throws JSONException, IOException {
+        JSONObject facts = getFacts(restApiClient, projectId);
+        JSONArray factEntries = facts.getJSONObject("query").getJSONArray("entries");
+
+        for (int i = 0, n = factEntries.length(); i < n; i++) {
+            JSONObject fact = factEntries.getJSONObject(i);
+            if (fact.getString("title").equals(name)) {
+                return fact.getString("link");
+            }
+        }
+
+        return null;
     }
 
     public static JSONObject getJSONObjectFrom(final RestApiClient restApiClient, final String uri)
@@ -878,7 +907,7 @@ public class RestUtils {
         EntityUtils.consumeQuietly(response.getEntity());
     }
 
-    public static String getLoginFromProfileUri(RestApiClient restApiClient, String profileUri) 
+    public static String getLoginFromProfileUri(RestApiClient restApiClient, String profileUri)
             throws ParseException, JSONException, IOException {
         HttpRequestBase request = restApiClient.newGetMethod("/gdc/account/profile/" + profileUri);
         String login = "";
@@ -967,7 +996,7 @@ public class RestUtils {
         }
     }
 
-    public static JSONObject getCurrentUserProfile(RestApiClient restApiClient) 
+    public static JSONObject getCurrentUserProfile(RestApiClient restApiClient)
             throws ParseException, JSONException, IOException {
         HttpRequestBase request = restApiClient.newGetMethod(USER_PROFILE_LINK + "current");
         try {

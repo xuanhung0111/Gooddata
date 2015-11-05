@@ -1,0 +1,11 @@
+CREATE ATTRIBUTE {attr.attribute} AS KEYS {tab.attribute} PRIMARY WITH LABELS {lab.attribute} VISUAL (TITLE "Lab") AS {tab.attribute_lab};
+
+CREATE FACT {fact.fact} VISUAL(TITLE "Fact" ) AS {tab.fact};
+
+CREATE DATASET {dataset.ds_minimalistic};
+ALTER DATASET {dataset.ds_minimalistic} ADD {attr.attribute}, {fact.fact};
+
+INCLUDE TEMPLATE "URN:GOODDATA:DATE" MODIFY (IDENTIFIER "dt_minimalistic", TITLE "templ:Minimalistic");
+ALTER ATTRIBUTE {dt_minimalistic.date} ADD KEYS {tab.min_date_id};
+
+SYNCHRONIZE {dataset.ds_minimalistic};

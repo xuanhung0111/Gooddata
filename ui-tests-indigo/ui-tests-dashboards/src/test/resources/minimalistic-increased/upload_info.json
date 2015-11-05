@@ -1,0 +1,32 @@
+{
+    "dataSetSLIManifest": {
+        "parts": [
+            {
+                "columnName" : "tab.fact",
+                "populates" : [
+                "fact.fact"
+                ],
+                "mode" : "FULL"
+            },
+            {
+                "columnName" : "tab.date",
+                "constraints" : { "date" : "yyyy-MM-dd" },
+                "populates" : [
+                "dt_minimalistic.date.mmddyyyy"
+                ],
+                "mode" : "FULL",
+                "referenceKey" : 1
+            },
+            {
+                "columnName" : "tab.attribute",
+                "populates" : [
+                "lab.attribute"
+                ],
+                "mode" : "FULL",
+                "referenceKey" : 1
+            }
+        ],
+        "file": "minimalistic-increased.csv",
+        "dataSet": "dataset.ds_minimalistic"
+    }
+}
