@@ -27,7 +27,14 @@ public class DatasetDetailPage extends AbstractFragment {
     
     @FindBy(css = ".file-detail")
     private WebElement createdDateTime;
-    
+
+    @FindBy(css = ".icon-analyze.button-link")
+    private WebElement analyzeButton;
+
+    public String getDatasetAnalyzeLink() {
+        return waitForElementVisible(analyzeButton).getAttribute("href");
+    }
+
     public void downloadTheLatestCsvFileUpload() {
         waitForElementVisible(latestCsvFileUpload).click();
     }
