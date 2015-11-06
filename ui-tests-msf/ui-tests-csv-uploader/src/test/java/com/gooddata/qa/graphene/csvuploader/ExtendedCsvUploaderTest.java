@@ -416,26 +416,6 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"myData"})
-    public void checkDatasetAnalyzeLink() {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String datasetName = getNewDataset(fileToUpload);
-
-        waitForDatasetName(datasetName);
-        waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        String adReportLink =
-                String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
-                        getDatasetId(datasetName));
-        assertThat(datasetsListPage.getDatasetAnalyzeLink(datasetName), is(adReportLink));
-        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
-
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
-        assertThat(waitForFragmentVisible(csvDatasetDetailPage).getDatasetAnalyzeLink(), is(adReportLink));
-        takeScreenshot(browser, toScreenshotName(DATASET_DETAIL_PAGE_NAME, datasetName), getClass());
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"myData"})
     public void checkBasicUploadProgress() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
 
