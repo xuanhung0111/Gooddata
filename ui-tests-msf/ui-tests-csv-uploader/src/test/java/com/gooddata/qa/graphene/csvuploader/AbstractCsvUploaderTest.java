@@ -296,6 +296,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         PAYROLL_REFRESH_BAD("payroll.refresh.bad"),
         PAYROLL_BY_PROJECT_OWNER("payroll.by.project.owner"),
         PAYROLL_BY_OTHER_ADMIN("payroll.by.other.admin"),
+        MULTIPLE_COLUMN_NAME_ROWS("multiple.column.name.rows", Lists.newArrayList("Id4", "Name4", "Lastname4",
+                "Age4", "Amount4"), Lists.newArrayList(Lists.newArrayList("Measure", "Attribute", "Attribute",
+                "Measure", "Measure")), 5),
         /** This csv file has incorrect column count (one more than expected) on the line number 2. */
         BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList(), 0),
         NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT),
@@ -326,7 +329,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         public String getFileName() {
             return this.name + ".csv";
         }
-    
+
         public String getDatasetNameOfFirstUpload() {
             String datasetName = this.name.replace(".", " ");
             return WordUtils.capitalize(datasetName);
