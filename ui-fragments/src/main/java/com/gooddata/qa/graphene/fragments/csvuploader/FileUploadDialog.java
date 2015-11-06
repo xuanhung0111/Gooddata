@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementEnabled;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
@@ -39,7 +40,7 @@ public class FileUploadDialog extends AbstractFragment {
     }
 
     public void clickUploadButton() {
-        waitForElementVisible(uploadButton).click();
+        waitForElementEnabled(uploadButton).click();
     }
 
     public void clickCancelButton() {
