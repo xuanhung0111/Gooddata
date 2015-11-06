@@ -6,6 +6,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
 
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -152,7 +153,7 @@ public class SplashScreenTest extends DashboardsTest {
             initDashboardsPage();
 
             logout();
-            signIn(true, UserRoles.VIEWER);
+            signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
             initIndigoDashboardsPage()
                 .getSplashScreen()
@@ -160,7 +161,7 @@ public class SplashScreenTest extends DashboardsTest {
 
         } finally {
             logout();
-            signIn(true, UserRoles.ADMIN);
+            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 
@@ -170,7 +171,7 @@ public class SplashScreenTest extends DashboardsTest {
             initDashboardsPage();
 
             logout();
-            signIn(true, UserRoles.EDITOR);
+            signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             initIndigoDashboardsPage()
                 .getSplashScreen()
@@ -178,7 +179,7 @@ public class SplashScreenTest extends DashboardsTest {
 
         } finally {
             logout();
-            signIn(true, UserRoles.ADMIN);
+            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 }

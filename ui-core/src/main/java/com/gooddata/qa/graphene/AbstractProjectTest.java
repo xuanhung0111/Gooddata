@@ -1,20 +1,22 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
+import static com.gooddata.qa.browser.BrowserUtils.maximize;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+
+import java.io.IOException;
 
 import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
-import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public abstract class AbstractProjectTest extends AbstractUITest {
 
@@ -30,18 +32,19 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP})
     public void init() throws JSONException {
-        System.out.println("Current browser agent is: " +
-                BrowserUtils.getCurrentBrowserAgent(browser).toUpperCase());
+        System.out.println("Current browser agent is: " + getCurrentBrowserAgent(browser).toUpperCase());
 
         String executionEnv = System.getProperty("test.execution.env");
         if (executionEnv != null && executionEnv.contains("browserstack-mobile")) {
             System.out.println("Maximizing window is ignored for execution on mobile devices at Browserstack.");
         } else {
-            browser.manage().window().maximize();
+            // Use this utility to maximize browser in chrome - MAC
+            // browser.manage().window().maximize(); do not work
+            maximize(browser);
         }
 
         // sign in with admin user
-        signIn(true, UserRoles.ADMIN);
+        signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
     }
 
     @Test(dependsOnGroups = {PROJECT_INIT_GROUP}, groups = {"createProject"})
@@ -55,7 +58,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             }
         }
 
-        if (BrowserUtils.isIE(browser)) {
+        if (!canAccessGreyPage(browser)) {
             System.out.println("Use REST api to create project.");
             testParams.setProjectId(RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
                     projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG,
@@ -97,15 +100,16 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     public void validateProjectTearDown() throws JSONException {
         //it is necessary to login admin to validate project on afterClass
         logout();
-        signIn(true, UserRoles.ADMIN);
+        signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
 
         if (validateAfterClass) {
             System.out.println("Going to validate project after tests...");
             // TODO remove when ATP-1520, ATP-1519, ATP-1822 are fixed
             String testName = this.getClass().getSimpleName();
-            if (BrowserUtils.isIE(browser) || testName.contains("Coupa") || testName.contains("Pardot")
+            if (!canAccessGreyPage(browser) || testName.contains("Coupa") || testName.contains("Pardot")
                     ||testName.contains("Zendesk4")) {
-                System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects or running in IE");
+                System.out.println("Validations are skipped for Coupa, Pardot and Zendesk4 projects"
+                        + " or running in IE, Android and Safari");
                 return;
             }
             assertEquals(validateProject(), "OK");
