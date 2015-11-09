@@ -215,6 +215,15 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
+    public void addVariableStatusToDashboard(String variable) {
+        int widgetCountBefore = listDashboardWidgets.size();
+        waitForElementVisible(addText).click();
+        waitForElementVisible(dashboardTextObject.getRoot());
+        dashboardTextObject.addVariableStatus(variable);
+        Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
+                "Widget wasn't added");
+    }
+
     public void addLineToDashboard() {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addLine).click();
@@ -296,5 +305,9 @@ public class DashboardEditBar extends AbstractFragment {
 
     public void setParentsFilterUsingDataset(String filter, String linkedDataset, String... parentFilterNames) {
         dashboardEditFilter.addParentFiltersUsingDataset(filter, linkedDataset, parentFilterNames);
+    }
+
+    public int getDashboardWidgetsCount() {
+        return listDashboardWidgets.size();
     }
 }

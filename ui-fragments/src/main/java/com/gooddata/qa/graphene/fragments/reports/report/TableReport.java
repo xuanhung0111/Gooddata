@@ -6,6 +6,7 @@ import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -59,6 +61,23 @@ public class TableReport extends AbstractReport {
 
     private static final String REPORT_NOT_COMPUTABLE = "Report not computable due to improper metric definition.";
 
+    private static final By BY_SORT_LOCATOR = className("sort");
+
+    public TableReport sortColumn(final String column, Sort howToSort) {
+        WebElement header = metricElementInGrid.stream()
+            .filter(e -> column.equals(e.getText()))
+            .map(e -> e.findElement(BY_PARENT))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find column named: " + column));
+
+        new Actions(browser).moveToElement(header).perform();
+        waitForElementVisible(header.findElement(BY_SORT_LOCATOR)
+                .findElement(className(howToSort.toString())))
+                .click();
+        waitForReportLoading();
+        return this;
+    }
+
     public List<String> getAttributesHeader() {
         waitForReportLoading();
         return Lists.newArrayList(Collections2.transform(attributesHeader,
@@ -79,6 +98,36 @@ public class TableReport extends AbstractReport {
                 return input.getText().trim();
             }
         }));
+    }
+
+    public TableReport changeAliasToAttribute(final String attribute, String alias) {
+        WebElement header = attributesHeader.stream()
+            .filter(e -> attribute.equals(e.getText().trim()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + attribute))
+            .findElement(BY_PARENT);
+        new Actions(browser).moveToElement(header).doubleClick().doubleClick().perform();
+        WebElement input = waitForElementVisible(className("ipeEditor"), browser);
+        input.clear();
+        input.sendKeys(alias);
+        input.sendKeys(Keys.ENTER);
+        assertEquals(header.getText().trim(), alias);
+        return this;
+    }
+
+    public TableReport changeAliasToMetric(final String metric, String alias) {
+        WebElement header = metricsHeader.stream()
+                .filter(e -> metric.equals(e.getText().trim()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find metric: " + metric))
+                .findElement(BY_PARENT);
+        new Actions(browser).doubleClick(header).perform();
+        WebElement input = waitForElementVisible(className("ipeEditor"), browser);
+        input.clear();
+        input.sendKeys(alias);
+        input.sendKeys(Keys.ENTER);
+        assertEquals(header.getText().trim(), alias);
+        return this;
     }
 
     public List<String> getAttributeElements() {
@@ -289,8 +338,34 @@ public class TableReport extends AbstractReport {
         waitForElementVisible(cssSelector("#ctxMenu .s-" + simplifyText(label) +" > a"), browser).click();
     }
 
+    public boolean isReportTitleVisible() {
+        final By reportLabelLocator = cssSelector(".yui3-c-reportdashboardwidget-reportTitle > a");
+
+        if (!isElementPresent(reportLabelLocator, getRoot())) {
+            return false;
+        }
+
+        return !getRoot().findElement(reportLabelLocator).getCssValue("display").startsWith("none");
+    }
+
     private Pair<Integer, Integer> getPossitionFromRegion(String region) {
         String[] parts = region.split(",");
         return Pair.of(Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()));
+    }
+
+    public static enum Sort {
+        ASC("ascendingArrow"),
+        DESC("descendingArrow");
+
+        private String cssClass;
+
+        private Sort(String css) {
+            cssClass = css;
+        }
+
+        @Override
+        public String toString() {
+            return cssClass;
+        }
     }
 }
