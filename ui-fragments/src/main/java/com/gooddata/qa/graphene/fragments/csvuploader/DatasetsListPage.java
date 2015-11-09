@@ -36,6 +36,10 @@ public class DatasetsListPage extends AbstractFragment {
     public void clickAddDataButton() {
         waitForAddDataButtonVisible().click();
     }
+    
+    public String getDatasetAnalyzeLink(String datasetName) {
+        return getMyDatasetsTable().getDatasetAnalyzeButton(datasetName).getAttribute("href");
+    }
 
     public WebElement waitForHeaderVisible() {
         return waitForElementVisible(datasetsHeader);

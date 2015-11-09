@@ -21,6 +21,7 @@ public class DatasetsTable extends AbstractTable {
     private static final By BY_DATASET_DELETE_BUTTON = By.className("s-dataset-delete-button");
     private static final By BY_DATASET_DETAIL_BUTTON = By.className("s-dataset-detail-button");
     private static final By BY_DATASET_REFRESH_BUTTON = By.className("s-dataset-update-button");
+    private static final By BY_DATASET_ANALYZE_BUTTON = By.cssSelector(".icon-analyze.button-link");
 
     public List<String> getDatasetNames() {
         // To get the correct number in both cases: empty and non-empty list
@@ -57,6 +58,10 @@ public class DatasetsTable extends AbstractTable {
 
     public WebElement getDatasetRefreshButton(String datasetName) {
         return getDatasetRowCell(datasetName, BY_DATASET_REFRESH_BUTTON);
+    }
+    
+    public WebElement getDatasetAnalyzeButton(String datasetName) {
+        return getDatasetRowCell(datasetName, BY_DATASET_ANALYZE_BUTTON);
     }
 
     public int getNumberOfDatasets() {
