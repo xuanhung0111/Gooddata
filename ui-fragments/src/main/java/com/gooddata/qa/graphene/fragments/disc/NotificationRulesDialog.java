@@ -34,13 +34,8 @@ public class NotificationRulesDialog extends AbstractFragment {
     public void clickOnAddNotificationButton() {
         final int notificationNumberBeforeAdding = getNotificationNumber();
         waitForElementVisible(addNotificationRuleButton).click();
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return notificationNumberBeforeAdding < getNotificationNumber();
-            }
-        });
+        Predicate<WebDriver> addNotificationDialogDisplayed = webDriver -> notificationNumberBeforeAdding < getNotificationNumber();
+        Graphene.waitGui().until(addNotificationDialogDisplayed);
     }
 
     public int getNotificationNumber() {
@@ -53,7 +48,6 @@ public class NotificationRulesDialog extends AbstractFragment {
     }
 
     public NotificationRule getNotificationRule(int index) {
-        waitForCollectionIsNotEmpty(notificationRules);
-        return notificationRules.get(index);
+        return waitForCollectionIsNotEmpty(notificationRules).get(index);
     }
 }

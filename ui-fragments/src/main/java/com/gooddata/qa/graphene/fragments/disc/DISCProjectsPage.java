@@ -21,10 +21,10 @@ public class DISCProjectsPage extends AbstractFragment {
     private By BY_ALL_PROJECTS_LINK = By.cssSelector(".all-projects-link");
 
     @FindBy(css = ".filter-combo .ember-select")
-    private WebElement projectFilter;
+    private Select projectFilter;
 
     @FindBy(css = ".paging-bar select")
-    private WebElement projectsPerPageOptions;
+    private Select projectsPerPageOptions;
 
     @FindBy(css = ".project-list")
     private ProjectsList discProjectsList;
@@ -55,18 +55,17 @@ public class DISCProjectsPage extends AbstractFragment {
 
     public Select getProjectFilterSelect() {
         waitForElementVisible(projectFilter);
-        return new Select(projectFilter);
+        return projectFilter;
     }
 
     public WebElement getSelectedFilterOption() {
         waitForElementVisible(projectFilter);
-        Select select = new Select(projectFilter);
-        return select.getFirstSelectedOption();
+        return projectFilter.getFirstSelectedOption();
     }
 
     public Select getProjectsPerPageSelect() {
         waitForElementVisible(projectsPerPageOptions);
-        return new Select(projectsPerPageOptions);
+        return projectsPerPageOptions;
     }
 
     public String getPagingBarLabel() {
@@ -106,8 +105,7 @@ public class DISCProjectsPage extends AbstractFragment {
 
     public void selectFilterOption(ProjectStateFilters option) {
         waitForElementVisible(projectFilter);
-        Select select = new Select(projectFilter);
-        select.selectByVisibleText(option.getOption());
+        projectFilter.selectByVisibleText(option.getOption());
 
         Graphene.waitGui().until()
                 .element(By.xpath(XPATH_SELECTED_OPTION.replace("${selectedOption}", option.getOption()))).is()

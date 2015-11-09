@@ -22,7 +22,6 @@ import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.google.common.base.Predicate;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Iterables;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
@@ -196,7 +195,7 @@ public class ScheduleDetail extends ScheduleForm {
     private WebElement brokenScheduleMessage;
 
     @FindBy(css = ".broken-schedule-info .schedule-title-select")
-    private WebElement brokenScheduleExecutable;
+    private Select brokenScheduleExecutable;
 
     @FindBy(css = ".ait-schedule-executable-edit-buttons .button-positive")
     private WebElement brokenScheduleSaveChangeButton;
@@ -211,7 +210,7 @@ public class ScheduleDetail extends ScheduleForm {
     private WebElement autoDisableScheduleMoreInfo;
 
     @FindBy(css = ".ait-schedule-executable-select-btn")
-    private WebElement selectExecutable;
+    private Select selectExecutable;
 
     @FindBy(css = ".ait-execution-history-empty")
     private WebElement executionHistoryEmptyState;
@@ -246,8 +245,7 @@ public class ScheduleDetail extends ScheduleForm {
 
     public String getSelectedExecutablePath() {
         waitForElementVisible(selectExecutable);
-        final Select select = new Select(selectExecutable);
-        return select.getFirstSelectedOption().getText();
+        return selectExecutable.getFirstSelectedOption().getText();
     }
 
     public WebElement getExecutionHistoryEmptyState() {
@@ -261,17 +259,14 @@ public class ScheduleDetail extends ScheduleForm {
     public void tryToWaitForAutoRun(CronTimeBuilder cronTimebuilder) {
         final int executionNumber = scheduleExecutionItems.size();
         try {
+            Predicate<WebDriver> autoExecutionFinished = webDriver -> {
+                System.out.println("Waiting for auto execution...");
+                return scheduleExecutionItems.size() > executionNumber;
+            };
             Graphene.waitGui()
                     .withTimeout(cronTimebuilder.getWaitingAutoRunInMinutes() + MAX_DELAY_TIME_WAITING_AUTO_RUN,
                             TimeUnit.MINUTES).pollingEvery(5, TimeUnit.SECONDS)
-                    .withMessage("Schedule doesn't run automatically!").until(new Predicate<WebDriver>() {
-
-                        @Override
-                        public boolean apply(WebDriver arg0) {
-                            System.out.println("Waiting for auto execution...");
-                            return scheduleExecutionItems.size() > executionNumber;
-                        }
-                    });
+                    .withMessage("Schedule doesn't run automatically!").until(autoExecutionFinished);
         } catch (TimeoutException ex) {
             System.out.println("Schedule doesn't run automatically");
         }
@@ -286,16 +281,13 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void waitForExecutionFinish() {
+        Predicate<WebDriver> runningScheduleFinished = webDriver -> {
+            System.out.println("Waiting for running schedule...");
+            return getRoot().findElement(BY_RUN_STOP_BUTTON).getText().equals("Run");  
+        };
+        
         Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES).pollingEvery(5, TimeUnit.SECONDS)
-                .withMessage("Schedule execution is not finished!").until(new Predicate<WebDriver>() {
-
-                    @Override
-                    public boolean apply(WebDriver arg0) {
-                        System.out.println("Waiting for running schedule...");
-                        return getRoot().findElement(BY_RUN_STOP_BUTTON).getText().equals("Run");
-                    }
-
-                });
+                .withMessage("Schedule execution is not finished!").until(runningScheduleFinished);
         getLastExecution();
     }
 
@@ -395,15 +387,10 @@ public class ScheduleDetail extends ScheduleForm {
 
     public void changeExecutable(Executables newExecutable, Confirmation saveChange) {
         waitForElementVisible(selectExecutable);
-        final Select select = new Select(selectExecutable);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return !select.getFirstSelectedOption().equals(select.getOptions().get(0));
-            }
-        });
-        select.selectByVisibleText(newExecutable.getExecutablePath());
+        Predicate<WebDriver> selectExecutableChanged = 
+                browser -> !selectExecutable.getFirstSelectedOption().equals(selectExecutable.getOptions().get(0));
+        Graphene.waitGui().until(selectExecutableChanged);
+        selectExecutable.selectByVisibleText(newExecutable.getExecutablePath());
         if (saveChange == Confirmation.SAVE_CHANGES) {
             waitForElementVisible(saveChangedExecutable).click();
             waitForElementNotPresent(saveChangedExecutable);
@@ -436,15 +423,11 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void editParameter(final Parameter existingParam, Parameter editedParam) {
-        WebElement parameter = Iterables.find(parameters, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement param) {
-                return param.findElement(BY_PARAMETER_NAME).getAttribute("value")
-                        .equals(existingParam.getParamName());
-            }
-        });
-
+        WebElement parameter = parameters.stream()
+                .filter(param -> param.findElement(BY_PARAMETER_NAME).getAttribute("value")
+                        .equals(existingParam.getParamName()))
+                .findFirst()
+                .get();
         WebElement paramName = parameter.findElement(BY_PARAMETER_NAME);
         paramName.clear();
         paramName.sendKeys(editedParam.getParamName());
@@ -454,16 +437,15 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void removeParameter(List<Parameter> paramsToRemove, Confirmation saveChange) {
-        for (final Parameter paramToRemove : paramsToRemove) {
-            Iterables.find(parameters, new Predicate<WebElement>() {
-
-                @Override
-                public boolean apply(WebElement param) {
-                    return param.findElement(BY_PARAMETER_NAME).getAttribute("value")
-                            .equals(paramToRemove.getParamName());
-                }
-            }).findElement(BY_PARAMETER_REMOVE_ACTION).click();
-        }
+        paramsToRemove.stream().forEach(paramToRemove -> {
+                parameters.stream()
+                .filter(param -> param.findElement(BY_PARAMETER_NAME).getAttribute("value").
+                        equals(paramToRemove.getParamName()))
+                .map(e -> e.findElement(BY_PARAMETER_REMOVE_ACTION))
+                .findFirst()
+                .get()
+                .click();
+            });
         confirmParamsChange(saveChange);
     }
 
@@ -476,8 +458,7 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public void fixBrokenSchedule(Executables newExecutable) {
-        Select select = new Select(brokenScheduleExecutable);
-        select.selectByVisibleText(newExecutable.getExecutablePath());
+        brokenScheduleExecutable.selectByVisibleText(newExecutable.getExecutablePath());
         waitForElementVisible(brokenScheduleSaveChangeButton).click();
         waitForElementNotPresent(brokenScheduleSaveChangeButton);
         clickOnCloseScheduleButton();
@@ -498,23 +479,15 @@ public class ScheduleDetail extends ScheduleForm {
     public boolean isInRunningState() {
         waitForCollectionIsNotEmpty(scheduleExecutionItems);
         try {
+            Predicate<WebDriver> executionStateRunning = browser -> {
+                System.out.println("Wait for execution state changed to RUNNING!");
+                return "RUNNING".equals(waitForElementVisible(executionItemDescription).getText());
+            };
             Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
-                    .pollingEvery(2, TimeUnit.SECONDS).until(new Predicate<WebDriver>() {
-
-                        @Override
-                        public boolean apply(WebDriver browser) {
-                            System.out.println("Wait for execution state changed to RUNNING!");
-                            return "RUNNING".equals(waitForElementVisible(executionItemDescription).getText());
-                        }
-                    });
-
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                @Override
-                public boolean apply(WebDriver browser) {
-                    return !getLastExecution().findElement(BY_EXECUTION_RUNTIME).getText().isEmpty();
-                }
-            });
+                    .pollingEvery(2, TimeUnit.SECONDS).until(executionStateRunning);
+            Predicate<WebDriver> executionStateFinished = 
+                    browser -> !getLastExecution().findElement(BY_EXECUTION_RUNTIME).getText().isEmpty();
+            Graphene.waitGui().until(executionStateFinished);
             return true;
         } catch (NoSuchElementException e) {
             return false;
@@ -524,15 +497,12 @@ public class ScheduleDetail extends ScheduleForm {
     public boolean isInScheduledState() {
         waitForCollectionIsNotEmpty(scheduleExecutionItems);
         try {
+            Predicate<WebDriver> executionStateScheduled = browser -> {
+                System.out.println("Wait for execution state changed to SCHEDULED!");
+                return "SCHEDULED".equals(waitForElementVisible(executionItemDescription).getText());
+            };
             Graphene.waitGui().withTimeout(MAX_SCHEDULE_RUN_TIME, TimeUnit.MINUTES)
-                    .pollingEvery(2, TimeUnit.SECONDS).until(new Predicate<WebDriver>() {
-
-                        @Override
-                        public boolean apply(WebDriver browser) {
-                            System.out.println("Wait for execution state changed to SCHEDULED!");
-                            return "SCHEDULED".equals(waitForElementVisible(executionItemDescription).getText());
-                        }
-                    });
+                    .pollingEvery(2, TimeUnit.SECONDS).until(executionStateScheduled);
             return true;
         } catch (NoSuchElementException e) {
             return false;
@@ -687,28 +657,20 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public String getTimelineExecutionTooltip() {
-        Actions action = new Actions(browser);
-        action.moveToElement(timelineExecution);
-        action.perform();
+        new Actions(browser).moveToElement(timelineExecution).perform();
         return waitForElementVisible(BY_EXECUTION_TOOLTIP, browser).getText();
     }
 
     public boolean isCorrectSuccessfulExecutionTooltip() {
         String excutionTooltip = getTimelineExecutionTooltip();
-        if (!excutionTooltip.contains("Successful execution"))
-            return false;
-        if (!excutionTooltip.contains(String.format("Runtime %s", getLastExecutionRuntime())))
-            return false;
-        return true;
+        return excutionTooltip.contains("Successful execution") &&
+                excutionTooltip.contains(String.format("Runtime %s", getLastExecutionRuntime()));
     }
 
     public boolean isCorrectFailedExecutionTooltip(Executables executable) {
         String excutionTooltip = getTimelineExecutionTooltip();
-        if (!excutionTooltip.contains("Failed execution"))
-            return false;
-        if (!excutionTooltip.contains(executable.getErrorMessage()))
-            return false;
-        return true;
+        return excutionTooltip.contains("Failed execution") && 
+                excutionTooltip.contains(executable.getErrorMessage());
     }
 
     public String getEffectiveUser() {
@@ -719,7 +681,7 @@ public class ScheduleDetail extends ScheduleForm {
         waitForElementVisible(addRetryDelay).click();
         waitForElementVisible(rescheduleForm);
         waitForElementVisible(retryDelayInput).clear();
-        retryDelayInput.sendKeys(String.valueOf(retryDelay));
+        retryDelayInput.sendKeys(retryDelay);
     }
 
     public void changeScheduleName(String newScheduleName) {
@@ -741,12 +703,8 @@ public class ScheduleDetail extends ScheduleForm {
         List<WebElement> items =
                 waitForElementVisible(datasetDialog).findElements(By.className("gd-list-view-item"));
         for (WebElement item : items) {
-            if (datasetsToSynchronize.contains(item.getText())) {
-                if (!item.getAttribute("class").contains("is-selected"))
-                    return false;
-            } else {
-                if (item.getAttribute("class").contains("is-selected"))
-                    return false;
+            if (datasetsToSynchronize.contains(item.getText()) ^ item.getAttribute("class").contains("is-selected")) {
+                return false;
             }
         }
 
@@ -795,14 +753,10 @@ public class ScheduleDetail extends ScheduleForm {
 
     public boolean isCorrectScheduleParameters(List<Parameter> expectedParams) {
         for (final Parameter expectedParam : expectedParams) {
-            WebElement actualParam = Iterables.find(parameters, new Predicate<WebElement>() {
-
-                @Override
-                public boolean apply(WebElement param) {
-                    return param.findElement(BY_PARAMETER_NAME).getAttribute("value")
-                            .equals(expectedParam.getParamName());
-                }
-            });
+            WebElement actualParam = parameters.stream()
+                    .filter(param -> param.findElement(BY_PARAMETER_NAME).getAttribute("value").equals(expectedParam.getParamName()))
+                    .findFirst()
+                    .get();
             if (expectedParam.isSecureParam()) {
                 if (!"password".equals(actualParam.findElement(BY_PARAMETER_VALUE).getAttribute("type")))
                     return false;
@@ -817,30 +771,21 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public boolean isCorrectCronTime(final CronTimeBuilder cronTimeBuilder) {
-        final Select selectCron = new Select(cronPicker);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return selectCron.getFirstSelectedOption().getText()
-                        .equals(cronTimeBuilder.getCronTime().getCronTimeOption());
-            }
-        });
+        Predicate<WebDriver> cronTimeDisplayed = webDriver -> cronPicker.getFirstSelectedOption().getText()
+                .equals(cronTimeBuilder.getCronTime().getCronTimeOption());
+        Graphene.waitGui().until(cronTimeDisplayed);
         switch (cronTimeBuilder.getCronTime()) {
             case CRON_EVERYWEEK:
                 waitForElementVisible(selectDayInWeek);
-                Select selectWeek = new Select(selectDayInWeek);
-                if (!cronTimeBuilder.getDayInWeek().equals(selectWeek.getFirstSelectedOption().getText()))
+                if (!cronTimeBuilder.getDayInWeek().equals(selectDayInWeek.getFirstSelectedOption().getText()))
                     return false;
             case CRON_EVERYDAY:
                 waitForElementVisible(selectHourInDay);
-                Select selectHour = new Select(selectHourInDay);
-                if (!cronTimeBuilder.getHourInDay().equals(selectHour.getFirstSelectedOption().getText()))
+                if (!cronTimeBuilder.getHourInDay().equals(selectHourInDay.getFirstSelectedOption().getText()))
                     return false;
             case CRON_EVERYHOUR:
                 waitForElementVisible(selectMinuteInHour);
-                Select selectMinute = new Select(selectMinuteInHour);
-                return cronTimeBuilder.getMinuteInHour().equals(selectMinute.getFirstSelectedOption().getText());
+                return cronTimeBuilder.getMinuteInHour().equals(selectMinuteInHour.getFirstSelectedOption().getText());
             case AFTER:
                 waitForElementVisible(selectTriggerSchedule);
                 Select selectTrigger = new Select(selectTriggerSchedule);
@@ -929,41 +874,32 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     private void waitForExecutionHistoryLoading() {
+        Predicate<WebDriver> executionHistoryLoaded = webDriver -> {
+            if (!scheduleExecutionItems.isEmpty())
+                return true;
+            System.out.println("Execution history is loading!");
+            browser.navigate().refresh();
+            return false;
+        };
         Graphene.waitGui().withTimeout(MAX_EXECUTION_HISTORY_LOADING_TIME, TimeUnit.MINUTES)
-                .pollingEvery(1, TimeUnit.MINUTES).until(new Predicate<WebDriver>() {
-
-                    @Override
-                    public boolean apply(WebDriver webDriver) {
-                        if (!scheduleExecutionItems.isEmpty())
-                            return true;
-                        System.out.println("Execution history is loading!");
-                        browser.navigate().refresh();
-                        return false;
-                    }
-                });
+                .pollingEvery(1, TimeUnit.MINUTES).until(executionHistoryLoaded);
     }
 
     private boolean waitForAutoRun(int waitingTimeInMinutes) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         final int executionNumberBeforeAutoRun = scheduleExecutionItems.size();
+        Predicate<WebDriver> autoExecutionFinished = webDriver -> {
+            System.out.println("Waiting for auto execution...");
+            return scheduleExecutionItems.size() > executionNumberBeforeAutoRun;
+        };
         Graphene.waitGui().withTimeout(waitingTimeInMinutes + MAX_DELAY_TIME_WAITING_AUTO_RUN, TimeUnit.MINUTES)
                 .pollingEvery(5, TimeUnit.SECONDS).withMessage("Schedule doesn't run automatically!")
-                .until(new Predicate<WebDriver>() {
-
-                    @Override
-                    public boolean apply(WebDriver arg0) {
-                        System.out.println("Waiting for auto execution...");
-                        return scheduleExecutionItems.size() > executionNumberBeforeAutoRun;
-                    }
-                });
+                .until(autoExecutionFinished);
         stopwatch.stop();
         if (scheduleExecutionItems.size() != executionNumberBeforeAutoRun + 1)
             return false;
         long delayTime = stopwatch.elapsed(TimeUnit.MINUTES) - waitingTimeInMinutes;
         System.out.println("Delay time: " + delayTime);
-        if (delayTime < -2 || delayTime > 2)
-            return false;
-
-        return true;
+        return Math.abs(delayTime) <= 2;
     }
 }

@@ -185,14 +185,9 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
                 "Incorrect schedule name oh schedule detail page!");
 
         if (!scheduleBuilder.isDataloadProcess()) {
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return scheduleDetail.getSelectedExecutablePath().equals(
-                            scheduleBuilder.getExecutable().getExecutablePath());
-                }
-            });
+            Predicate<WebDriver> executablePathUpdated = webDriver -> scheduleDetail.getSelectedExecutablePath()
+                    .equals(scheduleBuilder.getExecutable().getExecutablePath());
+            Graphene.waitGui().until(executablePathUpdated);
         }
 
         assertTrue(scheduleDetail.isCorrectCronTime(scheduleBuilder.getCronTimeBuilder()), "Incorrect cron time!");
@@ -261,13 +256,9 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
 
         assertOkExecutionGroupInfo(okExecutionGroup, groupDescription);
         scheduleDetail.getOkGroupExpandButton(okExecutionGroup).click();
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return scheduleExecutionItems.size() == scheduleExecutionNumber + okExecutionNumber;
-            }
-        });
+        Predicate<WebDriver> executionGroupOK = webDriver -> 
+            scheduleExecutionItems.size() == scheduleExecutionNumber + okExecutionNumber;
+        Graphene.waitGui().until(executionGroupOK);
         assertExecutionItemsInfo(okGroupIndex, okExecutionNumber, groupDescription);
     }
 
@@ -315,13 +306,8 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
 
         final NotificationRule notificationRuleItem =
                 discNotificationRules.getNotificationRule(notificationBuilder.getIndex());
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return !notificationRuleItem.getEmail().isEmpty();
-            }
-        });
+        Predicate<WebDriver> notificationEmailNotEmpty = webDriver -> !notificationRuleItem.getEmail().isEmpty();
+        Graphene.waitGui().until(notificationEmailNotEmpty);
         assertEquals(notificationRuleItem.getEmail(), notificationBuilder.getEmail(), "Incorrect email!");
         assertEquals(notificationRuleItem.getSubject(), notificationBuilder.getSubject(), "Incorrect subject!");
         assertEquals(notificationRuleItem.getMessage(), notificationBuilder.getMessage(), "Incorrect message!");
@@ -390,40 +376,38 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     }
 
     private void assertExecutionItemsInfo(int okGroupIndex, int okExecutionNumber, String groupDescription) {
-        for (int i = okGroupIndex; i < okGroupIndex + okExecutionNumber + 1; i++) {
-            if (i == okGroupIndex) {
-                WebElement scheduleExecutionItem = scheduleDetail.getExecutionItem(i);
-                WebElement executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
-                assertTrue(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
-                        "OK icon is not shown for OK execution group!");
-                System.out.println("Execution description at " + i + " index: " + executionDescription.getText());
-                assertThat(executionDescription.getText(), containsString(groupDescription));
-                assertFalse(scheduleDetail.isExecutionLogPresent(scheduleExecutionItem),
-                        "Execution log is present for expanded group!");
-                assertFalse(scheduleDetail.isExecutionTimePresent(scheduleExecutionItem),
-                        "Execution time is present for expanded group!");
-                assertFalse(scheduleDetail.isExecutionRuntimePresent(scheduleExecutionItem),
-                        "Execution runtime is present for expanded group!");
-            } else {
-                WebElement scheduleExecutionItem = scheduleDetail.getExecutionItem(i);
-                WebElement executionTime = scheduleDetail.getExecutionTime(scheduleExecutionItem);
-                WebElement executionRunTime = scheduleDetail.getExecutionRunTime(scheduleExecutionItem);
-                WebElement executionDate = scheduleDetail.getExecutionDate(scheduleExecutionItem);
-                WebElement executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
+        WebElement scheduleExecutionItem = scheduleDetail.getExecutionItem(okGroupIndex);
+        WebElement executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
+        assertTrue(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
+                "OK icon is not shown for OK execution group!");
+        System.out.println("Execution description at " + okGroupIndex + " index: " + executionDescription.getText());
+        assertThat(executionDescription.getText(), containsString(groupDescription));
+        assertFalse(scheduleDetail.isExecutionLogPresent(scheduleExecutionItem),
+                "Execution log is present for expanded group!");
+        assertFalse(scheduleDetail.isExecutionTimePresent(scheduleExecutionItem),
+                "Execution time is present for expanded group!");
+        assertFalse(scheduleDetail.isExecutionRuntimePresent(scheduleExecutionItem),
+                "Execution runtime is present for expanded group!");
+        
+        for (int i = okGroupIndex+1; i < okGroupIndex + okExecutionNumber + 1; i++) {
+            scheduleExecutionItem = scheduleDetail.getExecutionItem(i);
+            WebElement executionTime = scheduleDetail.getExecutionTime(scheduleExecutionItem);
+            WebElement executionRunTime = scheduleDetail.getExecutionRunTime(scheduleExecutionItem);
+            WebElement executionDate = scheduleDetail.getExecutionDate(scheduleExecutionItem);
+            executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
 
-                assertFalse(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
-                        "OK icon is shown for executions in group!");
-                System.out.println("Execution description at " + i + " index: " + executionDescription.getText());
-                assertTrue(executionDescription.isDisplayed(), "Execution description is not shown!");
-                System.out.println("Execution description at " + i + " index: " + executionRunTime.getText());
-                assertTrue(executionRunTime.isDisplayed(), "Execution runtime is not shown!");
-                System.out.println("Execution description at " + i + " index: " + executionDate.getText());
-                assertTrue(executionDate.isDisplayed(), "Execution date is not shown!");
-                System.out.println("Execution description at " + i + " index: " + executionTime.getText());
-                assertTrue(executionTime.isDisplayed(), "Execution time is not shown!");
-                assertTrue(scheduleDetail.getExecutionLog(scheduleExecutionItem).isDisplayed(),
-                        "Execution log is not shown!");
-            }
+            assertFalse(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
+                    "OK icon is shown for executions in group!");
+            System.out.println("Execution description at " + i + " index: " + executionDescription.getText());
+            assertTrue(executionDescription.isDisplayed(), "Execution description is not shown!");
+            System.out.println("Execution description at " + i + " index: " + executionRunTime.getText());
+            assertTrue(executionRunTime.isDisplayed(), "Execution runtime is not shown!");
+            System.out.println("Execution description at " + i + " index: " + executionDate.getText());
+            assertTrue(executionDate.isDisplayed(), "Execution date is not shown!");
+            System.out.println("Execution description at " + i + " index: " + executionTime.getText());
+            assertTrue(executionTime.isDisplayed(), "Execution time is not shown!");
+            assertTrue(scheduleDetail.getExecutionLog(scheduleExecutionItem).isDisplayed(),
+                    "Execution log is not shown!");
         }
     }
 

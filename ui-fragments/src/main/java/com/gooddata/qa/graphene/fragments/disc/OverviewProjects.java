@@ -15,8 +15,6 @@ import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProce
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class OverviewProjects extends AbstractFragment {
 
@@ -101,18 +99,15 @@ public class OverviewProjects extends AbstractFragment {
 
     public WebElement getOverviewProjectWithAdminRole(final ProjectInfo projectInfo) {
         waitForCollectionIsNotEmpty(overviewProjects);
-        WebElement overviewProject = Iterables.find(overviewProjects, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement project) {
-                waitForElementVisible(project);
-                WebElement projectTitle = project.findElement(BY_OVERVIEW_PROJECT_TITLE_LINK);
+        return overviewProjects.stream()
+            .filter(project -> {
+                WebElement projectTitle = waitForElementVisible(project)
+                        .findElement(BY_OVERVIEW_PROJECT_TITLE_LINK);
                 return project.findElement(BY_OVERVIEW_PROJECT_CHECKBOX).isEnabled()
                         && projectTitle.getText().equals(projectInfo.getProjectName())
                         && projectTitle.getAttribute("href").contains(projectInfo.getProjectId());
-            }
-        }, null);
-        return overviewProject;
+        })
+        .findFirst().orElse(null);
     }
 
     public void checkAllProjects() {
@@ -133,14 +128,11 @@ public class OverviewProjects extends AbstractFragment {
         if (!overviewProjectDetail.getAttribute("class").contains("expanded-border"))
             overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_EXPAND_BUTTON).click();
         for (final OverviewProcess selectedProcess : selectedOverviewProject.getOverviewProcesses()) {
-            WebElement overviewProcess = Iterables.find(overviewProcesses, new Predicate<WebElement>() {
-
-                @Override
-                public boolean apply(WebElement process) {
-                    return selectedProcess.getProcessName().equalsIgnoreCase(
-                            process.findElement(BY_OVERVIEW_PROCESS_TITLE).getText());
-                }
-            });
+            WebElement overviewProcess = overviewProcesses.stream().
+                    filter(process -> selectedProcess.getProcessName().equalsIgnoreCase(
+                            process.findElement(BY_OVERVIEW_PROCESS_TITLE).getText())).
+                    findFirst().
+                    get();
             checkOnSelectedSchedules(overviewProcess, selectedProcess.getOverviewSchedules());
         }
     }
@@ -168,8 +160,7 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     public int getOverviewProjectNumber() {
-        waitForCollectionIsNotEmpty(overviewProjects);
-        return overviewProjects.size();
+        return waitForCollectionIsNotEmpty(overviewProjects).size();
     }
 
     public String getOverviewScheduleGraphName(WebElement overviewSchedule) {
@@ -181,14 +172,11 @@ public class OverviewProjects extends AbstractFragment {
     }
 
     public WebElement getOverviewProcess(OverviewProcess expectedProcess) {
-        return Iterables.find(overviewProcesses, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement process) {
-                return expectedProcess.getProcessName()
-                        .equalsIgnoreCase(getOverviewProcessName(process).getText());
-            }
-        });
+        return overviewProcesses.stream()
+                .filter(process -> expectedProcess.getProcessName().equalsIgnoreCase(
+                        getOverviewProcessName(process).getText()))
+                .findFirst()
+                .get();
     }
 
     public int getProcessNumber() {
@@ -226,23 +214,18 @@ public class OverviewProjects extends AbstractFragment {
         return overviewProjectDetail.findElement(BY_OVERVIEW_PROJECT_ERROR_MESSAGE);
     }
 
-
     public WebElement getOverviewProjectOKInfo(WebElement overviewProjectDetail) {
         return waitForElementVisible(BY_OVERVIEW_PROJECT_OK_INFO, overviewProjectDetail);
     }
 
     public WebElement getOverviewProjectWithoutAdminRole(final String projectName) {
         waitForCollectionIsNotEmpty(overviewProjects);
-        return Iterables.find(overviewProjects, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement project) {
-                waitForElementVisible(project);
-                WebElement projectTitle = project.findElement(BY_OVERVIEW_PROJECT_TITLE_LINK);
-                return !project.findElement(BY_OVERVIEW_PROJECT_CHECKBOX).isEnabled()
-                        && projectTitle.getText().equals(projectName);
-            }
-        });
+        return overviewProjects.stream()
+                .filter(project -> 
+                !waitForElementVisible(project).findElement(BY_OVERVIEW_PROJECT_CHECKBOX).isEnabled() &&
+                    projectName.equals(project.findElement(BY_OVERVIEW_PROJECT_TITLE_LINK).getText()))
+                .findFirst()
+                .get();
     }
 
     public String getOverviewEmptyStateMessage() {
@@ -259,18 +242,15 @@ public class OverviewProjects extends AbstractFragment {
         return overviewProject.findElement(By.xpath(xpathScheduleTitle.replace("${scheduleUrl}", scheduleUrl)));
     }
 
-    private void checkOnSelectedSchedules(WebElement overviewProcess, List<OverviewSchedule> selectedSchedules) {
+    private void checkOnSelectedSchedules(final WebElement overviewProcess, List<OverviewSchedule> selectedSchedules) {
         for (final OverviewSchedule selectedSchedule : selectedSchedules) {
-            Iterables
-                    .find(overviewProcess.findElements(BY_OVERVIEW_PROJECT_SCHEDULE_ITEM),
-                            new Predicate<WebElement>() {
-
-                                @Override
-                                public boolean apply(WebElement schedule) {
-                                    return selectedSchedule.getScheduleName().equals(
-                                            schedule.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText());
-                                }
-                            }).findElement(BY_OVERVIEW_PROJECT_SCHEDULE_CHECKBOX).click();
+            overviewProcess.findElements(BY_OVERVIEW_PROJECT_SCHEDULE_ITEM).stream()
+                .filter(schedule -> selectedSchedule.getScheduleName()
+                        .equals(schedule.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_NAME).getText()))
+                .map(e -> e.findElement(BY_OVERVIEW_PROJECT_SCHEDULE_CHECKBOX))
+                .findFirst()
+                .get()
+                .click();
         }
     }
 

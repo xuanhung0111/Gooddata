@@ -62,47 +62,31 @@ public class ProjectsList extends AbstractTable {
     }
 
     public WebElement selectProjectWithAdminRole(final ProjectInfo project) {
-        Predicate<WebElement> predicate = new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement row) {
-                return row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-                        && row.findElement(BY_DISC_PROJECT_NAME).getText().equals(project.getProjectName())
-                        && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href")
-                                .contains(project.getProjectId());
-            }
-        };
+        Predicate<WebElement> predicate = row -> row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
+              && row.findElement(BY_DISC_PROJECT_NAME).getText().equals(project.getProjectName())
+              && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href").contains(project.getProjectId());
         return selectProject(predicate);
     }
 
     public boolean isCorrectSearchResultByName(String searchKey) {
         for (WebElement project : getRows()) {
-            if (project.findElement(BY_PROJECT_CHECKBOX).isEnabled()) {
-                if (!project.findElement(BY_DISC_PROJECT_NAME).getText().contains(searchKey))
-                    return false;
-            } else {
-                if (!project.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText().contains(searchKey))
-                    return false;
+            By projectNameLocator  = project.findElement(BY_PROJECT_CHECKBOX).isEnabled()?
+                    BY_DISC_PROJECT_NAME : BY_DISC_PROJECT_NAME_NOT_ADMIN;
+            if (!project.findElement(projectNameLocator).getText().contains(searchKey)) {
+                return false;
             }
         }
-
         return true;
     }
 
     public boolean isCorrectSearchedProjectByUnicodeName(String searchKey) {
         for (WebElement project : getRows()) {
-            if (project.findElement(BY_PROJECT_CHECKBOX).isEnabled()) {
-                if (project.findElements(By.xpath(XPATH_PROJECT_NAME.replace("${searchKey}", searchKey)))
-                        .isEmpty())
-                    return false;
-            } else {
-                if (project
-                        .findElements(By.xpath(XPATH_PROJECT_NAME_NOT_ADMIN.replace("${searchKey}", searchKey)))
-                        .isEmpty())
-                    return false;
+            String projectNameLocator = project.findElement(BY_PROJECT_CHECKBOX).isEnabled()?
+                    XPATH_PROJECT_NAME : XPATH_PROJECT_NAME_NOT_ADMIN;
+            if (project.findElements(By.xpath(projectNameLocator.replace("${searchKey}", searchKey))).isEmpty()) {
+                return false;
             }
         }
-
         return true;
     }
 
@@ -141,21 +125,15 @@ public class ProjectsList extends AbstractTable {
     }
 
     public WebElement selectProjectWithNonAdminRole(final String projectName) {
-        Predicate<WebElement> predicate = new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement row) {
-                return !row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-                        && row.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText().equals(projectName);
-            }
-        };
+        Predicate<WebElement> predicate = row -> !row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
+              && row.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText().equals(projectName);
         return selectProject(predicate);
     }
 
     private WebElement selectProject(Predicate<WebElement> predicate) {
         Iterator<WebElement> iterator = projectPages.iterator();
         do {
-            if (getRoot().findElements(BY_EMPTY_STATE).isEmpty())
+            if (!isElementPresent(BY_EMPTY_STATE, getRoot()))
                 waitForCollectionIsNotEmpty(rows);
             Optional<WebElement> project = Iterables.tryFind(rows, predicate);
             if (project.isPresent())

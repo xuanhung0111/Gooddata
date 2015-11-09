@@ -2,10 +2,12 @@ package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static org.testng.Assert.*;
+import static java.util.stream.Collectors.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
@@ -27,7 +29,6 @@ import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class AbstractOverviewProjectsTest extends AbstractDISCTest {
@@ -42,13 +43,9 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
                     "Incorrect overview empty state message!");
         else {
             try {
-                Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                    @Override
-                    public boolean apply(WebDriver arg0) {
-                        return discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo) == null;
-                    }
-                });
+                Predicate<WebDriver> projectsFilteredOut = 
+                        webDriver -> discOverviewProjects.getOverviewProjectWithAdminRole(projectInfo) == null;
+                Graphene.waitGui().until(projectsFilteredOut);
             } catch (TimeoutException e) {
                 fail("Project is not filtered out on overview page! " + e);
             }
@@ -403,14 +400,9 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     protected void searchProjectById(ProjectInfo project) {
         discProjectsPage.enterSearchKey(project.getProjectId());
         waitForFragmentVisible(discProjectsList);
+        Predicate<WebDriver> projectSearched = webDriver -> discProjectsList.getNumberOfRows() == 1;
         try {
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return discProjectsList.getNumberOfRows() == 1;
-                }
-            });
+            Graphene.waitGui().until(projectSearched);
         } catch (TimeoutException e) {
             fail("Incorrect number of projects in search result: " + discProjectsList.getNumberOfRows());
         }
@@ -425,30 +417,23 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     }
 
     protected void checkProjectFilter(final ProjectStateFilters filterOption, List<ProjectInfo> projects) {
-        List<ProjectStateFilters> filters =
-                Arrays.asList(ProjectStateFilters.DISABLED, ProjectStateFilters.FAILED,
-                        ProjectStateFilters.RUNNING, ProjectStateFilters.SCHEDULED,
-                        ProjectStateFilters.SUCCESSFUL, ProjectStateFilters.UNSCHEDULED);
-        Iterable<ProjectStateFilters> filterOutOptions =
-                Iterables.filter(filters, new Predicate<ProjectStateFilters>() {
-
-                    @Override
-                    public boolean apply(ProjectStateFilters filter) {
+        List<ProjectStateFilters> filterOutOptions = Stream.of(ProjectStateFilters.DISABLED, ProjectStateFilters.FAILED, 
+                ProjectStateFilters.RUNNING,ProjectStateFilters.SCHEDULED, ProjectStateFilters.SUCCESSFUL, 
+                ProjectStateFilters.UNSCHEDULED)
+                    .filter(filter -> {
                         if (filter == filterOption)
                             return false;
                         if (filterOption == ProjectStateFilters.DISABLED)
                             return filter != ProjectStateFilters.UNSCHEDULED;
                         return true;
-                    }
-                });
-
+                    })
+                    .collect(toList());
         checkFilteredProjects(filterOption, projects);
         if (filterOption == ProjectStateFilters.DISABLED)
             checkFilteredProjects(ProjectStateFilters.UNSCHEDULED, projects);
-
         for (ProjectStateFilters filterOutOption : filterOutOptions) {
             checkFilteredOutProjects(filterOutOption, projects);
-        }
+  }
     }
 
     protected void assertOverviewProject(OverviewProjectStates projectState,
@@ -599,13 +584,11 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
     private void assertOverviewSchedules(OverviewProjectStates state, List<OverviewSchedule> expectedSchedules,
             List<WebElement> overviewSchedules) {
         for (final OverviewSchedule expectedSchedule : expectedSchedules) {
-            WebElement overviewSchedule = Iterables.find(overviewSchedules, new Predicate<WebElement>() {
-                @Override
-                public boolean apply(WebElement input) {
-                    return discOverviewProjects.getOverviewScheduleName(input).equals(
-                            expectedSchedule.getScheduleName());
-                }
-            });
+            WebElement overviewSchedule = overviewSchedules.stream()
+                    .filter(input -> discOverviewProjects.getOverviewScheduleName(input)
+                            .equals(expectedSchedule.getScheduleName()))
+                    .findFirst()
+                    .get();
             assertEquals(discOverviewProjects.getOverviewScheduleLink(state, overviewSchedule),
                     expectedSchedule.getScheduleUrl(), "Incorrect schedule detail link!");
 

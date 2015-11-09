@@ -128,24 +128,16 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
         if (isSuccessful) {
             final String successfulDeployMessage =
                     String.format(SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECTS_PAGE, zipFileName);
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return successfulDeployMessage.equals(deployForm.getDeployProcessDialog().getText());
-                }
-            });
+            Predicate<WebDriver> successfulDeployMessageDisplayed = 
+                    browser -> successfulDeployMessage.equals(deployForm.getDeployProcessDialog().getText());
+            Graphene.waitGui().until(successfulDeployMessageDisplayed);
             waitForFragmentNotVisible(deployForm);
         } else {
             final String failedDeployMessage =
                     String.format(FAILED_DEPLOY_DIALOG_MESSAGE_IN_PROJECTS_PAGE, zipFileName);
-            Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-                @Override
-                public boolean apply(WebDriver arg0) {
-                    return failedDeployMessage.equals(deployForm.getDeployProcessDialog().getText());
-                }
-            });
+            Predicate<WebDriver> failedDeployMessageDisplayed = 
+                    browser -> failedDeployMessage.equals(deployForm.getDeployProcessDialog().getText());
+            Graphene.waitGui().until(failedDeployMessageDisplayed);
         }
     }
 
@@ -165,13 +157,9 @@ public abstract class AbstractDeployProcessTest extends AbstractDISCTest {
 
         final String successfulDeployMessage =
                 String.format(SUCCESSFUL_DEPLOY_MESSAGE_IN_PROJECT_DETAIL_PAGE, processName);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return successfulDeployMessage.equals(deployForm.getDeployProcessDialog().getText());
-            }
-        });
+        Predicate<WebDriver> successfulDeployMessageDisplayed = 
+                browser -> successfulDeployMessage.equals(deployForm.getDeployProcessDialog().getText());
+        Graphene.waitGui().until(successfulDeployMessageDisplayed);
         waitForFragmentNotVisible(deployForm);
     }
 

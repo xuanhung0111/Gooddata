@@ -214,14 +214,9 @@ public final class CheckUtils {
         });
     }
 
-    public static <T> Collection<T> waitForCollectionIsNotEmpty(final Collection<T> items) {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return !items.isEmpty();
-            }
-        });
-
+    public static <T extends Collection<?>> T waitForCollectionIsNotEmpty(final T items) {
+        Predicate<WebDriver> collectionIsNotEmpty = browser -> !items.isEmpty();
+        Graphene.waitGui().until(collectionIsNotEmpty);
         return items;
     }
 

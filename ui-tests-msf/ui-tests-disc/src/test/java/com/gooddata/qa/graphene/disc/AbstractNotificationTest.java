@@ -130,6 +130,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     @FindBy(tagName = "pre")
     protected ObjectFragment objectFragment;
+    
     protected ExecutionDetails successfulExecutionDetails = new ExecutionDetails().setStatus(ScheduleStatus.OK);
     protected ExecutionDetails failedExecutionDetails = new ExecutionDetails().setStatus(ScheduleStatus.ERROR);
 

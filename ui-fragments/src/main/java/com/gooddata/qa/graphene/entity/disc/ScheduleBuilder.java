@@ -282,12 +282,6 @@ public class ScheduleBuilder {
             return this;
         }
 
-        public CronTimeBuilder setDefaultCronTime() {
-            this.setCronTime(ScheduleCronTimes.CRON_EVERYHOUR);
-            this.setDefaultMinuteInHour();
-            return this;
-        }
-
         public String getDayInWeek() {
             return dayInWeek;
         }
@@ -389,6 +383,11 @@ public class ScheduleBuilder {
         public CronTimeBuilder setWaitingAutoRunInMinutes(int waitingAutoRunInMinutes) {
             this.waitingAutoRunInMinutes = waitingAutoRunInMinutes;
             return this;
+        }
+        
+        public void setDefaultCronTime() {
+            this.setCronTime(ScheduleCronTimes.CRON_EVERYHOUR);
+            this.setDefaultMinuteInHour();
         }
     }
 

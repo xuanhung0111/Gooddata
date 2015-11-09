@@ -12,9 +12,7 @@ import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
@@ -61,7 +59,6 @@ public class ProjectDetailPage extends AbstractFragment {
     @FindBy(css = ".ait-project-deploy-process-btn")
     private WebElement deployProcessButton;
 
-
     @FindBy(xpath = "//.[contains(@class, 'ait-process-list-item')]")
     private List<WebElement> processes;
 
@@ -100,13 +97,12 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public String getProjectMetadata(final String metadataKey) {
-        return Iterables.find(projectMetadataItems, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement projectMetadataItem) {
-                return projectMetadataItem.findElement(BY_PROJECT_METADATA_KEY).getText().equals(metadataKey);
-            }
-        }).findElement(BY_PROJECT_METADATA_VALUE).getText();
+        return projectMetadataItems.stream()
+                .filter(projectMetadataItem -> projectMetadataItem.findElement(BY_PROJECT_METADATA_KEY).getText()
+                        .equals(metadataKey))
+                .map(e -> e.findElement(BY_PROJECT_METADATA_VALUE).getText())
+                .findFirst()
+                .get();
     }
 
     public void goToDashboards() {
@@ -126,7 +122,7 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public boolean isErrorDialogVisible() {
-        return getRoot().findElements(BY_DEPLOY_ERROR_DIALOG).size() > 0;
+        return isElementPresent(BY_DEPLOY_ERROR_DIALOG, getRoot());
     }
 
     public void closeDeployErrorDialogButton() {
@@ -142,9 +138,6 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public int getNumberOfProcesses() {
-        if (processes == null) {
-            throw new NullPointerException();
-        }
         return processes.size();
     }
 
@@ -153,13 +146,8 @@ public class ProjectDetailPage extends AbstractFragment {
         clickOnDeleteButton();
         waitForElementVisible(processDeleteConfirmButton).click();
         waitForElementNotPresent(processDeleteDialog);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return processes.size() == processNumberBeforeDelete - 1;
-            }
-        });
+        Predicate<WebDriver> processDeleted = browser -> processes.size() == processNumberBeforeDelete - 1;
+        Graphene.waitGui().until(processDeleted);
         waitForElementVisible(getRoot());
     }
 
@@ -187,19 +175,17 @@ public class ProjectDetailPage extends AbstractFragment {
 
     public boolean isExistingProcess(String processName) {
         waitForElementVisible(getRoot());
-        Optional<WebElement> existingProcess = tryToFindProcess(processName);
-        return existingProcess.isPresent();
+        return processes.stream()
+              .filter(process -> activeProcess(process).getProcessTitle().equals(processName))
+              .findFirst()
+              .isPresent();
     }
 
     public boolean isCorrectScheduleInList(final SchedulesTable schedulesTable,
             final ScheduleBuilder scheduleBuilder) {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return schedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()) != null;
-            }
-        });
+        Predicate<WebDriver> correctScheduleDisplayed = 
+                browser -> schedulesTable.getScheduleTitle(scheduleBuilder.getScheduleName()) != null;
+        Graphene.waitGui().until(correctScheduleDisplayed);
 
         return scheduleBuilder.getCronTimeBuilder().getCronFormatInProjectDetailPage()
                 .equals(schedulesTable.getScheduleCron(scheduleBuilder.getScheduleName()).getText());
@@ -221,13 +207,10 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public WebElement getProcess(final String processName) {
-        return Iterables.find(processes, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement process) {
-                return waitForElementVisible(BY_PROCESS_TITLE, process).getText().equals(processName);
-            }
-        });
+        return processes.stream()
+                .filter(process -> waitForElementVisible(BY_PROCESS_TITLE, process).getText().equals(processName))
+                .findFirst()
+                .get();
     }
 
     public void clickOnScheduleTab() {
@@ -291,14 +274,12 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public String getMetadata() {
-        return Iterables.find(processMetadataItems, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement processMetadataItem) {
-                return processMetadataItem.findElement(BY_PROCESS_METADATA_KEY).getText()
-                        .equals(PROCESS_METADATA_ID);
-            }
-        }).findElement(BY_PROCESS_METADATA_VALUE).getText();
+        return processMetadataItems.stream()
+            .filter(processMetadataItem -> processMetadataItem.findElement(BY_PROCESS_METADATA_KEY).getText().
+                    equals(PROCESS_METADATA_ID))
+            .map(e -> e.findElement(BY_PROCESS_METADATA_VALUE).getText())
+            .findFirst()
+            .get();
     }
 
     public String getBrokenScheduleMessage() {
@@ -318,7 +299,7 @@ public class ProjectDetailPage extends AbstractFragment {
     }
 
     public boolean isEmptyScheduleList() {
-        return activeProcess.findElements(BY_CREATE_NEW_SCHEDULE_LINK).size() > 0;
+        return isElementPresent(BY_CREATE_NEW_SCHEDULE_LINK, activeProcess);
     }
 
     public boolean isCorrectExecutableList(List<Executables> executables) {
@@ -334,26 +315,7 @@ public class ProjectDetailPage extends AbstractFragment {
         waitForFragmentVisible(scheduleTable).getScheduleTitle(name).click();
     }
 
-    public boolean isScheduleTabActive() {
-        return getScheduleTab().getAttribute("class").contains("active");
-    }
-
-    public boolean isExecutableTabActive() {
-        return getExecutableTab().getAttribute("class").contains("active");
-    }
-
-    public boolean isMetadataTabActive() {
-        return getMetadataTab().getAttribute("class").contains("active");
-    }
-
-    private Optional<WebElement> tryToFindProcess(final String processName) {
-        Optional<WebElement> existingProcess = Iterables.tryFind(processes, new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement process) {
-                return activeProcess(process).getProcessTitle().equals(processName);
-            }
-        });
-        return existingProcess;
+    public boolean isTabActive(WebElement tab) {
+        return tab.getAttribute("class").contains("active");
     }
 }

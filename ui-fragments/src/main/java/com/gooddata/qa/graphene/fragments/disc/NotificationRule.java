@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.List;
+import static java.util.stream.Collectors.joining;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -23,7 +24,8 @@ public class NotificationRule extends AbstractFragment {
     private List<WebElement> availableParams;
 
     private String ERROR_NOTIFICATION_EMAIL =
-            "Email address is invalid. Please insert an email address in this format: email@domain.com. You may insert only one recipient per notification rule.";
+            "Email address is invalid. Please insert an email address in this format: email@domain.com. "
+            + "You may insert only one recipient per notification rule.";
     private String ERROR_NOTIFICATION_SUBJECT = "Subject cannot be empty.";
     private String ERROR_NOTIFICATION_MESSAGE = "Message cannot be empty.";
     private String ERROR_NOTIFICATION_CUSTOM_FIELD =
@@ -57,7 +59,7 @@ public class NotificationRule extends AbstractFragment {
 
     public void fillInEmail(String email) {
         waitForElementVisible(BY_NOTIFICATION_RULE_EMAIL, getRoot()).sendKeys(email);
-        getRoot().click();
+        activateInputValidate();
     }
 
     public String getEmail() {
@@ -66,7 +68,7 @@ public class NotificationRule extends AbstractFragment {
 
     public void fillInSubject(String subject) {
         waitForElementVisible(BY_NOTIFICATION_SUBJECT, getRoot()).sendKeys(subject);
-        getRoot().click();
+        activateInputValidate();
     }
 
     public String getSubject() {
@@ -75,7 +77,7 @@ public class NotificationRule extends AbstractFragment {
 
     public void fillInMessage(String message) {
         waitForElementVisible(BY_NOTIFICATION_MESSAGE, getRoot()).sendKeys(message);
-        getRoot().click();
+        activateInputValidate();
     }
 
     public String getMessage() {
@@ -84,7 +86,7 @@ public class NotificationRule extends AbstractFragment {
 
     public void fillInNotificationCustomEventName(String customEventName) {
         waitForElementVisible(BY_CUSTOM_EVENT_NAME, getRoot()).sendKeys(customEventName);
-        getRoot().click();
+        activateInputValidate();
     }
 
     public Select getEventSelect() {
@@ -113,11 +115,7 @@ public class NotificationRule extends AbstractFragment {
     }
 
     public String getAvailableParams() {
-        String availableParamsList = "";
-        for (int i = 0; i < availableParams.size(); i++) {
-            availableParamsList = availableParamsList.concat(availableParams.get(i).getText());
-        }
-        return availableParamsList;
+        return availableParams.stream().map(WebElement::getText).collect(joining());
     }
 
     public boolean isCorrectEmailValidationError() {
@@ -164,17 +162,17 @@ public class NotificationRule extends AbstractFragment {
     public void saveNotification() {
         waitForElementVisible(BY_SAVE_BUTTON, getRoot()).click();
         waitForElementNotPresent(BY_SAVE_BUTTON);
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return !getRoot().getAttribute("class").contains("modified");
-            }
-        });
+        Predicate<WebDriver> notificationRuleSaved = 
+                browser -> !getRoot().getAttribute("class").contains("modified");
+        Graphene.waitGui().until(notificationRuleSaved);
     }
 
     public void cancelSaveNotification() {
         waitForElementVisible(BY_CANCEL_BUTTON, getRoot()).click();
         waitForElementNotPresent(BY_SAVE_BUTTON);
+    }
+    
+    private void activateInputValidate() {
+        getRoot().click();
     }
 }

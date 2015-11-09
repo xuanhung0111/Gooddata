@@ -38,12 +38,7 @@ public class OverviewStates extends AbstractFragment {
     }
 
     private void waitForStateNumber(final WebElement stateNumber) {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return !stateNumber.getText().isEmpty();
-            }
-        });
+        Predicate<WebDriver> stateNumberNotEmpty = webDriver -> !stateNumber.getText().isEmpty();
+        Graphene.waitGui().until(stateNumberNotEmpty);
     }
 }

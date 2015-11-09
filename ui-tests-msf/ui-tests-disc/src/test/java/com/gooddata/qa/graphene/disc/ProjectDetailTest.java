@@ -74,11 +74,13 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
         projectDetailPage.activeProcess(processName);
-        assertTrue(projectDetailPage.isScheduleTabActive(), "Schedule tab is not active!");
+        assertTrue(projectDetailPage.isTabActive(projectDetailPage.getScheduleTab()), 
+                "Schedule tab is not active!");
         assertTrue(projectDetailPage.isEmptyScheduleList(), "Schedule list is not empty!");
 
         projectDetailPage.clickOnExecutableTab();
-        assertTrue(projectDetailPage.isExecutableTabActive(), "Executable tab is not active!");
+        assertTrue(projectDetailPage.isTabActive(projectDetailPage.getExecutableTab()), 
+                "Executable tab is not active!");
         assertTrue(projectDetailPage.isCorrectExecutableList(DeployPackages.BASIC.getExecutables()),
                 "Incorrect executable list");
 
@@ -119,15 +121,13 @@ public class ProjectDetailTest extends AbstractSchedulesTest {
         projectDetailPage.clickOnDownloadButton();
 
         final File zipDownload = new File(downloadFolder + processID + "-decrypted.zip");
+        Predicate<WebDriver> downloadProcessFinished = browser -> {
+            System.out.println("Wait for downloading process!");
+            return zipDownload.length() > expectedDownloadedProcessSize;
+        };
+        
         Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
-                .until(new Predicate<WebDriver>() {
-
-                    @Override
-                    public boolean apply(WebDriver arg0) {
-                        System.out.println("Wait for downloading process!");
-                        return zipDownload.length() > expectedDownloadedProcessSize;
-                    }
-                });
+            .until(downloadProcessFinished);
         System.out.println("Download file size: " + zipDownload.length());
         System.out.println("Download file path: " + zipDownload.getPath());
         System.out.println("Download file name: " + zipDownload.getName());
