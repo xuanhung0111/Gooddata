@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.csvuploader;
 
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.BeforeClass;
@@ -107,7 +108,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
         final String factColumnName = "Amount";
 
         dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("At least one column must contain numbers"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Mark at least one column as measure. Only files with at least one numerical column are supported."));
         dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.FACT);
 
         dataPreviewPage.selectHeader().getRowSelectionTable().getRow(3).click(); // select data row as header
@@ -213,7 +214,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
 
         try {
             logout();
-            signInAtGreyPages(testParams.getViewerUser(), testParams.getViewerPassword());
+            signIn(true, UserRoles.VIEWER);
 
             openUrl(String.format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
 
@@ -224,7 +225,7 @@ public class CsvUploaderTest extends AbstractCsvUploaderTest {
             assertThat(insufficientAccessHeader, containsString("you do not have access to the Load section."));
         } finally {
             logout();
-            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            signIn(true, UserRoles.ADMIN);
         }
     }
 
