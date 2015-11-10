@@ -414,7 +414,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"myData"})
+    @Test(dependsOnMethods = {"createProject","enableAnalyticalDesigner"}, groups = {"myData"})
     public void checkDatasetAnalyzeLink() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
 

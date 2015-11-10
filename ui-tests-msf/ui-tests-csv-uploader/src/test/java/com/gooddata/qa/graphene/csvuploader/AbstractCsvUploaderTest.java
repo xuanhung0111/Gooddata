@@ -20,11 +20,15 @@ import java.util.function.Consumer;
 
 import org.apache.commons.lang.WordUtils;
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
@@ -34,6 +38,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadProgressDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -84,6 +89,20 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     @FindBy(className = "s-insufficient-access-rights")
     protected InsufficientAccessRightsPage insufficientAccessRightsPage;
+
+    //TODO remove enabling AD feature flag when the AD is enabled by default
+    // this temporarily solves the problem that AD is not enabled for new users and on new PIs
+    @Test(alwaysRun = true, dependsOnMethods = {"createProject"})
+    public void enableAnalyticalDesigner() throws JSONException {
+        setADFeatureFlag(true);
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDownCsvUploaderTest() throws JSONException {
+        // the AD feature flag should be always disabled for the current project to cover test runs which are reusing
+        // existing projects
+        setADFeatureFlag(false);
+    }
 
     protected void checkDataPreview(CsvFile csvFile) {
         checkDataPreview(csvFile.getColumnNames(), csvFile.getColumnTypes());
@@ -248,6 +267,15 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         waitForFragmentVisible(fileUploadProgressDialog);
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFile.getFileName()), getClass());
+    }
+
+    /**
+     * Sets the Analytical Designer feature flag to be turned on/off for the current project.
+     */
+    private void setADFeatureFlag(boolean isEnabled) throws JSONException {
+        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
+                RestUtils.FeatureFlagOption.createFeatureClassOption(
+                        ProjectFeatureFlags.ANALYTICAL_DESIGNER.getFlagName(), isEnabled));
     }
 
     public class UploadHistory {

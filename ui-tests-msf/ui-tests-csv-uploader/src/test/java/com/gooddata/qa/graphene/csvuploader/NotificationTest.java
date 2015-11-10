@@ -42,7 +42,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject","enableAnalyticalDesigner"})
     public void checkNotificationForSuccessfulUpload() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
 
