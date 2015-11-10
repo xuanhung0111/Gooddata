@@ -3,7 +3,9 @@ package com.gooddata.qa.browser;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.arquillian.drone.browserstack.webdriver.BrowserStackDriver;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -28,20 +30,26 @@ public class BrowserUtils {
 
     public static String getCurrentBrowserAgent(WebDriver browser) {
         Capabilities capabilities = ((RemoteWebDriver) browser).getCapabilities();
-        String platform = capabilities.getCapability("platform").toString().toUpperCase();
-        return capabilities.getBrowserName() + " - " + platform;
+
+        if (browser instanceof BrowserStackDriver) {
+            capabilities = ((BrowserStackDriver) browser).getCapabilities();
+            if (capabilities.getCapability("platformName") != null) {
+                return capabilities.getCapability("browser") + " - " + capabilities.getCapability("platformName");
+            }
+        }
+
+        return capabilities.getBrowserName() + " - " + capabilities.getCapability("platform");
     }
 
     public static boolean canAccessGreyPage(WebDriver browser) {
-        if (getCurrentBrowserAgent(browser).contains("internet explorer")) {
-            return false;
+        final String currentBrowserAgent = getCurrentBrowserAgent(browser);
+
+        if (currentBrowserAgent.contains("iOS")) {
+            return true;
         }
 
-        if (getCurrentBrowserAgent(browser).contains("ANDROID")) {
-            return false;
-        }
-
-        if (getCurrentBrowserAgent(browser).contains("safari")) {
+        if (Stream.of("internet explorer", "ANDROID", "safari")
+                .anyMatch(currentBrowserAgent::contains)) {
             return false;
         }
 
