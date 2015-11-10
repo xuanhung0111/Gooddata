@@ -232,7 +232,7 @@ public final class CheckUtils {
 
     /**
      * Check if element is currently present in DOM
-     * @see http://stackoverflow.com/questions/7991522/selenium-webdriver-test-if-element-is-present
+     * @see <a href="http://stackoverflow.com/questions/7991522/selenium-webdriver-test-if-element-is-present">SO: selenium-webdriver-test-if-element-is-present</a>
      * @param locatorKey By element for location
      * @param context context to search
      * @return
@@ -256,4 +256,8 @@ public final class CheckUtils {
         return texts;
     }
 
+    public static WebElement waitForElementEnabled(WebElement element) {
+        Graphene.waitGui().until().element(element).is().enabled();
+        return element;
+    }
 }

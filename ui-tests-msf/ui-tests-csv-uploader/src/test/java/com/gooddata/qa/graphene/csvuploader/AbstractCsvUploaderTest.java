@@ -127,6 +127,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected void uploadCsv(CsvFile csvFile) {
         uploadFile(csvFile);
 
+        takeScreenshot(browser, toScreenshotName("before-data-preview", csvFile.getFileName()), getClass());
+
         waitForFragmentVisible(dataPreviewPage);
         assertThat(dataPreviewPage.getRowCountMessage(), containsString(Long.toString(csvFile.getDataRowCount())));
 
@@ -176,7 +178,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         // the processing should not go any further but display validation error directly in File Upload Dialog
         assertThat(waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors(),
-                hasItem("Failed to upload the " + csvFile.getFileName() + " file."));
+                hasItem(createErrorFailedToUploadFile(csvFile)));
 
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFile.getFileName()), getClass());
 
@@ -245,7 +247,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         fileUploadDialog.clickUploadButton();
 
         waitForFragmentVisible(fileUploadProgressDialog);
-
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFile.getFileName()), getClass());
     }
 
@@ -286,6 +287,10 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 }
             }
         }
+    }
+
+    protected String createErrorFailedToUploadFile(CsvFile csvFile) {
+        return String.format("Failed to upload the \"%s\" file.", csvFile.getFileName());
     }
 
     protected enum CsvFile {
