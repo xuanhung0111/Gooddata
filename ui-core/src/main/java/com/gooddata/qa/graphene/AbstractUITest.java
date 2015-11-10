@@ -75,11 +75,12 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Predicate;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 
-    protected static By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu");
+    protected static By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu,.gd-header-account");
     protected static By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
     protected static final By BY_PANEL_ROOT = By.id("root");
     protected static final By BY_IFRAME = By.tagName("iframe");

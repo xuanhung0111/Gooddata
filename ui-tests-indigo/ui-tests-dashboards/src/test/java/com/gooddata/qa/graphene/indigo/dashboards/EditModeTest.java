@@ -3,12 +3,9 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
-import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
@@ -85,12 +82,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             openUrl(getIndigoDashboardsPageUri());
             waitForStringInUrl(ACCOUNT_PAGE);
         } finally {
-            if (canAccessGreyPage(browser)) {
-                signIn(true, UserRoles.ADMIN);
-            } else {
-                waitForFragmentVisible(loginFragment).login(testParams.getUser(), testParams.getPassword(), true);
-                waitForElementVisible(className("gd-header-account"), browser);
-            }
+            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
 }
