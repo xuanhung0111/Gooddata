@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,9 +42,11 @@ import java.util.concurrent.TimeUnit;
 
 public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
-    private static final String EMPTY_COLUMN_NAME_ERROR = "Column name can't be empty";
-    private static final String NUMBERIC_COLUMN_NAME_ERROR = "The column name cannot begin with a numerical character. "
-            + "Use a different name starting with an alphabetic character.";
+    private static final String EMPTY_COLUMN_NAME_ERROR = "Fill in the column name.";
+    private static final String NUMBERIC_COLUMN_NAME_ERROR = "Invalid column name. Names must begin with an alphabetic character.";
+    public static final String TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR = "Row %d contains a value that exceeds the limit of 255 characters, or has more than the limit of 250 columns.";
+
+    public static final String ADDING_DATA_FROM_MESSAGE = "Adding data from \"%s\" ...";
 
     private static final long PAYROLL_FILE_SIZE_MINIMUM = 476L;
     private static final int PAYROLL_FILE_DEFAULT_ROW_COUNT = 3876;
@@ -219,7 +222,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
             String validationErrorMessage = waitForFragmentVisible(fileUploadDialog).getValidationErrorMessage();
             assertThat(validationErrorMessage,
-                    is("The selected file is larger than 1 GB. Select a different file."));
+                    is("The selected file is larger than 1 GB. Try uploading a subset of the data from the file."));
             takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFileName),
                     getClass());
 
@@ -291,10 +294,10 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         assertThat(
                 backendValidationErrors,
                 hasItems(
-                        "Failed to upload the " + fileToUpload.getFileName() + " file.",
-                        "We haven’t found at least one numeric value (measurable data) on first 20 rows. "
-                                + "We skipped further processing as it seems the file doesn’t contain numeric data for analysis. "
-                                + "Upload a different CSV file."));
+                        createErrorFailedToUploadFile(fileToUpload),
+                        "The file seems to contain no numerical data for analysis on first 20 rows. " +
+                                "Try removing comments and multi-row headers from the beginning of the file. " +
+                                "Only files with at least one numerical column are supported."));
         takeScreenshot(browser,
                 toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
 
@@ -312,7 +315,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
                 waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
         assertThat(
                 backendValidationErrors,
-                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
+                hasItems(createErrorFailedToUploadFile(fileToUpload),
                         "Row 2 contains more columns than the header row."));
         takeScreenshot(browser,
                 toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
@@ -331,10 +334,10 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
                 waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
         assertThat(
                 backendValidationErrors,
-                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
+                hasItems(createErrorFailedToUploadFile(fileToUpload),
                         "There are 5 rows containing less columns than the header row: 44-48.",
-                        "There are 5 rows without at least one numeric value (measurable data): 44-48. "
-                                + "Each row must contain numeric data for analysis."));
+                        "There are 5 rows without at least one numerical value: 44-48. "
+                                + "Each row must contain numerical data for analysis."));
         takeScreenshot(browser,
                 toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
 
@@ -351,9 +354,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         List<String> backendValidationErrors =
                 waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
         assertThat(backendValidationErrors,
-                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
-                        "Load failed and stopped on row 1. Some cell value at this row exceeds 255 characters, "
-                                + "or the number of columns exceeds 250."));
+                hasItems(createErrorFailedToUploadFile(fileToUpload), String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 1)));
         takeScreenshot(browser,
                 toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
 
@@ -370,9 +371,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         List<String> backendValidationErrors =
                 waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
         assertThat(backendValidationErrors,
-                hasItems("Failed to upload the " + fileToUpload.getFileName() + " file.",
-                        "Load failed and stopped on row 2. Some cell value at this row exceeds 255 characters, "
-                                + "or the number of columns exceeds 250."));
+                hasItems(createErrorFailedToUploadFile(fileToUpload), String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 2)));
         takeScreenshot(browser,
                 toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
 
@@ -406,12 +405,12 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         System.out.println("Download file name: " + downloadedCsvFile.getName());
 
         String createdDateTime =
-                csvDatasetDetailPage.getCreatedDateTime().replace("Created on ", "").replace("at ", "");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a");
+                csvDatasetDetailPage.getCreatedDateTime().replaceAll("Created by.*on\\s+", "");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a");
         try {
             formatter.parse(createdDateTime);
         } catch (DateTimeParseException e) {
-            throw new IllegalStateException("Incorrect format of created date time: " + createdDateTime, e);
+            Assert.fail("Incorrect format of created date time: " + createdDateTime);
         }
     }
 
@@ -443,11 +442,11 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         String datasetName = getNewDataset(fileToUpload);
 
         assertThat(datasetsListPage.waitForProgressMessageBar().getText(),
-                is(String.format("Adding data from %s to the project ...", fileToUpload.getFileName())));
+                is(String.format(ADDING_DATA_FROM_MESSAGE, fileToUpload.getFileName())));
         takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
 
         assertThat(datasetsListPage.waitForSuccessMessageBar().getText(),
-                is(String.format("Data in %s has been updated successfully. Happy analyzing!", datasetName)));
+                is(String.format("Data has been loaded successfully to \"%s\". Start analyzing!", datasetName)));
         takeScreenshot(browser, toScreenshotName("Successful-upload-data-to-dataset", datasetName), getClass());
     }
 
@@ -458,12 +457,12 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
 
         assertThat(datasetsListPage.waitForProgressMessageBar().getText(),
-                is(String.format("Adding data from %s to the project ...", fileToUpload.getFileName())));
+                is(String.format(ADDING_DATA_FROM_MESSAGE, fileToUpload.getFileName())));
         takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
 
         // The error message should be improved in MSF-9476
         assertThat(datasetsListPage.waitForErrorMessageBar().getText(),
-                is(String.format("Failed to add data from %s due to internal error", fileToUpload.getDatasetNameOfFirstUpload())));
+                is(String.format("Failed to add data from \"%s\" due to internal error. Contact support.", fileToUpload.getDatasetNameOfFirstUpload())));
         takeScreenshot(browser, toScreenshotName("Failed-upload-from", fileToUpload.getFileName()), getClass());
     }
 
@@ -489,9 +488,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
                 containsInAnyOrder("id3", "name3", "lastname3", "age3", "Amount3"));
         assertThat(
                 dataPreviewPage.getWarningMessage(),
-                is("You cannot set any of the greyed out rows as the header row: "
-                        + "each row following the header row must contain at least one "
-                        + "numeric value (measurable data), and the disabled rows do meet this requirement."));
+                is("First 3 rows cannot be set as a header. A header must be followed by rows containing at least one number."));
         takeScreenshot(browser, toScreenshotName("set-header", fileToUpload.getFileName()), getClass());
 
         dataPreviewPage.triggerIntegration();
@@ -703,8 +700,6 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
     public void checkMyDataAndNoDataOfOthers() {
         initDataUploadPage();
 
-        datasetsListPage.waitForOthersDatasetsEmptyStateLoaded();
-
         CsvFile fileToUpload = CsvFile.PAYROLL_BY_PROJECT_OWNER;
 
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
@@ -716,8 +711,6 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         assertThat(myDatasetNames, contains(myDatasetNames.stream().sorted().toArray()));
         waitForDatasetStatus(myDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", myDatasetName), getClass());
-
-        waitForFragmentVisible(datasetsListPage).waitForOthersDatasetsEmptyStateLoaded();
     }
 
     @Test(dependsOnGroups = {"myData"}, alwaysRun = true)
