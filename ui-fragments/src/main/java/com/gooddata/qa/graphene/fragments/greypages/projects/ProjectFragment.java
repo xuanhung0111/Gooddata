@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -17,6 +18,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+import org.testng.Assert;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
 
@@ -60,7 +62,9 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         this.authorizationToken.sendKeys(authorizationToken);
         waitForElementVisible(submit).click();
         waitForElementNotVisible(this.title);
-        waitForElementVisible(BY_GP_LINK, browser).click();
+        Graphene.guardHttp(waitForElementVisible(BY_GP_LINK, browser)).click();
+        Assert.assertEquals(loadJSON().getJSONObject("project").getJSONObject("meta").getString("title"), title,
+                "Project creation wasn't redirected properly to project grey page");
         return waitForProjectStateEnabled(checkIterations);
     }
 
