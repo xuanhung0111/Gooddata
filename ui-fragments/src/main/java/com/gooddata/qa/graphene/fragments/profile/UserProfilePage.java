@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.profile;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,8 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
 
 public class UserProfilePage extends AbstractFragment {
+
+    public static final By USER_PROFILE_PAGE_LOCATOR = By.cssSelector("#p-profilePage");
 
     @FindBy(css = ".fullname")
     private WebElement fullname;
@@ -33,6 +36,9 @@ public class UserProfilePage extends AbstractFragment {
 
     @FindBy(css = ".item")
     private List<WebElement> recentActivityItems;
+
+    @FindBy(css = ".role")
+    private WebElement role;
 
     public PersonalInfo getUserInfo() {
         return new PersonalInfo()
@@ -57,6 +63,10 @@ public class UserProfilePage extends AbstractFragment {
                 .filter(e -> e.equals(itemName))
                 .findFirst()
                 .isPresent();
+    }
+
+    public String getUserRole() {
+        return waitForElementPresent(role).getText();
     }
 
     public class UserVariableTable extends AbstractTable {

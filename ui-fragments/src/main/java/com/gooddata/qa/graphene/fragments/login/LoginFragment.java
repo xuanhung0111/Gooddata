@@ -29,6 +29,9 @@ public class LoginFragment extends AbstractFragment {
     @FindBy(xpath = "//*[contains(@href, 'lostPassword')]")
     private WebElement forgotPasswordLink;
 
+    @FindBy(css = ".s-registration-link")
+    private WebElement registrationLink;
+
     private static final String ERROR_CLASS = "has-error";
     private static final By NOTIFICATION_MESSAGE_LOCATOR = By.cssSelector(".message.is-success");
 
@@ -69,6 +72,10 @@ public class LoginFragment extends AbstractFragment {
         waitForElementVisible(forgotPasswordLink).click();
         return Graphene.createPageFragment(LostPasswordPage.class,
                 waitForElementVisible(By.className(LOST_PASSWORD_PAGE_CLASS_NAME), browser));
+    }
+
+    public void openRegistrationPage() {
+        waitForElementVisible(registrationLink).click();
     }
 
     public String getNotificationMessage() {
