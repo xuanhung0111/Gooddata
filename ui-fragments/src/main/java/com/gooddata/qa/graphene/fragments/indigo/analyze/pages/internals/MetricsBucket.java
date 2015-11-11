@@ -57,22 +57,22 @@ public class MetricsBucket extends AbstractFragment {
     private static final By BY_ATTRIBUTE_FILTER_PICKER = By.className("adi-attr-filter-picker");
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
 
-    public void addMetric(WebElement metric) {
+    public void addMetric(final WebElement metric) {
         new Actions(browser).dragAndDrop(metric, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
         assertTrue(getItemNames().contains(metric.getText().trim()));
     }
 
-    public void addMetricFromFact(WebElement fact) {
+    public void addMetricFromFact(final WebElement fact) {
         new Actions(browser).dragAndDrop(fact, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
         assertTrue(getItemNames().contains("Sum of " + fact.getText().trim()));
     }
 
-    public void addMetricFromAttribute(WebElement attribute) {
+    public void addMetricFromAttribute(final WebElement attribute) {
         new Actions(browser).dragAndDrop(attribute, waitForElementVisible(BY_BUCKET_INVITATION, getRoot())).perform();
         assertTrue(getItemNames().contains("Count of " + attribute.getText().trim()));
     }
 
-    public void replaceMetric(String oldMetric, WebElement newMetric) {
+    public void replaceMetric(String oldMetric, final WebElement newMetric) {
         new Actions(browser).dragAndDrop(newMetric, getMetric(oldMetric)).perform();
         assertTrue(getItemNames().contains(newMetric.getText().trim()));
     }

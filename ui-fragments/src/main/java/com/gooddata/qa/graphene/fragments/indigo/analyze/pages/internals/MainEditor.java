@@ -8,8 +8,9 @@ import java.text.ParseException;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.jboss.arquillian.graphene.enricher.WebElementUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -80,9 +81,18 @@ public class MainEditor extends AbstractFragment {
     }
 
     public void dragAndDropMetricToShortcutPanel(WebElement metric, ShortcutPanel shortcutPanel) {
-        new Actions(browser).clickAndHold(metric).moveToElement(getRoot())
-                .release(WebElementUtils.findElementLazily(shortcutPanel.getLocator(), getRoot()))
-                .perform();
+        Actions action = new Actions(browser);
+
+        Point location = getRoot().getLocation();
+        Dimension dimension = getRoot().getSize();
+        action.clickAndHold(metric)
+            .moveByOffset(location.x + dimension.width/2, location.y + dimension.height/2)
+            .perform();
+        try {
+            action.moveToElement(waitForElementVisible(shortcutPanel.getLocator(), getRoot())).perform();
+        } finally {
+            action.release().perform();
+        }
     }
 
     public String getExplorerMessage() {
