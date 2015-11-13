@@ -75,6 +75,7 @@ public class RestUtils {
     private static final String USER_PROFILE_LINK = "/gdc/account/profile/";
     private static final String UPDATE_USER_INFO_CONTENT_BODY;
     private static final String QUERY_FACTS_URI = "/gdc/md/${projectId}/query/facts";
+    private static final String GDC_ORGANIZATION_SETTINGS = "/gdc/organizations/default/settings";
 
     static {
         try {
@@ -1029,7 +1030,18 @@ public class RestUtils {
                     .getJSONArray("items")
                     .getJSONObject(0)
                     .getJSONObject("accountSetting");
+        } catch (JSONException e) {
+            return null;
+        }
+    }
 
+    public static String getNoReplyEmail(RestApiClient restApiClient)
+            throws ParseException, JSONException, IOException {
+        try {
+            return getJSONObjectFrom(restApiClient, GDC_ORGANIZATION_SETTINGS)
+                    .getJSONObject("settings")
+                    .getJSONObject("mailSettings")
+                    .getString("noReplyEmail");
         } catch (JSONException e) {
             return null;
         }
