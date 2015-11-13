@@ -14,6 +14,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstractTest {
 
     private static final String EXPECTED = "Expected";
+    private static final String REMAINING_QUOTA = "Remaining Quota";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -41,15 +42,17 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
         assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
                 asList(NUMBER_OF_ACTIVITIES, AMOUNT, EXPECTED)));
 
-        analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, QUOTA);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), asList(QUOTA, AMOUNT, EXPECTED)));
+        analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, REMAINING_QUOTA);
+        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
+                asList(REMAINING_QUOTA, AMOUNT, EXPECTED)));
 
         analysisPage.undo();
         assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
                 asList(NUMBER_OF_ACTIVITIES, AMOUNT, EXPECTED)));
 
         analysisPage.redo();
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), asList(QUOTA, AMOUNT, EXPECTED)));
+        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
+                asList(REMAINING_QUOTA, AMOUNT, EXPECTED)));
         checkingOpenAsReport("replaceMetricByNewOne");
     }
 
