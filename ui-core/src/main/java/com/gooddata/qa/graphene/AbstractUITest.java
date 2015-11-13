@@ -16,6 +16,8 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForReportsPageLoaded
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForSchedulesPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -38,6 +40,8 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.AccountPage;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -128,6 +132,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(css = ".l-primary")
     protected UploadFragment upload;
+
+    @FindBy(className = "s-datasets-list")
+    protected DatasetsListPage datasetsListPage;
 
     @FindBy(id = "p-dataPage")
     protected DataPage dataPage;
@@ -473,6 +480,23 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 reportsPage.getSelectedFolderName());
     }
 
+    public void uploadCSV(String filePath) {
+        initDataUploadPage();
+
+        final int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
+
+        waitForFragmentVisible(datasetsListPage).uploadFile(filePath);
+        takeScreenshot(browser, "upload-definition", this.getClass());
+
+        Graphene.createPageFragment(DataPreviewPage.class,
+                waitForElementVisible(className("s-data-preview"), browser))
+                .triggerIntegration();
+
+        Predicate<WebDriver> datasetsCountEqualsExpected = input ->
+            waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCountBeforeUpload + 1;
+        Graphene.waitGui(browser).until(datasetsCountEqualsExpected);
+    }
+
     public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType,
             String screenshotName) {
         initProjectsPage();
@@ -500,6 +524,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
     private void waitForDashboardPage() {
         waitForDashboardPageLoaded(browser);
         waitForElementVisible(dashboardsPage.getRoot());
+    }
+
+    public void initDataUploadPage() {
+        openUrl(format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
+        waitForFragmentVisible(datasetsListPage);
     }
 
     public void initProjectsPage() {
