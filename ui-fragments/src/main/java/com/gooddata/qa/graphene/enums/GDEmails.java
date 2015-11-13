@@ -1,15 +1,15 @@
 package com.gooddata.qa.graphene.enums;
 
-public enum GDEmails {
-    NO_REPLY("no-reply@gooddata.com", 3),
-    NOREPLY("noreply@gooddata.com", 5),
-    INVITATION("invitation@gooddata.com", 10),
-    REGISTRATION("registration@gooddata.com", 10);
+public class GDEmails {
+    public static GDEmails NO_REPLY = new GDEmails("no-reply@gooddata.com", 3);
+    public static GDEmails NOREPLY = new GDEmails("noreply@gooddata.com", 5);
+    public static GDEmails INVITATION = new GDEmails("invitation@gooddata.com", 10);
+    public static GDEmails REGISTRATION = new GDEmails("registration@gooddata.com", 10);
 
     private String emailAddress;
     private int maxWaitingTimeInMinute;
 
-    private GDEmails(String emailAddress, int maxWaitingTimeInMinute) {
+    public GDEmails(String emailAddress, int maxWaitingTimeInMinute) {
         this.emailAddress = emailAddress;
         this.maxWaitingTimeInMinute = maxWaitingTimeInMinute;
     }
