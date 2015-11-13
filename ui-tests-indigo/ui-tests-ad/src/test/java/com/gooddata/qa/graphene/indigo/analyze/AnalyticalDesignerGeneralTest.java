@@ -667,6 +667,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         if (remainedAttributes.isEmpty()) {
             System.out.println("Could not find any different attributes to test this case! Reuse old attributes");
             remainedAttributes = newArrayList(attributes);
+            cache.clear();
         }
         String attribute =  remainedAttributes.get(random.nextInt(remainedAttributes.size()));
         remainedAttributes.remove(attribute);

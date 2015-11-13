@@ -63,7 +63,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         initAnalysePage();
 
         try {
-            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-close"), browser);
+            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-cancel"), browser);
             walkmeCloseElement.click();
             waitForElementNotPresent(walkmeCloseElement);
         } catch (TimeoutException e) {

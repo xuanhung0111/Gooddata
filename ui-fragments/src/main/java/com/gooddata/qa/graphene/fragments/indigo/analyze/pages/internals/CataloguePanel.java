@@ -3,12 +3,12 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -51,6 +51,7 @@ public class CataloguePanel extends AbstractFragment {
     private static final By BY_UNRELATED_ITEMS_HIDDEN = By.cssSelector("footer > div");
     private static final By BY_UNAVAILABLE_ITEMS_MATCHED = By.className("s-unavailable-items-matched");
     private static final By BY_ADD_DATA = By.cssSelector(".csv-link-section .s-btn-add_data");
+    private static final By BY_CLEAR_SEARCH_FIELD = By.className("searchfield-clear");
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
@@ -163,14 +164,15 @@ public class CataloguePanel extends AbstractFragment {
      */
     public boolean searchBucketItem(String item) {
         waitForItemLoaded();
-        waitForElementVisible(searchInput).clear();
-        // TODO: work around to pass orchestrator, need to fix soon
-        Stream.of(WEIRD_STRING_TO_CLEAR_ALL_ITEMS.split("")).forEach(searchInput::sendKeys);
+        clearInputText();
+
+        searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        waitForItemLoaded();
         waitForCollectionIsEmpty(items);
 
-        searchInput.clear();
-        // TODO: work around to pass orchestrator, need to fix soon
-        Stream.of(item.split("")).forEach(searchInput::sendKeys);
+        clearInputText();
+        searchInput.sendKeys(item);
+        waitForItemLoaded();
 
         if (!isElementPresent(BY_NO_ITEMS, browser)) {
             waitForCollectionIsNotEmpty(items);
@@ -179,6 +181,17 @@ public class CataloguePanel extends AbstractFragment {
         WebElement noItem = browser.findElement(BY_NO_ITEMS).findElement(By.cssSelector("p:first-child"));
         assertEquals(noItem.getText().trim(), "No data matching\n\"" + item + "\"");
         return false;
+    }
+
+    private void clearInputText() {
+        if (isElementPresent(BY_CLEAR_SEARCH_FIELD, getRoot())) {
+            WebElement clearIcon = waitForElementVisible(BY_CLEAR_SEARCH_FIELD, getRoot());
+            clearIcon.click();
+            waitForElementNotPresent(clearIcon);
+        } else {
+            waitForElementVisible(searchInput).clear();
+        }
+        waitForItemLoaded();
     }
 
     public boolean isInapplicableAttributeMetricInViewPort() {
@@ -219,12 +232,9 @@ public class CataloguePanel extends AbstractFragment {
     }
 
     private void waitForItemLoaded() {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            public boolean apply(WebDriver input) {
-                return browser.findElements(
-                        By.cssSelector(".catalogue-container .gd-list-view-loading")).isEmpty();
-            };
-        });
+        Predicate<WebDriver> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
+                browser);
+        Graphene.waitGui().until(itemsLoaded);
     }
 
     private WebElement searchAndGetInapplicableItem(final String item, final FieldType type) {
@@ -243,7 +253,7 @@ public class CataloguePanel extends AbstractFragment {
         searchBucketItem(item);
         return Iterables.find(items, new Predicate<WebElement>() {
             @Override
-            public boolean apply(WebElement input) {
+            public boolean apply(final WebElement input) {
                 return item.equals(input.getText().trim())
                         && input.getAttribute("class").contains(type.toString());
             }
