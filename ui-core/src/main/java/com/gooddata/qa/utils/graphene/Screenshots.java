@@ -14,11 +14,24 @@ public class Screenshots {
 
     private static final String SCREENSHOT_NAME_SEPARATOR = "-";
 
-    private static File mavenProjectBuildDirectory = new File(System.getProperty("maven.project.build.directory", "./target/"));
+    private static File mavenProjectBuildDirectory = new File(System.getProperty("maven.project.build.directory",
+            "./target/"));
     private static File screenshotsOutputDir = new File(mavenProjectBuildDirectory, "screenshots");
+    private static File failuresOutputDir = new File(mavenProjectBuildDirectory, "failures");
 
     public static void takeScreenshot(WebDriver driver, String screenshotName, Class<?> testClass) {
-        File imageOutputFile = new File(screenshotsOutputDir, testClass.getSimpleName() + "/" + screenshotName + "-screenshot.png");
+        File imageOutputFile = new File(screenshotsOutputDir,
+                testClass.getSimpleName() + "/" + screenshotName + "-screenshot.png");
+        takeScreenshot(driver, imageOutputFile);
+    }
+
+    public static void takeFailureScreenshot(WebDriver driver, Class<?> testClass, String methodName) {
+        File imageOutputFile = new File(failuresOutputDir,
+                testClass.getSimpleName() + "." + methodName + "/screenshot.png");
+        takeScreenshot(driver, imageOutputFile);
+    }
+
+    private static void takeScreenshot(WebDriver driver, File imageOutputFile) {
         try {
             File directory = imageOutputFile.getParentFile();
             FileUtils.forceMkdir(directory);
