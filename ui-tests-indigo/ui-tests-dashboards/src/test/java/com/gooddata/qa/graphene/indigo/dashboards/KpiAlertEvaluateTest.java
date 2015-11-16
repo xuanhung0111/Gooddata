@@ -13,7 +13,6 @@ import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialo
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import com.gooddata.qa.utils.http.RestUtils;
-import static com.gooddata.qa.utils.http.RestUtils.getNoReplyEmail;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
@@ -73,7 +72,6 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         long testStartTime = new Date().getTime();
         String imapUniqueUser = generateImapUniqueUserEmail(imapUser);
         String userUri = addImapUserToProject(imapUniqueUser, imapPassword);
-        String from = getNoReplyEmail(restApiClient);
 
         String metricUri = null;
 
@@ -105,7 +103,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             switchToUser(imapUniqueUser, imapPassword);
 
             // metric name is in mail subject and is unique
-            String link = getDashboardLink(getLastMailContent(from, KPI_METRIC, testStartTime));
+            String link = getDashboardLink(getLastMailContent(KPI_METRIC, testStartTime));
 
             assertNotNull(link);
             browser.get(link);
@@ -158,9 +156,9 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         return userUri;
     }
 
-    private String getLastMailContent(String from, String subject, long messagesArrivedAfter) throws IOException, MessagingException {
+    private String getLastMailContent(String subject, long messagesArrivedAfter) throws IOException, MessagingException {
         Collection<Message> messages = ImapUtils.waitForMessageWithExpectedReceivedTime(
-                getImapClient(), new GDEmails(from, 5), subject, messagesArrivedAfter);
+                getImapClient(), GDEmails.NOREPLY, subject, messagesArrivedAfter);
 
         return Iterables.getLast(messages).getContent().toString().trim();
     }
