@@ -1,27 +1,25 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.json.JSONException;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
-import com.gooddata.qa.graphene.fragments.indigo.Header;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
-public class ResponsiveNavigationTest extends DashboardsGeneralTest {
+public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"mobile"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
     public void checkHamburgerMenuDisplayed() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -33,7 +31,7 @@ public class ResponsiveNavigationTest extends DashboardsGeneralTest {
         indigoDashboardsPage.closeHamburgerMenu();
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"mobile"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
     public void checkHamburgerMenuItems() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -50,13 +48,11 @@ public class ResponsiveNavigationTest extends DashboardsGeneralTest {
                 .goToPage(page);
 
             takeScreenshot(browser, "checkHamburgerMenuItems-" + page, getClass());
-            assertEquals(Stream.of("Analyze", "KPIs").anyMatch(p -> p.equals(page)),
-                    isElementPresent(Header.HAMBURGER_LINK, browser));
             assertTrue(browser.getCurrentUrl().contains(testParams.getProjectId()));
         });
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"mobile"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
     public void checkLogout() throws JSONException {
         if (!isDeviceSupportHamburgerMenu()) return;
 
@@ -72,7 +68,39 @@ public class ResponsiveNavigationTest extends DashboardsGeneralTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"mobile"})
+    public void checkLandingPage() throws JSONException {
+        String executionEnv = System.getProperty("test.execution.env");
+        if (executionEnv == null || !executionEnv.contains("browserstack-mobile")) {
+            String message = "This test should be executed in browserstack mobile."
+                    + " Skip this test in local testing.";
+            log.info(message);
+            throw new SkipException(message);
+        }
+
+        if (!isDeviceSupportHamburgerMenu()) return;
+
+        HamburgerMenu menu = indigoDashboardsPage.openHamburgerMenu();
+        List<String> pages = menu.getAllMenuItems();
+        indigoDashboardsPage.closeHamburgerMenu();
+
+        for (String page : pages) {
+            log.info("Navigate to page: " + page);
+
+            indigoDashboardsPage
+                .openHamburgerMenu()
+                .goToPage(page);
+
+            logout();
+            signIn(false, UserRoles.ADMIN);
+
+            waitForFragmentVisible(indigoDashboardsPage)
+                .waitForDashboardLoad()
+                .waitForAllKpiWidgetsLoaded();
+        }
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
     }
