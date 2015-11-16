@@ -12,6 +12,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
@@ -109,9 +110,27 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
-            scheduleDetail.cancelChangeAndCheckDatasetDialog(scheduleBuilder);
+            scheduleDetail.openDatasetDialog();
+            scheduleDetail.clickOnNoneDatasetButton();
+            assertTrue(scheduleDetail.isSelectedDatasetsChecked(Collections.<String>emptyList()));
 
-            scheduleDetail.changeAndCheckDatasetDialog(scheduleBuilder);
+            scheduleDetail.cancelSelectSynchronizeDatasets();
+            assertSchedule(scheduleBuilder);
+            assertTrue(scheduleDetail.isCorrectDatasetsSelected(scheduleBuilder), "Incorrect selected datasets!");
+            
+            scheduleDetail.openDatasetDialog();
+            scheduleDetail.clickOnAllDatasetsButton();
+            assertTrue(scheduleDetail.isSelectedDatasetsChecked(scheduleBuilder.getAllDatasets()), "All datasets are not checked");
+
+            scheduleDetail.clickOnNoneDatasetButton();
+            assertTrue(scheduleDetail.isSelectedDatasetsChecked(Collections.<String>emptyList()),
+                    "There are some checked datasets when none dataset option is selected");
+
+            scheduleDetail.saveSelectedSynchronizeDatasets();
+
+            scheduleBuilder.setDatasetsToSynchronize(Collections.<String>emptyList());
+            assertSchedule(scheduleBuilder);
+            
         } finally {
             scheduleDetail.disableSchedule();
         }
@@ -135,10 +154,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
             scheduleDetail.openDatasetDialog();
-            scheduleDetail.searchDatasetAndCheckResult(fullKey, asList(OPPORTUNITY_DATASET));
-            scheduleDetail.searchDatasetAndCheckResult(partKey, asList(OPPORTUNITY_DATASET));
-            scheduleDetail.searchDatasetAndCheckResult(invalidKey, Collections.<String>emptyList());
-            scheduleDetail.searchDatasetAndCheckResult(multiResultsKey, 
+            searchDatasetAndCheckResult(fullKey, asList(OPPORTUNITY_DATASET));
+            searchDatasetAndCheckResult(partKey, asList(OPPORTUNITY_DATASET));
+            searchDatasetAndCheckResult(invalidKey, Collections.<String>emptyList());
+            searchDatasetAndCheckResult(multiResultsKey, 
                     asList(PERSON_DATASET, OPPORTUNITY_DATASET));
         } finally {
             scheduleDetail.disableSchedule();
@@ -172,7 +191,6 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             openScheduleViaUrl(schedule1.getScheduleUrl());
             scheduleDetail.manualRun();
-            assertTrue(scheduleDetail.isInRunningState());
             scheduleDetail.clickOnCloseScheduleButton();
 
             openScheduleViaUrl(schedule2.getScheduleUrl());
@@ -182,7 +200,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             openScheduleViaUrl(schedule1.getScheduleUrl());
             Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule1-Successful", getClass());
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
         } finally {
             openScheduleViaUrl(schedule1.getScheduleUrl());
             scheduleDetail.disableSchedule();
@@ -277,7 +295,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
 
             checkReportOfAllDatasets();
         } finally {
@@ -302,7 +320,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
 
             prepareMetricToCheckNewAddedFields("age", "price");
             createAndCheckReport(new UiReportDefinition().withName("Opportunity dataset").withHows("name")
@@ -331,8 +349,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
-            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
-            scheduleDetail.assertSuccessfulExecution();
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
+            assertSuccessfulExecution();
 
             checkReportOfAllDatasets();
         } finally {
@@ -356,8 +375,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
-            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
-            scheduleDetail.assertSuccessfulExecution();
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
+            assertSuccessfulExecution();
 
             prepareMetricToCheckNewAddedFields("age", "price");
             createAndCheckReport(new UiReportDefinition().withName("Opportunity dataset").withHows("name")
@@ -413,9 +433,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                             .setConfirmed(true).setHasDataloadProcess(true).setSynchronizeAllDatasets(true)
                             .setScheduleName("Auto Run Dataload Schedule");
             createAndAssertSchedule(scheduleBuilder);
-            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
             scheduleDetail.waitForExecutionFinish();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
         } finally {
             scheduleDetail.disableSchedule();
         }
@@ -436,14 +457,15 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             scheduleDetail.disableSchedule();
             assertTrue(scheduleDetail.isDisabledSchedule(scheduleBuilder.getCronTimeBuilder()));
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
 
             scheduleBuilder.setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
             scheduleDetail.changeCronTime(scheduleBuilder.getCronTimeBuilder(), Confirmation.SAVE_CHANGES);
 
             scheduleDetail.enableSchedule();
-            scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder());
-            scheduleDetail.assertSuccessfulExecution();
+            assertTrue(scheduleDetail.waitForAutoRunSchedule(scheduleBuilder.getCronTimeBuilder()),
+                    "Schedule is not run automatically well!");
+            assertSuccessfulExecution();
         } finally {
             scheduleDetail.disableSchedule();
         }
@@ -472,7 +494,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             runSuccessfulTriggerSchedule(triggerScheduleBuilder.getScheduleUrl());
             waitForAutoRunDependentSchedule(dependentScheduleBuilder);
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
         } finally {
             openScheduleViaUrl(triggerScheduleBuilder.getScheduleUrl());
             scheduleDetail.disableSchedule();
@@ -493,6 +515,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                             .setScheduleName("Dataload Schedule with Retry");
             createAndAssertSchedule(scheduleBuilder);
             scheduleDetail.addValidRetry("15", Confirmation.SAVE_CHANGES);
+            assertEquals(scheduleDetail.getRescheduleTime(), "15");
         } finally {
             scheduleDetail.disableSchedule();
         }
@@ -511,12 +534,12 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             createAndAssertSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
 
             initDISCOverviewPage();
             discOverview.selectOverviewState(OverviewProjectStates.SUCCESSFUL);
             waitForElementVisible(discOverviewProjects.getRoot());
-            discOverviewProjects.assertOverviewCustomScheduleName(OverviewProjectStates.SUCCESSFUL,
+            assertOverviewCustomScheduleName(OverviewProjectStates.SUCCESSFUL,
                     getWorkingProject(), scheduleBuilder);
         } finally {
             openScheduleViaUrl(scheduleBuilder.getScheduleUrl());
@@ -543,18 +566,27 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     public void cleanUp() {
         deleteADSInstance(ads);
     }
+    
+    private void searchDatasetAndCheckResult(String searchKey, List<String> expectedResult) {
+        scheduleDetail.searchDatasets(searchKey);
+        assertTrue(CollectionUtils.isEqualCollection(scheduleDetail.getSearchedDatasets(), expectedResult), 
+                "Search results with keyword" + searchKey + " is not correct!");
+        if (expectedResult.isEmpty()) {
+            assertEquals(scheduleDetail.getDatasetListCount(), expectedResult.size(), 
+                    "Number of search results with keyword" + searchKey + " is not correct!");
+        }
+    }
 
     private void assertConcurrentDataloadScheduleFailed() {
         browser.navigate().refresh();
         waitForElementVisible(scheduleDetail.getRoot());
         scheduleDetail.waitForExecutionFinish();
-        assertTrue(scheduleDetail.isLastSchedulerErrorIconVisible());
-        assertEquals(scheduleDetail.getExecutionErrorDescription(), CONCURRENT_DATA_LOAD_MESSAGE);
-        assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE);
-        assertTrue(scheduleDetail.getExecutionRuntime().isEmpty());
-        assertFalse(scheduleDetail.getLastExecutionTime().isEmpty());
-        assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE);
-        assertNull(scheduleDetail.getLastExecutionLogLink());
+        assertTrue(scheduleDetail.isSchedulerErrorIconVisible(), "Scheduler error icon is not shown!");
+        assertEquals(scheduleDetail.getExecutionErrorDescription(), CONCURRENT_DATA_LOAD_MESSAGE, "Incorrect concurrent data load message!");
+        assertEquals(scheduleDetail.getLastExecutionLogTitle(), NO_LOG_AVAILABLE_TITLE, "Incorrect no log available!");
+        assertTrue(scheduleDetail.getLastExecutionRuntime().isEmpty(), "Execution runtime is not empty");
+        assertFalse(scheduleDetail.getLastExecutionTime().isEmpty(), "Execution time is not shown!");
+        assertNull(scheduleDetail.getLastExecutionLogLink(), "Log link is not null!");
     }
 
     private String getScheduleDetail(String scheduleUrl) {
@@ -572,7 +604,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     private void runManualAndCheckExecutionSuccessful(String screenShot) {
         scheduleDetail.manualRun();
-        scheduleDetail.assertSuccessfulExecution();
+        assertSuccessfulExecution();
         Screenshots.takeScreenshot(browser, screenShot, getClass());
     }
     

@@ -2,17 +2,13 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.fragments.AbstractTable;
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -52,79 +48,46 @@ public class ProjectsList extends AbstractTable {
     @FindBy(css = ".ait-projects-empty-state")
     private WebElement projectsEmptyState;
 
-    public void assertDataLoadingProcesses(int processNumber, int scheduleNumber,
-            List<ProjectInfo> projects) {
-        final String expectedDataLoadingProcess =
-                String.format("%d processes, %d schedules", processNumber, scheduleNumber);
-        System.out.println("expectedDataLoadingProcess " + expectedDataLoadingProcess);
-        for (ProjectInfo project : projects) {
-            assertEquals(expectedDataLoadingProcess, selectProjectWithAdminRole(project)
-                    .findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText());
-        }
+    public String getProcessesLabel(ProjectInfo project) {
+        return selectProjectWithAdminRole(project).findElement(BY_DISC_PROJECT_DATA_LOADING_PROCESSES).getText();
     }
 
-    public void assertProjectNotAdmin(String projectName) {
-        waitForElementVisible(getRoot());
-        WebElement selectedProject = selectProjectWithNonAdminRole(projectName);
-        assertNotNull(selectedProject, "Project is not found!");
-        try {
-            selectedProject.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).click();
-            Graphene.waitGui().withTimeout(10, TimeUnit.SECONDS).until().element(projectDetail)
-                    .is().visible();
-        } catch (NoSuchElementException ex) {
-            System.out.println("Non-admin user cannot access project detail page!");
-        }
-        waitForElementVisible(getRoot());
+    public void clickOnProjectWithNonAdminRole(WebElement selectedProject) {
+        selectedProject.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).click();
     }
-    
-    public void assertLastLoaded(String executionDate, String executionTime, ProjectInfo project) {
-        assertEquals(getLastSuccessfulExecutionInfo(project),
-                Joiner.on(" ").join(executionDate, executionTime));
-    }
-    
+
     public String getLastSuccessfulExecutionInfo(ProjectInfo project) {
         return waitForElementPresent(BY_DISC_PROJECT_LAST_SUCCESSFUL_EXECUTION,
                 selectProjectWithAdminRole(project)).getText();
     }
 
     public WebElement selectProjectWithAdminRole(final ProjectInfo project) {
-        Predicate<WebElement> predicate = new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement row) {
-                return row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-                        && row.findElement(BY_DISC_PROJECT_NAME).getText()
-                                .equals(project.getProjectName())
-                        && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href")
-                                .contains(project.getProjectId());
-            }
-        };
+        Predicate<WebElement> predicate = row -> row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
+              && row.findElement(BY_DISC_PROJECT_NAME).getText().equals(project.getProjectName())
+              && row.findElement(BY_DISC_PROJECT_NAME).getAttribute("href").contains(project.getProjectId());
         return selectProject(predicate);
     }
 
-    public void assertSearchProjectsByName(String searchKey) {
+    public boolean isCorrectSearchResultByName(String searchKey) {
         for (WebElement project : getRows()) {
-            if (project.findElement(BY_PROJECT_CHECKBOX).isEnabled())
-                assertTrue(project.findElement(BY_DISC_PROJECT_NAME).getText().contains(searchKey),
-                        "Display project with name: "
-                                + project.findElement(BY_DISC_PROJECT_NAME).getText());
-            else
-                assertTrue(
-                        project.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText()
-                                .contains(searchKey), "Display project with name: "
-                                + project.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText());
+            By projectNameLocator  = project.findElement(BY_PROJECT_CHECKBOX).isEnabled()?
+                    BY_DISC_PROJECT_NAME : BY_DISC_PROJECT_NAME_NOT_ADMIN;
+            if (!project.findElement(projectNameLocator).getText().contains(searchKey)) {
+                return false;
+            }
         }
+        return true;
     }
 
-    public void assertSearchProjectByUnicodeName(String searchKey) {
+    public boolean isCorrectSearchedProjectByUnicodeName(String searchKey) {
         for (WebElement project : getRows()) {
-            if (project.findElement(BY_PROJECT_CHECKBOX).isEnabled())
-                assertNotNull(project.findElement(By.xpath(XPATH_PROJECT_NAME.replace(
-                        "${searchKey}", searchKey))));
-            else
-                assertNotNull(project.findElement(By.xpath(XPATH_PROJECT_NAME_NOT_ADMIN.replace(
-                        "${searchKey}", searchKey))));
+            String projectNameLocator = project.findElement(BY_PROJECT_CHECKBOX).isEnabled()?
+                    XPATH_PROJECT_NAME : XPATH_PROJECT_NAME_NOT_ADMIN;
+            if (project.findElements(By.xpath(projectNameLocator.replace("${searchKey}", searchKey))).isEmpty()) {
+                return false;
+            }
         }
+        return true;
     }
 
     public String getEmptyStateMessage() {
@@ -161,10 +124,16 @@ public class ProjectsList extends AbstractTable {
         return errorBar;
     }
 
+    public WebElement selectProjectWithNonAdminRole(final String projectName) {
+        Predicate<WebElement> predicate = row -> !row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
+              && row.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText().equals(projectName);
+        return selectProject(predicate);
+    }
+
     private WebElement selectProject(Predicate<WebElement> predicate) {
         Iterator<WebElement> iterator = projectPages.iterator();
         do {
-            if (getRoot().findElements(BY_EMPTY_STATE).isEmpty())
+            if (!isElementPresent(BY_EMPTY_STATE, getRoot()))
                 waitForCollectionIsNotEmpty(rows);
             Optional<WebElement> project = Iterables.tryFind(rows, predicate);
             if (project.isPresent())
@@ -176,18 +145,5 @@ public class ProjectsList extends AbstractTable {
                 return null;
         } while (projectPages.size() > 0);
         return null;
-    }
-
-    private WebElement selectProjectWithNonAdminRole(final String projectName) {
-        Predicate<WebElement> predicate = new Predicate<WebElement>() {
-
-            @Override
-            public boolean apply(WebElement row) {
-                return !row.findElement(BY_PROJECT_CHECKBOX).isEnabled()
-                        && row.findElement(BY_DISC_PROJECT_NAME_NOT_ADMIN).getText()
-                                .equals(projectName);
-            }
-        };
-        return selectProject(predicate);
     }
 }

@@ -22,6 +22,7 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
+import com.gooddata.qa.graphene.fragments.disc.NotificationRule;
 
 public class NotificationsTest extends AbstractNotificationTest {
 
@@ -62,9 +63,8 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"prepareDataForSucessEvent"}, groups = {"notification"})
     public void createNotificationForSuccessEvent() {
         NotificationBuilder notificationInfo =
-                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(successNotificationSubject)
-                        .setMessage(successNotificationMessage)
+                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(successNotificationSubject).setMessage(successNotificationMessage)
                         .setEvent(NotificationEvents.SUCCESS);
         createAndAssertNotification(notificationInfo);
     }
@@ -72,9 +72,8 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"prepareDataForFailureEvent"}, groups = {"notification"})
     public void createNotificationForFailureEvent() {
         NotificationBuilder notificationInfo =
-                new NotificationBuilder().setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(failureNotificationSubject)
-                        .setMessage(failureNotificationMessage)
+                new NotificationBuilder().setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(failureNotificationSubject).setMessage(failureNotificationMessage)
                         .setEvent(NotificationEvents.FAILURE);
         createAndAssertNotification(notificationInfo);
     }
@@ -82,8 +81,8 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"prepareDataForSucessEvent"}, groups = {"notification"})
     public void createNotificationForProcessStartedEvent() {
         NotificationBuilder notificationInfo =
-                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(processStartedNotificationSubject)
+                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(processStartedNotificationSubject)
                         .setMessage(processStartedNotificationMessage)
                         .setEvent(NotificationEvents.PROCESS_STARTED);
         createAndAssertNotification(notificationInfo);
@@ -92,8 +91,8 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"prepareDataForSucessEvent"}, groups = {"notification"})
     public void createNotificationForProcessScheduledEvent() {
         NotificationBuilder notificationInfo =
-                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(processScheduledNotificationSubject)
+                new NotificationBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(processScheduledNotificationSubject)
                         .setMessage(processScheduledNotificationMessage)
                         .setEvent(NotificationEvents.PROCESS_SCHEDULED);
         createAndAssertNotification(notificationInfo);
@@ -102,11 +101,9 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"prepareDataForCustomEvent"}, groups = {"notification"})
     public void createNotificationForCustomEvent() {
         NotificationBuilder notificationInfo =
-                new NotificationBuilder().setProcessName(CUSTOM_NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(customEventNotificationSubject)
-                        .setMessage(customEventNotificationMessage)
-                        .setEvent(NotificationEvents.CUSTOM_EVENT)
-                        .setCustomEventName("welcomeEvent");
+                new NotificationBuilder().setProcessName(CUSTOM_NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(customEventNotificationSubject).setMessage(customEventNotificationMessage)
+                        .setEvent(NotificationEvents.CUSTOM_EVENT).setCustomEventName("welcomeEvent");
         createAndAssertNotification(notificationInfo);
     }
 
@@ -115,18 +112,16 @@ public class NotificationsTest extends AbstractNotificationTest {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(SUCCESS_NOTIFICATION_TEST_PROCESS)
-                        .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                        .setMinuteInHour("59");
+                        .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                        .setHourInDay("23").setMinuteInHour("59");
         createSchedule(scheduleBuilder);
         String scheduleUrl = browser.getCurrentUrl();
 
         scheduleDetail.manualRun();
-        scheduleDetail.assertSuccessfulExecution();
+        assertSuccessfulExecution();
         successProcessUri = getProcessUri(scheduleUrl);
         successfulScheduleId = scheduleUrl.substring(scheduleUrl.lastIndexOf("/") + 1);
-        getExecutionInfoFromGreyPage(successfulExecutionDetails,
-                scheduleDetail.getLastExecutionLogLink());
+        getExecutionInfoFromGreyPage(successfulExecutionDetails, scheduleDetail.getLastExecutionLogLink());
     }
 
     @Test(dependsOnMethods = {"createNotificationForFailureEvent"}, groups = {"notification"})
@@ -134,19 +129,17 @@ public class NotificationsTest extends AbstractNotificationTest {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(FAILURE_NOTIFICATION_TEST_PROCESS)
-                        .setExecutable(Executables.FAILED_GRAPH)
-                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                        .setMinuteInHour("59");
+                        .setExecutable(Executables.FAILED_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                        .setHourInDay("23").setMinuteInHour("59");
         createSchedule(scheduleBuilder);
 
         scheduleDetail.manualRun();
-        scheduleDetail.assertFailedExecution(scheduleBuilder.getExecutable());
+        assertFailedExecution(scheduleBuilder.getExecutable());
 
         String scheduleUrl = browser.getCurrentUrl();
         failureProcessUri = getProcessUri(scheduleUrl);
         failedScheduleId = scheduleUrl.substring(scheduleUrl.lastIndexOf("/") + 1);
-        getExecutionInfoFromGreyPage(failedExecutionDetails,
-                scheduleDetail.getLastExecutionLogLink());
+        getExecutionInfoFromGreyPage(failedExecutionDetails, scheduleDetail.getLastExecutionLogLink());
     }
 
     @Test(dependsOnMethods = {"createNotificationForCustomEvent"}, groups = {"notification"})
@@ -154,13 +147,12 @@ public class NotificationsTest extends AbstractNotificationTest {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(CUSTOM_NOTIFICATION_TEST_PROCESS)
-                        .setExecutable(Executables.CTL_GRAPH)
-                        .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                        .setMinuteInHour("59");
+                        .setExecutable(Executables.CTL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                        .setHourInDay("23").setMinuteInHour("59");
         createSchedule(scheduleBuilder);
 
         scheduleDetail.manualRun();
-        scheduleDetail.assertSuccessfulExecution();
+        assertSuccessfulExecution();
     }
 
     @Test(dependsOnMethods = {"successEventTrigger"}, groups = {"notification"})
@@ -176,8 +168,7 @@ public class NotificationsTest extends AbstractNotificationTest {
                                 DeployPackages.BASIC.getPackageRootFolder()
                                         + Executables.SUCCESSFUL_GRAPH.getExecutablePath())
                         .setScheduleName(Executables.SUCCESSFUL_GRAPH.getExecutableName())
-                        .setScheduleId(successfulScheduleId)
-                        .setExecutionDetails(successfulExecutionDetails);
+                        .setScheduleId(successfulScheduleId).setExecutionDetails(successfulExecutionDetails);
         checkNotification(NotificationEvents.SUCCESS, expectedParams);
     }
 
@@ -195,8 +186,7 @@ public class NotificationsTest extends AbstractNotificationTest {
                                 DeployPackages.BASIC.getPackageRootFolder()
                                         + Executables.SUCCESSFUL_GRAPH.getExecutablePath())
                         .setScheduleName(Executables.SUCCESSFUL_GRAPH.getExecutableName())
-                        .setScheduleId(successfulScheduleId)
-                        .setExecutionDetails(successfulExecutionDetails);
+                        .setScheduleId(successfulScheduleId).setExecutionDetails(successfulExecutionDetails);
         checkNotification(NotificationEvents.PROCESS_STARTED, expectedParams);
     }
 
@@ -213,8 +203,7 @@ public class NotificationsTest extends AbstractNotificationTest {
                                 DeployPackages.BASIC.getPackageRootFolder()
                                         + Executables.SUCCESSFUL_GRAPH.getExecutablePath())
                         .setScheduleName(Executables.SUCCESSFUL_GRAPH.getExecutableName())
-                        .setScheduleId(successfulScheduleId)
-                        .setExecutionDetails(successfulExecutionDetails);
+                        .setScheduleId(successfulScheduleId).setExecutionDetails(successfulExecutionDetails);
         checkNotification(NotificationEvents.PROCESS_SCHEDULED, expectedParams);
     }
 
@@ -231,66 +220,76 @@ public class NotificationsTest extends AbstractNotificationTest {
                                 DeployPackages.BASIC.getPackageRootFolder()
                                         + Executables.FAILED_GRAPH.getExecutablePath())
                         .setScheduleName(Executables.FAILED_GRAPH.getExecutableName())
-                        .setScheduleId(failedScheduleId)
-                        .setExecutionDetails(failedExecutionDetails);
+                        .setScheduleId(failedScheduleId).setExecutionDetails(failedExecutionDetails);
         checkNotification(NotificationEvents.FAILURE, expectedParams);
     }
 
     @Test(dependsOnMethods = {"customEventTrigger"}, groups = {"notification"})
     public void checkCustomEventMessage() {
-        NotificationParameters expectedParams =
-                new NotificationParameters().setCustomParam("World");
+        NotificationParameters expectedParams = new NotificationParameters().setCustomParam("World");
         checkNotification(NotificationEvents.CUSTOM_EVENT, expectedParams);
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkEmptyNotificationFieldsError() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
-        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
+        projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         discNotificationRules.clickOnAddNotificationButton();
         int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
-        discNotificationRules.checkEmptyNotificationFields(notificationIndex);
+        NotificationRule notificationRuleItem = discNotificationRules.getNotificationRule(notificationIndex);
+
+        notificationRuleItem.fillInEmail("");
+        assertTrue(notificationRuleItem.isCorrectEmailValidationError(), "Incorrect email validation error!");
+
+        notificationRuleItem.fillInSubject("");
+        assertTrue(notificationRuleItem.isCorrectSubjectValidationError(), "Incorrect subject validation error!");
+
+        notificationRuleItem.fillInMessage("");
+        assertTrue(notificationRuleItem.isCorrectMessageValidationError(), "Incorrect message validation error!");
+
+        notificationRuleItem.setNotificationEvent(NotificationEvents.CUSTOM_EVENT);
+        notificationRuleItem.fillInNotificationCustomEventName("");
+        assertTrue(notificationRuleItem.isCorrectCustomEventNameValidationError());
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkEmailFieldError() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
-        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
+        projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         discNotificationRules.clickOnAddNotificationButton();
         int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
-        discNotificationRules.checkOnlyOneEmailError(notificationIndex);
+        NotificationRule notificationRuleItem = discNotificationRules.getNotificationRule(notificationIndex);
+        notificationRuleItem.fillInEmail("abc@gmail.com,xyz@gmail.com");
+        assertTrue(notificationRuleItem.isCorrectEmailValidationError(), "Incorrect email validation error!");
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkAvailableParams() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
-        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
+        projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         discNotificationRules.clickOnAddNotificationButton();
         int notificationIndex = discNotificationRules.getNotificationNumber() - 1;
+        NotificationRule notificationRule = discNotificationRules.getNotificationRule(notificationIndex);
 
-        System.out.println("Available params for Success Notification: "
-                + discNotificationRules.getAvailableParams());
-        assertEquals(discNotificationRules.getAvailableParams(), successNotificationParams);
+        System.out.println("Available params for Success Notification: " + notificationRule.getAvailableParams());
+        assertEquals(notificationRule.getAvailableParams(), successNotificationParams);
 
-        discNotificationRules.setNotificationEvent(notificationIndex,
-                NotificationEvents.PROCESS_SCHEDULED);
+        notificationRule.setNotificationEvent(NotificationEvents.PROCESS_SCHEDULED);
         System.out.println("Available params for Process Scheduled Notification: "
-                + discNotificationRules.getAvailableParams());
-        assertEquals(discNotificationRules.getAvailableParams(), processScheduledNotificationParams);
+                + notificationRule.getAvailableParams());
+        assertEquals(notificationRule.getAvailableParams(), processScheduledNotificationParams);
 
-        discNotificationRules.setNotificationEvent(notificationIndex,
-                NotificationEvents.PROCESS_STARTED);
+        notificationRule.setNotificationEvent(NotificationEvents.PROCESS_STARTED);
         System.out.println("Available params for Process Started Notification: "
-                + discNotificationRules.getAvailableParams());
-        assertEquals(discNotificationRules.getAvailableParams(), processStartedNotificationParams);
+                + notificationRule.getAvailableParams());
+        assertEquals(notificationRule.getAvailableParams(), processStartedNotificationParams);
 
-        discNotificationRules.setNotificationEvent(notificationIndex, NotificationEvents.FAILURE);
-        System.out.println("Available params for Failure Notification: "
-                + discNotificationRules.getAvailableParams());
-        assertEquals(discNotificationRules.getAvailableParams(), failureNotificationParams);
+        notificationRule.setNotificationEvent(NotificationEvents.FAILURE);
+        System.out.println("Available params for Failure Notification: " + notificationRule.getAvailableParams());
+        assertEquals(notificationRule.getAvailableParams(), failureNotificationParams);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
@@ -317,32 +316,31 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkCancelCreateNotification() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
+
         String notificationNumber =
-                projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).getText();
+                projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).getNotificationRuleNumber();
 
         NotificationBuilder notificationBuilder =
-                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(notificationSubject)
-                        .setMessage(notificationMessage).setSaved(false);
+                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(notificationSubject).setMessage(notificationMessage).setSaved(false);
         createNotification(notificationBuilder);
 
         openProjectDetailPage(getWorkingProject());
-        assertEquals(projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).getText(),
+        assertEquals(projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).getNotificationRuleNumber(),
                 notificationNumber);
     }
 
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkDeleteNotification() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
-        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
+        projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         int notificationNumber = discNotificationRules.getNotificationNumber();
 
         NotificationBuilder notificationInfo =
-                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(notificationSubject)
-                        .setMessage(notificationMessage).setEvent(NotificationEvents.FAILURE)
-                        .setSaved(true);
+                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(notificationSubject).setMessage(notificationMessage)
+                        .setEvent(NotificationEvents.FAILURE).setSaved(true);
         createAndAssertNotification(notificationInfo);
 
         deleteNotification(notificationInfo);
@@ -352,20 +350,19 @@ public class NotificationsTest extends AbstractNotificationTest {
     @Test(dependsOnMethods = {"prepareDataForNotificationFormChecking"}, groups = {"notification"})
     public void checkCancelDeleteNotification() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
-        projectDetailPage.getNotificationButton(NOTIFICATION_TEST_PROCESS).click();
+        projectDetailPage.activeProcess(NOTIFICATION_TEST_PROCESS).clickOnNotificationRuleButton();
         waitForElementVisible(discNotificationRules.getRoot());
         int notificationNumber = discNotificationRules.getNotificationNumber();
 
         NotificationBuilder notificationInfo =
-                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS)
-                        .setEmail(imapUser).setSubject(notificationSubject)
-                        .setMessage(notificationMessage).setEvent(NotificationEvents.FAILURE)
-                        .setSaved(true);
+                new NotificationBuilder().setProcessName(NOTIFICATION_TEST_PROCESS).setEmail(imapUser)
+                        .setSubject(notificationSubject).setMessage(notificationMessage)
+                        .setEvent(NotificationEvents.FAILURE).setSaved(true);
         createAndAssertNotification(notificationInfo);
         notificationNumber++;
 
         deleteNotification(notificationInfo.setSaved(false));
-        checkNotificationNumber(notificationNumber, NOTIFICATION_TEST_PROCESS);
+        checkNotificationNumber(notificationNumber - 1, NOTIFICATION_TEST_PROCESS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
@@ -376,14 +373,11 @@ public class NotificationsTest extends AbstractNotificationTest {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
             String subject = notificationSubject + Calendar.getInstance().getTime();
-            String message =
-                    "params.PROJECT=${params.PROJECT}" + "*"
-                            + "params.FINISH_TIME=${params.FINISH_TIME}";
+            String message = "params.PROJECT=${params.PROJECT}" + "*" + "params.FINISH_TIME=${params.FINISH_TIME}";
 
             NotificationBuilder notificationInfo =
-                    new NotificationBuilder().setProcessName(processName)
-                            .setEmail(testParams.getUser()).setSubject(subject).setMessage(message)
-                            .setEvent(NotificationEvents.SUCCESS);
+                    new NotificationBuilder().setProcessName(processName).setEmail(testParams.getUser())
+                            .setSubject(subject).setMessage(message).setEvent(NotificationEvents.SUCCESS);
             createAndAssertNotification(notificationInfo);
 
             editNotification(notificationInfo.setEmail(imapUser)
@@ -392,15 +386,14 @@ public class NotificationsTest extends AbstractNotificationTest {
 
             openProjectDetailPage(getWorkingProject());
             createSchedule(new ScheduleBuilder().setProcessName(processName)
-                    .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                    .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                    .setMinuteInHour("59"));
+                    .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                    .setHourInDay("23").setMinuteInHour("59"));
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
 
             NotificationParameters expectedParams =
-                    new NotificationParameters().setProjectId(testParams.getProjectId())
-                            .setExecutionDetails(new ExecutionDetails());
+                    new NotificationParameters().setProjectId(testParams.getProjectId()).setExecutionDetails(
+                            new ExecutionDetails());
             waitForNotification(notificationInfo.getSubject(), expectedParams);
         } finally {
             cleanProcessesInWorkingProject();
@@ -415,14 +408,11 @@ public class NotificationsTest extends AbstractNotificationTest {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
 
             String subject = notificationSubject + Calendar.getInstance().getTime();
-            String message =
-                    "params.PROJECT=${params.PROJECT}" + "*"
-                            + "params.FINISH_TIME=${params.FINISH_TIME}";
+            String message = "params.PROJECT=${params.PROJECT}" + "*" + "params.FINISH_TIME=${params.FINISH_TIME}";
 
             NotificationBuilder notificationInfo =
-                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser)
-                            .setSubject(subject).setMessage(message)
-                            .setEvent(NotificationEvents.SUCCESS);
+                    new NotificationBuilder().setProcessName(processName).setEmail(imapUser).setSubject(subject)
+                            .setMessage(message).setEvent(NotificationEvents.SUCCESS);
             createAndAssertNotification(notificationInfo);
 
             NotificationBuilder editedNotificationInfo =
@@ -435,19 +425,18 @@ public class NotificationsTest extends AbstractNotificationTest {
 
             openProjectDetailPage(getWorkingProject());
             createSchedule(new ScheduleBuilder().setProcessName(processName)
-                    .setExecutable(Executables.SUCCESSFUL_GRAPH)
-                    .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                    .setMinuteInHour("59"));
+                    .setExecutable(Executables.SUCCESSFUL_GRAPH).setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                    .setHourInDay("23").setMinuteInHour("59"));
 
             scheduleDetail.manualRun();
-            scheduleDetail.assertSuccessfulExecution();
+            assertSuccessfulExecution();
 
             ExecutionDetails executionDetails = new ExecutionDetails().setStatus(ScheduleStatus.OK);
             getExecutionInfoFromGreyPage(executionDetails, scheduleDetail.getLastExecutionLogLink());
 
             NotificationParameters expectedParams =
-                    new NotificationParameters().setProjectId(testParams.getProjectId())
-                            .setExecutionDetails(executionDetails);
+                    new NotificationParameters().setProjectId(testParams.getProjectId()).setExecutionDetails(
+                            executionDetails);
             waitForNotification(subject, expectedParams);
         } finally {
             cleanProcessesInWorkingProject();
@@ -462,24 +451,21 @@ public class NotificationsTest extends AbstractNotificationTest {
 
             signInAtUI(imapUser, imapPassword);
             openProjectDetailByUrl(getWorkingProject().getProjectId());
-            String processName =
-                    "Check Repeated Failures Notification"
-                            + Calendar.getInstance().getTimeInMillis();
+            String processName = "Check Repeated Failures Notification" + Calendar.getInstance().getTimeInMillis();
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
             ScheduleBuilder scheduleBuilder =
                     new ScheduleBuilder().setProcessName(processName)
                             .setExecutable(Executables.SHORT_TIME_FAILED_GRAPH)
-                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23")
-                            .setMinuteInHour("59");
+                            .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHourInDay("23").setMinuteInHour("59");
             createSchedule(scheduleBuilder);
             scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
 
-            scheduleDetail.repeatManualRunFailedSchedule(getNumberOfFailuresToSendMail(),
-                    scheduleBuilder.getExecutable());
+            repeatManualRunFailedSchedule(getNumberOfFailuresToSendMail(), scheduleBuilder.getExecutable());
             waitForRepeatedFailuresEmail(scheduleBuilder);
 
-            scheduleDetail.repeatManualRunFailedSchedule(getNumberOfFailuresToDisableSchedule()
-                    - getNumberOfFailuresToSendMail(), scheduleBuilder.getExecutable());
+            repeatManualRunFailedSchedule(
+                    getNumberOfFailuresToDisableSchedule() - getNumberOfFailuresToSendMail(),
+                    scheduleBuilder.getExecutable());
             scheduleBuilder.setEnabled(false);
             waitForRepeatedFailuresEmail(scheduleBuilder);
         } finally {
@@ -496,7 +482,7 @@ public class NotificationsTest extends AbstractNotificationTest {
         try {
             deployInProjectDetailPage(DeployPackages.BASIC, processName);
             openProjectDetailPage(getWorkingProject());
-            projectDetailPage.getNotificationButton(processName).click();
+            projectDetailPage.activeProcess(processName).clickOnNotificationRuleButton();
             waitForElementVisible(discNotificationRules.getRoot());
             assertTrue(discNotificationRules.getEmptyStateMessage().contains(
                     NOTIFICATION_RULES_EMPTY_STATE_MESSAGE));

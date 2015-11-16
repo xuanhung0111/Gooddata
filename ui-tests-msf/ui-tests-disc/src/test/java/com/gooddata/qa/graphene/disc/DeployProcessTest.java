@@ -5,6 +5,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;
@@ -19,8 +20,7 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
     @Test(dependsOnMethods = {"createProject"})
     public void deployCloudConnectInProjectsPage() {
         try {
-            deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT,
-                    "CloudConnect - Projects List Page");
+            deployInProjectsPage(getProjects(), DeployPackages.CLOUDCONNECT, "CloudConnect - Projects List Page");
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -39,8 +39,7 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
     public void deployCloudConnectInProjectDetailPage() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
-            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT,
-                    "CloudConnect - Project Detail Page");
+            deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, "CloudConnect - Project Detail Page");
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -98,8 +97,10 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
         openUrl(DISC_PROJECTS_PAGE_URL);
         selectProjectsToDeployInProjectsPage(getProjects());
         deployForm.tryToDeployProcess("", ProcessTypes.DEFAULT, "");
-        deployForm.assertInvalidPackageError();
-        deployForm.assertInvalidProcessNameError();
+        assertTrue(deployForm.inputFileHasError(), "Error is not shown for file input!");
+        assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
+        assertTrue(deployForm.inputProcessNameHasError(), "Error is not shown for process name input!");
+        assertTrue(deployForm.isCorrectInvalidProcessNameError(), "Incorrect process name validation error!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -109,7 +110,8 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
 
         String filePath = getFilePathFromResource("/" + ZIP_FILES + "/not-zip-file.7z");
         deployForm.tryToDeployProcess(filePath, ProcessTypes.DEFAULT, "Not zip file");
-        deployForm.assertInvalidPackageError();
+        assertTrue(deployForm.inputFileHasError(), "Error is not shown for file input!");
+        assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -119,13 +121,14 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
 
         String filePath = getFilePathFromResource("/" + ZIP_FILES + "/too-large-file.zip");
         deployForm.tryToDeployProcess(filePath, ProcessTypes.DEFAULT, "Too large file");
-        deployForm.assertInvalidPackageError();
+        assertTrue(deployForm.inputFileHasError(), "Error is not shown for file input!");
+        assertTrue(deployForm.isCorrectInvalidPackageError(), "Incorrect package validation error!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void deployWithoutExecutablesInProjectsPage() {
-        failedDeployInProjectsPage(getProjects(), DeployPackages.NOT_EXECUTABLE,
-                ProcessTypes.DEFAULT, "Not Executables");
+        failedDeployInProjectsPage(getProjects(), DeployPackages.NOT_EXECUTABLE, ProcessTypes.DEFAULT,
+                "Not Executables");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -143,8 +146,7 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
     @Test(dependsOnMethods = {"createProject"})
     public void deployWithoutExecutablesInProjectDetailPage() {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
-        failedDeployInProjectDetailPage(DeployPackages.NOT_EXECUTABLE, ProcessTypes.DEFAULT,
-                "Not Executable");
+        failedDeployInProjectDetailPage(DeployPackages.NOT_EXECUTABLE, ProcessTypes.DEFAULT, "Not Executable");
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -167,8 +169,7 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
             String processName = "Redeploy process without executables";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
-            failedRedeployProcess(processName, DeployPackages.NOT_EXECUTABLE, ProcessTypes.GRAPH,
-                    processName);
+            failedRedeployProcess(processName, DeployPackages.NOT_EXECUTABLE, ProcessTypes.GRAPH, processName);
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -180,8 +181,7 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
             String processName = "Redeploy CloudConnect process with Ruby type";
             deployInProjectDetailPage(DeployPackages.CLOUDCONNECT, processName);
-            failedRedeployProcess(processName, DeployPackages.CLOUDCONNECT, ProcessTypes.RUBY,
-                    processName);
+            failedRedeployProcess(processName, DeployPackages.CLOUDCONNECT, ProcessTypes.RUBY, processName);
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -207,8 +207,7 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
     public void checkDeployDialogMessageInProjectDetail() {
         try {
             openProjectDetailByUrl(getWorkingProject().getProjectId());
-            checkSuccessfulDeployDialogMessageInProjectDetail(DeployPackages.BASIC,
-                    ProcessTypes.GRAPH);
+            checkSuccessfulDeployDialogMessageInProjectDetail(DeployPackages.BASIC, ProcessTypes.GRAPH);
         } finally {
             cleanProcessesInWorkingProject();
         }
@@ -237,8 +236,7 @@ public class DeployProcessTest extends AbstractDeployProcessTest {
     @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void checkFailedDeployMessageInProjectsPage() {
         try {
-            checkFailedDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC,
-                    ProcessTypes.RUBY);
+            checkFailedDeployDialogMessageInProjectsPage(getProjects(), DeployPackages.BASIC, ProcessTypes.RUBY);
         } finally {
             cleanProcessesInWorkingProject();
         }

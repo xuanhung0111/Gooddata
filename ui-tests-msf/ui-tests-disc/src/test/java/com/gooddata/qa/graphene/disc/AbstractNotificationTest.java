@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static org.testng.Assert.*;
 
 import java.io.IOException;
@@ -28,6 +28,7 @@ import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
+import com.gooddata.qa.graphene.fragments.disc.NotificationRule;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -39,8 +40,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     protected static final String NOTIFICATION_TEST_PROCESS = "Notification Test Process";
     protected static final String SUCCESS_NOTIFICATION_TEST_PROCESS = "Success Notification Test";
     protected static final String FAILURE_NOTIFICATION_TEST_PROCESS = "Failure Notification Test";
-    protected static final String CUSTOM_NOTIFICATION_TEST_PROCESS =
-            "Custom Event Notification Test";
+    protected static final String CUSTOM_NOTIFICATION_TEST_PROCESS = "Custom Event Notification Test";
     protected static final String REPEATED_FAILURES_NOTIFICATION_SUBJECT =
             "Repeated data loading failure: \"%s\" process";
     protected static final String REPEATED_FAILURES_NOTIFICATION_BODY =
@@ -53,8 +53,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                     + " GoodData project (id: %s) has failed for the ${numberOfFailures}th time.</p>";
     protected static final String REPEATED_FAILURES_NOTIFICATION_MESSAGE_2 =
             "<li>Go to the <a href=\"%s\">schedule page</a></li>";
-    protected static final String SCHEDULE_DISABLED_NOTIFICATION_SUBJECT =
-            "Schedule disabled: \"%s\" process";
+    protected static final String SCHEDULE_DISABLED_NOTIFICATION_SUBJECT = "Schedule disabled: \"%s\" process";
     protected static final String SCHEDULE_DISABLED_NOTIFICATION_BODY =
             "Hello, the %s schedule within the \"%s\" process of your \"%s\" GoodData project "
                     + "(id: %s) has been automatically disabled following its ${numberOfFailures}th consecutive failure. "
@@ -73,72 +72,53 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     protected static final String NOTIFICATION_RULES_EMPTY_STATE_MESSAGE =
             "No event (eg. schedule start, finish, fail, etc.) will trigger a notification email.";
 
-    protected String successNotificationSubject = "Success Notification_"
-            + Calendar.getInstance().getTime();
+    protected String successNotificationSubject = "Success Notification_" + Calendar.getInstance().getTime();
     protected String successNotificationMessage = "params.PROJECT=${params.PROJECT}" + "*"
             + "params.USER=${params.USER}" + "*" + "params.USER_EMAIL=${params.USER_EMAIL}" + "*"
-            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*"
-            + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
-            + "params.PROCESS_NAME=${params.PROCESS_NAME}" + "*"
-            + "params.EXECUTABLE=${params.EXECUTABLE}" + "*"
-            + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*"
-            + "params.SCHEDULE_NAME=${params.SCHEDULE_NAME}" + "*" + "params.LOG=${params.LOG}"
-            + "*" + "params.START_TIME=${params.START_TIME}" + "*"
+            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*" + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
+            + "params.PROCESS_NAME=${params.PROCESS_NAME}" + "*" + "params.EXECUTABLE=${params.EXECUTABLE}" + "*"
+            + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*" + "params.SCHEDULE_NAME=${params.SCHEDULE_NAME}"
+            + "*" + "params.LOG=${params.LOG}" + "*" + "params.START_TIME=${params.START_TIME}" + "*"
             + "params.FINISH_TIME=${params.FINISH_TIME}";
-    protected String successNotificationParams =
-            "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
-                    + "${params.PROCESS_URI}${params.PROCESS_ID}${params.PROCESS_NAME}${params.EXECUTABLE}"
-                    + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.LOG}${params.START_TIME}"
-                    + "${params.FINISH_TIME}";
-    protected String failureNotificationSubject = "Failure Notification_"
-            + Calendar.getInstance().getTime();
+    protected String successNotificationParams = "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
+            + "${params.PROCESS_URI}${params.PROCESS_ID}${params.PROCESS_NAME}${params.EXECUTABLE}"
+            + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.LOG}${params.START_TIME}"
+            + "${params.FINISH_TIME}";
+    protected String failureNotificationSubject = "Failure Notification_" + Calendar.getInstance().getTime();
     protected String failureNotificationMessage = "params.PROJECT=${params.PROJECT}" + "*"
             + "params.USER=${params.USER}" + "*" + "params.USER_EMAIL=${params.USER_EMAIL}" + "*"
-            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*"
-            + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
-            + "params.PROCESS_NAME=${params.PROCESS_NAME}" + "*"
-            + "params.EXECUTABLE=${params.EXECUTABLE}" + "*"
-            + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*"
-            + "params.SCHEDULE_NAME=${params.SCHEDULE_NAME}" + "*" + "params.LOG=${params.LOG}"
-            + "*" + "params.START_TIME=${params.START_TIME}" + "*"
-            + "params.FINISH_TIME=${params.FINISH_TIME}" + "*"
-            + "params.ERROR_MESSAGE=${params.ERROR_MESSAGE}";
-    protected String failureNotificationParams =
-            "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
-                    + "${params.PROCESS_URI}${params.PROCESS_ID}${params.PROCESS_NAME}${params.EXECUTABLE}"
-                    + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.LOG}${params.START_TIME}"
-                    + "${params.FINISH_TIME}${params.ERROR_MESSAGE}";
+            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*" + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
+            + "params.PROCESS_NAME=${params.PROCESS_NAME}" + "*" + "params.EXECUTABLE=${params.EXECUTABLE}" + "*"
+            + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*" + "params.SCHEDULE_NAME=${params.SCHEDULE_NAME}"
+            + "*" + "params.LOG=${params.LOG}" + "*" + "params.START_TIME=${params.START_TIME}" + "*"
+            + "params.FINISH_TIME=${params.FINISH_TIME}" + "*" + "params.ERROR_MESSAGE=${params.ERROR_MESSAGE}";
+    protected String failureNotificationParams = "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
+            + "${params.PROCESS_URI}${params.PROCESS_ID}${params.PROCESS_NAME}${params.EXECUTABLE}"
+            + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.LOG}${params.START_TIME}"
+            + "${params.FINISH_TIME}${params.ERROR_MESSAGE}";
     protected String processStartedNotificationSubject = "Process Started Notification_"
             + Calendar.getInstance().getTime();
     protected String processStartedNotificationMessage = "params.PROJECT=${params.PROJECT}" + "*"
             + "params.USER=${params.USER}" + "*" + "params.USER_EMAIL=${params.USER_EMAIL}" + "*"
-            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*"
-            + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
-            + "params.PROCESS_NAME=${params.PROCESS_NAME}" + "*"
-            + "params.EXECUTABLE=${params.EXECUTABLE}" + "*"
-            + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*"
-            + "params.SCHEDULE_NAME=${params.SCHEDULE_NAME}" + "*" + "params.LOG=${params.LOG}"
-            + "*" + "params.START_TIME=${params.START_TIME}";
-    protected String processStartedNotificationParams =
-            "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
-                    + "${params.PROCESS_URI}${params.PROCESS_ID}${params.PROCESS_NAME}${params.EXECUTABLE}"
-                    + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.LOG}${params.START_TIME}";
+            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*" + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
+            + "params.PROCESS_NAME=${params.PROCESS_NAME}" + "*" + "params.EXECUTABLE=${params.EXECUTABLE}" + "*"
+            + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*" + "params.SCHEDULE_NAME=${params.SCHEDULE_NAME}"
+            + "*" + "params.LOG=${params.LOG}" + "*" + "params.START_TIME=${params.START_TIME}";
+    protected String processStartedNotificationParams = "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
+            + "${params.PROCESS_URI}${params.PROCESS_ID}${params.PROCESS_NAME}${params.EXECUTABLE}"
+            + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.LOG}${params.START_TIME}";
     protected String processScheduledNotificationSubject = "Process Scheduled Notification_"
             + Calendar.getInstance().getTime();
     protected String processScheduledNotificationMessage = "params.PROJECT=${params.PROJECT}" + "*"
             + "params.USER=${params.USER}" + "*" + "params.USER_EMAIL=${params.USER_EMAIL}" + "*"
-            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*"
-            + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
-            + "params.EXECUTABLE=${params.EXECUTABLE}" + "*"
-            + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*"
+            + "params.PROCESS_URI=${params.PROCESS_URI}" + "*" + "params.PROCESS_ID=${params.PROCESS_ID}" + "*"
+            + "params.EXECUTABLE=${params.EXECUTABLE}" + "*" + "params.SCHEDULE_ID=${params.SCHEDULE_ID}" + "*"
             + "params.SCHEDULE_NAME=${params.SCHEDULE_NAME}" + "*"
             + "params.SCHEDULED_TIME=${params.SCHEDULED_TIME}";
-    protected String processScheduledNotificationParams =
-            "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
-                    + "${params.PROCESS_URI}${params.PROCESS_ID}${params.EXECUTABLE}"
-                    + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.SCHEDULED_TIME}";
-    protected String customEventNotificationSubject = "Custom Event_"
-            + Calendar.getInstance().getTime();
+    protected String processScheduledNotificationParams = "${params.PROJECT}${params.USER}${params.USER_EMAIL}"
+            + "${params.PROCESS_URI}${params.PROCESS_ID}${params.EXECUTABLE}"
+            + "${params.SCHEDULE_ID}${params.SCHEDULE_NAME}${params.SCHEDULED_TIME}";
+    protected String customEventNotificationSubject = "Custom Event_" + Calendar.getInstance().getTime();
     protected String customEventNotificationMessage = "params.CUSTOM=${params.hello}";
     protected String notificationSubject = "Notification Subject_";
     protected String notificationMessage = "params.PROJECT=${params.PROJECT}";
@@ -150,10 +130,9 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     @FindBy(tagName = "pre")
     protected ObjectFragment objectFragment;
-    protected ExecutionDetails successfulExecutionDetails = new ExecutionDetails()
-            .setStatus(ScheduleStatus.OK);
-    protected ExecutionDetails failedExecutionDetails = new ExecutionDetails()
-            .setStatus(ScheduleStatus.ERROR);
+    
+    protected ExecutionDetails successfulExecutionDetails = new ExecutionDetails().setStatus(ScheduleStatus.OK);
+    protected ExecutionDetails failedExecutionDetails = new ExecutionDetails().setStatus(ScheduleStatus.ERROR);
 
     enum RepeatedDataLoadingFailureNumber {
         TO_SEND_MAIL(2, 5, 5),
@@ -202,18 +181,19 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected void editNotification(NotificationBuilder newNotificationBuilder) {
         openProjectDetailPage(getWorkingProject());
-        projectDetailPage.getNotificationButton(newNotificationBuilder.getProcessName()).click();
-        waitForElementVisible(discNotificationRules.getRoot());
+        projectDetailPage.activeProcess(newNotificationBuilder.getProcessName()).clickOnNotificationRuleButton();
+        waitForFragmentVisible(discNotificationRules);
         int notificationIndex = newNotificationBuilder.getIndex();
-        discNotificationRules.expandNotificationRule(notificationIndex);
-        discNotificationRules.clearNotificationEmail(notificationIndex);
-        discNotificationRules.clearNotificationSubject(notificationIndex);
-        discNotificationRules.clearNotificationMessage(notificationIndex);
-        discNotificationRules.setNotificationFields(newNotificationBuilder);
+        NotificationRule notificationRule = discNotificationRules.getNotificationRule(notificationIndex);
+        notificationRule.expandNotificationRule();
+        notificationRule.clearNotificationEmail();
+        notificationRule.clearNotificationSubject();
+        notificationRule.clearNotificationMessage();
+        notificationRule.setNotificationFields(newNotificationBuilder);
         if (newNotificationBuilder.isSaved())
-            discNotificationRules.saveNotification(notificationIndex);
+            notificationRule.saveNotification();
         else
-            discNotificationRules.cancelSaveNotification(notificationIndex);
+            notificationRule.cancelSaveNotification();
     }
 
     protected void waitForNotification(String subject, NotificationParameters expectedParams) {
@@ -262,28 +242,29 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected void checkNotificationNumber(int expectedNotificationNumber, String processName) {
         openProjectDetailPage(getWorkingProject());
-        waitForElementVisible(projectDetailPage.getRoot());
+        waitForFragmentVisible(projectDetailPage);
+        projectDetailPage.activeProcess(processName);
         if (expectedNotificationNumber == 0) {
-            assertEquals(projectDetailPage.getNotificationButton(processName).getText(),
-                    "No notification rules");
+            assertEquals(projectDetailPage.getNotificationRuleNumber(), "No notification rules");
         } else {
             String notificationNumber =
                     String.valueOf(expectedNotificationNumber) + " notification rule"
                             + (expectedNotificationNumber > 1 ? "s" : "");
-            assertEquals(projectDetailPage.getNotificationButton(processName).getText(),
-                    notificationNumber);
+            assertEquals(projectDetailPage.getNotificationRuleNumber(), notificationNumber,
+                    "Incorrect notification number!");
         }
-        projectDetailPage.getNotificationButton(processName).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        assertEquals(expectedNotificationNumber, discNotificationRules.getNotificationNumber());
+        projectDetailPage.clickOnNotificationRuleButton();
+        waitForFragmentVisible(discNotificationRules);
+        assertEquals(expectedNotificationNumber, discNotificationRules.getNotificationNumber(),
+                "Incorrect notification number!");
         discNotificationRules.closeNotificationRulesDialog();
     }
 
     protected void deleteNotification(NotificationBuilder notificationInfo) {
         openProjectDetailPage(getWorkingProject());
-        projectDetailPage.getNotificationButton(notificationInfo.getProcessName()).click();
-        waitForElementVisible(discNotificationRules.getRoot());
-        discNotificationRules.deleteNotification(notificationInfo);
+        projectDetailPage.activeProcess(notificationInfo.getProcessName()).clickOnNotificationRuleButton();
+        waitForFragmentVisible(discNotificationRules);
+        discNotificationRules.getNotificationRule(notificationInfo.getIndex()).deleteNotification(true);
     }
 
     protected String getProcessUri(String url) {
@@ -293,11 +274,10 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         return processUri;
     }
 
-    protected void getExecutionInfoFromGreyPage(ExecutionDetails executionDetails,
-            String executionLogLink) {
+    protected void getExecutionInfoFromGreyPage(ExecutionDetails executionDetails, String executionLogLink) {
         executionDetails.setScheduleLogLink(executionLogLink);
         browser.get(executionLogLink.replace("ea.", "").replace("/log", "/detail"));
-        waitForElementVisible(objectFragment.getRoot());
+        waitForFragmentVisible(objectFragment);
         JSONObject jsonObject = null;
         JSONObject executionDetailJSONObject;
         try {
@@ -315,8 +295,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     protected static Message getNotification(final ImapClient imapClient, final String subject) {
-        Collection<Message> notifications =
-                ImapUtils.waitForMessage(imapClient, GDEmails.NO_REPLY, subject);
+        Collection<Message> notifications = ImapUtils.waitForMessage(imapClient, GDEmails.NO_REPLY, subject);
         assertTrue(notifications.size() == 1, "More than 1 notification!");
 
         return Iterables.getLast(notifications);
@@ -325,8 +304,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     private void checkRepeatFailureEmail(ImapClient imapClient, ScheduleBuilder scheduleBuilder) {
         boolean isEnabled = scheduleBuilder.isEnabled();
         String subjectFormat =
-                isEnabled ? REPEATED_FAILURES_NOTIFICATION_SUBJECT
-                        : SCHEDULE_DISABLED_NOTIFICATION_SUBJECT;
+                isEnabled ? REPEATED_FAILURES_NOTIFICATION_SUBJECT : SCHEDULE_DISABLED_NOTIFICATION_SUBJECT;
         String processName = scheduleBuilder.getProcessName();
         String notificationSubject = String.format(subjectFormat, processName);
         String notificationMessage1 =
@@ -335,13 +313,11 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                         : SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_1.replace("${numberOfFailures}",
                                 Integer.toString(getNumberOfFailuresToDisableSchedule()));
         String notificationMessage2 =
-                isEnabled ? REPEATED_FAILURES_NOTIFICATION_MESSAGE_2
-                        : SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2;
+                isEnabled ? REPEATED_FAILURES_NOTIFICATION_MESSAGE_2 : SCHEDULE_DISABLED_NOTIFICATION_MESSAGE_2;
         String notificationBody =
                 isEnabled ? REPEATED_FAILURES_NOTIFICATION_BODY.replace("${numberOfFailures}",
-                        Integer.toString(getNumberOfFailuresToSendMail()))
-                        : SCHEDULE_DISABLED_NOTIFICATION_BODY.replace("${numberOfFailures}",
-                                Integer.toString(getNumberOfFailuresToDisableSchedule()));
+                        Integer.toString(getNumberOfFailuresToSendMail())) : SCHEDULE_DISABLED_NOTIFICATION_BODY
+                        .replace("${numberOfFailures}", Integer.toString(getNumberOfFailuresToDisableSchedule()));
 
         Message notification = getNotification(imapClient, notificationSubject);
         Document message = null;
@@ -355,19 +331,16 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         System.out.println("Notification message: " + message.getElementsByTag("body").text());
 
         String scheduleName = scheduleBuilder.getScheduleName();
-        assertEquals(
-                message.getElementsByTag("body").text(),
-                String.format(notificationBody, scheduleName, processName, projectTitle,
-                        testParams.getProjectId()));
+        assertEquals(message.getElementsByTag("body").text(), String.format(notificationBody, scheduleName,
+                processName, projectTitle, testParams.getProjectId()), "Incorrect message in notification!");
         String scheduleUrl = scheduleBuilder.getScheduleUrl();
-        assertEquals(
-                message.getElementsByTag("p").get(1).toString().replace("https://ea.", "https://"),
-                String.format(notificationMessage1, scheduleUrl, scheduleName, processName,
-                        projectTitle, testParams.getProjectId()));
-        assertEquals(
-                message.getElementsByTag("li").get(0).toString().replace("https://ea.", "https://"),
-                String.format(notificationMessage2, scheduleUrl));
-        assertEquals(message.getElementsByTag("p").get(3).toString(), NOTIFICATION_SUPPORT_MESSAGE);
+        assertEquals(message.getElementsByTag("p").get(1).toString().replace("https://ea.", "https://"),
+                String.format(notificationMessage1, scheduleUrl, scheduleName, processName, projectTitle,
+                        testParams.getProjectId()), "Incorrect message in notification!");
+        assertEquals(message.getElementsByTag("li").get(0).toString().replace("https://ea.", "https://"),
+                String.format(notificationMessage2, scheduleUrl), "Incorrect message in notification!");
+        assertEquals(message.getElementsByTag("p").get(3).toString(), NOTIFICATION_SUPPORT_MESSAGE,
+                "Incorrect message in notification!");
     }
 
     private void checkScheduleEventNotification(ImapClient imapClient, String subject,
@@ -383,18 +356,16 @@ public class AbstractNotificationTest extends AbstractDISCTest {
             fail("There is problem when checking schedule event notification: " + e);
         }
         while (!notificationContent.isEmpty()) {
-            if (notificationContent.substring(0, notificationContent.indexOf("*")).contains(
-                    "params.LOG"))
-                paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*"))
-                        .replace("https://ea.", "https://"));
+            if (notificationContent.substring(0, notificationContent.indexOf("*")).contains("params.LOG"))
+                paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*")).replace(
+                        "https://ea.", "https://"));
             else
                 paramValues.add(notificationContent.substring(0, notificationContent.indexOf("*")));
             System.out.println("Param value: " + paramValues.get(paramValues.size() - 1));
             if (notificationContent.substring(notificationContent.indexOf("*")).equals("*"))
                 notificationContent = "";
             else
-                notificationContent =
-                        notificationContent.substring(notificationContent.indexOf("*") + 1);
+                notificationContent = notificationContent.substring(notificationContent.indexOf("*") + 1);
         }
 
         for (String paramItem : paramValues) {
@@ -413,7 +384,8 @@ public class AbstractNotificationTest extends AbstractDISCTest {
                 assertTrue(timeDifferenceInSeconds >= -2 && timeDifferenceInSeconds <= 2,
                         "Not allowed time difference in seconds: " + timeDifferenceInSeconds);
             } else
-                assertEquals(paramValue, expectedParams.getParamValue(paramName));
+                assertEquals(paramValue, expectedParams.getParamValue(paramName), "Parameter " + paramName
+                        + " has incorrect value: " + paramValue);
         }
     }
 
@@ -421,8 +393,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
-            long compareResult =
-                    format2.parse(actualTime).getTime() - format.parse(expectedTime).getTime();
+            long compareResult = format2.parse(actualTime).getTime() - format.parse(expectedTime).getTime();
             return TimeUnit.MILLISECONDS.toSeconds(compareResult);
         } catch (ParseException e) {
             fail("Exeception in parsing time: " + e);

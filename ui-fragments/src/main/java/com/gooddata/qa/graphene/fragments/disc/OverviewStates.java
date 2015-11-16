@@ -10,7 +10,6 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static org.testng.Assert.*;
 
 public class OverviewStates extends AbstractFragment {
 
@@ -23,36 +22,23 @@ public class OverviewStates extends AbstractFragment {
         waitForStateNumber(stateField.findElement(BY_OVERVIEW_STATE_NUMBER));
     }
 
-    public void assertOverviewStateNumber(OverviewProjectStates state, int number) {
-        assertTrue(state.getOption().equalsIgnoreCase(getState(state)));
-        assertEquals(getStateNumber(state), String.valueOf(number));
-    }
-
     public String getStateNumber(OverviewProjectStates state) {
         WebElement stateNumber =
-                waitForElementVisible(state.getOverviewFieldBy(), browser).findElement(
-                        BY_OVERVIEW_STATE_NUMBER);
+                waitForElementVisible(state.getOverviewFieldBy(), browser).findElement(BY_OVERVIEW_STATE_NUMBER);
         waitForStateNumber(stateNumber);
         return stateNumber.getText();
     }
 
     public boolean isActive(OverviewProjectStates state) {
-        return waitForElementPresent(state.getOverviewFieldBy(), browser).getAttribute("class")
-                .contains("active");
+        return waitForElementPresent(state.getOverviewFieldBy(), browser).getAttribute("class").contains("active");
+    }
+
+    public String getState(OverviewProjectStates state) {
+        return waitForElementVisible(state.getOverviewFieldBy(), browser).findElement(BY_OVERVIEW_STATE).getText();
     }
 
     private void waitForStateNumber(final WebElement stateNumber) {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-
-            @Override
-            public boolean apply(WebDriver arg0) {
-                return !stateNumber.getText().isEmpty();
-            }
-        });
-    }
-
-    private String getState(OverviewProjectStates state) {
-        return waitForElementVisible(state.getOverviewFieldBy(), browser).findElement(
-                BY_OVERVIEW_STATE).getText();
+        Predicate<WebDriver> stateNumberNotEmpty = webDriver -> !stateNumber.getText().isEmpty();
+        Graphene.waitGui().until(stateNumberNotEmpty);
     }
 }
