@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.utils.CheckUtils;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.common.TestParameters;
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
 import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
 import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 
@@ -23,7 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Properties;
 
-@Listeners({ConsoleStatusListener.class, FailureLoggingListener.class})
+@Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class})
 public abstract class AbstractTest extends Arquillian {
 
     protected Properties testVariables;
