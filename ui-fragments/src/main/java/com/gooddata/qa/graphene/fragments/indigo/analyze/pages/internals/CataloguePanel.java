@@ -103,7 +103,12 @@ public class CataloguePanel extends AbstractFragment {
     }
 
     public WebElement getTime(String filter) {
-        return searchAndGetItem(filter, FieldType.DATE);
+        clearInputText();
+        return waitForCollectionIsNotEmpty(items).stream()
+            .filter(date -> filter.equals(date.getText()))
+            .filter(date -> date.getAttribute("class").contains(FieldType.DATE.toString()))
+            .findFirst()
+            .get();
     }
 
     public String getTimeDescription(String time) {
