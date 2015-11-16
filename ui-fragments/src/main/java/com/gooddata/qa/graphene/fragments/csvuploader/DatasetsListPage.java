@@ -1,10 +1,13 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.className;
+
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
@@ -82,5 +85,14 @@ public class DatasetsListPage extends AbstractFragment {
     
     public WebElement waitForSuccessMessageBar() {
         return waitForElementVisible(BY_SUCCESS_MESSAGE_BAR, browser);
+    }
+
+    public void uploadFile(String filePath) {
+        waitForElementVisible(addDataButton).click();
+
+        Graphene.createPageFragment(FileUploadDialog.class,
+                waitForElementVisible(className("s-upload-dialog"), browser))
+                .pickCsvFile(filePath)
+                .clickUploadButton();
     }
 }
