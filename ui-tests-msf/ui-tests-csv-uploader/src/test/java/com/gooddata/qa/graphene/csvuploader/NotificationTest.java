@@ -5,8 +5,8 @@ import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.function.Consumer;
 
 import javax.mail.Message;
 
@@ -17,6 +17,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
@@ -29,9 +30,8 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     private static final String MANAGE_DATASETS_PAGE_URL = "https://%s/#s=/gdc/projects/%s|dataPage|dataSets";
     private static final String PROJECT_PAGE_URL = "https://%s/#s=/gdc/projects/%s";
-    private static final String DATA_SECTION_PAGE_URL = "https://%s/data/#/projects/%s/datasets";
-
-    private static String adReportLink = AD_REPORT_LINK;
+    private static final String DATA_LINK_IN_EMAIL = "https://%s/data/#/projects/%s/datasets/%s";
+    private static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
 
     @BeforeClass
     public void initProperties() {
@@ -52,34 +52,59 @@ public class NotificationTest extends AbstractCsvUploaderTest {
                 getClass());
 
         String datasetName = getNewDataset(fileToUpload);
-        adReportLink =
-                String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
-                        getDatasetId(datasetName));
-        checkNotification(getSuccessfulNotification(), this::checkSuccessfulNotification);
+        checkSuccessfulNotification(getSuccessfulNotification(), datasetName);
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkNotificationForFailedUpload() throws JSONException {
-        CsvFile fileToUpload = CsvFile.PAYROLL_TOO_LONG_FACT_VALUE;
+    public void checkNotificationForFailedUpload() throws JSONException, JSONException, IOException {
+        String projectId = testParams.getProjectId();
+        String GoodSalesProjectID = "";
+        try {
+            GoodSalesProjectID = RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
+                    GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                    testParams.getProjectEnvironment());
+            testParams.setProjectId(GoodSalesProjectID);
+            CsvFile fileToUpload = CsvFile.PAYROLL;
+        
+            checkCsvUpload(fileToUpload, this::uploadCsv, true);
+            takeScreenshot(browser,
+                    toScreenshotName("Upload-csv-file-to-check-failed-notification", fileToUpload.getFileName()),
+                    getClass());
 
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        takeScreenshot(browser,
-                toScreenshotName("Upload-csv-file-to-check-failed-notification", fileToUpload.getFileName()),
-                getClass());
-
-        checkNotification(getFailedNotification(), this::checkFailedNotification);
+            checkFailureNotification(getFailedNotification());
+        } finally {
+            testParams.setProjectId(projectId);
+            if (!GoodSalesProjectID.isEmpty()) {
+                RestUtils.deleteProject(getRestApiClient(), GoodSalesProjectID);
+            }
+        }
     }
 
-    private void checkNotification(Document message, Consumer<Document> checkContent) {
-        String datasetUrl = String.format(DATA_SECTION_PAGE_URL, testParams.getHost(), testParams.getProjectId());
-        assertThat(message.getElementsContainingText(".csv").attr("href"), is(datasetUrl));
-
+    private void checkSuccessfulNotification(Document message, String datasetName) {
+        checkGeneralNotification(message);
+        String datasetUrl = String.format(DATA_LINK_IN_EMAIL, testParams.getHost(), testParams.getProjectId(),
+                        getDatasetId(datasetName));
+        assertThat(message.getElementsContainingText(datasetName).attr("href"), is(datasetUrl));
+        
+        String analysisUrl = String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
+                getDatasetId(datasetName));
+        assertThat(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"), 
+                is(analysisUrl));
+    }
+    
+    private void checkFailureNotification(Document message) {
+        checkGeneralNotification(message);
+        String datasetManageUrl = String.format(MANAGE_DATASETS_PAGE_URL, testParams.getHost(), 
+                testParams.getProjectId());
+        assertThat(message.getElementsContainingText("delete the loaded file").attr("href"), is(datasetManageUrl));
+    }
+    
+    private void checkGeneralNotification(Document message) {
         String projectUrl = String.format(PROJECT_PAGE_URL, testParams.getHost(), testParams.getProjectId());
         assertThat(message.getElementsMatchingOwnText(projectTitle).attr("href"), is(projectUrl));
-
-        assertThat(message.getElementsMatchingOwnText(GOODDATA_SUPPORT_URL).attr("href"), is(GOODDATA_SUPPORT_URL));
-
-        checkContent.accept(message);
+        
+        assertThat(message.getElementsMatchingOwnText(GOODDATA_SUPPORT_URL).attr("href"),
+                is(GOODDATA_SUPPORT_URL));
     }
 
     private Document getNotification(String subject) {
@@ -106,18 +131,6 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         String subject = String.format("Error adding new data to %s project", projectTitle);
 
         return getNotification(subject);
-    }
-
-    private void checkSuccessfulNotification(Document message) {
-        assertThat(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"),
-                is(adReportLink));
-    }
-
-    private void checkFailedNotification(Document message) {
-        String datasetsPageUrl =
-                String.format(MANAGE_DATASETS_PAGE_URL, testParams.getHost(), testParams.getProjectId());
-        assertThat(message.getElementsMatchingOwnText("delete the uploaded file").attr("href"),
-                is(datasetsPageUrl));
     }
 
     private static Message getNotification(final ImapClient imapClient, final String subject) {
