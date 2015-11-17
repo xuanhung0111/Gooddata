@@ -34,7 +34,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDeleteDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
-import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadProgressDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
@@ -68,9 +67,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     private static final long PAYROLL_DATA_ROW_COUNT = 3876;
 
     protected List<UploadHistory> uploadHistory = Lists.newArrayList();
-
-    @FindBy(className = "s-datasets-list")
-    protected DatasetsListPage datasetsListPage;
 
     @FindBy(className = "s-upload-dialog")
     protected FileUploadDialog fileUploadDialog;
@@ -136,11 +132,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         uploadCsvFunction.accept(csvFile);
 
         waitForExpectedDatasetsCount(newDatasetExpected ? datasetCountBeforeUpload + 1 : datasetCountBeforeUpload);
-    }
-
-    protected void initDataUploadPage() {
-        openUrl(String.format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
-        waitForFragmentVisible(datasetsListPage);
     }
 
     protected void uploadCsv(CsvFile csvFile) {
