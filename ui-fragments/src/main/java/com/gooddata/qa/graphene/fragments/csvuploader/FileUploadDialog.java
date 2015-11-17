@@ -5,10 +5,12 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.io.File;
 import java.util.List;
 
 public class FileUploadDialog extends AbstractFragment {
@@ -31,6 +33,9 @@ public class FileUploadDialog extends AbstractFragment {
     private WebElement validationError;
 
     public FileUploadDialog pickCsvFile(String csvFilePath) {
+        log.finest("Csv file path: " + csvFilePath);
+        log.finest("Is file exists? " + new File(csvFilePath).exists());
+
         waitForElementVisible(pickFileButton).sendKeys(csvFilePath);
         return this;
     }
