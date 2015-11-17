@@ -7,8 +7,6 @@ import java.util.Map;
 
 public class GoodSalesAbstractTest extends AbstractProjectTest {
 
-    protected static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
-
     protected Map<String, String[]> expectedGoodSalesDashboardsAndTabs;
 
     @BeforeClass(alwaysRun = true)
