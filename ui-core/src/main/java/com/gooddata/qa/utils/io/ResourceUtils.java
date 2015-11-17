@@ -4,6 +4,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -38,7 +40,18 @@ public class ResourceUtils {
         if (resourceUrl == null) {
             throw new IllegalStateException("Resource '" + resourceName + "' not found!");
         }
-        return new File(resourceUrl.getFile());
+
+        // avoid URL encode paths from URL#getFile: 
+        // http://stackoverflow.com/questions/8928661/how-to-avoid-getting-url-encoded-paths-from-url-getfile
+
+        // When running from 2 builds in the same job in Jenkins, source directory will be created with suffix
+        // @<number> from the second build. Ex: /workspace/MSF-Data-Section-Graphene-simple-test@2/
+        // URL#getFile will encode this path from @<number> to %40<number> and this file path is not exists.
+        try {
+            return new File(new URI(resourceUrl.toString()).getPath());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String getFilePathFromResource(final String resourceName) {
