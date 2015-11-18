@@ -52,6 +52,7 @@ public class ResponsiveNavigationTest extends DashboardsGeneralTest {
             takeScreenshot(browser, "checkHamburgerMenuItems-" + page, getClass());
             assertEquals(Stream.of("Analyze", "KPIs").anyMatch(p -> p.equals(page)),
                     isElementPresent(Header.HAMBURGER_LINK, browser));
+            assertTrue(browser.getCurrentUrl().contains(testParams.getProjectId()));
         });
     }
 
