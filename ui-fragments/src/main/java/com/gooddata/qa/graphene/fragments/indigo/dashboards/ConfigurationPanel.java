@@ -73,4 +73,10 @@ public class ConfigurationPanel extends AbstractFragment {
         return waitForFragmentVisible(dateDimensionSelect).getValues();
     }
 
+    public boolean isDateDimensionEnabled() {
+        return !waitForFragmentVisible(dateDimensionSelect)
+                .getDropdownButton()
+                .getAttribute("class")
+                .contains("disabled");
+    }
 }

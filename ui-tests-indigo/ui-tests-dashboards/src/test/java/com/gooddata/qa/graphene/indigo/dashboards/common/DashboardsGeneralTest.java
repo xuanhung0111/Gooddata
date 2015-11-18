@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
-
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.openqa.selenium.Dimension;
 import org.testng.annotations.BeforeClass;
