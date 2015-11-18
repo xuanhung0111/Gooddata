@@ -38,7 +38,7 @@ public class GoodSalesAccessDataSectionTest extends AnalyticalDesignerAbstractTe
 
             BrowserUtils.switchToLastTab(browser);
             assertEquals(browser.getCurrentUrl(),
-                    getRootUrl() + format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
+                    getRootUrl() + format(CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/upload", testParams.getProjectId()));
         } finally {
             RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
                     ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), false));
