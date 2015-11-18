@@ -25,6 +25,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     protected String projectTitle = "simple-project";
     protected String projectTemplate = "";
     protected int projectCreateCheckIterations = DEFAULT_PROJECT_CHECK_LIMIT;
+    protected static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
 
     protected boolean addUsersWithOtherRoles = false;
     // validations are enabled by default on any child class
