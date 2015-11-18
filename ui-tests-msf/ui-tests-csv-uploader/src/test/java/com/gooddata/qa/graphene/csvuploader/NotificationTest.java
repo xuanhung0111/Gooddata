@@ -31,7 +31,6 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private static final String MANAGE_DATASETS_PAGE_URL = "https://%s/#s=/gdc/projects/%s|dataPage|dataSets";
     private static final String PROJECT_PAGE_URL = "https://%s/#s=/gdc/projects/%s";
     private static final String DATA_LINK_IN_EMAIL = "https://%s/data/#/projects/%s/datasets/%s";
-    private static final String GOODSALES_TEMPLATE = "/projectTemplates/GoodSalesDemo/2";
 
     @BeforeClass
     public void initProperties() {
@@ -66,7 +65,11 @@ public class NotificationTest extends AbstractCsvUploaderTest {
             testParams.setProjectId(GoodSalesProjectID);
             CsvFile fileToUpload = CsvFile.PAYROLL;
         
-            checkCsvUpload(fileToUpload, this::uploadCsv, true);
+            checkCsvUpload(fileToUpload, this::uploadCsv, false);
+            
+            assertThat(datasetsListPage.waitForErrorMessageBar().getText(),
+                    is(String.format("Failed to add data from \"%s\" due to internal error. Check your email for "
+                            + "instructions or contact support.", fileToUpload.getDatasetNameOfFirstUpload())));
             takeScreenshot(browser,
                     toScreenshotName("Upload-csv-file-to-check-failed-notification", fileToUpload.getFileName()),
                     getClass());
