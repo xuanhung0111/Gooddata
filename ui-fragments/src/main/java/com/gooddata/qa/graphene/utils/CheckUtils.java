@@ -174,6 +174,18 @@ public final class CheckUtils {
         Graphene.waitGui().until().element(fragment.getRoot()).is().not().visible();
     }
 
+    public static WebElement waitForElementEnabled(final WebElement element) {
+        // check for regularly disabled input, checks 'disabled' attribute, this will return true for the most elements
+        // since they don't contain 'disabled' attribute
+        Graphene.waitGui().until().element(element).is().enabled();
+
+        // check for other elements styled as button, input, etc. that are disabled programmatically and styled with css
+        Predicate<WebDriver> elementEnabled = browser -> !element.getAttribute("class").contains("disabled");
+        Graphene.waitGui().until(elementEnabled);
+
+        return element;
+    }
+
     public static WebElement waitForElementPresent(By byElement, SearchContext searchContext) {
         Graphene.waitGui().until().element(byElement).is().present();
         return searchContext.findElement(byElement);
@@ -206,21 +218,13 @@ public final class CheckUtils {
     }
 
     public static void waitForCollectionIsEmpty(final Collection<?> items) {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return items.isEmpty();
-            }
+        Graphene.waitGui().until((WebDriver input) -> {
+            return items.isEmpty();
         });
     }
 
     public static <T> Collection<T> waitForCollectionIsNotEmpty(final Collection<T> items) {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return !items.isEmpty();
-            }
-        });
+        Graphene.waitGui().until((WebDriver input) -> !items.isEmpty());
 
         return items;
     }
@@ -254,10 +258,5 @@ public final class CheckUtils {
         }
 
         return texts;
-    }
-
-    public static WebElement waitForElementEnabled(WebElement element) {
-        Graphene.waitGui().until().element(element).is().enabled();
-        return element;
     }
 }
