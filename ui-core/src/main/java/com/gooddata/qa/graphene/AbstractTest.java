@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class})
 public abstract class AbstractTest extends Arquillian {
@@ -44,7 +45,9 @@ public abstract class AbstractTest extends Arquillian {
 
     protected StartPageContext startPageContext = null;
     protected static final String PAGE_PROJECTS = "projects.html";
-    
+
+    protected static final Logger log = Logger.getLogger(AbstractTest.class.getName());
+
     //the projectInit group which will be skipped for loadPlatformPageBeforeTestMethod 
     protected static final String PROJECT_INIT_GROUP = "projectInit";
 

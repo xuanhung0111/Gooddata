@@ -2,8 +2,11 @@ package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
+import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.collect.Iterables;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -16,6 +19,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import org.openqa.selenium.TimeoutException;
 
 public class IndigoDashboardsPage extends AbstractFragment {
+
     @FindBy(css = Kpi.KPI_CSS_SELECTOR)
     private List<Kpi> kpis;
 
@@ -58,6 +62,8 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
+
+    public static final String MAIN_ID = "app-dashboards";
 
     public SplashScreen getSplashScreen() {
         return waitForFragmentVisible(splashScreen);
@@ -293,8 +299,19 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public void logout() {
-        waitForFragmentVisible(header);
+        waitForFragmentVisible(header).logout();
+    }
 
-        header.logout();
+    public boolean isHamburgerMenuLinkPresent() {
+        return waitForFragmentVisible(header).isHamburgerMenuLinkPresent();
+    }
+
+    public HamburgerMenu openHamburgerMenu() {
+        return waitForFragmentVisible(header).openHamburgerMenu();
+    }
+
+    public IndigoDashboardsPage closeHamburgerMenu() {
+        waitForFragmentVisible(header).closeHamburgerMenu();
+        return this;
     }
 }
