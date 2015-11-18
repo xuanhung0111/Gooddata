@@ -37,6 +37,8 @@ public class AnalysisPage extends AbstractFragment {
 
     private static final String DATE = "Date";
 
+    public static final String MAIN_CLASS = "adi-editor";
+
     public AnalysisPage dragAndDropMetricToShortcutPanel(String metric, ShortcutPanel shortcutPanel) {
         waitForFragmentVisible(mainEditor);
         waitForFragmentVisible(cataloguePanel);

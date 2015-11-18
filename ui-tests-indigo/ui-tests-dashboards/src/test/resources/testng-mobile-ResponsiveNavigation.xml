@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" [<!ENTITY parent SYSTEM "src/test/resources/mobile-parameters.xml">]>
+<suite name="GD_UI_Selenium_Tests_mobile">
+    <parameters>&parent;</parameters>
+
+    <test name="responsive-navigation-tests">
+        <groups>
+            <dependencies>
+                <group name="mobile" depends-on="projectInit" />
+            </dependencies>
+            <run>
+                <include name="mobile" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.ResponsiveNavigationTest" />
+        </classes>
+    </test>
+
+</suite>

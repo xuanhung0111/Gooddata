@@ -85,7 +85,7 @@ import com.google.common.base.Predicate;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 
-    protected static By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu,.gd-header-account");
+    protected static By BY_LOGGED_USER_BUTTON = By.cssSelector("a.account-menu,.gd-header-account,.hamburger-icon");
     protected static By BY_LOGOUT_LINK = By.cssSelector("div.s-logout");
     protected static final By BY_PANEL_ROOT = By.id("root");
     protected static final By BY_IFRAME = By.tagName("iframe");
@@ -236,13 +236,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(css = ".adi-editor")
+    @FindBy(className = AnalysisPage.MAIN_CLASS)
     protected AnalysisPage analysisPage;
 
     @FindBy(css = ".ember-application")
     protected UserManagementPage userManagementPage;
 
-    @FindBy(css = "#app-dashboards")
+    @FindBy(id = IndigoDashboardsPage.MAIN_ID)
     protected IndigoDashboardsPage indigoDashboardsPage;
 
     /**
@@ -584,6 +584,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         // work around CL-8058
         initEmptyDashboardsPage();
         ApplicationHeaderBar.goToAnalysisPage(browser);
+        waitForFragmentVisible(analysisPage);
     }
 
     public void initAccountPage() {
