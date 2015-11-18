@@ -224,10 +224,10 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
                 new UiReportDefinition().withName(REPORT_1).withWhats(AMOUNT).withHows(STAGE_NAME)
                         .withHows(new HowItem(YEAR_SNAPSHOT, HowItem.Position.TOP));
         createReport(rd, REPORT_1);
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter("FStageName", "2010", "2011", "2012",
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter("FStageName", "2010", "2011", "2012",
                 "Interest", "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation",
                 "Closed Won", "Closed Lost"));
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter("FQuarter/Year", "2012", "Interest",
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter("FQuarter/Year", "2012", "Interest",
                 "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won",
                 "Closed Lost"));
         reportPage.saveReport();
@@ -235,7 +235,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         initReportsPage();
         rd.withName(REPORT_2);
         createReport(rd, REPORT_2);
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter("FQuarter/Year", "2012", "Interest",
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter("FQuarter/Year", "2012", "Interest",
                 "Discovery", "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won",
                 "Closed Lost"));
         reportPage.saveReport();

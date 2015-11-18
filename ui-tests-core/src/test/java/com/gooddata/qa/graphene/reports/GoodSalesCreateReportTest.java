@@ -165,7 +165,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         initReportCreation();
 
         reportPage.initPage()
-            .addFilter(FilterItem.Factory.createListValuesFilter(ACTIVITY_TYPE, "Email"))
+            .addFilter(FilterItem.Factory.createAttributeFilter(ACTIVITY_TYPE, "Email"))
             .openHowPanel()
             .selectAttribute(ACTIVITY_TYPE)
             .doneSndPanel();
@@ -179,7 +179,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
             .openHowPanel()
             .selectAttribute(ACTIVITY_TYPE)
             .doneSndPanel()
-            .addFilter(FilterItem.Factory.createListValuesFilter(ACTIVITY_TYPE, "Email"))
+            .addFilter(FilterItem.Factory.createAttributeFilter(ACTIVITY_TYPE, "Email"))
             .getFilters().size(), equalTo(1));
 
         assertThat(reportPage.openHowPanel()

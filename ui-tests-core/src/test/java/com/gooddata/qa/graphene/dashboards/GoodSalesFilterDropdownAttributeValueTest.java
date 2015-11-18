@@ -130,7 +130,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         UiReportDefinition rd = new UiReportDefinition().withName(REPORT_2).withWhats(AMOUNT)
                 .withHows(STAGE_NAME).withHows(YEAR_SNAPSHOT);
         createReport(rd, REPORT_2);
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter(F_STAGE_NAME, "Discovery", "2010", "2011",
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter(F_STAGE_NAME, "Discovery", "2010", "2011",
                 "2012", "Risk Assessment", "2010", "2011", "2012"));
         reportPage.saveReport();
     }

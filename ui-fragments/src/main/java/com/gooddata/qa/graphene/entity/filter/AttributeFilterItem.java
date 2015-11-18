@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SelectFromListValuesFilterItem extends FilterItem {
+public class AttributeFilterItem extends FilterItem {
 
     private String attribute;
     private List<String> values;
 
-    SelectFromListValuesFilterItem(String attribute, String... values) {
+    AttributeFilterItem(String attribute, String... values) {
         this.attribute = attribute;
         this.values = new ArrayList<String>(Arrays.asList(values));
     }

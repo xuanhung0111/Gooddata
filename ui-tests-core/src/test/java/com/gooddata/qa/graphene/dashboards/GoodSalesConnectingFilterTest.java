@@ -66,7 +66,7 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         initReportsPage();
         rd = new UiReportDefinition().withName(REPORT_2).withWhats(AMOUNT).withHows(STAGE_NAME);
         createReport(rd, REPORT_2);
-        reportPage.addFilter(FilterItem.Factory.createVariableFilter(V_STAGE, "Interest", "Discovery",
+        reportPage.addFilter(FilterItem.Factory.createPromptFilter(V_STAGE, "Interest", "Discovery",
                 "Short List", "Risk Assessment", "Conviction", "Negotiation", "Closed Won", "Closed Lost"));
         reportPage.saveReport();
     }

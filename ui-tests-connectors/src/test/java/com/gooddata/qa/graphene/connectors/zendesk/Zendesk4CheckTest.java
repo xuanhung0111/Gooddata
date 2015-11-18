@@ -301,7 +301,7 @@ public class Zendesk4CheckTest extends AbstractZendeskCheckTest {
     }
 
     private void createReportTicketIdFilter(int ticketId) {
-        reportPage.addFilter(FilterItem.Factory.createListValuesFilter("Ticket Id", String.valueOf(ticketId)))
+        reportPage.addFilter(FilterItem.Factory.createAttributeFilter("Ticket Id", String.valueOf(ticketId)))
             .saveReport();
         waitForElementVisible(TABLE_REPORT_CONTAINER_LOCATION, browser);
     }

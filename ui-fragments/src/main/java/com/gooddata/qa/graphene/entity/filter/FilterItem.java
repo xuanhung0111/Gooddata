@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.entity.filter;
 
-import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem.Range;
-import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.ResultSize;
+import com.gooddata.qa.graphene.entity.filter.RangeFilterItem.RangeType;
+import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.Ranking;
 
 public abstract class FilterItem {
 
@@ -9,28 +9,30 @@ public abstract class FilterItem {
         private Factory() {
         }
 
-        public static FilterItem createListValuesFilter(String attribute, String... values) {
-            return new SelectFromListValuesFilterItem(attribute, values);
+        public static AttributeFilterItem createAttributeFilter(String attribute, String... values) {
+            return new AttributeFilterItem(attribute, values);
         }
 
-        public static FilterItem createRangeFilter(String attribute, String metric, Range range) {
-            return new NumericRangeFilterItem(attribute, metric, range);
+        public static RangeFilterItem createRangeFilter(RangeType rangeType, int rangeNumber, String metric,
+                String...attributes) {
+            return new RangeFilterItem(rangeType, rangeNumber, metric, attributes);
         }
 
-        public static FilterItem createRangeFilter(String attribute, String metric) {
-            return new NumericRangeFilterItem(attribute, metric);
+        public static RangeFilterItem createRangeFilter(String metric, String...attributes) {
+            return new RangeFilterItem(metric, attributes);
         }
 
-        public static FilterItem createRankingFilter(ResultSize size, String attribute, String metric) {
-            return new RankingFilterItem(size, attribute, metric);
+        public static RankingFilterItem createRankingFilter(Ranking ranking, int size, String metric,
+                String...attributes) {
+            return new RankingFilterItem(ranking, size, metric, attributes);
         }
 
-        public static FilterItem createRankingFilter(String attribute, String metric) {
-            return new RankingFilterItem(attribute, metric);
+        public static RankingFilterItem createRankingFilter(String metric, String...attributes) {
+            return new RankingFilterItem(metric, attributes);
         }
 
-        public static FilterItem createVariableFilter(String variable, String... prompts) {
-            return new VariableFilterItem(variable, prompts);
+        public static PromptFilterItem createPromptFilter(String variable, String... prompts) {
+            return new PromptFilterItem(variable, prompts);
         }
     }
 }

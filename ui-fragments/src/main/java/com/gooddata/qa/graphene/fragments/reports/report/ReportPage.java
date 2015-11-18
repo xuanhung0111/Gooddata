@@ -26,7 +26,9 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -40,10 +42,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.entity.filter.NumericRangeFilterItem;
-import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
-import com.gooddata.qa.graphene.entity.filter.SelectFromListValuesFilterItem;
-import com.gooddata.qa.graphene.entity.filter.VariableFilterItem;
+import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.report.WhatItem;
@@ -55,6 +54,7 @@ import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
 import com.google.common.base.Predicate;
 
 public class ReportPage extends AbstractFragment {
@@ -104,7 +104,7 @@ public class ReportPage extends AbstractFragment {
             "//div[contains(@class, 's-enabled')]/div[contains(@class, 'c-chartType') and"
             + " ./span[@title='${type}']]";
 
-    private static final By REPORT_FILTER_LOCATOR = id("filtersContainer");
+    public static final By REPORT_FILTER_LOCATOR = id("filtersContainer");
 
     private static final By VISIBILITY_CHECKBOX_LOCATOR = id("settings-visibility");
 
@@ -158,7 +158,9 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage openFilterPanel() {
-        waitForElementVisible(filterButton).click();
+        Optional.of(waitForElementVisible(filterButton))
+                .filter(e -> !e.getAttribute("class").contains("editorBtnEditorSadHighlight"))
+                .ifPresent(WebElement::click);
         return this;
     }
 
@@ -224,6 +226,11 @@ public class ReportPage extends AbstractFragment {
 
         waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser)
             .sendKeys(Keys.ENTER);
+
+        Predicate<WebDriver> predicate = input -> !waitForElementVisible(filterButton)
+                .getAttribute("class")
+                .contains("disabled");
+        Graphene.waitGui().until(predicate);
         return this;
     }
 
@@ -382,21 +389,7 @@ public class ReportPage extends AbstractFragment {
         String textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountBefore = getNumber(textOnFilterButton);
 
-        if (filterItem instanceof SelectFromListValuesFilterItem) {
-            reportFilter.addFilterSelectList((SelectFromListValuesFilterItem) filterItem);
-
-        } else if (filterItem instanceof RankingFilterItem) {
-            reportFilter.addRankFilter((RankingFilterItem) filterItem);
-
-        } else if (filterItem instanceof NumericRangeFilterItem) {
-            reportFilter.addRangeFilter((NumericRangeFilterItem) filterItem);
-
-        } else if (filterItem instanceof VariableFilterItem) {
-            reportFilter.addPromtFiter((VariableFilterItem) filterItem);
-
-        } else {
-            throw new IllegalArgumentException("Unknow filter item: " + filterItem);
-        }
+        reportFilter.addFilter(filterItem);
 
         textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountAfter = getNumber(textOnFilterButton);
@@ -452,10 +445,7 @@ public class ReportPage extends AbstractFragment {
         if (filterCount == 0)
             return emptyList();
 
-        // Need to sleep here. If we go too fast, action click is still successful
-        // but nothing happen
-        sleepTightInSeconds(3);
-        filterButton.click();
+        openFilterPanel();
 
         return waitForElementVisible(REPORT_FILTER_LOCATOR, browser)
             .findElements(cssSelector(".filterLinesContainer li span.text"))
@@ -690,6 +680,31 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
+    public boolean isRangeFilterApplied(RangeFilterItem filterItem) {
+        return getTableReport().getMetricElements()
+                    .stream()
+                    .allMatch(metricValue -> isMetricValueInRange(metricValue, filterItem));
+    }
+
+    public boolean isRankingFilterApplied(List<Float> expectedMetricList) {
+        List<Float> listOfMetrics = getTableReport()
+                .getMetricElements()
+                .stream()
+                .filter(metricValue -> !metricValue.equals(0f))
+                .sorted()
+                .distinct()
+                .collect(Collectors.toList());
+
+        return listOfMetrics.equals(expectedMetricList);
+    }
+
+    public boolean isReportContains(List<String> expectedAttributeList) {
+        return expectedAttributeList.stream()
+                .allMatch(attributeValue -> getTableReport()
+                                       .getAttributeElements()
+                                       .contains(attributeValue));
+    }
+
     private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
         WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
                 browser);
@@ -811,5 +826,9 @@ public class ReportPage extends AbstractFragment {
 
     private SimpleMenu getVersionsMenu() {
         return Graphene.createPageFragment(SimpleMenu.class, waitForElementVisible(id("undefined"), browser));
+    }
+
+    private boolean isMetricValueInRange(float metricValue, RangeFilterItem filterItem) {
+        return filterItem.getRangeType().isMetricValueInRange(metricValue, filterItem.getRangeNumber());
     }
 }
