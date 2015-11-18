@@ -229,13 +229,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(css = ".ait-overview-projects-fragment")
     protected OverviewProjects discOverviewProjects;
 
-    @FindBy(css = ".adi-editor")
+    @FindBy(className = AnalysisPage.MAIN_CLASS)
     protected AnalysisPage analysisPage;
 
     @FindBy(css = ".ember-application")
     protected UserManagementPage userManagementPage;
 
-    @FindBy(css = "#app-dashboards")
+    @FindBy(id = IndigoDashboardsPage.MAIN_ID)
     protected IndigoDashboardsPage indigoDashboardsPage;
 
     /**
@@ -577,6 +577,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
         // work around CL-8058
         initEmptyDashboardsPage();
         ApplicationHeaderBar.goToAnalysisPage(browser);
+        waitForFragmentVisible(analysisPage);
     }
 
     public void initAccountPage() {
