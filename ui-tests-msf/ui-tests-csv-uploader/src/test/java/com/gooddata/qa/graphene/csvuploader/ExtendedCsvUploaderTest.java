@@ -46,8 +46,6 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
     private static final String NUMBERIC_COLUMN_NAME_ERROR = "Invalid column name. Names must begin with an alphabetic character.";
     public static final String TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR = "Row %d contains a value that exceeds the limit of 255 characters, or has more than the limit of 250 columns.";
 
-    public static final String ADDING_DATA_FROM_MESSAGE = "Adding data from \"%s\" ...";
-
     private static final long PAYROLL_FILE_SIZE_MINIMUM = 476L;
     private static final int PAYROLL_FILE_DEFAULT_ROW_COUNT = 3876;
     private static final int PAYROLL_FILE_DEFAULT_COLUMN_COUNT = 9;
@@ -441,30 +439,11 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
 
-        assertThat(datasetsListPage.waitForProgressMessageBar().getText(),
-                is(String.format(ADDING_DATA_FROM_MESSAGE, fileToUpload.getFileName())));
         takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
 
         assertThat(datasetsListPage.waitForSuccessMessageBar().getText(),
                 is(String.format("Data has been loaded successfully to \"%s\". Start analyzing!", datasetName)));
         takeScreenshot(browser, toScreenshotName("Successful-upload-data-to-dataset", datasetName), getClass());
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"myData"})
-    public void failedToUploadCsvFile() {
-        CsvFile fileToUpload = CsvFile.PAYROLL_TOO_LONG_FACT_VALUE;
-
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-
-        assertThat(datasetsListPage.waitForProgressMessageBar().getText(),
-                is(String.format(ADDING_DATA_FROM_MESSAGE, fileToUpload.getFileName())));
-        takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
-
-        // The error message should be improved in MSF-9476
-        assertThat(datasetsListPage.waitForErrorMessageBar().getText(),
-                is(String.format("Failed to add data from \"%s\" due to internal error. Check your email for "
-                        + "instructions or contact support.", fileToUpload.getDatasetNameOfFirstUpload())));
-        takeScreenshot(browser, toScreenshotName("Failed-upload-from", fileToUpload.getFileName()), getClass());
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"myData"})

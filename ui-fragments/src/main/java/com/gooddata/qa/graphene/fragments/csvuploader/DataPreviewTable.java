@@ -76,12 +76,14 @@ public class DataPreviewTable extends FixedDataTable {
     public void changeColumnName(int fieldIndex, String columnName) {
         final WebElement editedColumn = columnNames.get(fieldIndex);
         editedColumn.clear();
-        Graphene.waitGui().until().element(editedColumn).attribute("value").is().equals("");
+        Predicate<WebDriver> columnNameClear = webDriver -> editedColumn.getAttribute("value").equals("");
+        Graphene.waitGui(browser).until(columnNameClear);
         editedColumn.sendKeys(columnName);
         final Predicate<WebDriver> columnNameUpdated =
                 input -> columnName.equals(editedColumn.getAttribute("value"));
         Graphene.waitGui(browser)
-                .withMessage(String.format("Expected name '%s' is not updated: '%s'", columnName, editedColumn.getAttribute("value")))
+                .withMessage(String.format("Expected name '%s' is not updated: '%s'", columnName, 
+                        editedColumn.getAttribute("value")))
                 .until(columnNameUpdated);
     }
 
