@@ -2,11 +2,11 @@ package com.gooddata.qa.graphene.fragments.common;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -147,7 +147,9 @@ public class SelectItemPopupPanel extends AbstractFragment {
 
     private void waitForPanelNotVisible() {
         try {
-            waitForElementNotVisible(this.getRoot());
+            Graphene.waitGui().withTimeout(30, TimeUnit.SECONDS).until()
+                    .element(this.getRoot()).is().not().visible();
+
         } catch (Exception e) {
             // In special case like "add drilling" in table report, the locator of
             // this fragment has more than 1 copy. In this case we have to use get(index)

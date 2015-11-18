@@ -1,0 +1,152 @@
+package com.gooddata.qa.graphene.reports;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.filter.FloatingTime.Time;
+import com.gooddata.qa.graphene.entity.filter.RangeFilterItem.RangeType;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.HowItem.Position;
+import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
+import com.gooddata.qa.graphene.fragments.reports.filter.RangeFilterFragment;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
+import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+
+public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest {
+
+    private static final String REPORT_NAME = "Advance-numeric-range-filter";
+    private static final String VARIABLE_NAME = "FVariable";
+
+    private static final String METRIC_AMOUNT = "Amount";
+    private static final String ATTR_OPPORTUNITY = "Opportunity";
+    private static final String ATTR_YEAR = "Year (Snapshot)";
+    private static final String ATTR_STAGE_NAME = "Stage Name";
+
+    private static final String RANGE_FILTER_DESCRIPTION = "Opportunity where Amount is greater than or "
+            + "equal to 19000";
+
+    @BeforeClass
+    public void setProjectTitle() {
+        projectTitle = "Advance-numeric-range-filter-report-test";
+    }
+
+    @Test(dependsOnMethods = "createProject")
+    public void createReport() {
+        createReport(new UiReportDefinition()
+                .withName(REPORT_NAME)
+                .withWhats(METRIC_AMOUNT)
+                .withHows(ATTR_OPPORTUNITY)
+                .withHows(new HowItem(ATTR_YEAR, Position.TOP)),
+                "Advance-numeric-range-filter-report");
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void addNewVariable() {
+        initVariablePage();
+        variablePage.createVariable(new AttributeVariable(VARIABLE_NAME)
+                .withAttribute(ATTR_STAGE_NAME)
+                .withAttributeElements("Interest", "Discovery", "Short List", "Negotiation"));
+    }
+
+    @Test(dependsOnMethods = "createReport")
+    public void addRangeFilter() {
+        initReport().addFilter(FilterItem.Factory.
+                createRangeFilter(RangeType.IS_GREATER_THAN_OR_EQUAL_TO, 19000, METRIC_AMOUNT, ATTR_OPPORTUNITY));
+        waitForReportLoaded();
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        assertThat(reportPage.getFilters(), hasItem(RANGE_FILTER_DESCRIPTION));
+    }
+
+    @Test(dependsOnMethods = "addRangeFilter")
+    public void addSubFilterByAttributeValues() {
+        initReport()
+                .<RangeFilterFragment> openExistingFilter(RANGE_FILTER_DESCRIPTION, FilterFragment.RANGE_FILTER)
+                .addSubFilterByAttributeValues(ATTR_STAGE_NAME, "Interest", "Discovery", "Short List")
+                .apply();
+        waitForReportLoaded();
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        String filterDescription = RANGE_FILTER_DESCRIPTION + " and Stage Name is Interest, Discovery, Short List";
+        assertThat(reportPage.getFilters(), hasItem(filterDescription));
+
+        reportPage.<RangeFilterFragment> openExistingFilter(filterDescription, FilterFragment.RANGE_FILTER)
+                .deleteLatestSubFilter()
+                .apply();
+        waitForReportLoaded();
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        assertThat(reportPage.getFilters(), hasItem(RANGE_FILTER_DESCRIPTION));
+    }
+
+    @Test(dependsOnMethods = "addSubFilterByAttributeValues")
+    public void addSubFilterByDateRange() {
+        initReport()
+                .<RangeFilterFragment> openExistingFilter(RANGE_FILTER_DESCRIPTION, FilterFragment.RANGE_FILTER)
+                .addSubFilterByDateRange(ATTR_YEAR, Time.LAST_YEAR)
+                .apply();
+        waitForAnalysisPageLoaded(browser);
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        String filterDescription = RANGE_FILTER_DESCRIPTION + " and Year (Snapshot) is last year";
+        assertThat(reportPage.getFilters(), hasItem(filterDescription));
+
+        reportPage.<RangeFilterFragment> openExistingFilter(filterDescription, FilterFragment.RANGE_FILTER)
+                .changeLatestSubFilterOperator("isn't")
+                .apply();
+        waitForReportLoaded();
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        filterDescription = RANGE_FILTER_DESCRIPTION + " and Year (Snapshot) isn't last year";
+        assertThat(reportPage.getFilters(), hasItem(filterDescription));
+    }
+
+    @Test(dependsOnMethods = {"addNewVariable", "addSubFilterByDateRange"})
+    public void addSubFilterByVariable() {
+        String filterDescription = RANGE_FILTER_DESCRIPTION + " and Year (Snapshot) isn't last year";
+
+        initReport()
+                .<RangeFilterFragment> openExistingFilter(filterDescription, FilterFragment.RANGE_FILTER)
+                .addSubFilterByVariable(VARIABLE_NAME)
+                .apply();
+        waitForReportLoaded();
+
+        reportPage.saveReport();
+        checkRedBar(browser);
+
+        filterDescription += ", %s variable";
+        assertThat(reportPage.getFilters(), hasItem(String.format(filterDescription, VARIABLE_NAME)));
+    }
+
+    private ReportPage initReport() {
+        initReportsPage();
+        reportsPage.getReportsList().openReport(REPORT_NAME);
+        waitForAnalysisPageLoaded(browser);
+
+        return waitForFragmentVisible(reportPage);
+    }
+
+    private void waitForReportLoaded() {
+        reportPage.getTableReport()
+                .waitForReportLoading();
+    }
+}
