@@ -256,7 +256,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
 
         analysisPage.configAttributeFilter(ACTIVITY_TYPE, "Email", "Web Meeting");
         assertEquals(report.getTrackersCount(), 2);
-        assertEquals(analysisPage.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email, Web Meeting");
+        assertEquals(analysisPage.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
     }
 
     private String getTimeString(Calendar date) {
