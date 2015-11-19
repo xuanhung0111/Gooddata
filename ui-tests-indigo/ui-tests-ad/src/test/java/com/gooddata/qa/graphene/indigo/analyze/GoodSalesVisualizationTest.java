@@ -46,8 +46,6 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
@@ -241,24 +239,25 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void testFilteringFieldsInCatalog() {
         initAnalysePage();
-        analysisPage.searchBucketItem("am");
-        analysisPage.filterCatalog(CatalogFilterType.MEASURES);
-        assertTrue(Iterables.all(analysisPage.getAllCatalogFieldsInViewPort(), new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                String cssClass = input.getAttribute("class");
+        analysisPage.filterCatalog(CatalogFilterType.MEASURES)
+            .searchBucketItem("am");
+
+        assertTrue(analysisPage.getAllCatalogFieldsInViewPort()
+            .stream()
+            .allMatch(input -> {
+                final String cssClass = input.getAttribute("class");
                 return cssClass.contains(FieldType.METRIC.toString()) ||
                         cssClass.contains(FieldType.FACT.toString());
-            }
-        }));
+            })
+        );
 
-        analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES);
-        assertTrue(Iterables.all(analysisPage.getAllCatalogFieldsInViewPort(), new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString());
-            }
-        }));
+        analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
+            .searchBucketItem("am");
+
+        assertTrue(analysisPage.getAllCatalogFieldsInViewPort()
+            .stream()
+            .allMatch(input -> input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString()))
+        );
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -536,10 +535,14 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         assertFalse(analysisPage.filterCatalog(CatalogFilterType.ALL)
                 .searchBucketItem("Amo"));
         assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(4));
-        assertThat(analysisPage.filterCatalog(CatalogFilterType.MEASURES)
-                .getUnrelatedItemsHiddenCount(), equalTo(4));
-        assertThat(analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
-                .getUnrelatedItemsHiddenCount(), equalTo(0));
+
+        assertFalse(analysisPage.filterCatalog(CatalogFilterType.MEASURES)
+                .searchBucketItem("Amo"));
+        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(4));
+
+        assertFalse(analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
+                .searchBucketItem("Amo"));
+        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -795,10 +798,10 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                     .waitForReportComputing()
                     .getTableReport(),
                 DEPARTMENT);
-        assertEquals(content, asList(asList("Email", "Inside Sales"), asList("In Person Meeting", "Inside Sales"),
-                asList("Phone Call", "Inside Sales"), asList("Web Meeting", "Inside Sales"),
-                asList("Email", "Direct Sales"), asList("In Person Meeting", "Direct Sales"),
-                asList("Phone Call", "Direct Sales"), asList("Web Meeting", "Direct Sales")));
+        assertEquals(content, asList(asList("Email", "Direct Sales"), asList("In Person Meeting", "Direct Sales"),
+                asList("Phone Call", "Direct Sales"), asList("Web Meeting", "Direct Sales"),
+                asList("Email", "Inside Sales"), asList("In Person Meeting", "Inside Sales"),
+                asList("Phone Call", "Inside Sales"), asList("Web Meeting", "Inside Sales")));
 
         content = sortReportBaseOnHeader(
                 analysisPage.addMetric(NUMBER_OF_ACTIVITIES)

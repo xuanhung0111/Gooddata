@@ -56,6 +56,7 @@ public class CataloguePanel extends AbstractFragment {
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     public int getUnrelatedItemsHiddenCount() {
+        waitForItemLoaded();
         By locator = isElementPresent(BY_NO_ITEMS, browser) ?
                 BY_UNAVAILABLE_ITEMS_MATCHED : BY_UNRELATED_ITEMS_HIDDEN;
 
