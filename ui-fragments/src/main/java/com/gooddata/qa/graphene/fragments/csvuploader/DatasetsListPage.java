@@ -15,9 +15,6 @@ public class DatasetsListPage extends AbstractFragment {
 
     private static final By BY_EMPTY_STATE = By.className("datasets-empty-state");
     private static final By BY_MY_DATASETS_EMPTY_STATE = By.className("my-datasets-empty-state");
-    private static final By BY_PROGRESS_MESSAGE_BAR = By.cssSelector(".gd-message.progress");
-    private static final By BY_ERROR_MESSAGE_BAR = By.cssSelector(".gd-message.error");
-    private static final By BY_SUCCESS_MESSAGE_BAR = By.cssSelector(".gd-message.success");
 
     @FindBy(className = "s-datasets-list-header")
     private WebElement datasetsHeader;
@@ -73,18 +70,6 @@ public class DatasetsListPage extends AbstractFragment {
 
     public DatasetsTable getOthersDatasetsTable() {
         return waitForFragmentVisible(othersDatasetsTable);
-    }
-    
-    public WebElement waitForProgressMessageBar() {
-        return waitForElementVisible(BY_PROGRESS_MESSAGE_BAR, browser);
-    }
-    
-    public WebElement waitForErrorMessageBar() {
-        return waitForElementVisible(BY_ERROR_MESSAGE_BAR, browser);
-    }
-    
-    public WebElement waitForSuccessMessageBar() {
-        return waitForElementVisible(BY_SUCCESS_MESSAGE_BAR, browser);
     }
 
     public void uploadFile(String filePath) {

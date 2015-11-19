@@ -29,6 +29,10 @@ public class FileUploadDialog extends AbstractFragment {
     @FindBy(className = "s-backend-validation-errors")
     private WebElement backendValidationErrorsList;
     
+    @FindBy(css = ".s-backend-validation-errors a")
+    private WebElement backendValidationErrorLink;
+    
+    // this is workaround for bug MSF-9734
     @FindBy(css = ".gd-message.error")
     private WebElement validationError;
 
@@ -53,9 +57,7 @@ public class FileUploadDialog extends AbstractFragment {
     }
 
     public List<String> getBackendValidationErrors() {
-        waitForElementVisible(backendValidationErrorsList);
-
-        return backendValidationErrorsList.findElements(By.tagName("span"))
+        return waitForElementVisible(backendValidationErrorsList).findElements(By.tagName("span"))
                 .stream()
                 .map(WebElement::getText)
                 .collect(toList());
@@ -63,5 +65,9 @@ public class FileUploadDialog extends AbstractFragment {
     
     public String getValidationErrorMessage() {
         return waitForElementVisible(validationError).getText();
+    }
+    
+    public String getLinkInBackendValidationError() {
+        return waitForElementVisible(backendValidationErrorLink).getAttribute("href");
     }
 }

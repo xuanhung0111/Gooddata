@@ -11,6 +11,7 @@ import com.gooddata.qa.graphene.fragments.FixedDataTable;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -75,10 +76,8 @@ public class DataPreviewTable extends FixedDataTable {
 
     public void changeColumnName(int fieldIndex, String columnName) {
         final WebElement editedColumn = columnNames.get(fieldIndex);
-        editedColumn.clear();
-        Predicate<WebDriver> columnNameClear = webDriver -> editedColumn.getAttribute("value").equals("");
-        Graphene.waitGui(browser).until(columnNameClear);
-        editedColumn.sendKeys(columnName);
+        // editedColumn.clear() works very unstable with react.js. So use sendKeys to make this action more stable.
+        editedColumn.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE + columnName);
         final Predicate<WebDriver> columnNameUpdated =
                 input -> columnName.equals(editedColumn.getAttribute("value"));
         Graphene.waitGui(browser)
