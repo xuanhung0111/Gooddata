@@ -9,6 +9,7 @@
             </dependencies>
             <run>
                 <include name="mobile" />
+                <include name="dashboardWidgetsInit" />
                 <include name="dashboardsInit" />
                 <include name="createProject" />
                 <include name="projectInit" />
