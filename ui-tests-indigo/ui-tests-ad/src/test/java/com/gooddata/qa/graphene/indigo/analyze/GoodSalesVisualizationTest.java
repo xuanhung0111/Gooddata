@@ -90,7 +90,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         projectTitle = "Indigo-GoodSales-Demo-Visualization-Test";
     }
 
-    @Test(dependsOnMethods = {"enableAnalyticalDesigner"}, groups = {"turnOfWalkme"}, priority = 0)
+    @Test(dependsOnGroups = {"setupProject"}, groups = {"turnOfWalkme"}, priority = 0)
     public void testWalkme() {
         initAnalysePage();
 
