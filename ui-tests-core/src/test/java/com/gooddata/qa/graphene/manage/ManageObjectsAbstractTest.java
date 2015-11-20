@@ -183,8 +183,6 @@ public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
         Screenshots.takeScreenshot(browser, objectType.getObjectsTableID()
                 + "-before-deleting-selected-objects", this.getClass());
         dataPage.getDeleteConfirmButton().click();
-        String progressText = waitForElementVisible(dataPage.getProgressMessageBox()).getText();
-        Assert.assertTrue(progressText.contains("Deleting "));    
         String message = String.format("%d %s(s) deleted.", deletedObjects.size(),
                 objectType.getName());
         Assert.assertEquals(waitForElementVisible(dataPage.getStatusMessageOnGreenBar()).getText(),
