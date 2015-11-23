@@ -5,8 +5,8 @@
         <groups>
             <dependencies>
                 <group name="createProject" depends-on="projectInit" />
-                <group name="enableAnalyticalDesigner" depends-on="createProject" />
-                <group name="turnOffWalkme" depends-on="enableAnalyticalDesigner" />
+                <group name="setupProject" depends-on="createProject" />
+                <group name="turnOffWalkme" depends-on="setupProject" />
                 <group name="init" depends-on="turnOffWalkme" />
                 <group name="prepare" depends-on="init" />
                 <group name="sanity" depends-on="prepare" />
@@ -16,7 +16,7 @@
                 <include name="prepare" />
                 <include name="init" />
                 <include name="turnOffWalkme" />
-                <include name="enableAnalyticalDesigner" />
+                <include name="setupProject" />
                 <include name="createProject" />
                 <include name="projectInit" />
                 <include name="arquillian" />
@@ -32,7 +32,7 @@
             <dependencies>
                 <group name="createProject" depends-on="projectInit" />
                 <group name="enableAnalyticalDesigner" depends-on="createProject" />
-                <group name="turnOffWalkme" depends-on="enableAnalyticalDesigner" />
+                <group name="turnOffWalkme" depends-on="setupProject" />
                 <group name="init" depends-on="turnOffWalkme" />
                 <group name="sanity" depends-on="init" />
             </dependencies>
@@ -40,7 +40,7 @@
                 <include name="sanity" />
                 <include name="init" />
                 <include name="turnOffWalkme" />
-                <include name="enableAnalyticalDesigner" />
+                <include name="setupProject" />
                 <include name="createProject" />
                 <include name="projectInit" />
                 <include name="arquillian" />
@@ -56,7 +56,7 @@
             <dependencies>
                 <group name="createProject" depends-on="projectInit" />
                 <group name="enableAnalyticalDesigner" depends-on="createProject" />
-                <group name="turnOffWalkme" depends-on="enableAnalyticalDesigner" />
+                <group name="turnOffWalkme" depends-on="setupProject" />
                 <group name="init" depends-on="turnOffWalkme" />
                 <group name="sanity" depends-on="init" />
             </dependencies>
@@ -64,7 +64,7 @@
                 <include name="sanity" />
                 <include name="init" />
                 <include name="turnOffWalkme" />
-                <include name="enableAnalyticalDesigner" />
+                <include name="setupProject" />
                 <include name="createProject" />
                 <include name="projectInit" />
                 <include name="arquillian" />

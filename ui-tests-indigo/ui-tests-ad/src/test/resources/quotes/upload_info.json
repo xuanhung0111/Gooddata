@@ -1,0 +1,108 @@
+{
+   "dataSetSLIManifest" : {
+      "parts" : [
+         {
+            "columnName" : "f_quotes.f_close_price",
+            "populates" : [
+               "fact.quotes.close_price"
+            ],
+            "mode" : "FULL"
+         },
+         {
+            "columnName" : "f_quotes.dt_quote_date_id",
+            "populates" : [
+               "quote.date.mmddyyyy"
+            ],
+            "constraints" : {
+               "date" : "yyyy-MM-dd"
+            },
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "f_quotes.f_volume",
+            "populates" : [
+               "fact.quotes.volume"
+            ],
+            "mode" : "FULL"
+         },
+         {
+            "columnName" : "d_quotes_sector.nm_sector",
+            "populates" : [
+               "label.quotes.sector"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "f_quotes.f_adjusted_close_price",
+            "populates" : [
+               "fact.quotes.adjusted_close_price"
+            ],
+            "mode" : "FULL"
+         },
+         {
+            "columnName" : "d_quotes_symbol.nm_symbol",
+            "populates" : [
+               "label.quotes.symbol"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "d_quotes_symbol.nm_company",
+            "populates" : [
+               "label.quotes.symbol.company"
+            ],
+            "mode" : "FULL"
+         },
+         {
+            "columnName" : "f_quotes.f_low_price",
+            "populates" : [
+               "fact.quotes.low_price"
+            ],
+            "mode" : "FULL"
+         },
+         {
+            "columnName" : "d_quotes_industry.nm_industry",
+            "populates" : [
+               "label.quotes.industry"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "f_quotes.nm_id",
+            "populates" : [
+               "label.quotes.id"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         },
+         {
+            "columnName" : "f_quotes.f_open_price",
+            "populates" : [
+               "fact.quotes.open_price"
+            ],
+            "mode" : "FULL"
+         },
+         {
+            "columnName" : "f_quotes.f_high_price",
+            "populates" : [
+               "fact.quotes.high_price"
+            ],
+            "mode" : "FULL"
+         },
+         {
+            "columnName" : "d_quotes_market.nm_market",
+            "populates" : [
+               "label.quotes.market"
+            ],
+            "mode" : "FULL",
+            "referenceKey" : 1
+         }
+      ],
+      "file" : "quotes.csv",
+      "dataSet" : "dataset.quotes"
+   }
+}

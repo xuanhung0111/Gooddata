@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -44,6 +45,9 @@ public class CataloguePanel extends AbstractFragment {
     @FindBy(className = "s-filter-attributes")
     private WebElement filterAttributes;
 
+    @FindBy(className = "s-dataset-picker-toggle")
+    private WebElement datasetPicker;
+
     private Actions actions;
 
     private static final By BY_INLINE_HELP = By.cssSelector(".inlineBubbleHelp");
@@ -52,6 +56,7 @@ public class CataloguePanel extends AbstractFragment {
     private static final By BY_UNAVAILABLE_ITEMS_MATCHED = By.className("s-unavailable-items-matched");
     private static final By BY_ADD_DATA = By.cssSelector(".csv-link-section .s-btn-add_data");
     private static final By BY_CLEAR_SEARCH_FIELD = By.className("searchfield-clear");
+    private static final By BY_DATASOURCE_DROPDOWN = By.className("data-source-picker-dropdown");
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
@@ -237,6 +242,13 @@ public class CataloguePanel extends AbstractFragment {
         waitForElementVisible(BY_ADD_DATA, getRoot()).click();
     }
 
+    public void changeDataset(String dataset) {
+        waitForElementVisible(datasetPicker).click();
+        Graphene.createPageFragment(DatasourceDropDown.class,
+                waitForElementVisible(BY_DATASOURCE_DROPDOWN, browser)).select(dataset);
+        waitForItemLoaded();
+    }
+
     private void waitForItemLoaded() {
         Predicate<WebDriver> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
                 browser);
@@ -269,5 +281,19 @@ public class CataloguePanel extends AbstractFragment {
     private Actions getActions() {
         if (actions == null) actions = new Actions(browser);
         return actions;
+    }
+
+    public class DatasourceDropDown extends AbstractFragment {
+
+        @FindBy(className = "gd-list-item")
+        private List<WebElement> items;
+
+        public void select(final String dataset) {
+            waitForCollectionIsNotEmpty(items).stream()
+                .filter(e -> dataset.equals(e.getText()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find dataset: " + dataset))
+                .click();
+        }
     }
 }
