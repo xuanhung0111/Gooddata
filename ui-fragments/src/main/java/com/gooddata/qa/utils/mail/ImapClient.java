@@ -4,6 +4,7 @@
 package com.gooddata.qa.utils.mail;
 
 import com.sun.mail.util.BASE64DecoderStream;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -22,6 +23,8 @@ import javax.mail.search.AndTerm;
 import javax.mail.search.FromStringTerm;
 import javax.mail.search.SearchTerm;
 import javax.mail.search.SubjectTerm;
+
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,7 +39,7 @@ import static org.apache.commons.lang.Validate.notNull;
 /**
  * Simple IMAP mailbox checker to detect arrived messages
  */
-public class ImapClient {
+public class ImapClient implements Closeable {
 
     private final String host;
     private final String email;
@@ -73,6 +76,7 @@ public class ImapClient {
         return messages;
     }
 
+    @Override
     public void close() {
         try {
             getStore().close();
