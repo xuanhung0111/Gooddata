@@ -11,6 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
@@ -23,6 +24,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.collections.Sets;
 
+import com.gooddata.qa.graphene.fragments.reports.filter.ContextMenu;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -346,6 +348,17 @@ public class TableReport extends AbstractReport {
         }
 
         return !getRoot().findElement(reportLabelLocator).getCssValue("display").startsWith("none");
+    }
+
+    public ContextMenu openContextMenuFromReportHeader(final String headerName) {
+        new Actions(browser).contextClick(Stream.of(metricsHeader, attributesHeader, attributeElementInGrid)
+                .flatMap(l -> l.stream())
+                .filter(e -> headerName.equals(e.getText()))
+                .findFirst()
+                .get())
+                .perform();
+
+        return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(By.id("ctxMenu"), browser));
     }
 
     private Pair<Integer, Integer> getPossitionFromRegion(String region) {
