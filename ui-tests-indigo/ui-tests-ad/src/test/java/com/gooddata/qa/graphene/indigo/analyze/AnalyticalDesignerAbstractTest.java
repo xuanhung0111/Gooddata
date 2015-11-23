@@ -7,9 +7,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
-import java.io.IOException;
-
-import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -17,9 +14,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest {
 
@@ -48,13 +42,12 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         projectTemplate = "/projectTemplates/GoodSalesDemo/2";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"enableAnalyticalDesigner"})
-    public void enableAnalyticalDesigner() throws IOException, JSONException {
-        RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
-                ProjectFeatureFlags.ANALYTICAL_DESIGNER.getFlagName(), true));
+    /* A hook for setup test project */
+    @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
+    public void prepareSetupProject() {
     }
 
-    @Test(dependsOnGroups = {"enableAnalyticalDesigner"}, groups = {"turnOffWalkme"}, priority = 1)
+    @Test(dependsOnGroups = {"setupProject"}, groups = {"turnOffWalkme"}, priority = 1)
     public void turnOffWalkme() {
         if (isWalkmeTurnOff) {
             return;
@@ -71,6 +64,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         }
     }
 
+    /* Make sure Ad tests will always be run */
     @Test(dependsOnGroups = {"turnOffWalkme"}, alwaysRun = true, groups = {"init"})
     public void prepareToTestAdAfterTurnOffWalkme() {
     }

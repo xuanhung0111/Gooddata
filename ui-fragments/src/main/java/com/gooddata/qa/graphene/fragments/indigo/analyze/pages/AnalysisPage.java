@@ -487,4 +487,9 @@ public class AnalysisPage extends AbstractFragment {
     public void goToDataSectionPage() {
         waitForFragmentVisible(cataloguePanel).goToDataSectionPage();
     }
+
+    public AnalysisPage changeDataset(String dataset) {
+        waitForFragmentVisible(cataloguePanel).changeDataset(dataset);
+        return this;
+    }
 }
