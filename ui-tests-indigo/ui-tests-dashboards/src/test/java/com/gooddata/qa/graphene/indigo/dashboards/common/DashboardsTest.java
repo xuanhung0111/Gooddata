@@ -20,6 +20,7 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
     public static final String DATE_FILTER_LAST_MONTH = "Last month";
     public static final String DATE_FILTER_THIS_QUARTER = "This quarter";
     public static final String DATE_FILTER_LAST_QUARTER = "Last quarter";
+    public static final String DATE_FILTER_THIS_YEAR = "This year";
 
     public static final String DRILL_TO_OUTLOOK = "Outlook";
     public static final String DRILL_TO_WHATS_CHANGED = "What's Changed";
