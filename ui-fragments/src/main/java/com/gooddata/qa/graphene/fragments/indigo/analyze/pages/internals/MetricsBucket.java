@@ -13,6 +13,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -73,8 +74,17 @@ public class MetricsBucket extends AbstractFragment {
     }
 
     public void replaceMetric(String oldMetric, final WebElement newMetric) {
-        new Actions(browser).dragAndDrop(newMetric, getMetric(oldMetric)).perform();
-        assertTrue(getItemNames().contains(newMetric.getText().trim()));
+        Optional<WebElement> oldMetricElement = getItem(oldMetric);
+
+        if (oldMetricElement.isPresent()) {
+            new Actions(browser).dragAndDrop(newMetric, oldMetricElement.get()).perform();
+            assertTrue(getItemNames().contains(newMetric.getText().trim()));
+            return;
+        }
+
+        log.info("Cannot find current attribute: " + oldMetric);
+        log.info("Try to add new one!");
+        addMetric(newMetric);
     }
 
     public boolean isWarningMessageShown() {
@@ -247,21 +257,13 @@ public class MetricsBucket extends AbstractFragment {
     }
 
     private WebElement getMetric(final String name) {
-        WebElement item = getItem(name);
-        if (item == null) {
-            throw new NoSuchElementException("Cannot find metric: " + name);
-        }
-        return item;
+        return getItem(name).orElseThrow(() -> new NoSuchElementException("Cannot find metric: " + name));
     }
 
-    private WebElement getItem(final String name) {
-        for (WebElement input : items) {
-            if (name.equals(getHeaderFrom(input).findElement(By.className("s-title")).getText())) {
-                return input;
-            }
-        }
-
-        return null;
+    private Optional<WebElement> getItem(final String name) {
+        return items.stream()
+            .filter(input -> name.equals(getHeaderFrom(input).findElement(By.className("s-title")).getText()))
+            .findFirst();
     }
 
     private boolean isMetricConfigurationCollapsed(WebElement metric) {
