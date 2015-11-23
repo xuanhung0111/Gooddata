@@ -197,22 +197,16 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     protected void waitForNotification(String subject, NotificationParameters expectedParams) {
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        try {
+        try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("Waiting for notification...");
             checkScheduleEventNotification(imapClient, subject, expectedParams);
-        } finally {
-            imapClient.close();
         }
     }
 
     protected void waitForRepeatedFailuresEmail(ScheduleBuilder scheduleBuilder) {
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        try {
+        try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("Waiting for notification...");
             checkRepeatFailureEmail(imapClient, scheduleBuilder);
-        } finally {
-            imapClient.close();
         }
     }
 

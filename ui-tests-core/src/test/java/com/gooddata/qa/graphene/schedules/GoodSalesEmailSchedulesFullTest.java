@@ -398,15 +398,13 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnMethods = {"updateScheduledMailRecurrency"})
     public void waitForMessages() throws MessagingException, IOException {
         ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        try {
+        try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
             pssClient.accelerate();
             checkMailbox(imapClient);
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
             pssClient.decelerate();
-            imapClient.close();
         }
     }
 

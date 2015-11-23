@@ -79,8 +79,8 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
     @Test(dependsOnMethods = {"updateScheduledMail"})
     public void waitForMessageAndUnsubscribe() throws MessagingException, IOException {
         ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        try {
+        
+        try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
             pssClient.accelerate();
 
@@ -103,7 +103,6 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
             pssClient.decelerate();
-            imapClient.close();
         }
     }
 

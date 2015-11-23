@@ -111,17 +111,12 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     }
 
     private Document getNotification(String subject) {
-        Document message = null;
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        try {
+        try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             Message notification = getNotification(imapClient, subject);
-            message = Jsoup.parse(ImapClient.getEmailBody(notification));
+            return Jsoup.parse(ImapClient.getEmailBody(notification));
         } catch (Exception e) {
             throw new IllegalStateException("There is an exception when checking notification content!", e);
-        } finally {
-            imapClient.close();
         }
-        return message;
     }
 
     private Document getSuccessfulNotification() {
