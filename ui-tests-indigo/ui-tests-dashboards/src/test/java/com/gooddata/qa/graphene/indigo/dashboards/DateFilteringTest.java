@@ -11,13 +11,13 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
-import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import static org.testng.Assert.assertFalse;
 
 public class DateFilteringTest extends DashboardWithWidgetsTest {
+    private static final String DEFAULT_METRIC_FORMAT = "#,##0";
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void checkDateFilterDefaultState() {
@@ -141,21 +141,35 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
     }
 
     private String createFilteredOutMetric() {
-        return createMetric("Filtered Out Metric", format("SELECT SUM([%s]) WHERE [%s] = 3000",
-                getAmountAttributeUri(), getYearSnapshotUri()));
+        String metricName = "Filtered Out Metric";
+
+        createMetric(metricName, format("SELECT SUM([%s]) WHERE [%s] = 3000",
+                getAmountAttributeUri(), getYearSnapshotUri()),
+                DEFAULT_METRIC_FORMAT);
+
+        return metricName;
     }
 
     private String createTimeMacrosMetric() {
-        return createMetric("Time Macros Metric", format("SELECT SUM([%s]) WHERE [%s] = THIS - 4",
-                getAmountAttributeUri(), getYearSnapshotUri()));
+        String metricName = "Time Macros Metric";
+
+        createMetric(metricName, format("SELECT SUM([%s]) WHERE [%s] = THIS - 4",
+                getAmountAttributeUri(), getYearSnapshotUri()),
+                DEFAULT_METRIC_FORMAT);
+
+        return metricName;
     }
 
     private String createAttributeFilterMetric() {
+        String metricName = "Attribute Filter Metric";
         String accountAttribute = getMdService().getObjUri(getProject(), Attribute.class, title(ACCOUNT));
 
-        return createMetric("Attribute Filter Metric", format("SELECT SUM([%s]) WHERE [%s] IN ([%s],[%s],[%s])",
+        createMetric(metricName, format("SELECT SUM([%s]) WHERE [%s] IN ([%s],[%s],[%s])",
                 getAmountAttributeUri(), accountAttribute, accountAttribute + "/elements?id=961040",
-                accountAttribute + "/elements?id=961042", accountAttribute + "/elements?id=958077"));
+                accountAttribute + "/elements?id=961042", accountAttribute + "/elements?id=958077"),
+                DEFAULT_METRIC_FORMAT);
+
+        return metricName;
     }
 
     private String getAmountAttributeUri() {
@@ -164,10 +178,5 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
 
     private String getYearSnapshotUri() {
         return getMdService().getObjUri(getProject(), Attribute.class, identifier("snapshot.year"));
-    }
-
-    private String createMetric(String name, String expression) {
-        getMdService().createObj(getProject(), new Metric(name, expression, "#,##0"));
-        return name;
     }
 }

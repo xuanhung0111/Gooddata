@@ -10,6 +10,9 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import com.gooddata.qa.utils.http.RestUtils;
+import java.util.UUID;
+import org.json.JSONException;
 
 import org.testng.Assert;
 
@@ -24,6 +27,11 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     private static final KpiConfiguration kpiConfig = new KpiConfiguration.Builder()
         .metric(AMOUNT)
+        .dateDimension(DATE_CREATED)
+        .build();
+    private static final String METRIC_IN_PERCENT = "M" + UUID.randomUUID().toString().substring(0, 6);
+    private static final KpiConfiguration kpiConfigWithMetricInPercent = new KpiConfiguration.Builder()
+        .metric(METRIC_IN_PERCENT)
         .dateDimension(DATE_CREATED)
         .build();
 
@@ -80,7 +88,6 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfig);
 
         try {
-
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             takeScreenshot(browser, "checkAddKpiAlert", getClass());
@@ -123,6 +130,27 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             assertEquals(kpiAlertDialog.getThreshold(), updatedThreshold);
         } finally {
             teardownKpi();
+        }
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void checkKpiAlertDialogWithPercentMetric() throws JSONException {
+        String metricUri = createMetric(METRIC_IN_PERCENT, "SELECT 1", "#,##0%");
+        setupKpi(kpiConfigWithMetricInPercent);
+
+        try {
+            boolean hasPercentSymbol = initIndigoDashboardsPageWithWidgets()
+                .getLastKpi()
+                .openAlertDialog()
+                .hasInputSuffix();
+
+            takeScreenshot(browser, "checkKpiAlertDialogWithPercentMetric", getClass());
+            assertTrue(hasPercentSymbol);
+        } finally {
+            teardownKpi();
+            if (metricUri != null) {
+                RestUtils.deleteObject(restApiClient, metricUri);
+            }
         }
     }
 

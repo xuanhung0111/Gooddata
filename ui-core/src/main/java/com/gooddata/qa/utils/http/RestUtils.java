@@ -996,7 +996,7 @@ public class RestUtils {
         }
     }
 
-    public static JSONObject getCurrentUserProfile(RestApiClient restApiClient) 
+    public static JSONObject getCurrentUserProfile(RestApiClient restApiClient)
             throws JSONException, IOException {
         return getJSONObjectFrom(restApiClient, USER_PROFILE_LINK + "current")
                 .getJSONObject("accountSetting");

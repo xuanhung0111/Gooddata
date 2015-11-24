@@ -2,8 +2,6 @@ package com.gooddata.qa.graphene.indigo.dashboards.common;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
-import com.gooddata.md.MetadataService;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 
@@ -52,13 +50,5 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
     protected String generateUniqueHeadlineTitle() {
         // create unique headline title which fits into headline title (has limited size)
         return UUID.randomUUID().toString().substring(0, 18);
-    }
-
-    protected MetadataService getMdService() {
-        return getGoodDataClient().getMetadataService();
-    }
-
-    protected Project getProject() {
-        return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 }
