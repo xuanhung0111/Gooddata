@@ -160,6 +160,9 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfig);
 
         try {
+            indigoDashboardsPage
+                .selectDateFilterByName(DATE_FILTER_THIS_MONTH);
+
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
             initIndigoDashboardsPageWithWidgets()

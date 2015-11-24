@@ -15,6 +15,7 @@ import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import static org.testng.Assert.assertFalse;
 
 public class DateFilteringTest extends DashboardWithWidgetsTest {
 
@@ -23,23 +24,82 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
         DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
         String dateFilterSelection = dateFilter.getSelection();
 
-        takeScreenshot(browser, "checkDateFilterDefaultState-this-month", getClass());
+        takeScreenshot(browser, "checkDateFilterDefaultState-all-time", getClass());
 
-        assertEquals(dateFilterSelection, "This month");
+        assertEquals(dateFilterSelection, DATE_FILTER_ALL_TIME);
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void checkDateFilterChangeValue() {
         DateFilter dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
-        String dateFilterThisYear = "This year";
 
-        dateFilter.selectByName(dateFilterThisYear);
+        dateFilter.selectByName(DATE_FILTER_THIS_YEAR);
 
         String dateFilterSelection = dateFilter.getSelection();
 
         takeScreenshot(browser, "checkDateFilterChangeValue-this-year", getClass());
 
-        assertEquals(dateFilterSelection, dateFilterThisYear);
+        assertEquals(dateFilterSelection, DATE_FILTER_THIS_YEAR);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = "desktop")
+    public void testInfoMessage() {
+        DateFilter dateFilter = initIndigoDashboardsPage()
+                .waitForDateFilter();
+
+        dateFilter.ensureDropdownOpen();
+
+        takeScreenshot(browser, "testInfoMessage-hidden", getClass());
+        assertFalse(dateFilter.isInfoMessageDisplayed());
+
+        dateFilter = indigoDashboardsPage
+                .switchToEditMode()
+                .waitForDateFilter();
+
+        dateFilter.ensureDropdownOpen();
+
+        takeScreenshot(browser, "testInfoMessage-displayed", getClass());
+        assertTrue(dateFilter.isInfoMessageDisplayed());
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = "desktop")
+    public void testDefaultDateFilterStored() {
+        initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .waitForDateFilter()
+                .selectByName(DATE_FILTER_THIS_YEAR);
+
+        indigoDashboardsPage.leaveEditMode();
+
+        String selectionAfterReload = initIndigoDashboardsPageWithWidgets()
+                .waitForDateFilter()
+                .getSelection();
+
+        takeScreenshot(browser, "testDefaultDateFilterStored", getClass());
+        assertEquals(selectionAfterReload, DATE_FILTER_THIS_YEAR);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = "desktop")
+    public void testDateFilterSwitchToEditMode() {
+        initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .waitForDateFilter()
+                .selectByName(DATE_FILTER_THIS_YEAR);
+
+        indigoDashboardsPage.leaveEditMode();
+
+        initIndigoDashboardsPageWithWidgets()
+                .waitForDateFilter()
+                .selectByName(DATE_FILTER_ALL_TIME);
+
+        indigoDashboardsPage.switchToEditMode();
+
+        String selectionAfterEditModeSwitch = indigoDashboardsPage
+                .waitForDateFilter()
+                .getSelection();
+
+        takeScreenshot(browser, "testDateFilterSwitchToEditMode", getClass());
+        assertEquals(selectionAfterEditModeSwitch, DATE_FILTER_THIS_YEAR);
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = "desktop")
