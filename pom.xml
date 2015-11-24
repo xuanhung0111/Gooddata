@@ -59,6 +59,7 @@
         <browserstack.platform.browser.version>xxx</browserstack.platform.browser.version>
         <browserstack.platform.os>xxx</browserstack.platform.os>
         <browserstack.platform.os.version>xxx</browserstack.platform.os.version>
+        <browserstack.platform.resolution>1600x1200</browserstack.platform.resolution>
         <browserstack.project>local</browserstack.project>
         <browserstack.build>${user.name}</browserstack.build>
 
@@ -338,6 +339,10 @@
                                             <property>
                                                 <name>browserstack.platform.os.version</name>
                                                 <value>${browserstack.platform.os.version}</value>
+                                            </property>
+                                            <property>
+                                                <name>browserstack.platform.resolution</name>
+                                                <value>${browserstack.platform.resolution}</value>
                                             </property>
                                             <property>
                                                 <name>browserstack.platform.browser</name>
@@ -654,6 +659,7 @@
                 <browserstack.platform.browser.version>11.0</browserstack.platform.browser.version>
                 <browserstack.platform.os>Windows</browserstack.platform.os>
                 <browserstack.platform.os.version>8.1</browserstack.platform.os.version>
+                <browserstack.platform.resolution>1280x1024</browserstack.platform.resolution>
             </properties>
         </profile>
         <profile>
