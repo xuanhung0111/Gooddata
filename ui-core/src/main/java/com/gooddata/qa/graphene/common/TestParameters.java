@@ -32,6 +32,9 @@ public class TestParameters {
     private int extendedTimeoutMultiple;
     private String folderSeparator;
     private boolean reuseProject = false;
+    // set this to what `host` is proxied to
+    // (e.g. set hostProxy=staging3.intgdc.com if host is localhost:8443 and proxied to staging3)
+    private String hostProxy;
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
@@ -59,6 +62,7 @@ public class TestParameters {
         folderSeparator = loadProperty("file.separator");
         reuseProject = Boolean.valueOf(loadProperty("project.reuse"));
         if (reuseProject) projectId = loadProperty("projectId");
+        hostProxy = loadProperty("hostProxy");
     }
 
     /**
@@ -175,5 +179,13 @@ public class TestParameters {
 
     public void setReuseProject(boolean reuseProject) {
         this.reuseProject = reuseProject;
+    }
+
+    public boolean isHostProxy() {
+        return !this.hostProxy.isEmpty();
+    }
+
+    public String getHostProxy() {
+        return this.hostProxy;
     }
 }

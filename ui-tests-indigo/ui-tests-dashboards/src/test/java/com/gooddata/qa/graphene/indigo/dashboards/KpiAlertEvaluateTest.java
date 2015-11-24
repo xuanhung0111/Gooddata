@@ -11,6 +11,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
+import static com.gooddata.qa.graphene.utils.NavigateUtils.replaceInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
@@ -107,6 +108,10 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
 
             assertNotNull(link);
             browser.get(link);
+
+            if (testParams.isHostProxy()) {
+                replaceInUrl(browser, testParams.getHostProxy(), testParams.getHost());
+            }
 
             Kpi firstKpi = indigoDashboardsPage
                     .waitForDashboardLoad()
