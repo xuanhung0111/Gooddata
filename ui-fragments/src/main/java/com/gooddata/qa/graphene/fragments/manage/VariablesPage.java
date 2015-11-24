@@ -56,11 +56,12 @@ public class VariablesPage extends AbstractFragment {
         return uri;
     }
 
-    public void openVariableFromList(String variableName) {
+    public VariableDetailPage openVariableFromList(String variableName) {
         waitForDataPageLoaded(browser);
         waitForFragmentVisible(variablesTable);
         variablesTable.selectObject(variableName);
         waitForObjectPageLoaded(browser);
+        return waitForFragmentVisible(variableDetailPage);
     }
 
     public boolean isVariableVisible(String variableName) {

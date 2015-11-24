@@ -26,6 +26,11 @@ public class AttributeVariable extends AbstractVariable {
         return this;
     }
 
+    public AttributeVariable withAttributeElements(List<String> elements) {
+        this.elements.addAll(elements);
+        return this;
+    }
+
     public AttributeVariable withAttribute(String attribute) {
         this.attribute = attribute;
         return this;

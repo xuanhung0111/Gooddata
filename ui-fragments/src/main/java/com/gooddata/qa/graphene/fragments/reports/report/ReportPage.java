@@ -24,6 +24,8 @@ import static org.openqa.selenium.By.tagName;
 import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 
+import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -103,8 +105,6 @@ public class ReportPage extends AbstractFragment {
     private static final String XPATH_REPORT_VISUALIZATION_TYPE =
             "//div[contains(@class, 's-enabled')]/div[contains(@class, 'c-chartType') and"
             + " ./span[@title='${type}']]";
-
-    public static final By REPORT_FILTER_LOCATOR = id("filtersContainer");
 
     private static final By VISIBILITY_CHECKBOX_LOCATOR = id("settings-visibility");
 
@@ -699,10 +699,15 @@ public class ReportPage extends AbstractFragment {
     }
 
     public boolean isReportContains(List<String> expectedAttributeList) {
+        final List<String> attributeValuesList = getTableReport().getAttributeElements();
+
         return expectedAttributeList.stream()
-                .allMatch(attributeValue -> getTableReport()
-                                       .getAttributeElements()
-                                       .contains(attributeValue));
+                .allMatch(attributeValue -> attributeValuesList.contains(attributeValue));
+    }
+
+    public void openExistingFilter(final String filterName) {
+        Graphene.createPageFragment(ReportFilter.class, waitForElementPresent(REPORT_FILTER_LOCATOR, browser))
+                .openExistingFilter(filterName);
     }
 
     private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {

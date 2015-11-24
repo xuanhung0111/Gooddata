@@ -9,6 +9,7 @@ import static org.testng.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -17,6 +18,7 @@ import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 
 public class VariableDetailPage extends AbstractFragment {
 
@@ -228,5 +230,20 @@ public class VariableDetailPage extends AbstractFragment {
         waitForElementVisible(unSavedBarInactive);
         waitForElementVisible(userTable);
         waitForElementVisible(dataLink).click();
+    }
+
+    public VariableDetailPage selectUserSpecificValues(List<String> values) {
+        waitForElementVisible(chooseButton).click();
+
+        Graphene.createPageFragment(SelectItemPopupPanel.class,
+                waitForElementVisible(By.cssSelector(".c-mdObjectsPicker:not(.gdc-hidden)"), browser))
+                .searchAndSelectItems(values)
+                .submitPanel();
+        return this;
+    }
+
+    public void saveChange() {
+        waitForElementVisible(saveChangeButton).click();
+        waitForElementNotVisible(saveChangeButton);
     }
 }
