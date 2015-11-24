@@ -42,7 +42,7 @@ import org.testng.annotations.Test;
 public class KpiAlertEvaluateTest extends AbstractProjectTest {
 
     private static final String KPI_METRIC = "M" + UUID.randomUUID().toString().substring(0, 6);
-    private static final String KPI_DATE_DIMENSION = "Date dimension (templ:Minimalistic)";
+    private static final String KPI_DATE_DIMENSION = "templ:Minimalistic";
     private static final String KPI_LINK_CLASS = "s-kpi-link";
 
     private static final String MAQL_PATH = "/minimalistic/minimalistic-maql.txt";

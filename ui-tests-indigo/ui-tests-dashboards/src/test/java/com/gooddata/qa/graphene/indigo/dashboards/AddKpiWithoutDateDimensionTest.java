@@ -19,7 +19,7 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
 
     private static final String METRIC_CONNECT_WITH_DATE_DIMENSION = "Amount[Sum]";
     private static final String METRIC_NOT_CONNECT_WITH_DATE_DIMENSION = "Age[Sum]";
-    private static final String DATE_DIMENSION = "Date dimension (Paydate)";
+    private static final String DATE_DIMENSION = "Paydate";
 
     private MetadataService mdService;
     private Project project;
