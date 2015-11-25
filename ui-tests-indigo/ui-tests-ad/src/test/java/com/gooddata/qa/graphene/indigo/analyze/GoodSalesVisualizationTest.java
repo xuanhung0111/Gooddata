@@ -12,7 +12,6 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -683,29 +682,6 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 getClass());
         assertEquals(analysisPage.getAddedStackByName(), ACTIVITY_TYPE);
         assertEquals(analysisPage.getAllAddedCategoryNames(), asList(DATE));
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void testAttributeLimitationInTableReport() {
-        initAttributePage();
-        waitForFragmentVisible(attributePage).createAttribute();
-        waitForFragmentVisible(createAttributePage).selectAttribute("Sales Rep");
-        createAttributePage.selectMetric("# of Won Opps.");
-        createAttributePage.setComputedAttributeName("20th attribute");
-        createAttributePage.submit();
-        waitForElementVisible(className("s-attributeBucketName"), browser);
-        takeScreenshot(browser, "testAttributeLimitationInTableReport-create20thAttribute", getClass());
-
-        initAnalysePage();
-        analysisPage.changeReportType(ReportType.TABLE)
-            .filterCatalog(CatalogFilterType.ATTRIBUTES);
-        Stream.of(ACCOUNT, ACTIVITY_TYPE, "Activity", DEPARTMENT, "Forecast Category", "Is Active?", "Is Closed?",
-                "Is Task?", "Is Won?", "Opp. Snapshot", "Opportunity", "Priority", "Product", "Region", "Status",
-                "Sales Rep", "Stage History", "Stage Name", DATE, "20th attribute")
-                .forEach(analysisPage::addCategory);
-        takeScreenshot(browser, "testAttributeLimitationInTableReport-finishAdding20Attributes", getClass());
-
-        assertEquals(analysisPage.getAllAddedCategoryNames().size(), 20);
     }
 
     @Test(dependsOnGroups = {"init"})
