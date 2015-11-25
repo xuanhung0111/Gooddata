@@ -1,10 +1,8 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.md.Restriction.*;
-import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -17,7 +15,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,7 +36,7 @@ import com.gooddata.qa.graphene.entity.filter.FloatingTime.Time;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem.Ranking;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.fragments.reports.filter.AttributeFilterFragment;
-import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.google.common.collect.Lists;
 
@@ -73,10 +70,8 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createProject")
     public void addFilterBySpecifyingAttributeValues() {
-        initReport(REPORT_NAME + System.currentTimeMillis()).openFilterPanel();
-
-        AttributeFilterFragment filterFragment = Graphene.createPageFragment(ReportFilter.class,
-                waitForElementVisible(REPORT_FILTER_LOCATOR, browser))
+        AttributeFilterFragment filterFragment = initReport(REPORT_NAME + System.currentTimeMillis())
+                .openFilterPanel()
                 .clickAddFilter()
                 .openAttributeFilterFragment();
 
@@ -103,26 +98,25 @@ public class GoodSalesBasicFilterReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createProject")
     public void addFilterBySpecifyingFloatingTime() {
-        initReport(REPORT_NAME + System.currentTimeMillis()).openFilterPanel();
+        int rangeNumber = getCurrentYear() - 2012;
 
-        AttributeFilterFragment filterFragment = Graphene.createPageFragment(ReportFilter.class,
-                waitForElementVisible(REPORT_FILTER_LOCATOR, browser))
+        initReport(REPORT_NAME + System.currentTimeMillis()).openFilterPanel()
                 .clickAddFilter()
-                .openAttributeFilterFragment();
-
-        filterFragment.searchAndSelectAttribute(ATTR_YEAR)
+                .openAttributeFilterFragment()
+                .searchAndSelectAttribute(ATTR_YEAR)
                 .selectFloatingTime(Time.THIS_YEAR)
                 .apply();
         waitForAnalysisPageLoaded(browser);
 
+        reportPage.saveReport();
+        checkRedBar(browser);
+
         String filterName = ATTR_YEAR + " is " + Time.THIS_YEAR;
         assertThat(reportPage.getFilters(), hasItem(filterName));
 
-        reportPage.openExistingFilter(filterName);
-
-        int rangeNumber = getCurrentYear() - 2012;
-        filterFragment.selectFloatingTime(new FloatingTime(Time.YEARS_AGO)
-                .withRangeNumber(rangeNumber), new FloatingTime(Time.THIS_YEAR))
+        reportPage.<AttributeFilterFragment> openExistingFilter(filterName, FilterFragment.ATTRIBUTE_FILTER)
+                .selectFloatingTime(new FloatingTime(Time.YEARS_AGO)
+                        .withRangeNumber(rangeNumber), new FloatingTime(Time.THIS_YEAR))
                 .apply();
         waitForReportLoaded();
 

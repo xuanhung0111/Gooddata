@@ -32,7 +32,7 @@ public class WidgetConfigPanel extends AbstractFragment {
     private WebElement cancelButton;
 
     public static final By LOCATOR = By
-            .cssSelector(".gdc-overlay-simple:not(.hidden):not(.yui3-overlay-hidden)");
+            .cssSelector(".gdc-overlay-simple:not(.hidden):not(.yui3-overlay-hidden):not(.ember-view)");
 
     public static final WidgetConfigPanel openConfigurationPanelFor(WebElement element,
             SearchContext searchContext) {

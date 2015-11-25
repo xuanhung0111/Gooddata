@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -22,7 +23,8 @@ import com.google.common.base.Predicate;
 
 public class SelectItemPopupPanel extends AbstractFragment {
 
-    public static final By LOCATOR = By.cssSelector(".gdc-overlay-simple:not(.hidden):not(.yui3-overlay-hidden)");
+    public static final By LOCATOR = By
+            .cssSelector(".gdc-overlay-simple:not(.hidden):not(.yui3-overlay-hidden):not(.ember-view)");
 
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
@@ -104,6 +106,12 @@ public class SelectItemPopupPanel extends AbstractFragment {
     public SelectItemPopupPanel searchAndSelectItems(Collection<String> items) {
         items.stream().forEach(this::searchAndSelectEmbedItem);
         return this;
+    }
+
+    public Collection<String> getItems() {
+        return items.stream()
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
     }
 
     private void selectCheckboxItem(String item) {

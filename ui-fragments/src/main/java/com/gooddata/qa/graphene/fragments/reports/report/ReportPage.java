@@ -56,7 +56,9 @@ import com.gooddata.qa.graphene.fragments.common.SelectItemPopupPanel;
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
+import com.gooddata.qa.graphene.fragments.reports.filter.AbstractFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter;
+import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.google.common.base.Predicate;
 
 public class ReportPage extends AbstractFragment {
@@ -157,11 +159,12 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    public ReportPage openFilterPanel() {
+    public ReportFilter openFilterPanel() {
         Optional.of(waitForElementVisible(filterButton))
                 .filter(e -> !e.getAttribute("class").contains("editorBtnEditorSadHighlight"))
                 .ifPresent(WebElement::click);
-        return this;
+        return Graphene.createPageFragment(ReportFilter.class,
+                waitForElementVisible(REPORT_FILTER_LOCATOR, browser));
     }
 
     public ReportPage selectFolderLocation(String folder) {
@@ -383,13 +386,10 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage addFilter(FilterItem filterItem) {
-        openFilterPanel();
-        ReportFilter reportFilter = Graphene.createPageFragment(ReportFilter.class,
-                waitForElementVisible(REPORT_FILTER_LOCATOR, browser));
         String textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountBefore = getNumber(textOnFilterButton);
 
-        reportFilter.addFilter(filterItem);
+        openFilterPanel().addFilter(filterItem);
 
         textOnFilterButton = waitForElementVisible(filterButton).getText();
         float filterCountAfter = getNumber(textOnFilterButton);
@@ -705,9 +705,17 @@ public class ReportPage extends AbstractFragment {
                 .allMatch(attributeValue -> attributeValuesList.contains(attributeValue));
     }
 
-    public void openExistingFilter(final String filterName) {
-        Graphene.createPageFragment(ReportFilter.class, waitForElementPresent(REPORT_FILTER_LOCATOR, browser))
-                .openExistingFilter(filterName);
+    public <T extends AbstractFilterFragment> T openExistingFilter(String filterName, FilterFragment fragment) {
+        return openFilterPanel().openExistingFilter(filterName, fragment);
+    }
+
+    public boolean hoverMouseToExistingFilter(String filterName) {
+        return openFilterPanel().hoverMouseToFilter(filterName);
+    }
+
+    public void deleteExistingFilter(String filterName) {
+        openFilterPanel().deleteFilter(filterName);
+        waitForSaveButtonEnabled();
     }
 
     private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
@@ -835,5 +843,12 @@ public class ReportPage extends AbstractFragment {
 
     private boolean isMetricValueInRange(float metricValue, RangeFilterItem filterItem) {
         return filterItem.getRangeType().isMetricValueInRange(metricValue, filterItem.getRangeNumber());
+    }
+
+    private void waitForSaveButtonEnabled() {
+        Predicate<WebDriver> saveButtonEnabled = browser -> !waitForElementVisible(createReportButton)
+                .getAttribute("class")
+                .contains("disabled");
+        Graphene.waitGui().until(saveButtonEnabled);
     }
 }
