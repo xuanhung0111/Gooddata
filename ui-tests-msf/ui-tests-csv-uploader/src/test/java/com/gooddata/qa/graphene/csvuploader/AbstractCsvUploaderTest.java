@@ -59,7 +59,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = ".*rows.*data\\s+fields.*";
 
     protected static final List<String> PAYROLL_COLUMN_TYPES = Lists.newArrayList("Attribute", "Attribute",
-            "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Date", "Measure");
+            "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Date [2015-12-31]", "Measure");
     protected static final List<String> PAYROLL_COLUMN_NAMES = Lists.newArrayList("Lastname", "Firstname",
             "Education", "Position", "Department", "State", "County", "Paydate", "Amount");
 
