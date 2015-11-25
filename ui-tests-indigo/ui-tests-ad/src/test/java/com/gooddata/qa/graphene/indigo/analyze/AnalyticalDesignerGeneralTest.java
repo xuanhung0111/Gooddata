@@ -102,9 +102,19 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
     @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"prepare"})
     public void loadMetrics() {
+        initAnalysePage();
+
         metrics = mdService.find(project, Metric.class)
                 .stream()
                 .map(Entry::getTitle)
+                .filter(metric -> {
+                    final boolean goodMetric = isGoodMetric(metric);
+                    analysisPage.resetToBlankState();
+                    if (!goodMetric) {
+                        log.info(format("Metric [%s] is not good to test. Maybe it has empty value or no data.", metric));
+                    }
+                    return goodMetric;
+                })
                 .collect(toList());
     }
 
@@ -691,6 +701,17 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
             }
         }
         return false;
+    }
+
+    private boolean isGoodMetric(String metric) {
+        analysisPage.addMetric(metric)
+            .waitForReportComputing();
+
+        if (analysisPage.isExplorerMessageVisible())
+            return false;
+
+        return analysisPage.getChartReport()
+                .getTrackersCount() > 0;
     }
 
     private String doSafetyMetricAction(Consumer<String> action, Consumer<String> failedAction, String screenshot) {
