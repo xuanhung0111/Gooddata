@@ -63,33 +63,33 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
         assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(STAGE_NAME)));
         assertTrue(analysisPage.isFilterVisible(STAGE_NAME));
 
-        analysisPage.replaceCategory(STAGE_NAME, ACTIVITY_TYPE);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE)));
+        analysisPage.replaceCategory(STAGE_NAME, PRODUCT);
+        assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(PRODUCT)));
         assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
+        assertTrue(analysisPage.isFilterVisible(PRODUCT));
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
         analysisPage.addStackBy(STAGE_NAME);
         assertEquals(analysisPage.getAddedStackByName(), STAGE_NAME);
         assertTrue(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
+        assertTrue(analysisPage.isFilterVisible(PRODUCT));
 
         analysisPage.replaceStackBy(DEPARTMENT);
         assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
         assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
+        assertTrue(analysisPage.isFilterVisible(PRODUCT));
         assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
 
         analysisPage.undo();
         assertEquals(analysisPage.getAddedStackByName(), STAGE_NAME);
         assertTrue(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
+        assertTrue(analysisPage.isFilterVisible(PRODUCT));
         assertFalse(analysisPage.isFilterVisible(DEPARTMENT));
 
         analysisPage.redo();
         assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
         assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(ACTIVITY_TYPE));
+        assertTrue(analysisPage.isFilterVisible(PRODUCT));
         assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
         checkingOpenAsReport("replaceAttributeByNewOne");
     }
