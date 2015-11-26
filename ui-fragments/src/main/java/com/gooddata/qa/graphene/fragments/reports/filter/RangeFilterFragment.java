@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.reports.filter;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,6 +12,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.filter.FloatingTime.Time;
 import com.gooddata.qa.graphene.entity.filter.RangeFilterItem;
 
 public class RangeFilterFragment extends AbstractFilterFragment {
@@ -30,6 +32,9 @@ public class RangeFilterFragment extends AbstractFilterFragment {
     @FindBy(css = ".s-input-number")
     private WebElement numberInput;
 
+    @FindBy(className = "yui3-c-subfilters")
+    private SubFilterContainer subFilterContainer;
+
     @Override
     public void addFilter(FilterItem filterItem) {
         RangeFilterItem rangeFilterItem = (RangeFilterItem) filterItem;
@@ -39,6 +44,31 @@ public class RangeFilterFragment extends AbstractFilterFragment {
                 .selectRange(rangeFilterItem)
                 .apply();
         waitForFragmentNotVisible(this);
+    }
+
+    public RangeFilterFragment addSubFilterByAttributeValues(String attribute, String...values) {
+        waitForFragmentVisible(subFilterContainer).addSubFilterByAttributeValues(attribute, values);
+        return this;
+    }
+
+    public RangeFilterFragment addSubFilterByDateRange(String attrDate, Time time) {
+        waitForFragmentVisible(subFilterContainer).addSubFilterByDateRange(attrDate, time);
+        return this;
+    }
+
+    public RangeFilterFragment addSubFilterByVariable(String variableName) {
+        waitForFragmentVisible(subFilterContainer).addSubFilterByVariable(variableName);
+        return this;
+    }
+
+    public RangeFilterFragment deleteLatestSubFilter() {
+        getLatestSubFilter().delete();
+        return this;
+    }
+
+    public RangeFilterFragment changeLatestSubFilterOperator(String operator) {
+        getLatestSubFilter().changeOperator(operator);
+        return this;
     }
 
     private RangeFilterFragment selectAttributes(List<String> attribute) {
@@ -68,5 +98,9 @@ public class RangeFilterFragment extends AbstractFilterFragment {
         waitForElementVisible(numberInput).clear();
         numberInput.sendKeys(String.valueOf(filterItem.getRangeNumber()));
         return this;
+    }
+
+    private SubFilter getLatestSubFilter() {
+        return waitForFragmentVisible(subFilterContainer).getLatestSubFilter();
     }
 }
