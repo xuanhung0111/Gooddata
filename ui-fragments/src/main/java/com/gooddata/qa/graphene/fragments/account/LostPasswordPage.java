@@ -11,7 +11,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class LostPasswordPage extends AbstractFragment {
 
-    public static final String LOST_PASSWORD_PAGE_CLASS_NAME = "s-lostPasswordPage";
+    public static final String LOST_PASSWORD_PAGE_CLASS_NAME = "lostPasswordPage";
 
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector("#gd-overlays div.content");
     private static final By PAGE_MESSAGE_LOCATOR = By.cssSelector(".message");
