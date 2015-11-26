@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene;
 
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.project.Project;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
 import static com.gooddata.qa.browser.BrowserUtils.maximize;
@@ -148,5 +151,19 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         } else {
             System.out.println("No project created -> no delete...");
         }
+    }
+
+    protected MetadataService getMdService() {
+        return getGoodDataClient().getMetadataService();
+    }
+
+    protected Project getProject() {
+        return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
+    }
+
+    protected String createMetric(String name, String expression, String format) {
+        Metric customMetric = getMdService().createObj(getProject(), new Metric(name, expression, format));
+
+        return customMetric.getUri();
     }
 }

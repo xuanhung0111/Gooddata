@@ -1,9 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.GoodData;
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
@@ -34,6 +30,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -42,7 +39,6 @@ import org.testng.annotations.Test;
  */
 public class KpiAlertEvaluateTest extends AbstractProjectTest {
 
-    private static final String KPI_METRIC = "M" + UUID.randomUUID().toString().substring(0, 6);
     private static final String KPI_DATE_DIMENSION = "templ:Minimalistic";
     private static final String KPI_LINK_CLASS = "s-kpi-link";
 
@@ -54,13 +50,6 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     private static final String CSV_INCREASED_PATH = "/minimalistic-increased/minimalistic-increased.csv";
     private static final String UPLOADINFO_INCREASED_PATH = "/minimalistic-increased/upload_info.json";
 
-    private static final String INCREASED_VALUE = "2";
-
-    private static final KpiConfiguration kpi = new KpiConfiguration.Builder()
-        .metric(KPI_METRIC)
-        .dateDimension(KPI_DATE_DIMENSION)
-        .build();
-
     @BeforeClass(alwaysRun = true)
     public void setUpImap() throws Exception {
         imapHost = testParams.loadProperty("imap.host");
@@ -68,21 +57,39 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"desktop"})
-    public void checkKpiAlertEvaluation() throws URISyntaxException, JSONException, IOException, MessagingException {
+    @Test(dependsOnMethods = "createProject", groups = "desktop")
+    public void setupProjectMaql() throws JSONException, IOException {
+        switchToAdmin();
+        setupMaql(MAQL_PATH);
+    }
+
+    @DataProvider(name = "alertsProvider")
+    public Object[][] alertsProvider() {
+        return new Object[][] {
+            {"Fact", "select sum([%s])", "#,##0.00", "2"},
+            {"Fact", "select sum([%s]) / 100", "#,##0.00%", "50"}
+        };
+    }
+
+    @Test(dependsOnMethods = "setupProjectMaql", dataProvider = "alertsProvider", groups = "desktop")
+    public void checkKpiAlertEvaluation(String factName, String metricTemplate, String format, String threshold)
+            throws URISyntaxException, JSONException, IOException, MessagingException {
+
         long testStartTime = new Date().getTime();
         String imapUniqueUser = generateImapUniqueUserEmail(imapUser);
         String userUri = addImapUserToProject(imapUniqueUser, imapPassword);
 
         String metricUri = null;
 
+        String metricName = "M" + UUID.randomUUID().toString().substring(0, 6);
+        KpiConfiguration kpi = getKpiConfiguration(metricName, KPI_DATE_DIMENSION);
+
         try {
             switchToAdmin();
-            setupMaql(MAQL_PATH);
             setupData(CSV_PATH, UPLOADINFO_PATH);
             switchToUser(imapUniqueUser, imapPassword);
 
-            metricUri = createMetric(KPI_METRIC, "Fact");
+            metricUri = createMetricFromFact(metricName, factName, metricTemplate, format);
 
             initIndigoDashboardsPage()
                     .getSplashScreen()
@@ -93,10 +100,10 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
                     .addWidget(kpi)
                     .saveEditModeWithKpis()
                     .selectDateFilterByName(DATE_FILTER_ALL_TIME)
-                    .getFirstKpi()
+                    .getKpiByHeadline(metricName)
                     .openAlertDialog()
                     .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
-                    .setThreshold(INCREASED_VALUE)
+                    .setThreshold(threshold)
                     .setAlert();
 
             switchToAdmin();
@@ -104,25 +111,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             switchToUser(imapUniqueUser, imapPassword);
 
             // metric name is in mail subject and is unique
-            String link = getDashboardLink(getLastMailContent(KPI_METRIC, testStartTime));
-
-            assertNotNull(link);
-            browser.get(link);
-
-            if (testParams.isHostProxy()) {
-                replaceInUrl(browser, testParams.getHostProxy(), testParams.getHost());
-            }
-
-            Kpi firstKpi = indigoDashboardsPage
-                    .waitForDashboardLoad()
-                    .waitForAllKpiWidgetContentLoaded()
-                    .getFirstKpi();
-
-            takeScreenshot(browser, "checkKpiAlertEvaluation-alert-triggered", getClass());
-
-            // check that alert is triggered and date filter is reset accordingly
-            assertTrue(firstKpi.isAlertTriggered());
-            assertEquals(indigoDashboardsPage.getDateFilterSelection(), DATE_FILTER_ALL_TIME);
+            checkKpiAlertTriggered(metricName, DATE_FILTER_ALL_TIME, testStartTime);
 
             indigoDashboardsPage
                     .switchToEditMode()
@@ -183,15 +172,11 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), 60);
     }
 
-    private String createMetric(String metricName, String factName) throws JSONException, IOException {
-        GoodData gdClient = getGoodDataClient();
-        MetadataService mdService = gdClient.getMetadataService();
-        Project project = gdClient.getProjectService().getProjectById(testParams.getProjectId());
-        String factUri = RestUtils.getFactUriByName(restApiClient, testParams.getProjectId(), factName);
-        Metric customMetric = mdService.createObj(project,
-                new Metric(metricName, "select sum(["+factUri+"])", "#,##0.00"));
+    private String createMetricFromFact(String metricName, String factName, String template, String format)
+            throws JSONException, IOException {
 
-        return customMetric.getUri();
+        String factUri = RestUtils.getFactUriByName(restApiClient, testParams.getProjectId(), factName);
+        return createMetric(metricName, template.replace("%s", factUri), format);
     }
 
     private void switchToAdmin() throws JSONException {
@@ -202,5 +187,35 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     private void switchToUser(String username, String password) throws JSONException {
         logout();
         signInAtGreyPages(username, password);
+    }
+
+    private void checkKpiAlertTriggered(String metricName, String dateFilter, long testStartTime)
+            throws IOException, MessagingException {
+        String link = getDashboardLink(getLastMailContent(metricName, testStartTime));
+
+        assertNotNull(link);
+        browser.get(link);
+
+        if (testParams.isHostProxy()) {
+            replaceInUrl(browser, testParams.getHostProxy(), testParams.getHost());
+        }
+
+        Kpi checkKpi = indigoDashboardsPage
+                .waitForDashboardLoad()
+                .waitForAllKpiWidgetContentLoaded()
+                .getKpiByHeadline(metricName);
+
+        takeScreenshot(browser, "checkKpiAlertEvaluation-alert-triggered-"+metricName, getClass());
+
+        // check that alert is triggered and date filter is reset accordingly
+        assertTrue(checkKpi.isAlertTriggered());
+        assertEquals(indigoDashboardsPage.getDateFilterSelection(), dateFilter);
+    }
+
+    private KpiConfiguration getKpiConfiguration(String metricName, String dateDimension) {
+        return new KpiConfiguration.Builder()
+            .metric(metricName)
+            .dateDimension(dateDimension)
+            .build();
     }
 }

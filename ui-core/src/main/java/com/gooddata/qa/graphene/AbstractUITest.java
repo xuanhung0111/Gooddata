@@ -80,7 +80,6 @@ import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
 import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.base.Predicate;
 
 public class AbstractUITest extends AbstractGreyPageTest {
@@ -100,7 +99,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_USER_MANAGEMENT = "users/#/users";
     protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
     protected static final String PAGE_LOST_PASSWORD = "account.html#/lostPassword";
-    protected static final String PAGE_REGISTRATION = 
+    protected static final String PAGE_REGISTRATION =
             "account.html#/registration/projectTemplate/urn%3Agooddata%3AOnboardingWalkMe";
 
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";

@@ -18,10 +18,12 @@ public class KpiAlertDialog extends AbstractFragment {
     private static final String ALERT_DIALOG_MESSAGE_CLASS = "gd-message";
 
     private static final By ALERT_DIALOG_MESSAGE = By.cssSelector("." + MAIN_CLASS + " ." + ALERT_DIALOG_MESSAGE_CLASS);
-    public static final By LOCATOR = By.className(MAIN_CLASS);
+    private static final By ALERT_DIALOG_INPUT_SUFFIX = By.cssSelector("." + MAIN_CLASS + " .input-suffix");
 
     public static final String TRIGGERED_WHEN_GOES_ABOVE = "above";
     public static final String TRIGGERED_WHEN_DROPS_BELOW = "below";
+
+    public static final By LOCATOR = By.className(MAIN_CLASS);
 
     @FindBy(className = "kpi-alert-dialog-text")
     protected WebElement header;
@@ -110,5 +112,9 @@ public class KpiAlertDialog extends AbstractFragment {
     public KpiAlertDialog applyAlertFilters() {
         waitForElementVisible(applyAlertFiltersButton).click();
         return this;
+    }
+
+    public boolean hasInputSuffix() {
+        return isElementPresent(ALERT_DIALOG_INPUT_SUFFIX, browser);
     }
 }

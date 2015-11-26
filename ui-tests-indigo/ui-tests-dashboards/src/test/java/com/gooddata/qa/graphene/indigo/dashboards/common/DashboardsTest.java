@@ -9,6 +9,7 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
     public static final String STAT_REGION = "stat_region";
     public static final String LOST = "Lost";
     public static final String NUMBER_OF_ACTIVITIES = "# of Activities";
+    public static final String PERCENT_OF_GOAL = "% of Goal";
 
     public static final String DATE_CREATED = "Created";
     public static final String DATE_CLOSED = "Closed";
