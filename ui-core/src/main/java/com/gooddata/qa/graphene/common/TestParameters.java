@@ -182,7 +182,7 @@ public class TestParameters {
     }
 
     public boolean isHostProxy() {
-        return !this.hostProxy.isEmpty();
+        return this.hostProxy != null && !this.hostProxy.isEmpty();
     }
 
     public String getHostProxy() {
