@@ -39,6 +39,8 @@ public class Kpi extends AbstractFragment {
     public static final By IS_NOT_EDITABLE = By.cssSelector("." + MAIN_CLASS + " .kpi:not(.is-editable)");
     public static final By ALERT_DIALOG = By.className(KPI_ALERT_DIALOG_CLASS);
 
+    public static final By HINT_LOCATOR = By.cssSelector(".inplaceedit:hover");
+
     @FindBy(css = ".dash-item-action-delete")
     protected WebElement deleteButton;
 
@@ -166,6 +168,16 @@ public class Kpi extends AbstractFragment {
 
     public void waitForLoading() {
         waitForElementVisible(contentLoading);
+    }
+
+    public String hoverToHeadline() {
+        new Actions(browser).moveToElement(headlineInplaceEdit).perform();
+        return waitForElementVisible(getRoot().findElement(HINT_LOCATOR))
+                .getCssValue("background-color");
+    }
+
+    public boolean hasHintForEditName() {
+        return isElementPresent(HINT_LOCATOR, this.getRoot());
     }
 
     public enum ComparisonType {

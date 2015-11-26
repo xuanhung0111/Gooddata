@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertFalse;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import org.testng.annotations.BeforeClass;
@@ -13,6 +14,7 @@ import org.testng.annotations.Test;
 public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     private static final String TEST_HEADLINE = "Test headline";
+    private static final String KPI_HINT_FOR_EDIT_NAME_COLOR = "rgba(255, 255, 204, 1)";
 
     @BeforeClass(alwaysRun = true)
     public void before() {
@@ -205,5 +207,19 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .submitClick();
 
         assertEquals(indigoDashboardsPage.getKpisCount(), kpisCount);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void checkKpiShowHintForEditableName() {
+        Kpi kpi = initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .selectKpi(0);
+
+        takeScreenshot(browser, "Kpi does not show hint before hover to headline", this.getClass());
+        assertFalse(kpi.hasHintForEditName(), "Kpi shows hint although headline is not hovered");
+
+        String hintColor = kpi.hoverToHeadline();
+        takeScreenshot(browser, "Kpi shows hint for editable name when hover to headline", this.getClass());
+        assertEquals(hintColor, KPI_HINT_FOR_EDIT_NAME_COLOR);
     }
 }
