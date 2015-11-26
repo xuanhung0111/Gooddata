@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
@@ -23,8 +24,6 @@ import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.tagName;
 import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
-
-import static com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.REPORT_FILTER_LOCATOR;
 
 import java.util.Collection;
 import java.util.List;
@@ -716,6 +715,12 @@ public class ReportPage extends AbstractFragment {
     public void deleteExistingFilter(String filterName) {
         openFilterPanel().deleteFilter(filterName);
         waitForSaveButtonEnabled();
+    }
+
+    public ReportPage deleteFilterInSndDialog() {
+        waitForElementVisible(By.className("deleteFilter"), browser).click();
+        waitForElementNotVisible(By.className("deleteFilter"));
+        return this;
     }
 
     private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
