@@ -229,12 +229,14 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
         reportPage.initPage()
             .openHowPanel();
-        asList("Account", "Activity", "Activity Type", "Department", "Forecast Category", "Is Active?",
-                "Is Closed?", "Is Task?", "Is Won?", "Opp. Snapshot", "Opportunity", "Priority", "Product",
-                "Region", "Sales Rep", "Stage History", "Stage Name", "Status", "Date (Activity)",
-                "Date (Closed)").stream().forEach(reportPage::selectAttribute);
+        asList("Account", "Activity", "Activity Type", "Department", "Is Task?", "Opportunity",
+                "Priority", "Region", "Sales Rep", "Date (Activity)", "Month (Activity)", "Month/Year (Activity)",
+                "Month of Quarter (Activity)", "Quarter/Year (Activity)", "Year (Activity)", "Date (Created)", 
+                "Month (Created)", "Month/Year (Created)", "Quarter/Year (Created)", "Year (Created)")
+            .stream()
+            .forEach(reportPage::selectAttribute);
 
-        reportPage.selectAttribute("Date (Snapshot)");
+        reportPage.selectAttribute("Month of Quarter (Created)");
         assertThat(getErrorMessage(), startsWith(ATTRIBUTE_LIMIT_MESSAGE));
     }
 

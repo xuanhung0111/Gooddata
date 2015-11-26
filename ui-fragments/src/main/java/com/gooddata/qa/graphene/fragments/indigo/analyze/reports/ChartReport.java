@@ -73,8 +73,15 @@ public class ChartReport extends AbstractFragment {
     }
 
     public int getTrackersCount() {
-        waitForCollectionIsNotEmpty(trackers);
-        return trackers.size();
+        if (isLineChart()) {
+            return waitForCollectionIsNotEmpty(trackers).size();
+        }
+
+        return (int) waitForCollectionIsNotEmpty(trackers).stream()
+            .map(e -> e.getAttribute("height"))
+            .map(Integer::parseInt)
+            .filter(i -> i > 0)
+            .count();
     }
 
     public boolean isTrackerInSelectedStateByIndex(int index) {
