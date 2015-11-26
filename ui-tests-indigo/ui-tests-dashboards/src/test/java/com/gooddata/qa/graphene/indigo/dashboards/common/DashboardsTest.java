@@ -10,10 +10,10 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
     public static final String LOST = "Lost";
     public static final String NUMBER_OF_ACTIVITIES = "# of Activities";
 
-    public static final String DATE_CREATED = "Date dimension (Created)";
-    public static final String DATE_CLOSED = "Date dimension (Closed)";
-    public static final String DATE_ACTIVITY = "Date dimension (Activity)";
-    public static final String DATE_SNAPSHOT = "Date dimension (Snapshot)";
+    public static final String DATE_CREATED = "Created";
+    public static final String DATE_CLOSED = "Closed";
+    public static final String DATE_ACTIVITY = "Activity";
+    public static final String DATE_SNAPSHOT = "Snapshot";
 
     public static final String DATE_FILTER_ALL_TIME = "All time";
     public static final String DATE_FILTER_THIS_MONTH = "This month";
