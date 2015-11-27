@@ -97,7 +97,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
             .openWhatPanel()
             .selectMetric(NUMBER_OF_ACTIVITIES);
         sleepTightInSeconds(1);
-        reportPage.openFilterPanel();
+        reportPage.tryOpenFilterPanel();
 
         String wrongStateFilterMessage = waitForElementVisible(cssSelector(".c-infoDialog .message"), browser)
                 .getText().trim();
