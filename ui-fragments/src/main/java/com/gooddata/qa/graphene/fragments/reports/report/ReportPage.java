@@ -159,11 +159,13 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportFilter openFilterPanel() {
-        Optional.of(waitForElementVisible(filterButton))
-                .filter(e -> !e.getAttribute("class").contains("editorBtnEditorSadHighlight"))
-                .ifPresent(WebElement::click);
+        selectFilterButton();
         return Graphene.createPageFragment(ReportFilter.class,
                 waitForElementVisible(REPORT_FILTER_LOCATOR, browser));
+    }
+    
+    public void tryOpenFilterPanel() {
+        selectFilterButton();
     }
 
     public ReportPage selectFolderLocation(String folder) {
@@ -855,5 +857,11 @@ public class ReportPage extends AbstractFragment {
                 .getAttribute("class")
                 .contains("disabled");
         Graphene.waitGui().until(saveButtonEnabled);
+    }
+    
+    private void selectFilterButton() {
+        Optional.of(waitForElementVisible(filterButton))
+                .filter(e -> !e.getAttribute("class").contains("editorBtnEditorSadHighlight"))
+                .ifPresent(WebElement::click);
     }
 }
