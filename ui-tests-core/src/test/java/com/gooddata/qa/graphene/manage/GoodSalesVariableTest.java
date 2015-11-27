@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 @Test(groups = {"GoodSalesVariables"}, description = "Tests for GoodSales project (create/view and edit variable functionality) in GD platform")
 public class GoodSalesVariableTest extends ObjectAbstractTest {
@@ -19,7 +20,7 @@ public class GoodSalesVariableTest extends ObjectAbstractTest {
         initVariablePage();
         variablePage.createVariable(new NumericVariable("Test variable" + System.currentTimeMillis())
                 .withDefaultNumber(1234)
-                .withUserNumber(5678));
+                .withUserNumber(UserRoles.ADMIN, 5678));
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "object-tests" })

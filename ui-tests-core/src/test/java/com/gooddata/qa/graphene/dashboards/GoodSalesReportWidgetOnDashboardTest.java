@@ -237,7 +237,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
         initVariablePage();
         variablePage.createVariable(new NumericVariable(VARIABLE_NAME)
                 .withDefaultNumber(1234)
-                .withUserNumber(5678));
+                .withUserNumber(UserRoles.EDITOR, 5678));
     }
 
     @Test(dependsOnMethods = {"createNumericVariableTest"})
