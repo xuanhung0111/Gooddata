@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 
@@ -16,6 +14,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class VariableDetailPage extends AbstractFragment {
@@ -100,6 +99,8 @@ public class VariableDetailPage extends AbstractFragment {
 
     private static final By confirmDeleteButtonLocator = By
             .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .c-modalDialog .s-btn-delete");
+    
+    private static final String setBtnLocator = "//table[contains(@class,'usersTable')]//td[contains(@class,'role') and text()='%s']/following-sibling::td//button[contains(@class,'s-btn-set')]";
 
     @FindBy(id = "p-objectPage")
     protected ObjectPropertiesPage objectPropertiesPage;
@@ -162,8 +163,8 @@ public class VariableDetailPage extends AbstractFragment {
         waitForElementNotVisible(setButton);
     }
 
-    public void setUserValueNumericVariable(int number) {
-        waitForElementVisible(userSetButton).click();// note
+    public void setUserValueNumericVariable(UserRoles userRole, int number) {
+        waitForElementVisible(By.xpath(String.format(setBtnLocator, userRole.getName())), this.getRoot()).click();
         waitForElementVisible(userNumberSet).sendKeys(String.valueOf(number));
         waitForElementVisible(userOkButton).click();
         waitForElementNotVisible(userNumberSet);

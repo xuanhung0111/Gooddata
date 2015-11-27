@@ -1,9 +1,12 @@
 package com.gooddata.qa.graphene.entity.variable;
 
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+
 public class NumericVariable extends AbstractVariable {
 
     private int defaultNumber;
     private int userNumber;
+    private UserRoles userRole;
 
     public NumericVariable(String name) {
         super(name);
@@ -15,8 +18,9 @@ public class NumericVariable extends AbstractVariable {
         return this;
     }
 
-    public NumericVariable withUserNumber(int number) {
+    public NumericVariable withUserNumber(UserRoles userRole, int number) {
         userNumber = number;
+        this.userRole = userRole;
         return this;
     }
 
@@ -26,5 +30,9 @@ public class NumericVariable extends AbstractVariable {
 
     public int getUserNumber() {
         return userNumber;
+    }
+    
+    public UserRoles getUserRole() {
+        return userRole;
     }
 }
