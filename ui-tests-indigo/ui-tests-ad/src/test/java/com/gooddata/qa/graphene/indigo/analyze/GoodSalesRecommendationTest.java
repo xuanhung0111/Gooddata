@@ -38,7 +38,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
                 .isFilterVisible("Activity"));
         assertEquals(analysisPage.getFilterText("Activity"), "Activity: All time");
         ChartReport report = analysisPage.getChartReport();
-        assertThat(report.getTrackersCount(), equalTo(9));
+        assertThat(report.getTrackersCount(), equalTo(6));
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
