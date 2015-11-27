@@ -16,10 +16,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -35,9 +32,11 @@ import static org.testng.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
@@ -217,10 +216,16 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
             initDataUploadPage();
             waitForFragmentVisible(datasetsListPage).clickAddDataButton();
             waitForFragmentVisible(fileUploadDialog).pickCsvFile(fileToUpload.getCsvFileToUpload());
-
+            
+            // this is workaround for bug MSF-9734
             String validationErrorMessage = waitForFragmentVisible(fileUploadDialog).getValidationErrorMessage();
             assertThat(validationErrorMessage,
                     is("The selected file is larger than 1 GB. Try uploading a subset of the data from the file."));
+//            List<String> backendValidationErrors = waitForFragmentVisible(fileUploadDialog)
+//                    .getBackendValidationErrors();
+//            assertThat(backendValidationErrors,
+//                    hasItems("The selected file is larger than 1 GB. "
+//                            + "Try uploading a subset of the data from the file."));
             takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFileName),
                     getClass());
 
@@ -404,7 +409,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         String createdDateTime =
                 csvDatasetDetailPage.getCreatedDateTime().replaceAll("Created by.*on\\s+", "");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Today at' h:mm a");
         try {
             formatter.parse(createdDateTime);
         } catch (DateTimeParseException e) {
@@ -412,7 +417,7 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"createProject","enableAnalyticalDesigner"}, groups = {"myData"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"myData"})
     public void checkDatasetAnalyzeLink() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
 
@@ -441,8 +446,8 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
 
-        assertThat(datasetsListPage.waitForSuccessMessageBar().getText(),
-                is(String.format("Data has been loaded successfully to \"%s\". Start analyzing!", datasetName)));
+        assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
         takeScreenshot(browser, toScreenshotName("Successful-upload-data-to-dataset", datasetName), getClass());
     }
 
@@ -543,12 +548,12 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
-        int numberOfRows = PAYROLL_FILE_DEFAULT_ROW_COUNT - 3; // All rows above header shouldn't be
-                                                               // added
+        int numberOfRows = PAYROLL_FILE_DEFAULT_ROW_COUNT - 3; // All rows above header shouldn't be added
+        String numberOfRowsInString = NumberFormat.getNumberInstance(Locale.US).format(numberOfRows);
         String expectedDatasetStatus =
-                String.format(".*%d.*,.*%d.*", numberOfRows, PAYROLL_FILE_DEFAULT_COLUMN_COUNT);
+                String.format("%s rows, %s data fields", numberOfRowsInString, String.valueOf(PAYROLL_FILE_DEFAULT_COLUMN_COUNT));
         assertTrue(waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetStatus(datasetName)
-                .matches(expectedDatasetStatus), "Incorrect row/colum number!");
+                .equals(expectedDatasetStatus), "Incorrect row/colum number!");
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
 
@@ -749,6 +754,29 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
                     is(projectOwnerDatasetNames.size()));
             assertThat(datasetsListPage.getOthersDatasetsTable().getDatasetNames(),
                     contains(projectOwnerDatasetNames.toArray()));
+        } finally {
+            logout();
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        }
+    }
+
+    @Test(dependsOnMethods = {"addOtherAdminToProject"})
+    public void checkAdminUpdateDataOfOthers() throws JSONException {
+        try {
+            String datasetName = CsvFile.PAYROLL_BY_PROJECT_OWNER.getDatasetNameOfFirstUpload();
+            System.out.println("datasetName by owner: " + datasetName);
+            logout();
+            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
+
+            initDataUploadPage();
+            datasetsListPage.getOthersDatasetsTable().getDatasetRefreshButton(datasetName).click();
+            refreshCsv(CsvFile.PAYROLL_REFRESH, datasetName, false);
+            
+            assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                    is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
+            datasetsListPage.getOthersDatasetsTable().getDatasetDetailButton(datasetName).click();
+            waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
+            refreshCsv(CsvFile.PAYROLL_REFRESH, datasetName, false);
         } finally {
             logout();
             signInAtGreyPages(testParams.getUser(), testParams.getPassword());
