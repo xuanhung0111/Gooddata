@@ -46,7 +46,7 @@ public class VariablesPage extends AbstractFragment {
             variableDetailPage.createNumericVariable(numVar);
             openVariableFromList(varName);
             if (numVar.getUserNumber() != Integer.MAX_VALUE) { 
-                variableDetailPage.setUserValueNumericVariable(numVar.getUserNumber());
+                variableDetailPage.setUserValueNumericVariable(numVar.getUserRole(), numVar.getUserNumber());
                 openVariableFromList(varName);
             }
             uri = getUri();
