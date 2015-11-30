@@ -7,7 +7,19 @@ public enum ReportType {
 
     TABLE("table"),
     COLUMN_CHART("column"),
-    LINE_CHART("line"),
+
+    LINE_CHART("line") {
+        @Override
+        public String getMetricMessage() {
+            return "TO ADD ADDITIONAL MEASURE, REMOVE FROM SEGMENT BY";
+        }
+
+        @Override
+        public String getStackByMessage() {
+            return "TO SEGMENT BY, A VISUALIZATION CAN HAVE ONLY ONE MEASURE";
+        }
+    },
+
     BAR_CHART("bar");
 
     private String label;
