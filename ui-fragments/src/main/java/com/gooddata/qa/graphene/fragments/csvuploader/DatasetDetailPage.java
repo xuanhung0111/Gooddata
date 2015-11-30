@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
