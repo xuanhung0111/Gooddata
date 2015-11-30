@@ -7,19 +7,7 @@ public enum ReportType {
 
     TABLE("table"),
     COLUMN_CHART("column"),
-
-    LINE_CHART("line") {
-        @Override
-        public String getMetricMessage() {
-            return "TO ADD ADDITIONAL SERIES, REMOVE FROM SEGMENT BY";
-        }
-
-        @Override
-        public String getStackByMessage() {
-            return "TO SEGMENT BY, A VISUALIZATION CAN HAVE ONLY ONE SERIES";
-        }
-    },
-
+    LINE_CHART("line"),
     BAR_CHART("bar");
 
     private String label;
@@ -33,11 +21,11 @@ public enum ReportType {
     }
 
     public String getMetricMessage() {
-        return "TO ADD ADDITIONAL SERIES, REMOVE FROM STACK BY";
+        return "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY";
     }
 
     public String getStackByMessage() {
-        return "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE SERIES";
+        return "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE MEASURE";
     }
 
     @Override
