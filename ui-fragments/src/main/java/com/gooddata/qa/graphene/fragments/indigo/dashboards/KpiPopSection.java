@@ -13,6 +13,9 @@ public class KpiPopSection extends AbstractFragment {
     @FindBy(css = ".kpi-pop-period dd")
     protected WebElement periodTitle;
 
+    @FindBy(css = ".kpi-pop-change dt")
+    private WebElement changeValue;
+
     public String getChangeTitle() {
         return waitForElementVisible(changeTitle).getText();
     }
@@ -21,4 +24,7 @@ public class KpiPopSection extends AbstractFragment {
         return waitForElementVisible(periodTitle).getText();
     }
 
+    public String getChangeValue() {
+        return waitForElementVisible(changeValue).getText();
+    }
 }

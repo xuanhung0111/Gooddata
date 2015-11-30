@@ -75,6 +75,7 @@ public class RestUtils {
     private static final String USER_PROFILE_LINK = "/gdc/account/profile/";
     private static final String UPDATE_USER_INFO_CONTENT_BODY;
     private static final String QUERY_FACTS_URI = "/gdc/md/${projectId}/query/facts";
+    private static final String PULL_DATA_LINK = "/gdc/md/%s/etl/pull2";
 
     static {
         try {
@@ -1034,6 +1035,32 @@ public class RestUtils {
         }
     }
 
+    public static void postEtlPullIntegration(RestApiClient restApiClient, String projectId, String integrationEntry)
+            throws JSONException, ParseException, IOException {
+
+        HttpRequestBase request = restApiClient.newPostMethod(format(PULL_DATA_LINK, projectId),
+                new JSONObject().put("pullIntegration", integrationEntry).toString());
+
+        try {
+            HttpResponse response = restApiClient.execute(request);
+            String pullingUri = new JSONObject(EntityUtils.toString(response.getEntity()))
+                    .getJSONObject("pull2Task")
+                    .getJSONObject("links")
+                    .getString("poll");
+            EntityUtils.consumeQuietly(response.getEntity());
+
+            String pullingStatus = "";
+
+            while(!"OK".equals(pullingStatus = getEtlPullingStatus(restApiClient, pullingUri))) {
+                System.out.println("The pulling status is: " + pullingStatus);
+                sleepTightInSeconds(5);
+            }
+
+        } finally {
+            request.releaseConnection();
+        }
+    }
+
     private static String getProjectState(RestApiClient restApiClient, String projectId)
             throws ParseException, JSONException, IOException {
         return getProjectInfo(restApiClient, projectId).getJSONObject("project")
@@ -1058,6 +1085,21 @@ public class RestUtils {
         while (!"ENABLED".equals((currentStatus = getProjectState(restApiClient, projectId)))) {
             System.out.println("Current status: " + currentStatus);
             sleepTightInSeconds(5);
+        }
+    }
+
+    private static String getEtlPullingStatus(RestApiClient restApiClient, String pullingUri)
+            throws ParseException, JSONException, IOException {
+        HttpRequestBase request = restApiClient.newGetMethod(pullingUri);
+
+        try {
+            HttpResponse response = restApiClient.execute(request);
+
+            return new JSONObject(EntityUtils.toString(response.getEntity()))
+                    .getJSONObject("wTaskStatus").getString("status");
+
+        } finally {
+            request.releaseConnection();
         }
     }
 }
