@@ -4,6 +4,7 @@ import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 
+import java.util.stream.Stream;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -187,5 +188,15 @@ public class TestParameters {
 
     public String getHostProxy() {
         return this.hostProxy;
+    }
+
+    /**
+     * Some test cases should be executed only on cluster.
+     * E.g.
+     * * Kpi alert evaluation via Sendrid (3rd party) - dependency on 3rd party system
+     */
+    public boolean isClusterEnvironment() {
+        return Stream.of(".*secure.*\\.gooddata\\.com", "staging.*\\.intgdc\\.com", "perf\\.getgooddata\\.com", ".*\\.eu\\.gooddata\\.com")
+                .anyMatch(this.host::matches);
     }
 }

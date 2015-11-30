@@ -9,6 +9,7 @@ import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialo
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
 import static com.gooddata.qa.graphene.utils.NavigateUtils.replaceInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
@@ -191,6 +192,47 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
 
     private void checkKpiAlertTriggered(String metricName, String dateFilter, long testStartTime)
             throws IOException, MessagingException {
+        // check that dashboard alert worker triggered the alert in UI
+        checkAlertInUI(metricName);
+
+        if (!testParams.isClusterEnvironment()) return;
+
+        // check via email notification link
+        checkAlertViaEmail(metricName, dateFilter, testStartTime);
+    }
+
+    private KpiConfiguration getKpiConfiguration(String metricName, String dateDimension) {
+        return new KpiConfiguration.Builder()
+            .metric(metricName)
+            .dateDimension(dateDimension)
+            .build();
+    }
+
+    private Kpi initDashboardsPageAndGetKpi(String metricName) {
+        return initIndigoDashboardsPage()
+                .waitForDashboardLoad()
+                .waitForAllKpiWidgetContentLoaded()
+                .getKpiByHeadline(metricName);
+    }
+
+    private void checkAlertInUI(String metricName) {
+        log.info("Checking the alert via UI...");
+        for (int attempt = 0;; attempt++) {
+            assertTrue(attempt < 10, "Maximum attempts to get triggered alert reached. Exiting.");
+
+            if (initDashboardsPageAndGetKpi(metricName)
+                    .isAlertTriggered()) {
+                break;
+            }
+
+            sleepTightInSeconds(30);
+        }
+        takeScreenshot(browser, "checkKpiAlertEvaluation-alert-triggered-via-UI-"+metricName, getClass());
+    }
+
+    private void checkAlertViaEmail(String metricName, String dateFilter, long testStartTime)
+            throws IOException, MessagingException {
+        log.info("Checking the alert via email notification...");
         String link = getDashboardLink(getLastMailContent(metricName, testStartTime));
 
         assertNotNull(link);
@@ -199,23 +241,14 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         if (testParams.isHostProxy()) {
             replaceInUrl(browser, testParams.getHostProxy(), testParams.getHost());
         }
-
         Kpi checkKpi = indigoDashboardsPage
                 .waitForDashboardLoad()
                 .waitForAllKpiWidgetContentLoaded()
                 .getKpiByHeadline(metricName);
 
-        takeScreenshot(browser, "checkKpiAlertEvaluation-alert-triggered-"+metricName, getClass());
-
         // check that alert is triggered and date filter is reset accordingly
         assertTrue(checkKpi.isAlertTriggered());
+        takeScreenshot(browser, "checkKpiAlertEvaluation-alert-triggered-via-email-"+metricName, getClass());
         assertEquals(indigoDashboardsPage.getDateFilterSelection(), dateFilter);
-    }
-
-    private KpiConfiguration getKpiConfiguration(String metricName, String dateDimension) {
-        return new KpiConfiguration.Builder()
-            .metric(metricName)
-            .dateDimension(dateDimension)
-            .build();
     }
 }
