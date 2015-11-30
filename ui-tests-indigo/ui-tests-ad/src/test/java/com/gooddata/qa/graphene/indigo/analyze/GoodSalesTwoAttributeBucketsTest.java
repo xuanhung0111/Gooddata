@@ -72,14 +72,14 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
 
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addMetric(BEST_CASE).addCategory(REGION);
         assertTrue(analysisPage.isStackByDisabled());
-        assertEquals(analysisPage.getStackByMessage(), "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE MEASURE");
+        assertEquals(analysisPage.getStackByMessage(), "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE SERIES");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void addSecondMetricIfAttributeInStackBy() {
         initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(ACTIVITY_TYPE).addStackBy(DEPARTMENT);
-        assertEquals(analysisPage.getMetricMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
+        assertEquals(analysisPage.getMetricMessage(), "TO ADD ADDITIONAL SERIES, REMOVE FROM STACK BY");
     }
 
     @Test(dependsOnGroups = {"init"})
