@@ -512,13 +512,13 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         List<String> customHeaderColumns =
                 Lists.newArrayList("Nowmer", "Sheri", "Graduate Degree", "President", "Foodz, Inc.", "Washington",
-                        "Spokane", "2006-03-01", "10230");
+                        "Spokane", "2006 03 01", "10230");
         assertThat(dataPreviewTable.getHeaderColumns(), contains(customHeaderColumns.toArray()));
 
         dataPreviewPage.triggerIntegration();
 
         assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
-        assertTrue(dataPreviewTable.isColumnNameError("2006-03-01"), "Error is not shown!");
+        assertTrue(dataPreviewTable.isColumnNameError("2006 03 01"), "Error is not shown!");
         assertTrue(dataPreviewTable.isColumnNameError("10230"), "Error is not shown!");
 
         dataPreviewTable.getColumnNameInput("2006-03-01").click();
@@ -634,14 +634,14 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         List<String> customHeaderColumns =
                 Lists.newArrayList("Nowmer", "Sheri", "Graduate Degree", "President", "Foodz, Inc.", "Washington",
-                        "Spokane", "2006-03-01", "10230");
+                        "Spokane", "2006 03 01", "10230");
         assertThat(dataPreviewTable.getHeaderColumns(), contains(customHeaderColumns.toArray()));
 
         dataPreviewPage.triggerIntegration();
 
-        dataPreviewTable.changeColumnName("2006-03-01", "Paydate");
+        dataPreviewTable.changeColumnName("2006 03 01", "Paydate");
         dataPreviewTable.changeColumnName("10230", "Amount");
-        customHeaderColumns.set(customHeaderColumns.indexOf("2006-03-01"), "Paydate");
+        customHeaderColumns.set(customHeaderColumns.indexOf("2006 03 01"), "Paydate");
         customHeaderColumns.set(customHeaderColumns.indexOf("10230"), "Amount");
 
         assertFalse(dataPreviewTable.isColumnNameError("Paydate"), "Error is still shown!");
