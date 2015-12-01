@@ -42,7 +42,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     private static final By CLOSE_DIALOG_BUTTON_LOCATOR = By.cssSelector(".s-btn-close");
 
     private static final String DEMO_PROJECT = "GoodSales";
-    private static final String GOODDATA_PRODUCT_TRIAL_PROJECT = "GoodData Product Trial";
+    private static final String GOODDATA_PRODUCT_TOUR_PROJECT = "GoodData Product Tour";
 
     private static final String INVALID_EMAIL = "johndoe@yahoocom";
     private static final String INVALID_PASSWORD = "aaaaaa";
@@ -57,10 +57,10 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     private static final String INVALID_PHONE_NUMBER_ERROR_MESSAGE = "This is not a valid phone number.";
 
-    private static final String ACTIVATION_SUCCESS_MESSAGE = "ACCOUNT ACTIVATED"
+    private static final String ACTIVATION_SUCCESS_MESSAGE = "Account Activated"
             + "\nYour account has been successfully activated!";
 
-    private static final String ALREADY_ACTIVATED_MESSAGE = "ALREADY ACTIVATED"
+    private static final String ALREADY_ACTIVATED_MESSAGE = "Already activated"
             + "\nThis registration has already been activated. Please log in below.";
 
     private static final String NOT_FULLY_ACTIVATED_MESSAGE = "Your account has not yet been fully activated. "
@@ -139,7 +139,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         activationLink = registrationPage.registerNewUser(imapClient, registrationForm);
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-        openProject(GOODDATA_PRODUCT_TRIAL_PROJECT);
+        openProject(GOODDATA_PRODUCT_TOUR_PROJECT);
 
         initProjectsAndUsersPage();
         assertFalse(projectAndUsersPage.isEmailingDashboardsTabDisplayed(),
