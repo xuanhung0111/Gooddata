@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="metric-bucket" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.MetricBucketTest" />
+        </classes>
+    </test>
+
+    <test name="metric-filters" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.MetricFiltersTest" />
+        </classes>
+    </test>
+
+    <test name="metric-modifiers" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.MetricModifiersTest" />
+        </classes>
+    </test>
+
+</suite>

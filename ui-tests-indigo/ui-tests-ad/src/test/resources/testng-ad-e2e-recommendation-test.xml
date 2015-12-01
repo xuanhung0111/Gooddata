@@ -1,0 +1,34 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="comparison-recommendation" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ComparisonRecommendationTest" />
+        </classes>
+    </test>
+
+    <test name="contribution-recommendation" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ContributionRecommendationTest" />
+        </classes>
+    </test>
+
+    <test name="pop-recommendation" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.PopRecommendationTest" />
+        </classes>
+    </test>
+
+    <test name="trending-recommendation" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.TrendingRecommendationTest" />
+        </classes>
+    </test>
+
+    <test name="drag-recommendation" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.DragRecommendationsTest" />
+        </classes>
+    </test>
+
+</suite>
