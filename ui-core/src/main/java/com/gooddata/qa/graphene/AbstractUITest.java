@@ -100,7 +100,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final String PAGE_INDIGO_DASHBOARDS = "dashboards/";
     protected static final String PAGE_LOST_PASSWORD = "account.html#/lostPassword";
     protected static final String PAGE_REGISTRATION =
-            "account.html#/registration/projectTemplate/urn%3Agooddata%3AOnboardingWalkMe";
+            "account.html#/registration/projectTemplate/urn%3Agooddata%3AOnboardingProductTour";
 
     protected static final String DISC_PROJECTS_PAGE_URL = "admin/disc/#/projects";
     protected static final String DISC_OVERVIEW_PAGE = "admin/disc/#/overview";
