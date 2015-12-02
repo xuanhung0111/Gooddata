@@ -43,7 +43,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     private static final String INVITATION_SUCCESS_MESSAGE = "Invitation was successfully sent.";
 
-    private static final String JOINED_PROJECT_SUCCESS_MESSAGE = "CONGRATULATIONS!"
+    private static final String JOINED_PROJECT_SUCCESS_MESSAGE = "Congratulations!"
             + "\nYou have successfully joined the project. Please log in below.";
 
     private RegistrationForm registrationForm;
