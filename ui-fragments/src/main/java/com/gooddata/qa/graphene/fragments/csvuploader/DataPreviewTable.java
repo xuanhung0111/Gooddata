@@ -15,7 +15,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -29,8 +28,8 @@ public class DataPreviewTable extends FixedDataTable {
     @FindBy(className = "input-text")
     private List<WebElement> columnNames;
 
-    @FindBy(css = ".s-data-type-picker select")
-    private List<Select> columnTypes;
+    @FindBy(css = ".data-type-picker.s-data-type-picker")
+    private List<ReactDropdown> columnTypes;
 
     public List<String> getColumnNames() {
         waitForCollectionIsNotEmpty(columnNames);
@@ -45,7 +44,7 @@ public class DataPreviewTable extends FixedDataTable {
 
     public List<String> getColumnTypes() {
         return columnTypes.stream()
-                .map(type -> type.getFirstSelectedOption().getText())
+                .map(ReactDropdown::getSelection)
                 .collect(toList());
     }
 
@@ -59,13 +58,13 @@ public class DataPreviewTable extends FixedDataTable {
     }
 
     public void changeColumnType(int fieldIndex, ColumnType type) {
-        final Select selectedColumnType = columnTypes.get(fieldIndex);
-        selectedColumnType.selectByValue(type.getValue());
+        final ReactDropdown selectedColumnType = columnTypes.get(fieldIndex);
+        selectedColumnType.selectByValue(type.getVisibleText());
         final Predicate<WebDriver> typeIsSelected =
-                input -> type.getValue().equals(selectedColumnType.getFirstSelectedOption().getAttribute("value"));
+                input -> type.getVisibleText().equals(selectedColumnType.getSelection());
         Graphene.waitGui(browser)
                 .withMessage(
-                        "Expected type is not selected: " + selectedColumnType.getFirstSelectedOption().getText())
+                        "Expected type is not selected: " + selectedColumnType.getSelection())
                 .until(typeIsSelected);
     }
     
@@ -145,7 +144,7 @@ public class DataPreviewTable extends FixedDataTable {
         
         private String typeByVisibleText;
         
-        private ColumnType(String typeByVisibleText) {
+        ColumnType(String typeByVisibleText) {
             this.typeByVisibleText = typeByVisibleText;
         }
         
