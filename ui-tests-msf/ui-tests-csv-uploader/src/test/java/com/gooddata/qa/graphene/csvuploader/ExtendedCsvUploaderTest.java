@@ -32,11 +32,9 @@ import static org.testng.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
@@ -512,23 +510,23 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         List<String> customHeaderColumns =
                 Lists.newArrayList("Nowmer", "Sheri", "Graduate Degree", "President", "Foodz, Inc.", "Washington",
-                        "Spokane", "2006 03 01", "10230");
+                        "Spokane", "2006-03-01", "10230");
         assertThat(dataPreviewTable.getHeaderColumns(), contains(customHeaderColumns.toArray()));
 
         dataPreviewPage.triggerIntegration();
 
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names before proceeding."));
         assertTrue(dataPreviewTable.isColumnNameError("2006 03 01"), "Error is not shown!");
         assertTrue(dataPreviewTable.isColumnNameError("10230"), "Error is not shown!");
 
-        dataPreviewTable.getColumnNameInput("2006-03-01").click();
+        dataPreviewTable.getColumnNameInput("2006 03 01").click();
         assertThat(getErrorBubbleMessage(), is(NUMBERIC_COLUMN_NAME_ERROR));
         dataPreviewTable.getColumnNameInput("10230").click();
         assertThat(getErrorBubbleMessage(), is(NUMBERIC_COLUMN_NAME_ERROR));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when column names start with numbers");
 
-        dataPreviewTable.changeColumnName("2006-03-01", "Paydate");
+        dataPreviewTable.changeColumnName("2006 03 01", "Paydate");
         dataPreviewTable.changeColumnName("10230", "Amount");
         customHeaderColumns.set(customHeaderColumns.indexOf("2006-03-01"), "Paydate");
         customHeaderColumns.set(customHeaderColumns.indexOf("10230"), "Amount");
@@ -549,9 +547,9 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
         int numberOfRows = PAYROLL_FILE_DEFAULT_ROW_COUNT - 3; // All rows above header shouldn't be added
-        String numberOfRowsInString = NumberFormat.getNumberInstance(Locale.US).format(numberOfRows);
         String expectedDatasetStatus =
-                String.format("%s rows, %s data fields", numberOfRowsInString, String.valueOf(PAYROLL_FILE_DEFAULT_COLUMN_COUNT));
+                String.format("%s rows, %s data fields", numberOfRows, String.valueOf(PAYROLL_FILE_DEFAULT_COLUMN_COUNT));
+        System.out.println(expectedDatasetStatus);
         assertTrue(waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetStatus(datasetName)
                 .equals(expectedDatasetStatus), "Incorrect row/colum number!");
 
@@ -634,14 +632,14 @@ public class ExtendedCsvUploaderTest extends AbstractCsvUploaderTest {
 
         List<String> customHeaderColumns =
                 Lists.newArrayList("Nowmer", "Sheri", "Graduate Degree", "President", "Foodz, Inc.", "Washington",
-                        "Spokane", "2006 03 01", "10230");
+                        "Spokane", "2006-03-01", "10230");
         assertThat(dataPreviewTable.getHeaderColumns(), contains(customHeaderColumns.toArray()));
 
         dataPreviewPage.triggerIntegration();
 
         dataPreviewTable.changeColumnName("2006 03 01", "Paydate");
         dataPreviewTable.changeColumnName("10230", "Amount");
-        customHeaderColumns.set(customHeaderColumns.indexOf("2006 03 01"), "Paydate");
+        customHeaderColumns.set(customHeaderColumns.indexOf("2006-03-01"), "Paydate");
         customHeaderColumns.set(customHeaderColumns.indexOf("10230"), "Amount");
 
         assertFalse(dataPreviewTable.isColumnNameError("Paydate"), "Error is still shown!");
