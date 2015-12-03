@@ -13,7 +13,7 @@ public abstract class AbstractRecommendation extends AbstractFragment implements
     @FindBy(css = ".gd-heading-3")
     protected WebElement title;
 
-    @FindBy(css = ".s-btn-apply")
+    @FindBy(css = ".s-apply")
     protected WebElement applyButton;
 
     @Override
