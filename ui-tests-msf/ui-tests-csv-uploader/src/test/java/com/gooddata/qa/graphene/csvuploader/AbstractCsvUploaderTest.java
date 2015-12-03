@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.WordUtils;
 import org.jboss.arquillian.graphene.Graphene;
@@ -105,7 +106,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected void checkDataPreview(List<String> expectedColumnNames, List<String> expectedColumnTypes) {
         DataPreviewTable dataPreviewTable = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable();
 
-        assertThat(dataPreviewTable.getColumnNames(), containsInAnyOrder(expectedColumnNames.toArray()));
+        assertThat(dataPreviewTable.getColumnNames(), 
+                containsInAnyOrder(simplifyHeaderNames(expectedColumnNames).toArray()));
         assertThat(dataPreviewTable.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
     }
 
@@ -118,7 +120,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         waitForFragmentVisible(csvDatasetDetailPage);
 
         assertThat(csvDatasetDetailPage.getDatasetName(), is(datasetName));
-        assertThat(csvDatasetDetailPage.getColumnNames(), containsInAnyOrder(expectedColumnNames.toArray()));
+        assertThat(csvDatasetDetailPage.getColumnNames(), 
+                containsInAnyOrder(simplifyHeaderNames(expectedColumnNames).toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
     }
 
@@ -278,6 +281,12 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
             assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
         }
+    }
+    
+    private List<String> simplifyHeaderNames(List<String> columnNames) {
+        return columnNames.stream()
+                .map (e -> e.replaceAll("[\\,,\\-,.]", ""))
+                .collect(Collectors.toList());
     }
 
     /**
