@@ -135,7 +135,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkKpiAlertDialogWithPercentMetric() throws JSONException {
-        String metricUri = createMetric(METRIC_IN_PERCENT, "SELECT 1", "#,##0%");
+        String metricUri = createMetric(METRIC_IN_PERCENT, "SELECT 1", "#,##0%").getUri();
         setupKpi(kpiConfigWithMetricInPercent);
 
         try {
