@@ -161,9 +161,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
         return getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
     }
 
-    protected String createMetric(String name, String expression, String format) {
-        Metric customMetric = getMdService().createObj(getProject(), new Metric(name, expression, format));
-
-        return customMetric.getUri();
+    protected Metric createMetric(String name, String expression, String format) {
+        return getMdService().createObj(getProject(), new Metric(name, expression, format));
     }
 }

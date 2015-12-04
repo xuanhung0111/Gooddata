@@ -177,7 +177,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             throws JSONException, IOException {
 
         String factUri = RestUtils.getFactUriByName(restApiClient, testParams.getProjectId(), factName);
-        return createMetric(metricName, template.replace("%s", factUri), format);
+        return createMetric(metricName, template.replace("%s", factUri), format).getUri();
     }
 
     private void switchToAdmin() throws JSONException {
