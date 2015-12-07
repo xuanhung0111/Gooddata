@@ -66,7 +66,7 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
 
         analysisPage.dragAndDropFactToShortcutPanel(AMOUNT, ShortcutPanel.TRENDED_OVER_TIME)
             .waitForReportComputing();
-        assertEquals(analysisPage.getDateFilterText(), "Activity: Last 4 quarters");
+        assertEquals(analysisPage.getDateFilterText(), "Closed: Last 4 quarters");
         assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
         assertEquals(analysisPage.getSelectedGranularity(), "Quarter");
         checkingOpenAsReport("createSimpleMetricFromFactUsingShortcut");
