@@ -663,6 +663,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initDISCProjectsPage() {
         openUrl(DISC_PROJECTS_PAGE_URL);
         waitForFragmentVisible(discProjectsPage);
+        waitForFragmentVisible(discProjectsList);
     }
 
     public void initLostPasswordPage() {
