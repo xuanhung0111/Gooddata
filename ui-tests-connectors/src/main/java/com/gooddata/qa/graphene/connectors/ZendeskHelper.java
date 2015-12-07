@@ -232,7 +232,7 @@ public class ZendeskHelper {
         try {
             System.out.println("Going to delete object on url " + objectUrl);
             HttpResponse deleteResponse = apiClient.execute(deleteRequest);
-            checkStatusCode(deleteResponse, 200);
+            checkStatusCode(deleteResponse, 204);
             System.out.println("Deleted object on url " + objectUrl);
         } finally {
             deleteRequest.releaseConnection();
