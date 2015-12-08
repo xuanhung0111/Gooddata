@@ -14,7 +14,7 @@ import com.gooddata.qa.graphene.AbstractTest;
 
 public class TestsRegistry {
 
-    public static final String TESTS_FLOW_FILE = "suites.txt";
+    public static final String TESTS_REGISTRY_FILE = "tests_registry.txt";
 
     private List<String> tests;
 
@@ -37,13 +37,14 @@ public class TestsRegistry {
     }
 
     public File toTextFile(File dir) throws IOException {
-        File flowFile = new File(dir, TESTS_FLOW_FILE);
+        File flowFile = new File(dir, TESTS_REGISTRY_FILE);
 
         try (FileWriter writer = new FileWriter(flowFile)) {
-            writer.append(tests.stream().collect(joining(",")));
+            writer.append("TESTS_REGISTRY=")
+                .append(tests.stream().collect(joining(",")));
         }
 
-        System.out.println(TESTS_FLOW_FILE + " path: " + flowFile.getAbsolutePath());
+        System.out.println(TESTS_REGISTRY_FILE + " path: " + flowFile.getAbsolutePath());
         System.out.println("Content: ");
         FileUtils.readLines(flowFile).stream().forEach(System.out::println);
 
