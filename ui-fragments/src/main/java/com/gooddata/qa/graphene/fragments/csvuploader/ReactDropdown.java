@@ -37,7 +37,7 @@ public class ReactDropdown extends AbstractFragment {
         this.dropdownSelector = dropdownSelector;
     }
 
-    @FindBy(css = "button")
+    @FindBy(css = "button.button-dropdown")
     private WebElement dropdownButtonLoaded;
 
     public boolean isDropdownOpen() {

@@ -38,6 +38,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
     public Object[][] errorCsvFileProvider() {
         return new Object[][] {
             {CsvFile.WITHOUT_FACT, Arrays.asList(DATA_WITHOUT_FACT)},
+            {CsvFile.INVALID_DELIMITER, Arrays.asList(DATA_WITHOUT_FACT)},
             {CsvFile.BAD_STRUCTURE, Arrays.asList(String.format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2))},
             {CsvFile.TOO_MANY_COLUMNS, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 1))},
             {CsvFile.TOO_LONG_FIELD, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 2))},

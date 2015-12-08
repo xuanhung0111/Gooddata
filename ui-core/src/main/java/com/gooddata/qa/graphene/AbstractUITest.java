@@ -42,6 +42,8 @@ import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
@@ -78,8 +80,6 @@ import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.gooddata.qa.graphene.fragments.upload.UploadColumns;
-import com.gooddata.qa.graphene.fragments.upload.UploadFragment;
 import com.google.common.base.Predicate;
 
 public class AbstractUITest extends AbstractGreyPageTest {
@@ -92,7 +92,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
-    protected static final String PAGE_UPLOAD = "upload.html";
     protected static final String ACCOUNT_PAGE = "account.html";
     protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
     protected static final String DASHBOARD_PAGE_SUFFIX = "|projectDashboardPage";
@@ -132,9 +131,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(id = "projectsCentral")
     protected ProjectsPage projectsPage;
-
-    @FindBy(css = ".l-primary")
-    protected UploadFragment upload;
 
     @FindBy(className = "s-datasets-list")
     protected DatasetsListPage datasetsListPage;
@@ -487,44 +483,30 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath) {
+        uploadCSV(filePath, null);
+    }
+
+    public void uploadCSV(String filePath, Map<String, ColumnType> columnsWithExpectedType) {
         initDataUploadPage();
 
         final int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
 
-        waitForFragmentVisible(datasetsListPage).uploadFile(filePath);
+        datasetsListPage.uploadFile(filePath);
         takeScreenshot(browser, "upload-definition", this.getClass());
 
-        Graphene.createPageFragment(DataPreviewPage.class,
-                waitForElementVisible(className("s-data-preview"), browser))
-                .triggerIntegration();
+        DataPreviewPage dataPreviewPage = Graphene.createPageFragment(DataPreviewPage.class,
+                waitForElementVisible(className("s-data-preview"), browser));
+        if (columnsWithExpectedType != null) {
+            DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
+            for (String columnName : columnsWithExpectedType.keySet()) {
+                dataPreviewTable.changeColumnType(columnName, columnsWithExpectedType.get(columnName));
+            }
+        }
+        dataPreviewPage.triggerIntegration();
 
         Predicate<WebDriver> datasetsCountEqualsExpected = input ->
             waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCountBeforeUpload + 1;
         Graphene.waitGui(browser).until(datasetsCountEqualsExpected);
-    }
-
-    public void uploadCSV(String filePath, Map<Integer, UploadColumns.OptionDataType> columnsWithExpectedType,
-            String screenshotName) {
-        initProjectsPage();
-        initEmptyDashboardsPage();
-        initUploadPage();
-        upload.uploadFile(filePath);
-        takeScreenshot(browser, screenshotName + "upload", this.getClass());
-        UploadColumns uploadColumns = upload.getUploadColumns();
-        if (columnsWithExpectedType != null) {
-            takeScreenshot(browser, screenshotName + "-upload-definition-before-changing-column-type",
-                    this.getClass());
-            for (int columnIndex : columnsWithExpectedType.keySet()) {
-                uploadColumns.setColumnType(columnIndex, columnsWithExpectedType.get(columnIndex));
-            }
-            takeScreenshot(browser, screenshotName + "-upload-definition-after-changing-column-type",
-                    this.getClass());
-        }
-        takeScreenshot(browser, "upload-definition", this.getClass());
-        upload.confirmloadCsv();
-        waitForElementVisible(By.xpath("//iframe[contains(@src,'Auto-Tab')]"), browser);
-        waitForDashboardPageLoaded(browser);
-        takeScreenshot(browser, screenshotName + "-dashboard", this.getClass());
     }
 
     private void waitForDashboardPage() {
@@ -541,11 +523,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
         openUrl(PAGE_PROJECTS);
         waitForProjectsPageLoaded(browser);
         waitForElementVisible(projectsPage.getRoot());
-    }
-
-    public void initUploadPage() {
-        openUrl(PAGE_UPLOAD);
-        waitForElementVisible(upload.getRoot());
     }
 
     public void initEmptyDashboardsPage() {
