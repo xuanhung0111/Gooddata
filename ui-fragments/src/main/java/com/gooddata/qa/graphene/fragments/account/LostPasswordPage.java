@@ -2,12 +2,22 @@ package com.gooddata.qa.graphene.fragments.account;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.mail.ImapUtils.*;
+
+import java.io.IOException;
+import java.util.Collection;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.utils.mail.ImapClient;
+import com.google.common.collect.Iterables;
 
 public class LostPasswordPage extends AbstractFragment {
 
@@ -15,6 +25,8 @@ public class LostPasswordPage extends AbstractFragment {
 
     private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector("#gd-overlays div.content");
     private static final By PAGE_MESSAGE_LOCATOR = By.cssSelector(".message");
+
+    private static final String RESET_PASSWORD_EMAIL_SUBJECT = "GoodData password reset request";
 
     @FindBy(css = "input[type='email']")
     private WebElement emailInput;
@@ -40,6 +52,16 @@ public class LostPasswordPage extends AbstractFragment {
         }
     }
 
+    public String resetPassword(ImapClient imapClient, String email)
+            throws MessagingException, IOException {
+        int expectedMessageCount = getMessageWithExpectedReceivedTime(imapClient,
+                GDEmails.REGISTRATION, RESET_PASSWORD_EMAIL_SUBJECT, 0).size();
+
+        resetPassword(email, true);
+
+        return getResetPasswordLink(imapClient, expectedMessageCount);
+    }
+
     public void setNewPassword(String password) {
         waitForElementVisible(newPasswordInput).clear();
         newPasswordInput.sendKeys(password);
@@ -58,4 +80,13 @@ public class LostPasswordPage extends AbstractFragment {
         waitForElementVisible(backToLoginLink).click();
     }
 
+    private String getResetPasswordLink(ImapClient imapClient, int expectedMessageCount)
+            throws MessagingException, IOException {
+        Collection<Message> messages = waitForMessageWithExpectedCount(imapClient, GDEmails.REGISTRATION,
+                RESET_PASSWORD_EMAIL_SUBJECT, expectedMessageCount);
+        Message resetPasswordMessage = Iterables.getLast(messages);
+        String messageBody = ImapClient.getEmailBody(resetPasswordMessage);
+        int beginIndex = messageBody.indexOf("/l/");
+        return messageBody.substring(beginIndex, messageBody.indexOf("\n", beginIndex));
+    }
 }
