@@ -10,7 +10,9 @@ import com.gooddata.qa.graphene.fragments.greypages.md.etl.pull.PullFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.singleloadinterface.SingleLoadInterfaceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp.ExportFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp.PartialExportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.imp.ImportFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.imp.PartialImportFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectElementsFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAttributesFragment;
@@ -80,7 +82,13 @@ public class AbstractGreyPageTest extends AbstractTest {
     protected ExportFragment exportFragment;
 
     @FindBy(tagName = "form")
+    protected PartialExportFragment partialExportFragment;
+
+    @FindBy(tagName = "form")
     protected ImportFragment importFragment;
+
+    @FindBy(tagName = "form")
+    protected PartialImportFragment partialImportFragment;
 
     @FindBy(tagName = "form")
     protected PullFragment pullFragment;
@@ -157,12 +165,26 @@ public class AbstractGreyPageTest extends AbstractTest {
         return exportFragment.invokeExport(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
     }
 
+    public String exportPartialProject(String exportObjectUri, int statusPollingCheckIterations) throws JSONException {
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/partialmdexport");
+        waitForElementPresent(partialExportFragment.getRoot());
+        return partialExportFragment.invokeExport(exportObjectUri, statusPollingCheckIterations);
+    }
+
     public void importProject(String exportToken, int statusPollingCheckIterations)
             throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/import");
         waitForElementPresent(importFragment.getRoot());
         assertTrue(importFragment.invokeImport(exportToken, statusPollingCheckIterations),
                 "Project import failed");
+    }
+
+    public void importPartialProject(String exportToken, int statusPollingCheckIterations)
+            throws JSONException {
+        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/partialmdimport");
+        waitForElementPresent(partialImportFragment.getRoot());
+        assertTrue(partialImportFragment.invokeImport(exportToken, statusPollingCheckIterations),
+                "Partial project import failed");
     }
 
     public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations)

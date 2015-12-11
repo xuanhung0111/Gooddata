@@ -72,7 +72,7 @@ public class IndigoRestUtils {
         }
     }
 
-    private static List<String> getAnalyticalDashboards(RestApiClient restApiClient, String projectId)
+    public static List<String> getAnalyticalDashboards(RestApiClient restApiClient, String projectId)
             throws JSONException, IOException {
         String analyticalDashboardsUri = "/gdc/md/" + projectId + "/query/analyticaldashboard";
 
