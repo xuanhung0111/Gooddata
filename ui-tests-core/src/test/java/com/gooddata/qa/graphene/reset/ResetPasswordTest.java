@@ -5,16 +5,12 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessageWithExpectedCount;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
@@ -24,11 +20,9 @@ import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.google.common.collect.Iterables;
 
 public class ResetPasswordTest extends AbstractUITest {
 
@@ -36,7 +30,6 @@ public class ResetPasswordTest extends AbstractUITest {
     
     private static final String PROJECT_NAME = "GoodSales";
 
-    private static final String RESET_PASSWORD_EMAIL_SUBJECT = "GoodData password reset request";
     private static final String NEW_PASSWORD = "Gooddata12345";
 
     private static final String SHORT_PASSWORD_ERROR_MESSAGE = "Password too short. "
@@ -63,6 +56,8 @@ public class ResetPasswordTest extends AbstractUITest {
     private String user;
     private String oldPassword;
 
+    private ImapClient imapClient;
+
     @Test(groups = {PROJECT_INIT_GROUP})
     public void init() {
         user = testParams.getUser();
@@ -71,6 +66,8 @@ public class ResetPasswordTest extends AbstractUITest {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
+
+        imapClient = new ImapClient(imapHost, imapUser, imapPassword);
     }
 
     @Test(dependsOnMethods = {"init"}, groups = {PROJECT_INIT_GROUP})
@@ -94,10 +91,10 @@ public class ResetPasswordTest extends AbstractUITest {
     public void resetWithValidAndInvalidPassword() throws MessagingException, IOException, JSONException {
         LostPasswordPage lostPasswordPage = loginFragment.openLostPasswordPage();
 
-        lostPasswordPage.resetPassword(user, true);
+        String resetPasswordLink = lostPasswordPage.resetPassword(imapClient, user);
         assertEquals(lostPasswordPage.getPageLocalMessage(), PASSWORD_PAGE_LOCAL_MESSAGE);
 
-        openUrl(getResetPasswordLink(GDEmails.REGISTRATION, RESET_PASSWORD_EMAIL_SUBJECT));
+        openUrl(resetPasswordLink);
         LostPasswordPage resetPasswordPage = Graphene.createPageFragment(LostPasswordPage.class,
                 waitForElementVisible(RESET_PASSWORD_PAGE_LOCATOR, browser));
 
@@ -174,17 +171,5 @@ public class ResetPasswordTest extends AbstractUITest {
             loginFragment.login(user, oldPassword, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
         }
-    }
-
-    private String getResetPasswordLink(GDEmails from, String messageSubject)
-            throws MessagingException, IOException {
-        ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
-        int expectedMessageCount = getMessageWithExpectedReceivedTime(imapClient, from, messageSubject, 0).size();
-        Collection<Message> messages = waitForMessageWithExpectedCount(imapClient, from, messageSubject,
-                expectedMessageCount);
-        Message resetPasswordMessage = Iterables.getLast(messages);
-        String messageBody = ImapClient.getEmailBody(resetPasswordMessage);
-        int beginIndex = messageBody.indexOf("/l/");
-        return messageBody.substring(beginIndex, messageBody.indexOf("\n", beginIndex));
     }
 }
