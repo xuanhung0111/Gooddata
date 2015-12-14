@@ -18,7 +18,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.testng.Assert.assertEquals;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertTrue;
 
 public class ZendeskHelper {
 
@@ -232,7 +233,7 @@ public class ZendeskHelper {
         try {
             System.out.println("Going to delete object on url " + objectUrl);
             HttpResponse deleteResponse = apiClient.execute(deleteRequest);
-            checkStatusCode(deleteResponse, 204);
+            checkStatusCode(deleteResponse, 204, 200);
             System.out.println("Deleted object on url " + objectUrl);
         } finally {
             deleteRequest.releaseConnection();
@@ -257,10 +258,11 @@ public class ZendeskHelper {
         return dateFormat.format(new Date());
     }
 
-    private void checkStatusCode(HttpResponse response, int expectedStatus) {
-        if (response.getStatusLine().getStatusCode() != expectedStatus) {
+    private void checkStatusCode(HttpResponse response, Integer ... expectedStatus) {
+        final boolean hasExpectedStatus = asList(expectedStatus).contains(response.getStatusLine().getStatusCode());
+        if (hasExpectedStatus) {
             System.out.println("Response status reason phrase: " + response.getStatusLine().getReasonPhrase());
         }
-        assertEquals(response.getStatusLine().getStatusCode(), expectedStatus, "Invalid status code");
+        assertTrue(hasExpectedStatus, "Invalid status code");
     }
 }
