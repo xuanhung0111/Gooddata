@@ -4,7 +4,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -21,16 +20,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.WordUtils;
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
-import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDeleteDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
@@ -38,7 +34,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadProgressDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -92,23 +87,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     @FindBy(className = "s-insufficient-access-rights")
     protected InsufficientAccessRightsPage insufficientAccessRightsPage;
 
-    @AfterClass(alwaysRun = true)
-    public void tearDownCsvUploaderTest() throws JSONException {
-        // the AD feature flag should be always disabled for the current project to cover test runs which are reusing
-        // existing projects
-        setADFeatureFlag(false);
-    }
-
-    protected void checkDataPreview(CsvFile csvFile) {
-        checkDataPreview(csvFile.getColumnNames(), csvFile.getColumnTypes());
-    }
-
-    protected void checkDataPreview(List<String> expectedColumnNames, List<String> expectedColumnTypes) {
-        DataPreviewTable dataPreviewTable = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable();
-
-        assertThat(dataPreviewTable.getColumnNames(), 
-                containsInAnyOrder(simplifyHeaderNames(expectedColumnNames).toArray()));
-        assertThat(dataPreviewTable.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
+    @BeforeClass
+    public void initProperties() {
+        projectTitle = "Csv-uploader-test";
     }
 
     protected void checkCsvDatasetDetail(CsvFile csvFile, String datasetName) {
@@ -123,6 +104,12 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         assertThat(csvDatasetDetailPage.getColumnNames(), 
                 containsInAnyOrder(simplifyHeaderNames(expectedColumnNames).toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
+    }
+    
+    protected List<String> simplifyHeaderNames(List<String> columnNames) {
+        return columnNames.stream()
+                .map (e -> e.replaceAll("[\\,,\\-,.]", ""))
+                .collect(Collectors.toList());
     }
 
     protected void checkCsvUpload(CsvFile csvFile, Consumer<CsvFile> uploadCsvFunction, boolean newDatasetExpected) {
@@ -168,36 +155,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         return newDatasetId;
     }
-    
-    protected void removeDataset(CsvFile csvFile, String datasetName) {
-        final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
-
-        datasetsListPage.getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
-        takeScreenshot(browser, DELETE_DATASET_DIALOG_NAME, getClass());
-        waitForFragmentVisible(datasetDeleteDialog).clickDelete();
-
-        waitForExpectedDatasetsCount(datasetCountBeforeDelete - 1);
-    }
-
-    protected void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
-        Optional<UploadHistory> fileUpload = uploadHistory.stream()
-                .filter(upload -> upload.getCsvFile() == csvFile)
-                .findAny();
-        assertThat(fileUpload.isPresent(), is(true));
-        fileUpload.get().removeDatasetName(datasetName);
-    }
-
-    protected void uploadBadCsv(CsvFile csvFile) {
-        uploadFile(csvFile);
-
-        // the processing should not go any further but display validation error directly in File Upload Dialog
-        assertThat(waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors(),
-                hasItem(createErrorFailedToUploadFile(csvFile)));
-
-        takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", csvFile.getFileName()), getClass());
-
-        waitForFragmentVisible(fileUploadDialog).clickCancelButton();
-    }
 
     protected void uploadFile(CsvFile csvFile) {
         waitForFragmentVisible(datasetsListPage).clickAddDataButton();
@@ -242,15 +199,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 .until(datasetHasSuccessfulStatus);
     }
 
-    protected void checkForDatasetRemoved(final String csvDatasetName) {
-        Predicate<WebDriver> datasetSuccessfullyRemoved = input ->
-                waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetRow(csvDatasetName) == null;
-
-        Graphene.waitGui(browser)
-                .withMessage("Dataset '" + csvDatasetName + "' has not been removed from the dataset list.")
-                .until(datasetSuccessfullyRemoved);
-    }
-
     protected void doUploadFromDialog(CsvFile csvFile) {
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "initial-state", csvFile.getFileName()), getClass());
 
@@ -281,21 +229,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
             assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
         }
-    }
-    
-    private List<String> simplifyHeaderNames(List<String> columnNames) {
-        return columnNames.stream()
-                .map (e -> e.replaceAll("[\\,,\\-,.]", ""))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Sets the Analytical Designer feature flag to be turned on/off for the current project.
-     */
-    private void setADFeatureFlag(boolean isEnabled) throws JSONException {
-        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(),
-                RestUtils.FeatureFlagOption.createFeatureClassOption(
-                        ProjectFeatureFlags.ANALYTICAL_DESIGNER.getFlagName(), isEnabled));
     }
 
     public class UploadHistory {
@@ -337,21 +270,10 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         }
     }
 
-    protected String createErrorFailedToUploadFile(CsvFile csvFile) {
-        return String.format("Failed to upload the \"%s\" file.", csvFile.getFileName());
-    }
-
     protected enum CsvFile {
         PAYROLL("payroll"),
-        PAYROLL_CHANGE_TYPE("payroll.change.column.type"),
-        PAYROLL_CHECK_SYNC_DATA("payroll.sync.data"),
-        PAYROLL_CHECK_NOT_SYNC_DATA("payroll.not.sync.data"),
-        PAYROLL_UPLOAD_MULTIPLE_TIMES("payroll.upload.multiple.times"),
-        PAYROLL_UPLOAD_AFTER_DELETE_DATASET("payroll.upload.after.delete.dataset"),
         PAYROLL_REFRESH("payroll.refresh"),
         PAYROLL_REFRESH_BAD("payroll.refresh.bad"),
-        PAYROLL_BY_PROJECT_OWNER("payroll.by.project.owner"),
-        PAYROLL_BY_OTHER_ADMIN("payroll.by.other.admin"),
         MULTIPLE_COLUMN_NAME_ROWS("multiple.column.name.rows", Lists.newArrayList("Id4", "Name4", "Lastname4",
                 "Age4", "Amount4"), Lists.newArrayList(Lists.newArrayList("Measure", "Attribute", "Attribute",
                 "Measure", "Measure")), 5),
