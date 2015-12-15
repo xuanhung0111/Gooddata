@@ -45,7 +45,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected static final String DATA_PAGE_NAME = "data-page";
     protected static final String DATASET_DETAIL_PAGE_NAME = "dataset-detail";
     protected static final String DATA_PREVIEW_PAGE = "data-preview";
-    protected static final String DELETE_DATASET_DIALOG_NAME = "delete-dataset-dialog";
     protected static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit?dataset=%s";
     protected static final String CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE = DATA_UPLOAD_PAGE_URI_TEMPLATE + "/%s";
     protected static final String DATASET_LINK= "https://%s/data/#/projects/%s/datasets/%s";

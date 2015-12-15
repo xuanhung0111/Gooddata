@@ -109,6 +109,10 @@ public class DashboardsPage extends AbstractFragment {
     public DashboardContent getContent() {
         return content;
     }
+    
+    public boolean isEmptyDashboard() {
+        return getContent().isEmpty();
+    }
 
     public DashboardEditBar getDashboardEditBar() {
         return editDashboardBar;

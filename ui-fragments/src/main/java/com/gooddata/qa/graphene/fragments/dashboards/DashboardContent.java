@@ -37,13 +37,16 @@ public class DashboardContent extends AbstractFragment {
 
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-filterdashboardwidget")
     private List<WebElement> filters;
-    
+
     @FindBy(css = ".yui3-selectionbox-resize-tl")
     private WebElement topLeftWidgetResizeButton;
     
     @FindBy(css = ".yui3-selectionbox-resize-br")
     private WebElement bottomRightWidgetResizeButton;
 
+    @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-dashboardcollectionwidget-content .yui3-c-dashboardwidget")
+    private List<WebElement> widgets;
+    
     private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
 
     public int getNumberOfReports() {
@@ -115,6 +118,10 @@ public class DashboardContent extends AbstractFragment {
         }
 
         return createPageFragment(FilterWidget.class, filter);
+    }
+
+    public boolean isEmpty() {
+        return widgets.size() == 0;
     }
 
     public void resizeWidgetTopLeft(int xOffset, int yOffset) {

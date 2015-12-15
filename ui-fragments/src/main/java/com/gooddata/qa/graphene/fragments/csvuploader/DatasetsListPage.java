@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.CheckUtils;
 
 public class DatasetsListPage extends AbstractFragment {
 
@@ -63,13 +64,26 @@ public class DatasetsListPage extends AbstractFragment {
     public DatasetsTable getMyDatasetsTable() {
         return waitForFragmentVisible(myDatasetsTable);
     }
+    
+    public boolean isMyDatasetsEmpty() {
+        return getMyDatasetsTable().getRoot().getAttribute("class").contains("empty-state");
+    }
 
     public int getMyDatasetsCount() {
-        return getMyDatasetsTable().getNumberOfDatasets();
+        return isMyDatasetsEmpty()? 0 : getMyDatasetsTable().getNumberOfDatasets();
+    }
+
+    public boolean isOtherDatasetsEmpty() {
+        waitForFragmentVisible(myDatasetsTable); //this is used as indicator for datasets table is loaded
+        return !CheckUtils.isElementPresent(By.cssSelector(".others-datasets"), getRoot());
     }
 
     public DatasetsTable getOthersDatasetsTable() {
         return waitForFragmentVisible(othersDatasetsTable);
+    }
+
+    public int getOtherDatasetsCount() {
+        return isOtherDatasetsEmpty()? 0 : waitForFragmentVisible(othersDatasetsTable).getNumberOfDatasets();
     }
 
     public void uploadFile(String filePath) {
