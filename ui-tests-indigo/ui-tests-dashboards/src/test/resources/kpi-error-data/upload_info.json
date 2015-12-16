@@ -1,0 +1,63 @@
+{"dataSetSLIManifest": {
+  "parts":   [
+        {
+      "columnName": "user",
+      "mode": "FULL",
+      "populates": ["fact.user.user"]
+    },
+        {
+      "columnName": "firstname",
+      "mode": "FULL",
+      "populates": ["label.user.firstname"],
+      "referenceKey": 1
+    },
+        {
+      "columnName": "lastname",
+      "mode": "FULL",
+      "populates": ["label.user.lastname"],
+      "referenceKey": 1
+    },
+        {
+      "columnName": "name",
+      "mode": "FULL",
+      "populates": ["label.user.name"],
+      "referenceKey": 1
+    },
+        {
+      "columnName": "address",
+      "mode": "FULL",
+      "populates": ["label.user.address"],
+      "referenceKey": 1
+    },
+        {
+      "columnName": "age",
+      "mode": "FULL",
+      "populates": ["fact.user.age"]
+    },
+        {
+      "columnName": "number",
+      "mode": "FULL",
+      "populates": ["fact.user.number"]
+    },
+        {
+      "columnName": "date",
+      "mode": "FULL",
+      "populates": ["user_date.date.mdyy"],
+      "constraints": {"date": "yyyy-MM-dd"},
+      "referenceKey": 1
+    },
+        {
+      "columnName": "date_dt",
+      "mode": "FULL",
+      "populates": ["dt.user.date"]
+    }
+  ],
+  "file": "data.csv",
+  "dataSet": "dataset.user",
+  "csvParams":   {
+    "quoteChar": "\"",
+    "escapeChar": "\"",
+    "separatorChar": ",",
+    "endOfLine": "\n"
+  }
+}}

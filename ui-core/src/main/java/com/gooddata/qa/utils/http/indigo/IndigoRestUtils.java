@@ -97,7 +97,7 @@ public class IndigoRestUtils {
         }
     }
 
-    private static String createKpiWidget(RestApiClient restApiClient, String projectId, KpiMDConfiguration kpiConfig)
+    public static String createKpiWidget(RestApiClient restApiClient, String projectId, KpiMDConfiguration kpiConfig)
             throws JSONException, IOException {
         String content = KPI_WIDGET_BODY
                 .replace("${title}", kpiConfig.getTitle())
@@ -143,7 +143,7 @@ public class IndigoRestUtils {
         }
     }
 
-    private static String createAnalyticalDashboard(RestApiClient restApiClient, String projectId,
+    public static String createAnalyticalDashboard(RestApiClient restApiClient, String projectId,
             Collection<String> widgetUris) throws JSONException, IOException {
 
         // TODO: consider better with .put() and have clever template
@@ -165,12 +165,6 @@ public class IndigoRestUtils {
         }
 
     }
-
-    private static String getObjectUri(String projectId, String objectId) {
-        return "/gdc/md/${projectId}/obj/${objectId}".replace("${projectId}", projectId)
-                .replace("${objectId}", objectId);
-    }
-
 
     public static void prepareAnalyticalDashboardTemplate(RestApiClient restApiClient, String projectId)
             throws JSONException, IOException {
@@ -219,4 +213,8 @@ public class IndigoRestUtils {
         createAnalyticalDashboard(restApiClient, projectId, widgetUris);
     }
 
+    private static String getObjectUri(String projectId, String objectId) {
+        return "/gdc/md/${projectId}/obj/${objectId}".replace("${projectId}", projectId)
+                .replace("${objectId}", objectId);
+    }
 }
