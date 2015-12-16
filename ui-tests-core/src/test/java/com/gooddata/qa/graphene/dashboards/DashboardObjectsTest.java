@@ -2,13 +2,18 @@ package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
@@ -22,6 +27,10 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     private final String variableName = "FVariable";
     private static final long expectedDashboardExportSize = 65000L;
+    private static final String REPORT_NAME = "Amount Overview table";
+    private static final String METRIC_NAME = "Sum of Amount";
+    private static final String FACT_NAME ="Amount";
+    private static final String DEFAULT_METRIC_FORMAT = "#,##0";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -30,7 +39,8 @@ public class DashboardObjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadDataTest() {
-        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"), null, "simple-ws");
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
+        takeScreenshot(browser, "uploaded-payroll", getClass());
     }
 
     @Test(dependsOnMethods = {"uploadDataTest"})
@@ -48,7 +58,17 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"changeStateLabelTest", "createvariableTest"})
-    public void addDashboardObjectsTest() {
+    public void addDashboardObjectsTest() {;
+        createMetric(METRIC_NAME, 
+                format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title(FACT_NAME))),
+                DEFAULT_METRIC_FORMAT);
+
+        createReport(new UiReportDefinition()
+                .withName(REPORT_NAME)
+                .withWhats(METRIC_NAME)
+                .withHows("Lastname", "Firstname", "Education", "Position", "Department"),
+                REPORT_NAME);
+
         initDashboardsPage();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         String dashboardName = "Test";
@@ -57,15 +77,15 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, this.variableName);
         dashboardEditBar.addTimeFilterToDashboard(0, "7 ago");
-        dashboardEditBar.addReportToDashboard("Amount Overview table");
+        dashboardEditBar.addReportToDashboard(REPORT_NAME);
         sleepTightInSeconds(2);
         dashboardEditBar.addTextToDashboard(TextObject.HEADLINE, "Headline", "google.com");
         dashboardEditBar.addTextToDashboard(TextObject.SUB_HEADLINE, "Sub-Headline", "google.com");
         dashboardEditBar.addTextToDashboard(TextObject.DESCRIPTION, "Description", "google.com");
         dashboardEditBar.addLineToDashboard();
-        dashboardEditBar.addWidgetToDashboard(WidgetTypes.KEY_METRIC, "Avg of Amount");
+        dashboardEditBar.addWidgetToDashboard(WidgetTypes.KEY_METRIC, METRIC_NAME);
         sleepTightInSeconds(2);
-        dashboardEditBar.addWidgetToDashboard(WidgetTypes.GEO_CHART, "Avg of Amount");
+        dashboardEditBar.addWidgetToDashboard(WidgetTypes.GEO_CHART, METRIC_NAME);
         sleepTightInSeconds(2);
         dashboardEditBar.addWebContentToDashboard("https://www.gooddata.com");
         dashboardEditBar.saveDashboard();

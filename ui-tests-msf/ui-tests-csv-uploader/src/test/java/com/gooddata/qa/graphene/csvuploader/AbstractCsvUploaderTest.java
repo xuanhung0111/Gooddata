@@ -275,17 +275,25 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         PAYROLL_REFRESH("payroll.refresh"),
         PAYROLL_REFRESH_BAD("payroll.refresh.bad"),
         MULTIPLE_COLUMN_NAME_ROWS("multiple.column.name.rows", Lists.newArrayList("Id4", "Name4", "Lastname4",
-                "Age4", "Amount4"), Lists.newArrayList(Lists.newArrayList("Measure", "Attribute", "Attribute",
-                "Measure", "Measure")), 5),
+                "Age4", "Amount4"), Lists.newArrayList("Measure", "Attribute", "Attribute", "Measure", "Measure"), 5),
         /** This csv file has incorrect column count (one more than expected) on the line number 2. */
         BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList(), 0),
         NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT),
         TOO_LARGE_FILE("payroll.too.large"),
         WITHOUT_FACT("payroll.without.fact"),
+        INVALID_DELIMITER("invalid.delimiter"),
         CRAZY_DATA("crazy.data"),
         TOO_MANY_COLUMNS("too.many.columns"),
         TOO_LONG_FIELD("payroll.too.long.field"),
-        PAYROLL_TOO_LONG_FACT_VALUE("payroll.too.long.fact.value");
+        PAYROLL_TOO_LONG_FACT_VALUE("payroll.too.long.fact.value"),
+        PAYROLL_NEGATIVE_NUMBER("payroll.negative.number", PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES, 3568),
+        PAYROLL_NULL_NUMBER("payroll.null.number", Lists.newArrayList("Lastname", "Firstname",
+                "Education", "Position", "Department", "State", "County", "Paydate", "Amount", "Amount1"),
+                Lists.newArrayList("Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
+                        "Attribute", "Date [2015-12-31]", "Measure", "Measure"), PAYROLL_DATA_ROW_COUNT),
+        WITHOUT_ATTRIBUTE("without.attribute", Lists.newArrayList("Amount"), Lists.newArrayList("Measure"), 44),
+        WITHOUT_DATE("without.date", Lists.newArrayList("state","county","name","censusarea"), 
+                Lists.newArrayList("Attribute", "Attribute", "Attribute", "Measure"), 3273);
 
         private final String name;
         private final List<String> columnNames = Lists.newArrayList();

@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.manage;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
@@ -13,10 +15,11 @@ import java.util.Map;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.graphene.fragments.upload.UploadColumns.OptionDataType;
 
 public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
 
@@ -30,14 +33,16 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"})
     public void initialize() {
         attributesList =
-                asList("Geo_pushpin", "AUS_State_Name", "AUS_State_ISO", "StateName", "StateID",
-                        "StateCode", "CountyID", "CountryName", "Country_ISO2", "Country_ISO3",
-                        "CZ_District_Name", "CZ_District_NO_Diacritics", "CZ_District_NUTS4",
-                        "CZ_District_KNOK");
-        Map<Integer, OptionDataType> columnIndexAndType = new HashMap<Integer, OptionDataType>();
-        columnIndexAndType.put(9, OptionDataType.TEXT);
-        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_geo_labels.csv"), columnIndexAndType,
-                "attribute_geo_labels");
+                asList("Geo Pushpin", "Aus State Name", "Aus State Iso", "Statename", "Stateid",
+                        "Statecode", "Countyid", "Countryname", "Country Iso2", "Country Iso3",
+                        "Cz District Name", "Cz District No Diacritics", "Cz District Nuts4",
+                        "Cz District Knok");
+        Map<String, ColumnType> columnIndexAndType = new HashMap<String, ColumnType>();
+        columnIndexAndType.put("Cz District Knok", ColumnType.ATTRIBUTE);
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/attribute_geo_labels.csv"), columnIndexAndType);
+        createMetric("Sum of Amount", 
+                format("SELECT SUM([%s])", getMdService().getObjUri(getProject(), Fact.class, title("Amount"))),
+                "#,##0.00");
     }
 
     @Test(dependsOnMethods = {"initialize"})
@@ -95,7 +100,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
     }
 
     private enum GeoAttributeLabels {
-        GEO_PUSHPIN("Geo_pushpin", "Sum of Amount", 10225f, 102303f, asList(0, 1, 2, 3, 4, 5, 6, 7,
+        GEO_PUSHPIN("Geo Pushpin", "Sum of Amount", 10225f, 102303f, asList(0, 1, 2, 3, 4, 5, 6, 7,
                 8), asList("rgb(230, 230, 230)", "rgb(43, 107, 174)", "rgb(230, 230, 230)",
                 "rgb(43, 107, 174)", "rgb(43, 107, 174)", "rgb(43, 107, 174)",
                 "rgb(230, 230, 230)", "rgb(230, 230, 230)", "rgb(230, 230, 230)"), asList(
@@ -110,7 +115,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 "33.607361;-86.630355", "34.616719;-92.498309", "34.743001;-86.601108",
                 "35.091612;-92.427588")),
         AUS_STATE_NAME(
-                "AUS_State_Name",
+                "Aus State Name",
                 "Sum of Amount",
                 102300f,
                 112526f,
@@ -122,7 +127,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("112,526.00", "102,303.00", "102,300.00"),
                 asList("Queensland", "Tasmania", "Victoria")),
         AUS_STATE_ISO(
-                "AUS_State_ISO",
+                "Aus State Iso",
                 "Sum of Amount",
                 10230f,
                 112526f,
@@ -142,7 +147,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("New South Wales", "Northern Territory", "Queensland", "South Australia",
                         "Tasmania", "Victoria", "Western Australia")),
         US_STATE_NAME(
-                "StateName",
+                "Statename",
                 "Sum of Amount",
                 102301f,
                 255769f,
@@ -152,7 +157,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("255,769.00"),
                 asList("Washington")),
         US_STATE_CENSUS_ID(
-                "StateID",
+                "Stateid",
                 "Sum of Amount",
                 102300f,
                 102303f,
@@ -166,7 +171,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("102,300.00", "102,301.00", "102,302.00", "102,303.00"),
                 asList("Washington", "West Virginia", "Wisconsin", "Wyoming")),
         US_STATE_CODE(
-                "StateCode",
+                "Statecode",
                 "Sum of Amount",
                 102301f,
                 255769f,
@@ -177,7 +182,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("102,301.00", "255,769.00"),
                 asList("Alabama", "Washington")),
         US_COUNTY_CENSUS_ID(
-                "CountyID",
+                "Countyid",
                 "Sum of Amount",
                 10225f,
                 225081f,
@@ -192,7 +197,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("225,081.00", "10,225.00", "10,236.00", "204,601.00", "10,230.00"),
                 asList("Ada", "Clark", "Valley", "Chouteau", "Baker")),
         WORLD_COUNTRIES_NAME(
-                "CountryName",
+                "Countryname",
                 "Sum of Amount",
                 30712f,
                 214835f,
@@ -207,7 +212,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("Czech Republic", "United States of America", "United States of America",
                         "United States of America")),
         WORLD_COUNTRIES_ISO2(
-                "Country_ISO2",
+                "Country Iso2",
                 "Sum of Amount",
                 30712f,
                 214835f,
@@ -221,7 +226,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("214,826.00", "214,835.00", "214,835.00", "214,835.00"),
                 asList("Czech Republic", "United States", "United States", "United States")),
         WORLD_COUNTRIES_ISO3(
-                "Country_ISO2",
+                "Country Iso3",
                 "Sum of Amount",
                 30712f,
                 214835f,
@@ -235,7 +240,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("214,826.00", "214,835.00", "214,835.00", "214,835.00"),
                 asList("Czech Republic", "United States", "United States", "United States")),
         CZ_DISTRICT_NAME(
-                "CZ_District_Name",
+                "Cz District Name",
                 "Sum of Amount",
                 30712f,
                 214835f,
@@ -247,7 +252,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("214,826.00", "214,835.00", "30,712.00"),
                 asList("Beroun", "Nymburk", "Rokycany")),
         CZ_DISTRICT_NAME_WO_DIAC(
-                "CZ_District_NO_Diacritics",
+                "Cz District No Diacritics",
                 "Sum of Amount",
                 30701f,
                 306903f,
@@ -259,7 +264,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("306,903.00", "122,769.00", "30,701.00"),
                 asList("Kladno", "Strakonice", "Tachov")),
         CZ_DISTRICT_NUTS4(
-                "CZ_District_NUTS4",
+                "Cz District Nuts4",
                 "Sum of Amount",
                 30712f,
                 214835f,
@@ -271,7 +276,7 @@ public class SimpleProjectGeoLabelTest extends AbstractProjectTest {
                 asList("214,826.00", "214,835.00", "30,712.00"),
                 asList("Beroun", "Nymburk", "Rokycany")),
         CZ_DISTRICT_KNOK(
-                "CZ_District_KNOK",
+                "Cz District Knok",
                 "Sum of Amount",
                 122764f,
                 214834f,
