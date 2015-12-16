@@ -1,0 +1,6 @@
+"id","name","lastname","age","phone_time","phone_time_formatted"
+1,"Homer Simpson","Simpson",36,10000,10000
+2,"Marge Simpson","Simpson",34,50,50
+3,"Bart Simpson","Simpson",10,100000,100000
+4,"Lisa Simpson","Simpson",8,86400,86400
+5,"Maggie Simpson","Simpson",2,1000,1000
