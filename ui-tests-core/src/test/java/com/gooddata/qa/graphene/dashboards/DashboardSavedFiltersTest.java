@@ -51,7 +51,12 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init-data"})
     public void uploadCsvDataForBlankProject() {
-        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"), null, "payroll");
+        uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
+    }
+
+    @Test(dependsOnMethods = {"uploadCsvDataForBlankProject"}, groups = {"init-data"})
+    public void createDashboard() {
+        createDashboard("Sample Dashboard");
     }
 
     @Test(dependsOnGroups = {"init-data"}, priority = 1)
@@ -64,7 +69,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             WebElement savedViewDisabledNotification = dashboardEditBar.getSavedViewDisabledNotification();
             waitForElementVisible(savedViewDisabledNotification);
             checkSavedViewisDisableByNotification(savedViewDisabledNotification);
-    
+
             savedViewDisabledNotification.click();
             DashboardSettingsDialog dashboardSettingsDialog = dashboardEditBar.getDashboardSettingsDialog();
             waitForElementVisible(dashboardSettingsDialog.getRoot());
@@ -73,7 +78,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             dashboardEditBar.cancelDashboard();
             dashboardsPage.editDashboard();
             checkSavedViewisDisableByNotification(savedViewDisabledNotification);
-    
+
             dashboardEditBar.turnSavedViewOption(true);
             dashboardEditBar.saveDashboard();
             waitForElementNotVisible(savedViewDisabledNotification);
@@ -165,6 +170,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"createSavedFilterViewTest"})
     public void renameSavedFilterViewTest() {
         initDashboardsPage();
+        dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         // change filter value so Selenium can loads all saved views
         dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(PENULTIMATE_YEAR);
 
@@ -206,6 +212,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"renameSavedFilterViewTest"})
     public void filterViewNamingUniquenessTest() {
         initDashboardsPage();
+        dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         // change filter value so Selenium can loads all saved views
         dashboardsPage.getFilterWidget("date_dimension").changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 3));
 
@@ -235,6 +242,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"filterViewNamingUniquenessTest"})
     public void deleteSavedFilterViewTest() {
         initDashboardsPage();
+        dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         // change filter value so Selenium can loads all saved views
         FilterWidget filter = dashboardsPage.getFilterWidget("date_dimension");
         filter.changeTimeFilterValueByClickInTimeLine(String.valueOf(THIS_YEAR - 4));
@@ -367,6 +375,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     public void savedViewFilterDoNotApplyOnFiltersAfterRemovingTest() {
         try {
             initDashboardsPage();
+            dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
             DashboardEditFilter dashboardEditFilter = dashboardEditBar.getDashboardEditFilter();
@@ -386,6 +395,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnFiltersAfterRemovingTest"})
     public void dashboardHasManyFiltersInManyTabsTest() {
         initDashboardsPage();
+        dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         dashboardsPage.addNewTab("second tab");
