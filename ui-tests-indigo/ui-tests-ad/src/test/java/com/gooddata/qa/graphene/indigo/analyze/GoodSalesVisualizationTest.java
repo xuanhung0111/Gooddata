@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
@@ -12,6 +13,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -26,6 +28,7 @@ import java.util.stream.Stream;
 
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
+import org.jboss.arquillian.graphene.findby.ByJQuery;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -542,6 +545,27 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         assertFalse(analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .searchBucketItem("Amo"));
         assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(0));
+    }
+
+    @Test(dependsOnGroups = {"init"})
+    public void searchNonExistent() {
+        initAnalysePage();
+        Stream.of(CatalogFilterType.values()).forEach(type -> {
+            assertFalse(analysisPage.filterCatalog(type)
+                    .searchBucketItem("abcxyz"));
+            assertTrue(isElementPresent(ByJQuery.selector(
+                    ".adi-no-items:contains('No data matching\"abcxyz\"')"), browser));
+        });
+
+        analysisPage.addCategory(ACTIVITY_TYPE);
+        Stream.of(CatalogFilterType.values()).forEach(type -> {
+            assertFalse(analysisPage.searchBucketItem("Am"));
+            assertTrue(isElementPresent(ByJQuery.selector(
+                    ".adi-no-items:contains('No data matching\"Am\"')"), browser));
+
+            assertTrue(waitForElementVisible(cssSelector(".adi-no-items .s-unavailable-items-matched"), browser)
+                    .getText().matches("^\\d unrelated data item[s]? hidden$"));
+        });
     }
 
     @Test(dependsOnGroups = {"init"})
