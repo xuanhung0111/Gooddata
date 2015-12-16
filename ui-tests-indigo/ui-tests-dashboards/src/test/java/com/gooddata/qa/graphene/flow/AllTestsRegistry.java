@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.flow;
 
+import com.gooddata.qa.graphene.indigo.dashboards.AddKpiWithoutDateDimensionTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDimensionTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
@@ -18,6 +19,7 @@ public class AllTestsRegistry {
                 .register(ManipulateWidgetsTest.class)
                 .register(MetricFormattingTest.class)
                 .register(PartialExportDashboardsTest.class)
+                .register(AddKpiWithoutDateDimensionTest.class)
                 .register("testng-desktop-DateFiltering.xml")
                 .register("testng-desktop-permissions-EditMode.xml")
                 .register("testng-desktop-imap-KpiAlertEvaluate.xml")
