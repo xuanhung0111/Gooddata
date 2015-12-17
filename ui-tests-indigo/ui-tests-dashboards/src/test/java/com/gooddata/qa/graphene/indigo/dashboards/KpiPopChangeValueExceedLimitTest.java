@@ -51,7 +51,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
     private static final String CHANGE_VALUE_EXCEED_LIMIT_OR_INFINITY = ">99999%";
 
     private static final String KPI_ERROR_DATA_RESOURCE = "/kpi-error-data/";
-    private static final String USER_UPLOAD_LINK = "gdc/uploads/";
+    private static final String USER_UPLOAD_LINK = "uploads/";
 
     private MetadataService mdService;
     private Project project;
@@ -125,7 +125,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
     private String getCsvData(File csvFile) throws IOException {
         StringBuilder csvData = new StringBuilder();
-        String record = null;
+        String record;
 
         try (BufferedReader file = new BufferedReader(new FileReader(csvFile))) {
             while ((record = file.readLine()) != null) {
