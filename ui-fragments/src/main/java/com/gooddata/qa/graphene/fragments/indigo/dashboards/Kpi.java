@@ -30,6 +30,7 @@ public class Kpi extends AbstractFragment {
     public static final String KPI_IS_EMPTY_VALUE = "is-empty-value";
     public static final String KPI_IS_ERROR_VALUE = "is-error-value";
     public static final String KPI_ALERT_DIALOG_CLASS = "kpi-alert-dialog";
+    public static final String KPI_CONTENT_CLASS = "dash-item-content";
 
     public static final String WIDGET_LOADING_CLASS = "widget-loading";
     public static final String CONTENT_LOADING_CLASS = "content-loading";
@@ -64,6 +65,9 @@ public class Kpi extends AbstractFragment {
 
     @FindBy(className = CONTENT_LOADING_CLASS)
     private WebElement contentLoading;
+
+    @FindBy(className = KPI_CONTENT_CLASS)
+    private WebElement content;
 
     public String getHeadline() {
         return waitForElementVisible(headline).getText();
@@ -164,6 +168,10 @@ public class Kpi extends AbstractFragment {
         action.moveToElement(value).moveToElement(alertButton).click().build().perform();
 
         return this;
+    }
+
+    public void clickKpiContent() {
+        waitForElementVisible(content).click();
     }
 
     public void waitForLoading() {
