@@ -44,7 +44,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         checkDataPreview(fileToUpload);
         takeScreenshot(browser,
                 toScreenshotName(DATA_PAGE_NAME, "empty-column-name-in", fileToUpload.getFileName()), getClass());
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be disabled when column names are invalid");
 
         waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().setColumnsName(PAYROLL_COLUMN_NAMES);
@@ -200,7 +200,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         dataPreviewPage.triggerIntegration();
 
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewTable.isColumnNameError("2006 03 01"), "Error is not shown!");
         assertTrue(dataPreviewTable.isColumnNameError("10230"), "Error is not shown!");
 
@@ -304,7 +304,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         checkDataPreview(fileToUpload);
         DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewTable.isEmptyColumnNameError(0), "Error is not shown!");
         assertTrue(dataPreviewTable.isEmptyColumnNameError(3), "Error is not shown!");
         assertTrue(dataPreviewTable.isEmptyColumnNameError(6), "Error is not shown!");

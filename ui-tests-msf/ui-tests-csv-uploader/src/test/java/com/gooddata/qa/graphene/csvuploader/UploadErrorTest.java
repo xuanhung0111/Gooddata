@@ -74,7 +74,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
         dataPreviewPage.selectHeader().getRowSelectionTable().getRow(3).click(); // select data row as header
         dataPreviewPage.triggerIntegration();                                    // confirm header row
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when column names start with numbers");
     }
@@ -95,7 +95,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNameValidationErrors"), getClass());
 
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fix the errors in column names"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when columns have the same names");
 
