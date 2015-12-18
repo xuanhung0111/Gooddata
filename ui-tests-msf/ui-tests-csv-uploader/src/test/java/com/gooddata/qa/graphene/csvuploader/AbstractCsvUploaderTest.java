@@ -220,10 +220,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         takeScreenshot(browser, toScreenshotName(DATA_PREVIEW_PAGE, refreshData.getFileName()), getClass());
 
         dataPreviewPage.triggerIntegration();
-        
-        assertThat(csvDatasetMessageBar.waitForProgressMessageBar().getText(),
-                is(String.format(UPDATE_DATA_MESSAGE, refreshData.getFileName())));
-        
+
         // TODO workaround for bug: MSF-9563 Green message isn't shown after updating successfully by other admin
         if (isOwner) {
             assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
