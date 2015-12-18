@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.csvuploader;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
@@ -8,6 +9,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.openqa.selenium.By.className;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +34,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDeleteDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
-import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadProgressDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
 import com.gooddata.qa.utils.io.ResourceUtils;
 import com.google.common.base.Predicate;
@@ -77,9 +78,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     
     @FindBy(className = "gd-messages")
     protected DatasetMessageBar csvDatasetMessageBar;
-
-    @FindBy(className = "s-progress-dialog")
-    protected FileUploadProgressDialog fileUploadProgressDialog;
 
     @FindBy(className = "s-dataset-delete-dialog")
     protected DatasetDeleteDialog datasetDeleteDialog;
@@ -208,10 +206,12 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
         fileUploadDialog.clickUploadButton();
 
-        waitForFragmentVisible(fileUploadProgressDialog);
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFile.getFileName()), getClass());
+        if (!isElementPresent(className("s-progress-dialog"), browser)) {
+            log.warning("Progress dialog is not show or graphene is too slow to capture it!");
+        }
     }
-    
+
     protected void refreshCsv(CsvFile refreshData, String datasetName, boolean isOwner) {
         doUploadFromDialog(refreshData);
 
