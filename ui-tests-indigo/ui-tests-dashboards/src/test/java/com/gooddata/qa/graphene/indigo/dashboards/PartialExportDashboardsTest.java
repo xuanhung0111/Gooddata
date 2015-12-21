@@ -21,8 +21,8 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
-        projectTitle = "Onboarding-partial-export-test";
-        projectTemplate = "/projectTemplates/Onboarding/2";
+        projectTitle = "OnboardingWalkme-partial-export-test";
+        projectTemplate = "/projectTemplates/OnboardingWalkMe/3";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"desktop"})
@@ -34,10 +34,10 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
         indigoDashboardsPage
             .waitForDashboardLoad()
             .addWidget(new KpiConfiguration.Builder()
-                .metric("Cases")
+                .metric("Sales")
                 .dateDimension("Date")
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
-                .drillTo("4. Data Discovery")
+                .drillTo("Sales Forecast")
                 .build())
             .saveEditModeWithKpis();
     }
@@ -63,8 +63,8 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
                 .clickKpiValue();
             waitForDashboardPageLoaded(browser);
 
-            takeScreenshot(browser, "Dashboard tab: '4. Data Discovery' is selected", getClass());
-            assertTrue(dashboardsPage.getTabs().isTabSelected(3));
+            takeScreenshot(browser, "Dashboard tab: 'Sales Forecast' is selected", getClass());
+            assertTrue(dashboardsPage.getTabs().isTabSelected(2));
         } finally {
             testParams.setProjectId(oldPid);
 
