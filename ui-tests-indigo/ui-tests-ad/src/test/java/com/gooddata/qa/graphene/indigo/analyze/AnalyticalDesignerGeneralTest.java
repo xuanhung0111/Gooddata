@@ -262,6 +262,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 System.out.println(format("Report with metric [%s] and attribute [%s] shows message: %s",
                         metric, attribute, analysisPage.getExplorerMessage()));
                 System.out.println("Try another attribute");
+                analysisPage.removeCategory(attribute).waitForReportComputing();
             } else {
                 analysisPage.removeCategory(attribute).waitForReportComputing();
                 System.out.println(format("Good pair to test: metric [%s] and attribute [%s]", metric, attribute));
