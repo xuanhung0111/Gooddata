@@ -66,7 +66,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"precondition"})
     public void uploadDatasetFromCsv() throws IOException, JSONException, URISyntaxException {
-        // The fixed data in CSV file will be invalid and make this test failed 
+        // The fixed data in CSV file will be invalid and make this test failed
         // when the time pass to another period.
         // So updating Csv file with new date data every time the test is executing
         // to make sure the data is always valid.
@@ -160,8 +160,10 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
     }
 
     private void uploadDatasetFromCsv(String csvFilePath) throws JSONException, URISyntaxException, IOException {
-      RestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
+      String pollingUri = RestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
               getResourceAsString(KPI_ERROR_DATA_RESOURCE + "user.maql"));
+      RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
+
       setupData(csvFilePath, KPI_ERROR_DATA_RESOURCE + "upload_info.json");
     }
 
