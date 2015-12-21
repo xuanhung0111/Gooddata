@@ -957,7 +957,9 @@ public class RestUtils {
             request.releaseConnection();
         }
 
-        waitForProjectCreated(restApiClient, projectId);
+        if (!waitForProjectCreated(restApiClient, projectId)) {
+            throw new RuntimeException("Cannot create project!");
+        }
         return projectId;
     }
 
@@ -1079,13 +1081,17 @@ public class RestUtils {
         }
     }
 
-    private static void waitForProjectCreated(RestApiClient restApiClient, String projectId)
+    private static boolean waitForProjectCreated(RestApiClient restApiClient, String projectId)
             throws ParseException, JSONException, IOException {
         String currentStatus = "";
-        while (!"ENABLED".equals((currentStatus = getProjectState(restApiClient, projectId)))) {
+        while (true) {
+            currentStatus = getProjectState(restApiClient, projectId);
             System.out.println("Current status: " + currentStatus);
+            if (!"PREPARING".equals(currentStatus)) break;
             sleepTightInSeconds(5);
         }
+
+        return "ENABLED".equals(currentStatus);
     }
 
     private static String getEtlPullingStatus(RestApiClient restApiClient, String pullingUri)
