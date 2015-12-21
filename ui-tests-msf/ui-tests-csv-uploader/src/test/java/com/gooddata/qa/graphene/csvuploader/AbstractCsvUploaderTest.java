@@ -49,8 +49,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit?dataset=%s";
     protected static final String CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE = DATA_UPLOAD_PAGE_URI_TEMPLATE + "/%s";
     protected static final String DATASET_LINK= "https://%s/data/#/projects/%s/datasets/%s";
-    private static final String ADDING_DATA_FROM_MESSAGE = "Adding data from \"%s\" ...";
-    protected static final String UPDATE_DATA_MESSAGE = "Updating data from \"%s\" ...";
     protected static final String SUCCESSFUL_DATA_MESSAGE = "Data has been loaded successfully to \"%s\". Start analyzing!";
     /**
      * Successful load contains information about number of rows and columns,
@@ -131,9 +129,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         takeScreenshot(browser, toScreenshotName(DATA_PREVIEW_PAGE, csvFile.getFileName()), getClass());
 
         dataPreviewPage.triggerIntegration();
-        
-        assertThat(csvDatasetMessageBar.waitForProgressMessageBar().getText(),
-                is(String.format(ADDING_DATA_FROM_MESSAGE, csvFile.getFileName())));
     }
 
     protected String getNewDataset(CsvFile csvFile) {
