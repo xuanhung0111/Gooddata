@@ -12,6 +12,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,7 +52,6 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
     private static final String CHANGE_VALUE_EXCEED_LIMIT_OR_INFINITY = ">99999%";
 
     private static final String KPI_ERROR_DATA_RESOURCE = "/kpi-error-data/";
-    private static final String USER_UPLOAD_LINK = "uploads/";
 
     private MetadataService mdService;
     private Project project;
@@ -167,7 +167,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
     private void setupData(String csvPath, String uploadInfoPath)
             throws JSONException, URISyntaxException, ParseException, IOException {
-        String webdavUrl = getRootUrl() + USER_UPLOAD_LINK + UUID.randomUUID().toString();
+        String webdavUrl = getRootUrl() + RestUtils.getWebDavUrl(getRestApiClient()).substring(1) + "/" + UUID.randomUUID().toString();
 
         URL csvResource = new File(csvPath).toURI().toURL();
         URL uploadInfoResource = getClass().getResource(uploadInfoPath);
@@ -176,6 +176,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
         uploadFileToWebDav(uploadInfoResource, webdavUrl);
 
         String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
-        RestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(), integrationEntry);
+        assertTrue(RestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
+                integrationEntry), "Etl pull is not ok!");
     }
 }

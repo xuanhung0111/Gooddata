@@ -1038,7 +1038,7 @@ public class RestUtils {
         }
     }
 
-    public static void postEtlPullIntegration(RestApiClient restApiClient, String projectId, String integrationEntry)
+    public static boolean postEtlPullIntegration(RestApiClient restApiClient, String projectId, String integrationEntry)
             throws JSONException, ParseException, IOException {
 
         HttpRequestBase request = restApiClient.newPostMethod(format(PULL_DATA_LINK, projectId),
@@ -1054,14 +1054,33 @@ public class RestUtils {
 
             String pullingStatus = "";
 
-            while(!"OK".equals(pullingStatus = getEtlPullingStatus(restApiClient, pullingUri))) {
+            while (true) {
+                pullingStatus = getEtlPullingStatus(restApiClient, pullingUri);
                 System.out.println("The pulling status is: " + pullingStatus);
+
+                if (!pullingStatus.equals("RUNNING"))
+                    break;
                 sleepTightInSeconds(5);
             }
 
+            return "OK".equals(pullingStatus);
         } finally {
             request.releaseConnection();
         }
+    }
+
+    public static String getWebDavUrl(RestApiClient restApiClient) throws IOException, JSONException {
+        JSONArray links = getJSONObjectFrom(restApiClient, "/gdc", HttpStatus.OK).getJSONObject("about")
+                .getJSONArray("links");
+
+        JSONObject link;
+        for (int i = 0, n = links.length(); i < n; i++) {
+            link = links.getJSONObject(i);
+            if (!"user-uploads".equals(link.getString("title"))) continue;
+            return link.getString("link");
+        }
+
+        return "";
     }
 
     private static String getProjectState(RestApiClient restApiClient, String projectId)
@@ -1105,8 +1124,11 @@ public class RestUtils {
         try {
             HttpResponse response = restApiClient.execute(request);
 
-            return new JSONObject(EntityUtils.toString(response.getEntity()))
-                    .getJSONObject("wTaskStatus").getString("status");
+            JSONObject taskStatus = new JSONObject(EntityUtils.toString(response.getEntity()))
+                .getJSONObject("wTaskStatus");
+
+            System.out.println("Task status: \n" + taskStatus + "\n");
+            return taskStatus.getString("status");
 
         } finally {
             request.releaseConnection();
