@@ -88,7 +88,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String SNAPSHOT_BOP = "_Snapshot [BOP]";
     private static final String SNAPSHOT_EOP1 = "_Snapshot [EOP-1]";
     private static final String SNAPSHOT_EOP2 = "_Snapshot [EOP-2]";
-    private static final String NUMBER_OF_LOST_OPPS = "# of Lost Opps.";
+    private static final String NUMBER_OF_OPPS = "# of Opportunities";
     private static final String NEGATIVE = "negative";
     private static final String NULL_METRIC = "null-metric";
 
@@ -482,23 +482,24 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         return new Object[][] {
             {"GREATEST_LEAST_basic", asList(SNAPSHOT_BOP, SNAPSHOT_EOP1, SNAPSHOT_EOP2),
                     getResultInGreatestLeastBasic()},
-            {"GREATEST_LEAST_no_aggregation", asList(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS, NEGATIVE), asList(
-                    asList(null, "262", "-38", "262", "-38"),
-                    asList(null, "247", "-53", "247", "-53"),
-                    asList(null, "198", "-102", "198", "-102"),
-                    asList(null, "46", "-254", "46", "-254"),
-                    asList(null, "87", "-213", "87", "-213"),
-                    asList(null, "78", "-222", "78", "-222"),
-                    asList("1770", null, null, "1770", "1770"))},
+            {"GREATEST_LEAST_no_aggregation", asList(NUMBER_OF_OPPS, NUMBER_OF_OPEN_OPPS, NEGATIVE), asList(
+                    asList("262", "262", "-38", "262", "-38"),
+                    asList("247", "247", "-53", "247", "-53"),
+                    asList("198", "198", "-102", "198", "-102"),
+                    asList("46", "46", "-254", "46", "-254"),
+                    asList("87", "87", "-213", "87", "-213"),
+                    asList("78", "78", "-222", "78", "-222"),
+                    asList("3311", null, null, null, null),
+                    asList("1770", null, null, null, null))},
             {"GREATEST_LEAST_null", asList(NUMBER_OF_OPEN_OPPS, NULL_METRIC, SNAPSHOT_BOP), asList(
                     asList("262", "1", "40334", "40334", "1"),
                     asList("247", "1", "40334", "40334", "1"),
-                    asList("198", null, "40334", "40334", "198"),
-                    asList("46", null, "40334", "40334", "46"),
-                    asList("87", null, "40334", "40334", "87"),
-                    asList("78", null, "40334", "40334", "78"),
-                    asList("null", null, "40334", "40334", "40334"),
-                    asList("null", null, "40334", "40334", "40334"))}
+                    asList("198", "0", "40334", "40334", "0"),
+                    asList("46", "0", "40334", "40334", "0"),
+                    asList("87", "0", "40334", "40334", "0"),
+                    asList("78", "0", "40334", "40334", "0"),
+                    asList(null, "0", "40334", null, null),
+                    asList(null, "0", "40334", null, null))}
         };
     }
 
@@ -513,7 +514,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     public void createMetricHasNullValue() {
         String nullMaql = "SELECT CASE WHEN [" + mdService.getObjUri(project, Metric.class,
                 Restriction.title(NUMBER_OF_OPEN_OPPS)) + "] > 200 THEN 1 END";
-        mdService.createObj(project, new Metric(NULL_METRIC, nullMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+        String ifNullMaql = "SELECT IFNULL((" + nullMaql+ "),0)";
+        mdService.createObj(project, new Metric(NULL_METRIC, ifNullMaql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
     @Test(dependsOnGroups = {"init-metrics"}, groups = {"non-UI-metric"},
