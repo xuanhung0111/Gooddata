@@ -21,6 +21,9 @@ public class DatasetDeleteDialog extends AbstractFragment {
 
     @FindBy(className = "s-dialog-cancel-button")
     private WebElement cancelButton;
+    
+    @FindBy(css = ".gd-dialog-content span")
+    private WebElement message;
 
     public void clickDelete() {
         waitForElementVisible(deleteButton).click();
@@ -28,5 +31,9 @@ public class DatasetDeleteDialog extends AbstractFragment {
 
     public void clickCancel() {
         waitForElementVisible(cancelButton).click();
+    }
+
+    public String getMessage() {
+        return waitForElementVisible(message).getText();
     }
 }

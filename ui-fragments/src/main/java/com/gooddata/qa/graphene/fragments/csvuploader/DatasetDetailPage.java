@@ -32,6 +32,9 @@ public class DatasetDetailPage extends AbstractFragment {
     @FindBy(css = ".icon-analyze.button-link")
     private WebElement analyzeButton;
 
+    @FindBy(css = "button.s-delete")
+    private WebElement deleteButton;
+
     public String getDatasetAnalyzeLink() {
         return waitForElementVisible(analyzeButton).getAttribute("href");
     }
@@ -50,6 +53,10 @@ public class DatasetDetailPage extends AbstractFragment {
 
     public void clickRefreshButton() {
         waitForElementVisible(refreshDatasetButton).click();
+    }
+
+    public void clickDeleteButton() {
+        waitForElementVisible(deleteButton).click();
     }
 
     public String getDatasetName() {

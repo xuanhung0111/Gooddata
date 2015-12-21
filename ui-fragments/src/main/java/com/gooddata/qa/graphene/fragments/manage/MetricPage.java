@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForObjectPageLoaded;
@@ -109,10 +110,15 @@ public class MetricPage extends AbstractFragment {
     }
 
     public boolean isMetricVisible(String metric) {
+        if (isEmpty()) return false;
         ObjectsTable metricsTable = Graphene.createPageFragment(ObjectsTable.class,
                 waitForElementVisible(By.id("metricsTable"), browser));
         waitForDataPageLoaded(browser);
         return metricsTable.getAllItems().contains(metric);
+    }
+
+    public boolean isEmpty() {
+        return !waitForElementPresent(By.id("metricsTable"), browser).isDisplayed();
     }
 
     private void openMetricEditor() {

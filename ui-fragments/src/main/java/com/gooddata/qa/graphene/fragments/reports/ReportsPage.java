@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.stream.Collectors.toList;
 import static org.testng.Assert.assertEquals;
@@ -100,8 +101,13 @@ public class ReportsPage extends AbstractFragment {
         return waitForElementVisible(selectedFolderDescription).getText().trim();
     }
 
-    public boolean isReportVisible(String reportName) {
+    public boolean isReportVisible(String reportName) { 
+        if (isEmpty()) return false;
         return waitForFragmentVisible(reportsList).getAllReportLabels().contains(reportName);
+    }
+
+    public boolean isEmpty() {
+        return !waitForElementPresent(reportsList.getRoot()).isDisplayed();
     }
 
     public void tryDeleteReports(String... reports) {

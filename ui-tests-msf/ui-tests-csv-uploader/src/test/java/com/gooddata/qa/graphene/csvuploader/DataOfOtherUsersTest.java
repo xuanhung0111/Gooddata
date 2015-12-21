@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -12,10 +14,13 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.google.common.base.Predicate;
 
 public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
     
@@ -88,10 +93,42 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     getClass());
 
             waitForCollectionIsNotEmpty(datasetsListPage.getOthersDatasetsTable().getRows());
-            assertThat(datasetsListPage.getOthersDatasetsTable().getNumberOfDatasets(),
+            assertThat(datasetsListPage.getOtherDatasetsCount(),
                     is(projectOwnerDatasetNames.size()));
             assertThat(datasetsListPage.getOthersDatasetsTable().getDatasetNames(),
                     contains(projectOwnerDatasetNames.toArray()));
+        } finally {
+            logout();
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        }
+    }
+
+    @Test(dependsOnMethods = {"checkMyDataAndDataOfOthers", "addOtherAdminToProject"})
+    public void checkAdminCanDeleteDatasetOfOthers() throws JSONException {
+        try {
+            logout();
+            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
+            
+            initDataUploadPage();
+            String datasetName = CsvFile.PAYROLL.getDatasetNameOfFirstUpload();
+            
+            final int datasetCountBeforeDelete = datasetsListPage.getOtherDatasetsCount();
+            
+            datasetsListPage.getOthersDatasetsTable().getDatasetDeleteButton(datasetName).click();
+            waitForFragmentVisible(datasetDeleteDialog).clickDelete();
+            waitForFragmentNotVisible(datasetDeleteDialog);
+            
+            assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                    is(String.format("\"%s\" was successfully deleted!", datasetName)));
+            final int datasetCountAfterDelete = datasetCountBeforeDelete - 1;
+            Predicate<WebDriver> datasetsCountEqualsExpected = input ->
+                waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount() == datasetCountAfterDelete;
+
+            Graphene.waitGui(browser)
+                .withMessage("Dataset count <" + 
+                 waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount()
+                 + "> in the dataset list doesn't match expected value <" + datasetCountAfterDelete + ">.")
+                .until(datasetsCountEqualsExpected);
         } finally {
             logout();
             signInAtGreyPages(testParams.getUser(), testParams.getPassword());
