@@ -1,23 +1,13 @@
 package com.gooddata.qa.utils.http;
 
-import com.gooddata.qa.graphene.enums.DatasetElements;
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
-import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -40,6 +31,16 @@ import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriTemplate;
+
+import com.gooddata.qa.graphene.enums.DatasetElements;
+import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 public class RestUtils {
 
@@ -1084,10 +1085,13 @@ public class RestUtils {
     private static boolean waitForProjectCreated(RestApiClient restApiClient, String projectId)
             throws ParseException, JSONException, IOException {
         String currentStatus = "";
-        while (true) {
+
+        // checking in 10 minutes
+        for (int i = 0; i < 120; i++) {
             currentStatus = getProjectState(restApiClient, projectId);
             System.out.println("Current status: " + currentStatus);
-            if (!"PREPARING".equals(currentStatus)) break;
+            if (Stream.of("ERROR", "DELETED", "CANCELED", "ENABLED", "DISABLED", "ARCHIVED")
+                    .anyMatch(currentStatus::equals)) break;
             sleepTightInSeconds(5);
         }
 
