@@ -56,8 +56,7 @@ public enum DeployPackages {
                 "errorGraph.grf",
                 "graph",
                 "Graph=Basic/graph/errorGraph.grf error: Graph=schedule_param transformation failed!: " +
-                        "Component [GD Dataset Writer:GD_DATASET_WRITER] finished with status ERROR.: " +
-                        "action=batch_sli_upload status=failed"),
+                        "Component [GD Dataset Writer:GD_DATASET_WRITER] finished with status ERROR."),
         LONG_TIME_RUNNING_GRAPH(DeployPackages.BASIC, "longTimeRunningGraph.grf", "graph"),
         SHORT_TIME_FAILED_GRAPH(
                 DeployPackages.BASIC,
