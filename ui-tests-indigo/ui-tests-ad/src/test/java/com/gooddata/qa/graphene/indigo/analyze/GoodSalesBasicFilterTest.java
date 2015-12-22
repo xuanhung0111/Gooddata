@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -38,16 +39,17 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void filterOnDateAttribute() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
-                .addFilter(DATE)
+                .addAttribute(ACTIVITY_TYPE)
+                .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: All time");
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
 
-        analysisPage.configTimeFilter("This year");
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: This year");
+        assertEquals(filtersBucket.configTimeFilter("This year")
+                .getFilterText("Activity"), "Activity: This year");
         assertEquals(report.getTrackersCount(), 3);
         checkingOpenAsReport("filterOnDateAttribute");
     }
@@ -57,11 +59,11 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(DATE)
+                .addDate()
                 .getChartReport()
                 .getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: All time");
-        assertEquals(analysisPage.getAllGranularities(),
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
+        assertEquals(analysisPage.getCategoriesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
     }
@@ -69,11 +71,12 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addFilter(DATE)
-                .getFilterText("Activity"), "Activity: All time");
-        analysisPage.configTimeFilter("Last 12 months");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDateFilter();
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
+        filtersBucket.configTimeFilter("Last 12 months");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
@@ -81,7 +84,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();;
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("trendingRecommendationOverrideDateFilter");
     }
@@ -89,14 +92,16 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void dragAndDropAttributeToFilterBucket() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
+                .addAttribute(ACTIVITY_TYPE)
                 .getChartReport()
                 .getTrackersCount(), 4);
-        assertEquals(analysisPage.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
 
-        assertEquals(analysisPage.addFilter(DEPARTMENT).getFilterText(DEPARTMENT), DEPARTMENT + ": All");
+        analysisPage.addFilter(DEPARTMENT);
+        assertEquals(filtersBucket.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
         checkingOpenAsReport("dragAndDropAttributeToFilterBucket");
     }
 
@@ -105,7 +110,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
+                .addAttribute(ACTIVITY_TYPE)
                 .getChartReport()
                 .getTrackersCount(), 4);
         RecommendationContainer recommendationContainer =
@@ -127,8 +132,9 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addCategory(ACTIVITY_TYPE)
-            .addFilter(DATE)
+            .addAttribute(ACTIVITY_TYPE)
+            .addDateFilter()
+            .getFilterBuckets()
             .configTimeFilter("Last year");
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
@@ -138,7 +144,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: This month");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: This month");
         analysisPage.waitForReportComputing();
         if (analysisPage.isExplorerMessageVisible()) {
             System.out.print("Error message: ");
@@ -157,7 +163,8 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
     public void checkDefaultValueInDateRange() {
         initAnalysePage();
 
-        analysisPage.addFilter(DATE)
+        analysisPage.addDateFilter()
+            .getFilterBuckets()
             .getFilter("Activity").click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
@@ -174,15 +181,16 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void switchingDateRangeNotComputeReport() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
-                .addFilter(DATE)
+                .addAttribute(ACTIVITY_TYPE)
+                .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: All time");
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
 
-        WebElement dateFilter = analysisPage.getFilter("Activity");
+        WebElement dateFilter = filtersBucket.getFilter("Activity");
         dateFilter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
@@ -197,14 +205,16 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void allowDateFilterByRange() throws ParseException {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
-                .addFilter(DATE)
+                .addAttribute(ACTIVITY_TYPE)
+                .addDateFilter()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: All time");
-        analysisPage.configTimeFilterByRangeButNotApply("Activity", "01/12/2014", "01/12/2015").exportReport();
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
+        filtersBucket.configTimeFilterByRangeButNotApply("Activity", "01/12/2014", "01/12/2015");
+        analysisPage.exportReport();
         String currentWindowHandle = browser.getWindowHandle();
         for (String handle : browser.getWindowHandles()) {
             if (!handle.equals(currentWindowHandle))
@@ -216,7 +226,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         browser.close();
         browser.switchTo().window(currentWindowHandle);
 
-        analysisPage.configTimeFilterByRange("Activity", "01/12/2014", "01/12/2015");
+        filtersBucket.configTimeFilterByRange("Activity", "01/12/2014", "01/12/2015");
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 4);
         analysisPage.exportReport();
@@ -238,15 +248,16 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void filterOnAttribute() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
+                .addAttribute(ACTIVITY_TYPE)
                 .waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
-        assertEquals(analysisPage.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
 
-        WebElement filter = analysisPage.getFilter(ACTIVITY_TYPE);
+        WebElement filter = filtersBucket.getFilter(ACTIVITY_TYPE);
         filter.click();
         AttributeFilterPickerPanel attributePanel =
                 Graphene.createPageFragment(AttributeFilterPickerPanel.class,
@@ -254,9 +265,9 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         attributePanel.assertPanel();
         attributePanel.discard();
 
-        analysisPage.configAttributeFilter(ACTIVITY_TYPE, "Email", "Web Meeting");
+        filtersBucket.configAttributeFilter(ACTIVITY_TYPE, "Email", "Web Meeting");
         assertEquals(report.getTrackersCount(), 2);
-        assertEquals(analysisPage.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
+        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email, Web Meeting\n(2)");
     }
 
     private String getTimeString(Calendar date) {

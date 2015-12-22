@@ -11,24 +11,17 @@ import com.google.common.base.Predicate;
 
 public class VisualizationReportTypePicker extends AbstractFragment {
 
-    private static final String SELECTED = "is-selected";
-
     public void setReportType(final ReportType type) {
         if (isSelected(type))
             return;
 
         waitForElementVisible(type.getLocator(), browser).click();
 
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return isSelected(type);
-            }
-        });
+        Predicate<WebDriver> visualizationIsSelected = browser -> isSelected(type);
+        Graphene.waitGui().until(visualizationIsSelected);
     }
 
     public boolean isSelected(ReportType type) {
-        return waitForElementVisible(type.getLocator(), browser).getAttribute("class").contains(
-                SELECTED);
+        return waitForElementVisible(type.getLocator(), browser).getAttribute("class").contains("is-selected");
     }
 }

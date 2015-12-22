@@ -10,10 +10,10 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public abstract class AbstractRecommendation extends AbstractFragment implements Recommendation {
 
-    @FindBy(css = ".gd-heading-3")
+    @FindBy(className = "gd-heading-3")
     protected WebElement title;
 
-    @FindBy(css = ".s-apply")
+    @FindBy(className = "s-apply")
     protected WebElement applyButton;
 
     @Override

@@ -640,6 +640,12 @@ public class RestUtils {
                 new FeatureFlagOption(featureFlag.getFlagName(), true));
     }
 
+    public static void disableFeatureFlagInProject(RestApiClient restApiClient, String projectId,
+            ProjectFeatureFlags featureFlag) throws JSONException {
+        setFeatureFlagsToProject(restApiClient, projectId,
+                new FeatureFlagOption(featureFlag.getFlagName(), false));
+    }
+
     public static void verifyValidLink(RestApiClient restApiClient, String link) {
         HttpRequestBase getRequest = restApiClient.newGetMethod(link);
         try {

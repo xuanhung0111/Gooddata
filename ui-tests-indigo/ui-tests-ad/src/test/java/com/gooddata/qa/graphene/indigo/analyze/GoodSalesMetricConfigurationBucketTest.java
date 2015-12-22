@@ -1,15 +1,18 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 
 public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAbstractTest {
 
@@ -23,17 +26,24 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
     @Test(dependsOnGroups = {"init"})
     public void testBuiltInMetric() {
         initAnalysePage();
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .isMetricConfigurationCollapsed(NUMBER_OF_ACTIVITIES));
 
-        assertFalse(analysisPage.expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .addMetric(AMOUNT).isMetricConfigurationCollapsed(NUMBER_OF_ACTIVITIES));
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        MetricConfiguration activitiesConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES);
+        assertTrue(activitiesConfiguration.isConfigurationCollapsed());
 
-        assertTrue(analysisPage.isMetricConfigurationCollapsed(AMOUNT));
+        activitiesConfiguration.expandConfiguration();
+        analysisPage.addMetric(AMOUNT);
+        assertFalse(activitiesConfiguration.isConfigurationCollapsed());
 
-        assertFalse(analysisPage.expandMetricConfiguration(AMOUNT)
-                .addMetric(AMOUNT).isMetricConfigurationCollapsed(AMOUNT));
-        assertFalse(analysisPage.isMetricConfigurationCollapsed(NUMBER_OF_ACTIVITIES));
+        MetricConfiguration amountConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(AMOUNT);
+        assertTrue(amountConfiguration.isConfigurationCollapsed());
+
+        amountConfiguration.expandConfiguration();
+        analysisPage.addMetric(AMOUNT);
+        assertFalse(amountConfiguration.isConfigurationCollapsed());
+        assertFalse(activitiesConfiguration.isConfigurationCollapsed());
         checkingOpenAsReport("MetricConfigurationBucket-testBuiltInMetric");
     }
 
@@ -45,77 +55,88 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
         String runningSumOfDuration = "Runsum of " + DURATION;
 
         initAnalysePage();
-        assertTrue(analysisPage.addMetricFromFact(AMOUNT)
-                .isMetricConfigurationCollapsed(sumOfAmount));
 
-        analysisPage.expandMetricConfiguration(sumOfAmount).changeMetricAggregation(sumOfAmount, "Average");
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), singleton(averageAmount)));
+        analysisPage.addMetric(AMOUNT, FieldType.FACT);
+        MetricConfiguration amountConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(sumOfAmount);
+        assertTrue(amountConfiguration.isConfigurationCollapsed());
 
-        assertTrue(analysisPage.addMetricFromFact(DURATION)
-                .isMetricConfigurationCollapsed(sumOfDuration));
+        amountConfiguration.expandConfiguration().changeAggregation("Average");
+        assertTrue(isEqualCollection(analysisPage.getMetricsBucket().getItemNames(), singleton(averageAmount)));
 
-        analysisPage.expandMetricConfiguration(sumOfDuration)
-            .changeMetricAggregation(sumOfDuration, "Running sum");
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
+        analysisPage.addMetric(DURATION, FieldType.FACT);
+        MetricConfiguration durationConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(sumOfDuration);
+        assertTrue(durationConfiguration.isConfigurationCollapsed());
+
+        durationConfiguration.expandConfiguration().changeAggregation("Running sum");
+        assertTrue(isEqualCollection(analysisPage.getMetricsBucket().getItemNames(),
                 asList(averageAmount, runningSumOfDuration)));
 
-        assertFalse(analysisPage.isMetricConfigurationCollapsed(averageAmount));
-        assertFalse(analysisPage.isMetricConfigurationCollapsed(runningSumOfDuration));
+        assertFalse(amountConfiguration.isConfigurationCollapsed());
+        assertFalse(durationConfiguration.isConfigurationCollapsed());
         checkingOpenAsReport("MetricConfigurationBucket-testMetricFromFact");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testMetricFromAttribute() {
-        String countOfActivityType = "Count of " + ACTIVITY_TYPE;
-
         initAnalysePage();
-        assertTrue(analysisPage.addMetricFromAttribute(ACTIVITY_TYPE)
-                .isMetricConfigurationCollapsed(countOfActivityType));
+        analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE);
 
-        analysisPage.expandMetricConfiguration(countOfActivityType);
-        assertTrue(browser.findElements(MetricsBucket.BY_FACT_AGGREGATION).isEmpty());
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+            .getMetricConfiguration("Count of " + ACTIVITY_TYPE);
+        assertTrue(metricConfiguration.isConfigurationCollapsed());
+
+        metricConfiguration.expandConfiguration();
+        assertFalse(isElementPresent(className("s-fact-aggregation-switch"), browser));
         checkingOpenAsReport("MetricConfigurationBucket-testMetricFromAttribute");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void showInPercentAndPop() {
         initAnalysePage();
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(DATE)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
+        MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDate()
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
 
-        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
+        assertTrue(metricConfiguration.isPopEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled());
 
-        analysisPage.turnOnShowInPercents()
-            .compareToSamePeriodOfYearBefore()
-            .changeDimensionSwitchInBucket("Created")
-            .waitForReportComputing()
-            .addMetricFromFact(AMOUNT);
+        metricConfiguration.showPercents().showPop();
+        analysisPage.getCategoriesBucket().changeDimensionSwitchInBucket("Created");
+        analysisPage.waitForReportComputing()
+            .addMetric(AMOUNT, FieldType.FACT);
 
-        assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertFalse(analysisPage.isShowPercentConfigEnabled());
+        assertFalse(metricConfiguration.isPopEnabled());
+        assertFalse(metricConfiguration.isShowPercentEnabled());
 
-        analysisPage.undo()
-            .expandMetricConfiguration("% " + NUMBER_OF_ACTIVITIES);
-        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isCompareSamePeriodConfigSelected());
-        assertTrue(analysisPage.isShowPercentConfigSelected());
+        analysisPage.undo();
+        metricConfiguration.expandConfiguration();
+        assertTrue(metricConfiguration.isPopEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isPopSelected());
+        assertTrue(metricConfiguration.isShowPercentSelected());
 
-        analysisPage.replaceMetric("% " + NUMBER_OF_ACTIVITIES, AMOUNT)
-            .expandMetricConfiguration(AMOUNT);
-        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertFalse(analysisPage.isCompareSamePeriodConfigSelected());
-        assertFalse(analysisPage.isShowPercentConfigSelected());
+        metricConfiguration = analysisPage.replaceMetric("% " + NUMBER_OF_ACTIVITIES, AMOUNT)
+                .getMetricsBucket()
+                .getMetricConfiguration(AMOUNT)
+                .expandConfiguration();
+        assertTrue(metricConfiguration.isPopEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isPopSelected());
+        assertFalse(metricConfiguration.isShowPercentSelected());
 
-        analysisPage.collapseMetricConfiguration(AMOUNT)
-            .replaceMetric(AMOUNT, NUMBER_OF_ACTIVITIES)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
-        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertFalse(analysisPage.isCompareSamePeriodConfigSelected());
-        assertFalse(analysisPage.isShowPercentConfigSelected());
+        metricConfiguration.collapseConfiguration();
+        metricConfiguration = analysisPage.replaceMetric(AMOUNT, NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
+        assertTrue(metricConfiguration.isPopEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isPopSelected());
+        assertFalse(metricConfiguration.isShowPercentSelected());
         checkingOpenAsReport("MetricConfigurationBucket-showInPercentAndPop");
     }
 }

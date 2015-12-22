@@ -10,6 +10,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 
 public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstractTest {
 
@@ -24,34 +28,36 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
     @Test(dependsOnGroups = {"init"}, groups = {"sanity"})
     public void replaceMetricByNewOne() {
         initAnalysePage();
+        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
+
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), asList(NUMBER_OF_ACTIVITIES)));
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(NUMBER_OF_ACTIVITIES)));
 
         analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, AMOUNT);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), asList(AMOUNT)));
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(AMOUNT)));
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), asList(NUMBER_OF_ACTIVITIES, AMOUNT)));
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(NUMBER_OF_ACTIVITIES, AMOUNT)));
 
         analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, EXPECTED);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(), asList(EXPECTED, AMOUNT)));
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(EXPECTED, AMOUNT)));
 
         analysisPage.changeReportType(ReportType.TABLE);
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(NUMBER_OF_ACTIVITIES, AMOUNT, EXPECTED)));
 
         analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, REMAINING_QUOTA);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, AMOUNT, EXPECTED)));
 
         analysisPage.undo();
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(NUMBER_OF_ACTIVITIES, AMOUNT, EXPECTED)));
 
         analysisPage.redo();
-        assertTrue(isEqualCollection(analysisPage.getAllAddedMetricNames(),
+        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
                 asList(REMAINING_QUOTA, AMOUNT, EXPECTED)));
         checkingOpenAsReport("replaceMetricByNewOne");
     }
@@ -59,51 +65,58 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
     @Test(dependsOnGroups = {"init"})
     public void replaceAttributeByNewOne() {
         initAnalysePage();
-        analysisPage.addCategory(STAGE_NAME);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(STAGE_NAME)));
-        assertTrue(analysisPage.isFilterVisible(STAGE_NAME));
+        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-        analysisPage.replaceCategory(STAGE_NAME, PRODUCT);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(PRODUCT)));
-        assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(PRODUCT));
+        analysisPage.addAttribute(STAGE_NAME);
+        assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(STAGE_NAME)));
+        assertTrue(filtersBucket.isFilterVisible(STAGE_NAME));
+
+        analysisPage.replaceAttribute(STAGE_NAME, PRODUCT);
+        assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(PRODUCT)));
+        assertFalse(filtersBucket.isFilterVisible(STAGE_NAME));
+        assertTrue(filtersBucket.isFilterVisible(PRODUCT));
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
-        analysisPage.addStackBy(STAGE_NAME);
-        assertEquals(analysisPage.getAddedStackByName(), STAGE_NAME);
-        assertTrue(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(PRODUCT));
+        analysisPage.addStack(STAGE_NAME);
+        assertEquals(stacksBucket.getAddedStackByName(), STAGE_NAME);
+        assertTrue(filtersBucket.isFilterVisible(STAGE_NAME));
+        assertTrue(filtersBucket.isFilterVisible(PRODUCT));
 
-        analysisPage.replaceStackBy(DEPARTMENT);
-        assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
-        assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(PRODUCT));
-        assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
+        analysisPage.replaceStack(DEPARTMENT);
+        assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+        assertFalse(filtersBucket.isFilterVisible(STAGE_NAME));
+        assertTrue(filtersBucket.isFilterVisible(PRODUCT));
+        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
 
         analysisPage.undo();
-        assertEquals(analysisPage.getAddedStackByName(), STAGE_NAME);
-        assertTrue(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(PRODUCT));
-        assertFalse(analysisPage.isFilterVisible(DEPARTMENT));
+        assertEquals(stacksBucket.getAddedStackByName(), STAGE_NAME);
+        assertTrue(filtersBucket.isFilterVisible(STAGE_NAME));
+        assertTrue(filtersBucket.isFilterVisible(PRODUCT));
+        assertFalse(filtersBucket.isFilterVisible(DEPARTMENT));
 
         analysisPage.redo();
-        assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
-        assertFalse(analysisPage.isFilterVisible(STAGE_NAME));
-        assertTrue(analysisPage.isFilterVisible(PRODUCT));
-        assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
+        assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+        assertFalse(filtersBucket.isFilterVisible(STAGE_NAME));
+        assertTrue(filtersBucket.isFilterVisible(PRODUCT));
+        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
         checkingOpenAsReport("replaceAttributeByNewOne");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchAttributesBetweenAxisAndStackBy() {
         initAnalysePage();
-        analysisPage.addCategory(STAGE_NAME).addStackBy(DEPARTMENT);
-        assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(STAGE_NAME)));
-        assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
+        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
-        analysisPage.switchAxisAndStackBy();
-        assertTrue(isEqualCollection(analysisPage.getAllAddedCategoryNames(), asList(DEPARTMENT)));
-        assertEquals(analysisPage.getAddedStackByName(), STAGE_NAME);
+        analysisPage.addAttribute(STAGE_NAME).addStack(DEPARTMENT);
+        assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(STAGE_NAME)));
+        assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+
+        analysisPage.drag(categoriesBucket.getFirst(), stacksBucket.get());
+        assertTrue(isEqualCollection(categoriesBucket.getItemNames(), asList(DEPARTMENT)));
+        assertEquals(stacksBucket.getAddedStackByName(), STAGE_NAME);
         checkingOpenAsReport("switchAttributesBetweenAxisAndStackBy");
     }
 }

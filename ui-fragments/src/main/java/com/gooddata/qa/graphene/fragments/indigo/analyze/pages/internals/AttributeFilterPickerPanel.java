@@ -1,5 +1,12 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.tagName;
+
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -8,10 +15,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.tagName;
-
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class AttributeFilterPickerPanel extends AbstractFragment {
@@ -19,23 +22,23 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
     @FindBy(className = "searchfield-input")
     private WebElement searchInput;
 
-    @FindBy(css = ".s-select_all")
+    @FindBy(className = "s-select_all")
     private WebElement selectAllButton;
 
-    @FindBy(css = ".s-clear")
+    @FindBy(className = "s-clear")
     private WebElement clearButton;
 
     @FindBy(css = ".s-filter-item > div")
     private List<WebElement> items;
 
-    @FindBy(css = ".s-btn-cancel")
+    @FindBy(className = "s-btn-cancel")
     private WebElement cancelButton;
 
-    @FindBy(css = ".s-btn-apply")
+    @FindBy(className = "s-btn-apply")
     private WebElement applyButton;
 
-    public static final By LOCATOR = cssSelector(".adi-attr-filter-picker");
-    private static final By BY_INPUT = cssSelector("input");
+    public static final By LOCATOR = className("adi-attr-filter-picker");
+    private static final By BY_INPUT = tagName("input");
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     public void select(String... values) {

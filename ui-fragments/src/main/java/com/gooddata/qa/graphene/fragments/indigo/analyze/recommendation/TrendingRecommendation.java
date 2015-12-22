@@ -7,7 +7,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class TrendingRecommendation extends AbstractRecommendation {
 
-    @FindBy(css = ".s-date-granularity-switch")
+    @FindBy(className = "s-date-granularity-switch")
     private Select dateGranularitySwitch;
 
     public TrendingRecommendation select(String item) {

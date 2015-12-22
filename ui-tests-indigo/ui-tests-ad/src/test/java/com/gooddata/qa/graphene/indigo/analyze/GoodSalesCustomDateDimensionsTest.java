@@ -18,8 +18,10 @@ import java.util.List;
 import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.google.common.collect.Sets;
@@ -32,19 +34,21 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
     @Test(dependsOnGroups = {"init"})
     public void datePresetsAppliedInReport() {
         initAnalysePage();
-        analysisPage.addMetricFromFact(NUMBER).addCategory(DATE);
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        assertTrue(analysisPage.isFilterVisible(RETAIL_DATE));
-        assertEquals(analysisPage.getFilterText(RETAIL_DATE), RETAIL_DATE + ": All time");
+        analysisPage.addMetric(NUMBER, FieldType.FACT).addDate();
+
+        assertTrue(filtersBucket.isFilterVisible(RETAIL_DATE));
+        assertEquals(filtersBucket.getFilterText(RETAIL_DATE), RETAIL_DATE + ": All time");
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucket.getAllTimeFilterOptions())) {
             System.out.println(format("Try with time period [%s]", period));
-            analysisPage.configTimeFilter(period).waitForReportComputing();
-            if (analysisPage.isExplorerMessageVisible()) {
+            filtersBucket.configTimeFilter(period);
+            if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
                 System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
             } else {
                 System.out.println(format("Time period [%s] is ok", period));
@@ -56,17 +60,18 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
     @Test(dependsOnGroups = {"init"})
     public void dateRangeAppliedInReport() throws ParseException {
         initAnalysePage();
-        analysisPage.addMetricFromFact(NUMBER)
-            .addCategory(DATE)
-            .configTimeFilterByRange(RETAIL_DATE, "07/13/2014", "08/11/2014")
-            .waitForReportComputing();
+        analysisPage.addMetric(NUMBER, FieldType.FACT)
+            .addDate()
+            .getFilterBuckets()
+            .configTimeFilterByRange(RETAIL_DATE, "07/13/2014", "08/11/2014");
+        analysisPage.waitForReportComputing();
         checkingOpenAsReport("dateRangeAppliedInReport");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void applyRecommendation() {
         initAnalysePage();
-        analysisPage.addMetricFromFact(NUMBER);
+        analysisPage.addMetric(NUMBER, FieldType.FACT);
 
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -74,8 +79,8 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertEquals(analysisPage.getFilterText(RETAIL_DATE), RETAIL_DATE + ": Last 4 quarters");
-        assertThat(analysisPage.getAllAddedCategoryNames(), contains(DATE));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(RETAIL_DATE), RETAIL_DATE + ": Last 4 quarters");
+        assertThat(analysisPage.getCategoriesBucket().getItemNames(), contains(DATE));
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), equalTo(4));
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("applyRecommendation");
@@ -84,11 +89,11 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
     @Test(dependsOnGroups = {"init"})
     public void testGranularityOfDate() {
         initAnalysePage();
-        analysisPage.addMetricFromFact(NUMBER)
-            .addCategory(DATE)
-            .changeGranularity("Month")
-            .waitForReportComputing();
-        assertThat(analysisPage.getChartReport().getTrackersCount(), greaterThanOrEqualTo(1));
+        analysisPage.addMetric(NUMBER, FieldType.FACT)
+            .addDate()
+            .getCategoriesBucket()
+            .changeGranularity("Month");
+        assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), greaterThanOrEqualTo(1));
 
         List<String> headers = analysisPage.changeReportType(ReportType.TABLE)
             .waitForReportComputing()
@@ -103,14 +108,18 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
     @Test(dependsOnGroups = {"init"})
     public void testPopAndPercentOnCustomDate() {
         initAnalysePage();
-        ChartReport report = analysisPage.addMetricFromFact(NUMBER)
-            .addCategory(DATE)
-            .expandMetricConfiguration("Sum of " + NUMBER)
-            .turnOnShowInPercents()
-            .compareToSamePeriodOfYearBefore()
+        ChartReport report = analysisPage.addMetric(NUMBER, FieldType.FACT)
+            .addDate()
             .waitForReportComputing()
             .getChartReport();
 
+        analysisPage.getMetricsBucket()
+            .getMetricConfiguration("Sum of " + NUMBER)
+            .expandConfiguration()
+            .showPercents()
+            .showPop();
+
+        analysisPage.waitForReportComputing();
         assertThat(report.getLegends(), equalTo(asList("% Sum of Number - previous year", "% Sum of Number")));
         checkingOpenAsReport("testPopAndPercentOnCustomDate");
     }

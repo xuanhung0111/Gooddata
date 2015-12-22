@@ -1,21 +1,18 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 public class DateFilterPickerPanel extends AbstractFragment {
 
@@ -46,51 +43,38 @@ public class DateFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".adi-tab-date-range .s-btn-apply")
     private WebElement applyButton;
 
-    public static final By LOCATOR = By.cssSelector(".adi-date-filter-picker");
+    public static final By LOCATOR = By.className("adi-date-filter-picker");
 
     private static final String DIMENSION_SWITCH_LOCATOR = ".adi-dimension-select> select"; 
 
     public void select(final String period) {
-        waitForCollectionIsNotEmpty(periods);
-        Iterables.find(periods, new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return period.equals(input.getText());
-            }
-        }).click();
+        waitForCollectionIsNotEmpty(periods).stream()
+            .filter(e -> period.equals(e.getText()))
+            .findFirst()
+            .get()
+            .click();
         waitForFragmentNotVisible(this);
     }
 
     public List<String> getAllPeriods() {
-        waitForCollectionIsNotEmpty(periods);
-        return Lists.newArrayList(Collections2.transform(periods,
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getText();
-            }
-        }));
+        return waitForCollectionIsNotEmpty(periods).stream()
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
     public List<String> getAllDimensionSwitchs() {
-        waitForElementVisible(dimensionSwitch);
-        return Lists.newArrayList(Collections2.transform(dimensionSwitch.getOptions(),
-                new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getText();
-            }
-        }));
+        return waitForElementVisible(dimensionSwitch).getOptions()
+            .stream()
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
     public void hoverOnPeriod(final String period) {
-        waitForCollectionIsNotEmpty(periods);
-        new Actions(browser).moveToElement(Iterables.find(periods, new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return period.equals(input.getText());
-            }
-        })).perform();
+        WebElement element = waitForCollectionIsNotEmpty(periods).stream()
+            .filter(e -> period.equals(e.getText()))
+            .findFirst()
+            .get();
+        getActions().moveToElement(element).perform();
     }
 
     public String getTooltipFromPeriod() {

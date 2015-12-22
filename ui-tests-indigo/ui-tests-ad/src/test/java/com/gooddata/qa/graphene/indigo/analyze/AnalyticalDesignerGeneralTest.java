@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
@@ -24,20 +25,22 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Entry;
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
@@ -49,7 +52,6 @@ import com.google.common.collect.Sets;
 
 public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String DATE = "Date";
     private static final List<String> PROJECT_TEMPLATES = Lists.newArrayList("/projectTemplates/GoodSalesDemo/2",
             "/projectTemplates/MarketingFunnelDemo/1", "/projectTemplates/SocialECommerceDemo/1");
 
@@ -60,9 +62,6 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     private List<Pair<String, String>> cache = Lists.newArrayList();
     private List<String> remainedAttributes;
 
-    private Project project;
-    private MetadataService mdService;
-
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         shuffle(PROJECT_TEMPLATES);
@@ -72,15 +71,8 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"prepare"})
-    public void initializeGoodDataSDK() throws JSONException {
-        GoodData goodDataClient = getGoodDataClient();
-        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-        mdService = goodDataClient.getMetadataService();
-    }
-
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"prepare"})
     public void loadAttributes() {
-        Supplier<Stream<String>> allAttributes = () -> mdService.find(project, Attribute.class)
+        Supplier<Stream<String>> allAttributes = () -> getMdService().find(getProject(), Attribute.class)
                 .stream()
                 .map(Entry::getTitle);
 
@@ -100,22 +92,22 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         remainedAttributes = Lists.newArrayList(attributes);
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"prepare"})
+    @Test(dependsOnGroups = {"init"}, groups = {"prepare"})
     public void loadMetrics() {
         initAnalysePage();
 
-        metrics = mdService.find(project, Metric.class)
-                .stream()
-                .map(Entry::getTitle)
-                .filter(metric -> {
-                    final boolean goodMetric = isGoodMetric(metric);
-                    analysisPage.resetToBlankState();
-                    if (!goodMetric) {
-                        log.info(format("Metric [%s] is not good to test. Maybe it has empty value or no data.", metric));
-                    }
-                    return goodMetric;
-                })
-                .collect(toList());
+        metrics = getMdService().find(getProject(), Metric.class)
+            .stream()
+            .map(Entry::getTitle)
+            .filter(metric -> {
+                final boolean goodMetric = isGoodMetric(metric);
+                analysisPage.resetToBlankState();
+                if (!goodMetric) {
+                    log.info(format("Metric [%s] is not good to test. Maybe it has empty value or no data.", metric));
+                }
+                return goodMetric;
+            })
+            .collect(toList());
     }
 
     @Test(dependsOnGroups = {"prepare"})
@@ -134,7 +126,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         analysisPage.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "testCustomDiscovery");
+        doSafetyAttributeAction(metric, analysisPage::addAttribute, "testCustomDiscovery");
 
         assertTrue(report.getTrackersCount() >= 1);
         analysisPage.resetToBlankState();
@@ -145,7 +137,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String attribute = getRandomAttribute();
         initAnalysePage();
 
-        assertEquals(analysisPage.addCategory(attribute).getExplorerMessage(), "Now select a measure to display");
+        assertEquals(analysisPage.addAttribute(attribute).getExplorerMessage(), "Now select a measure to display");
 
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART).getExplorerMessage(),
                 "Now select a measure to display");
@@ -164,9 +156,15 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     public void dragMetricToColumnChartShortcutPanel() {
         initAnalysePage();
 
+        final Supplier<WebElement> recommendation = () ->
+            waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
+
         String metric = doSafetyMetricAction(
-                data -> analysisPage.dragAndDropMetricToShortcutPanel(data, ShortcutPanel.AS_A_COLUMN_CHART),
-                "dragMetricToColumnChartShortcutPanel");
+            data -> {
+                WebElement source = analysisPage.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
+                analysisPage.drag(source, recommendation);
+            },
+            "dragMetricToColumnChartShortcutPanel");
 
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -179,7 +177,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         analysisPage.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "dragMetricToColumnChartShortcutPanel");
+        doSafetyAttributeAction(metric, analysisPage::addAttribute, "dragMetricToColumnChartShortcutPanel");
 
         assertTrue(report.getTrackersCount() >= 1);
     }
@@ -188,14 +186,23 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     public void dragMetricToTrendShortcutPanel() {
         initAnalysePage();
 
+        final Supplier<WebElement> recommendation = () ->
+            waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
+
         doSafetyMetricAction(
-                data -> analysisPage.dragAndDropMetricToShortcutPanel(data, ShortcutPanel.TRENDED_OVER_TIME),
-                "dragMetricToTrendShortcutPanel");
+            data -> {
+                WebElement source = analysisPage.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
+                analysisPage.drag(source, recommendation);
+            },
+            "dragMetricToTrendShortcutPanel");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPage.isDateFilterVisible());
-        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
+
+        FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        assertTrue(filtersBucket.isDateFilterVisible());
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
+
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -207,7 +214,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "testSimpleContribution");
-        final String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleContribution");
+        final String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute, "testSimpleContribution");
 
         final ChartReport report = analysisPage.getChartReport();
         int oldTrackersCount = report.getTrackersCount();
@@ -219,16 +226,19 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), oldTrackersCount);
-        analysisPage.expandMetricConfiguration("% " + metric);
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigSelected());
 
-        doSafetyAttributeAction(metric, attr -> analysisPage.replaceCategory(attribute, attr),
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration("% " + metric)
+                .expandConfiguration();
+        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isShowPercentSelected());
+
+        doSafetyAttributeAction(metric, attr -> this.replaceAttribute(attribute, attr),
                 "testSimpleContribution");
 
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled());
     }
 
     @Test(dependsOnGroups = {"prepare"})
@@ -246,10 +256,11 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
 
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
         String attribute;
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
-            if (!analysisPage.searchBucketItem(attribute) || !analysisPage.isDataApplicable(attribute)) {
+            if (!cataloguePanel.searchBucketItem(attribute) || !cataloguePanel.isDataApplicable(attribute)) {
                 Screenshots.takeScreenshot(browser,
                         "[Inapplicable attribute] testAnotherApproachToShowContribution", this.getClass());
                 System.out.println(format("Attribute [%s] is not available!", attribute));
@@ -257,7 +268,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 continue;
             }
 
-            analysisPage.addCategory(attribute).waitForReportComputing();
+            analysisPage.addAttribute(attribute).waitForReportComputing();
             if (analysisPage.isExplorerMessageVisible()) {
                 System.out.println(format("Report with metric [%s] and attribute [%s] shows message: %s",
                         metric, attribute, analysisPage.getExplorerMessage()));
@@ -290,21 +301,21 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
         final ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        final String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory, "testSimpleComparison");
+        final String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute, "testSimpleComparison");
 
         analysisPage.resetToBlankState().addMetric(metric);
         waitForFragmentVisible(comparisonRecommendation);
         comparisonRecommendation.select(attribute).apply();
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(attribute));
-        assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(attribute));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(attribute), attribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         String newAttribute = doSafetyAttributeAction(metric,
-                attr -> analysisPage.replaceCategory(attribute, attr), "testSimpleComparison");
+                attr -> this.replaceAttribute(attribute, attr), "testSimpleComparison");
 
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(newAttribute));
-        assertEquals(analysisPage.getFilterText(newAttribute), newAttribute + ": All");
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(newAttribute));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(newAttribute), newAttribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
@@ -315,6 +326,8 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric;
 
         initAnalysePage();
+        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         while (true) {
             if (badMetrics.size() >= 3) {
@@ -342,12 +355,14 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                     recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
             trendingRecommendation.select("Month").apply();
             analysisPage.waitForReportComputing();
-            assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-            assertTrue(analysisPage.isDateFilterVisible());
-            assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
-            analysisPage.expandMetricConfiguration(metric);
-            assertTrue(analysisPage.isShowPercentConfigEnabled());
-            assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
+            assertTrue(categoriesBucket.getItemNames().contains(DATE));
+            assertTrue(filtersBucket.isDateFilterVisible());
+            assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
+
+            MetricConfiguration metricConfiguration =  analysisPage.getMetricsBucket()
+                    .getMetricConfiguration(metric).expandConfiguration();
+            assertTrue(metricConfiguration.isShowPercentEnabled());
+            assertTrue(metricConfiguration.isPopEnabled());
 
             if (!browser.findElements(RecommendationContainer.LOCATOR).isEmpty()) {
                 assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
@@ -385,7 +400,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "displayInColumnChartWithOnlyMetric");
+        doSafetyAttributeAction(metric, analysisPage::addAttribute, "displayInColumnChartWithOnlyMetric");
 
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
@@ -393,14 +408,22 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
+        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+
+        final Supplier<WebElement> recommendation = () ->
+            waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
         doSafetyMetricAction(
-                data -> analysisPage.dragAndDropMetricToShortcutPanel(data, ShortcutPanel.TRENDED_OVER_TIME),
-                "displayWhenDraggingFirstMetric");
+            data -> {
+                WebElement source = analysisPage.getCataloguePanel().searchAndGet(data, FieldType.METRIC);
+                analysisPage.drag(source, recommendation);
+            },
+            "displayWhenDraggingFirstMetric");
 
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isDateFilterVisible());
-        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
+        assertTrue(categoriesBucket.getItemNames().contains(DATE));
+        assertTrue(filtersBucket.isDateFilterVisible());
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
@@ -411,9 +434,9 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric = doSafetyMetricAction(
                 data -> analysisPage.addMetric(data).changeReportType(ReportType.TABLE),
                 "exportCustomDiscovery");
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "exportCustomDiscovery");
+        doSafetyAttributeAction(metric, analysisPage::addAttribute, "exportCustomDiscovery");
 
-        assertTrue(analysisPage.isExportToReportButtonEnabled());
+        assertTrue(analysisPage.getPageHeader().isExportToReportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
 
@@ -456,26 +479,27 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
-        assertEquals(analysisPage.addCategory(getRandomAttribute()).getExplorerMessage(),
+        assertEquals(analysisPage.addAttribute(getRandomAttribute()).getExplorerMessage(),
                 "Now select a measure to display");
-        assertFalse(analysisPage.isExportToReportButtonEnabled());
+        assertFalse(analysisPage.getPageHeader().isExportToReportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
     public void filterOnDateAttribute() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addFilter(DATE),
+                data -> analysisPage.addMetric(data).addDateFilter(),
                 "filterOnDateAttribute");
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "filterOnDateAttribute");
+        doSafetyAttributeAction(metric, analysisPage::addAttribute, "filterOnDateAttribute");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
 
-        analysisPage.configTimeFilter("This year");
-        assertTrue(analysisPage.getDateFilterText().endsWith(": This year"));
+        filtersBucket.configTimeFilter("This year");
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": This year"));
     }
 
     @Test(dependsOnGroups = {"prepare"})
@@ -483,29 +507,30 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addCategory(DATE),
+                data -> analysisPage.addMetric(data).addDate(),
                 "testDateInCategoryAndDateInFilter");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
-        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
-        assertTrue(isEqualCollection(analysisPage.getAllGranularities(),
+        assertTrue(analysisPage.getFilterBuckets().getDateFilterText().endsWith(": All time"));
+        assertTrue(isEqualCollection(analysisPage.getCategoriesBucket().getAllGranularities(),
                 asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year")));
     }
 
     @Test(dependsOnGroups = {"prepare"})
     public void trendingRecommendationOverrideDateFilter() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addFilter(DATE),
+                data -> analysisPage.addMetric(data).addDateFilter(),
                 "trendingRecommendationOverrideDateFilter");
-        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
 
         boolean timeFilterOk = false;
-        for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucket.getAllTimeFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(format("Try with time period [%s]", period));
-            analysisPage.configTimeFilter(period).waitForReportComputing();
-            if (analysisPage.isExplorerMessageVisible()) {
+            filtersBucket.configTimeFilter(period);
+            if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
                 System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
             } else {
                 System.out.println(format("Time period [%s] is ok with metric [%s]", period, metric));
@@ -523,24 +548,25 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();;
-        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
     }
 
     @Test(dependsOnGroups = {"prepare"})
     public void dragAndDropAttributeToFilterBucket() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "dragAndDropAttributeToFilterBucket");
-        String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory,
+        String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute,
                 "dragAndDropAttributeToFilterBucket");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
+        assertEquals(filtersBucket.getFilterText(attribute), attribute + ": All");
 
         attribute = doSafetyAttributeAction(metric, analysisPage::addFilter, "dragAndDropAttributeToFilterBucket");
 
-        assertEquals(analysisPage.getFilterText(attribute), attribute + ": All");
+        assertEquals(filtersBucket.getFilterText(attribute), attribute + ": All");
     }
 
     @Test(dependsOnGroups = {"prepare"})
@@ -548,7 +574,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         initAnalysePage();
 
         String metric = doSafetyMetricAction(analysisPage::addMetric, "addFilterDoesNotHideRecommendation");
-        doSafetyAttributeAction(metric, analysisPage::addCategory, "addFilterDoesNotHideRecommendation");
+        doSafetyAttributeAction(metric, analysisPage::addAttribute, "addFilterDoesNotHideRecommendation");
 
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
@@ -567,13 +593,14 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
     public void testSimplePoP() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         final String metric1 = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addCategory(DATE),
+                data -> analysisPage.addMetric(data).addDate(),
                 "testSimplePoP");
 
-        assertTrue(analysisPage.isDateFilterVisible());
-        assertTrue(analysisPage.getDateFilterText().endsWith(": All time"));
+        assertTrue(filtersBucket.isDateFilterVisible());
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
@@ -586,12 +613,13 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertEquals(legends.size(), 2);
         assertTrue(isEqualCollection(legends, asList(metric1 + " - previous year", metric1)));
 
-        doSafetyMetricAction(data -> analysisPage.replaceMetric(metric1, data), "testSimplePoP");
+        doSafetyMetricAction(data -> this.replaceMetric(metric1, data), "testSimplePoP");
     }
 
     @Test(dependsOnGroups = {"prepare"})
     public void testAnotherApproachToShowPoP() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         doSafetyMetricAction(analysisPage::addMetric, "testAnotherApproachToShowPoP");
         ChartReport report = analysisPage.getChartReport();
@@ -602,9 +630,9 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isDateFilterVisible());
-        assertTrue(analysisPage.getDateFilterText().endsWith(": Last 4 quarters"));
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(filtersBucket.isDateFilterVisible());
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
 
         if (analysisPage.isExplorerMessageVisible()) {
             System.out.println(format("After applying 'see trend', report shows message: %s",
@@ -617,19 +645,20 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     @Test(dependsOnGroups = {"prepare"})
     public void compararisonRecommendationOverrideDateFilter() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         String metric = doSafetyMetricAction(
-                data -> analysisPage.addMetric(data).addFilter(DATE),
+                data -> analysisPage.addMetric(data).addDateFilter(),
                 "compararisonRecommendationOverrideDateFilter");
-        String attribute = doSafetyAttributeAction(metric, analysisPage::addCategory,
+        String attribute = doSafetyAttributeAction(metric, analysisPage::addAttribute,
                 "compararisonRecommendationOverrideDateFilter");
 
         boolean timeFilterOk = false;
-        for (String period : Sets.newHashSet(analysisPage.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucket.getAllTimeFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(format("Try with time period [%s]", period));
-            analysisPage.configTimeFilter(period).waitForReportComputing();
-            if (analysisPage.isExplorerMessageVisible()) {
+            filtersBucket.configTimeFilter(period);
+            if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
                 System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
             } else {
                 System.out.println(format("Time period [%s] is ok with metric [%s] and attribute [%s]",
@@ -651,7 +680,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
-        assertTrue(analysisPage.getDateFilterText().endsWith(": This month"));
+        assertTrue(filtersBucket.getDateFilterText().endsWith(": This month"));
         if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
             System.out.println(format("After comparing 'This month', report shows message: %s",
                     analysisPage.getExplorerMessage()));
@@ -720,7 +749,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         while (true) {
             metric = getRandomMetric();
 
-            if (analysisPage.searchBucketItem(metric)) {
+            if (analysisPage.getCataloguePanel().searchBucketItem(metric)) {
                 action.accept(metric);
                 analysisPage.waitForReportComputing();
             } else {
@@ -752,11 +781,12 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
     private String doSafetyAttributeAction(String metric, Consumer<String> action, Consumer<String> failedAction,
             String screenshot) {
+        CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
         String attribute;
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
 
-            if (analysisPage.searchBucketItem(attribute) && analysisPage.isDataApplicable(attribute)) {
+            if (cataloguePanel.searchBucketItem(attribute) && cataloguePanel.isDataApplicable(attribute)) {
                 action.accept(attribute);
                 analysisPage.waitForReportComputing();
             } else {
@@ -785,5 +815,21 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
     private String doSafetyAttributeAction(String metric, Consumer<String> action, String screenshot) {
         return doSafetyAttributeAction(metric, action, analysisPage::removeCategory, screenshot);
+    }
+
+    private void replaceAttribute(String oldAttr, String newAttr) {
+        if (analysisPage.getCategoriesBucket().getItemNames().contains(oldAttr)) {
+            analysisPage.replaceAttribute(oldAttr, newAttr);
+        } else {
+            analysisPage.addAttribute(newAttr);
+        }
+    }
+
+    private void replaceMetric(String oldMetric, String newMetric) {
+        if (analysisPage.getMetricsBucket().getItemNames().contains(oldMetric)) {
+            analysisPage.replaceMetric(oldMetric, newMetric);
+        } else {
+            analysisPage.addMetric(newMetric);
+        }
     }
 }

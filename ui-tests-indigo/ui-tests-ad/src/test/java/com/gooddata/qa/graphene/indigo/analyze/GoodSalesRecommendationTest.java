@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,14 +10,19 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
@@ -33,10 +39,11 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
     public void testSimplePoP() {
         initAnalysePage();
 
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(DATE)
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDate();
+        assertTrue(analysisPage.getFilterBuckets()
                 .isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: All time");
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
         ChartReport report = analysisPage.getChartReport();
         assertThat(report.getTrackersCount(), equalTo(6));
         RecommendationContainer recommendationContainer =
@@ -70,9 +77,9 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testAnotherApproachToShowPoP");
     }
@@ -82,7 +89,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         initAnalysePage();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
+                .addAttribute(ACTIVITY_TYPE)
                 .getChartReport();
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 4);
@@ -94,15 +101,18 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         recommendationContainer.getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 4);
-        analysisPage.expandMetricConfiguration("% " + NUMBER_OF_ACTIVITIES);
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigSelected());
 
-        analysisPage.replaceCategory(ACTIVITY_TYPE, DEPARTMENT);
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration("% " + NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
+        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isShowPercentSelected());
+
+        analysisPage.replaceAttribute(ACTIVITY_TYPE, DEPARTMENT);
         assertTrue(analysisPage.isReportTypeSelected(ReportType.BAR_CHART));
         assertEquals(report.getTrackersCount(), 2);
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigSelected());
+        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isShowPercentSelected());
         checkingOpenAsReport("testSimpleContribution");
     }
 
@@ -139,14 +149,14 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ACTIVITY_TYPE).apply();
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        analysisPage.replaceCategory(ACTIVITY_TYPE, DEPARTMENT);
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DEPARTMENT));
-        assertEquals(analysisPage.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
+        analysisPage.replaceAttribute(ACTIVITY_TYPE, DEPARTMENT);
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DEPARTMENT));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(DEPARTMENT), DEPARTMENT + ": All");
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         checkingOpenAsReport("testSimpleComparison");
@@ -155,6 +165,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
     @Test(dependsOnGroups = {"init"})
     public void testComparisonAndPoPAttribute() {
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
@@ -167,8 +178,8 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
@@ -176,7 +187,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select("This month").apply();
         analysisPage.waitForReportComputing();
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: This month");
+        assertEquals(filtersBucket.getFilterText("Activity"), "Activity: This month");
         if (analysisPage.isExplorerMessageVisible()) {
             System.out.print("Error message: ");
             System.out.println(analysisPage.getExplorerMessage());
@@ -188,8 +199,8 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         assertEquals(legends.size(), 2);
         assertEquals(legends, asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
 
-        analysisPage.replaceCategory(ACTIVITY_TYPE, DEPARTMENT);
-        assertEquals(analysisPage.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
+        analysisPage.replaceAttribute(ACTIVITY_TYPE, DEPARTMENT);
+        assertEquals(filtersBucket.getFilterText(DEPARTMENT), DEPARTMENT + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         legends = report.getLegends();
         assertEquals(legends.size(), 2);
@@ -202,8 +213,11 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         initAnalysePage();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
                 .getChartReport();
+        final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
+
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
@@ -215,11 +229,11 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
                 recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
         trendingRecommendation.select("Month").apply();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: Last 4 quarters");
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
-        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
+        assertTrue(metricConfiguration.isShowPercentEnabled());
+        assertTrue(metricConfiguration.isPopEnabled());
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         assertTrue(report.getTrackersCount() >= 1);
@@ -246,7 +260,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         analysisPage.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
 
-        analysisPage.addCategory(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ACTIVITY_TYPE);
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("displayInColumnChartWithOnlyMetric");
     }
@@ -255,10 +269,17 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
 
-        analysisPage.dragAndDropMetricToShortcutPanel(NUMBER_OF_ACTIVITIES, ShortcutPanel.TRENDED_OVER_TIME);
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(DATE));
-        assertTrue(analysisPage.isFilterVisible("Activity"));
-        assertEquals(analysisPage.getFilterText("Activity"), "Activity: Last 4 quarters");
+        WebElement metric = analysisPage.getCataloguePanel()
+                .searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+
+        Supplier<WebElement> trendRecommendation = () ->
+            waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
+
+        analysisPage.drag(metric, trendRecommendation);
+
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("displayWhenDraggingFirstMetric");
     }

@@ -13,8 +13,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public class GoodSalesAccessDataSectionTest extends AnalyticalDesignerAbstractTest {
 
@@ -27,31 +27,32 @@ public class GoodSalesAccessDataSectionTest extends AnalyticalDesignerAbstractTe
 
     @Test(dependsOnMethods = {"cannotAccessDataSectionIfNotEnableFlag"})
     public void accessDataSection() throws IOException, JSONException {
-        RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
-                ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), true));
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(), 
+                ProjectFeatureFlags.ENABLE_CSV_UPLOADER);
 
         try {
             initAnalysePage();
-            assertTrue(analysisPage.isAddDataLinkVisible());
-            assertEquals(analysisPage.getDataLinkBubbleMessage(), DATA_LINK_BUBBLE_MESSAGE);
-            analysisPage.goToDataSectionPage();
+            final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+            assertTrue(cataloguePanel.isAddDataLinkVisible());
+            assertEquals(cataloguePanel.getDataLinkBubbleMessage(), DATA_LINK_BUBBLE_MESSAGE);
+            cataloguePanel.goToDataSectionPage();
 
             BrowserUtils.switchToLastTab(browser);
             assertEquals(browser.getCurrentUrl(),
                     getRootUrl() + format(CSV_UPLOADER_PROJECT_ROOT_TEMPLATE + "/upload", testParams.getProjectId()));
         } finally {
-            RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
-                    ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), false));
+            RestUtils.disableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(), 
+                    ProjectFeatureFlags.ENABLE_CSV_UPLOADER);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
     public void cannotAccessDataSectionIfNotEnableFlag() throws IOException, JSONException {
         // make sure csv uploader flag is disabled
-        RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
-                ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), false));
+        RestUtils.disableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(), 
+                ProjectFeatureFlags.ENABLE_CSV_UPLOADER);
 
         initAnalysePage();
-        assertFalse(analysisPage.isAddDataLinkVisible());
+        assertFalse(analysisPage.getCataloguePanel().isAddDataLinkVisible());
     }
 }

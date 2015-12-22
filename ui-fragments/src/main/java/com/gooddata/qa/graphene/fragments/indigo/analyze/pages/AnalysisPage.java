@@ -1,495 +1,256 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertTrue;
 
-import java.text.ParseException;
-import java.util.Collection;
-import java.util.List;
+import java.util.function.Supplier;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.BucketsPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEditor;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.VisualizationReportTypePicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 
 public class AnalysisPage extends AbstractFragment {
 
-    @FindBy(css = ".adi-editor-header")
+    @FindBy(className = "adi-editor-header")
     private AnalysisPageHeader pageHeader;
 
-    @FindBy(css = ".s-catalogue")
+    @FindBy(className = "s-catalogue")
     private CataloguePanel cataloguePanel;
 
-    @FindBy(css = ".adi-buckets-panel")
-    private BucketsPanel bucketsPanel;
-
-    @FindBy(css = ".adi-editor-main")
+    @FindBy(className = "adi-editor-main")
     private MainEditor mainEditor;
 
-    private static final String DATE = "Date";
+    @FindBy(className = "s-visualization-picker")
+    private VisualizationReportTypePicker reportTypePicker;
+
+    @FindBy(className = "s-bucket-metrics")
+    private MetricsBucket metricsBucket;
+
+    @FindBy(className = "s-bucket-categories")
+    private CategoriesBucket categoriesBucket;
+
+    @FindBy(className = StacksBucket.CSS_CLASS)
+    private StacksBucket stacksBucket;
+
+    @FindBy(className = "s-bucket-filters")
+    private FiltersBucket filterBuckets;
 
     public static final String MAIN_CLASS = "adi-editor";
 
-    public AnalysisPage dragAndDropMetricToShortcutPanel(String metric, ShortcutPanel shortcutPanel) {
-        waitForFragmentVisible(mainEditor);
-        waitForFragmentVisible(cataloguePanel);
-        mainEditor.dragAndDropMetricToShortcutPanel(cataloguePanel.getMetric(metric), shortcutPanel);
+    private static final By BY_TRASH_PANEL = className("adi-trash-panel");
+
+    public AnalysisPage startDrag(WebElement source) {
+        WebElement editor = waitForElementVisible(getRoot());
+
+        Point location = editor.getLocation();
+        Dimension dimension = editor.getSize();
+        getActions().clickAndHold(source)
+                .moveByOffset(location.x + dimension.width / 2, location.y + dimension.height / 2).perform();
         return this;
     }
 
-    public AnalysisPage dragAndDropFactToShortcutPanel(String fact, ShortcutPanel shortcutPanel) {
-        waitForFragmentVisible(mainEditor);
-        waitForFragmentVisible(cataloguePanel);
-        mainEditor.dragAndDropMetricToShortcutPanel(cataloguePanel.getFact(fact), shortcutPanel);
-        return this;
-    }
-
-    public AnalysisPage turnOnShowInPercents() {
-        waitForFragmentVisible(bucketsPanel).turnOnShowInPercents();
-        return this;
-    }
-
-    public AnalysisPage compareToSamePeriodOfYearBefore() {
-        waitForFragmentVisible(bucketsPanel).compareToSamePeriodOfYearBefore();
-        return this;
-    }
-
-    public AnalysisPage removeFilter(String dateOrAttribute) {
-        waitForFragmentVisible(mainEditor).removeFilter(dateOrAttribute);
-        return this;
-    }
-
-    public AnalysisPage addFilter(String dateOrAttribute) {
-        waitForFragmentVisible(mainEditor);
-        waitForFragmentVisible(cataloguePanel);
-        if (DATE.equals(dateOrAttribute))
-            mainEditor.addFilter(cataloguePanel.getTime(dateOrAttribute));
-        else
-            mainEditor.addFilter(cataloguePanel.getCategory(dateOrAttribute));
-        return this;
-    }
-
-    public AnalysisPage addMetric(String metric) {
-        waitForFragmentVisible(bucketsPanel);
-        waitForFragmentVisible(cataloguePanel);
-        bucketsPanel.addMetric(cataloguePanel.getMetric(metric));
-        return this;
-    }
-
-    public AnalysisPage addMetricFromFact(String fact) {
-        waitForFragmentVisible(bucketsPanel);
-        waitForFragmentVisible(cataloguePanel);
-        bucketsPanel.addMetricFromFact(cataloguePanel.getFact(fact));
-        return this;
-    }
-
-    public AnalysisPage addMetricFromAttribute(String attribute) {
-        waitForFragmentVisible(bucketsPanel);
-        waitForFragmentVisible(cataloguePanel);
-        bucketsPanel.addMetricFromAttribute(cataloguePanel.getCategory(attribute));
-        return this;
-    }
-
-    public AnalysisPage addCategory(String category) {
-        waitForFragmentVisible(bucketsPanel);
-        waitForFragmentVisible(cataloguePanel);
-        if (DATE.equals(category)) {
-            bucketsPanel.addCategory(cataloguePanel.getTime(category));
-        } else {
-            bucketsPanel.addCategory(cataloguePanel.getCategory(category));
+    public AnalysisPage drag(WebElement source, Supplier<WebElement> target) {
+        startDrag(source);
+        try {
+            getActions().moveToElement(target.get()).perform();
+        } finally {
+            getActions().release().perform();
         }
         return this;
     }
 
-    public AnalysisPage addInapplicableCategory(String category) {
-        waitForFragmentVisible(bucketsPanel);
-        waitForFragmentVisible(cataloguePanel);
-        bucketsPanel.addCategory(cataloguePanel.getInapplicableCategory(category));
+    public AnalysisPage drag(WebElement source, WebElement target) {
+        startDrag(source);
+        try {
+            getActions().moveToElement(waitForElementPresent(target)).perform();
+        } finally {
+            getActions().release().perform();
+        }
         return this;
     }
 
-    public List<String> getAllCatalogFieldNamesInViewPort() {
-        return waitForFragmentVisible(cataloguePanel).getAllCatalogFieldNamesInViewPort();
+    public AnalysisPage addMetric(String metric) {
+        return addMetric(metric, FieldType.METRIC);
     }
 
-    public Collection<WebElement> getAllCatalogFieldsInViewPort() {
-        return waitForFragmentVisible(cataloguePanel).getAllCatalogFieldsInViewPort();
+    public AnalysisPage addMetric(String data, FieldType type) {
+        WebElement source = getCataloguePanel().searchAndGet(data, type);
+        WebElement target = getMetricsBucket().getInvitation();
+        return drag(source, target);
     }
 
-    public AnalysisPage removeCategory(String category) {
-        waitForFragmentVisible(bucketsPanel).removeCategory(category);
-        return this;
+    public AnalysisPage addAttribute(String attribute) {
+        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
+        WebElement target = getCategoriesBucket().getInvitation();
+        return drag(source, target);
+    }
+
+    public AnalysisPage addDate() {
+        WebElement source = getCataloguePanel().getDate();
+        WebElement target = getCategoriesBucket().getInvitation();
+        return drag(source, target);
+    }
+
+    public AnalysisPage addStack(String attribute) {
+        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
+        WebElement target = getStacksBucket().getInvitation();
+        return drag(source, target);
+    }
+
+    public AnalysisPage addFilter(String attribute) {
+        WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
+        WebElement target = getFilterBuckets().getInvitation();
+        return drag(source, target);
+    }
+
+    public AnalysisPage addDateFilter() {
+        WebElement source = getCataloguePanel().getDate();
+        WebElement target = getFilterBuckets().getInvitation();
+        return drag(source, target);
+    }
+
+    public AnalysisPage replaceMetric(String oldMetric, String newMetric) {
+        WebElement source = getCataloguePanel().searchAndGet(newMetric, FieldType.METRIC);
+        WebElement target = getMetricsBucket().get(oldMetric);
+        return drag(source, target);
+    }
+
+    public AnalysisPage replaceAttribute(String oldAttr, String newAttr) {
+        WebElement source = getCataloguePanel().searchAndGet(newAttr, FieldType.ATTRIBUTE);
+        WebElement target = getCategoriesBucket().get(oldAttr);
+        return drag(source, target);
+    }
+
+    public AnalysisPage replaceAttribute(String attr) {
+        WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
+        WebElement target = getCategoriesBucket().getFirst();
+        return drag(source, target);
+    }
+
+    public AnalysisPage replaceStack(String attr) {
+        WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
+        WebElement target = getStacksBucket().get();
+        return drag(source, target);
     }
 
     public AnalysisPage removeMetric(String metric) {
-        waitForFragmentVisible(bucketsPanel).removeMetric(metric);
-        return this;
+        return drag(getMetricsBucket().get(metric),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeCategory(String attr) {
+        return drag(getCategoriesBucket().get(attr),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeFilter(String attr) {
+        return drag(getFilterBuckets().getFilter(attr),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
     public AnalysisPage changeReportType(ReportType type) {
-        waitForFragmentVisible(bucketsPanel).setReportType(type);
+        waitForFragmentVisible(reportTypePicker).setReportType(type);
         return this;
     }
 
     public boolean isReportTypeSelected(ReportType type) {
-        return waitForFragmentVisible(bucketsPanel).isReportTypeSelected(type);
+        return waitForFragmentVisible(reportTypePicker).isSelected(type);
     }
 
     public AnalysisPage resetToBlankState() {
-        waitForFragmentVisible(pageHeader);
-        waitForFragmentVisible(bucketsPanel);
-        waitForFragmentVisible(mainEditor);
-        pageHeader.resetToBlankState();
-        assertTrue(bucketsPanel.isBlankState());
-        assertTrue(mainEditor.isBlankState());
+        getPageHeader().resetToBlankState();
+        assertTrue(getFilterBuckets().isEmpty());
+        assertTrue(getMetricsBucket().isEmpty());
+        assertTrue(getCategoriesBucket().isEmpty());
+        assertTrue(getStacksBucket().isEmpty());
+        assertTrue(getMainEditor().isEmpty());
         return this;
-    }
-
-    public AnalysisPage configTimeFilter(String period) {
-        waitForFragmentVisible(mainEditor).configTimeFilter(period);
-        return this;
-    }
-
-    /**
-     * @param from format MM/DD/YYYY
-     * @param to   format MM/DD/YYYY
-     */
-    public AnalysisPage configTimeFilterByRangeButNotApply(String dateFilter, String from, String to) {
-        waitForFragmentVisible(mainEditor).configTimeFilterByRangeButNotApply(dateFilter, from, to);
-        return this;
-    }
-
-    /**
-     * @param from format MM/DD/YYYY
-     * @param to   format MM/DD/YYYY
-     * @throws ParseException 
-     */
-    public AnalysisPage configTimeFilterByRange(String dateFilter, String from, String to) throws ParseException {
-        waitForFragmentVisible(mainEditor).configTimeFilterByRange(dateFilter, from, to);
-        return this;
-    }
-
-    public AnalysisPage configAttributeFilter(String attribute, String... values) {
-        waitForFragmentVisible(mainEditor).configAttributeFilter(attribute, values);
-        return this;
-    }
-
-    public TableReport getTableReport() {
-        return waitForFragmentVisible(mainEditor).getTableReport();
-    }
-
-    public ChartReport getChartReport() {
-        return waitForFragmentVisible(mainEditor).getChartReport();
-    }
-
-    public String getTimeDescription(String time) {
-        return waitForFragmentVisible(cataloguePanel).getTimeDescription(time);
-    }
-
-    public String getAttributeDescription(String attribute) {
-        return waitForFragmentVisible(cataloguePanel).getAttributeDescription(attribute);
-    }
-
-    public String getAttributeDescriptionInMetricFilter(String metric, String attribute) {
-        return waitForFragmentVisible(bucketsPanel).getAttributeDescription(metric, attribute);
-    }
-
-    public String getMetricDescription(String metric) {
-        return waitForFragmentVisible(cataloguePanel).getMetricDescription(metric);
-    }
-
-    public String getFactDescription(String fact) {
-        return waitForFragmentVisible(cataloguePanel).getFactDescription(fact);
-    }
-
-    public List<String> getAllAddedCategoryNames() {
-        return waitForFragmentVisible(bucketsPanel).getAllAddedCategoryNames();
-    }
-
-    public List<String> getAllAddedMetricNames() {
-        return waitForFragmentVisible(bucketsPanel).getAllAddedMetricNames();
-    }
-
-    public boolean isExportToReportButtonEnabled() {
-        return waitForFragmentVisible(pageHeader).isExportToReportButtonEnable();
-    }
-
-    public boolean isShowPercentConfigEnabled() {
-        return waitForFragmentVisible(bucketsPanel).isShowPercentConfigEnabled();
-    }
-
-    public boolean isShowPercentConfigSelected() {
-        return waitForFragmentVisible(bucketsPanel).isShowPercentConfigSelected();
-    }
-
-    public boolean isCompareSamePeriodConfigSelected() {
-        return waitForFragmentVisible(bucketsPanel).isCompareSamePeriodConfigSelected();
-    }
-
-    public boolean isCompareSamePeriodConfigEnabled() {
-        return waitForFragmentVisible(bucketsPanel).isCompareSamePeriodConfigEnabled();
-    }
-
-    public String getFilterText(String dateOrAttribute) {
-        return waitForFragmentVisible(mainEditor).getFilterText(dateOrAttribute);
-    }
-
-    public String getDateFilterText() {
-        return waitForFragmentVisible(mainEditor).getDateFilterText();
-    }
-
-    public boolean isFilterVisible(String dateOrAttribute) {
-        return waitForFragmentVisible(mainEditor).isFilterVisible(dateOrAttribute);
-    }
-
-    public boolean isDateFilterVisible() {
-        return waitForFragmentVisible(mainEditor).isDateFilterVisible();
     }
 
     public AnalysisPage exportReport() {
-        waitForFragmentVisible(pageHeader).exportReport();
+        getPageHeader().exportReport();
         return this;
     }
 
     public String getExplorerMessage() {
-        return waitForFragmentVisible(mainEditor).getExplorerMessage();
-    }
-
-    public AnalysisPage changeGranularity(String time) {
-        waitForFragmentVisible(bucketsPanel).changeGranularity(time);
-        return this;
-    }
-
-    public String getSelectedGranularity() {
-        return waitForFragmentVisible(bucketsPanel).getSelectedGranularity();
-    }
-
-    public String getSelectedDimensionSwitch() {
-        return waitForFragmentVisible(bucketsPanel).getSelectedDimensionSwitch();
-    }
-
-    public List<String> getAllGranularities() {
-        return waitForFragmentVisible(bucketsPanel).getAllGranularities();
-    }
-
-    public WebElement getFilter(String dateOrAttribute) {
-        return waitForFragmentVisible(mainEditor).getFilter(dateOrAttribute);
+        return getMainEditor().getExplorerMessage();
     }
 
     public boolean isExplorerMessageVisible() {
-        return waitForFragmentVisible(mainEditor).isExplorerMessageVisible();
-    }
-
-    public List<String> getAllTimeFilterOptions() {
-        return waitForFragmentVisible(mainEditor).getAllTimeFilterOptions();
+        return getMainEditor().isExplorerMessageVisible();
     }
 
     public AnalysisPage waitForReportComputing() {
-        waitForFragmentVisible(mainEditor).waitForReportComputing();
+        getMainEditor().waitForReportComputing();
         return this;
     }
 
     public boolean isReportComputing() {
-        return waitForFragmentVisible(mainEditor).isReportComputing();
-    }
-
-    public boolean searchBucketItem(String item) {
-        return waitForFragmentVisible(cataloguePanel).searchBucketItem(item);
-    }
-
-    public int getUnrelatedItemsHiddenCount() {
-        return waitForFragmentVisible(cataloguePanel).getUnrelatedItemsHiddenCount();
+        return getMainEditor().isReportComputing();
     }
 
     public AnalysisPage undo() {
-        waitForFragmentVisible(pageHeader).undo();
+        getPageHeader().undo();
         return this;
     }
 
     public AnalysisPage redo() {
-        waitForFragmentVisible(pageHeader).redo();
+        getPageHeader().redo();
         return this;
     }
 
-    public boolean isUndoButtonEnabled() {
-        return waitForFragmentVisible(pageHeader).isUndoButtonEnabled();
+    public TableReport getTableReport() {
+        return getMainEditor().getTableReport();
     }
 
-    public boolean isRedoButtonEnabled() {
-        return waitForFragmentVisible(pageHeader).isRedoButtonEnabled();
+    public ChartReport getChartReport() {
+        return getMainEditor().getChartReport();
     }
 
-    public boolean isMetricBucketEmpty() {
-        return waitForFragmentVisible(bucketsPanel).isMetricBucketEmpty();
+    public CataloguePanel getCataloguePanel() {
+        return waitForFragmentVisible(cataloguePanel);
     }
 
-    public boolean isCategoryBucketEmpty() {
-        return waitForFragmentVisible(bucketsPanel).isCategoryBucketEmpty();
+    public MetricsBucket getMetricsBucket() {
+        return waitForFragmentVisible(metricsBucket);
     }
 
-    public boolean isBucketBlankState() {
-        return waitForFragmentVisible(bucketsPanel).isBlankState();
+    public CategoriesBucket getCategoriesBucket() {
+        return waitForFragmentVisible(categoriesBucket);
     }
 
-    public boolean isMainEditorBlankState() {
-        return waitForFragmentVisible(mainEditor).isBlankState();
+    public StacksBucket getStacksBucket() {
+        return waitForFragmentVisible(stacksBucket);
     }
 
-    public AnalysisPage changeDimensionSwitchInFilter(String currentRelatedDate, String dimensionSwitch) {
-        waitForFragmentVisible(mainEditor).changeDimensionSwitchInFilter(currentRelatedDate, dimensionSwitch);
-        return this;
+    public FiltersBucket getFilterBuckets() {
+        return waitForFragmentVisible(filterBuckets);
     }
 
-    public AnalysisPage changeDimensionSwitchInBucket(String dimensionSwitch) {
-        waitForFragmentVisible(bucketsPanel).changeDimensionSwitchInBucket(dimensionSwitch);
-        return this;
+    public MainEditor getMainEditor() {
+        return waitForFragmentVisible(mainEditor);
     }
 
-    public boolean isInapplicableAttributeMetricInViewPort() {
-        return waitForFragmentVisible(cataloguePanel).isInapplicableAttributeMetricInViewPort();
-    }
-
-    public boolean isDataApplicable(String data) {
-        return waitForFragmentVisible(cataloguePanel).isDataApplicable(data);
-    }
-
-    public AnalysisPage addStackBy(String category) {
-        waitForFragmentVisible(cataloguePanel);
-        waitForFragmentVisible(bucketsPanel).addStackBy(cataloguePanel.getCategory(category));
-        return this;
-    }
-
-    public AnalysisPage replaceMetric(String oldMetric, String newMetric) {
-        waitForFragmentVisible(cataloguePanel);
-        waitForFragmentVisible(bucketsPanel).replaceMetric(oldMetric, cataloguePanel.getMetric(newMetric));
-        return this;
-    }
-
-    public AnalysisPage replaceCategory(String oldCategory, String newCategory) {
-        waitForFragmentVisible(cataloguePanel);
-        waitForFragmentVisible(bucketsPanel).replaceCategory(oldCategory, cataloguePanel.getCategory(newCategory));
-        return this;
-    }
-
-    public void replaceStackBy(String category) {
-        waitForFragmentVisible(cataloguePanel);
-        waitForFragmentVisible(bucketsPanel).replaceStackBy(cataloguePanel.getCategory(category));
-    }
-
-    public boolean isStackByDisabled() {
-        return waitForFragmentVisible(bucketsPanel).isStackByDisabled();
-    }
-
-    public String getStackByMessage() {
-        return waitForFragmentVisible(bucketsPanel).getStackByMessage();
-    }
-
-    public String getMetricMessage() {
-        return waitForFragmentVisible(bucketsPanel).getMetricMessage();
-    }
-
-    public String getAddedStackByName() {
-        return waitForFragmentVisible(bucketsPanel).getAddedStackByName();
-    }
-
-    public boolean isStackByBucketEmpty() {
-        return waitForFragmentVisible(bucketsPanel).isStackByBucketEmpty();
-    }
-
-    public String getExportToReportButtonTooltipText() {
-        return waitForFragmentVisible(pageHeader).getExportToReportButtonTooltipText();
-    }
-
-    public AnalysisPage switchAxisAndStackBy() {
-        waitForFragmentVisible(bucketsPanel).switchAxisAndStackBy();
-        return this;
-    }
-
-    public String getMetricAggregation(String metric) {
-        return waitForFragmentVisible(bucketsPanel).getMetricAggregation(metric);
-    }
-
-    public Collection<String> getAllMetricAggregations(String metric) {
-        return waitForFragmentVisible(bucketsPanel).getAllMetricAggregations(metric);
-    }
-
-    public AnalysisPage changeMetricAggregation(String metric, String newAggregation) {
-        waitForFragmentVisible(bucketsPanel).changeMetricAggregation(metric, newAggregation);
-        return this;
-    }
-
-    public AnalysisPage filterCatalog(CatalogFilterType type) {
-        waitForFragmentVisible(cataloguePanel).filterCatalog(type);
-        return this;
-    }
-
-    public boolean isMetricConfigurationCollapsed(String metric) {
-        return waitForFragmentVisible(bucketsPanel).isMetricConfigurationCollapsed(metric);
-    }
-
-    public AnalysisPage expandMetricConfiguration(String metric) {
-        waitForFragmentVisible(bucketsPanel).expandMetricConfiguration(metric);
-        return this;
-    }
-
-    public AnalysisPage collapseMetricConfiguration(String metric) {
-        waitForFragmentVisible(bucketsPanel).collapseMetricConfiguration(metric);
-        return this;
-    }
-
-    public AnalysisPage addFilterMetric(String metric, String attribute, String... values) {
-        waitForFragmentVisible(bucketsPanel).addFilterMetric(metric, attribute, values);
-        return this;
-    }
-
-    public AnalysisPage addFilterMetricBySelectOnly(String metric, String attribute, String value) {
-        waitForFragmentVisible(bucketsPanel).addFilterMetricBySelectOnly(metric, attribute, value);
-        return this;
-    }
-
-    public AnalysisPage addFilterMetricWithLargeNumberValues(String metric, String attribute,
-            String... unselectedValues) {
-        waitForFragmentVisible(bucketsPanel).addFilterMetricWithLargeNumberValues(metric, attribute,
-                unselectedValues);
-        return this;
-    }
-
-    public String getFilterMetricText(String metric) {
-        return waitForFragmentVisible(bucketsPanel).getFilterMetricText(metric);
-    }
-
-    public boolean canAddAnotherAttributeFilterToMetric(String metric) {
-        return waitForFragmentVisible(bucketsPanel).canAddAnotherAttributeFilterToMetric(metric);
-    }
-
-    public AnalysisPage removeAttributeFilterFromMetric(String metric) {
-        waitForFragmentVisible(bucketsPanel).removeAttributeFilterFromMetric(metric);
-        return this;
-    }
-
-    public boolean isAddDataLinkVisible() {
-        return waitForFragmentVisible(cataloguePanel).isAddDataLinkVisible();
-    }
-
-    public String getDataLinkBubbleMessage() {
-        return waitForFragmentVisible(cataloguePanel).getDataLinkBubbleMessage();
-    }
-
-    public void goToDataSectionPage() {
-        waitForFragmentVisible(cataloguePanel).goToDataSectionPage();
-    }
-
-    public AnalysisPage changeDataset(String dataset) {
-        waitForFragmentVisible(cataloguePanel).changeDataset(dataset);
-        return this;
+    public AnalysisPageHeader getPageHeader() {
+        return waitForFragmentVisible(pageHeader);
     }
 }

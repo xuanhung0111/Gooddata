@@ -105,7 +105,7 @@ public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractT
     private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
         initAnalysePage();
         List<List<String>> tooltip = analysisPage.addMetric(PERCENT_OF_GOAL)
-            .addCategory(IS_WON)
+            .addAttribute(IS_WON)
             .waitForReportComputing()
             .getChartReport()
             .getTooltipTextOnTrackerByIndex(0);

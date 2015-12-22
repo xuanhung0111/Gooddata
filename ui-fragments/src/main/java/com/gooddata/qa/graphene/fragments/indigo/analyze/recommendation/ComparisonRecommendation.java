@@ -7,7 +7,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ComparisonRecommendation extends AbstractRecommendation {
 
-    @FindBy(css = ".s-attribute-switch")
+    @FindBy(className = "s-attribute-switch")
     private Select attributeSwitch;
 
     public ComparisonRecommendation select(String attribute) {

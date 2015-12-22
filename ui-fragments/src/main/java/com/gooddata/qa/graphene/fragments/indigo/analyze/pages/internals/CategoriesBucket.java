@@ -1,102 +1,28 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Point;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+public class CategoriesBucket extends AbstractBucket {
 
-public class CategoriesBucket extends AbstractFragment {
-
-    @FindBy(css = ".adi-bucket-item")
-    private List<WebElement> items;
-
-    @FindBy(css = ".s-date-granularity-switch")
+    @FindBy(className = "s-date-granularity-switch")
     private Select granularity;
 
     @FindBy(className = "s-date-dimension-switch")
     private Select dimensionSwitch;
 
-    private static final By BY_BUCKET_INVITATION = By.cssSelector(".adi-bucket-invitation");
-    private static final By BY_TRASH_PANEL = By.cssSelector(".adi-trash-panel");
-    private static final By BY_HEADER = By.className("adi-bucket-item-header");
-    private static final String EMPTY = "s-bucket-empty";
-
-    public void addCategory(WebElement category) {
-        WebElement invitation = waitForElementVisible(BY_BUCKET_INVITATION, getRoot());
-        ((JavascriptExecutor) browser).executeScript("arguments[0].scrollIntoView(true);", invitation);
-        sleepTightInSeconds(1);
-
-        new Actions(browser).dragAndDrop(category, waitForElementVisible(BY_BUCKET_INVITATION, getRoot()))
-            .perform();
-        assertEquals(items.get(items.size() - 1).findElement(BY_HEADER).getText(), category.getText());
-    }
-
-    public void removeCategory(final String category) {
-        int oldItemsCount = items.size();
-        WebElement element = Iterables.find(items, new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return category.equals(input.findElement(BY_HEADER).getText());
-            }
-        });
-
-        Actions action = new Actions(browser);
-        WebElement catalogue = browser.findElement(By.className("s-catalogue"));
-        Point location = catalogue.getLocation();
-        Dimension dimension = catalogue.getSize();
-        action.clickAndHold(element).moveByOffset(location.x + dimension.width/2, location.y + dimension.height/2)
-            .perform();
-        action.moveToElement(waitForElementPresent(BY_TRASH_PANEL, browser)).perform();
-        action.release().perform();
-
-        assertEquals(items.size(), oldItemsCount - 1, "Category is not removed yet!");
-    }
-
-    public void replaceCategory(String oldCategory, WebElement newCategory) {
-        Optional<WebElement> oldAttributeElement = getCategory(oldCategory);
-
-        if (oldAttributeElement.isPresent()) {
-            new Actions(browser).dragAndDrop(newCategory, oldAttributeElement.get()).perform();
-            assertTrue(getItemNames().contains(newCategory.getText().trim()));
-            return;
-        }
-
-        System.out.println("Cannot find current attribute: " + oldCategory);
-        System.out.println("Try to add new one!");
-        addCategory(newCategory);
-    }
-
-    public boolean isEmpty() {
-        return getRoot().getAttribute("class").contains(EMPTY);
-    }
-
     public List<String> getItemNames() {
-        return Lists.newArrayList(Collections2.transform(items, new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.findElement(BY_HEADER).getText();
-            }
-        }));
+        return items.stream()
+            .map(e -> e.findElement(BY_HEADER))
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
     public void changeGranularity(String time) {
@@ -108,13 +34,10 @@ public class CategoriesBucket extends AbstractFragment {
     }
 
     public List<String> getAllGranularities() {
-        waitForElementVisible(granularity);
-        return Lists.newArrayList(Collections2.transform(granularity.getOptions(), new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.getText();
-            }
-        }));
+        return waitForElementVisible(granularity).getOptions()
+            .stream()
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
     public String getSelectedDimensionSwitch() {
@@ -127,13 +50,19 @@ public class CategoriesBucket extends AbstractFragment {
         this.dimensionSwitch.selectByVisibleText(dimensionSwitch);
     }
 
-    public WebElement getFirstItem() {
+    public WebElement getFirst() {
         return items.get(0);
     }
 
-    private Optional<WebElement> getCategory(final String category) {
+    public WebElement get(final String name) {
         return items.stream()
-                .filter(e -> category.equals(e.findElement(BY_HEADER).getText()))
-                .findFirst();
+                .filter(e -> name.equals(e.findElement(BY_HEADER).getText()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + name));
+    }
+
+    @Override
+    public String getWarningMessage() {
+        throw new UnsupportedOperationException();
     }
 }

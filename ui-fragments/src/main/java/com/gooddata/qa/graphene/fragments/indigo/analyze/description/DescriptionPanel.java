@@ -16,20 +16,20 @@ public class DescriptionPanel extends AbstractFragment {
     @FindBy(tagName = "h3")
     private WebElement title;
 
-    @FindBy(css = ".adi-item-description")
+    @FindBy(className = "adi-item-description")
     private WebElement titleDescription;
 
-    @FindBy(css = ".adi-item-type")
+    @FindBy(className = "adi-item-type")
     private WebElement fieldType;
 
     @FindBy(css = ".adi-item-type~div p")
     private WebElement value;
 
-    @FindBy(css = ".s-dataset-name")
+    @FindBy(className = "s-dataset-name")
     private WebElement dataset;
 
     public static final By LOCATOR = By.cssSelector(".adi-catalogue-item-details");
-    
+
     private static final String NEW_LINE = "\n";
     private static final String LOADING = "Loading...";
 
@@ -78,11 +78,7 @@ public class DescriptionPanel extends AbstractFragment {
     }
 
     private void waitForDataLoaded() {
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return !LOADING.equals(value.getText());
-            }
-        });
+        Predicate<WebDriver> dataLoaded = browser -> !LOADING.equals(value.getText());
+        Graphene.waitGui().until(dataLoaded);
     }
 }
