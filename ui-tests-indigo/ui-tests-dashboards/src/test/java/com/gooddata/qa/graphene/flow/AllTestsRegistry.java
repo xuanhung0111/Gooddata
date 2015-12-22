@@ -27,14 +27,14 @@ public class AllTestsRegistry {
                 .register("testng-desktop-KpiPop.xml")
                 .register("testng-desktop-permissions-SplashScreen.xml")
                 .register("testng-desktop-ResponsiveNavigation.xml")
-                //.register("testng-desktop-KpiPopChangeValueExceedLimit.xml")
+                .register("testng-desktop-KpiPopChangeValueExceedLimit.xml")
                 .register("testng-mobile-DateFiltering.xml")
                 .register("testng-mobile-EditMode.xml")
                 .register("testng-mobile-KpiDrillTo.xml")
                 .register("testng-mobile-KpiPop.xml")
                 .register("testng-mobile-ResponsiveNavigation.xml")
                 .register("testng-mobile-SplashScreen.xml")
-                //.register("testng-mobile-KpiPopChangeValueExceedLimit.xml")
+                .register("testng-mobile-KpiPopChangeValueExceedLimit.xml")
                 .toTextFile();
     }
 }
