@@ -129,7 +129,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public Kpi selectKpi(int index) {
         Kpi tempKpi = getKpiByIndex(index);
         waitForElementPresent(tempKpi.getRoot());
-        tempKpi.getRoot().click();
+        tempKpi.clickKpiContent();
 
         waitForFragmentVisible(configurationPanel).waitForButtonsLoaded();
         return tempKpi;
