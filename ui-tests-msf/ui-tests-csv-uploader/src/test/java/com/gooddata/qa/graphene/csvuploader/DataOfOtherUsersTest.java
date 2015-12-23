@@ -9,6 +9,8 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,7 +43,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", myDatasetName), getClass());
     }
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"checkMyDataAndNoDataOfOthers"})
     public void addOtherAdminToProject() throws ParseException, IOException, JSONException {
         addUserToProject(testParams.getAdminUser(), UserRoles.ADMIN);
     }
@@ -103,7 +105,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"checkMyDataAndDataOfOthers", "addOtherAdminToProject"})
+    @Test(dependsOnMethods = {"checkMyDataAndDataOfOthers"})
     public void checkAdminCanDeleteDatasetOfOthers() throws JSONException {
         try {
             logout();
@@ -129,6 +131,104 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                  waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount()
                  + "> in the dataset list doesn't match expected value <" + datasetCountAfterDelete + ">.")
                 .until(datasetsCountEqualsExpected);
+            removeDatasetFromUploadHistory(CsvFile.PAYROLL, datasetName);
+        } finally {
+            logout();
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        }
+    }
+
+    @Test(dependsOnMethods = {"checkAdminCanDeleteDatasetOfOthers"})
+    public void addViewerAndEditorToProject() throws ParseException, IOException, JSONException {
+        addUsersWithOtherRolesToProject();
+    }
+
+    @Test(dependsOnMethods = {"addViewerAndEditorToProject"})
+    public void checkEditorCanManageHisOwnData() throws JSONException {
+        try {
+            logout();
+            signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
+            
+            initDataUploadPage();
+            final int datasetCount = datasetsListPage.getMyDatasetsCount();
+            CsvFile fileToUpload = CsvFile.PAYROLL;
+            checkCsvUpload(fileToUpload, this::uploadCsv, true);
+            String datasetName = getNewDataset(fileToUpload);
+            waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
+            assertTrue(datasetsListPage.getMyDatasetsTable().isDeleteButtonVisible(datasetName),
+                    "Delete button is not shown in editor's dataset");
+            assertTrue(datasetsListPage.getMyDatasetsTable().isRefreshButtonVisible(datasetName),
+                    "Update button is still shown in editor's dataset");
+            assertTrue(datasetsListPage.getMyDatasetsTable().isAnalyzeButtonVisble(datasetName),
+                    "Analyze button is not shown in editor's dataset");
+            assertTrue(datasetsListPage.getMyDatasetsTable().isDetailButtonVisble(datasetName),
+                    "Detail button is not shown in editor's dataset");
+            datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
+            waitForFragmentVisible(csvDatasetDetailPage);
+            assertTrue(csvDatasetDetailPage.isDeleteButtonVisible(), 
+                    "Delete button is not shown in editor's dataset");
+            assertTrue(csvDatasetDetailPage.isRefreshButtonVisible(), 
+                    "Update button is not shown in editor's dataset");
+            assertTrue(csvDatasetDetailPage.isAnalyzeButtonVisible(), 
+                    "Analyze button is not shown in editor's dataset");
+            
+            csvDatasetDetailPage.clickRefreshButton();
+            refreshCsv(CsvFile.PAYROLL_REFRESH, datasetName, true);
+            waitForFragmentVisible(csvDatasetDetailPage);
+            
+            csvDatasetDetailPage.clickBackButton();
+            waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
+            waitForFragmentVisible(datasetDeleteDialog).clickDelete();
+            waitForFragmentNotVisible(datasetDeleteDialog);
+            removeDatasetFromUploadHistory(fileToUpload, datasetName);
+            
+            assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                    is(String.format("\"%s\" was successfully deleted!", datasetName)));
+            Predicate<WebDriver> datasetsCountEqualsExpected = input ->
+                waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCount;
+
+            Graphene.waitGui(browser)
+                .withMessage("Dataset count <" + 
+                 waitForFragmentVisible(datasetsListPage).getMyDatasetsCount()
+                 + "> in the dataset list doesn't match expected value <" + datasetCount + ">.")
+                .until(datasetsCountEqualsExpected);
+        } finally {
+            logout();
+            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        }
+    }
+
+    @Test(dependsOnMethods = {"addViewerAndEditorToProject"})
+    public void checEditorCannotEditDataOfOthers() throws JSONException {
+        try {
+            initDataUploadPage();
+
+            CsvFile fileToUpload = CsvFile.PAYROLL;
+
+            checkCsvUpload(fileToUpload, this::uploadCsv, true);
+            String datasetName = getNewDataset(fileToUpload);
+            waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
+            
+            logout();
+            signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
+            
+            initDataUploadPage();
+            
+            assertFalse(datasetsListPage.getOthersDatasetsTable().isDeleteButtonVisible(datasetName),
+                    "Delete button is still shown in other dataset");
+            assertFalse(datasetsListPage.getOthersDatasetsTable().isRefreshButtonVisible(datasetName),
+                    "Update button is still shown in other dataset");
+            assertTrue(datasetsListPage.getOthersDatasetsTable().isAnalyzeButtonVisble(datasetName),
+                    "Analyze button is not shown in other dataset");
+            assertTrue(datasetsListPage.getOthersDatasetsTable().isDetailButtonVisble(datasetName),
+                    "Detail button is not shown in other dataset");
+            
+            datasetsListPage.getOthersDatasetsTable().getDatasetDetailButton(datasetName).click();
+            waitForFragmentVisible(csvDatasetDetailPage);
+            assertFalse(csvDatasetDetailPage.isDeleteButtonVisible(), 
+                    "Delete button is still shown in other dataset");
+            assertFalse(csvDatasetDetailPage.isRefreshButtonVisible(), 
+                    "Update button is still shown in other dataset");
         } finally {
             logout();
             signInAtGreyPages(testParams.getUser(), testParams.getPassword());

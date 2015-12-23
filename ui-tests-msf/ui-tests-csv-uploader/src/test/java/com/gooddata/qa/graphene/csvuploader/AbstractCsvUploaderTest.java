@@ -140,6 +140,14 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         return csvFile.getDatasetNameOfFirstUpload();
     }
 
+    protected void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
+        Optional<UploadHistory> fileUpload = uploadHistory.stream()
+                .filter(upload -> upload.getCsvFile() == csvFile)
+                .findAny();
+        assertThat(fileUpload.isPresent(), is(true));
+        fileUpload.get().removeDatasetName(datasetName);
+    }
+
     protected String getDatasetId(String datasetName) {
         String newDatasetId =
                 "dataset.csv_"
@@ -220,14 +228,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
             assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
         }
-    }
-
-    protected void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
-        Optional<UploadHistory> fileUpload = uploadHistory.stream()
-                .filter(upload -> upload.getCsvFile() == csvFile)
-                .findAny();
-        assertThat(fileUpload.isPresent(), is(true));
-        fileUpload.get().removeDatasetName(datasetName);
     }
 
     public class UploadHistory {
