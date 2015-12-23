@@ -1,0 +1,17 @@
+CREATE DATASET {dataset.customer} VISUAL(TITLE "customer");
+CREATE ATTRIBUTE {attr.customer.id} VISUAL(TITLE "id") AS KEYS {f_customer.id} FULLSET;
+ALTER DATASET {dataset.customer} ADD {attr.customer.id};
+ALTER ATTRIBUTE {attr.customer.id} ADD LABELS {label.customer.id} VISUAL(TITLE "id") AS {f_customer.nm_id};
+CREATE ATTRIBUTE {attr.customer.name} VISUAL(TITLE "name") AS KEYS {d_customer_name.id} FULLSET, {f_customer.name_id};
+ALTER DATASET {dataset.customer} ADD {attr.customer.name};
+ALTER ATTRIBUTE {attr.customer.name} ADD LABELS {label.customer.name} VISUAL(TITLE "name") AS {d_customer_name.nm_name};
+ALTER ATTRIBUTE {attr.customer.name} DEFAULT LABEL {label.customer.name};
+CREATE ATTRIBUTE {attr.customer.lastname} VISUAL(TITLE "lastname") AS KEYS {d_customer_lastname.id} FULLSET, {f_customer.lastname_id};
+ALTER DATASET {dataset.customer} ADD {attr.customer.lastname};
+ALTER ATTRIBUTE {attr.customer.lastname} ADD LABELS {label.customer.lastname} VISUAL(TITLE "lastname") AS {d_customer_lastname.nm_lastname};
+ALTER ATTRIBUTE {attr.customer.lastname} DEFAULT LABEL {label.customer.lastname};
+CREATE FACT {fact.customer.age} VISUAL(TITLE "age") AS {f_customer.f_age};
+ALTER DATASET {dataset.customer} ADD {fact.customer.age};
+CREATE FACT {fact.customer.amount} VISUAL(TITLE "Amount") AS {f_customer.f_amount};
+ALTER DATASET {dataset.customer} ADD {fact.customer.amount};
+SYNCHRONIZE {dataset.customer} PRESERVE DATA;

@@ -1,0 +1,30 @@
+{
+    "dataSetSLIManifest": {
+        "parts": [{
+            "columnName": "customer_id",
+            "mode": "FULL",
+            "populates": ["label.customer.id"],
+            "referenceKey": 1
+        }, {
+            "columnName": "name",
+            "mode": "FULL",
+            "populates": ["label.customer.name"],
+            "referenceKey": 1
+        }, {
+            "columnName": "lastname",
+            "mode": "FULL",
+            "populates": ["label.customer.lastname"],
+            "referenceKey": 1
+        }, {
+            "columnName": "age",
+            "mode": "FULL",
+            "populates": ["fact.customer.age"]
+        }, {
+            "columnName": "amount",
+            "mode": "FULL",
+            "populates": ["fact.customer.amount"]
+        }],
+        "file": "customer.csv",
+        "dataSet": "dataset.customer"
+	}
+}

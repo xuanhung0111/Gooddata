@@ -1,0 +1,40 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="chart-legend" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ChartLegendTest" />
+        </classes>
+    </test>
+
+    <test name="color-palette" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ColorPaletteTest" />
+        </classes>
+    </test>
+
+    <test name="export-limitations" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ExportLimitationsTest" />
+        </classes>
+    </test>
+
+    <test name="shortcut-canvas" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.ShortcutCanvasTest" />
+        </classes>
+    </test>
+
+    <test name="trash" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.TrashTest" />
+        </classes>
+    </test>
+
+    <test name="visualization-types" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.VisualizationTypesTest" />
+        </classes>
+    </test>
+
+</suite>

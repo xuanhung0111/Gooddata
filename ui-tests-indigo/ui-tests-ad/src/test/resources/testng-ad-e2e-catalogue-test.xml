@@ -1,0 +1,28 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="catalogue-description" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.CatalogueDescriptionTest" />
+        </classes>
+    </test>
+
+    <test name="catalogue-filter" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.CatalogueFilterTest" />
+        </classes>
+    </test>
+
+    <test name="catalogue-search" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.CatalogueSearchTest" />
+        </classes>
+    </test>
+
+    <test name="available-items" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.AvailableItemsTest" />
+        </classes>
+    </test>
+
+</suite>

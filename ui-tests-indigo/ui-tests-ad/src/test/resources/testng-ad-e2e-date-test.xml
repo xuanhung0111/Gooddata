@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="date-filters" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.DateFiltersTest" />
+        </classes>
+    </test>
+
+    <test name="date-granularity-switch" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.DateGranularitySwitchTest" />
+        </classes>
+    </test>
+
+    <test name="noncommon-date" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.NoncommonDateTest" />
+        </classes>
+    </test>
+
+</suite>
