@@ -48,6 +48,7 @@ public abstract class ReactDropdownParent extends AbstractFragment {
 
     protected ReactDropdownParent searchForText(String text) {
         By searchField = cssSelector(getSearchFieldSelector());
+        waitForElementVisible(searchField, browser).clear();
         waitForElementVisible(searchField, browser).sendKeys(text);
         return this;
     }
