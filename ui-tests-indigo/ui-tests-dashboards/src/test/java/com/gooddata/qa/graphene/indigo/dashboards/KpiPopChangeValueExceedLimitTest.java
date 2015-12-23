@@ -49,7 +49,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
     private static final String METRIC_NUMBER = "Number[Sum]";
 
-    private static final String CHANGE_VALUE_EXCEED_LIMIT_OR_INFINITY = ">99999%";
+    private static final String CHANGE_VALUE_EXCEED_LIMIT_OR_INFINITY = ">999%";
 
     private static final String KPI_ERROR_DATA_RESOURCE = "/kpi-error-data/";
 
