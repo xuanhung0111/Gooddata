@@ -3,16 +3,16 @@
 
     <test name="filter-share-ratio-metric" enabled="true">
         <groups>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="filter-share-ratio-metric" depends-on="createProject" />
-            </dependencies>
             <run>
                 <include name="filter-share-ratio-metric" />
                 <include name="createProject" />
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="filter-share-ratio-metric" depends-on="createProject" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.manage.GoodSalesMetricTest" />

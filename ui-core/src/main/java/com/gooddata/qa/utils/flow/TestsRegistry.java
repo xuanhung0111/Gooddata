@@ -32,7 +32,7 @@ public class TestsRegistry {
     }
 
     public TestsRegistry register(Class<? extends AbstractTest> testClass) {
-        tests.add(testClass.toString().split(" ")[1]);
+        tests.add(testClass.getSimpleName());
         return this;
     }
 

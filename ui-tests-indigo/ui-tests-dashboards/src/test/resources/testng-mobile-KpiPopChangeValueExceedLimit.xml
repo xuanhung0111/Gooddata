@@ -2,9 +2,6 @@
 <suite name="GD_UI_Selenium_Tests">
     <test name="kpi-pop-change-value-exceed-limit-test">
         <groups>
-            <dependencies>
-                <group name="mobile" depends-on="projectInit" />
-            </dependencies>
             <run>
                 <include name="precondition" />
                 <include name="mobile" />
@@ -13,10 +10,15 @@
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="mobile" depends-on="projectInit" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.dashboards.KpiPopChangeValueExceedLimitTest" />
         </classes>
     </test>
 
+    <parameter name="windowSize" value="600,800" />
+    <parameter name="isMobileRunning" value="true" />
 </suite>

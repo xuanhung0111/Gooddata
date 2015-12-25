@@ -3,16 +3,16 @@
 
     <test name="dp-sanity" enabled="true">
         <groups>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="sanity" depends-on="createProject" />
-            </dependencies>
             <run>
                 <include name="sanity" />
                 <include name="createProject" />
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="sanity" depends-on="createProject" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.dashboards.DashboardPermissionsTest" />
