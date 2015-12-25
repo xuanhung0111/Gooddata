@@ -1,20 +1,25 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertFalse;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
 public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
     private static final String TEST_HEADLINE = "Test headline";
     private static final String KPI_HINT_FOR_EDIT_NAME_COLOR = "rgba(255, 255, 204, 1)";
+    private static final String LONG_NAME_METRIC = "# test metric with longer name is shortened";
+    private static final String PATTERN_OF_METRIC_NAME = "is shortened";
 
     @BeforeClass(alwaysRun = true)
     public void before() {
@@ -221,5 +226,32 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         String hintColor = kpi.hoverToHeadline();
         takeScreenshot(browser, "Kpi shows hint for editable name when hover to headline", this.getClass());
         assertEquals(hintColor, KPI_HINT_FOR_EDIT_NAME_COLOR);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void checkMetricWithLongerNameWillBeShortened() {
+        createMetric(LONG_NAME_METRIC, "SELECT 1", "#,##0");
+
+        MetricSelect metricSelect = initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .clickAddWidget()
+                .getConfigurationPanel()
+                .getMetricSelect();
+        takeScreenshot(browser, "Metric with longer name", getClass());
+        assertTrue(metricSelect.hasItem(LONG_NAME_METRIC), "Item: " + LONG_NAME_METRIC + " not exist in list");
+
+        metricSelect.searchByName(PATTERN_OF_METRIC_NAME);
+        assertTrue(metricSelect.isNameShortened(LONG_NAME_METRIC), "The metric still displays full name");
+
+        String metricTooltip = metricSelect.getTooltip(LONG_NAME_METRIC);
+        takeScreenshot(browser, "Metric tooltip when partial searching", getClass());
+        assertEquals(metricTooltip, LONG_NAME_METRIC);
+
+        metricSelect.searchByName(LONG_NAME_METRIC);
+        assertTrue(metricSelect.isNameShortened(LONG_NAME_METRIC), "The metric still displays full name");
+
+        metricTooltip = metricSelect.getTooltip(LONG_NAME_METRIC);
+        takeScreenshot(browser, "Metric tooltip when searching", getClass());
+        assertEquals(metricTooltip, LONG_NAME_METRIC);
     }
 }

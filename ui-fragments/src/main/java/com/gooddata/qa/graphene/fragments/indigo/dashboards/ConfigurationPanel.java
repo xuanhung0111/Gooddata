@@ -79,4 +79,8 @@ public class ConfigurationPanel extends AbstractFragment {
                 .getAttribute("class")
                 .contains("disabled");
     }
+
+    public MetricSelect getMetricSelect() {
+        return waitForFragmentVisible(metricSelect);
+    }
 }
