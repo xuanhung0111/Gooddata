@@ -393,13 +393,6 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void createDashboard(String name) {
         initDashboardsPage();
         dashboardsPage.addNewDashboard(name);
-        initDashboardsPage();
-    }
-
-    public void createDashboard(String name, boolean lock, boolean publish) {
-        createDashboard(name);
-        lockDashboard(lock);
-        publishDashboard(publish);
     }
 
     public void lockDashboard(boolean lock) {
