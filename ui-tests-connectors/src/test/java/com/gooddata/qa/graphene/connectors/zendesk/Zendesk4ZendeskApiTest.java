@@ -7,12 +7,12 @@ import static org.testng.Assert.fail;
 
 import java.io.IOException;
 
-import com.gooddata.qa.graphene.connectors.ZendeskHelper;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractGreyPageTest;
+import com.gooddata.qa.graphene.connectors.ZendeskHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 
 @Test(groups = {"connectors", "zendesk4", "apiTests"}, description = "Checklist tests for Zendesk Helper")

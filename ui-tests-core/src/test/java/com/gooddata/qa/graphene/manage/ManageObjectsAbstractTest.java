@@ -1,5 +1,10 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,13 +14,10 @@ import java.util.Set;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.ObjectTypes;
 import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 public abstract class ManageObjectsAbstractTest extends GoodSalesAbstractTest {
 

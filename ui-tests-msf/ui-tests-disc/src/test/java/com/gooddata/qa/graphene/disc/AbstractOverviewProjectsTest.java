@@ -1,8 +1,15 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static org.testng.Assert.*;
-import static java.util.stream.Collectors.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static java.util.stream.Collectors.toList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -22,12 +29,12 @@ import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProce
 import com.gooddata.qa.graphene.entity.disc.OverviewProjectDetails.OverviewProcess.OverviewSchedule;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 

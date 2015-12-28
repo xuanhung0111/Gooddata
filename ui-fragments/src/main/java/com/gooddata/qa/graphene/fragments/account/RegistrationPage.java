@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.account;
 
 import static com.gooddata.qa.graphene.fragments.account.ChangePasswordDialog.ERROR_MESSAGE_LOCATOR;
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
 import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessageWithExpectedCount;
 

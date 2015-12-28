@@ -3,42 +3,17 @@
  */
 package com.gooddata.qa.graphene.connectors.zendesk;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.md.AttributeElement;
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
-import com.gooddata.md.report.AttributeInGrid;
-import com.gooddata.md.report.Filter;
-import com.gooddata.md.report.GridElement;
-import com.gooddata.md.report.GridReportDefinitionContent;
-import com.gooddata.md.report.OneNumberReportDefinitionContent;
-import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.project.Project;
-import com.gooddata.qa.graphene.connectors.ZendeskHelper;
-import com.gooddata.qa.graphene.entity.report.HowItem;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.filter.FilterItem;
-import com.gooddata.qa.graphene.enums.Connectors;
-import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.report.ReportExportFormat;
-import com.gooddata.report.ReportService;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-
-import org.apache.commons.lang.StringUtils;
-import org.jboss.arquillian.graphene.Graphene;
-import org.joda.time.DateTime;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.By;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.io.ICsvListReader;
-import org.supercsv.prefs.CsvPreference;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,17 +27,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import org.apache.commons.lang.StringUtils;
+import org.jboss.arquillian.graphene.Graphene;
+import org.joda.time.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.By;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.io.ICsvListReader;
+import org.supercsv.prefs.CsvPreference;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.gooddata.md.Attribute;
+import com.gooddata.md.AttributeElement;
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.md.Restriction;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.Filter;
+import com.gooddata.md.report.GridElement;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.OneNumberReportDefinitionContent;
+import com.gooddata.md.report.ReportDefinition;
+import com.gooddata.project.Project;
+import com.gooddata.qa.graphene.connectors.ZendeskHelper;
+import com.gooddata.qa.graphene.entity.filter.FilterItem;
+import com.gooddata.qa.graphene.entity.report.HowItem;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.Connectors;
+import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.report.ReportExportFormat;
+import com.gooddata.report.ReportService;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 @SuppressWarnings("serial")
 @Test(groups = {"connectors", "zendesk4"}, description = "Checklist tests for Zendesk4 REST API")

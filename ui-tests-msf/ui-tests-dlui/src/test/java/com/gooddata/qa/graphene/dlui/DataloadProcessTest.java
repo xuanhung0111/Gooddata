@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.dlui;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -28,8 +28,8 @@ import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.dto.Processes;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
+import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;

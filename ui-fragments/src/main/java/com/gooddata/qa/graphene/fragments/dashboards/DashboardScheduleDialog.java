@@ -3,16 +3,17 @@
  */
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Joiner;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Joiner;
 
 public class DashboardScheduleDialog extends AbstractFragment {
 

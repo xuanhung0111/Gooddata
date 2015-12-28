@@ -1,5 +1,12 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -13,8 +20,6 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.base.Predicate;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ProjectDetailPage extends AbstractFragment {
 

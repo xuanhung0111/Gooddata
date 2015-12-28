@@ -1,12 +1,12 @@
 package com.gooddata.qa.graphene.fragments.indigo;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForReportsPageLoaded;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.id;
 
@@ -37,9 +37,7 @@ public class HamburgerMenu extends AbstractFragment {
     }
 
     public List<String> getAllMenuItems() {
-        return waitForCollectionIsNotEmpty(menuItems).stream()
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(waitForCollectionIsNotEmpty(menuItems));
     }
 
     public void goToPage(final String page) {

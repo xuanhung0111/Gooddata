@@ -1,14 +1,16 @@
 package com.gooddata.qa.graphene.fragments.greypages;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public abstract class AbstractGreyPagesFragment extends AbstractFragment {
 

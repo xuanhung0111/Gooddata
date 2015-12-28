@@ -1,7 +1,9 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.IOException;
 import java.text.ParseException;

@@ -1,5 +1,11 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertNotNull;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,9 +18,6 @@ import com.gooddata.qa.graphene.fragments.AbstractTable;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static org.testng.Assert.*;
 
 public class ProjectsList extends AbstractTable {
 

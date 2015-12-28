@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.entity.kpi;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 
 public class KpiMDConfiguration {
 

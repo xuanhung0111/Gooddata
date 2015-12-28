@@ -1,6 +1,14 @@
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.qa.utils.http.RestApiClient;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -11,15 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static java.util.Arrays.asList;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 public class ZendeskHelper {
 

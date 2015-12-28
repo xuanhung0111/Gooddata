@@ -2,14 +2,14 @@ package com.gooddata.qa.graphene.indigo.dashboards.common;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
-
 import java.io.IOException;
 import java.util.UUID;
 
 import org.json.JSONException;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 
 public abstract class DashboardWithWidgetsTest extends DashboardsTest {
 

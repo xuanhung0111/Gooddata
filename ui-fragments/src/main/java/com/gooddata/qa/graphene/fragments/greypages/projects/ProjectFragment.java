@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.greypages.projects;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,11 +14,11 @@ import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.testng.Assert;
 
 import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
-import org.testng.Assert;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
 

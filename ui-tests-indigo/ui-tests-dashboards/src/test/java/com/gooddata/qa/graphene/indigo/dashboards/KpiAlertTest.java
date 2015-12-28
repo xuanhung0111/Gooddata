@@ -1,27 +1,24 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
-
-import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
-
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-
+import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import com.gooddata.qa.utils.http.RestUtils;
-import java.util.UUID;
-import org.json.JSONException;
-
-import org.testng.Assert;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.UUID;
+
+import org.json.JSONException;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public class KpiAlertTest extends DashboardWithWidgetsTest {
 

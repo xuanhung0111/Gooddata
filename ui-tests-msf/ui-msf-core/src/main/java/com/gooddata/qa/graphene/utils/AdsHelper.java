@@ -4,18 +4,18 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.Validate.notNull;
 import static org.testng.Assert.assertEquals;
 
-import com.gooddata.GoodData;
-import com.gooddata.project.Environment;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.warehouse.Warehouse;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+
+import com.gooddata.GoodData;
+import com.gooddata.project.Environment;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.warehouse.Warehouse;
 
 public final class AdsHelper {
 

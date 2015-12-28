@@ -1,12 +1,9 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.md.MetadataService;
-import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.browser.BrowserUtils.getCurrentBrowserAgent;
 import static com.gooddata.qa.browser.BrowserUtils.maximize;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
@@ -16,6 +13,9 @@ import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;

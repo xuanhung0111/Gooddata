@@ -1,16 +1,21 @@
 package com.gooddata.qa.graphene.disc;
 
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
-import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
-import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
-import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.google.common.collect.Lists;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
@@ -20,18 +25,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
-import static org.testng.Assert.*;
-import static java.util.Arrays.asList;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
+import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
+import com.gooddata.qa.graphene.utils.ProcessUtils;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.google.common.collect.Lists;
 
 public class DataloadSchedulesTest extends AbstractSchedulesTest {
 

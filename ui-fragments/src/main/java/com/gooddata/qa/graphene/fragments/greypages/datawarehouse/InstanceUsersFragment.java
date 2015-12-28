@@ -1,14 +1,15 @@
 package com.gooddata.qa.graphene.fragments.greypages.datawarehouse;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.testng.Assert.assertEquals;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class InstanceUsersFragment extends AbstractDatawarehouseFragment {
 

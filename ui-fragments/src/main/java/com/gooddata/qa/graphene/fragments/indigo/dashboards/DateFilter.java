@@ -1,7 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import com.gooddata.qa.graphene.utils.CheckUtils;
 import org.openqa.selenium.By;
+
+import com.gooddata.qa.graphene.utils.ElementUtils;
 
 public class DateFilter extends ReactDropdown {
 
@@ -14,6 +15,6 @@ public class DateFilter extends ReactDropdown {
     }
 
     public boolean isInfoMessageDisplayed() {
-        return CheckUtils.isElementPresent(By.cssSelector(DROPDOWN_MESSAGE_CSS_SELECTOR), browser);
+        return ElementUtils.isElementPresent(By.cssSelector(DROPDOWN_MESSAGE_CSS_SELECTOR), browser);
     }
 }

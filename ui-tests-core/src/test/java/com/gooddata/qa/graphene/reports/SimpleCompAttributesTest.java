@@ -1,14 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,8 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.AbstractProjectTest;
 
 @Test(groups = {"projectSimpleCompAttributes"}, description = "Tests for basic Computed Attributes functionality in GD platform")
 public class SimpleCompAttributesTest extends AbstractProjectTest {

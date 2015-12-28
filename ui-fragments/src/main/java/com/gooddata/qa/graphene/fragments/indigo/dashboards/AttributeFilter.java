@@ -1,15 +1,15 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
+
 import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
 
 public class AttributeFilter extends ReactDropdownParent {
 

@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.stream.Collectors.joining;
 
 import java.util.List;
-import static java.util.stream.Collectors.joining;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;

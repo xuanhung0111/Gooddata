@@ -1,12 +1,13 @@
 package com.gooddata.qa.graphene.fragments.common;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 

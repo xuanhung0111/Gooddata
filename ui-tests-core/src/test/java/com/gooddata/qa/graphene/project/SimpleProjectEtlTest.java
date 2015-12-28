@@ -1,14 +1,7 @@
 package com.gooddata.qa.graphene.project;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.openqa.selenium.TimeoutException;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +12,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.zip.CRC32;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.openqa.selenium.TimeoutException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.AbstractProjectTest;
 
 @Test(groups = {"projectSimpleETL"}, description = "Tests for basic ETL functionality in GD platform")
 public class SimpleProjectEtlTest extends AbstractProjectTest {

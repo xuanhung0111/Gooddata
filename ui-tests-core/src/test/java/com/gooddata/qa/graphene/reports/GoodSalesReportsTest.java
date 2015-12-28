@@ -1,29 +1,31 @@
 package com.gooddata.qa.graphene.reports;
 
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
-import com.gooddata.qa.utils.graphene.Screenshots;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.By;
+import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.net.URL;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.enums.report.ReportTypes;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"GoodSalesReports"}, description = "Tests for GoodSales project (reports functionality) in GD platform")
 public class GoodSalesReportsTest extends GoodSalesAbstractTest {

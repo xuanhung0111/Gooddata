@@ -1,12 +1,19 @@
 package com.gooddata.qa.graphene.disc;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static java.util.stream.Collectors.toList;
-import static org.testng.Assert.*;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -27,11 +34,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.ProjectStateFilters;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -57,7 +64,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     public void checkProjectFilterOptions() {
         initDISCProjectsPage();
         Select select = discProjectsPage.getProjectFilterSelect();
-        List<String> options = select.getOptions().stream().map(option -> option.getText()).collect(toList());
+        List<String> options = getElementTexts(select.getOptions());
         System.out.println("Check filter options list...");
         assertThat(
                 options,
@@ -232,8 +239,7 @@ public class ProjectsPageTest extends AbstractOverviewProjectsTest {
     public void checkPagingOptions() {
         initDISCProjectsPage();
         Select select = discProjectsPage.getProjectsPerPageSelect();
-        List<String> pagingOptions =
-                select.getOptions().stream().map(option -> option.getText()).collect(toList());
+        List<String> pagingOptions = getElementTexts(select.getOptions());
         System.out.println("Check paging options list...");
         assertThat(pagingOptions, hasItems("20", "50", "100", "200", "500", "1000", "2000", "5000"));
         assertEquals(select.getFirstSelectedOption().getText(), "20");

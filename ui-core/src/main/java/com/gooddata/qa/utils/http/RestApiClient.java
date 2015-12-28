@@ -4,9 +4,10 @@
 package com.gooddata.qa.utils.http;
 
 
-import com.gooddata.http.client.GoodDataHttpClient;
-import com.gooddata.http.client.LoginSSTRetrievalStrategy;
-import com.gooddata.http.client.SSTRetrievalStrategy;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -25,13 +26,13 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.*;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.http.HttpStatus;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import com.gooddata.http.client.GoodDataHttpClient;
+import com.gooddata.http.client.LoginSSTRetrievalStrategy;
+import com.gooddata.http.client.SSTRetrievalStrategy;
 
 /**
  * Wrapper for Gooddata REST API client which simplifies its usage

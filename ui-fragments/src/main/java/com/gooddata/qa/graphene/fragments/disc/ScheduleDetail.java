@@ -1,10 +1,14 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static java.util.stream.Collectors.toList;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -22,8 +26,6 @@ import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.google.common.base.Predicate;
 import com.google.common.base.Stopwatch;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ScheduleDetail extends ScheduleForm {
 
@@ -632,7 +634,7 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public List<String> getSearchedDatasets() {
-        return datasets.stream().map(dataset -> dataset.getText().trim()).collect(toList());
+        return getElementTexts(datasets);
     }
 
     public int getDatasetListCount() {

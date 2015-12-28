@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import java.util.List;
 
@@ -57,16 +57,11 @@ public class DateFilterPickerPanel extends AbstractFragment {
     }
 
     public List<String> getAllPeriods() {
-        return waitForCollectionIsNotEmpty(periods).stream()
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(waitForCollectionIsNotEmpty(periods));
     }
 
     public List<String> getAllDimensionSwitchs() {
-        return waitForElementVisible(dimensionSwitch).getOptions()
-            .stream()
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(waitForElementVisible(dimensionSwitch).getOptions());
     }
 
     public void hoverOnPeriod(final String period) {

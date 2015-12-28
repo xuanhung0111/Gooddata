@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -10,7 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.utils.CheckUtils;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 
 public class DatasetsListPage extends AbstractFragment {
 
@@ -75,7 +75,7 @@ public class DatasetsListPage extends AbstractFragment {
 
     public boolean isOtherDatasetsEmpty() {
         waitForFragmentVisible(myDatasetsTable); //this is used as indicator for datasets table is loaded
-        return !CheckUtils.isElementPresent(By.cssSelector(".others-datasets"), getRoot());
+        return !ElementUtils.isElementPresent(By.cssSelector(".others-datasets"), getRoot());
     }
 
     public DatasetsTable getOthersDatasetsTable() {

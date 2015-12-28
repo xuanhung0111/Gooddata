@@ -1,8 +1,16 @@
 package com.gooddata.qa.graphene.datawarehouse;
 
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
-import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,13 +19,9 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
-import static org.testng.Assert.*;
+import com.gooddata.qa.graphene.common.StartPageContext;
+import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
+import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
 
 @Test(groups = {"datawarehouse"}, description = "Basic verification of datawarehouse restapi in GD platform")
 public class BasicDatawarehouseRestTest extends AbstractDatawarehouseTest {

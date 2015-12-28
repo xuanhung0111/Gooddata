@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.entity;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -11,8 +13,6 @@ import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class DataSource {
 

@@ -1,14 +1,17 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Arrays.asList;
-import java.util.List;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+
+import java.util.List;
+
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 
 public class DateDimensionTest extends DashboardWithWidgetsTest {
 

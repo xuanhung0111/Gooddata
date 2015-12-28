@@ -1,15 +1,18 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import com.gooddata.qa.graphene.enums.dashboard.PublishType;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.enums.dashboard.PublishType;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class PermissionsDialog extends AbstractFragment {
 

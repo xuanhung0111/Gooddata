@@ -1,17 +1,16 @@
 package com.gooddata.qa.graphene.login;
 
-import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import org.json.JSONException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.common.StartPageContext;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 
 
 @Test(groups = {"login"}, description = "Tests for basic login functionality in GD platform")

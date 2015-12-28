@@ -1,19 +1,14 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
 import static com.gooddata.qa.graphene.utils.NavigateUtils.replaceInUrl;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
-import com.google.common.collect.Iterables;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -22,17 +17,26 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.mail.ImapClient;
+import com.gooddata.qa.utils.mail.ImapUtils;
+import com.google.common.collect.Iterables;
 
 /**
  * Need to run on empty project because neither csv upload (upload.html) nor

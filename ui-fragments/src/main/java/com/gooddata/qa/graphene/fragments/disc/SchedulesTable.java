@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractTable;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class SchedulesTable extends AbstractTable {
 

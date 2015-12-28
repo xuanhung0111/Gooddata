@@ -1,11 +1,18 @@
 package com.gooddata.qa.graphene.performance.dashboards;
 
-import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.utils.CheckUtils;
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
-import com.gooddata.qa.graphene.fragments.greypages.projects.ClearCaches;
-import com.gooddata.qa.utils.graphene.Screenshots;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.graphene.Graphene;
@@ -16,13 +23,12 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.*;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.common.StartPageContext;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
+import com.gooddata.qa.graphene.fragments.greypages.projects.ClearCaches;
+import com.gooddata.qa.graphene.utils.WaitUtils;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"projectDashboardPerf"}, description = "Tests for performance of rendering dashboards of given project")
 public class ProjectPerfWalkthrough extends AbstractUITest {
@@ -41,7 +47,7 @@ public class ProjectPerfWalkthrough extends AbstractUITest {
             
             @Override
             public void waitForStartPageLoaded() {
-                CheckUtils.waitForElementVisible(By.className("param"), browser);
+                WaitUtils.waitForElementVisible(By.className("param"), browser);
             }
             
             @Override

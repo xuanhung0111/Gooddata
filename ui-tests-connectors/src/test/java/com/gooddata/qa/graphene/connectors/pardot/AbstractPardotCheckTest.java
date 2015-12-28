@@ -1,7 +1,10 @@
 package com.gooddata.qa.graphene.connectors.pardot;
 
-import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+
+import java.util.HashMap;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,10 +12,8 @@ import org.openqa.selenium.By;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
-
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public abstract class AbstractPardotCheckTest extends AbstractConnectorsCheckTest {
 

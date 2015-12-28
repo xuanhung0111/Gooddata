@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.openqa.selenium.By.className;
 

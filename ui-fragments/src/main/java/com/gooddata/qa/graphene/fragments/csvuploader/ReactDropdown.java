@@ -1,18 +1,19 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.apache.commons.lang3.Validate.notNull;
+import static org.openqa.selenium.By.cssSelector;
+
+import java.util.Collection;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.Collection;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static org.apache.commons.lang3.Validate.notNull;
-import static org.openqa.selenium.By.cssSelector;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 /**
  * This componet is used for testing Dropdown component from gdc-data-section. It is based on {@link com.gooddata.qa.graphene.fragments.indigo.dashboards.ReactDropdown}

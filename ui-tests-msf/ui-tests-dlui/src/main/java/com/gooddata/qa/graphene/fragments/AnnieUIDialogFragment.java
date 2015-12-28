@@ -1,5 +1,10 @@
 package com.gooddata.qa.graphene.fragments;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
@@ -12,9 +17,6 @@ import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.google.common.base.Predicate;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static org.testng.Assert.*;
 
 public class AnnieUIDialogFragment extends AbstractFragment {
 

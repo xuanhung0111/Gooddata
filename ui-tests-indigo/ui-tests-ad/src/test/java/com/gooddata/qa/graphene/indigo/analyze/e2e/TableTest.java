@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.sort;
 import static org.openqa.selenium.By.cssSelector;

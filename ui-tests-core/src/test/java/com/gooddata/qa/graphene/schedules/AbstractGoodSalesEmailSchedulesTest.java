@@ -3,8 +3,18 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.utils.http.RestApiClient;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import javax.mail.MessagingException;
+import javax.mail.Part;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -14,24 +24,12 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import javax.mail.MessagingException;
-import javax.mail.Part;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import com.gooddata.qa.utils.graphene.Screenshots;
-
-import static java.util.Arrays.asList;
-import static org.testng.Assert.assertEquals;
-
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 

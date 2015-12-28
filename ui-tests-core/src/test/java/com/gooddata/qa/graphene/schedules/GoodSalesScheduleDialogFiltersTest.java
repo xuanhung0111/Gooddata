@@ -3,13 +3,10 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
-import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectExecutionContext;
-import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailFragment;
-import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
-import com.gooddata.qa.utils.graphene.Screenshots;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -20,10 +17,13 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectExecutionContext;
+import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailFragment;
+import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSchedulesTest {

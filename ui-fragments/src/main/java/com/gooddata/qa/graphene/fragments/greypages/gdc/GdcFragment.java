@@ -1,8 +1,9 @@
 package com.gooddata.qa.graphene.fragments.greypages.gdc;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class GdcFragment extends AbstractGreyPagesFragment {
 

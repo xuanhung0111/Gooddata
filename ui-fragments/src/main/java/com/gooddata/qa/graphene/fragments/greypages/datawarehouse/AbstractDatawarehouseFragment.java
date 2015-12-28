@@ -2,11 +2,11 @@ package com.gooddata.qa.graphene.fragments.greypages.datawarehouse;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.Assert;
+
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class AbstractDatawarehouseFragment extends AbstractGreyPagesFragment {
 

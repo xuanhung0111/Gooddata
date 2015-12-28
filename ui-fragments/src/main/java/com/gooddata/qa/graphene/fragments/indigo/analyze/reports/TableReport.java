@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
 
@@ -24,9 +25,7 @@ public class TableReport extends AbstractFragment {
     private static final String CELL_CONTENT = "public_fixedDataTableCell_cellContent";
 
     public List<String> getHeaders() {
-        return waitForCollectionIsNotEmpty(headers).stream()
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(waitForCollectionIsNotEmpty(headers));
     }
 
     public List<List<String>> getContent() {

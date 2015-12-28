@@ -1,11 +1,11 @@
 package com.gooddata.qa.utils.testng;
 
+import static com.gooddata.qa.utils.testng.TestInfo.STATUSES;
+import static com.gooddata.qa.utils.testng.TestInfo.getPackageClassMethodName;
+
 import java.util.Date;
 
 import org.testng.ITestResult;
-
-import static com.gooddata.qa.utils.testng.TestInfo.STATUSES;
-import static com.gooddata.qa.utils.testng.TestInfo.getPackageClassMethodName;
 
 public final class TestLoggingUtils {
 

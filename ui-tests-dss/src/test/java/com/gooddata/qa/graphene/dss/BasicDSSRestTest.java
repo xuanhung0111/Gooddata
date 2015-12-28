@@ -1,8 +1,15 @@
 package com.gooddata.qa.graphene.dss;
 
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
-import com.gooddata.qa.graphene.fragments.greypages.dss.StorageFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,14 +20,9 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static org.jboss.arquillian.graphene.Graphene.createPageFragment;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.common.StartPageContext;
+import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
+import com.gooddata.qa.graphene.fragments.greypages.dss.StorageFragment;
 
 @Test(groups = {"dss"}, description = "Basic verification of dss restapi in GD platform")
 public class BasicDSSRestTest extends AbstractDSSTest {
