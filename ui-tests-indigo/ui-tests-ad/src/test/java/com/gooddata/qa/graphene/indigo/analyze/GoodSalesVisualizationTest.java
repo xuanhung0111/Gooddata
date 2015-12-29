@@ -45,6 +45,11 @@ import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
@@ -137,7 +142,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeReportType(ReportType.BAR_CHART);
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
 
-        analysisPage.addCategory(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ACTIVITY_TYPE);
         assertThat(report.getTrackersCount(), equalTo(4));
 
         analysisPage.resetToBlankState();
@@ -146,24 +151,25 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void disableExportForUnexportableVisualization() {
         initAnalysePage();
+        final AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
         ChartReport report = analysisPage.addMetric(AMOUNT).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
-        assertTrue(analysisPage.isExportToReportButtonEnabled());
+        assertTrue(pageHeader.isExportToReportButtonEnabled());
 
-        analysisPage.addCategory(STAGE_NAME).waitForReportComputing();
+        analysisPage.addAttribute(STAGE_NAME).waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
 
-        analysisPage.addStackBy(STAGE_NAME);
+        analysisPage.addStack(STAGE_NAME);
         assertEquals(report.getTrackersCount(), 8);
 
-        assertFalse(analysisPage.isExportToReportButtonEnabled());
-        assertEquals(analysisPage.getExportToReportButtonTooltipText(), EXPORT_ERROR_MESSAGE);
+        assertFalse(pageHeader.isExportToReportButtonEnabled());
+        assertEquals(pageHeader.getExportToReportButtonTooltipText(), EXPORT_ERROR_MESSAGE);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void dontShowLegendWhenOnlyOneMetric() {
         initAnalysePage();
-        ChartReport report = analysisPage.addMetric(AMOUNT).addCategory(STAGE_NAME).waitForReportComputing()
+        ChartReport report = analysisPage.addMetric(AMOUNT).addAttribute(STAGE_NAME).waitForReportComputing()
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 8);
         assertFalse(report.isLegendVisible());
@@ -187,8 +193,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void testLegendsInStackBy() {
         initAnalysePage();
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(ACTIVITY_TYPE)
-                .addStackBy(DEPARTMENT).waitForReportComputing().getChartReport();
+        ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE)
+                .addStack(DEPARTMENT).waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         assertTrue(report.areLegendsVertical());
 
@@ -204,7 +210,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void showLegendForStackedChartWithOneSeries() {
         initAnalysePage();
-        ChartReport report = analysisPage.addMetric(NUMBER_OF_WON_OPPS).addStackBy(STAGE_NAME)
+        ChartReport report = analysisPage.addMetric(NUMBER_OF_WON_OPPS).addStack(STAGE_NAME)
                 .waitForReportComputing().getChartReport();
         assertTrue(report.isLegendVisible());
         List<String> legends = report.getLegends();
@@ -224,27 +230,21 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
         analysisPage.resetToBlankState();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(ACCOUNT).waitForReportComputing();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACCOUNT).waitForReportComputing();
         assertTrue(analysisPage.isExplorerMessageVisible());
         assertEquals(analysisPage.getExplorerMessage(), "Too many data points to display");
         analysisPage.resetToBlankState();
-
-        // TODO: disable because of https://jira.intgdc.com/browse/CL-7670
-        /*
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addCategory(STAGE_NAME).waitForReportComputing();
-        assertTrue(analysisPage.isExplorerMessageVisible());
-        assertEquals(analysisPage.getExplorerMessage(), "Visualization cannot be displayed");
-        analysisPage.resetToBlankState();
-        */
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testFilteringFieldsInCatalog() {
         initAnalysePage();
-        analysisPage.filterCatalog(CatalogFilterType.MEASURES)
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+
+        cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
             .searchBucketItem("am");
 
-        assertTrue(analysisPage.getAllCatalogFieldsInViewPort()
+        assertTrue(cataloguePanel.getAllCatalogFieldsInViewPort()
             .stream()
             .allMatch(input -> {
                 final String cssClass = input.getAttribute("class");
@@ -253,10 +253,10 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             })
         );
 
-        analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
+        cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
             .searchBucketItem("am");
 
-        assertTrue(analysisPage.getAllCatalogFieldsInViewPort()
+        assertTrue(cataloguePanel.getAllCatalogFieldsInViewPort()
             .stream()
             .allMatch(input -> input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString()))
         );
@@ -265,10 +265,12 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void testCreateReportWithFieldsInCatalogFilter() {
         initAnalysePage();
-        analysisPage.filterCatalog(CatalogFilterType.MEASURES)
-            .addMetric(AMOUNT)
-            .filterCatalog(CatalogFilterType.ATTRIBUTES)
-            .addCategory(STAGE_NAME)
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+
+        cataloguePanel.filterCatalog(CatalogFilterType.MEASURES);
+        analysisPage.addMetric(AMOUNT);
+        cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES);
+        analysisPage.addAttribute(STAGE_NAME)
             .waitForReportComputing();
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
@@ -276,9 +278,12 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"}, description = "https://jira.intgdc.com/browse/CL-7777")
     public void testAggregationFunctionList() {
         initAnalysePage();
-        assertEquals(analysisPage.addMetricFromFact(AMOUNT)
-            .expandMetricConfiguration("Sum of " + AMOUNT)
-            .getAllMetricAggregations("Sum of " + AMOUNT),
+        analysisPage.addMetric(AMOUNT, FieldType.FACT);
+
+        assertEquals(analysisPage.getMetricsBucket()
+                .getMetricConfiguration("Sum of " + AMOUNT)
+                .expandConfiguration()
+                .getAllAggregations(),
             asList("Sum", "Average", "Minimum", "Maximum", "Median", "Running sum"));
     }
 
@@ -286,7 +291,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     public void gridlinesShouldBeCheckedWhenExportBarChart() {
         initAnalysePage();
         analysisPage.addMetric(AMOUNT)
-                .addCategory(STAGE_NAME)
+                .addAttribute(STAGE_NAME)
                 .changeReportType(ReportType.BAR_CHART)
                 .waitForReportComputing()
                 .exportReport();
@@ -326,8 +331,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
         try {
             initAnalysePage();
-            analysisPage.searchBucketItem("aaaa");
-            assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), asList("aaaaA1", "AAAAb2"));
+            analysisPage.getCataloguePanel().searchBucketItem("aaaa");
+            assertEquals(analysisPage.getCataloguePanel().getAllCatalogFieldNamesInViewPort(),
+                    asList("aaaaA1", "AAAAb2"));
         } finally {
             deleteMetric("aaaaA1");
             deleteMetric("AAAAb2");
@@ -349,17 +355,19 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
         try {
             initAnalysePage();
-            assertFalse(analysisPage.searchBucketItem("<button> test XSS </button>"));
-            assertFalse(analysisPage.searchBucketItem("<script> alert('test'); </script>"));
-            assertTrue(analysisPage.searchBucketItem("<button>"));
-            assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
+            final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+
+            assertFalse(cataloguePanel.searchBucketItem("<button> test XSS </button>"));
+            assertFalse(cataloguePanel.searchBucketItem("<script> alert('test'); </script>"));
+            assertTrue(cataloguePanel.searchBucketItem("<button>"));
+            assertEquals(cataloguePanel.getAllCatalogFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
 
             StringBuilder expected = new StringBuilder(xssMetric).append("\n")
                     .append("Field Type\n")
                     .append("Calculated Measure\n")
                     .append("Defined As\n")
                     .append("select Won/Quota\n");
-            assertEquals(analysisPage.getMetricDescription(xssMetric), expected.toString());
+            assertEquals(cataloguePanel.getMetricDescription(xssMetric), expected.toString());
 
             expected = new StringBuilder(xssAttribute).append("\n")
                     .append("Field Type\n")
@@ -367,13 +375,13 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                     .append("Values\n")
                     .append("false\n")
                     .append("true\n");
-            assertEquals(analysisPage.getAttributeDescription(xssAttribute), expected.toString());
+            assertEquals(cataloguePanel.getAttributeDescription(xssAttribute), expected.toString());
 
-            analysisPage.addMetric(xssMetric).addCategory(xssAttribute)
+            analysisPage.addMetric(xssMetric).addAttribute(xssAttribute)
                 .waitForReportComputing();
-            assertEquals(analysisPage.getAllAddedMetricNames(), asList(xssMetric));
-            assertEquals(analysisPage.getAllAddedCategoryNames(), asList(xssAttribute));
-            assertTrue(analysisPage.isFilterVisible(xssAttribute));
+            assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(xssMetric));
+            assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(xssAttribute));
+            assertTrue(analysisPage.getFilterBuckets().isFilterVisible(xssAttribute));
             assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
                     asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
         } finally {
@@ -399,8 +407,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         try {
             initAnalysePage();
             analysisPage.addMetric(PERCENT_OF_GOAL)
-                  .addCategory(IS_WON)
-                  .addStackBy(IS_WON)
+                  .addAttribute(IS_WON)
+                  .addStack(IS_WON)
                   .waitForReportComputing();
             ChartReport report = analysisPage.getChartReport();
             assertTrue(report.getTrackersCount() >= 1);
@@ -418,8 +426,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE)
+                .addAttribute(ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
+                .getPageHeader()
                 .isExportToReportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
@@ -466,9 +475,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     public void exportVisualizationWithOneAttributeInChart() {
         initAnalysePage();
 
-        assertEquals(analysisPage.addCategory(ACTIVITY_TYPE).getExplorerMessage(),
+        assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE).getExplorerMessage(),
                 "Now select a measure to display");
-        assertFalse(analysisPage.isExportToReportButtonEnabled());
+        assertFalse(analysisPage.getPageHeader().isExportToReportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -478,7 +487,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .append("Represents all your dates in project. Can group by Day, Week, Month, Quarter & Year.\n")
                 .append("Field Type\n")
                 .append("Date\n");
-        assertEquals(analysisPage.getTimeDescription(DATE), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getDateDescription(), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -490,7 +499,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .append("Values\n")
                 .append("Direct Sales\n")
                 .append("Inside Sales\n");
-        assertEquals(analysisPage.getAttributeDescription(DEPARTMENT), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getAttributeDescription(DEPARTMENT), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -501,15 +510,17 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .append("Calculated Measure\n")
                 .append("Defined As\n")
                 .append("SELECT COUNT(Activity)\n");
-        assertEquals(analysisPage.getMetricDescription(NUMBER_OF_ACTIVITIES), expected.toString());
+        assertEquals(analysisPage.getCataloguePanel().getMetricDescription(NUMBER_OF_ACTIVITIES), expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void exploreAttributeInMetricFilter() {
         initAnalysePage();
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
+        assertTrue(metricConfiguration.canAddAnotherFilter());
 
         StringBuilder expected = new StringBuilder(DEPARTMENT).append("\n")
                 .append("Field Type\n")
@@ -517,49 +528,51 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .append("Values\n")
                 .append("Direct Sales\n")
                 .append("Inside Sales\n");
-        assertEquals(analysisPage.getAttributeDescriptionInMetricFilter(NUMBER_OF_ACTIVITIES, DEPARTMENT),
+        assertEquals(metricConfiguration.getAttributeDescription(DEPARTMENT),
                 expected.toString());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void testHiddenUnrelatedObjects() {
         initAnalysePage();
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addCategory(ACTIVITY_TYPE)
-            .searchBucketItem(""));
-        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(48));
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
-        assertThat(analysisPage.filterCatalog(CatalogFilterType.MEASURES)
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE);
+        assertTrue(cataloguePanel.searchBucketItem(""));
+        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(48));
+
+        assertThat(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
             .getUnrelatedItemsHiddenCount(), equalTo(39));
-        assertThat(analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
+        assertThat(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .getUnrelatedItemsHiddenCount(), equalTo(9));
 
-        assertFalse(analysisPage.filterCatalog(CatalogFilterType.ALL)
+        assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ALL)
                 .searchBucketItem("Amo"));
-        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(4));
+        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(4));
 
-        assertFalse(analysisPage.filterCatalog(CatalogFilterType.MEASURES)
+        assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
                 .searchBucketItem("Amo"));
-        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(4));
+        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(4));
 
-        assertFalse(analysisPage.filterCatalog(CatalogFilterType.ATTRIBUTES)
+        assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
                 .searchBucketItem("Amo"));
-        assertThat(analysisPage.getUnrelatedItemsHiddenCount(), equalTo(0));
+        assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void searchNonExistent() {
         initAnalysePage();
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPage.filterCatalog(type)
+            assertFalse(analysisPage.getCataloguePanel().filterCatalog(type)
                     .searchBucketItem("abcxyz"));
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"abcxyz\"')"), browser));
         });
 
-        analysisPage.addCategory(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPage.searchBucketItem("Am"));
+            assertFalse(analysisPage.getCataloguePanel().searchBucketItem("Am"));
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"Am\"')"), browser));
 
@@ -572,8 +585,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     public void createReportWithManyAttributes() {
         initAnalysePage();
         List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
-            .addCategory(ACTIVITY_TYPE)
-            .addCategory(DEPARTMENT)
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getTableReport()
@@ -585,13 +598,14 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void filterReportIncludeManyAttributes() {
         initAnalysePage();
-        List<List<String>> adReportContent = analysisPage.changeReportType(ReportType.TABLE)
-            .addCategory(ACTIVITY_TYPE)
-            .addCategory(DEPARTMENT)
-            .addMetric(NUMBER_OF_ACTIVITIES)
-            .configAttributeFilter(ACTIVITY_TYPE, "Email")
-            .configAttributeFilter(DEPARTMENT, "Direct Sales")
-            .waitForReportComputing()
+        analysisPage.changeReportType(ReportType.TABLE)
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
+            .addMetric(NUMBER_OF_ACTIVITIES);
+        analysisPage.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email")
+            .configAttributeFilter(DEPARTMENT, "Direct Sales");
+
+        List<List<String>> adReportContent = analysisPage.waitForReportComputing()
             .getTableReport()
             .getContent();
 
@@ -602,8 +616,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     public void switchReportHasOneMetricManyAttributes() {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE)
-            .addCategory(ACTIVITY_TYPE)
-            .addCategory(DEPARTMENT)
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
@@ -611,24 +625,24 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
-                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
-                assertEquals(analysisPage.getMetricMessage(), type.getMetricMessage());
+                assertEquals(analysisPage.getStacksBucket().getAddedStackByName(), DEPARTMENT);
+                assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE));
+                assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), type.getMetricMessage());
                 analysisPage.undo();
         });
 
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .changeReportType(ReportType.TABLE);
         takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
-        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE, DEPARTMENT));
+        assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE, DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportHasManyMetricsManyAttributes() {
         initAnalysePage();
         analysisPage.changeReportType(ReportType.TABLE)
-            .addCategory(ACTIVITY_TYPE)
-            .addCategory(DEPARTMENT)
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(QUOTA)
             .waitForReportComputing();
@@ -637,75 +651,78 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
-                assertEquals(analysisPage.getStackByMessage(), type.getStackByMessage());
+                assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE));
+                assertEquals(analysisPage.getStacksBucket().getWarningMessage(), type.getStackByMessage());
                 analysisPage.undo();
         });
 
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .changeReportType(ReportType.TABLE);
         takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
-        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+        assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportWithDateAttributes() {
         initAnalysePage();
+        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
+        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+
         analysisPage.changeReportType(ReportType.TABLE)
-            .addCategory(DATE)
-            .addCategory(ACTIVITY_TYPE)
-            .addCategory(DEPARTMENT);
+            .addDate()
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT);
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART, ReportType.LINE_CHART)
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
-                assertEquals(analysisPage.getAddedStackByName(), ACTIVITY_TYPE);
-                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(DATE));
+                assertEquals(stacksBucket.getAddedStackByName(), ACTIVITY_TYPE);
+                assertEquals(categoriesBucket.getItemNames(), asList(DATE));
                 analysisPage.undo();
         });
 
         analysisPage.resetToBlankState()
             .changeReportType(ReportType.TABLE)
-            .addCategory(ACTIVITY_TYPE)
-            .addCategory(DATE)
-            .addCategory(DEPARTMENT);
+            .addAttribute(ACTIVITY_TYPE)
+            .addDate()
+            .addAttribute(DEPARTMENT);
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
-                assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
-                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+                assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+                assertEquals(categoriesBucket.getItemNames(), asList(ACTIVITY_TYPE));
                 analysisPage.undo();
         });
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
         takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + ReportType.LINE_CHART.name(),
                 getClass());
-        assertEquals(analysisPage.getAddedStackByName(), ACTIVITY_TYPE);
-        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(DATE));
+        assertEquals(stacksBucket.getAddedStackByName(), ACTIVITY_TYPE);
+        assertEquals(categoriesBucket.getItemNames(), asList(DATE));
 
         analysisPage.resetToBlankState()
             .changeReportType(ReportType.TABLE)
-            .addCategory(ACTIVITY_TYPE)
-            .addCategory(DEPARTMENT)
-            .addCategory(DATE);
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
+            .addDate();
 
         Stream.of(ReportType.COLUMN_CHART, ReportType.BAR_CHART)
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
-                assertEquals(analysisPage.getAddedStackByName(), DEPARTMENT);
-                assertEquals(analysisPage.getAllAddedCategoryNames(), asList(ACTIVITY_TYPE));
+                assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+                assertEquals(categoriesBucket.getItemNames(), asList(ACTIVITY_TYPE));
                 analysisPage.undo();
         });
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
         takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + ReportType.LINE_CHART.name(),
                 getClass());
-        assertEquals(analysisPage.getAddedStackByName(), ACTIVITY_TYPE);
-        assertEquals(analysisPage.getAllAddedCategoryNames(), asList(DATE));
+        assertEquals(stacksBucket.getAddedStackByName(), ACTIVITY_TYPE);
+        assertEquals(categoriesBucket.getItemNames(), asList(DATE));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -716,8 +733,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .addMetric(NUMBER_OF_OPEN_OPPS)
             .addMetric(NUMBER_OF_OPPORTUNITIES)
             .addMetric(NUMBER_OF_WON_OPPS)
-            .addCategory(DEPARTMENT)
-            .addCategory(PRODUCT)
+            .addAttribute(DEPARTMENT)
+            .addAttribute(PRODUCT)
             .waitForReportComputing()
             .getTableReport()
             .getHeaders()
@@ -786,7 +803,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         content = sortReportBaseOnHeader(
                 analysisPage.resetToBlankState()
                     .changeReportType(ReportType.TABLE)
-                    .addCategory(ACTIVITY_TYPE)
+                    .addAttribute(ACTIVITY_TYPE)
                     .waitForReportComputing()
                     .getTableReport(),
                 ACTIVITY_TYPE);
@@ -794,7 +811,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 asList("Email")));
 
         content = sortReportBaseOnHeader(
-                analysisPage.addCategory(DEPARTMENT)
+                analysisPage.addAttribute(DEPARTMENT)
                     .waitForReportComputing()
                     .getTableReport(),
                 DEPARTMENT);

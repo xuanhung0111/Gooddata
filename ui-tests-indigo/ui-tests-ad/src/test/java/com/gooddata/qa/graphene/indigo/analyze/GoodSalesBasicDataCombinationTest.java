@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
@@ -40,12 +41,15 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
         initAnalysePage();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(DATE)
-                .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .addDate()
                 .getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertTrue(analysisPage.isShowPercentConfigEnabled());
+
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
+        assertTrue(metricConfiguration.isPopEnabled());
+        assertTrue(metricConfiguration.isShowPercentEnabled());
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
@@ -54,15 +58,15 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
         analysisPage.addMetric(QUOTA).waitForReportComputing();
         sleepTight(3000);
         assertTrue(report.getTrackersCount() >= 1);
-        assertFalse(analysisPage.isCompareSamePeriodConfigEnabled());
-        assertFalse(analysisPage.isShowPercentConfigEnabled());
+        assertFalse(metricConfiguration.isPopEnabled());
+        assertFalse(metricConfiguration.isShowPercentEnabled());
         assertEquals(report.getLegends(), asList(NUMBER_OF_ACTIVITIES, QUOTA));
         assertTrue(browser.findElements(RecommendationContainer.LOCATOR).size() == 0);
-        assertEquals(analysisPage.getAllAddedMetricNames(), asList(NUMBER_OF_ACTIVITIES, QUOTA));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(NUMBER_OF_ACTIVITIES, QUOTA));
 
         analysisPage.addMetric(SNAPSHOT_BOP).waitForReportComputing();
         assertTrue(report.getTrackersCount() >= 1);
-        assertEquals(analysisPage.getAllAddedMetricNames(), asList(NUMBER_OF_ACTIVITIES, QUOTA, SNAPSHOT_BOP));
+        assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(NUMBER_OF_ACTIVITIES, QUOTA, SNAPSHOT_BOP));
         checkingOpenAsReport("checkSeriesStateTransitions");
     }
 
@@ -101,7 +105,7 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
         TableReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
                 .addMetric(QUOTA)
                 .addMetric(SNAPSHOT_BOP)
-                .addCategory(ACTIVITY_TYPE)
+                .addAttribute(ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
                 .getTableReport();
         sleepTight(3000);
@@ -128,16 +132,19 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
         initAnalysePage();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addCategory(ACTIVITY_TYPE)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .turnOnShowInPercents()
+            .addAttribute(ACTIVITY_TYPE)
             .getChartReport();
+
+        MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .expandConfiguration()
+                .showPercents();
         sleepTight(5000);
         assertTrue(report.getDataLabels().get(0).endsWith("%"));
 
         analysisPage.addMetric(QUOTA);
-        assertFalse(analysisPage.isShowPercentConfigEnabled());
-        assertFalse(analysisPage.isShowPercentConfigSelected());
+        assertFalse(metricConfiguration.isShowPercentEnabled());
+        assertFalse(metricConfiguration.isShowPercentSelected());
 
         assertEquals(report.getLegendColors(), asList("rgb(0, 131, 255)", "rgb(0, 192, 142)"));
         checkingOpenAsReport("checkShowPercentAndLegendColor");

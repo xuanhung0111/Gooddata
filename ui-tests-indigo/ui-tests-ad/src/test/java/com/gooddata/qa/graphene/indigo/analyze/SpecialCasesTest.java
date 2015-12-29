@@ -16,7 +16,6 @@ import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
 
@@ -36,8 +35,8 @@ public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
     public void enableAccessingDataSection() throws IOException, JSONException {
-        RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
-                ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), true));
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(), 
+                ProjectFeatureFlags.ENABLE_CSV_UPLOADER);
     }
 
     @Test(dependsOnMethods = {"enableAccessingDataSection"}, groups = {"setupProject"})
@@ -49,15 +48,16 @@ public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void testAttributeLimitationInTableReport() {
         initAnalysePage();
-        analysisPage.changeDataset(MANY_CLOUMNS_DATASET)
-            .changeReportType(ReportType.TABLE)
+
+        analysisPage.getCataloguePanel().changeDataset(MANY_CLOUMNS_DATASET)
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
+        analysisPage.changeReportType(ReportType.TABLE);
         Stream.of(ACCOUNT, DEPARTMENT, "Forecast Category", "Is Active", "Is Closed", "Is Won",
                 "Opportunity", PRODUCT, "Region", "Stag 1", "Stag 2", "Stag 3", "Stag 4", "Stag 5",
                 "Stag 6", "Stag 7", "Stag 8", "Stag 9", "Stage Name", "Status")
-                .forEach(analysisPage::addCategory);
+                .forEach(analysisPage::addAttribute);
         takeScreenshot(browser, "testAttributeLimitationInTableReport-finishAdding20Attributes", getClass());
 
-        assertEquals(analysisPage.getAllAddedCategoryNames().size(), 20);
+        assertEquals(analysisPage.getCategoriesBucket().getItemNames().size(), 20);
     }
 }

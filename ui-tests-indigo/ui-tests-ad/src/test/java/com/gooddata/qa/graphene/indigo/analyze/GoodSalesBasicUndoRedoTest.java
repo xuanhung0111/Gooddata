@@ -13,6 +13,9 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
@@ -39,12 +42,12 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
     public void testUndoRedoAfterAddAtribute() {
         initAnalysePage();
 
-        analysisPage.addCategory(ACTIVITY_TYPE);
+        analysisPage.addAttribute(ACTIVITY_TYPE);
 
         checkUndoRedoForEmptyState(true);
 
         analysisPage.redo();
-        assertTrue(analysisPage.getAllAddedCategoryNames().contains(ACTIVITY_TYPE));
+        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -54,13 +57,13 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
         ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(NUMBER_OF_ACTIVITIES));
 
         analysisPage.removeMetric(NUMBER_OF_ACTIVITIES);
-        assertFalse(analysisPage.getAllAddedMetricNames().contains(NUMBER_OF_ACTIVITIES));
+        assertFalse(analysisPage.getMetricsBucket().getItemNames().contains(NUMBER_OF_ACTIVITIES));
 
         checkUndoRedoForReport(baseState, true);
         checkUndoRedoForEmptyState(false);
 
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addCategory(ACTIVITY_TYPE);
+            .addAttribute(ACTIVITY_TYPE);
         ReportState baseStateWithAttribute = ReportState.getCurrentState(analysisPage);
 
         analysisPage.removeCategory(ACTIVITY_TYPE);
@@ -73,36 +76,38 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
     public void testUndoRedoAfterAddFilter() {
         int actionsCount = 0;
         initAnalysePage();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
-        analysisPage.addCategory(ACTIVITY_TYPE); actionsCount++;
+        analysisPage.addAttribute(ACTIVITY_TYPE); actionsCount++;
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES); actionsCount++;
         analysisPage.addFilter(DEPARTMENT); actionsCount++;
 
         analysisPage.undo();
-        assertFalse(analysisPage.isFilterVisible(DEPARTMENT));
+        assertFalse(filtersBucket.isFilterVisible(DEPARTMENT));
 
         analysisPage.redo();
-        assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
+        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
 
         analysisPage.removeFilter(DEPARTMENT);
         actionsCount++;
-        assertFalse(analysisPage.isFilterVisible(DEPARTMENT));
+        assertFalse(filtersBucket.isFilterVisible(DEPARTMENT));
         takeScreenshot(browser, "Indigo_remove_filter", this.getClass());
 
         analysisPage.undo();
-        assertTrue(analysisPage.isFilterVisible(DEPARTMENT));
+        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
 
         analysisPage.redo();
-        assertFalse(analysisPage.isFilterVisible(DEPARTMENT));
+        assertFalse(filtersBucket.isFilterVisible(DEPARTMENT));
 
+        AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
         // Check that the undo must go back to the start of his session
-        assertTrue(analysisPage.isUndoButtonEnabled());
-        assertFalse(analysisPage.isRedoButtonEnabled());
+        assertTrue(pageHeader.isUndoButtonEnabled());
+        assertFalse(pageHeader.isRedoButtonEnabled());
         for (int i = 1; i <= actionsCount; i++) {
             analysisPage.undo();
         }
-        assertFalse(analysisPage.isUndoButtonEnabled());
-        assertTrue(analysisPage.isRedoButtonEnabled());
+        assertFalse(pageHeader.isUndoButtonEnabled());
+        assertTrue(pageHeader.isRedoButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -124,7 +129,7 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-                .addCategory(ACTIVITY_TYPE));
+                .addAttribute(ACTIVITY_TYPE));
         analysisPage.resetToBlankState();
         checkUndoRedoForReport(baseState, true);
     }
@@ -134,13 +139,15 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
 
         ReportState baseState = ReportState.getCurrentState(analysisPage.addMetric(NUMBER_OF_ACTIVITIES));
-        analysisPage.addCategory(ACTIVITY_TYPE)
-            .searchBucketItem(DEPARTMENT);
-        assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), asList(DEPARTMENT));
-        checkUndoRedoForReport(baseState, true);
-        assertEquals(analysisPage.getAllCatalogFieldNamesInViewPort(), asList(DEPARTMENT));
+        analysisPage.addAttribute(ACTIVITY_TYPE);
 
-        analysisPage.addCategory(ACTIVITY_TYPE).exportReport();
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
+        cataloguePanel.searchBucketItem(DEPARTMENT);
+        assertEquals(cataloguePanel.getAllCatalogFieldNamesInViewPort(), asList(DEPARTMENT));
+        checkUndoRedoForReport(baseState, true);
+        assertEquals(cataloguePanel.getAllCatalogFieldNamesInViewPort(), asList(DEPARTMENT));
+
+        analysisPage.addAttribute(ACTIVITY_TYPE).exportReport();
         checkUndoRedoForReport(baseState, true);
     }
 
@@ -156,8 +163,10 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
         }
 
         if (expectedState == null) {
-            assertTrue(analysisPage.isBucketBlankState());
-            assertTrue(analysisPage.isMainEditorBlankState());
+            assertTrue(analysisPage.getMetricsBucket().isEmpty());
+            assertTrue(analysisPage.getCategoriesBucket().isEmpty());
+            assertTrue(analysisPage.getFilterBuckets().isEmpty());
+            assertTrue(analysisPage.getMainEditor().isEmpty());
         } else {
             ReportState currentState = ReportState.getCurrentState(analysisPage);
             assertTrue(currentState.equals(expectedState));
@@ -186,8 +195,8 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
             ChartReport report = analysisPage.getChartReport();
 
             reportTrackerCount = report.getTrackersCount();
-            addedMetrics = analysisPage.getAllAddedMetricNames();
-            addedAttributes = analysisPage.getAllAddedCategoryNames();
+            addedMetrics = analysisPage.getMetricsBucket().getItemNames();
+            addedAttributes = analysisPage.getCategoriesBucket().getItemNames();
 
             reportDataLables = report.getDataLabels();
             reportAxisLables = report.getAxisLabels();

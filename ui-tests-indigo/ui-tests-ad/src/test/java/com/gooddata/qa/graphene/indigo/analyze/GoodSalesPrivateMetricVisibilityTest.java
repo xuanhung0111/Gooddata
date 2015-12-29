@@ -12,11 +12,7 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbstractTest {
 
@@ -47,7 +43,7 @@ public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbst
     public void testPrivateMetric() {
         initAnalysePage();
         assertEquals(analysisPage.addMetric(RATIO_METRIC)
-                .addCategory(DEPARTMENT)
+                .addAttribute(DEPARTMENT)
                 .waitForReportComputing()
                 .getChartReport()
                 .getTrackersCount(), 2);
@@ -61,12 +57,8 @@ public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbst
             logout();
             signIn(false, UserRoles.EDITOR);
 
-            RestApiClient editorRestClient = getRestApiClient(testParams.getEditorUser(),
-                    testParams.getEditorPassword());
-            RestUtils.setFeatureFlags(editorRestClient, FeatureFlagOption.createFeatureClassOption(
-                    ProjectFeatureFlags.ANALYTICAL_DESIGNER.getFlagName(), true));
             initAnalysePage();
-            assertFalse(analysisPage.searchBucketItem(RATIO_METRIC));
+            assertFalse(analysisPage.getCataloguePanel().searchBucketItem(RATIO_METRIC));
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);

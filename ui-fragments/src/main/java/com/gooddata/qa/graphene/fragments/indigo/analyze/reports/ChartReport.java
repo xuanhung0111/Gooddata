@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,23 +12,16 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 public class ChartReport extends AbstractFragment {
 
     @FindBy(css = ".highcharts-series *")
     private List<WebElement> trackers;
 
-    @FindBy(css = ".highcharts-legend-item")
+    @FindBy(className = "highcharts-legend-item")
     private List<WebElement> legends;
 
     @FindBy(css = "div.highcharts-tooltip")
@@ -39,9 +33,7 @@ public class ChartReport extends AbstractFragment {
     @FindBy(css = ".highcharts-axis-labels text[text-anchor = 'middle']")
     private List<WebElement> axisLabels;
 
-    private static final String DESELECTED_COLOR = "rgb(216,216,216)";
-
-    private static final By BY_Y_AXIS_TITLE = By.cssSelector(".highcharts-yaxis-title");
+    private static final By BY_Y_AXIS_TITLE = By.className("highcharts-yaxis-title");
 
     public String getYaxisTitle() {
         List<WebElement> yAxisTitle = getRoot().findElements(BY_Y_AXIS_TITLE);
@@ -51,25 +43,10 @@ public class ChartReport extends AbstractFragment {
         return yAxisTitle.get(0).getText();
     }
 
-    public List<String> getStackLabels() {
-        return getLabels(browser.findElements(By.cssSelector(".highcharts-stack-labels tspan")));
-    }
-
     private List<String> getLabels(Collection<WebElement> labels) {
-        waitForCollectionIsNotEmpty(labels);
-        return Lists.newArrayList(Collections2.transform(labels, new Function<WebElement, String>(){
-            @Override
-            public String apply(WebElement input) {
-                return input.getText().trim();
-            }
-        }));
-    }
-
-    public ChartReport clickOnTrackerByIndex(int index) {
-        waitForCollectionIsNotEmpty(trackers);
-        checkIndex(index);
-        trackers.get(index).click();
-        return this;
+        return waitForCollectionIsNotEmpty(labels).stream()
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
     public int getTrackersCount() {
@@ -84,44 +61,10 @@ public class ChartReport extends AbstractFragment {
             .count();
     }
 
-    public boolean isTrackerInSelectedStateByIndex(int index) {
-        waitForCollectionIsNotEmpty(trackers);
-        checkIndex(index);
-        WebElement tracker = trackers.get(index);
-
-        if (tracker.getAttribute("stroke") == null)
-            return false;
-
-        if (isLineChart()) {
-            if (!"black".equals(tracker.getAttribute("stroke")))
-                return false;
-            return "2".equals(tracker.getAttribute("stroke-width"));
-        }
-
-        if (DESELECTED_COLOR.equals(tracker.getAttribute("fill")))
-            return false;
-        if (!"#FFFFFF".equals(tracker.getAttribute("stroke")))
-            return false;
-        return "1".equals(tracker.getAttribute("stroke-width"));
-    }
-
-    public boolean isTrackerInNormalStateByIndex(int index) {
-        if (!isLineChart())
-            return isTrackerInSelectedStateByIndex(index);
-
-        waitForCollectionIsNotEmpty(trackers);
-        checkIndex(index);
-        WebElement tracker = trackers.get(index);
-
-        if (tracker.getAttribute("stroke") != null)
-            return false;
-        return "1".equals(tracker.getAttribute("stroke-width"));
-    }
-
     public List<List<String>> getTooltipTextOnTrackerByIndex(int index) {
         waitForCollectionIsNotEmpty(trackers);
         checkIndex(index);
-        new Actions(browser).moveToElement(trackers.get(index)).perform();
+        getActions().moveToElement(trackers.get(index)).perform();
 
         waitForElementVisible(tooltip);
         return getTooltipText();
@@ -135,58 +78,28 @@ public class ChartReport extends AbstractFragment {
         List<String[]> values = getTransformValueFormLegend();
         final String y = values.get(0)[1];
 
-        return Iterables.all(values, new Predicate<String[]>() {
-            @Override
-            public boolean apply(String[] input) {
-                return y.equals(input[1]);
-            }
-        });
+        return values.stream().allMatch(input -> y.equals(input[1]));
     }
 
     public boolean areLegendsVertical() {
         List<String[]> values = getTransformValueFormLegend();
         final String x = values.get(0)[0];
 
-        return Iterables.all(values, new Predicate<String[]>() {
-            @Override
-            public boolean apply(String[] input) {
-                return x.equals(input[0]);
-            }
-        });
-    }
-
-    private List<String[]> getTransformValueFormLegend() {
-        waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String[]>() {
-            @Override
-            public String[] apply(WebElement input) {
-                return input.getAttribute("transform").replace("translate(", "").replace(")", "").split(",");
-            }
-        }));
+        return values.stream().allMatch(input -> x.equals(input[0]));
     }
 
     public List<String> getLegends() {
-        waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.findElement(By.cssSelector("tspan")).getText();
-            }
-        }));
+        return waitForCollectionIsNotEmpty(legends).stream()
+            .map(e -> e.findElement(By.cssSelector("tspan")))
+            .map(WebElement::getText)
+            .collect(toList());
     }
 
     public List<String> getLegendColors() {
-        waitForCollectionIsNotEmpty(legends);
-        return Lists.newArrayList(Collections2.transform(legends, new Function<WebElement, String>() {
-            @Override
-            public String apply(WebElement input) {
-                return input.findElement(By.cssSelector("path")).getCssValue("fill");
-            }
-        }));
-    }
-
-    public String getLegendColorByName(String name) {
-        return findLegendByName(name).findElement(By.cssSelector("span")).getCssValue("fill");
+        return waitForCollectionIsNotEmpty(legends).stream()
+            .map(e -> e.findElement(By.cssSelector("path")))
+            .map(e -> e.getCssValue("fill"))
+            .collect(toList());
     }
 
     public List<String> getDataLabels() {
@@ -201,25 +114,13 @@ public class ChartReport extends AbstractFragment {
         return getLabels(axisLabels);
     }
 
-    public ChartReport clickOnLegendByName(String name) {
-        findLegendByName(name).click();
-        return this;
-    }
-
-    private WebElement findLegendByName(final String name) {
-        waitForCollectionIsNotEmpty(legends);
-
-        return FluentIterable.from(legends).filter(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return "div".equals(input.getTagName());
-            }
-        }).firstMatch(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                return name.equals(input.findElement(By.cssSelector("span")).getText());
-            }
-        }).get();
+    private List<String[]> getTransformValueFormLegend() {
+        return waitForCollectionIsNotEmpty(legends).stream()
+            .map(e -> e.getAttribute("transform"))
+            .map(e -> e.replace("translate(", ""))
+            .map(e -> e.replace(")", ""))
+            .map(e -> e.split(","))
+            .collect(toList());
     }
 
     private void checkIndex(int index) {

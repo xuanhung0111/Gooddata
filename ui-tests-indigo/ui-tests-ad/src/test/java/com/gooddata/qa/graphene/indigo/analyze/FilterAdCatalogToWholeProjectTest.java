@@ -18,10 +18,12 @@ import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
 
 public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstractTest {
 
@@ -52,8 +54,8 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
     public void enableAccessingDataSection() throws IOException, JSONException {
-        RestUtils.setFeatureFlags(getRestApiClient(), FeatureFlagOption.createFeatureClassOption(
-                ProjectFeatureFlags.ENABLE_CSV_UPLOADER.getFlagName(), true));
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(), 
+                ProjectFeatureFlags.ENABLE_CSV_UPLOADER);
     }
 
     @Test(dependsOnMethods = {"enableAccessingDataSection"}, groups = {"setupProject"})
@@ -66,56 +68,59 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
     public void analyzeReportOnProductionData() {
         initAnalysePage();
 
-        ChartReport report = analysisPage.addMetricFromFact("Close Price")
-                .addCategory(DATE)
-                .addStackBy("Industry")
+        ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
+                .addDate()
+                .addStack("Industry")
                 .waitForReportComputing()
                 .getChartReport();
         takeScreenshot(browser, "analyzeReportOnProductionData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        analysisPage.configAttributeFilter("Industry", "Apparel Stores", "Consumer Services")
-            .waitForReportComputing();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        filtersBucket.configAttributeFilter("Industry", "Apparel Stores", "Consumer Services");
+        analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnProductionData - apply attribute filter", getClass());
-        assertEquals(analysisPage.getFilterText("Industry"), "Industry: Apparel Stores, Consumer Services\n(2)");
+        assertEquals(filtersBucket.getFilterText("Industry"), "Industry: Apparel Stores, Consumer Services\n(2)");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnPayrollData() {
         initAnalysePage();
+        analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
 
-        ChartReport report = analysisPage.changeDataset(PAYROLL_DATASET)
-            .addMetricFromFact(AMOUNT)
-            .addCategory(DATE)
-            .addStackBy("County")
+        ChartReport report = analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .addDate()
+            .addStack("County")
             .waitForReportComputing()
             .getChartReport();
         takeScreenshot(browser, "analyzeReportOnPayrollData", getClass());
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
 
-        analysisPage.configAttributeFilter("County", "Austin", "Clover")
-            .waitForReportComputing();
+        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
+        filtersBucket.configAttributeFilter("County", "Austin", "Clover");
+        analysisPage.waitForReportComputing();
         assertThat(report.getTrackersCount(), greaterThanOrEqualTo(1));
         takeScreenshot(browser, "analyzeReportOnPayrollData - apply attribute filter", getClass());
-        assertEquals(analysisPage.getFilterText("County"), "County: Austin, Clover");
+        assertEquals(filtersBucket.getFilterText("County"), "County: Austin, Clover");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void searchDataAfterSelectDataset() {
         initAnalysePage();
+        final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
-        assertFalse(analysisPage.changeDataset(PRODUCTION_DATASET)
+        assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)
             .searchBucketItem(AMOUNT));
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in production data", getClass());
-        assertFalse(analysisPage.searchBucketItem("County"));
-        assertTrue(analysisPage.searchBucketItem("Id"));
+        assertFalse(cataloguePanel.searchBucketItem("County"));
+        assertTrue(cataloguePanel.searchBucketItem("Id"));
 
-        assertTrue(analysisPage.changeDataset(PAYROLL_DATASET)
+        assertTrue(cataloguePanel.changeDataset(PAYROLL_DATASET)
                 .searchBucketItem(AMOUNT));
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
-        assertTrue(analysisPage.searchBucketItem("County"));
-        assertFalse(analysisPage.searchBucketItem("Id"));
+        assertTrue(cataloguePanel.searchBucketItem("County"));
+        assertFalse(cataloguePanel.searchBucketItem("Id"));
     }
 
     private void setupData(String csvPath, String uploadInfoPath) throws JSONException, URISyntaxException {

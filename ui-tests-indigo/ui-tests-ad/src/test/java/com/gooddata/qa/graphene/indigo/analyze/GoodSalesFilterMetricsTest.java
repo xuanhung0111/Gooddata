@@ -14,6 +14,7 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
 public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
@@ -32,24 +33,29 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void replaceAttributeFilterByNewOne() {
         addFilterToMetric();
-        assertTrue(analysisPage.removeAttributeFilterFromMetric(NUMBER_OF_ACTIVITIES)
-                .canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
-        analysisPage.addFilterMetric(NUMBER_OF_ACTIVITIES, DEPARTMENT, "Inside Sales")
-            .waitForReportComputing();
-        ChartReport report = analysisPage.getChartReport();
+        final MetricConfiguration metricConfiguration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES);
+
+        assertTrue(metricConfiguration.removeFilter().canAddAnotherFilter());
+
+        metricConfiguration.addFilter(DEPARTMENT, "Inside Sales");
+        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), format("%s (%s: Inside Sales)",
                 NUMBER_OF_ACTIVITIES, DEPARTMENT));
-        assertEquals(analysisPage.getFilterMetricText(NUMBER_OF_ACTIVITIES),
+        assertEquals(metricConfiguration.getFilterText(),
                 format("%s: Inside Sales", DEPARTMENT));
-        assertFalse(analysisPage.canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
-        assertFalse(analysisPage.undo()
-                .waitForReportComputing()
-                .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-                .canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
-        assertFalse(analysisPage.redo()
-                .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-                .canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
+        assertFalse(metricConfiguration.canAddAnotherFilter());
+
+        analysisPage.undo()
+            .waitForReportComputing();
+        metricConfiguration.expandConfiguration();
+        assertFalse(metricConfiguration.canAddAnotherFilter());
+
+        analysisPage.redo()
+            .waitForReportComputing();
+        metricConfiguration.expandConfiguration();
+        assertFalse(metricConfiguration.canAddAnotherFilter());
         analysisPage.waitForReportComputing();
         checkingOpenAsReport("replaceAttributeFilterByNewOne");
     }
@@ -58,9 +64,11 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
     public void replaceMetricHasAttributeFilter() {
         addFilterToMetric();
         analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, AMOUNT)
-            .expandMetricConfiguration(AMOUNT)
             .waitForReportComputing();
-        assertTrue(analysisPage.canAddAnotherAttributeFilterToMetric(AMOUNT));
+        assertTrue(analysisPage.getMetricsBucket()
+                .getMetricConfiguration(AMOUNT)
+                .expandConfiguration()
+                .canAddAnotherFilter());
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), AMOUNT);
@@ -71,13 +79,18 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
     public void addAttributeFilterForMultipleMetrics() {
         initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .addMetric(AMOUNT)
-            .expandMetricConfiguration(AMOUNT);
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .addFilter(DEPARTMENT, "Direct Sales");
 
-        ChartReport report = analysisPage.addFilterMetric(NUMBER_OF_ACTIVITIES, DEPARTMENT, "Direct Sales")
-            .addFilterMetric(AMOUNT, DEPARTMENT, "Inside Sales")
-            .waitForReportComputing()
+        analysisPage.addMetric(AMOUNT)
+            .getMetricsBucket()
+            .getMetricConfiguration(AMOUNT)
+            .expandConfiguration()
+            .addFilter(DEPARTMENT, "Inside Sales");
+
+        ChartReport report = analysisPage.waitForReportComputing()
             .getChartReport();
 
         assertEquals(report.getTrackersCount(), 2);
@@ -90,15 +103,16 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void searchOnlyAttributeElement() {
         initAnalysePage();
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .addFilterMetricBySelectOnly(NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE, "Email")
-            .waitForReportComputing();
+        MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .addFilterBySelectOnly(ACTIVITY_TYPE, "Email");
 
-        ChartReport report = analysisPage.getChartReport();
+        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email)", NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterMetricText(NUMBER_OF_ACTIVITIES), format("%s: Email", ACTIVITY_TYPE));
+        assertEquals(metricConfiguration.getFilterText(), format("%s: Email", ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"}, description = "Cover issue: https://jira.intgdc.com/browse/CL-7952")
@@ -107,9 +121,11 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
 
         initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .addFilterMetricWithLargeNumberValues(NUMBER_OF_ACTIVITIES, ACCOUNT, unselectedValue)
-            .waitForReportComputing();
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .addFilterWithLargeNumberValues(ACCOUNT, unselectedValue);
+        analysisPage.waitForReportComputing();
 
         takeScreenshot(browser, "checkReportWhenFilterContainManyCharacters", getClass());
         ChartReport report = analysisPage.getChartReport();
@@ -118,18 +134,20 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
 
     private void addFilterToMetric() {
         initAnalysePage();
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .expandMetricConfiguration(NUMBER_OF_ACTIVITIES);
+        MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+                .getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
 
-        assertTrue(analysisPage.canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
-        analysisPage.addFilterMetric(NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE, "Email", "Phone Call", "Web Meeting")
-            .waitForReportComputing();
-        ChartReport report = analysisPage.getChartReport();
+        assertTrue(metricConfiguration.canAddAnotherFilter());
+
+        metricConfiguration.addFilter(ACTIVITY_TYPE, "Email", "Phone Call", "Web Meeting");
+        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         assertEquals(report.getYaxisTitle(), format("%s (%s: Email, Phone Call, Web Meeting)",
                 NUMBER_OF_ACTIVITIES, ACTIVITY_TYPE));
-        assertEquals(analysisPage.getFilterMetricText(NUMBER_OF_ACTIVITIES),
+        assertEquals(metricConfiguration.getFilterText(),
                 format("%s: Email, Phone Call, Web Meeting\n(3)", ACTIVITY_TYPE));
-        assertFalse(analysisPage.canAddAnotherAttributeFilterToMetric(NUMBER_OF_ACTIVITIES));
+        assertFalse(metricConfiguration.canAddAnotherFilter());
     }
 }

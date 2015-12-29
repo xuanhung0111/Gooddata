@@ -60,7 +60,8 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
             walkmeCloseElement.click();
             waitForElementNotPresent(walkmeCloseElement);
         } catch (TimeoutException e) {
-            System.out.println("Walkme dialog is not appeared!");
+            takeScreenshot(browser, "Walkme dialog is not appeared", getClass());
+            log.info("Walkme dialog is not appeared!");
         }
     }
 
@@ -71,8 +72,8 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
 
     protected void checkingOpenAsReport(String screenShot) {
         takeScreenshot(browser, screenShot + "-AD-page", getClass());
-        if (!analysisPage.isExportToReportButtonEnabled()) {
-            System.out.println("[Open as Report] button is disabled. Skip export report!");
+        if (!analysisPage.getPageHeader().isExportToReportButtonEnabled()) {
+            log.info("[Open as Report] button is disabled. Skip export report!");
             return;
         }
 

@@ -1,29 +1,26 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class AnalysisPageHeader extends AbstractFragment {
 
-    @FindBy(css = ".s-btn-reset")
+    @FindBy(className = "s-btn-reset")
     private WebElement resetButton;
 
-    @FindBy(css = ".s-export-to-report")
+    @FindBy(className = "s-export-to-report")
     private WebElement exportToReportButton;
 
-    @FindBy(css = ".s-undo")
+    @FindBy(className = "s-undo")
     private WebElement undoButton;
 
-    @FindBy(css = ".s-redo")
+    @FindBy(className = "s-redo")
     private WebElement redoButton;
-
-    private static final String DISABLED = "disabled";
 
     public void resetToBlankState() {
         waitForElementVisible(resetButton).click();
@@ -33,8 +30,8 @@ public class AnalysisPageHeader extends AbstractFragment {
         waitForElementVisible(exportToReportButton).click();
     }
 
-    public boolean isExportToReportButtonEnable() {
-        return !waitForElementVisible(exportToReportButton).getAttribute("class").contains(DISABLED);
+    public boolean isExportToReportButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(exportToReportButton));
     }
 
     public void undo() {
@@ -46,15 +43,19 @@ public class AnalysisPageHeader extends AbstractFragment {
     }
 
     public boolean isUndoButtonEnabled() {
-        return !waitForElementVisible(undoButton).getAttribute("class").contains(DISABLED);
+        return !isElementDisabled(waitForElementVisible(undoButton));
     }
 
     public boolean isRedoButtonEnabled() {
-        return !waitForElementVisible(redoButton).getAttribute("class").contains(DISABLED);
+        return !isElementDisabled(waitForElementVisible(redoButton));
     }
 
     public String getExportToReportButtonTooltipText() {
-        new Actions(browser).moveToElement(exportToReportButton).perform();
-        return waitForElementVisible(By.cssSelector(".bubble-overlay .content"), browser).getText().trim();
+        getActions().moveToElement(exportToReportButton).perform();
+        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText().trim();
+    }
+
+    private boolean isElementDisabled(WebElement element) {
+        return element.getAttribute("class").contains("disabled");
     }
 }
