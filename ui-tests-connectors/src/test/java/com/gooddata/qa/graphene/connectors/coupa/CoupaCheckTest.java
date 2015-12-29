@@ -1,7 +1,11 @@
 package com.gooddata.qa.graphene.connectors.coupa;
 
-import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertTrue;
+
+import java.util.HashMap;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,13 +14,10 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
 import com.gooddata.qa.graphene.enums.Connectors;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.CoupaInstanceFragment;
-
-import java.util.HashMap;
-
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"connectors", "coupa"}, description = "Checklist tests for Coupa connector in GD platform")
 public class CoupaCheckTest extends AbstractConnectorsCheckTest {

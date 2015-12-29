@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports.filter;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.filter.RankingFilterItem;
-import com.gooddata.qa.graphene.utils.CheckUtils;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class RankingFilterFragment extends AbstractFilterFragment {
 
@@ -73,7 +73,7 @@ public class RankingFilterFragment extends AbstractFilterFragment {
 
     private RankingFilterFragment selectRankingSize(final RankingFilterItem filterItem) {
         Stream.of(topRadio, bottomRadio)
-                .map(CheckUtils::waitForElementVisible)
+                .map(WaitUtils::waitForElementVisible)
                 .filter(e -> filterItem.getRanking().toString().equals(e.getAttribute("value")))
                 .findFirst()
                 .get()

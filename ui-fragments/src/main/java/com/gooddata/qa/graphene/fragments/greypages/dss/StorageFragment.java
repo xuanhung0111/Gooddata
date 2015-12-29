@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.fragments.greypages.dss;
 
-import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.AbstractDatawarehouseFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.By;
@@ -8,7 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.AbstractDatawarehouseFragment;
 
 public class StorageFragment extends AbstractDatawarehouseFragment {
 

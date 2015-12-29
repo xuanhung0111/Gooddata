@@ -2,10 +2,10 @@ package com.gooddata.qa.graphene.fragments;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import java.util.List;
 
 /**
  * Graphene fragment representing react FixedDataTable component by Facebook.

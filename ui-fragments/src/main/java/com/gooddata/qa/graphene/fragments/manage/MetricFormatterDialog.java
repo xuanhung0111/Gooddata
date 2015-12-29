@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

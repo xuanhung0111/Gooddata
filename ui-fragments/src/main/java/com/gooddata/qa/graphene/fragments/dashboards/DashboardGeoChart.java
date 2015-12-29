@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,12 +11,9 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import static org.testng.Assert.*;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class DashboardGeoChart extends AbstractFragment {
 

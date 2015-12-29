@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;

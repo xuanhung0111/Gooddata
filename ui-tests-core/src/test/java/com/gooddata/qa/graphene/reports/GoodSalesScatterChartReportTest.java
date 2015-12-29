@@ -1,8 +1,11 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,15 +18,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanelRow;
+import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 
 public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {

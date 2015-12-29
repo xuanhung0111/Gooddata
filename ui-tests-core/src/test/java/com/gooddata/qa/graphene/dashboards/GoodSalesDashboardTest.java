@@ -1,14 +1,18 @@
 package com.gooddata.qa.graphene.dashboards;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
-import com.gooddata.qa.utils.graphene.Screenshots;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static org.testng.Assert.*;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
+import com.gooddata.qa.utils.graphene.Screenshots;
 
 @Test(groups = {"GoodSalesDashboard"}, description = "Tests for GoodSales project (dashboards functionality) in GD platform")
 public class GoodSalesDashboardTest extends GoodSalesAbstractTest {

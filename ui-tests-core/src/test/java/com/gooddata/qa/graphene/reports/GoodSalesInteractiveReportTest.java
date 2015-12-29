@@ -1,14 +1,14 @@
 package com.gooddata.qa.graphene.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.AREA_CHART;
+import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.BAR_CHART;
+import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.LINE_CHART;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.BAR_CHART;
-import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.LINE_CHART;
-import static com.gooddata.qa.graphene.fragments.reports.report.InteractiveReportWidget.ChartType.AREA_CHART;
 
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;

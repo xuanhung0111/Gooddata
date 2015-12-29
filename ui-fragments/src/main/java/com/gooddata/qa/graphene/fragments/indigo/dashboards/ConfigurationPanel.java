@@ -1,11 +1,14 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+
 import java.util.Collection;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class ConfigurationPanel extends AbstractFragment {
 

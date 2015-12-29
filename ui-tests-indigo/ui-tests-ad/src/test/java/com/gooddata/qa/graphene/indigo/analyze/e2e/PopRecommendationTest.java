@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;

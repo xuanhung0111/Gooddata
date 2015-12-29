@@ -1,14 +1,13 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertFalse;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.testng.Assert.*;
-
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ReportWithImage extends AbstractReport {
 

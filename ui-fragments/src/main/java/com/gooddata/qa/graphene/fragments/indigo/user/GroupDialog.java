@@ -1,5 +1,12 @@
 package com.gooddata.qa.graphene.fragments.indigo.user;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -7,14 +14,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertEquals;
 
 public class GroupDialog extends AbstractFragment {
 

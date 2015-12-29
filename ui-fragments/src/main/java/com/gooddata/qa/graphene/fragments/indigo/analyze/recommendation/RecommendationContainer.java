@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 

@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForReportsPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 
 import java.util.ArrayList;
 import java.util.List;

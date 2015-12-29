@@ -1,7 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.reports;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -44,9 +45,7 @@ public class ChartReport extends AbstractFragment {
     }
 
     private List<String> getLabels(Collection<WebElement> labels) {
-        return waitForCollectionIsNotEmpty(labels).stream()
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(waitForCollectionIsNotEmpty(labels));
     }
 
     public int getTrackersCount() {
@@ -89,10 +88,7 @@ public class ChartReport extends AbstractFragment {
     }
 
     public List<String> getLegends() {
-        return waitForCollectionIsNotEmpty(legends).stream()
-            .map(e -> e.findElement(By.cssSelector("tspan")))
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(waitForCollectionIsNotEmpty(legends), e -> e.findElement(By.cssSelector("tspan")));
     }
 
     public List<String> getLegendColors() {

@@ -3,6 +3,15 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
+import static org.testng.Assert.assertEquals;
+
+import java.io.IOException;
+
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
+import org.json.JSONException;
+import org.testng.annotations.Test;
+
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.AbstractRecurrenceTestCase;
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfMonthTestCase;
 import com.gooddata.qa.graphene.entity.dashboard.scheduledialog.MonthlyDayOfWeekTestCase;
@@ -12,15 +21,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
-
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.json.JSONException;
-import org.testng.annotations.Test;
-
-import java.io.IOException;
-
-import static org.testng.Assert.assertEquals;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {

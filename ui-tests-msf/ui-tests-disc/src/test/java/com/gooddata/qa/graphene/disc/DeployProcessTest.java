@@ -2,10 +2,10 @@ package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
 import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.ProcessTypes;

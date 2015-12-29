@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.filter;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;

@@ -1,13 +1,15 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.AbstractTable;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.AbstractTable;
 
 public class DataPreviewPage extends AbstractFragment {
 

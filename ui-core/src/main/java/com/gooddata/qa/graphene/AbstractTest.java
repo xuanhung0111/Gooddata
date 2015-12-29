@@ -1,13 +1,11 @@
 package com.gooddata.qa.graphene;
 
-import com.gooddata.GoodData;
-import com.gooddata.qa.graphene.utils.CheckUtils;
-import com.gooddata.qa.graphene.common.StartPageContext;
-import com.gooddata.qa.graphene.common.TestParameters;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
-import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
-import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpHost;
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -18,12 +16,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.logging.Logger;
+import com.gooddata.GoodData;
+import com.gooddata.qa.graphene.common.StartPageContext;
+import com.gooddata.qa.graphene.common.TestParameters;
+import com.gooddata.qa.graphene.utils.WaitUtils;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.testng.listener.AuxiliaryFailureScreenshotListener;
+import com.gooddata.qa.utils.testng.listener.ConsoleStatusListener;
+import com.gooddata.qa.utils.testng.listener.FailureLoggingListener;
 
 @Listeners({ConsoleStatusListener.class, FailureLoggingListener.class, AuxiliaryFailureScreenshotListener.class})
 public abstract class AbstractTest extends Arquillian {
@@ -72,7 +72,7 @@ public abstract class AbstractTest extends Arquillian {
             
             @Override
             public void waitForStartPageLoaded() {
-                CheckUtils.waitForProjectsPageLoaded(browser);
+                WaitUtils.waitForProjectsPageLoaded(browser);
             }
             
             @Override

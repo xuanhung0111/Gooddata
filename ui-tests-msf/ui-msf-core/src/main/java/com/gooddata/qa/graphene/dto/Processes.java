@@ -1,7 +1,11 @@
 package com.gooddata.qa.graphene.dto;
 
 
-import com.google.common.base.Objects;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.apache.commons.lang.Validate;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -11,10 +15,7 @@ import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import com.google.common.base.Objects;
 
 /**
  * ETL Processes

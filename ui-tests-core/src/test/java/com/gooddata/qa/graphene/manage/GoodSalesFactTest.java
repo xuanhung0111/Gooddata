@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.manage;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 
 @Test(groups = {"GoodSalesFacts"}, description = "Tests for GoodSales project (view and edit fact functionality) in GD platform")

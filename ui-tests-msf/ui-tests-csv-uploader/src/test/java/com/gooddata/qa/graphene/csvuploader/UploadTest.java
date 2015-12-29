@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static java.lang.String.format;

@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkBlueBar;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForReportsPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;

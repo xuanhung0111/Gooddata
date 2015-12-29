@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.dlui;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

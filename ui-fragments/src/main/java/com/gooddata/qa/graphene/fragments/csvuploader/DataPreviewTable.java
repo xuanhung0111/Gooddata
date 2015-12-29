@@ -1,13 +1,11 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Objects;
-
-import static java.util.stream.Collectors.toList;
-
-import com.gooddata.qa.graphene.fragments.FixedDataTable;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -16,6 +14,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import com.gooddata.qa.graphene.fragments.FixedDataTable;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
@@ -39,7 +38,7 @@ public class DataPreviewTable extends FixedDataTable {
     }
 
     public List<WebElement> getColumnNameInputs() {
-        return waitForCollectionIsNotEmpty(columnNames).stream().collect(toList());
+        return waitForCollectionIsNotEmpty(columnNames);
     }
 
     public List<String> getColumnTypes() {
@@ -132,9 +131,7 @@ public class DataPreviewTable extends FixedDataTable {
     private List<String> getColumns(WebElement columnElement) {
         if (columnElement == null)
             return Lists.newArrayList();
-        return columnElement.findElements(By.tagName("td")).stream()
-                .map(WebElement::getText)
-                .collect(toList());
+        return getElementTexts(columnElement.findElements(By.tagName("td")));
     }
 
     public enum ColumnType {

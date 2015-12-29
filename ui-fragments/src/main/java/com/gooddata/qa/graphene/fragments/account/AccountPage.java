@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.account;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForProjectsPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;

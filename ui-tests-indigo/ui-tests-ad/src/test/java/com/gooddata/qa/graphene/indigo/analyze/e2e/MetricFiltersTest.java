@@ -1,13 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
 
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -85,10 +84,8 @@ public class MetricFiltersTest extends AbstractGoodSalesE2ETest {
         assertThat(waitForElementVisible(cssSelector(".s-catalogue-bubble .adi-item-type"), browser).getText(),
                 containsString("Attribute"));
         expectFind(".s-catalogue-bubble .s-attribute-element");
-        assertThat(browser.findElements(cssSelector(".s-catalogue-bubble .s-attribute-element"))
-            .stream()
-            .map(WebElement::getText)
-            .collect(toList()), contains("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
+        assertThat(getElementTexts(browser.findElements(cssSelector(".s-catalogue-bubble .s-attribute-element"))),
+                contains("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
     }
 
     @Test(dependsOnGroups = {"init"})

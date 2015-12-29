@@ -1,7 +1,8 @@
 package com.gooddata.qa.graphene.utils;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForStringInUrl;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static java.lang.String.format;
+
 import org.openqa.selenium.WebDriver;
 
 public class NavigateUtils {

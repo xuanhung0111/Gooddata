@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertEquals;
+
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -14,13 +17,10 @@ import org.openqa.selenium.support.ui.Select;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.CronTimeBuilder;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder.Parameter;
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static org.testng.Assert.*;
 
 public class ScheduleForm extends AbstractFragment {
 

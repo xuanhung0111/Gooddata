@@ -4,7 +4,12 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
+import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR_WARNING;
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.addMUFToUser;
@@ -17,10 +22,6 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.utils.http.ScheduleMailPssClient;
-import com.gooddata.qa.utils.mail.ImapClient;
 
 import java.io.File;
 import java.io.FileReader;
@@ -59,7 +60,10 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
+import com.gooddata.qa.utils.http.ScheduleMailPssClient;
+import com.gooddata.qa.utils.mail.ImapClient;
 import com.google.common.base.Predicate;
 
 @Test(groups = {"GoodSalesSchedules"},

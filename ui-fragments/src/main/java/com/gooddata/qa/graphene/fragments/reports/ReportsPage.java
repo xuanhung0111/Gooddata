@@ -1,12 +1,12 @@
 package com.gooddata.qa.graphene.fragments.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -140,10 +140,7 @@ public class ReportsPage extends AbstractFragment {
     }
 
     public Collection<String> getGroupByVisibility() {
-        return waitForElementVisible(groupBy).getOptions()
-                .stream()
-                .map(WebElement::getText)
-                .collect(toList());
+        return getElementTexts(waitForElementVisible(groupBy).getOptions());
     }
 
     public boolean isTagCloudVisible() {

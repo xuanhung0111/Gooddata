@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

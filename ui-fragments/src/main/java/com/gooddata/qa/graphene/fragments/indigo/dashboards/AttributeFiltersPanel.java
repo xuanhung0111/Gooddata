@@ -1,10 +1,11 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import org.openqa.selenium.support.FindBy;
-
 import java.util.List;
 import java.util.Objects;
+
+import org.openqa.selenium.support.FindBy;
+
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 /**
  * Panel holding {@link AttributeFilter}s

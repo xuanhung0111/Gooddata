@@ -1,15 +1,15 @@
 package com.gooddata.qa.graphene.tools;
 
-import java.util.List;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 
-import com.gooddata.qa.graphene.AbstractUITest;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
+import java.util.List;
 
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import com.gooddata.qa.graphene.AbstractUITest;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 /**
  * This is a helper class to delete test projects from required GD host

@@ -1,33 +1,22 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import java.io.IOException;
-import java.util.stream.Stream;
-
-import com.gooddata.qa.browser.BrowserUtils;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.DrillToSelect;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.google.common.base.Predicate;
-
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
@@ -35,6 +24,17 @@ import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.DrillToSelect;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.utils.http.RestUtils;
+import com.google.common.base.Predicate;
 
 public class KpiDrillToTest extends DashboardWithWidgetsTest {
 

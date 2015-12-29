@@ -1,6 +1,14 @@
 package com.gooddata.qa.graphene.connectors;
 
-import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -19,13 +27,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.Connectors;
-
-import java.io.IOException;
-import java.util.Map;
-
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
 
 public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 

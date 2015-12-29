@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.openqa.selenium.Dimension;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
 public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
 

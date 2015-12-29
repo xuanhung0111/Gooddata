@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.performance.dashboards;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.json.JSONArray;
@@ -14,7 +15,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
 import org.testng.annotations.Test;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 
 @Test(groups = {"dashboardPerf"}, description = "Tests for performance od rendering dashboards in GoodSales project")
 public class GoodSalesDashboardWalkthrough extends GoodSalesAbstractTest {

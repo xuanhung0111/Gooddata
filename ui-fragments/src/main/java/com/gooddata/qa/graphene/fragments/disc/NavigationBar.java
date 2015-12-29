@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class NavigationBar extends AbstractFragment {
 

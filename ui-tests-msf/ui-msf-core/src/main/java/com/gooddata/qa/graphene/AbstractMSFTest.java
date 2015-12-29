@@ -1,12 +1,13 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
-import static java.lang.String.format;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -32,19 +33,19 @@ import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
-import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.ExecutionParameter;
-import com.gooddata.qa.graphene.entity.ProcessInfo;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.DatasetElements;
+import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
-import com.gooddata.qa.graphene.enums.DatasetElements;
-import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.warehouse.Warehouse;
 import com.google.common.collect.Lists;
 

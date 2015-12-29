@@ -1,10 +1,13 @@
 package com.gooddata.qa.graphene.utils;
 
-import com.gooddata.qa.graphene.dto.Processes;
-import com.gooddata.qa.graphene.entity.ExecutionParameter;
-import com.gooddata.qa.graphene.entity.ProcessInfo;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -15,14 +18,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
-import static java.lang.String.format;
-import static org.testng.Assert.*;
+import com.gooddata.qa.graphene.dto.Processes;
+import com.gooddata.qa.graphene.entity.ExecutionParameter;
+import com.gooddata.qa.graphene.entity.ProcessInfo;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public class ProcessUtils {
 

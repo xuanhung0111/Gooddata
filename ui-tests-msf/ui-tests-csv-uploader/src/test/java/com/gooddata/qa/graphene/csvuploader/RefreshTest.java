@@ -1,16 +1,15 @@
 package com.gooddata.qa.graphene.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
-
-import static org.testng.Assert.assertEquals;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;

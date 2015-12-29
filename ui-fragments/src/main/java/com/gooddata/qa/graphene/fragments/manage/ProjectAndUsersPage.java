@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.fragments.manage;
 
 import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE_USER_DIALOG_LOCATOR;
 import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.io.IOException;
 import java.util.List;

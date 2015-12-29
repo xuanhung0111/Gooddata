@@ -3,16 +3,17 @@
  */
 package com.gooddata.qa.graphene.connectors.zendesk;
 
-import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static org.testng.Assert.assertEquals;
+
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.connectors.AbstractConnectorsCheckTest;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public abstract class AbstractZendeskCheckTest extends AbstractConnectorsCheckTest {
 

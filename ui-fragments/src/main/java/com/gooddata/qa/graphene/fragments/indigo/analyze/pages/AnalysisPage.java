@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertTrue;
 

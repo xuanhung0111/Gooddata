@@ -5,16 +5,16 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import static org.testng.Assert.assertFalse;
 
 public class DateFilteringTest extends DashboardWithWidgetsTest {
     private static final String DEFAULT_METRIC_FORMAT = "#,##0";

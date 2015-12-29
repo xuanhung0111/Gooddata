@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 
@@ -15,11 +15,11 @@ import com.gooddata.qa.graphene.entity.filter.FloatingTime.Time;
 import com.gooddata.qa.graphene.entity.filter.RangeFilterItem.RangeType;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;
+import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.fragments.reports.filter.RangeFilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.filter.ReportFilter.FilterFragment;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 
 public class GoodSalesAdvanceRangeFilterReportTest extends GoodSalesAbstractTest {
 

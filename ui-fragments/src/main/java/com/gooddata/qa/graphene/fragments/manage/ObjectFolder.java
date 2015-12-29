@@ -1,5 +1,9 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +13,6 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ObjectFolder extends AbstractFragment {
 

@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.fragments.login;
 
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.LOST_PASSWORD_PAGE_CLASS_NAME;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;

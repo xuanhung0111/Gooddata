@@ -1,12 +1,12 @@
 package com.gooddata.qa.utils.io;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * Convenient utility methods for working with resource files.

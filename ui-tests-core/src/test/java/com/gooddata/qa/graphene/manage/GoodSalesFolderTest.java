@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,8 +15,6 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 @Test(groups = {"GoodSalesFolder"}, description = "Tests for view and edit folder on GoodSales project in GD platform")
 public class GoodSalesFolderTest extends GoodSalesAbstractTest {

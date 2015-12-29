@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports.filter;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.id;
 
 import java.util.List;

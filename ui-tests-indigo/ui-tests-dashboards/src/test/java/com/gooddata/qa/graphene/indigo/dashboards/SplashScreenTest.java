@@ -1,11 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
-
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -15,6 +9,12 @@ import org.json.JSONException;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
 
 public class SplashScreenTest extends DashboardsTest {
 

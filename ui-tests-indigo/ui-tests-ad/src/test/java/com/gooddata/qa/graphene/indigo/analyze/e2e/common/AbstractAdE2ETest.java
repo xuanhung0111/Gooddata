@@ -1,11 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e.common;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -107,10 +108,8 @@ public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
             return;
         }
 
-        assertEquals(waitForCollectionIsNotEmpty(browser.findElements(cssSelector(".highcharts-legend tspan")))
-            .stream()
-            .map(WebElement::getText)
-            .collect(toList()), legends);
+        assertEquals(getElementTexts(waitForCollectionIsNotEmpty(browser.findElements(
+                cssSelector(".highcharts-legend tspan")))), legends);
     }
 
     protected void toggleBucketItemConfig(String cssLocator) {
@@ -200,10 +199,7 @@ public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
     }
 
     protected void expectElementTexts(String cssLocator, List<String> texts) {
-        assertEquals(browser.findElements(cssSelector(cssLocator))
-            .stream()
-            .map(WebElement::getText)
-            .collect(toList()), texts);
+        assertEquals(getElementTexts(browser.findElements(cssSelector(cssLocator))), texts);
     }
 
     protected void expectClean() {

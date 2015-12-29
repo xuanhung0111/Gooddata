@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Objects.nonNull;
 import static org.testng.Assert.assertTrue;

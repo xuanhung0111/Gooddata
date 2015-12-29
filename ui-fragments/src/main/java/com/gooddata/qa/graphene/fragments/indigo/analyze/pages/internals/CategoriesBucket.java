@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.List;
 
@@ -19,10 +19,7 @@ public class CategoriesBucket extends AbstractBucket {
     private Select dimensionSwitch;
 
     public List<String> getItemNames() {
-        return items.stream()
-            .map(e -> e.findElement(BY_HEADER))
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(items, e -> e.findElement(BY_HEADER));
     }
 
     public void changeGranularity(String time) {
@@ -34,10 +31,7 @@ public class CategoriesBucket extends AbstractBucket {
     }
 
     public List<String> getAllGranularities() {
-        return waitForElementVisible(granularity).getOptions()
-            .stream()
-            .map(WebElement::getText)
-            .collect(toList());
+        return getElementTexts(waitForElementVisible(granularity).getOptions());
     }
 
     public String getSelectedDimensionSwitch() {

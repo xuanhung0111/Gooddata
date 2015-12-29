@@ -1,10 +1,11 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class QueryScheduledEmailsFragment extends AbstractGreyPagesFragment {
     public final static int WRONG_ID = -1;

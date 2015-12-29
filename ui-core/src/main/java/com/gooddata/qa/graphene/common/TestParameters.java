@@ -1,12 +1,12 @@
 package com.gooddata.qa.graphene.common;
 
+import java.util.Properties;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
 import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
-
-import java.util.stream.Stream;
-import java.util.Properties;
-import java.util.UUID;
 
 public class TestParameters {
 

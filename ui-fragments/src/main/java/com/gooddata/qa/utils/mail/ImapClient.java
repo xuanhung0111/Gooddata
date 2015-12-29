@@ -3,11 +3,17 @@
  */
 package com.gooddata.qa.utils.mail;
 
-import com.sun.mail.util.BASE64DecoderStream;
+import static org.apache.commons.lang.Validate.notNull;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import javax.mail.BodyPart;
 import javax.mail.Folder;
@@ -24,17 +30,11 @@ import javax.mail.search.FromStringTerm;
 import javax.mail.search.SearchTerm;
 import javax.mail.search.SubjectTerm;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
-import static org.apache.commons.lang.Validate.notNull;
+import com.sun.mail.util.BASE64DecoderStream;
 
 /**
  * Simple IMAP mailbox checker to detect arrived messages

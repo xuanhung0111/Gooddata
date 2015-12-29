@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.manage;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;

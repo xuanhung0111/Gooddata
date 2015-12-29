@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collection;
@@ -137,9 +137,7 @@ public class CataloguePanel extends AbstractFragment {
     }
 
     public List<String> getAllCatalogFieldNamesInViewPort() {
-        return items.stream()
-                .map(WebElement::getText)
-                .collect(toList());
+        return getElementTexts(items);
     }
 
     /**

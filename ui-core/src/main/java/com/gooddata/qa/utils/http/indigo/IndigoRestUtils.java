@@ -1,16 +1,8 @@
 package com.gooddata.qa.utils.http.indigo;
 
-import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
-
-import java.io.IOException;
-
 import static java.lang.String.format;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +16,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+
+import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
+import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public class IndigoRestUtils {
 

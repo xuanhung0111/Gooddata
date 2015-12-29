@@ -1,8 +1,9 @@
 package com.gooddata.qa.graphene.fragments.account;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.mail.ImapUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessageWithExpectedCount;
 
 import java.io.IOException;
 import java.util.Collection;

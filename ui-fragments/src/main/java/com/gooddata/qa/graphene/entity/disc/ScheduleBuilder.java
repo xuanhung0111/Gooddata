@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.google.common.base.CharMatcher;
 
 public class ScheduleBuilder {

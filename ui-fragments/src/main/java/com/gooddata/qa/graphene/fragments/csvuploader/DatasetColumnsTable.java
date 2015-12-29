@@ -1,12 +1,12 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 
-import com.gooddata.qa.graphene.fragments.AbstractTable;
+import java.util.List;
 
 import org.openqa.selenium.By;
 
-import java.util.List;
+import com.gooddata.qa.graphene.fragments.AbstractTable;
 
 public class DatasetColumnsTable extends AbstractTable {
 
@@ -21,10 +21,8 @@ public class DatasetColumnsTable extends AbstractTable {
         return getTableColumnValues(BY_DATASET_COLUMN_TYPE);
     }
 
-    private List<String> getTableColumnValues(By by) {
-        return getRows().stream()
-                .map(row -> row.findElement(by).getText())
-                .collect(toList());
+    private List<String> getTableColumnValues(final By by) {
+        return getElementTexts(getRows(), row -> row.findElement(by));
     }
 
 }

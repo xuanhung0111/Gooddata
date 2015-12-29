@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene;
 
-import org.testng.annotations.BeforeClass;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.testng.annotations.BeforeClass;
 
 public class GoodSalesAbstractTest extends AbstractProjectTest {
 

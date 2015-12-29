@@ -1,7 +1,12 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForEmailSchedulePageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -9,8 +14,6 @@ import static org.testng.Assert.fail;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import com.gooddata.qa.graphene.enums.report.ExportFormat;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -19,10 +22,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
+import com.gooddata.qa.graphene.enums.report.ExportFormat;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 
 public class EmailSchedulePage extends AbstractFragment {

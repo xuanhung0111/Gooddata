@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import java.io.File;

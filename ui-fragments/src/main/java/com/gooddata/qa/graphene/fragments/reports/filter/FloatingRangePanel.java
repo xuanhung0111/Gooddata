@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.filter;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.stream.Stream;
 
@@ -13,7 +13,7 @@ import org.openqa.selenium.support.ui.Select;
 import com.gooddata.qa.graphene.entity.filter.FloatingTime;
 import com.gooddata.qa.graphene.entity.filter.FloatingTime.Time;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.utils.CheckUtils;
+import com.gooddata.qa.graphene.utils.WaitUtils;
 
 public class FloatingRangePanel extends AbstractFragment {
 
@@ -38,7 +38,7 @@ public class FloatingRangePanel extends AbstractFragment {
 
     public void selectTime(final Time time) {
         Stream.of(timeCurrentLabel, timePreviousLabel, timeNextLabel)
-                .map(CheckUtils::waitForElementVisible)
+                .map(WaitUtils::waitForElementVisible)
                 .filter(e -> time.toString().equals(e.findElement(By.tagName("span")).getText()))
                 .map(e -> e.findElement(By.tagName("input")))
                 .findFirst()

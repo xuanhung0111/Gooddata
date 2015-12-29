@@ -1,17 +1,17 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementEnabled;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementEnabled;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import java.io.File;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.io.File;
-import java.util.List;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class FileUploadDialog extends AbstractFragment {
 
@@ -57,10 +57,7 @@ public class FileUploadDialog extends AbstractFragment {
     }
 
     public List<String> getBackendValidationErrors() {
-        return waitForElementVisible(backendValidationErrorsList).findElements(By.tagName("span"))
-                .stream()
-                .map(WebElement::getText)
-                .collect(toList());
+        return getElementTexts(waitForElementVisible(backendValidationErrorsList).findElements(By.tagName("span")));
     }
     
     public String getValidationErrorMessage() {

@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import java.util.List;
 import java.util.Set;
 
@@ -13,8 +15,6 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.dashboards.ReportInfoViewPanel;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.utils.frame.InFrameAction;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class EmbeddedReportWidget extends AbstractFragment {
 

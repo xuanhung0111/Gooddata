@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.fragments.manage;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -14,8 +17,6 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 
 public class ObjectPropertiesPage extends AbstractFragment {
 

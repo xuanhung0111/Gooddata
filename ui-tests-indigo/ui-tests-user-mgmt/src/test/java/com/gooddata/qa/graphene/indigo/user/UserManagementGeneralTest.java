@@ -1,8 +1,13 @@
 package com.gooddata.qa.graphene.indigo.user;
 
-import static org.testng.Assert.*;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -19,17 +24,17 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.dashboard.PublishType;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
-import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.graphene.enums.dashboard.PublishType;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
@@ -37,8 +42,6 @@ import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-
-import static java.util.Arrays.asList;
 
 public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 

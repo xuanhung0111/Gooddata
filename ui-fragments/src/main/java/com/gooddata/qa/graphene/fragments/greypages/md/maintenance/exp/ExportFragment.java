@@ -1,14 +1,14 @@
 package com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp;
 
-import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ExportFragment extends AbstractGreyPagesFragment {
 

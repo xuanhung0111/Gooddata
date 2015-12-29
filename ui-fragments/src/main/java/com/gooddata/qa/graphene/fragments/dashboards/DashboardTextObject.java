@@ -1,16 +1,17 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.CssUtils.simplifyText;
+import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.cssSelector;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.enums.dashboard.TextObject;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
 
 public class DashboardTextObject extends AbstractFragment {
     

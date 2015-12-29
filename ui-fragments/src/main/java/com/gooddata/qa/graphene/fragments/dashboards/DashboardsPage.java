@@ -1,12 +1,14 @@
 package com.gooddata.qa.graphene.fragments.dashboards;
 
-import com.gooddata.qa.utils.CssUtils;
-import com.gooddata.qa.graphene.enums.dashboard.PublishType;
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
-import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
-import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
-import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
-import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -16,11 +18,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import com.gooddata.qa.graphene.enums.dashboard.PublishType;
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
+import com.gooddata.qa.graphene.fragments.dashboards.menu.DashboardMenu;
+import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.utils.CssUtils;
 
 public class DashboardsPage extends AbstractFragment {
     private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 

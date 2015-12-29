@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertFalse;

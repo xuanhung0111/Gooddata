@@ -1,7 +1,8 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
-import java.util.List;
 import static java.util.stream.Collectors.toList;
+
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

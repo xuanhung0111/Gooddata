@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -13,9 +16,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.configuration.Widget
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.AttributeFilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.FilterPanel;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.filter.TimeFilterPanel;
-
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 public class FilterWidget extends AbstractFragment {
 

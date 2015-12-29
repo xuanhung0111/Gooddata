@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.dto;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -13,8 +15,7 @@ import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * ETL Process

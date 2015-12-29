@@ -1,13 +1,11 @@
 package com.gooddata.qa.graphene.account;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForAccountPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAccountPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;

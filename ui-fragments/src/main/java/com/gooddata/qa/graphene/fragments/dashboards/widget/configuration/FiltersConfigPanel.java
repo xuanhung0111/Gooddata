@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.entity.filter;
 
+import static java.lang.Float.compare;
+
 import java.util.Arrays;
 import java.util.List;
 
 import com.gooddata.qa.graphene.enums.metrics.FilterMetric;
-
-import static java.lang.Float.compare;
 
 public class RangeFilterItem extends FilterItem {
 

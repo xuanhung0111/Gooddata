@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.fragments.profile;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -71,9 +71,7 @@ public class UserProfilePage extends AbstractFragment {
 
     public class UserVariableTable extends AbstractTable {
         private List<String> getAllItems() {
-            return rows.stream()
-                    .map(e -> e.findElement(BY_LINK).getText())
-                    .collect(Collectors.toList());
+            return getElementTexts(rows, e -> e.findElement(BY_LINK));
         }
     }
 }

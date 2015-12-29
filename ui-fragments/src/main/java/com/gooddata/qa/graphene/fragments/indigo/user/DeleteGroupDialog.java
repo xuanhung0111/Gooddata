@@ -1,6 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.user;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

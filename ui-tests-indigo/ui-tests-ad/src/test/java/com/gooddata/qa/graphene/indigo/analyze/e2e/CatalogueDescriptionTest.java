@@ -1,12 +1,11 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
-import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -44,10 +43,8 @@ public class CatalogueDescriptionTest extends AbstractGoodSalesE2ETest {
 
         showBubble(activityTypeAttr);
 
-        assertTrue(browser.findElements(cssSelector(".s-catalogue-bubble .s-attribute-element"))
-            .stream()
-            .map(WebElement::getText)
-            .collect(toList()).contains("Email"));
+        assertTrue(getElementTexts(browser.findElements(cssSelector(".s-catalogue-bubble .s-attribute-element")))
+                .contains("Email"));
     }
 
     @Test(dependsOnGroups = {"init"})

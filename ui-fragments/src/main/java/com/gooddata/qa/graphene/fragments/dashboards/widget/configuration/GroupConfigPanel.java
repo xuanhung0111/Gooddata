@@ -1,5 +1,7 @@
 package com.gooddata.qa.graphene.fragments.dashboards.widget.configuration;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -7,7 +9,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.*;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class GroupConfigPanel extends AbstractFragment {

@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene.fragments.common;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.CheckUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
@@ -109,9 +109,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
     }
 
     public Collection<String> getItems() {
-        return items.stream()
-                .map(WebElement::getText)
-                .collect(Collectors.toList());
+        return getElementTexts(items);
     }
 
     private void selectCheckboxItem(String item) {
