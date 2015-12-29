@@ -1,17 +1,22 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class FactBasedMetricsTest extends AbstractGoodSalesE2ETest {
+public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -20,124 +25,140 @@ public class FactBasedMetricsTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_fact_on_the_metrics_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-
-        expectFind(METRICS_BUCKET + NOT_EMPTY_BUCKET);
+        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_remove_created_metric() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
+        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration();
 
-        drag(METRICS_BUCKET + " .adi-bucket-item", TRASH);
-
-        expectFind(METRICS_BUCKET + EMPTY_BUCKET);
+        assertTrue(analysisPage.removeMetric("Sum of " + AMOUNT)
+            .getMetricsBucket()
+            .isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_change_aggregation_function() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
+        MetricConfiguration configuration = analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .waitForReportComputing()
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration();
 
         expectAggregationSelected("SUM", "opportunitysnapshot_amount");
-        expectAggregationAxisLabel("Sum of Amount");
+        expectAggregationAxisLabel("Sum of " + AMOUNT);
 
-        selectAggregation("AVG", "opportunitysnapshot_amount");
+        configuration.changeAggregation("Average");
         expectAggregationSelected("AVG", "opportunitysnapshot_amount");
-        expectAggregationAxisLabel("Avg Amount");
-        expectBucketItemTitle("Avg Amount");
+        expectAggregationAxisLabel("Avg " + AMOUNT);
+        expectBucketItemTitle("Avg " + AMOUNT);
 
-        selectAggregation("MAX", "opportunitysnapshot_amount");
+        configuration.changeAggregation("Maximum");
         expectAggregationSelected("MAX", "opportunitysnapshot_amount");
-        expectAggregationAxisLabel("Max Amount");
-        expectBucketItemTitle("Max Amount");
+        expectAggregationAxisLabel("Max " + AMOUNT);
+        expectBucketItemTitle("Max " + AMOUNT);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_the_same_fact_multiple_times() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-
-        expectElementCount(METRICS_BUCKET + " .adi-bucket-item", 3);
+        assertEquals(analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .addMetric(AMOUNT, FieldType.FACT)
+            .addMetric(AMOUNT, FieldType.FACT)
+            .getMetricsBucket()
+            .getItemNames()
+            .size(), 3);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_allow_to_have_two_different_metrics_from_one_fact() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
+        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration()
+            .changeAggregation("Maximum");
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item:nth-of-type(2)");
-        selectAggregation("MAX", "opportunitysnapshot_amount");
-        selectAggregation("MIN", "opportunitysnapshot_amount", 1);
+        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration()
+            .changeAggregation("Minimum");
 
-        expectChartLegend(asList("Max Amount", "Min Amount"));
+        assertEquals(analysisPage.waitForReportComputing()
+            .getChartReport()
+            .getLegends(), asList("Max " + AMOUNT, "Min " + AMOUNT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_aggregation_change() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-        selectAggregation("MAX", "opportunitysnapshot_amount");
+        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration()
+            .changeAggregation("Maximum");
 
-        undo();
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
+        analysisPage.undo()
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration();
         expectAggregationSelected("SUM", "opportunitysnapshot_amount");
 
-        undo();
-        redo();
-        expectFind(METRICS_BUCKET + NOT_EMPTY_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
+        assertFalse(analysisPage.undo()
+            .redo()
+            .getMetricsBucket()
+            .isEmpty());
+
+        analysisPage.getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration();
         expectAggregationSelected("SUM", "opportunitysnapshot_amount");
-        expectFind(".s-show-pop");
-        expectFind(".s-show-in-percent");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_fact_based_metric_via_single_metric_shortcut() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        drag(amountFact, ".s-recommendation-metric-canvas");
-        expectElementCount(METRICS_BUCKET + " .adi-bucket-item", 1);
+        assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT),
+                () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
+            .waitForReportComputing()
+            .getMetricsBucket()
+            .getItemNames()
+            .size(), 1);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_fact_based_metric_via_trending_shortcut() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        drag(amountFact, ".s-recommendation-metric-over-time-canvas");
-        expectElementCount(METRICS_BUCKET + " .adi-bucket-item", 1);
-        expectElementCount(CATEGORIES_BUCKET + " .adi-bucket-item", 1);
+        assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT),
+                () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
+            .waitForReportComputing()
+            .getMetricsBucket()
+            .getItemNames()
+            .size(), 1);
+        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
     }
 
     private void expectBucketItemTitle(String title) {
         assertEquals(waitForElementVisible(cssSelector(".adi-bucket-item .s-bucket-item-header .s-title"),
                 browser).getText(), title);
-    }
-
-    private void selectAggregation(String aggregation, String factMetricGenerated) {
-        select(".adi-bucket-item[class*=fact_" + factMetricGenerated + "_generated] .s-fact-aggregation-switch",
-                aggregation);
-    }
-
-    private void selectAggregation(String aggregation, String factMetricGenerated, int index) {
-        select(".adi-bucket-item[class*=fact_" + factMetricGenerated + "_generated] .s-fact-aggregation-switch",
-                aggregation, index);
     }
 
     private void expectAggregationAxisLabel(String label) {
@@ -147,7 +168,7 @@ public class FactBasedMetricsTest extends AbstractGoodSalesE2ETest {
     private void expectAggregationSelected(String aggregation, String factMetricGenerated) {
         String locator = ".adi-bucket-item[class*=fact_" + factMetricGenerated + "_generated] .s-fact-aggregation-switch";
 
-        expectFind(locator);
+        assertTrue(isElementPresent(cssSelector(locator), browser));
 
         assertEquals(new Select(waitForElementVisible(cssSelector(locator), browser))
             .getFirstSelectedOption().getAttribute("value"), aggregation);

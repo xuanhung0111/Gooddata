@@ -1,16 +1,23 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class TrendingRecommendationTest extends AbstractGoodSalesE2ETest {
+public class TrendingRecommendationTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -19,44 +26,56 @@ public class TrendingRecommendationTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_add_date_item_with_proper_granularity_to_category_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        expectFind(".s-recommendation-trending");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_month_in_trending_widget_and_hide_it() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        select(".s-date-granularity-switch", "GDC.time.month");
-        click(".s-recommendation-trending .s-apply-recommendation");
-        expectMissing(".s-recommendation-trending");
-        expectFind(CATEGORIES_BUCKET + " " + monthYearActivityLabel);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).select("Month").apply();
+        analysisPage.waitForReportComputing();
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void ashould_have_quarter_selected_after_resetting_a_widget() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        select(".s-date-granularity-switch", "GDC.time.month");
-        resetReport();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).select("Month");
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.resetToBlankState()
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
         assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-granularity-switch"), browser))
             .getFirstSelectedOption().getAttribute("value"), "GDC.time.quarter");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_select_last_4_quarters_on_date_filter_when_trending() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        click(".s-recommendation-trending .s-apply-recommendation");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        expectFind(FILTERS_BUCKET + " .s-date-filter" + quarterYearActivityLabel);
-        expectFind(FILTERS_BUCKET + " .s-date-filter.s-where-___between____3_0__");
+        analysisPage.waitForReportComputing();
+        assertTrue(analysisPage.getFilterBuckets().isDateFilterVisible());
+        assertTrue(isElementPresent(cssSelector(".s-date-filter.s-where-___between____3_0__"), browser));
     }
 }

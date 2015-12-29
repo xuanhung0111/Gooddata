@@ -1,18 +1,23 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import java.util.List;
+
+import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration.AttributeFilterPicker;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class MetricFiltersTest extends AbstractGoodSalesE2ETest {
+public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -21,135 +26,136 @@ public class MetricFiltersTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_filter_metric_by_attribute() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-
-        //  Create attribute filter
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-
-        createAttributeFilter(".s-activity_type");
-
-        selectFirstElementFromAttributeFilter();
-
-        assertThat(waitForElementVisible(cssSelector(METRICS_BUCKET + " .s-bucket-item-header label"), browser)
-                .getText(), containsString("Activity Type: Email"));
+        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .addFilter(ACTIVITY_TYPE, "Email")
+            .getFilterText(), ACTIVITY_TYPE + ": Email");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_filter_metric_by_unavailable_attribute() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + lostOppsMetric);
+        List<String> attributes = analysisPage.addMetric(NUMBER_OF_LOST_OPPS)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_LOST_OPPS)
+            .expandConfiguration()
+            .clickAddAttributeFilter()
+            .getAllAttributesInViewPort();
 
-        click(".s-btn-add_attribute_filter");
-
-        expectFind(".adi-filter-picker .s-department");
-        expectMissing(".adi-filter-picker .s-activity_type");
+        assertTrue(attributes.contains(DEPARTMENT));
+        assertFalse(attributes.contains(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_remove_filter() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-
-        //  Create attribute filter
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-
-        createAttributeFilter(".s-activity_type");
-
-        selectFirstElementFromAttributeFilter();
-
-        // Delete it
-       click(".s-bucket-item .s-remove-attribute-filter");
-       expectMissing(".s-filter-button");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .addFilter(ACTIVITY_TYPE, "Email")
+            .removeFilter();
+        assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_show_tooltip() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-
-        click(".s-btn-add_attribute_filter");
-
-        hover(".s-bubble-id-attr_activity_activitytype");
-
-        assertThat(waitForElementVisible(cssSelector(".s-catalogue-bubble h3"), browser).getText(),
-                containsString("Activity Type"));
-        assertThat(waitForElementVisible(cssSelector(".s-catalogue-bubble .adi-item-type"), browser).getText(),
-                containsString("Attribute"));
-        expectFind(".s-catalogue-bubble .s-attribute-element");
-        assertThat(getElementTexts(browser.findElements(cssSelector(".s-catalogue-bubble .s-attribute-element"))),
-                contains("Email", "In Person Meeting", "Phone Call", "Web Meeting"));
+        String description = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .clickAddAttributeFilter()
+            .getDescription(ACTIVITY_TYPE);
+        assertTrue(description.contains(ACTIVITY_TYPE));
+        assertTrue(description.contains("Attribute"));
+        assertTrue(description.contains("Email"));
+        assertTrue(description.contains("In Person Meeting"));
+        assertTrue(description.contains("Phone Call"));
+        assertTrue(description.contains("Web Meeting"));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_restore_filter_creation() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .clickAddAttributeFilter()
+            .selectAttribute(ACTIVITY_TYPE);
 
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-        createAttributeFilter(".s-activity_type");
+        analysisPage.undo()
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
 
-        undo();
+        assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser));
 
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-
-        expectMissing(".s-filter-button");
-
-        redo();
-
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-
-        // Check filter existence
-        assertThat(waitForElementVisible(cssSelector(".s-filter-button"), browser).getText(),
-                containsString("Activity Type: All"));
+        assertEquals(analysisPage.redo()
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .getFilterText(), ACTIVITY_TYPE + ": All");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_restore_attribute_elements_settings() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-        createAttributeFilter(".s-activity_type");
-        selectFirstElementFromAttributeFilter();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .addFilter(ACTIVITY_TYPE, "Email");
 
-        undo();
-        redo();
+        analysisPage.undo()
+            .redo()
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
 
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-
-        click(".s-filter-button");
+        waitForElementVisible(cssSelector(".s-filter-button"), browser).click();
 
         // Check the attribute filter dropdown status
         // is revived correctly. i.e check 2nd attribute element
         // is not selected.
-        expectFind(".s-filter-item[title='In Person Meeting']:not(.is-selected)");
+        assertTrue(isElementPresent(cssSelector(".s-filter-item[title='In Person Meeting']:not(.is-selected)"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_total_count_in_attribute_filter_label_correctly() {
-        visitEditor();
+        initAnalysePageByUrl();
 
         String labelCount = ".s-attribute-filter-label .s-total-count";
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-        createAttributeFilter(".s-activity_type");
-        expectMissing(labelCount);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .clickAddAttributeFilter()
+            .selectAttribute(ACTIVITY_TYPE);
+        assertFalse(isElementPresent(cssSelector(labelCount), browser));
 
-        selectFirstElementFromAttributeFilter();
-        expectFind(labelCount);
+        AttributeFilterPicker panel = Graphene.createPageFragment(AttributeFilterPicker.class,
+                waitForElementVisible(MetricConfiguration.BY_ATTRIBUTE_FILTER_PICKER, browser));
 
-        click(".s-filter-button");
-        selectAllElementsFromAttributeFilter();
-        expectMissing(labelCount);
+        panel.clear()
+            .selectItems("Email")
+            .apply();
+        assertTrue(isElementPresent(cssSelector(labelCount), browser));
+
+        waitForElementVisible(cssSelector(".s-filter-button"), browser).click();
+        panel.selectAll()
+            .apply();
+        assertFalse(isElementPresent(cssSelector(labelCount), browser));
     }
 }

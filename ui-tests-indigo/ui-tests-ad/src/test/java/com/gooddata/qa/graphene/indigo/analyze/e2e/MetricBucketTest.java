@@ -1,14 +1,22 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class MetricBucketTest extends AbstractGoodSalesE2ETest {
+public class MetricBucketTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -17,151 +25,188 @@ public class MetricBucketTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_metric_details() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-        hover(".inlineBubbleHelp", METRICS_BUCKET);
-        expectFind(".s-catalogue-bubble-loaded");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
+
+        hover(".s-bucket-metrics .inlineBubbleHelp");
+        assertTrue(isElementPresent(cssSelector(".s-catalogue-bubble-loaded"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_fact_details() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(amountFact, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-        hover(".inlineBubbleHelp", METRICS_BUCKET);
-        expectFind(".s-catalogue-bubble-loaded");
+        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + AMOUNT)
+            .expandConfiguration();
+        hover(".s-bucket-metrics .inlineBubbleHelp");
+        assertTrue(isElementPresent(cssSelector(".s-catalogue-bubble-loaded"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_attribute_details() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-        hover(".inlineBubbleHelp", METRICS_BUCKET);
-        expectFind(".s-catalogue-bubble-loaded");
+        analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+            .getMetricsBucket()
+            .getMetricConfiguration("Count of " + ACTIVITY_TYPE)
+            .expandConfiguration();
+        hover(".s-bucket-metrics .inlineBubbleHelp");
+        assertTrue(isElementPresent(cssSelector(".s-catalogue-bubble-loaded"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_open_and_close_configuration() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        expectMissing(METRICS_BUCKET + " input[type=checkbox]");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        assertFalse(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
 
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-        expectFind(METRICS_BUCKET + " input[type=checkbox]");
+        MetricConfiguration configuration = analysisPage.getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
+        assertTrue(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
 
-        toggleBucketItemConfig(METRICS_BUCKET + " .s-bucket-item");
-        expectMissing(METRICS_BUCKET + " input[type=checkbox]");
+        configuration.collapseConfiguration();
+        assertFalse(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_able_to_drop_second_metric_into_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(NUMBER_OF_LOST_OPPS)
+            .waitForReportComputing();
 
-        expectFind(".adi-components .visualization-column .s-property-y");
-        expectFind(".adi-components .visualization-column .s-property-color");
+        assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-y"), browser));
+        assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-color"), browser));
 
-        expectChartLegend(asList("# of Activities", "# of Lost Opps."));
+        assertEquals(analysisPage.getChartReport().getLegends(), asList(NUMBER_OF_ACTIVITIES, NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_show_in_percent_correctly() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-        expectFind(".is-disabled .s-show-in-percent");
+        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
+        assertFalse(configuration.isShowPercentEnabled());
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        expectMissing(".is-disabled .s-show-in-percent");
+        analysisPage.addAttribute(ACTIVITY_TYPE);
+        assertTrue(configuration.isShowPercentEnabled());
 
-        dragFromCatalogue(quotaMetric, METRICS_BUCKET);
-        expectFind(".is-disabled .s-show-in-percent");
+        assertFalse(analysisPage.addMetric(QUOTA)
+            .getMetricsBucket()
+            .getMetricConfiguration(QUOTA)
+            .expandConfiguration()
+            .isShowPercentEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_show_PoP_correctly() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
-        expectFind(".is-disabled .s-show-pop");
+        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
+        assertFalse(configuration.isPopEnabled());
 
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
-        expectMissing(".is-disabled .s-show-pop");
+        analysisPage.addDate();
+        assertTrue(configuration.isPopEnabled());
 
-        dragFromCatalogue(quotaMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + quotaMetric);
-        expectFind(".is-disabled .s-show-pop");
+        assertFalse(analysisPage.addMetric(QUOTA)
+            .getMetricsBucket()
+            .getMetricConfiguration(QUOTA)
+            .expandConfiguration()
+            .isPopEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_PoP_after_second_metric_is_added() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDate()
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .showPop();
+        assertEquals(analysisPage.waitForReportComputing()
+            .getChartReport()
+            .getLegends(), asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
 
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
-
-        click(METRICS_BUCKET + " .s-show-pop");
-        expectChartLegend(asList("# of Activities - previous year", "# of Activities"));
-
-        dragFromCatalogue(quotaMetric, METRICS_BUCKET);
-        expectChartLegend(asList("# of Activities", "Quota"));
+        assertEquals(analysisPage.addMetric(QUOTA)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), asList(NUMBER_OF_ACTIVITIES, QUOTA));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_percent_if_2_metric_is_added() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration()
+            .showPercents();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-
-        click(METRICS_BUCKET + " .s-show-in-percent");
-
-        dragFromCatalogue(quotaMetric, METRICS_BUCKET);
-        expectChartLegend(asList("# of Activities", "Quota"));
+        assertEquals(analysisPage.addMetric(QUOTA)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), asList(NUMBER_OF_ACTIVITIES, QUOTA));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_second_metric_if_user_wants() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
+        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(NUMBER_OF_LOST_OPPS)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), asList(NUMBER_OF_ACTIVITIES, NUMBER_OF_LOST_OPPS));
 
-        expectChartLegend(asList("# of Activities", "# of Lost Opps."));
-
-        drag(METRICS_BUCKET + " " + activitiesMetric, TRASH);
-        expectChartLegend(emptyList());
+        assertFalse(analysisPage.removeMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing()
+            .getChartReport()
+            .isLegendVisible());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_allow_to_add_second_instance_of_metric_already_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-
-        expectElementCount(METRICS_BUCKET + " " + activitiesMetric, 2);
+        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getItemNames()
+            .size(), 2);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_legend_for_only_one_metric() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        expectChartLegend(emptyList());
+        assertFalse(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing()
+            .getChartReport()
+            .isLegendVisible());
+    }
+
+    private void hover(String cssLocator) {
+        new Actions(browser)
+            .moveToElement(waitForElementVisible(cssSelector(cssLocator), browser))
+            .perform();
     }
 }

@@ -1,11 +1,20 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static java.util.Objects.isNull;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class VisualizationTypesTest extends AbstractGoodSalesE2ETest {
+public class VisualizationTypesTest extends AbstractAdE2ETest {
+
+    private String activityTypeIdentifier;
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -14,151 +23,194 @@ public class VisualizationTypesTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_table_visualization() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("table");
-        expectFind(".adi-components .dda-table-component");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_line_chart_visualization() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("line");
-        expectFind(".adi-components .dda-line-component");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.LINE_CHART)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-line-component"), browser));
 
-        expectFind(".adi-components .visualization-line .s-property-y.s-id-metricvalues");
-        expectFind(".adi-components .visualization-line .s-property-x" + activityTypeAttrLabel);
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-line .s-property-y.s-id-metricvalues"), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-line .s-property-x" + getActivityTypeIdentifier()), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_bar_chart_visualization() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("bar");
-        expectFind(".adi-components .dda-bar-component");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.BAR_CHART)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-bar-component"), browser));
 
-        expectFind(".adi-components .visualization-bar .s-property-y.s-id-metricvalues");
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_column_chart_visualization() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("column");
-        expectFind(".adi-components .dda-column-component");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.COLUMN_CHART)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-column-component"), browser));
 
-        expectFind(".adi-components .visualization-column .s-property-y.s-id-metricvalues");
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .s-property-y.s-id-metricvalues"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_changing_the_visualization_type() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("table");
-        expectFind(".adi-components .dda-table-component");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component"), browser));
 
-        switchVisualization("line");
-        expectFind(".adi-components .dda-line-component");
-        expectFind(".adi-components .visualization-line .s-property-y.s-id-metricvalues");
-        expectFind(".adi-components .visualization-line .s-property-x" + activityTypeAttrLabel);
+        analysisPage.changeReportType(ReportType.LINE_CHART)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-line-component"), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-line .s-property-y.s-id-metricvalues"), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-line .s-property-x" + getActivityTypeIdentifier()), browser));
 
-        switchVisualization("bar");
-        expectFind(".adi-components .dda-bar-component");
-        expectFind(".adi-components .visualization-bar .s-property-y.s-id-metricvalues");
+        analysisPage.changeReportType(ReportType.BAR_CHART)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-bar-component"), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
 
-        switchVisualization("column");
-        expectFind(".adi-components .dda-column-component");
-        expectFind(".adi-components .visualization-column .s-property-y.s-id-metricvalues");
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-column-component"), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .s-property-y.s-id-metricvalues"), browser));
 
-        switchVisualization("table");
-        expectFind(".adi-components .dda-table-component");
+        analysisPage.changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_sort_bar_chart() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("bar");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.BAR_CHART)
+            .waitForReportComputing();
 
-        expectFind(".s-property-orderBy");
+        assertTrue(isElementPresent(cssSelector(".s-property-orderBy"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_line_chart() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("line");
-        expectMissing(".s-property-orderBy");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.LINE_CHART)
+            .waitForReportComputing();
+
+        assertFalse(isElementPresent(cssSelector(".s-property-orderBy"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_column_chart() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("column");
-        expectMissing(".s-property-orderBy");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.COLUMN_CHART)
+            .waitForReportComputing();
+
+        assertFalse(isElementPresent(cssSelector(".s-property-orderBy"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_table() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        switchVisualization("table");
-        expectMissing(".s-property-orderBy");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
+
+        assertFalse(isElementPresent(cssSelector(".s-property-orderBy"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_update_visualization_upon_config_change() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        switchVisualization("bar");
+        analysisPage.changeReportType(ReportType.BAR_CHART)
+            // add a metric to configuration
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
 
-        // add a metric to configuration
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
         // check whether a rendered highcharts component is indeed present
         // with a single metric configuration
-        expectFind(".adi-components .dda-bar-component .highcharts-container");
-        expectFind(".adi-components .visualization-bar .s-property-y.s-id-metricvalues");
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .dda-bar-component .highcharts-container"), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
 
         // add an attribute
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        expectFind(".adi-components .visualization-bar .s-property-x" + activityTypeAttrLabel);
+        analysisPage.addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-bar .s-property-x" + getActivityTypeIdentifier()), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_if_one_attribute_is_dragged_in() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        switchVisualization("column");
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        expectFind(".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric");
+        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+            .addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"), browser));
 
-        switchVisualization("table");
-        expectMissing(".adi-editor-canvas .adi-canvas-message");
+        analysisPage.changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
+        assertFalse(isElementPresent(cssSelector(
+                ".adi-editor-canvas .adi-canvas-message"), browser));
 
-        switchVisualization("line");
-        expectFind(".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric");
+        analysisPage.changeReportType(ReportType.LINE_CHART)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"), browser));
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        expectMissing(".adi-editor-canvas .adi-canvas-message");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        assertFalse(isElementPresent(cssSelector(
+                ".adi-editor-canvas .adi-canvas-message"), browser));
+    }
+
+    private String getActivityTypeIdentifier() {
+        if (isNull(activityTypeIdentifier))
+            activityTypeIdentifier = ".s-id-" + getAttributeDisplayFormIdentifier(ACTIVITY_TYPE);
+        return activityTypeIdentifier;
     }
 }

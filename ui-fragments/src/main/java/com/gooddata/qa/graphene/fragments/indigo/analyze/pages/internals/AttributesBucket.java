@@ -50,7 +50,8 @@ public class AttributesBucket extends AbstractBucket {
 
     public WebElement get(final String name) {
         return items.stream()
-                .filter(e -> name.equals(e.findElement(BY_HEADER).getText()))
+                .map(e -> e.findElement(BY_HEADER))
+                .filter(e -> name.equals(e.getText()))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Cannot find attribute: " + name));
     }
