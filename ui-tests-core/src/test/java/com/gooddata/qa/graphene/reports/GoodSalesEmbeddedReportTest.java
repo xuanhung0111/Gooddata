@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
@@ -417,7 +418,8 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     private void embedReportToOtherProjectDashboard(String embedCode, String projectToShare, String dashboardName) {
         initProjectsPage();
-        projectsPage.goToProject(projectToShare);
+        openUrl(PAGE_UI_PROJECT_PREFIX + projectToShare + DASHBOARD_PAGE_SUFFIX);
+        waitForDashboardPageLoaded(browser);
         waitForFragmentVisible(dashboardsPage);
         dashboardsPage.addNewDashboard(dashboardName);
         dashboardsPage.editDashboard();
