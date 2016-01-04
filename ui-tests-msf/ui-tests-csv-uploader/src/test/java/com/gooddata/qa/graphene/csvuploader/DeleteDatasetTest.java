@@ -44,7 +44,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
     public void deleteCsvDatasetFromList() throws Exception {
         CsvFile fileToUpload = CsvFile.PAYROLL;
         String datasetName = uploadData(fileToUpload);
-        
+
         createObjectsUsingUploadedData();
         initDataUploadPage();
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
@@ -63,7 +63,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         checkForDatasetRemoved(datasetName);
         removeDatasetFromUploadHistory(fileToUpload, datasetName);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, datasetName, "dataset-deleted"), getClass());
-        
+
         checkObjectsCreatedAfterDatasetRemoved();
     }
 
@@ -71,13 +71,13 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
     public void deleteCsvDatasetFromDetail() throws Exception {
         CsvFile fileToUpload = CsvFile.PAYROLL;
         String datasetName = uploadData(fileToUpload);
-        
+
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
 
         datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
         waitForFragmentVisible(csvDatasetDetailPage).clickDeleteButton();
         waitForFragmentVisible(datasetDeleteDialog).clickDelete();
-        
+
         assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                 is(String.format(SUCCESSFUL_REMOVE_DATASET, datasetName)));
 
@@ -97,12 +97,12 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
         waitForFragmentVisible(csvDatasetDetailPage).clickDeleteButton();
         waitForFragmentVisible(datasetDeleteDialog).clickCancel();
-        
+
         waitForFragmentNotVisible(datasetDeleteDialog);
         csvDatasetDetailPage.clickBackButton();
         waitForFragmentVisible(datasetsListPage);
         waitForExpectedDatasetsCount(datasetCountBeforeDelete);
-        
+
         datasetsListPage.getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
         waitForFragmentVisible(datasetDeleteDialog).clickCancel();
         waitForFragmentNotVisible(datasetDeleteDialog);
@@ -136,28 +136,28 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         initReportsPage();
         assertFalse(reportsPage.isReportVisible(REPORT1), "Report1 is not deleted");
         assertFalse(reportsPage.isReportVisible(REPORT2), "Report2 is not deleted");
-        
+
         initDashboardsPage();
         dashboardsPage.selectDashboard(DASHBOARD1);
         waitForDashboardPageLoaded(browser);
         assertTrue(dashboardsPage.isEmptyDashboard(), "Widgets are not removed from Dashboard");
-        
+
         initMetricPage();
         assertFalse(metricPage.isMetricVisible(SUM_OF_AMOUNT_METRIC), "Sum of Amount metric is not deleted");
     }
 
     private void createObjectsUsingUploadedData() {
-        getMdService().createObj(getProject(), 
-                new Metric(SUM_OF_AMOUNT_METRIC, format("SELECT SUM([%s])", 
+        getMdService().createObj(getProject(),
+                new Metric(SUM_OF_AMOUNT_METRIC, format("SELECT SUM([%s])",
                         getMdService().getObjUri(getProject(), Fact.class, title(AMOUNT_FACT))), "#,##0"));
         createReport(new UiReportDefinition().withHows(EDUCATION_ATTRIBUTE)
-                .withWhats(SUM_OF_AMOUNT_METRIC)
-                .withName(REPORT1),
+                        .withWhats(SUM_OF_AMOUNT_METRIC)
+                        .withName(REPORT1),
                 REPORT1);
         createReport(new UiReportDefinition().withHows(LASTNAME_ATTRIBUTE)
-                .withWhats(SUM_OF_AMOUNT_METRIC)
-                .withName(REPORT2)
-                .withFilters(FilterItem.Factory.createAttributeFilter(FIRSTNAME_ATTRIBUTE, "Sheri", "Derrick")),
+                        .withWhats(SUM_OF_AMOUNT_METRIC)
+                        .withName(REPORT2)
+                        .withFilters(FilterItem.Factory.createAttributeFilter(FIRSTNAME_ATTRIBUTE, "Sheri", "Derrick")),
                 REPORT2);
         createDashboard(DASHBOARD1);
         dashboardsPage.editDashboard();

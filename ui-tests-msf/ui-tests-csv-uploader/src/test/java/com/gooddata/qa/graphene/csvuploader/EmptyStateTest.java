@@ -6,14 +6,14 @@ import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import org.testng.annotations.Test;
 
 public class EmptyStateTest extends AbstractCsvUploaderTest {
-   
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkDataUploadPageHeader() {
         initDataUploadPage();
         datasetsListPage.waitForHeaderVisible();
         datasetsListPage.waitForAddDataButtonVisible();
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkEmptyState() {
         initDataUploadPage();

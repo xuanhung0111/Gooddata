@@ -36,22 +36,22 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
     @DataProvider(name = "errorCsvFileProvider")
     public Object[][] errorCsvFileProvider() {
-        return new Object[][] {
-            {CsvFile.WITHOUT_FACT, Arrays.asList(DATA_WITHOUT_FACT)},
-            {CsvFile.INVALID_DELIMITER, Arrays.asList(DATA_WITHOUT_FACT)},
-            {CsvFile.BAD_STRUCTURE, Arrays.asList(String.format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2))},
-            {CsvFile.TOO_MANY_COLUMNS, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 1))},
-            {CsvFile.TOO_LONG_FIELD, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 2))},
-            {CsvFile.CRAZY_DATA, Arrays.asList( "There are 5 rows containing less columns than the header row: 44-48.",
-                    "There are 5 rows without at least one numerical value: 44-48. "
-                            + "Each row must contain numerical data for analysis.")}
+        return new Object[][]{
+                {CsvFile.WITHOUT_FACT, Arrays.asList(DATA_WITHOUT_FACT)},
+                {CsvFile.INVALID_DELIMITER, Arrays.asList(DATA_WITHOUT_FACT)},
+                {CsvFile.BAD_STRUCTURE, Arrays.asList(String.format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2))},
+                {CsvFile.TOO_MANY_COLUMNS, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 1))},
+                {CsvFile.TOO_LONG_FIELD, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 2))},
+                {CsvFile.CRAZY_DATA, Arrays.asList("There are 5 rows containing less columns than the header row: 44-48.",
+                        "There are 5 rows without at least one numerical value: 44-48. "
+                                + "Each row must contain numerical data for analysis.")}
         };
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkCsvBadFormat() throws Exception {
         CsvFile fileToUpload = CsvFile.BAD_STRUCTURE;
-        uploadCsvFileWithErrors(fileToUpload, 
+        uploadCsvFileWithErrors(fileToUpload,
                 Arrays.asList(String.format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2)));
 
         String datasetName = fileToUpload.getDatasetNameOfFirstUpload();
@@ -59,7 +59,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
                 datasetsListPage.getMyDatasetsTable().getDatasetNames(),
                 not(hasItem(datasetName)));
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkNoFactAndNumericColumnNameCsvConfig() {
         initDataUploadPage();
@@ -78,7 +78,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when column names start with numbers");
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkCsvDuplicateColumnNames() {
 
@@ -106,7 +106,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
         assertFalse(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be enabled");
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void uploadTooLargeCsvFile() throws IOException {
         CsvFile fileToUpload = CsvFile.TOO_LARGE_FILE;
@@ -119,7 +119,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
             initDataUploadPage();
             waitForFragmentVisible(datasetsListPage).clickAddDataButton();
             waitForFragmentVisible(fileUploadDialog).pickCsvFile(fileToUpload.getCsvFileToUpload());
-            
+
             // this is workaround for bug MSF-9734
             String validationErrorMessage = waitForFragmentVisible(fileUploadDialog).getValidationErrorMessage();
             assertThat(validationErrorMessage,

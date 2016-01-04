@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public class RefreshTest extends HappyUploadTest {
-    
+
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshFromList() {
         initDataUploadPage();
@@ -47,7 +47,7 @@ public class RefreshTest extends HappyUploadTest {
     public void checkSetHeaderHiddenWhenUpdate() {
         initDataUploadPage();
         String datasetName = CsvFile.PAYROLL.getDatasetNameOfFirstUpload();
-        
+
         waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetRefreshButton(datasetName).click();
         doUploadFromDialog(CsvFile.PAYROLL_REFRESH);
         waitForFragmentVisible(dataPreviewPage);
@@ -61,18 +61,18 @@ public class RefreshTest extends HappyUploadTest {
         initDataUploadPage();
 
         datasetsListPage.getMyDatasetsTable()
-            .getDatasetRefreshButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
+                .getDatasetRefreshButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
 
         doUploadFromDialog(CsvFile.PAYROLL_REFRESH_BAD);
 
         List<String> backendValidationErrors =
                 waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
-        assertThat(backendValidationErrors, 
+        assertThat(backendValidationErrors,
                 hasItems(String.format("Update from file \"%s\" failed. "
                         + "Number, type, and order of the columns do not match the dataset. "
                         + "Check the dataset structure.", CsvFile.PAYROLL_REFRESH_BAD.getFileName())));
         assertEquals(fileUploadDialog.getLinkInBackendValidationError(),
-                String.format(DATASET_LINK, testParams.getHost(), testParams.getProjectId(), 
+                String.format(DATASET_LINK, testParams.getHost(), testParams.getProjectId(),
                         getDatasetId(CsvFile.PAYROLL.getDatasetNameOfFirstUpload())));
     }
 
@@ -81,31 +81,31 @@ public class RefreshTest extends HappyUploadTest {
         initDataUploadPage();
 
         datasetsListPage.getMyDatasetsTable()
-            .getDatasetRefreshButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
+                .getDatasetRefreshButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
 
         doUploadFromDialog(CsvFile.PAYROLL_REFRESH);
-        
+
         waitForFragmentVisible(dataPreviewPage).cancelTriggerIntegration();
-        
+
         waitForFragmentVisible(datasetsListPage);
-        
+
         datasetsListPage.getMyDatasetsTable()
-            .getDatasetDetailButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
+                .getDatasetDetailButton(CsvFile.PAYROLL.getDatasetNameOfFirstUpload()).click();
 
         waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
 
         doUploadFromDialog(CsvFile.PAYROLL_REFRESH);
-        
+
         waitForFragmentVisible(dataPreviewPage).cancelTriggerIntegration();
-        
+
         waitForFragmentVisible(csvDatasetDetailPage);
     }
-    
+
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"}, alwaysRun = true)
     public void addOtherAdminToProject() throws ParseException, IOException, JSONException {
         addUserToProject(testParams.getAdminUser(), UserRoles.ADMIN);
     }
-    
+
     @Test(dependsOnMethods = {"addOtherAdminToProject"})
     public void checkAdminUpdateDataOfOthers() throws JSONException {
         try {
@@ -117,7 +117,7 @@ public class RefreshTest extends HappyUploadTest {
             initDataUploadPage();
             datasetsListPage.getOthersDatasetsTable().getDatasetRefreshButton(datasetName).click();
             refreshCsv(CsvFile.PAYROLL_REFRESH, datasetName, false);
-            
+
             assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
             datasetsListPage.getOthersDatasetsTable().getDatasetDetailButton(datasetName).click();

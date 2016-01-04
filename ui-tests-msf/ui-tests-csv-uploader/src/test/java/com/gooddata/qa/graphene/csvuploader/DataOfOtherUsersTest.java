@@ -25,7 +25,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.google.common.base.Predicate;
 
 public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkMyDataAndNoDataOfOthers() {
         initDataUploadPage();
@@ -110,27 +110,27 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         try {
             logout();
             signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
-            
+
             initDataUploadPage();
             String datasetName = CsvFile.PAYROLL.getDatasetNameOfFirstUpload();
-            
+
             final int datasetCountBeforeDelete = datasetsListPage.getOtherDatasetsCount();
-            
+
             datasetsListPage.getOthersDatasetsTable().getDatasetDeleteButton(datasetName).click();
             waitForFragmentVisible(datasetDeleteDialog).clickDelete();
             waitForFragmentNotVisible(datasetDeleteDialog);
-            
+
             assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     is(String.format("\"%s\" was successfully deleted!", datasetName)));
             final int datasetCountAfterDelete = datasetCountBeforeDelete - 1;
             Predicate<WebDriver> datasetsCountEqualsExpected = input ->
-                waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount() == datasetCountAfterDelete;
+                    waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount() == datasetCountAfterDelete;
 
             Graphene.waitGui(browser)
-                .withMessage("Dataset count <" + 
-                 waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount()
-                 + "> in the dataset list doesn't match expected value <" + datasetCountAfterDelete + ">.")
-                .until(datasetsCountEqualsExpected);
+                    .withMessage("Dataset count <" +
+                            waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount()
+                            + "> in the dataset list doesn't match expected value <" + datasetCountAfterDelete + ">.")
+                    .until(datasetsCountEqualsExpected);
             removeDatasetFromUploadHistory(CsvFile.PAYROLL, datasetName);
         } finally {
             logout();
@@ -148,7 +148,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         try {
             logout();
             signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
-            
+
             initDataUploadPage();
             final int datasetCount = datasetsListPage.getMyDatasetsCount();
             CsvFile fileToUpload = CsvFile.PAYROLL;
@@ -165,33 +165,33 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     "Detail button is not shown in editor's dataset");
             datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
             waitForFragmentVisible(csvDatasetDetailPage);
-            assertTrue(csvDatasetDetailPage.isDeleteButtonVisible(), 
+            assertTrue(csvDatasetDetailPage.isDeleteButtonVisible(),
                     "Delete button is not shown in editor's dataset");
-            assertTrue(csvDatasetDetailPage.isRefreshButtonVisible(), 
+            assertTrue(csvDatasetDetailPage.isRefreshButtonVisible(),
                     "Update button is not shown in editor's dataset");
-            assertTrue(csvDatasetDetailPage.isAnalyzeButtonVisible(), 
+            assertTrue(csvDatasetDetailPage.isAnalyzeButtonVisible(),
                     "Analyze button is not shown in editor's dataset");
-            
+
             csvDatasetDetailPage.clickRefreshButton();
             refreshCsv(CsvFile.PAYROLL_REFRESH, datasetName, true);
             waitForFragmentVisible(csvDatasetDetailPage);
-            
+
             csvDatasetDetailPage.clickBackButton();
             waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
             waitForFragmentVisible(datasetDeleteDialog).clickDelete();
             waitForFragmentNotVisible(datasetDeleteDialog);
             removeDatasetFromUploadHistory(fileToUpload, datasetName);
-            
+
             assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     is(String.format("\"%s\" was successfully deleted!", datasetName)));
             Predicate<WebDriver> datasetsCountEqualsExpected = input ->
-                waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCount;
+                    waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCount;
 
             Graphene.waitGui(browser)
-                .withMessage("Dataset count <" + 
-                 waitForFragmentVisible(datasetsListPage).getMyDatasetsCount()
-                 + "> in the dataset list doesn't match expected value <" + datasetCount + ">.")
-                .until(datasetsCountEqualsExpected);
+                    .withMessage("Dataset count <" +
+                            waitForFragmentVisible(datasetsListPage).getMyDatasetsCount()
+                            + "> in the dataset list doesn't match expected value <" + datasetCount + ">.")
+                    .until(datasetsCountEqualsExpected);
         } finally {
             logout();
             signInAtGreyPages(testParams.getUser(), testParams.getPassword());
@@ -208,12 +208,12 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             checkCsvUpload(fileToUpload, this::uploadCsv, true);
             String datasetName = getNewDataset(fileToUpload);
             waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-            
+
             logout();
             signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
-            
+
             initDataUploadPage();
-            
+
             assertFalse(datasetsListPage.getOthersDatasetsTable().isDeleteButtonVisible(datasetName),
                     "Delete button is still shown in other dataset");
             assertFalse(datasetsListPage.getOthersDatasetsTable().isRefreshButtonVisible(datasetName),
@@ -222,12 +222,12 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     "Analyze button is not shown in other dataset");
             assertTrue(datasetsListPage.getOthersDatasetsTable().isDetailButtonVisble(datasetName),
                     "Detail button is not shown in other dataset");
-            
+
             datasetsListPage.getOthersDatasetsTable().getDatasetDetailButton(datasetName).click();
             waitForFragmentVisible(csvDatasetDetailPage);
-            assertFalse(csvDatasetDetailPage.isDeleteButtonVisible(), 
+            assertFalse(csvDatasetDetailPage.isDeleteButtonVisible(),
                     "Delete button is still shown in other dataset");
-            assertFalse(csvDatasetDetailPage.isRefreshButtonVisible(), 
+            assertFalse(csvDatasetDetailPage.isRefreshButtonVisible(),
                     "Update button is still shown in other dataset");
         } finally {
             logout();
