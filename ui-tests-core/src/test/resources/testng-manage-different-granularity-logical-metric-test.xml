@@ -3,16 +3,16 @@
 
     <test name="different-granularity-logical-metric" enabled="true">
         <groups>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="different-granularity-logical-metric" depends-on="createProject" />
-            </dependencies>
             <run>
                 <include name="different-granularity-logical-metric" />
                 <include name="createProject" />
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="different-granularity-logical-metric" depends-on="createProject" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.manage.GoodSalesMetricTest" />

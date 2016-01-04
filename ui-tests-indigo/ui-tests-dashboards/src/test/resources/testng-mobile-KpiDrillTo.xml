@@ -1,12 +1,7 @@
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" [<!ENTITY parent SYSTEM "src/test/resources/mobile-parameters.xml">]>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests_mobile">
-    <parameters>&parent;</parameters>
-
     <test name="kpi-drill-to-tests">
         <groups>
-            <dependencies>
-                <group name="mobile" depends-on="projectInit" />
-            </dependencies>
             <run>
                 <include name="mobile" />
                 <include name="dashboardWidgetsInit" />
@@ -15,10 +10,15 @@
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="mobile" depends-on="projectInit" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.dashboards.KpiDrillToTest" />
         </classes>
     </test>
 
+    <parameter name="windowSize" value="600,800" />
+    <parameter name="isMobileRunning" value="true" />
 </suite>

@@ -3,10 +3,6 @@
 
     <test name="um-sanity" enabled="true">
         <groups>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="initialize" depends-on="createProject" />
-            </dependencies>
             <run>
                 <include name="sanity" />
                 <include name="initialize" />
@@ -14,6 +10,10 @@
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="initialize" depends-on="createProject" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.user.UserManagementGeneralTest" />

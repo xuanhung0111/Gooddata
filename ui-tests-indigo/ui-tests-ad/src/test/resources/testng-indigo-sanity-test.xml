@@ -3,14 +3,6 @@
 
     <test name="sanity-1" enabled="true">
         <groups>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="setupProject" depends-on="createProject" />
-                <group name="turnOffWalkme" depends-on="setupProject" />
-                <group name="init" depends-on="turnOffWalkme" />
-                <group name="prepare" depends-on="init" />
-                <group name="sanity" depends-on="prepare" />
-            </dependencies>
             <run>
                 <include name="sanity" />
                 <include name="prepare" />
@@ -21,6 +13,14 @@
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="setupProject" depends-on="createProject" />
+                <group name="turnOffWalkme" depends-on="setupProject" />
+                <group name="init" depends-on="turnOffWalkme" />
+                <group name="prepare" depends-on="init" />
+                <group name="sanity" depends-on="prepare" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerGeneralTest" />
@@ -29,13 +29,6 @@
 
     <test name="sanity-2" enabled="true">
         <groups>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="enableAnalyticalDesigner" depends-on="createProject" />
-                <group name="turnOffWalkme" depends-on="setupProject" />
-                <group name="init" depends-on="turnOffWalkme" />
-                <group name="sanity" depends-on="init" />
-            </dependencies>
             <run>
                 <include name="sanity" />
                 <include name="init" />
@@ -45,6 +38,13 @@
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="enableAnalyticalDesigner" depends-on="createProject" />
+                <group name="turnOffWalkme" depends-on="setupProject" />
+                <group name="init" depends-on="turnOffWalkme" />
+                <group name="sanity" depends-on="init" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesReplaceMetricAttributeTest" />
@@ -53,13 +53,6 @@
 
     <test name="sanity-3" enabled="true">
         <groups>
-            <dependencies>
-                <group name="createProject" depends-on="projectInit" />
-                <group name="enableAnalyticalDesigner" depends-on="createProject" />
-                <group name="turnOffWalkme" depends-on="setupProject" />
-                <group name="init" depends-on="turnOffWalkme" />
-                <group name="sanity" depends-on="init" />
-            </dependencies>
             <run>
                 <include name="sanity" />
                 <include name="init" />
@@ -69,6 +62,13 @@
                 <include name="projectInit" />
                 <include name="arquillian" />
             </run>
+            <dependencies>
+                <group name="createProject" depends-on="projectInit" />
+                <group name="enableAnalyticalDesigner" depends-on="createProject" />
+                <group name="turnOffWalkme" depends-on="setupProject" />
+                <group name="init" depends-on="turnOffWalkme" />
+                <group name="sanity" depends-on="init" />
+            </dependencies>
         </groups>
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesTwoAttributeBucketsTest" />
