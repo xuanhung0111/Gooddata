@@ -38,43 +38,83 @@ public class ReactDropdown extends AbstractFragment {
         this.dropdownSelector = dropdownSelector;
     }
 
-    @FindBy(css = "button.button-dropdown")
-    private WebElement dropdownButtonLoaded;
+    @FindBy(css = "button.button-dropdown:not([data-reactid*=date-format])")
+    private WebElement dropdownTypeButtonLoaded;
+    
+    @FindBy(css = "button.button-dropdown[data-reactid*=date-format]")
+    private WebElement dropdownFormatButtonLoaded;
 
-    public boolean isDropdownOpen() {
-        waitForElementVisible(dropdownButtonLoaded);
-        return isElementPresent(By.cssSelector("button.is-active"), this.getRoot());
+    public ReactDropdown selectTypeByValue(final String value) {
+        ensureTypeDropdownOpen();
+        return selectByValue(value);
     }
 
-    public void ensureDropdownOpen() {
-        if (!this.isDropdownOpen()) {
-            this.toggleDropdown();
-        }
+    public String getTypeSelection() {
+        return getTypeDropdownButton().getAttribute("title");
     }
 
-    public WebElement getDropdownButton() {
-        return waitForElementPresent(dropdownButtonLoaded);
-    }
-
-    protected void toggleDropdown() {
-        waitForElementVisible(dropdownButtonLoaded).click();
-    }
-
-    public String getSelection() {
-        return getDropdownButton().getText();
-    }
-
-    public Collection<String> getValues() {
-        ensureDropdownOpen();
+    public Collection<String> getTypeValues() {
+        ensureTypeDropdownOpen();
 
         String itemSelector = dropdownSelector + " .gd-list-item:not(.is-header)";
         return getElementTexts(cssSelector(itemSelector), browser);
     }
 
-    public ReactDropdown selectByValue(final String value) {
+    public ReactDropdown selectFormatByValue(final String value) {
+        ensureFormatDropdownOpen();
+        return selectByValue(value);
+    }
 
-        ensureDropdownOpen();
+    public String getFormatSelection() {
+        return getFormatDropdownButton().getAttribute("title");
+    }
 
+    public Collection<String> getFormatValues() {
+        ensureFormatDropdownOpen();
+
+        String itemSelector = dropdownSelector + " .gd-list-item:not(.is-header)";
+        return getElementTexts(cssSelector(itemSelector), browser);
+    }
+
+    private boolean isFormatDropdownOpen() {
+        waitForElementVisible(dropdownFormatButtonLoaded);
+        return isElementPresent(By.cssSelector("button.is-active"), this.getRoot());
+    }
+
+    private void toggleFormatDropdown() {
+        waitForElementVisible(dropdownFormatButtonLoaded).click();
+    }
+
+    private void ensureFormatDropdownOpen() {
+        if (!this.isFormatDropdownOpen()) {
+            this.toggleFormatDropdown();
+        }
+    }
+
+    private WebElement getFormatDropdownButton() {
+        return waitForElementPresent(dropdownFormatButtonLoaded);
+    }
+
+    private boolean isTypeDropdownOpen() {
+        waitForElementVisible(dropdownTypeButtonLoaded);
+        return isElementPresent(By.cssSelector("button.is-active"), this.getRoot());
+    }
+
+    private void toggleTypeDropdown() {
+        waitForElementVisible(dropdownTypeButtonLoaded).click();
+    }
+
+    private void ensureTypeDropdownOpen() {
+        if (!this.isTypeDropdownOpen()) {
+            this.toggleTypeDropdown();
+        }
+    }
+
+    private WebElement getTypeDropdownButton() {
+        return waitForElementPresent(dropdownTypeButtonLoaded);
+    }
+
+    private ReactDropdown selectByValue(final String value) {
         browser.findElements(cssSelector(dropdownSelector + " .gd-list-item:not(.is-disabled)"))
                 .stream()
                 .filter(e -> value.equals(e.getText()))

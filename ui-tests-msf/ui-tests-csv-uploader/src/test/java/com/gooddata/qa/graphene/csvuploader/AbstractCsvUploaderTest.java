@@ -222,6 +222,14 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         }
     }
 
+    protected void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
+        Optional<UploadHistory> fileUpload = uploadHistory.stream()
+                .filter(upload -> upload.getCsvFile() == csvFile)
+                .findAny();
+        assertThat(fileUpload.isPresent(), is(true));
+        fileUpload.get().removeDatasetName(datasetName);
+    }
+
     public class UploadHistory {
         private CsvFile csvFile;
         private Map<String, Boolean> datasetNames = new HashMap<>();
@@ -284,7 +292,49 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                         "Attribute", "Date [2015-12-31]", "Measure", "Measure"), PAYROLL_DATA_ROW_COUNT),
         WITHOUT_ATTRIBUTE("without.attribute", Lists.newArrayList("Amount"), Lists.newArrayList("Measure"), 44),
         WITHOUT_DATE("without.date", Lists.newArrayList("state","county","name","censusarea"), 
-                Lists.newArrayList("Attribute", "Attribute", "Attribute", "Measure"), 3273);
+                Lists.newArrayList("Attribute", "Attribute", "Attribute", "Measure"), 3273),
+        DATE_YYYY("24dates.yyyy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", 
+                "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
+                "Date 16", "Date 17", "Date 18", "Date 19", "Date 20", "Date 21", "Date 22", "Date 23", "Date 24",
+                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)", 
+                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
+                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
+                "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
+                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
+                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
+                "Date (Day Month Year)", "Date (Year Month Day)", "Measure"), 100),
+        DATE_INVALID_YYYY("24dates.yyyy.invalid"),
+        DATE_YY("24dates.yy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", 
+                "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
+                "Date 16", "Date 17", "Date 18", "Date 19", "Date 20", "Date 21", "Date 22", "Date 23", "Date 24",
+                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)", 
+                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
+                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
+                "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
+                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
+                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
+                "Date (Day Month Year)", "Date (Year Month Day)", "Measure"), 100),
+        DATE_YY_AND_YYYY("date.yyyymmdd.yymmdd", Lists.newArrayList("Date 1", "Date 2", "Number"), 
+                Lists.newArrayList("Date (YearMonthDay)", "Date (YearMonthDay)", "Measure"), 100),
+        UNSUPPORTED_DATE_FORMAT("unsupported.date.formats", Lists.newArrayList("Date 1", "Date 2", "Date 3", 
+                "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", 
+                "Date 13", "Date 14", "Date 15", "Date 16", "Date 17", "Number"), Lists.newArrayList("Measure",
+                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", 
+                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", 
+                "Attribute", "Attribute", "Measure"), 100),
+        AMBIGUOUS_DATE_START_WITH_YEAR("8ambiguous.dates.starting.with.year", Lists.newArrayList("Date 1", "Date 2",
+                "Date 3", "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Number"), Lists.newArrayList(
+                "Date (Year-Month-Day)", "Date (Year/Month/Day)", "Date (Year.Month.Day)", "Date (Year Month Day)",
+                "Date (Year-Month-Day)", "Date (Year/Month/Day)", "Date (Year.Month.Day)", "Date (Year Month Day)",
+                "Measure"), 10),
+        AMBIGUOUS_DATE_3_FORMATS("4ambiguous.dates.3formats", Lists.newArrayList("Date 1", "Date 2",
+                "Date 3", "Date 4", "Number"), Lists.newArrayList("Date", "Date", "Date", "Date", "Measure"), 10),
+        AMBIGUOUS_DATE_MONTHDAY_DAYMONTH("6ambiguous.dates.monthday.daymotnh", Lists.newArrayList("Date 1", 
+                "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date", 
+                "Date", "Date", "Date", "Date", "Measure"), 10),
+        AMBIGUOUS_DATE_YEARDAY_DAYYEAR("6ambiguous.dates.yearday.dayyear", Lists.newArrayList("Date 1", "Date 2",
+                "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date", "Date", 
+                "Date", "Date", "Date", "Measure"), 100);
 
         private final String name;
         private final List<String> columnNames = Lists.newArrayList();

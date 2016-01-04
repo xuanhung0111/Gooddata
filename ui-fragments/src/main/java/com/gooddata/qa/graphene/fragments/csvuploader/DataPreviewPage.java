@@ -14,9 +14,10 @@ import com.gooddata.qa.graphene.fragments.AbstractTable;
 public class DataPreviewPage extends AbstractFragment {
 
     private static final By DISABLED_INTEGRATION_BUTTON = By.cssSelector(".s-integration-button.disabled");
-    private static final String SET_HEADER_BUTTON_LOCATION = "s-select-header-button";
+    private static final String SET_HEADER_BUTTON_LOCATOR = "s-select-header-button";
+    private static final String PREVIEW_PAGE_ERROR_LOCATOR = "s-preview-page-error";
 
-    @FindBy(className = "s-preview-page-error")
+    @FindBy(className = PREVIEW_PAGE_ERROR_LOCATOR)
     private WebElement previewPageError;
 
     @FindBy(className = "data-table")
@@ -31,7 +32,7 @@ public class DataPreviewPage extends AbstractFragment {
     @FindBy(className = "s-integration-cancel-button")
     private WebElement triggerIntegrationCancelButton;
 
-    @FindBy(className = SET_HEADER_BUTTON_LOCATION)
+    @FindBy(className = SET_HEADER_BUTTON_LOCATOR)
     private WebElement selectHeaderButton;
 
     @FindBy(className = "s-row-count-message")
@@ -64,11 +65,15 @@ public class DataPreviewPage extends AbstractFragment {
     }
     
     public boolean isSetHeaderButtonHidden() {
-        return !isElementPresent(By.className(SET_HEADER_BUTTON_LOCATION), browser);
+        return !isElementPresent(By.className(SET_HEADER_BUTTON_LOCATOR), browser);
     }
 
     public String getPreviewPageErrorMessage() {
         return waitForElementVisible(previewPageError).getText();
+    }
+
+    public boolean hasPreviewPageErrorMessage() {
+        return isElementPresent(By.className(PREVIEW_PAGE_ERROR_LOCATOR), browser);
     }
 
     public DataPreviewTable getDataPreviewTable() {

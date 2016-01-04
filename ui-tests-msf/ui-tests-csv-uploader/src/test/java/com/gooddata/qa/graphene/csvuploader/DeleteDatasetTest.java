@@ -12,8 +12,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.util.Optional;
-
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
@@ -123,14 +121,6 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         return datasetName;
-    }
-
-    private void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
-        Optional<UploadHistory> fileUpload = uploadHistory.stream()
-                .filter(upload -> upload.getCsvFile() == csvFile)
-                .findAny();
-        assertThat(fileUpload.isPresent(), is(true));
-        fileUpload.get().removeDatasetName(datasetName);
     }
 
     private void checkForDatasetRemoved(final String csvDatasetName) {
