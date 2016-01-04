@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 import com.google.common.base.Predicate;
 
 public class DatasetDetailTest extends HappyUploadTest {
-    
+
     private static final CsvFile PAYROLL_FILE = CsvFile.PAYROLL;
     private static String PAYROLL_DATASET_NAME = PAYROLL_FILE.getDatasetNameOfFirstUpload();
     private static final long PAYROLL_FILE_SIZE_MINIMUM = 476L;
@@ -42,7 +42,7 @@ public class DatasetDetailTest extends HappyUploadTest {
 
         waitForFragmentVisible(csvDatasetDetailPage).downloadTheLatestCsvFileUpload();
         final File downloadedCsvFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                                        + PAYROLL_FILE.getFileName());
+                + PAYROLL_FILE.getFileName());
         Predicate<WebDriver> fileDownloadComplete =
                 browser -> downloadedCsvFile.length() > PAYROLL_FILE_SIZE_MINIMUM;
         Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)

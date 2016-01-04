@@ -47,7 +47,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected static final String DATA_PREVIEW_PAGE = "data-preview";
     protected static final String AD_REPORT_LINK = "https://%s/analyze/#/%s/reportId/edit?dataset=%s";
     protected static final String CSV_DATASET_DETAIL_PAGE_URI_TEMPLATE = DATA_UPLOAD_PAGE_URI_TEMPLATE + "/%s";
-    protected static final String DATASET_LINK= "https://%s/data/#/projects/%s/datasets/%s";
+    protected static final String DATASET_LINK = "https://%s/data/#/projects/%s/datasets/%s";
     protected static final String SUCCESSFUL_DATA_MESSAGE = "Data has been loaded successfully to \"%s\". Start analyzing!";
     /**
      * Successful load contains information about number of rows and columns,
@@ -72,7 +72,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     @FindBy(className = "s-dataset-detail")
     protected DatasetDetailPage csvDatasetDetailPage;
-    
+
     @FindBy(className = "gd-messages")
     protected DatasetMessageBar csvDatasetMessageBar;
 
@@ -92,18 +92,18 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     }
 
     protected void checkCsvDatasetDetail(String datasetName, List<String> expectedColumnNames,
-            List<String> expectedColumnTypes) {
+                                         List<String> expectedColumnTypes) {
         waitForFragmentVisible(csvDatasetDetailPage);
 
         assertThat(csvDatasetDetailPage.getDatasetName(), is(datasetName));
-        assertThat(csvDatasetDetailPage.getColumnNames(), 
+        assertThat(csvDatasetDetailPage.getColumnNames(),
                 containsInAnyOrder(simplifyHeaderNames(expectedColumnNames).toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
     }
-    
+
     protected List<String> simplifyHeaderNames(List<String> columnNames) {
         return columnNames.stream()
-                .map (e -> e.replaceAll("[\\,,\\-,.]", ""))
+                .map(e -> e.replaceAll("[\\,,\\-,.]", ""))
                 .collect(Collectors.toList());
     }
 
@@ -134,10 +134,18 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         Optional<UploadHistory> fileUpload = uploadHistory.stream()
                 .filter(upload -> upload.getCsvFile() == csvFile)
                 .findAny();
-        if(fileUpload.isPresent())
+        if (fileUpload.isPresent())
             return fileUpload.get().addDatasetName();
         uploadHistory.add(new UploadHistory(csvFile));
         return csvFile.getDatasetNameOfFirstUpload();
+    }
+
+    protected void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
+        Optional<UploadHistory> fileUpload = uploadHistory.stream()
+                .filter(upload -> upload.getCsvFile() == csvFile)
+                .findAny();
+        assertThat(fileUpload.isPresent(), is(true));
+        fileUpload.get().removeDatasetName(datasetName);
     }
 
     protected String getDatasetId(String datasetName) {
@@ -156,7 +164,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     protected void waitForExpectedDatasetsCount(final int expectedDatasetsCount) {
         Predicate<WebDriver> datasetsCountEqualsExpected = input ->
-            waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == expectedDatasetsCount;
+                waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == expectedDatasetsCount;
 
         Graphene.waitGui(browser)
                 .withMessage("Dataset count <" + waitForFragmentVisible(datasetsListPage).getMyDatasetsCount()
@@ -222,14 +230,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         }
     }
 
-    protected void removeDatasetFromUploadHistory(CsvFile csvFile, String datasetName) {
-        Optional<UploadHistory> fileUpload = uploadHistory.stream()
-                .filter(upload -> upload.getCsvFile() == csvFile)
-                .findAny();
-        assertThat(fileUpload.isPresent(), is(true));
-        fileUpload.get().removeDatasetName(datasetName);
-    }
-
     public class UploadHistory {
         private CsvFile csvFile;
         private Map<String, Boolean> datasetNames = new HashMap<>();
@@ -275,7 +275,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         PAYROLL_REFRESH_BAD("payroll.refresh.bad"),
         MULTIPLE_COLUMN_NAME_ROWS("multiple.column.name.rows", Lists.newArrayList("Id4", "Name4", "Lastname4",
                 "Age4", "Amount4"), Lists.newArrayList("Measure", "Attribute", "Attribute", "Measure", "Measure"), 5),
-        /** This csv file has incorrect column count (one more than expected) on the line number 2. */
+        /**
+         * This csv file has incorrect column count (one more than expected) on the line number 2.
+         */
         BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList(), 0),
         NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT),
         TOO_LARGE_FILE("payroll.too.large"),
@@ -291,12 +293,12 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 Lists.newArrayList("Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
                         "Attribute", "Date [2015-12-31]", "Measure", "Measure"), PAYROLL_DATA_ROW_COUNT),
         WITHOUT_ATTRIBUTE("without.attribute", Lists.newArrayList("Amount"), Lists.newArrayList("Measure"), 44),
-        WITHOUT_DATE("without.date", Lists.newArrayList("state","county","name","censusarea"), 
+        WITHOUT_DATE("without.date", Lists.newArrayList("state", "county", "name", "censusarea"),
                 Lists.newArrayList("Attribute", "Attribute", "Attribute", "Measure"), 3273),
-        DATE_YYYY("24dates.yyyy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", 
+        DATE_YYYY("24dates.yyyy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6",
                 "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
                 "Date 16", "Date 17", "Date 18", "Date 19", "Date 20", "Date 21", "Date 22", "Date 23", "Date 24",
-                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)", 
+                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)",
                 "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
                 "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
                 "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
@@ -304,23 +306,23 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
                 "Date (Day Month Year)", "Date (Year Month Day)", "Measure"), 100),
         DATE_INVALID_YYYY("24dates.yyyy.invalid"),
-        DATE_YY("24dates.yy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", 
+        DATE_YY("24dates.yy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6",
                 "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
                 "Date 16", "Date 17", "Date 18", "Date 19", "Date 20", "Date 21", "Date 22", "Date 23", "Date 24",
-                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)", 
+                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)",
                 "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
                 "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
                 "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
                 "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
                 "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
                 "Date (Day Month Year)", "Date (Year Month Day)", "Measure"), 100),
-        DATE_YY_AND_YYYY("date.yyyymmdd.yymmdd", Lists.newArrayList("Date 1", "Date 2", "Number"), 
+        DATE_YY_AND_YYYY("date.yyyymmdd.yymmdd", Lists.newArrayList("Date 1", "Date 2", "Number"),
                 Lists.newArrayList("Date (YearMonthDay)", "Date (YearMonthDay)", "Measure"), 100),
-        UNSUPPORTED_DATE_FORMAT("unsupported.date.formats", Lists.newArrayList("Date 1", "Date 2", "Date 3", 
-                "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", 
+        UNSUPPORTED_DATE_FORMAT("unsupported.date.formats", Lists.newArrayList("Date 1", "Date 2", "Date 3",
+                "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12",
                 "Date 13", "Date 14", "Date 15", "Date 16", "Date 17", "Number"), Lists.newArrayList("Measure",
-                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", 
-                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", 
+                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
+                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
                 "Attribute", "Attribute", "Measure"), 100),
         AMBIGUOUS_DATE_START_WITH_YEAR("8ambiguous.dates.starting.with.year", Lists.newArrayList("Date 1", "Date 2",
                 "Date 3", "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Number"), Lists.newArrayList(
@@ -329,11 +331,11 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 "Measure"), 10),
         AMBIGUOUS_DATE_3_FORMATS("4ambiguous.dates.3formats", Lists.newArrayList("Date 1", "Date 2",
                 "Date 3", "Date 4", "Number"), Lists.newArrayList("Date", "Date", "Date", "Date", "Measure"), 10),
-        AMBIGUOUS_DATE_MONTHDAY_DAYMONTH("6ambiguous.dates.monthday.daymotnh", Lists.newArrayList("Date 1", 
-                "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date", 
+        AMBIGUOUS_DATE_MONTHDAY_DAYMONTH("6ambiguous.dates.monthday.daymotnh", Lists.newArrayList("Date 1",
+                "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date",
                 "Date", "Date", "Date", "Date", "Measure"), 10),
         AMBIGUOUS_DATE_YEARDAY_DAYYEAR("6ambiguous.dates.yearday.dayyear", Lists.newArrayList("Date 1", "Date 2",
-                "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date", "Date", 
+                "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date", "Date",
                 "Date", "Date", "Date", "Measure"), 100);
 
         private final String name;
@@ -341,18 +343,18 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         private final List<String> columnTypes = Lists.newArrayList();
         //number of rows with data (rows with facts)
         private final long dataRowCount;
-    
+
         private CsvFile(String fileName) {
             this(fileName, PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT);
         }
-    
+
         private CsvFile(String fileName, List<String> columnNames, List<String> columnTypes, long dataRowCount) {
             this.name = fileName;
             this.columnNames.addAll(columnNames);
             this.columnTypes.addAll(columnTypes);
             this.dataRowCount = dataRowCount;
         }
-    
+
         public String getFileName() {
             return this.name + ".csv";
         }
@@ -361,23 +363,23 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
             String datasetName = this.name.replace(".", " ");
             return WordUtils.capitalize(datasetName);
         }
-        
+
         public String getDatasetName(long datasetIndex) {
             assertThat(datasetIndex > 0, is(true));
             return String.format("%s (%s)", getDatasetNameOfFirstUpload(), datasetIndex);
         }
-    
+
         public List<String> getColumnNames() {
             return Collections.unmodifiableList(this.columnNames);
         }
-        
+
         public List<String> changeColumnType(String columnName, ColumnType type) {
             int columnIndex = getColumnNames().indexOf(columnName);
             List<String> changedColumnTypes = Lists.newArrayList(this.columnTypes);
             changedColumnTypes.set(columnIndex, type.getVisibleText());
             return changedColumnTypes;
         }
-    
+
         public List<String> getColumnTypes() {
             return Collections.unmodifiableList(this.columnTypes);
         }

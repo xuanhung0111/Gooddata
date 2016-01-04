@@ -28,7 +28,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     private static final String EMPTY_COLUMN_NAME_ERROR = "Fill in the column name.";
     private static final int PAYROLL_FILE_DEFAULT_ROW_COUNT = 3876;
     private static final int PAYROLL_FILE_DEFAULT_COLUMN_COUNT = 9;
-    
+
     @FindBy(css = ".bubble-negative .content")
     private WebElement errorBubbleMessage;
 
@@ -133,7 +133,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(csvDatasetDetailPage).clickBackButton();
         waitForFragmentVisible(datasetsListPage);
     }
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkCsvFileWithMultipleHeaderRows() {
         initDataUploadPage();

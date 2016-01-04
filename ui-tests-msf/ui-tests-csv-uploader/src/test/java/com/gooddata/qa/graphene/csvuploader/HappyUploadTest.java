@@ -6,10 +6,10 @@ import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import org.testng.annotations.Test;
 
 public class HappyUploadTest extends AbstractCsvUploaderTest {
-    
+
     protected static final CsvFile PAYROLL_FILE = CsvFile.PAYROLL;
     protected static String PAYROLL_DATASET_NAME = PAYROLL_FILE.getDatasetNameOfFirstUpload();
-    
+
     @Test(dependsOnMethods = {"createProject"})
     public void checkCsvUploadHappyPath() throws Exception {
         checkCsvUpload(PAYROLL_FILE, this::uploadCsv, true);

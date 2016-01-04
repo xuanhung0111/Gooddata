@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.apache.commons.lang.Validate.notEmpty;
 import static org.apache.commons.lang.Validate.notNull;
@@ -49,7 +50,7 @@ public class DatasetsTable extends AbstractTable {
     public WebElement getDatasetDeleteButton(String datasetName) {
         return getDatasetRowCell(datasetName, BY_DATASET_DELETE_BUTTON);
     }
-    
+
     public WebElement getDatasetDetailButton(String datasetName) {
         return getDatasetRowCell(datasetName, BY_DATASET_DETAIL_BUTTON);
     }
@@ -57,9 +58,25 @@ public class DatasetsTable extends AbstractTable {
     public WebElement getDatasetRefreshButton(String datasetName) {
         return getDatasetRowCell(datasetName, BY_DATASET_REFRESH_BUTTON);
     }
-    
+
     public WebElement getDatasetAnalyzeButton(String datasetName) {
         return getDatasetRowCell(datasetName, BY_DATASET_ANALYZE_BUTTON);
+    }
+
+    public boolean isDeleteButtonVisible(String datasetName) {
+        return isDatasetRowCellVisible(datasetName, BY_DATASET_DELETE_BUTTON);
+    }
+
+    public boolean isRefreshButtonVisible(String datasetName) {
+        return isDatasetRowCellVisible(datasetName, BY_DATASET_REFRESH_BUTTON);
+    }
+
+    public boolean isAnalyzeButtonVisble(String datasetName) {
+        return isDatasetRowCellVisible(datasetName, BY_DATASET_ANALYZE_BUTTON);
+    }
+
+    public boolean isDetailButtonVisble(String datasetName) {
+        return isDatasetRowCellVisible(datasetName, BY_DATASET_DETAIL_BUTTON);
     }
 
     public int getNumberOfDatasets() {
@@ -74,5 +91,13 @@ public class DatasetsTable extends AbstractTable {
         notNull(datasetRow, "Dataset with name '" + datasetName + "' not found.");
 
         return waitForElementVisible(by, datasetRow);
+    }
+    
+    private boolean isDatasetRowCellVisible(String datasetName, By by) {
+        final WebElement datasetRow = getDatasetRow(datasetName);
+
+        notNull(datasetRow, "Dataset with name '" + datasetName + "' not found.");
+
+        return isElementPresent(by, datasetRow);
     }
 }

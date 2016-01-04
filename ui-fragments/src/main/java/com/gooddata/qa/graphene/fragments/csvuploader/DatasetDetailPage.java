@@ -2,15 +2,21 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class DatasetDetailPage extends AbstractFragment {
+    
+    private static final String ANALYZE_BUTTON_LOCATOR = ".icon-analyze.button-link";
+    private static final String DELETE_BUTTON_LOCATOR = "button.s-delete";
+    private static final String REFRESH_BUTTON_LOCATOR = "s-dataset-update-ds-from-file-button";
 
     @FindBy(className = "s-dataset-name")
     private WebElement datasetName;
@@ -21,19 +27,19 @@ public class DatasetDetailPage extends AbstractFragment {
     @FindBy(className = "s-dataset-columns-table")
     private DatasetColumnsTable datasetColumns;
 
-    @FindBy(className = "s-dataset-update-ds-from-file-button")
-    private WebElement refreshDatasetButton;
-    
     @FindBy(xpath = "//.[@class='datasets-sidebar']//a")
     private WebElement latestCsvFileUpload;
-    
+
     @FindBy(css = ".file-detail")
     private WebElement createdDateTime;
 
-    @FindBy(css = ".icon-analyze.button-link")
+    @FindBy(css = ANALYZE_BUTTON_LOCATOR)
     private WebElement analyzeButton;
 
-    @FindBy(css = "button.s-delete")
+    @FindBy(className = REFRESH_BUTTON_LOCATOR)
+    private WebElement refreshDatasetButton;
+
+    @FindBy(css = DELETE_BUTTON_LOCATOR)
     private WebElement deleteButton;
 
     public String getDatasetAnalyzeLink() {
@@ -58,6 +64,18 @@ public class DatasetDetailPage extends AbstractFragment {
 
     public void clickDeleteButton() {
         waitForElementVisible(deleteButton).click();
+    }
+
+    public boolean isDeleteButtonVisible() {
+        return isElementPresent(By.cssSelector(DELETE_BUTTON_LOCATOR), getRoot());
+    }
+
+    public boolean isRefreshButtonVisible() {
+        return isElementPresent(By.className(REFRESH_BUTTON_LOCATOR), getRoot());
+    }
+    
+    public boolean isAnalyzeButtonVisible() {
+        return isElementPresent(By.cssSelector(ANALYZE_BUTTON_LOCATOR), getRoot());
     }
 
     public String getDatasetName() {

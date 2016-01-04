@@ -63,9 +63,9 @@ public class NotificationTest extends AbstractCsvUploaderTest {
                     testParams.getProjectEnvironment());
             testParams.setProjectId(GoodSalesProjectID);
             CsvFile fileToUpload = CsvFile.PAYROLL;
-        
+
             checkCsvUpload(fileToUpload, this::uploadCsv, false);
-            
+
             assertThat(csvDatasetMessageBar.waitForErrorMessageBar().getText(),
                     is(String.format("Failed to add data from \"%s\" due to internal error. Check your email for "
                             + "instructions or contact support.", fileToUpload.getDatasetNameOfFirstUpload())));
@@ -81,17 +81,17 @@ public class NotificationTest extends AbstractCsvUploaderTest {
             }
         }
     }
-    
+
     @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"})
     public void checkNotificationForSuccessfulUpdate() {
         initDataUploadPage();
-        
+
         CsvFile fileToUpload = CsvFile.PAYROLL_REFRESH;
         String datasetName = CsvFile.PAYROLL.getDatasetNameOfFirstUpload();
         datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
 
         waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
-        
+
         refreshCsv(fileToUpload, datasetName, true);
         takeScreenshot(browser,
                 toScreenshotName("Update-csv-file-to-check-successful-notification", fileToUpload.getFileName()),
@@ -103,26 +103,26 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private void checkSuccessfulNotification(Document message, String datasetName) {
         checkGeneralNotification(message);
         String datasetUrl = String.format(DATASET_LINK, testParams.getHost(), testParams.getProjectId(),
-                        getDatasetId(datasetName));
+                getDatasetId(datasetName));
         assertThat(message.getElementsContainingText(datasetName).attr("href"), is(datasetUrl));
 
         String analysisUrl = String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
                 getDatasetId(datasetName));
-        assertThat(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"), 
+        assertThat(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"),
                 is(analysisUrl));
     }
-    
+
     private void checkFailureNotification(Document message) {
         checkGeneralNotification(message);
-        String datasetManageUrl = String.format(MANAGE_DATASETS_PAGE_URL, testParams.getHost(), 
+        String datasetManageUrl = String.format(MANAGE_DATASETS_PAGE_URL, testParams.getHost(),
                 testParams.getProjectId());
         assertThat(message.getElementsContainingText("delete the loaded file").attr("href"), is(datasetManageUrl));
     }
-    
+
     private void checkGeneralNotification(Document message) {
         String projectUrl = String.format(PROJECT_PAGE_URL, testParams.getHost(), testParams.getProjectId());
         assertThat(message.getElementsMatchingOwnText(projectTitle).attr("href"), is(projectUrl));
-        
+
         assertThat(message.getElementsMatchingOwnText(GOODDATA_SUPPORT_URL).attr("href"),
                 is(GOODDATA_SUPPORT_URL));
     }

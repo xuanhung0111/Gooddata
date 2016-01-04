@@ -44,7 +44,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.clear();
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void checkUploadedDatasetAtManagePage() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
@@ -63,7 +63,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         assertThat(datasetDetailPage.getFacts(), containsInAnyOrder("Amount"));
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void checkOnlyUploadedDatasetSync() throws JSONException {
         CsvFile fileToUploadFirst = CsvFile.PAYROLL;
         checkCsvUpload(fileToUploadFirst, this::uploadCsv, true);
@@ -88,7 +88,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         assertThat(waitForFragmentVisible(datasetDetailPage).getLatestUploadDate(), is(latestUploadDate));
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void uploadOneCsvFileMultipleTime() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
 
@@ -111,7 +111,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.add(secondDatasetName);
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void checkDatasetAnalyzeLink() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
 
@@ -131,7 +131,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, toScreenshotName(DATASET_DETAIL_PAGE_NAME, datasetName), getClass());
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void checkBasicUploadProgress() {
         CsvFile fileToUpload = CsvFile.PAYROLL;
 
@@ -146,7 +146,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void uploadWithoutAttributeCSV() {
         CsvFile fileToUpload = CsvFile.WITHOUT_ATTRIBUTE;
 
@@ -161,7 +161,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.add(datasetName);
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void uploadWithoutDateCSV() {
         CsvFile fileToUpload = CsvFile.WITHOUT_DATE;
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
@@ -172,7 +172,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         datasetNames.add(datasetName);
     }
 
-    @Test(enabled = false, dependsOnMethods = { "createProject" })
+    @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void uploadSpecialUnicodeCharacterColumnName() {
         initDataUploadPage();
         CsvFile fileToUpload = CsvFile.PAYROLL;
@@ -200,7 +200,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         checkCsvDatasetDetail(datasetName, customHeaderColumns, CsvFile.PAYROLL.getColumnTypes());
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void uploadNegativeNumber() {
         CsvFile fileToUpload = CsvFile.PAYROLL_NEGATIVE_NUMBER;
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
@@ -208,7 +208,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
-        
+
         createMetric("Min of Amount", format("SELECT MIN([%s])",
                 getMdService().getObjUri(getProject(), Fact.class, title("Amount"))), "#,##0.00");
         createReport(new UiReportDefinition().withName("Report with negative number").withHows("Education")
@@ -223,7 +223,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         System.out.println("Negative numbers are displayed well in report!");
     }
 
-    @Test(dependsOnMethods = { "createProject" })
+    @Test(dependsOnMethods = {"createProject"})
     public void uploadNullNumber() {
         CsvFile fileToUpload = CsvFile.PAYROLL_NULL_NUMBER;
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
@@ -231,7 +231,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
-        
+
         createMetric("Sum of Amount", format("SELECT SUM([%s])",
                 getMdService().getObjUri(getProject(), Fact.class, title("Amount1"))), "#,##0.00");
         createReport(new UiReportDefinition().withName("Report with negative number").withHows("Lastname")
@@ -246,7 +246,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
     }
 
     private void assertMetricValuesInReport(List<Integer> metricIndexes, List<Float> metricValues,
-            List<Double> expectedMetricValues) {
+                                            List<Double> expectedMetricValues) {
         int index = 0;
         for (int metricIndex : metricIndexes) {
             assertEquals(metricValues.get(metricIndex).doubleValue(), expectedMetricValues.get(index));
