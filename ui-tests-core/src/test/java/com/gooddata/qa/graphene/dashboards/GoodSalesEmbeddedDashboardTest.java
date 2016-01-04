@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.openqa.selenium.By.className;
@@ -502,7 +503,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private void embedDashboardToOtherProjectDashboard(String embedCode, String projectToShare,
             String dashboardName) {
         initProjectsPage();
-        projectsPage.goToProject(projectToShare);
+        openUrl(PAGE_UI_PROJECT_PREFIX + projectToShare + DASHBOARD_PAGE_SUFFIX);
+        waitForDashboardPageLoaded(browser);
         waitForFragmentVisible(dashboardsPage);
         dashboardsPage.addNewDashboard(dashboardName);
         dashboardsPage.editDashboard();
