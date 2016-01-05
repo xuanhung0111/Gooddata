@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -13,8 +14,14 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 
 public class EditModeTest extends DashboardWithWidgetsTest {
+
+    private static final KpiConfiguration kpiConfig = new KpiConfiguration.Builder()
+        .metric(AMOUNT)
+        .dateDimension(DATE_CREATED)
+        .build();
 
     @BeforeClass(alwaysRun = true)
     public void before(ITestContext context) {
@@ -85,4 +92,68 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void checkMessageIsNotShownWhenEditingKpiWithoutAlerts() throws JSONException {
+        initIndigoDashboardsPageWithWidgets()
+            .switchToEditMode()
+            .selectLastKpi();
+
+        indigoDashboardsPage
+            .getConfigurationPanel()
+            .waitForAlertEditWarningMissing();
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void checkMessageIsShownWhenEditingKpiWithOwnAlert() throws JSONException {
+        setupKpi(kpiConfig);
+
+        try {
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
+
+            initIndigoDashboardsPageWithWidgets()
+                    .switchToEditMode()
+                    .selectLastKpi();
+
+            takeScreenshot(browser, "checkMessageIsShownWhenEditingKpiWithOwnAlert", getClass());
+            indigoDashboardsPage
+                    .getConfigurationPanel()
+                    .waitForAlertEditWarning();
+        } finally {
+            teardownKpi();
+        }
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void checkMessageIsShownWhenEditingKpiWithOthersAlerts() throws JSONException {
+        setupKpi(kpiConfig);
+
+        // add alert as different user
+        try {
+            initDashboardsPage();
+
+            logout();
+            signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
+
+            setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
+
+        } finally {
+            logout();
+            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+        }
+
+        try {
+            initIndigoDashboardsPageWithWidgets()
+                    .switchToEditMode()
+                    .selectLastKpi();
+
+            takeScreenshot(browser, "checkMessageIsShownWhenEditingKpiWithOthersAlerts", getClass());
+            indigoDashboardsPage
+                    .getConfigurationPanel()
+                    .waitForAlertEditWarning();
+        } finally {
+            teardownKpi();
+        }
+    }
+
 }

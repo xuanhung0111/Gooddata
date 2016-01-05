@@ -9,6 +9,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 public class ConfigurationPanel extends AbstractFragment {
 
@@ -32,6 +34,12 @@ public class ConfigurationPanel extends AbstractFragment {
 
     @FindBy(className = "s-button-remove-drill-to")
     private WebElement removeDrillToButton;
+
+    @FindBy(className = "s-widget-alerts-information-loaded")
+    private WebElement widgetAlertsLoaded;
+
+    @FindBy(className = "s-alert-edit-warning")
+    private WebElement alertEditWarning;
 
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
@@ -85,5 +93,19 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public MetricSelect getMetricSelect() {
         return waitForFragmentVisible(metricSelect);
+    }
+
+    public ConfigurationPanel waitForAlertEditWarning() {
+        waitForElementPresent(widgetAlertsLoaded);
+        waitForElementVisible(alertEditWarning);
+
+        return this;
+    }
+
+    public ConfigurationPanel waitForAlertEditWarningMissing() {
+        waitForElementPresent(widgetAlertsLoaded);
+        waitForElementNotVisible(alertEditWarning, 20);
+
+        return this;
     }
 }

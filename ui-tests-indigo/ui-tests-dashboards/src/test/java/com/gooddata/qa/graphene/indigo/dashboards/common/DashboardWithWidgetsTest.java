@@ -51,4 +51,20 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
         // create unique headline title which fits into headline title (has limited size)
         return UUID.randomUUID().toString().substring(0, 18);
     }
+
+    protected void setAlertForLastKpi(String triggeredWhen, String threshold) {
+        initIndigoDashboardsPageWithWidgets()
+            .getLastKpi()
+            .openAlertDialog()
+            .selectTriggeredWhen(triggeredWhen)
+            .setThreshold(threshold)
+            .setAlert();
+    }
+
+    protected void deleteAlertForLastKpi() {
+        initIndigoDashboardsPageWithWidgets()
+            .getLastKpi()
+            .openAlertDialog()
+            .deleteAlert();
+    }
 }
