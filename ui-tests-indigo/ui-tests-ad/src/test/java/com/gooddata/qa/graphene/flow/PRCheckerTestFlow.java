@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeBasedMetricsTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeFiltersTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.BucketsTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.CsvUploaderTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.DropZonesTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.EmptyCatalogueTest;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.ErrorStatesTest;
@@ -22,7 +21,6 @@ public class PRCheckerTestFlow {
     public static void main(String[] args) throws IOException {
         TestsRegistry.getInstance()
             .register(EmptyCatalogueTest.class)
-            .register(CsvUploaderTest.class)
             .register(RecommendationsWithoutDateDimensionTest.class)
             .register(AttributeFiltersTest.class)
             .register(BucketsTest.class)

@@ -10,7 +10,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -19,11 +18,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstractTest {
 
@@ -52,13 +49,7 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
         setupData(QUOTES_CSV_PATH, UPLOAD_INFO_PATH);
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
-    public void enableAccessingDataSection() throws IOException, JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(), 
-                ProjectFeatureFlags.ENABLE_CSV_UPLOADER);
-    }
-
-    @Test(dependsOnMethods = {"enableAccessingDataSection"}, groups = {"setupProject"})
+    @Test(dependsOnMethods = {"setupProductionData"}, groups = {"setupProject"})
     public void uploadPayrollDataset() {
         uploadCSV(getFilePathFromResource(PAYROLL_CSV_PATH));
         takeScreenshot(browser, "uploaded-payroll", getClass());
