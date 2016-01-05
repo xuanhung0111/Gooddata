@@ -39,7 +39,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(className = "s-cancel_button")
     private WebElement cancelButton;
 
-    @FindBy(className = "s-save_button")
+    @FindBy(className = SAVE_BUTTON_CLASS_NAME)
     private WebElement saveButton;
 
     @FindBy(className = "configuration-panel")
@@ -60,12 +60,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = ".dash-filters-attribute.are-loaded")
     private AttributeFiltersPanel attributeFiltersPanel;
 
-    private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
-    private static final By SAVE_BUTTON_ENABLED = By.cssSelector(".s-save_button:not(.disabled)");
-
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
+    private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
+
+    private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
+    private static final By SAVE_BUTTON_ENABLED = By.cssSelector(SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
 
     public static final String MAIN_ID = "app-dashboards";
 
@@ -111,10 +112,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return this;
     }
 
+    public boolean isSaveEnabled() {
+        return isElementPresent(SAVE_BUTTON_ENABLED, browser);
+    }
+
     // if save is disabled, use cancel. But leave edit mode in any case
     public IndigoDashboardsPage leaveEditMode() {
-        boolean isSaveEnabled = isElementPresent(SAVE_BUTTON_ENABLED, browser);
-        if (isSaveEnabled) {
+        if (isSaveEnabled()) {
             return saveEditModeWithKpis();
         }
 

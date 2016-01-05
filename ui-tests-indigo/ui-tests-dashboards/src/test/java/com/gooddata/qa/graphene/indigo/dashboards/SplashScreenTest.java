@@ -182,4 +182,16 @@ public class SplashScreenTest extends DashboardsTest {
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
+    public void checkCannotSaveNewEmptyDashboard() throws JSONException {
+        initIndigoDashboardsPage()
+                .getSplashScreen()
+                .startEditingWidgets();
+        indigoDashboardsPage
+                .selectDateFilterByName(DATE_FILTER_THIS_QUARTER);
+
+        takeScreenshot(browser, "checkCannotSaveNewEmptyDashboard", getClass());
+        assertFalse(indigoDashboardsPage.isSaveEnabled());
+    }
 }
