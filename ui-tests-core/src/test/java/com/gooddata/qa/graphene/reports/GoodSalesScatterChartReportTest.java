@@ -33,6 +33,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
 
     private static final By BY_IFRAME_SCATTER = By.xpath("//iframe[contains(@src,'iaa/scatter')]");
     private static final long expectedDashboardExportSize = 42000;
+    private static final int SELECTED_DATA_POINT_INDEX = 7;
 
     private static final By dataPoints =
             By.xpath("//*[local-name()='svg' and namespace-uri()='http://www.w3.org/2000/svg']/*[name()='g' and @class='highcharts-series-group']//*[name() = 'path']");
@@ -121,7 +122,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         // check if dataPoints has been rendered
         waitForElementVisible(dataPoints, browser);
         List<WebElement> dataPointElements = browser.findElements(dataPoints);
-        WebElement selectedDataPointElement = dataPointElements.get(7);
+        WebElement selectedDataPointElement = dataPointElements.get(SELECTED_DATA_POINT_INDEX);
         Actions builder = new Actions(browser);
         Actions hoverOverDataPoint = builder.moveToElement(selectedDataPointElement);
         hoverOverDataPoint.perform();
@@ -139,12 +140,11 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         selectedDataPointElement.click();
         sleepTight(2000);
         assertEquals(selectedDataPointElement.getAttribute("fill"), "rgb(77,133,255)");
-        for (Iterator<WebElement> iterator = dataPointElements.iterator(); iterator.hasNext();) {
-            WebElement dataPointElement = (WebElement) iterator.next();
-            if (!dataPointElement.equals(selectedDataPointElement)) {
-                assertEquals(dataPointElement.getAttribute("fill"), "rgb(194,194,194)");
-                System.out.println(dataPointElement.getLocation() + " is gray");
-            }
+        int index = 0;
+        for (WebElement dataPointElement : dataPointElements) {
+            if (index++==SELECTED_DATA_POINT_INDEX) continue;
+            assertEquals(dataPointElement.getAttribute("fill"), "rgb(194,194,194)");
+            System.out.println(dataPointElement.getLocation() + " is gray");
         }
         assertEquals(tableStatusElement.getText(), "1 selected out of 16 total",
                 "Table does not contain data of the selected data point");
@@ -517,7 +517,7 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         switchToScatterFrame();
         waitForElementVisible(dataPoints, browser);
         List<WebElement> dataPointElements = browser.findElements(dataPoints);
-        WebElement selectedDataPointElement = dataPointElements.get(7);
+        WebElement selectedDataPointElement = dataPointElements.get(SELECTED_DATA_POINT_INDEX);
         Actions builder = new Actions(browser);
         Actions hoverOverDataPoint = builder.moveToElement(selectedDataPointElement);
         hoverOverDataPoint.perform();
@@ -539,11 +539,11 @@ public class GoodSalesScatterChartReportTest extends GoodSalesAbstractTest {
         assertEquals(tableStatusElement.getText(), "8 total", "Table does not contain report data");
         selectedDataPointElement.click();
         assertEquals(selectedDataPointElement.getAttribute("fill"), "rgb(77,133,255)");
+        int index = 0;
         for (WebElement dataPointElement : dataPointElements) {
-            if (!dataPointElement.equals(selectedDataPointElement)) {
-                assertEquals(dataPointElement.getAttribute("fill"), "rgb(194,194,194)");
-                System.out.println(dataPointElement.getLocation() + " is gray");
-            }
+            if (index++== SELECTED_DATA_POINT_INDEX) continue;
+            assertEquals(dataPointElement.getAttribute("fill"), "rgb(194,194,194)");
+            System.out.println(dataPointElement.getLocation() + " is gray");
         }
         assertEquals(tableStatusElement.getText(), "1 selected out of 8 total",
                 "Table does not contain data of the selected data point");
