@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.shuffle;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
@@ -52,9 +51,6 @@ import com.google.common.collect.Sets;
 
 public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTest {
 
-    private static final List<String> PROJECT_TEMPLATES = Lists.newArrayList("/projectTemplates/GoodSalesDemo/2",
-            "/projectTemplates/MarketingFunnelDemo/1", "/projectTemplates/SocialECommerceDemo/1");
-
     private List<String> attributes;
     private List<String> metrics;
     private Random random = new Random();
@@ -64,10 +60,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        shuffle(PROJECT_TEMPLATES);
-        projectTemplate = PROJECT_TEMPLATES.get(0);
         projectTitle = "Indigo-General-Test";
-        System.out.println("Use project template: " + projectTemplate);
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"prepare"})
