@@ -66,7 +66,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
-    private static final By SAVE_BUTTON_ENABLED = By.cssSelector(SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
+    private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");
 
     public static final String MAIN_ID = "app-dashboards";
 
