@@ -8,6 +8,8 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 
+import java.util.Calendar;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -31,6 +33,7 @@ public class DashboardObjectsTest extends AbstractProjectTest {
     private static final String METRIC_NAME = "Sum of Amount";
     private static final String FACT_NAME ="Amount";
     private static final String DEFAULT_METRIC_FORMAT = "#,##0";
+    private static final int YEAR_OF_DATA = 2007;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -76,7 +79,8 @@ public class DashboardObjectsTest extends AbstractProjectTest {
         dashboardsPage.editDashboard();
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.ATTRIBUTE, "County");
         dashboardEditBar.addListFilterToDashboard(DashFilterTypes.PROMPT, this.variableName);
-        dashboardEditBar.addTimeFilterToDashboard(0, "7 ago");
+        dashboardEditBar.addTimeFilterToDashboard(0, String.format("%s ago", 
+                Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA));
         dashboardEditBar.addReportToDashboard(REPORT_NAME);
         sleepTightInSeconds(2);
         dashboardEditBar.addTextToDashboard(TextObject.HEADLINE, "Headline", "google.com");

@@ -8,6 +8,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Calendar;
+
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -40,6 +42,8 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
 
     private static final String DB1 = "DB1";
     private static final String DB2 = "DB2";
+
+    private static final int YEAR_OF_DATA = 2011;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -78,9 +82,11 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         dashboardsPage.addNewDashboard(TEST_DASHBOARD);
         dashboardsPage.editDashboard();
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-        addReportsAndFilters(dashboardEditBar, "4 ago");
+        addReportsAndFilters(dashboardEditBar, String.format("%s ago", 
+                Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA));
         dashboardsPage.addNewTab("tab 2");
-        addReportsAndFilters(dashboardEditBar, "4 ago");
+        addReportsAndFilters(dashboardEditBar, String.format("%s ago", 
+                Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA));
         dashboardEditBar.saveDashboard();
     }
 
@@ -181,7 +187,8 @@ public class GoodSalesConnectingFilterTest extends GoodSalesAbstractTest {
         try {
             dashboardsPage.editDashboard();
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
-            addReportsAndFilters(dashboardEditBar, "4 ago");
+            addReportsAndFilters(dashboardEditBar, String.format("%s ago", 
+                    Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA));
             dashboardEditBar.saveDashboard();
 
             dashboardsPage.duplicateDashboardTab(0);
