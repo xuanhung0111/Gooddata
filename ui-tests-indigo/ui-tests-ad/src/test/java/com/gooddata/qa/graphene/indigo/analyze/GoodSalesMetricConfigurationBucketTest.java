@@ -105,7 +105,7 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
         assertTrue(metricConfiguration.isShowPercentEnabled());
 
         metricConfiguration.showPercents().showPop();
-        analysisPage.getCategoriesBucket().changeDimensionSwitchInBucket("Created");
+        analysisPage.getAttributesBucket().changeDateDimension("Created");
         analysisPage.waitForReportComputing()
             .addMetric(AMOUNT, FieldType.FACT);
 

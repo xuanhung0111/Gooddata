@@ -30,7 +30,7 @@ public class AnalysisPageHeader extends AbstractFragment {
         waitForElementVisible(exportToReportButton).click();
     }
 
-    public boolean isExportToReportButtonEnabled() {
+    public boolean isExportButtonEnabled() {
         return !isElementDisabled(waitForElementVisible(exportToReportButton));
     }
 
@@ -50,7 +50,7 @@ public class AnalysisPageHeader extends AbstractFragment {
         return !isElementDisabled(waitForElementVisible(redoButton));
     }
 
-    public String getExportToReportButtonTooltipText() {
+    public String getExportButtonTooltipText() {
         getActions().moveToElement(exportToReportButton).perform();
         return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText().trim();
     }

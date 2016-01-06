@@ -72,7 +72,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
 
     protected void checkingOpenAsReport(String screenShot) {
         takeScreenshot(browser, screenShot + "-AD-page", getClass());
-        if (!analysisPage.getPageHeader().isExportToReportButtonEnabled()) {
+        if (!analysisPage.getPageHeader().isExportButtonEnabled()) {
             log.info("[Open as Report] button is disabled. Skip export report!");
             return;
         }

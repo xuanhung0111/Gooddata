@@ -14,11 +14,11 @@ public class StacksBucket extends AbstractBucket {
 
     public static final String CSS_CLASS = "s-bucket-stacks";
 
-    public boolean isStackByDisabled() {
+    public boolean isDisabled() {
         return getRoot().getAttribute("class").contains(BUCKET_WITH_WARN_MESSAGE);
     }
 
-    public String getAddedStackByName() {
+    public String getAttributeName() {
         if (isEmpty()) {
             return "";
         }

@@ -48,6 +48,6 @@ public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
                 .forEach(analysisPage::addAttribute);
         takeScreenshot(browser, "testAttributeLimitationInTableReport-finishAdding20Attributes", getClass());
 
-        assertEquals(analysisPage.getCategoriesBucket().getItemNames().size(), 20);
+        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 20);
     }
 }

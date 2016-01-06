@@ -13,7 +13,7 @@ import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.DateFilterPickerPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
@@ -46,7 +46,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        assertTrue(isEqualCollection(panel.getAllDimensionSwitchs(),
+        assertTrue(isEqualCollection(panel.getDimensionSwitchs(),
                 asList(ACTIVITY, "Closed", CREATED, "Snapshot", "Timeline")));
 
         panel.select("This year");
@@ -64,10 +64,10 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate();
         assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
-        analysisPage.getCategoriesBucket().changeGranularity("Month");
+        analysisPage.getAttributesBucket().changeGranularity("Month");
         analysisPage.waitForReportComputing();
 
-        filtersBucket.configTimeFilter("Last 90 days");
+        filtersBucket.configDateFilter("Last 90 days");
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("applyOnBucket");
@@ -81,7 +81,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDateFilter();
         assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
 
-        filtersBucket.changeDimensionSwitchInFilter(ACTIVITY, CREATED);
+        filtersBucket.changeDateDimension(ACTIVITY, CREATED);
         assertEquals(filtersBucket.getFilterText(CREATED), CREATED + ": All time");
 
         analysisPage.addDate();
@@ -91,7 +91,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
               waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         assertFalse(panel.isDimensionSwitcherEnabled());
 
-        analysisPage.getCategoriesBucket().changeDimensionSwitchInBucket(ACTIVITY);
+        analysisPage.getAttributesBucket().changeDateDimension(ACTIVITY);
         assertEquals(filtersBucket.getFilterText(ACTIVITY), ACTIVITY + ": All time");
         checkingOpenAsReport("applyOnBothFilterAndBucket");
     }
@@ -103,7 +103,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
                     .addDate()
                     .getFilterBuckets()
-                    .configTimeFilter("Last 90 days");
+                    .configDateFilter("Last 90 days");
         analysisPage.getMetricsBucket()
                     .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
                     .expandConfiguration()
@@ -129,7 +129,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
                     .addDate()
                     .getFilterBuckets()
-                    .configTimeFilter("Last 90 days");
+                    .configDateFilter("Last 90 days");
 
         analysisPage.getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -146,7 +146,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     public void switchBetweenPresetsAndDataRange() {
         initAnalysePage();
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configTimeFilter("Last 90 days");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate().getFilterBuckets().configDateFilter("Last 90 days");
         analysisPage.waitForReportComputing();
 
         WebElement dateFilter = analysisPage.getFilterBuckets().getFilter(ACTIVITY);
@@ -155,7 +155,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
         panel.changeToDateRangeSection();
         assertFalse(analysisPage.isReportComputing());
-        panel.configTimeFilterByRange("01/14/2015", "04/13/2015");
+        panel.configTimeFilter("01/14/2015", "04/13/2015");
         analysisPage.waitForReportComputing();
 
         dateFilter.click();
@@ -169,14 +169,14 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
     @Test(dependsOnGroups = {"init"})
     public void undoRedoOnBucket() {
         initAnalysePage();
-        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate().undo();
         assertTrue(categoriesBucket.isEmpty());
         analysisPage.redo();
         assertFalse(categoriesBucket.isEmpty());
 
-        categoriesBucket.changeDimensionSwitchInBucket(CREATED);
+        categoriesBucket.changeDateDimension(CREATED);
         assertEquals(categoriesBucket.getSelectedDimensionSwitch(), CREATED);
         analysisPage.undo();
         assertEquals(categoriesBucket.getSelectedDimensionSwitch(), ACTIVITY);
@@ -196,7 +196,7 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         assertTrue(filtersBucket.isFilterVisible(ACTIVITY));
 
         WebElement filter = filtersBucket.getFilter(ACTIVITY);
-        filtersBucket.changeDimensionSwitchInFilter(ACTIVITY, CREATED);
+        filtersBucket.changeDateDimension(ACTIVITY, CREATED);
 
         analysisPage.undo();
         filter.click();

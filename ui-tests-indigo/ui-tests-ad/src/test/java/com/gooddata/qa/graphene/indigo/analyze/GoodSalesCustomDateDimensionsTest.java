@@ -38,16 +38,16 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
 
         analysisPage.addMetric(NUMBER, FieldType.FACT).addDate();
 
-        assertTrue(filtersBucket.isFilterVisible(RETAIL_DATE));
-        assertEquals(filtersBucket.getFilterText(RETAIL_DATE), RETAIL_DATE + ": All time");
+        assertTrue(filtersBucket.isDateFilterVisible());
+        assertEquals(filtersBucket.getDateFilterText(), RETAIL_DATE + ": All time");
         RecommendationContainer recommendationContainer =
                 Graphene.createPageFragment(RecommendationContainer.class,
                         waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
-        for (String period : Sets.newHashSet(filtersBucket.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucket.getDateFilterOptions())) {
             System.out.println(format("Try with time period [%s]", period));
-            filtersBucket.configTimeFilter(period);
+            filtersBucket.configDateFilter(period);
             if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
                 System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
             } else {
@@ -63,7 +63,7 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
         analysisPage.addMetric(NUMBER, FieldType.FACT)
             .addDate()
             .getFilterBuckets()
-            .configTimeFilterByRange(RETAIL_DATE, "07/13/2014", "08/11/2014");
+            .configDateFilter("07/13/2014", "08/11/2014");
         analysisPage.waitForReportComputing();
         checkingOpenAsReport("dateRangeAppliedInReport");
     }
@@ -79,8 +79,8 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(RETAIL_DATE), RETAIL_DATE + ": Last 4 quarters");
-        assertThat(analysisPage.getCategoriesBucket().getItemNames(), contains(DATE));
+        assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), RETAIL_DATE + ": Last 4 quarters");
+        assertThat(analysisPage.getAttributesBucket().getItemNames(), contains(DATE));
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), equalTo(4));
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         checkingOpenAsReport("applyRecommendation");
@@ -91,7 +91,7 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
         initAnalysePage();
         analysisPage.addMetric(NUMBER, FieldType.FACT)
             .addDate()
-            .getCategoriesBucket()
+            .getAttributesBucket()
             .changeGranularity("Month");
         assertThat(analysisPage.waitForReportComputing().getChartReport().getTrackersCount(), greaterThanOrEqualTo(1));
 
