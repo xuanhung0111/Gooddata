@@ -5,17 +5,13 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
 
@@ -34,12 +30,6 @@ public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
-    public void enableAccessingDataSection() throws IOException, JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(), 
-                ProjectFeatureFlags.ENABLE_CSV_UPLOADER);
-    }
-
-    @Test(dependsOnMethods = {"enableAccessingDataSection"}, groups = {"setupProject"})
     public void uploadDatasets() {
         uploadCSV(getFilePathFromResource(MANY_COLUMNS_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + MANY_CLOUMNS_DATASET +"-dataset", getClass());
