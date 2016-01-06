@@ -90,8 +90,8 @@ public class GoodSalesSimpleMetricCreationTest extends AnalyticalDesignerAbstrac
         analysisPage.drag(fact, recommendation)
             .waitForReportComputing();
         assertEquals(analysisPage.getFilterBuckets().getDateFilterText(), "Closed: Last 4 quarters");
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
-        assertEquals(analysisPage.getCategoriesBucket().getSelectedGranularity(), "Quarter");
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
+        assertEquals(analysisPage.getAttributesBucket().getSelectedGranularity(), "Quarter");
         checkingOpenAsReport("createSimpleMetricFromFactUsingShortcut");
     }
 

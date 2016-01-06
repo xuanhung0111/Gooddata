@@ -47,7 +47,7 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
         checkUndoRedoForEmptyState(true);
 
         analysisPage.redo();
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -66,7 +66,7 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
             .addAttribute(ACTIVITY_TYPE);
         ReportState baseStateWithAttribute = ReportState.getCurrentState(analysisPage);
 
-        analysisPage.removeCategory(ACTIVITY_TYPE);
+        analysisPage.removeAttribute(ACTIVITY_TYPE);
 
         checkUndoRedoForReport(baseStateWithAttribute, true);
         checkUndoRedoForReport(baseState, false);
@@ -142,10 +142,10 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addAttribute(ACTIVITY_TYPE);
 
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
-        cataloguePanel.searchBucketItem(DEPARTMENT);
-        assertEquals(cataloguePanel.getAllCatalogFieldNamesInViewPort(), asList(DEPARTMENT));
+        cataloguePanel.search(DEPARTMENT);
+        assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(DEPARTMENT));
         checkUndoRedoForReport(baseState, true);
-        assertEquals(cataloguePanel.getAllCatalogFieldNamesInViewPort(), asList(DEPARTMENT));
+        assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(DEPARTMENT));
 
         analysisPage.addAttribute(ACTIVITY_TYPE).exportReport();
         checkUndoRedoForReport(baseState, true);
@@ -164,7 +164,7 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
 
         if (expectedState == null) {
             assertTrue(analysisPage.getMetricsBucket().isEmpty());
-            assertTrue(analysisPage.getCategoriesBucket().isEmpty());
+            assertTrue(analysisPage.getAttributesBucket().isEmpty());
             assertTrue(analysisPage.getFilterBuckets().isEmpty());
             assertTrue(analysisPage.getMainEditor().isEmpty());
         } else {
@@ -196,7 +196,7 @@ public class GoodSalesBasicUndoRedoTest extends AnalyticalDesignerAbstractTest {
 
             reportTrackerCount = report.getTrackersCount();
             addedMetrics = analysisPage.getMetricsBucket().getItemNames();
-            addedAttributes = analysisPage.getCategoriesBucket().getItemNames();
+            addedAttributes = analysisPage.getAttributesBucket().getItemNames();
 
             reportDataLables = report.getDataLabels();
             reportAxisLables = report.getAxisLabels();

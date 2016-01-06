@@ -47,7 +47,7 @@ import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
@@ -154,7 +154,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         final AnalysisPageHeader pageHeader = analysisPage.getPageHeader();
         ChartReport report = analysisPage.addMetric(AMOUNT).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
-        assertTrue(pageHeader.isExportToReportButtonEnabled());
+        assertTrue(pageHeader.isExportButtonEnabled());
 
         analysisPage.addAttribute(STAGE_NAME).waitForReportComputing();
         assertEquals(report.getTrackersCount(), 8);
@@ -162,8 +162,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addStack(STAGE_NAME);
         assertEquals(report.getTrackersCount(), 8);
 
-        assertFalse(pageHeader.isExportToReportButtonEnabled());
-        assertEquals(pageHeader.getExportToReportButtonTooltipText(), EXPORT_ERROR_MESSAGE);
+        assertFalse(pageHeader.isExportButtonEnabled());
+        assertEquals(pageHeader.getExportButtonTooltipText(), EXPORT_ERROR_MESSAGE);
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -242,9 +242,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
-            .searchBucketItem("am");
+            .search("am");
 
-        assertTrue(cataloguePanel.getAllCatalogFieldsInViewPort()
+        assertTrue(cataloguePanel.getFieldsInViewPort()
             .stream()
             .allMatch(input -> {
                 final String cssClass = input.getAttribute("class");
@@ -254,9 +254,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         );
 
         cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
-            .searchBucketItem("am");
+            .search("am");
 
-        assertTrue(cataloguePanel.getAllCatalogFieldsInViewPort()
+        assertTrue(cataloguePanel.getFieldsInViewPort()
             .stream()
             .allMatch(input -> input.getAttribute("class").contains(FieldType.ATTRIBUTE.toString()))
         );
@@ -331,8 +331,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
         try {
             initAnalysePage();
-            analysisPage.getCataloguePanel().searchBucketItem("aaaa");
-            assertEquals(analysisPage.getCataloguePanel().getAllCatalogFieldNamesInViewPort(),
+            analysisPage.getCataloguePanel().search("aaaa");
+            assertEquals(analysisPage.getCataloguePanel().getFieldNamesInViewPort(),
                     asList("aaaaA1", "AAAAb2"));
         } finally {
             deleteMetric("aaaaA1");
@@ -357,10 +357,10 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             initAnalysePage();
             final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
-            assertFalse(cataloguePanel.searchBucketItem("<button> test XSS </button>"));
-            assertFalse(cataloguePanel.searchBucketItem("<script> alert('test'); </script>"));
-            assertTrue(cataloguePanel.searchBucketItem("<button>"));
-            assertEquals(cataloguePanel.getAllCatalogFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
+            assertFalse(cataloguePanel.search("<button> test XSS </button>"));
+            assertFalse(cataloguePanel.search("<script> alert('test'); </script>"));
+            assertTrue(cataloguePanel.search("<button>"));
+            assertEquals(cataloguePanel.getFieldNamesInViewPort(), asList(xssMetric, xssAttribute));
 
             StringBuilder expected = new StringBuilder(xssMetric).append("\n")
                     .append("Field Type\n")
@@ -380,7 +380,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             analysisPage.addMetric(xssMetric).addAttribute(xssAttribute)
                 .waitForReportComputing();
             assertEquals(analysisPage.getMetricsBucket().getItemNames(), asList(xssMetric));
-            assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(xssAttribute));
+            assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(xssAttribute));
             assertTrue(analysisPage.getFilterBuckets().isFilterVisible(xssAttribute));
             assertEquals(analysisPage.getChartReport().getTooltipTextOnTrackerByIndex(0),
                     asList(asList(xssAttribute, "true"), asList(xssMetric, "1,160.9%")));
@@ -429,7 +429,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .addAttribute(ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
                 .getPageHeader()
-                .isExportToReportButtonEnabled());
+                .isExportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
         Iterator<String> analysisHeaders = analysisReport.getHeaders().iterator();
@@ -477,7 +477,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
         assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE).getExplorerMessage(),
                 "Now select a measure to display");
-        assertFalse(analysisPage.getPageHeader().isExportToReportButtonEnabled());
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -539,7 +539,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
 
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE);
-        assertTrue(cataloguePanel.searchBucketItem(""));
+        assertTrue(cataloguePanel.search(""));
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(48));
 
         assertThat(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
@@ -548,15 +548,15 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                 .getUnrelatedItemsHiddenCount(), equalTo(9));
 
         assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ALL)
-                .searchBucketItem("Amo"));
+                .search("Amo"));
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(4));
 
         assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.MEASURES)
-                .searchBucketItem("Amo"));
+                .search("Amo"));
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(4));
 
         assertFalse(cataloguePanel.filterCatalog(CatalogFilterType.ATTRIBUTES)
-                .searchBucketItem("Amo"));
+                .search("Amo"));
         assertThat(cataloguePanel.getUnrelatedItemsHiddenCount(), equalTo(0));
     }
 
@@ -565,14 +565,14 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         initAnalysePage();
         Stream.of(CatalogFilterType.values()).forEach(type -> {
             assertFalse(analysisPage.getCataloguePanel().filterCatalog(type)
-                    .searchBucketItem("abcxyz"));
+                    .search("abcxyz"));
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"abcxyz\"')"), browser));
         });
 
         analysisPage.addAttribute(ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPage.getCataloguePanel().searchBucketItem("Am"));
+            assertFalse(analysisPage.getCataloguePanel().search("Am"));
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"Am\"')"), browser));
 
@@ -625,8 +625,8 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPage.getStacksBucket().getAddedStackByName(), DEPARTMENT);
-                assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE));
+                assertEquals(analysisPage.getStacksBucket().getAttributeName(), DEPARTMENT);
+                assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ACTIVITY_TYPE));
                 assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), type.getMetricMessage());
                 analysisPage.undo();
         });
@@ -634,7 +634,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .changeReportType(ReportType.TABLE);
         takeScreenshot(browser, "switchReportHasOneMetricManyAttributes-backToTable", getClass());
-        assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE, DEPARTMENT));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ACTIVITY_TYPE, DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -651,7 +651,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-" + type.name(), getClass());
-                assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE));
+                assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ACTIVITY_TYPE));
                 assertEquals(analysisPage.getStacksBucket().getWarningMessage(), type.getStackByMessage());
                 analysisPage.undo();
         });
@@ -659,14 +659,14 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .changeReportType(ReportType.TABLE);
         takeScreenshot(browser, "switchReportHasManyMetricsManyAttributes-backToTable", getClass());
-        assertEquals(analysisPage.getCategoriesBucket().getItemNames(), asList(ACTIVITY_TYPE));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void switchReportWithDateAttributes() {
         initAnalysePage();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
-        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
 
         analysisPage.changeReportType(ReportType.TABLE)
             .addDate()
@@ -677,7 +677,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-firstDate-" + type.name(), getClass());
-                assertEquals(stacksBucket.getAddedStackByName(), ACTIVITY_TYPE);
+                assertEquals(stacksBucket.getAttributeName(), ACTIVITY_TYPE);
                 assertEquals(categoriesBucket.getItemNames(), asList(DATE));
                 analysisPage.undo();
         });
@@ -692,7 +692,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + type.name(), getClass());
-                assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+                assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
                 assertEquals(categoriesBucket.getItemNames(), asList(ACTIVITY_TYPE));
                 analysisPage.undo();
         });
@@ -700,7 +700,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeReportType(ReportType.LINE_CHART);
         takeScreenshot(browser, "switchReportWithDateAttributes-secondDate-" + ReportType.LINE_CHART.name(),
                 getClass());
-        assertEquals(stacksBucket.getAddedStackByName(), ACTIVITY_TYPE);
+        assertEquals(stacksBucket.getAttributeName(), ACTIVITY_TYPE);
         assertEquals(categoriesBucket.getItemNames(), asList(DATE));
 
         analysisPage.resetToBlankState()
@@ -713,7 +713,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
             .forEach(type -> {
                 analysisPage.changeReportType(type);
                 takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + type.name(), getClass());
-                assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+                assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
                 assertEquals(categoriesBucket.getItemNames(), asList(ACTIVITY_TYPE));
                 analysisPage.undo();
         });
@@ -721,7 +721,7 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
         analysisPage.changeReportType(ReportType.LINE_CHART);
         takeScreenshot(browser, "switchReportWithDateAttributes-thirdDate-" + ReportType.LINE_CHART.name(),
                 getClass());
-        assertEquals(stacksBucket.getAddedStackByName(), ACTIVITY_TYPE);
+        assertEquals(stacksBucket.getAttributeName(), ACTIVITY_TYPE);
         assertEquals(categoriesBucket.getItemNames(), asList(DATE));
     }
 

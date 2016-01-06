@@ -10,7 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-public class CategoriesBucket extends AbstractBucket {
+public class AttributesBucket extends AbstractBucket {
 
     @FindBy(className = "s-date-granularity-switch")
     private Select granularity;
@@ -39,9 +39,9 @@ public class CategoriesBucket extends AbstractBucket {
         return dimensionSwitch.getFirstSelectedOption().getText();
     }
 
-    public void changeDimensionSwitchInBucket(String dimensionSwitch) {
+    public void changeDateDimension(String switchDimension) {
         waitForElementVisible(this.dimensionSwitch);
-        this.dimensionSwitch.selectByVisibleText(dimensionSwitch);
+        this.dimensionSwitch.selectByVisibleText(switchDimension);
     }
 
     public WebElement getFirst() {

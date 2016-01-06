@@ -111,16 +111,16 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)
-            .searchBucketItem(AMOUNT));
+            .search(AMOUNT));
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in production data", getClass());
-        assertFalse(cataloguePanel.searchBucketItem("County"));
-        assertTrue(cataloguePanel.searchBucketItem("Id"));
+        assertFalse(cataloguePanel.search("County"));
+        assertTrue(cataloguePanel.search("Id"));
 
         assertTrue(cataloguePanel.changeDataset(PAYROLL_DATASET)
-                .searchBucketItem(AMOUNT));
+                .search(AMOUNT));
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
-        assertTrue(cataloguePanel.searchBucketItem("County"));
-        assertFalse(cataloguePanel.searchBucketItem("Id"));
+        assertTrue(cataloguePanel.search("County"));
+        assertFalse(cataloguePanel.search("Id"));
     }
 
     private void setupData(String csvPath, String uploadInfoPath) throws JSONException, URISyntaxException {

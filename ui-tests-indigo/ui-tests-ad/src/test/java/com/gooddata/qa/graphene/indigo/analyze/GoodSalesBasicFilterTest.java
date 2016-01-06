@@ -48,7 +48,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         assertEquals(report.getTrackersCount(), 4);
         assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
 
-        assertEquals(filtersBucket.configTimeFilter("This year")
+        assertEquals(filtersBucket.configDateFilter("This year")
                 .getFilterText("Activity"), "Activity: This year");
         assertEquals(report.getTrackersCount(), 3);
         checkingOpenAsReport("filterOnDateAttribute");
@@ -63,7 +63,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
                 .getChartReport()
                 .getTrackersCount() >= 1);
         assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: All time");
-        assertEquals(analysisPage.getCategoriesBucket().getAllGranularities(),
+        assertEquals(analysisPage.getAttributesBucket().getAllGranularities(),
                 Arrays.asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year"));
         checkingOpenAsReport("testDateInCategoryAndDateInFilter");
     }
@@ -76,7 +76,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addDateFilter();
         assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
-        filtersBucket.configTimeFilter("Last 12 months");
+        filtersBucket.configDateFilter("Last 12 months");
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 1);
 
@@ -135,7 +135,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
             .addAttribute(ACTIVITY_TYPE)
             .addDateFilter()
             .getFilterBuckets()
-            .configTimeFilter("Last year");
+            .configDateFilter("Last year");
         ChartReport report = analysisPage.getChartReport();
         assertTrue(report.getTrackersCount() >= 1);
         RecommendationContainer recommendationContainer =
@@ -213,7 +213,8 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
                 .getChartReport();
         assertEquals(report.getTrackersCount(), 4);
         assertEquals(filtersBucket.getFilterText("Activity"), "Activity: All time");
-        filtersBucket.configTimeFilterByRangeButNotApply("Activity", "01/12/2014", "01/12/2015");
+
+        filtersBucket.configDateFilterByRangeButNotApply("01/12/2014", "01/12/2015");
         analysisPage.exportReport();
         String currentWindowHandle = browser.getWindowHandle();
         for (String handle : browser.getWindowHandles()) {
@@ -226,7 +227,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
         browser.close();
         browser.switchTo().window(currentWindowHandle);
 
-        filtersBucket.configTimeFilterByRange("Activity", "01/12/2014", "01/12/2015");
+        filtersBucket.configDateFilter("01/12/2014", "01/12/2015");
         analysisPage.waitForReportComputing();
         assertEquals(report.getTrackersCount(), 4);
         analysisPage.exportReport();

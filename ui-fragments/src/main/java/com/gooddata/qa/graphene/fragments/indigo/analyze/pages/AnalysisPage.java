@@ -19,7 +19,7 @@ import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MainEditor;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
@@ -46,7 +46,7 @@ public class AnalysisPage extends AbstractFragment {
     private MetricsBucket metricsBucket;
 
     @FindBy(className = "s-bucket-categories")
-    private CategoriesBucket categoriesBucket;
+    private AttributesBucket attributesBucket;
 
     @FindBy(className = StacksBucket.CSS_CLASS)
     private StacksBucket stacksBucket;
@@ -100,13 +100,13 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage addAttribute(String attribute) {
         WebElement source = getCataloguePanel().searchAndGet(attribute, FieldType.ATTRIBUTE);
-        WebElement target = getCategoriesBucket().getInvitation();
+        WebElement target = getAttributesBucket().getInvitation();
         return drag(source, target);
     }
 
     public AnalysisPage addDate() {
         WebElement source = getCataloguePanel().getDate();
-        WebElement target = getCategoriesBucket().getInvitation();
+        WebElement target = getAttributesBucket().getInvitation();
         return drag(source, target);
     }
 
@@ -136,13 +136,13 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage replaceAttribute(String oldAttr, String newAttr) {
         WebElement source = getCataloguePanel().searchAndGet(newAttr, FieldType.ATTRIBUTE);
-        WebElement target = getCategoriesBucket().get(oldAttr);
+        WebElement target = getAttributesBucket().get(oldAttr);
         return drag(source, target);
     }
 
     public AnalysisPage replaceAttribute(String attr) {
         WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
-        WebElement target = getCategoriesBucket().getFirst();
+        WebElement target = getAttributesBucket().getFirst();
         return drag(source, target);
     }
 
@@ -157,8 +157,8 @@ public class AnalysisPage extends AbstractFragment {
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
-    public AnalysisPage removeCategory(String attr) {
-        return drag(getCategoriesBucket().get(attr),
+    public AnalysisPage removeAttribute(String attr) {
+        return drag(getAttributesBucket().get(attr),
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
@@ -180,7 +180,7 @@ public class AnalysisPage extends AbstractFragment {
         getPageHeader().resetToBlankState();
         assertTrue(getFilterBuckets().isEmpty());
         assertTrue(getMetricsBucket().isEmpty());
-        assertTrue(getCategoriesBucket().isEmpty());
+        assertTrue(getAttributesBucket().isEmpty());
         assertTrue(getStacksBucket().isEmpty());
         assertTrue(getMainEditor().isEmpty());
         return this;
@@ -234,8 +234,8 @@ public class AnalysisPage extends AbstractFragment {
         return waitForFragmentVisible(metricsBucket);
     }
 
-    public CategoriesBucket getCategoriesBucket() {
-        return waitForFragmentVisible(categoriesBucket);
+    public AttributesBucket getAttributesBucket() {
+        return waitForFragmentVisible(attributesBucket);
     }
 
     public StacksBucket getStacksBucket() {

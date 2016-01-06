@@ -56,11 +56,11 @@ public class DateFilterPickerPanel extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-    public List<String> getAllPeriods() {
+    public List<String> getPeriods() {
         return getElementTexts(waitForCollectionIsNotEmpty(periods));
     }
 
-    public List<String> getAllDimensionSwitchs() {
+    public List<String> getDimensionSwitchs() {
         return getElementTexts(waitForElementVisible(dimensionSwitch).getOptions());
     }
 
@@ -88,7 +88,7 @@ public class DateFilterPickerPanel extends AbstractFragment {
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
      */
-    public void configTimeFilterByRange(String from, String to) {
+    public void configTimeFilter(String from, String to) {
         configTimeFilterByRangeHelper(from, to, true);
     }
 
@@ -108,6 +108,18 @@ public class DateFilterPickerPanel extends AbstractFragment {
         waitForElementVisible(presetsSection).click();
     }
 
+    public void changeDateDimension(String switchDimension) {
+        waitForElementVisible(this.dimensionSwitch).selectByVisibleText(switchDimension);
+    }
+
+    public boolean isDimensionSwitcherEnabled() {
+        return waitForElementVisible(By.cssSelector(DIMENSION_SWITCH_LOCATOR), getRoot()).isEnabled();
+    }
+
+    public String getSelectedDimensionSwitch() {
+        return waitForElementVisible(dimensionSwitch).getFirstSelectedOption().getText();
+    }
+
     private void configTimeFilterByRangeHelper(String from, String to, boolean apply) {
         waitForElementVisible(dateRangeSection).click();
         waitForElementVisible(fromDate).clear();
@@ -118,17 +130,5 @@ public class DateFilterPickerPanel extends AbstractFragment {
 
         waitForElementVisible(apply ? applyButton : cancelButton).click();
         waitForFragmentNotVisible(this);
-    }
-
-    public void changeDimensionSwitchInFilter(String dimensionSwitch) {
-        waitForElementVisible(this.dimensionSwitch).selectByVisibleText(dimensionSwitch);
-    }
-
-    public boolean isDimensionSwitcherEnabled() {
-        return waitForElementVisible(By.cssSelector(DIMENSION_SWITCH_LOCATOR), getRoot()).isEnabled();
-    }
-
-    public String getSelectedDimensionSwitch() {
-        return waitForElementVisible(dimensionSwitch).getFirstSelectedOption().getText();
     }
 }

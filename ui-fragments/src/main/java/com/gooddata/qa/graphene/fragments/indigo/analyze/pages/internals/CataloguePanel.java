@@ -136,7 +136,7 @@ public class CataloguePanel extends AbstractFragment {
                 waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getFactDescription();
     }
 
-    public List<String> getAllCatalogFieldNamesInViewPort() {
+    public List<String> getFieldNamesInViewPort() {
         return getElementTexts(items);
     }
 
@@ -145,7 +145,7 @@ public class CataloguePanel extends AbstractFragment {
      * @param item
      * @return true if found something from search input, otherwise return false
      */
-    public boolean searchBucketItem(String item) {
+    public boolean search(String item) {
         waitForItemLoaded();
         clearInputText();
 
@@ -177,7 +177,7 @@ public class CataloguePanel extends AbstractFragment {
         waitForItemLoaded();
     }
 
-    public Collection<WebElement> getAllCatalogFieldsInViewPort() {
+    public Collection<WebElement> getFieldsInViewPort() {
         return items;
     }
 
@@ -213,19 +213,19 @@ public class CataloguePanel extends AbstractFragment {
         return this;
     }
 
-    private void waitForItemLoaded() {
-        Predicate<WebDriver> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
-                browser);
-        Graphene.waitGui().until(itemsLoaded);
-    }
-
     public WebElement searchAndGet(final String item, final FieldType type) {
-        searchBucketItem(item);
+        search(item);
         return items.stream()
             .filter(e -> item.equals(e.getText().trim()))
             .filter(e -> e.getAttribute("class").contains(type.toString()))
             .findFirst()
             .get();
+    }
+
+    private void waitForItemLoaded() {
+        Predicate<WebDriver> itemsLoaded = browser -> !isElementPresent(By.cssSelector(".gd-spinner.small"),
+                browser);
+        Graphene.waitGui().until(itemsLoaded);
     }
 
     public class DatasourceDropDown extends AbstractFragment {

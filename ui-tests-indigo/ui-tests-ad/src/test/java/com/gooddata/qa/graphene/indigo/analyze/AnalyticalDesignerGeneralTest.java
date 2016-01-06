@@ -38,7 +38,7 @@ import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CategoriesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
@@ -260,7 +260,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String attribute;
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
-            if (!cataloguePanel.searchBucketItem(attribute) || !cataloguePanel.isDataApplicable(attribute)) {
+            if (!cataloguePanel.search(attribute) || !cataloguePanel.isDataApplicable(attribute)) {
                 Screenshots.takeScreenshot(browser,
                         "[Inapplicable attribute] testAnotherApproachToShowContribution", this.getClass());
                 System.out.println(format("Attribute [%s] is not available!", attribute));
@@ -273,9 +273,9 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 System.out.println(format("Report with metric [%s] and attribute [%s] shows message: %s",
                         metric, attribute, analysisPage.getExplorerMessage()));
                 System.out.println("Try another attribute");
-                analysisPage.removeCategory(attribute).waitForReportComputing();
+                analysisPage.removeAttribute(attribute).waitForReportComputing();
             } else {
-                analysisPage.removeCategory(attribute).waitForReportComputing();
+                analysisPage.removeAttribute(attribute).waitForReportComputing();
                 System.out.println(format("Good pair to test: metric [%s] and attribute [%s]", metric, attribute));
                 break;
             }
@@ -306,7 +306,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         analysisPage.resetToBlankState().addMetric(metric);
         waitForFragmentVisible(comparisonRecommendation);
         comparisonRecommendation.select(attribute).apply();
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(attribute));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(attribute));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(attribute), attribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -314,7 +314,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String newAttribute = doSafetyAttributeAction(metric,
                 attr -> this.replaceAttribute(attribute, attr), "testSimpleComparison");
 
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(newAttribute));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(newAttribute));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(newAttribute), newAttribute + ": All");
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -326,7 +326,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         String metric;
 
         initAnalysePage();
-        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         while (true) {
@@ -408,7 +408,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
-        final CategoriesBucket categoriesBucket = analysisPage.getCategoriesBucket();
+        final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         final Supplier<WebElement> recommendation = () ->
@@ -436,7 +436,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 "exportCustomDiscovery");
         doSafetyAttributeAction(metric, analysisPage::addAttribute, "exportCustomDiscovery");
 
-        assertTrue(analysisPage.getPageHeader().isExportToReportButtonEnabled());
+        assertTrue(analysisPage.getPageHeader().isExportButtonEnabled());
         TableReport analysisReport = analysisPage.getTableReport();
         List<List<String>> analysisContent = analysisReport.getContent();
 
@@ -481,7 +481,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
         assertEquals(analysisPage.addAttribute(getRandomAttribute()).getExplorerMessage(),
                 "Now select a measure to display");
-        assertFalse(analysisPage.getPageHeader().isExportToReportButtonEnabled());
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
@@ -498,7 +498,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(report.getTrackersCount() >= 1);
         assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
 
-        filtersBucket.configTimeFilter("This year");
+        filtersBucket.configDateFilter("This year");
         assertTrue(filtersBucket.getDateFilterText().endsWith(": This year"));
     }
 
@@ -511,7 +511,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 "testDateInCategoryAndDateInFilter");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         assertTrue(analysisPage.getFilterBuckets().getDateFilterText().endsWith(": All time"));
-        assertTrue(isEqualCollection(analysisPage.getCategoriesBucket().getAllGranularities(),
+        assertTrue(isEqualCollection(analysisPage.getAttributesBucket().getAllGranularities(),
                 asList("Day", "Week (Sun-Sat)", "Month", "Quarter", "Year")));
     }
 
@@ -526,10 +526,10 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(filtersBucket.getDateFilterText().endsWith(": All time"));
 
         boolean timeFilterOk = false;
-        for (String period : Sets.newHashSet(filtersBucket.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucket.getDateFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(format("Try with time period [%s]", period));
-            filtersBucket.configTimeFilter(period);
+            filtersBucket.configDateFilter(period);
             if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
                 System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
             } else {
@@ -630,7 +630,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(filtersBucket.isDateFilterVisible());
         assertTrue(filtersBucket.getDateFilterText().endsWith(": Last 4 quarters"));
 
@@ -654,10 +654,10 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 "compararisonRecommendationOverrideDateFilter");
 
         boolean timeFilterOk = false;
-        for (String period : Sets.newHashSet(filtersBucket.getAllTimeFilterOptions())) {
+        for (String period : Sets.newHashSet(filtersBucket.getDateFilterOptions())) {
             if ("All time".equals(period)) continue;
             System.out.println(format("Try with time period [%s]", period));
-            filtersBucket.configTimeFilter(period);
+            filtersBucket.configDateFilter(period);
             if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
                 System.out.println(format("Report shows message: %s", analysisPage.getExplorerMessage()));
             } else {
@@ -749,7 +749,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         while (true) {
             metric = getRandomMetric();
 
-            if (analysisPage.getCataloguePanel().searchBucketItem(metric)) {
+            if (analysisPage.getCataloguePanel().search(metric)) {
                 action.accept(metric);
                 analysisPage.waitForReportComputing();
             } else {
@@ -786,7 +786,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         while (true) {
             attribute = getRandomeAttributeFromMetric(metric);
 
-            if (cataloguePanel.searchBucketItem(attribute) && cataloguePanel.isDataApplicable(attribute)) {
+            if (cataloguePanel.search(attribute) && cataloguePanel.isDataApplicable(attribute)) {
                 action.accept(attribute);
                 analysisPage.waitForReportComputing();
             } else {
@@ -814,11 +814,11 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
     }
 
     private String doSafetyAttributeAction(String metric, Consumer<String> action, String screenshot) {
-        return doSafetyAttributeAction(metric, action, analysisPage::removeCategory, screenshot);
+        return doSafetyAttributeAction(metric, action, analysisPage::removeAttribute, screenshot);
     }
 
     private void replaceAttribute(String oldAttr, String newAttr) {
-        if (analysisPage.getCategoriesBucket().getItemNames().contains(oldAttr)) {
+        if (analysisPage.getAttributesBucket().getItemNames().contains(oldAttr)) {
             analysisPage.replaceAttribute(oldAttr, newAttr);
         } else {
             analysisPage.addAttribute(newAttr);

@@ -58,7 +58,7 @@ public class GoodSalesPrivateMetricVisibilityTest extends AnalyticalDesignerAbst
             signIn(false, UserRoles.EDITOR);
 
             initAnalysePage();
-            assertFalse(analysisPage.getCataloguePanel().searchBucketItem(RATIO_METRIC));
+            assertFalse(analysisPage.getCataloguePanel().search(RATIO_METRIC));
         } finally {
             logout();
             signIn(false, UserRoles.ADMIN);

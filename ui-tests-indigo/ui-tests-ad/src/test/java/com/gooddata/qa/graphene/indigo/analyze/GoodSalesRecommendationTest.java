@@ -77,7 +77,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
         recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
         assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -149,13 +149,13 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ACTIVITY_TYPE).apply();
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
 
         analysisPage.replaceAttribute(ACTIVITY_TYPE, DEPARTMENT);
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DEPARTMENT));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DEPARTMENT));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(DEPARTMENT), DEPARTMENT + ": All");
         assertEquals(report.getTrackersCount(), 2);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -178,7 +178,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
         comparisonRecommendation.select(ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
         assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
@@ -229,7 +229,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
                 recommendationContainer.getRecommendation(RecommendationStep.SEE_TREND);
         trendingRecommendation.select("Month").apply();
         analysisPage.waitForReportComputing();
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
         assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(metricConfiguration.isShowPercentEnabled());
@@ -277,7 +277,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
 
         analysisPage.drag(metric, trendRecommendation);
 
-        assertTrue(analysisPage.getCategoriesBucket().getItemNames().contains(DATE));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
         assertEquals(analysisPage.getFilterBuckets().getFilterText("Activity"), "Activity: Last 4 quarters");
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
