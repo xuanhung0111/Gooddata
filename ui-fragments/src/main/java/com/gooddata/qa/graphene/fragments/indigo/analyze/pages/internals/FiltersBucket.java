@@ -8,7 +8,6 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -28,16 +27,23 @@ public class FiltersBucket extends AbstractBucket {
     private static final String LOADING = "...";
     private static final By BY_FILTER_TEXT = By.cssSelector(".button-text");
 
-    private static final SimpleDateFormat INPUT_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
-    private static final SimpleDateFormat OUTPUT_FORMAT = new SimpleDateFormat("MMM d, yyyy");
-
-    public FiltersBucket configTimeFilter(String period) {
+    public FiltersBucket configDateFilter(String period) {
         WebElement filter = getDateFilter();
         filter.click();
         Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser)).select(period);
         assertTrue(getFilterTextHelper(filter).endsWith(": " + period));
         return this;
+    }
+
+    /**
+     * @param from format MM/DD/YYYY
+     * @param to   format MM/DD/YYYY
+     * @throws ParseException 
+     */
+    public void configDateFilter(String from, String to) throws ParseException {
+        WebElement filter = getDateFilter();
+        openDatePanelOfFilter(filter).configTimeFilter(from, to);
     }
 
     public FiltersBucket configAttributeFilter(String attribute, String... values) {
@@ -87,22 +93,12 @@ public class FiltersBucket extends AbstractBucket {
             .get();
     }
 
-    private String getFilterTextHelper(WebElement filter) {
-        return filter.findElement(BY_FILTER_TEXT).getText();
-    }
-
-    private WebElement waitForFilterLoaded(final WebElement filter) {
-        Predicate<WebDriver> filterLoaded = browser -> !LOADING.equals(getFilterTextHelper(filter));
-        Graphene.waitGui().until(filterLoaded);
-        return filter;
-    }
-
-    public List<String> getAllTimeFilterOptions() {
+    public List<String> getDateFilterOptions() {
         WebElement filter = getDateFilter();
         filter.click();
         DateFilterPickerPanel panel = Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
-        List<String> ret = panel.getAllPeriods();
+        List<String> ret = panel.getPeriods();
         filter.click();
         waitForFragmentNotVisible(panel);
         return ret;
@@ -112,32 +108,16 @@ public class FiltersBucket extends AbstractBucket {
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
      */
-    public void configTimeFilterByRangeButNotApply(String dateFilter, String from, String to) {
-        WebElement filter = getFilter(dateFilter);
+    public void configDateFilterByRangeButNotApply(String from, String to) {
+        WebElement filter = getDateFilter();
         String oldFilterText = getFilterTextHelper(filter);
         openDatePanelOfFilter(filter).configTimeFilterByRangeButNotApply(from, to);
         assertEquals(getFilterTextHelper(filter), oldFilterText);
     }
 
-    /**
-     * @param from format MM/DD/YYYY
-     * @param to   format MM/DD/YYYY
-     * @throws ParseException 
-     */
-    public void configTimeFilterByRange(String dateFilter, String from, String to) throws ParseException {
-        WebElement filter = getFilter(dateFilter);
-        openDatePanelOfFilter(filter).configTimeFilterByRange(from, to);
-        assertEquals(getFilterTextHelper(filter),
-                dateFilter + ": " + getAnotherTimeFormat(from) + " – " + getAnotherTimeFormat(to));
-    }
-
-    private String getAnotherTimeFormat(String time) throws ParseException {
-        return OUTPUT_FORMAT.format(INPUT_FORMAT.parse(time));
-    }
-
-    public void changeDimensionSwitchInFilter(String currentRelatedDate, String dimensionSwitch) {
-        WebElement filter = getFilter(currentRelatedDate);
-        openDatePanelOfFilter(filter).changeDimensionSwitchInFilter(dimensionSwitch);
+    public void changeDateDimension(String currentDimension, String switchDimension) {
+        WebElement filter = getFilter(switchDimension);
+        openDatePanelOfFilter(filter).changeDateDimension(switchDimension);
     }
 
     public boolean isDateFilterVisible() {
@@ -153,14 +133,24 @@ public class FiltersBucket extends AbstractBucket {
         }
     }
 
+    @Override
+    public String getWarningMessage() {
+        throw new UnsupportedOperationException();
+    }
+
     private DateFilterPickerPanel openDatePanelOfFilter(WebElement filter) {
         filter.click();
         return Graphene.createPageFragment(DateFilterPickerPanel.class,
                 waitForElementVisible(DateFilterPickerPanel.LOCATOR, browser));
     }
 
-    @Override
-    public String getWarningMessage() {
-        throw new UnsupportedOperationException();
+    private String getFilterTextHelper(WebElement filter) {
+        return filter.findElement(BY_FILTER_TEXT).getText();
+    }
+
+    private WebElement waitForFilterLoaded(final WebElement filter) {
+        Predicate<WebDriver> filterLoaded = browser -> !LOADING.equals(getFilterTextHelper(filter));
+        Graphene.waitGui().until(filterLoaded);
+        return filter;
     }
 }

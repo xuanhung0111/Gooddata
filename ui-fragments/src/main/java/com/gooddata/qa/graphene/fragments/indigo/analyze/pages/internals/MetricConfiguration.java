@@ -239,16 +239,6 @@ public class MetricConfiguration extends AbstractFragment {
                 .click();
         }
 
-        private void selectInputItem(String element) {
-            searchItem(element);
-            waitForCollectionIsNotEmpty(items).stream()
-                .filter(item -> element.equals(item.findElement(tagName("span")).getText()))
-                .findFirst()
-                .map(item -> item.findElement(tagName("input")))
-                .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element))
-                .click();
-        }
-
         public AttributeFilterPicker selectItems(String... items) {
             Stream.of(items).forEach(this::selectInputItem);
             return this;
@@ -257,6 +247,16 @@ public class MetricConfiguration extends AbstractFragment {
         public void apply() {
             waitForElementVisible(applyButton).click();
             waitForElementNotVisible(getRoot());
+        }
+
+        private void selectInputItem(String element) {
+            searchItem(element);
+            waitForCollectionIsNotEmpty(items).stream()
+                .filter(item -> element.equals(item.findElement(tagName("span")).getText()))
+                .findFirst()
+                .map(item -> item.findElement(tagName("input")))
+                .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element))
+                .click();
         }
 
         private void searchItem(String name) {

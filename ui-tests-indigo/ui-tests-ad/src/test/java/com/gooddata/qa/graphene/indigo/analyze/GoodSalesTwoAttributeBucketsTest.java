@@ -47,12 +47,12 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         dropAttributeToReportHaveOneMetric();
 
         analysisPage.replaceAttribute(ACTIVITY_TYPE, PRIORITY);
-        Collection<String> addedAttributes = analysisPage.getCategoriesBucket().getItemNames();
+        Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
         assertTrue(addedAttributes.contains(PRIORITY));
         assertFalse(addedAttributes.contains(ACTIVITY_TYPE));
 
         analysisPage.replaceStack(REGION);
-        assertEquals(analysisPage.getStacksBucket().getAddedStackByName(), REGION);
+        assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
         checkingOpenAsReport("dropThirdAttributeToBucket");
     }
 
@@ -82,7 +82,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addMetric(BEST_CASE).addAttribute(REGION);
 
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
-        assertTrue(stacksBucket.isStackByDisabled());
+        assertTrue(stacksBucket.isDisabled());
         assertEquals(stacksBucket.getWarningMessage(), "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE MEASURE");
     }
 
@@ -97,8 +97,8 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
     public void removeAttributeOnXBucket() {
         dropAttributeToReportHaveOneMetric();
 
-        analysisPage.removeCategory(ACTIVITY_TYPE);
-        Collection<String> addedAttributes = analysisPage.getCategoriesBucket().getItemNames();
+        analysisPage.removeAttribute(ACTIVITY_TYPE);
+        Collection<String> addedAttributes = analysisPage.getAttributesBucket().getItemNames();
         assertFalse(addedAttributes.contains(ACTIVITY_TYPE));
     }
 
@@ -161,10 +161,10 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 
         analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
 
         analysisPage.changeReportType(ReportType.LINE_CHART);
-        assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
 
         analysisPage.changeReportType(ReportType.TABLE);
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
@@ -191,7 +191,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
 
         analysisPage.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email", "Phone Call")
-            .configTimeFilter("Last year");
+            .configDateFilter("Last year");
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("applyFilterInReportHasDateAndAttribute");
     }
@@ -214,7 +214,7 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
         assertFalse(metricConfiguration.isPopEnabled());
         assertFalse(metricConfiguration.isPopSelected());
-        assertEquals(analysisPage.getCategoriesBucket().getItemNames(), Arrays.asList(ACTIVITY_TYPE));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), Arrays.asList(ACTIVITY_TYPE));
         checkingOpenAsReport("uncheckSelectedPopCheckbox");
     }
 
@@ -226,18 +226,18 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.undo();
         assertTrue(stacksBucket.isEmpty());
         analysisPage.redo();
-        assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
 
         analysisPage.replaceStack(REGION);
-        assertEquals(stacksBucket.getAddedStackByName(), REGION);
+        assertEquals(stacksBucket.getAttributeName(), REGION);
 
         analysisPage.undo();
-        assertEquals(stacksBucket.getAddedStackByName(), DEPARTMENT);
+        assertEquals(stacksBucket.getAttributeName(), DEPARTMENT);
 
         analysisPage.undo();
         assertTrue(stacksBucket.isEmpty());
 
         analysisPage.redo().redo();
-        assertEquals(stacksBucket.getAddedStackByName(), REGION);
+        assertEquals(stacksBucket.getAttributeName(), REGION);
     }
 }

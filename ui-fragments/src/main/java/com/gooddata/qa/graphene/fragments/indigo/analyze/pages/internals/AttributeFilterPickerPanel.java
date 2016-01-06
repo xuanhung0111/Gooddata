@@ -54,16 +54,6 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
-    private void selectItem(String item) {
-        searchItem(item);
-        items.stream()
-            .filter(e -> item.equals(e.findElement(tagName("span")).getText()))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Cannot find: " + item))
-            .findElement(BY_INPUT)
-            .click();
-    }
-
     public void selectAll() {
         waitForElementVisible(selectAllButton).click();
         waitForElementVisible(applyButton).click();
@@ -80,6 +70,16 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
         waitForElementVisible(clearButton);
         waitForElementVisible(applyButton);
         waitForElementVisible(cancelButton);
+    }
+
+    private void selectItem(String item) {
+        searchItem(item);
+        items.stream()
+            .filter(e -> item.equals(e.findElement(tagName("span")).getText()))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Cannot find: " + item))
+            .findElement(BY_INPUT)
+            .click();
     }
 
     private void searchItem(String name) {
