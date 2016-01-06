@@ -10,6 +10,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +55,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     private static final String STAGE_NAME_FILTER = "stage_name";
 
     private String nVariableUri = "";
+
+    private static final int YEAR_OF_DATA = 2012;
 
     @BeforeClass
     public void setProjectTitle() {
@@ -138,7 +141,8 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
-            dashboardEditBar.addTimeFilterToDashboard(3, "3 ago");
+            dashboardEditBar.addTimeFilterToDashboard(3, String.format("%s ago", 
+                    Calendar.getInstance().get(Calendar.YEAR) - YEAR_OF_DATA));
             dashboardEditBar.saveDashboard();
 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
