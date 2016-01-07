@@ -22,7 +22,7 @@ public class DescriptionPanel extends AbstractFragment {
     @FindBy(className = "adi-item-type")
     private WebElement fieldType;
 
-    @FindBy(css = ".adi-item-type~div p")
+    @FindBy(css = ".adi-item-type + span p")
     private WebElement value;
 
     @FindBy(className = "s-dataset-name")
