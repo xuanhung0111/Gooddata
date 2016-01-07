@@ -14,12 +14,21 @@ import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.utils.http.RestUtils;
+import org.json.JSONException;
 
 public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    public void setupAttributeFiltersFeatureFlag() throws JSONException {
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS);
+    }
+
+    @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = {"desktop", "mobile"})
     public void checkAttributeFilterDefaultState() {
         final AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPageWithWidgets().waitForAttributeFilters();
 
@@ -30,7 +39,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelection(), "All");
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = {"desktop", "mobile"})
     public void checkAttributeFilterChangeValue() {
         String attributeFilterWestCoast = "West Coast";
         String attributeFilterSourceConsulting = "1 Source Consulting";
@@ -60,7 +69,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         assertEquals(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItemsCount(), "(4)");
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = "desktop")
+    @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = "desktop")
     public void testFilterBySuggestedAttributes() {
         String attribute14West = "14 West";
         String attribute123Exteriors = "123 Exteriors";
