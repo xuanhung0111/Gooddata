@@ -50,7 +50,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
 
         assertEquals(filtersBucket.configDateFilter("This year")
                 .getFilterText("Activity"), "Activity: This year");
-        assertEquals(report.getTrackersCount(), 3);
+        assertTrue(report.getTrackersCount() >= 1);
         checkingOpenAsReport("filterOnDateAttribute");
     }
 
