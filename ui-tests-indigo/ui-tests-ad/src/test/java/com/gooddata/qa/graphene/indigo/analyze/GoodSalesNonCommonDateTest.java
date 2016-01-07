@@ -69,6 +69,10 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
 
         filtersBucket.configDateFilter("Last 90 days");
         analysisPage.waitForReportComputing();
+        if (analysisPage.isExplorerMessageVisible()) {
+            log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
+            return;
+        }
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
         checkingOpenAsReport("applyOnBucket");
     }
@@ -112,6 +116,11 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
         // wait for data labels rendered
         sleepTight(2000);
 
+        if (analysisPage.isExplorerMessageVisible()) {
+            log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
+            return;
+        }
+
         ChartReport report = analysisPage.getChartReport();
         assertTrue(Iterables.all(report.getDataLabels(), new Predicate<String>() {
             @Override
@@ -135,7 +144,14 @@ public class GoodSalesNonCommonDateTest extends AnalyticalDesignerAbstractTest {
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .showPop();
-        ChartReport report = analysisPage.waitForReportComputing().getChartReport();
+
+        analysisPage.waitForReportComputing();
+        if (analysisPage.isExplorerMessageVisible()) {
+            log.info("Visual cannot be rendered! Message: " + analysisPage.getExplorerMessage());
+            return;
+        }
+
+        ChartReport report = analysisPage.getChartReport();
 
         assertTrue(isEqualCollection(report.getLegends(),
                 asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES)));

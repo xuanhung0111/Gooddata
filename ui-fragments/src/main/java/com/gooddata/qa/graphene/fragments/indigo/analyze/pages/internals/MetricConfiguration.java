@@ -45,7 +45,7 @@ public class MetricConfiguration extends AbstractFragment {
     private static final By BY_ATTRIBUTE_FILTER_BUTTON = By.className("adi-attr-filter-button");
     private static final By BY_FACT_AGGREGATION = By.className("s-fact-aggregation-switch");
 
-    private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-btn-add_attribute_filter";
+    private static final String ADD_ATTRIBUTE_FILTER_CLASS = "s-add_attribute_filter";
 
     private static final String DISABLED = "is-disabled";
 
@@ -119,7 +119,7 @@ public class MetricConfiguration extends AbstractFragment {
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
-                .selectTextItem(attribute);
+                .selectAttribute(attribute);
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
@@ -133,7 +133,7 @@ public class MetricConfiguration extends AbstractFragment {
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
-                .selectTextItem(attribute);
+                .selectAttribute(attribute);
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
@@ -148,7 +148,7 @@ public class MetricConfiguration extends AbstractFragment {
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
-                .selectTextItem(attribute);
+                .selectAttribute(attribute);
 
         Graphene.createPageFragment(AttributeFilterPicker.class,
                 waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser))
@@ -173,7 +173,7 @@ public class MetricConfiguration extends AbstractFragment {
     public String getAttributeDescription(String attribute) {
         waitForElementVisible(addAttributeFilter).click();
         return Graphene.createPageFragment(AttributeFilterPicker.class,
-                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser)).getDescription(attribute);
+                waitForElementVisible(BY_ATTRIBUTE_FILTER_PICKER, browser)).getAttributeDescription(attribute);
     }
 
     public class AttributeFilterPicker extends AbstractFragment {
@@ -187,7 +187,7 @@ public class MetricConfiguration extends AbstractFragment {
         @FindBy(className = "s-select_all")
         private WebElement selectAllButton;
 
-        @FindBy(css = ".gd-list-item")
+        @FindBy(xpath = "//*[contains(@class, 'adi-filter-item')]")
         private List<WebElement> items;
 
         @FindBy(css = ".s-btn-apply:not(.disabled)")
@@ -216,23 +216,23 @@ public class MetricConfiguration extends AbstractFragment {
             return this;
         }
 
-        public String getDescription(String element) {
+        public String getAttributeDescription(String element) {
             searchItem(element);
             WebElement ele = waitForCollectionIsNotEmpty(items).stream()
-                    .map(item -> item.findElement(cssSelector("span:last-child")))
-                    .filter(item -> element.equals(item.getText()))
+                    .filter(item -> element.equals(item.findElement(cssSelector(".attr-field-icon + span")).getText()))
                     .findFirst()
                     .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element));
             getActions().moveToElement(ele).perform();
+            getActions().moveToElement(waitForElementPresent(cssSelector(".inlineBubbleHelp"), ele)).perform();
 
             return Graphene.createPageFragment(DescriptionPanel.class,
                     waitForElementVisible(DescriptionPanel.LOCATOR, browser)).getAttributeDescription();
         }
 
-        public void selectTextItem(String element) {
+        public void selectAttribute(String element) {
             searchItem(element);
             waitForCollectionIsNotEmpty(items).stream()
-                .map(item -> item.findElement(cssSelector("span:last-child")))
+                .map(item -> item.findElement(cssSelector(".attr-field-icon + span")))
                 .filter(item -> element.equals(item.getText()))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element))

@@ -116,7 +116,7 @@ public class FiltersBucket extends AbstractBucket {
     }
 
     public void changeDateDimension(String currentDimension, String switchDimension) {
-        WebElement filter = getFilter(switchDimension);
+        WebElement filter = getFilter(currentDimension);
         openDatePanelOfFilter(filter).changeDateDimension(switchDimension);
     }
 
