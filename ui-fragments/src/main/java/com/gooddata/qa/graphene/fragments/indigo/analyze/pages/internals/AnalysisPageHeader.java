@@ -10,7 +10,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class AnalysisPageHeader extends AbstractFragment {
 
-    @FindBy(className = "s-btn-reset")
+    @FindBy(className = "s-reset")
     private WebElement resetButton;
 
     @FindBy(className = "s-export-to-report")
