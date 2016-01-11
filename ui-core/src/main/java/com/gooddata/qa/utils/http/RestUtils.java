@@ -1075,7 +1075,7 @@ public class RestUtils {
         }
     }
 
-    public static String getWebDavUrl(RestApiClient restApiClient) throws IOException, JSONException {
+    public static String getWebDavServerUrl(RestApiClient restApiClient, String serverRootUrl) throws IOException, JSONException {
         JSONArray links = getJSONObjectFrom(restApiClient, "/gdc", HttpStatus.OK).getJSONObject("about")
                 .getJSONArray("links");
 
@@ -1083,10 +1083,22 @@ public class RestUtils {
         for (int i = 0, n = links.length(); i < n; i++) {
             link = links.getJSONObject(i);
             if (!"user-uploads".equals(link.getString("title"))) continue;
-            return link.getString("link");
+            return getWebDavServerUrl(link.getString("link"), serverRootUrl);
         }
 
         return "";
+    }
+
+    private static String getWebDavServerUrl(String userUploadsLink, String serverRootUrl) {
+        String webdavServerUrl = "";
+        if (userUploadsLink.startsWith("https://")) {
+            webdavServerUrl = userUploadsLink;
+        } else if (userUploadsLink.startsWith("/")) {
+            webdavServerUrl = serverRootUrl + userUploadsLink.substring(1);
+        } else {
+            webdavServerUrl = serverRootUrl + userUploadsLink;
+        }
+        return webdavServerUrl;
     }
 
     private static String getProjectState(RestApiClient restApiClient, String projectId)
