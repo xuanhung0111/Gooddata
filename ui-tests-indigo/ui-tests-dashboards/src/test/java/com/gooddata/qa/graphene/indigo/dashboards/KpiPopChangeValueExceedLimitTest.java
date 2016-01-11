@@ -169,7 +169,9 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
     private void setupData(String csvPath, String uploadInfoPath)
             throws JSONException, URISyntaxException, ParseException, IOException {
-        String webdavUrl = getRootUrl() + RestUtils.getWebDavUrl(getRestApiClient()).substring(1) + "/" + UUID.randomUUID().toString();
+        String webdavServerUrl = RestUtils.getWebDavServerUrl(getRestApiClient(), getRootUrl());
+
+        String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
 
         URL csvResource = new File(csvPath).toURI().toURL();
         URL uploadInfoResource = getClass().getResource(uploadInfoPath);
