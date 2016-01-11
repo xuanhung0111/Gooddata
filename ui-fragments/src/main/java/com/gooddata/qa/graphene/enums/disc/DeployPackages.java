@@ -63,8 +63,7 @@ public enum DeployPackages {
                 "shortTimeErrorGraph.grf",
                 "graph",
                 "Graph=Basic/graph/shortTimeErrorGraph.grf error: Graph=schedule_param transformation failed!: "
-                        + "Component [GD Dataset Writer:GD_DATASET_WRITER] finished with status ERROR.: "
-                        + "Unrecoverable error in SLI upload occurred."),
+                        + "Component [GD Dataset Writer:GD_DATASET_WRITER] finished with status ERROR."),
         SUCCESSFUL_GRAPH(DeployPackages.BASIC, "successfulGraph.grf", "graph"),
         SUCCESSFUL_GRAPH_FOR_BROKEN_SCHEDULE(DeployPackages.ONE_GRAPH, "successfulGraph.grf", "graph"),
         SUCCESSFUL_GRAPH_FOR_BROKEN_SCHEDULE_RENAMED(DeployPackages.ONE_GRAPH_RENAMED, "successfulGraph_Rename.grf", "graph"),
