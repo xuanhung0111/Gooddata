@@ -270,10 +270,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             takeScreenshot(browser, "checkKpiAlertDelete_before", getClass());
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
-            initIndigoDashboardsPageWithWidgets()
-                .getLastKpi()
-                .openAlertDialog()
-                .deleteAlert();
+            deleteAlertForLastKpi();
 
             takeScreenshot(browser, "checkKpiAlertDelete_after", getClass());
             assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
@@ -307,14 +304,5 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             .waitForAllKpiWidgetContentLoaded()
             .waitForAlertsLoaded()
             .getLastKpi();
-    }
-
-    private void setAlertForLastKpi(String triggeredWhen, String threshold) {
-        initIndigoDashboardsPageWithWidgets()
-            .getLastKpi()
-            .openAlertDialog()
-            .selectTriggeredWhen(triggeredWhen)
-            .setThreshold(threshold)
-            .setAlert();
     }
 }
