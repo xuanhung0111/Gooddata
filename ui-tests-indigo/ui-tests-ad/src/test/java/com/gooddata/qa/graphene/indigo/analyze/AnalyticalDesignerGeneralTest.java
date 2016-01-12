@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -36,8 +36,8 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.indigo.ShortcutPanel;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
@@ -275,7 +275,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         }
 
         waitForFragmentVisible(comparisonRecommendation);
-        comparisonRecommendation.select(attribute).apply();
+        comparisonRecommendation.clickAttributePicker().select(attribute).apply();
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
@@ -298,19 +298,36 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
 
         analysisPage.resetToBlankState().addMetric(metric);
         waitForFragmentVisible(comparisonRecommendation);
-        comparisonRecommendation.select(attribute).apply();
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(attribute));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(attribute), attribute + ": All");
-        assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+
+        final String attribute2 = comparisonRecommendation.clickAttributePicker().getSuitableAttribute(attribute);
+        comparisonRecommendation.select(attribute2).apply();
+
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(attribute2));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(attribute2), attribute2 + ": All");
+
+        if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
+            log.info(format(
+                    "Report with metric [%s] and attribute [%s] shows message: %s", metric,
+                    attribute2, analysisPage.getExplorerMessage()));
+        } else {
+            assertTrue(report.getTrackersCount() >= 1);
+            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        }
 
         String newAttribute = doSafetyAttributeAction(metric,
-                attr -> this.replaceAttribute(attribute, attr), "testSimpleComparison");
+                attr -> this.replaceAttribute(attribute2, attr), "testSimpleComparison");
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(newAttribute));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(newAttribute), newAttribute + ": All");
-        assertTrue(report.getTrackersCount() >= 1);
-        assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+
+        if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
+            log.info(format(
+                    "Report with metric [%s] and attribute [%s] shows message: %s", metric,
+                    newAttribute, analysisPage.getExplorerMessage()));
+        } else {
+            assertTrue(report.getTrackersCount() >= 1);
+            assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
+        }
     }
 
     @Test(dependsOnGroups = {"prepare"})
