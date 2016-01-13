@@ -145,7 +145,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
         }
     }
 
-    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = "desktop")
     public void checkDefaultDateInterval() throws JSONException {
         DateFilter dateFilter = initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
