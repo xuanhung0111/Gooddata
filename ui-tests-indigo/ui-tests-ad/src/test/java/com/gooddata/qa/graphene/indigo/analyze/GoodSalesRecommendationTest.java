@@ -129,7 +129,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select(ACTIVITY_TYPE).apply();
+        comparisonRecommendation.clickAttributePicker().select(ACTIVITY_TYPE).apply();
         assertTrue(recommendationContainer
                 .isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
         checkingOpenAsReport("testAnotherApproachToShowContribution");
@@ -148,7 +148,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select(ACTIVITY_TYPE).apply();
+        comparisonRecommendation.clickAttributePicker().select(ACTIVITY_TYPE).apply();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
         assertEquals(report.getTrackersCount(), 4);
@@ -176,7 +176,7 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
 
         ComparisonRecommendation comparisonRecommendation =
                 recommendationContainer.getRecommendation(RecommendationStep.COMPARE);
-        comparisonRecommendation.select(ACTIVITY_TYPE).apply();
+        comparisonRecommendation.clickAttributePicker().select(ACTIVITY_TYPE).apply();
         analysisPage.waitForReportComputing();
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
         assertEquals(filtersBucket.getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": All");
