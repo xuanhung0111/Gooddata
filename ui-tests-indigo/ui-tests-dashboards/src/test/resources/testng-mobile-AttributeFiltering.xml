@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests_mobile">
+    <test name="attribute-filtering-tests">
+        <groups>
+            <run>
+                <include name="mobile" />
+                <include name="dashboardWidgetsInit" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+            <dependencies>
+                <group name="mobile" depends-on="projectInit" />
+            </dependencies>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.AttributeFilteringTest" />
+        </classes>
+    </test>
+
+    <parameter name="windowSize" value="600,800" />
+    <parameter name="isMobileRunning" value="true" />
+</suite>

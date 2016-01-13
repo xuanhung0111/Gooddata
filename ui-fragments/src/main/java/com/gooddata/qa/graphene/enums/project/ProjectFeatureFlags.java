@@ -8,9 +8,10 @@ public enum ProjectFeatureFlags {
     DISPLAY_USER_MANAGEMENT("displayUserManagement"),
     NPS_STATUS("npsStatus"),
     ANALYTICAL_DESIGNER("analyticalDesigner"),
-    ENABLE_CSV_UPLOADER("enableCsvUploader");
+    ENABLE_CSV_UPLOADER("enableCsvUploader"),
+    ENABLE_ATTRIBUTE_FILTERS("enableAttributeFilters");
 
-    private String featureFlag;
+    private final String featureFlag;
 
     private ProjectFeatureFlags(String featureFlag) {
         this.featureFlag = featureFlag;
