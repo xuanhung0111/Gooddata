@@ -5,10 +5,14 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.stream.Stream;
+
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -17,6 +21,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAbstractTest {
 
     private static final String DURATION = "Duration";
+    private static final String ACTIVITY_DATE = "Activity (Date)";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -138,5 +143,59 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
         assertFalse(metricConfiguration.isPopSelected());
         assertFalse(metricConfiguration.isShowPercentSelected());
         checkingOpenAsReport("MetricConfigurationBucket-showInPercentAndPop");
+    }
+
+    @DataProvider(name = "factMetricCombination")
+    public Object[][] factMetricCombination() {
+        return new Object[][] {
+            {false, false},
+            {true, false},
+            {false, true},
+            {true, true}
+        };
+    }
+
+    @Test(dependsOnGroups = {"init"}, dataProvider = "factMetricCombination")
+    public void shouldNotCreateDuplicateMetricFromFact(boolean pop, boolean percent) {
+        initAnalysePage();
+        MetricConfiguration configuration = analysisPage.addDate()
+            .addMetric(ACTIVITY_DATE, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + ACTIVITY_DATE)
+            .expandConfiguration();
+
+        if (pop) configuration.showPop();
+        if (percent) configuration.showPercents();
+
+        // css class of metric from fact will be somehow like this:
+        // class="s-bucket-item s-id-dt_activity_activity_generated_sum_9b39e371f6bc8e93b15843c6794f6968 ..."
+        // and identifier will be dt_activity_activity_generated_sum_9b39e371f6bc8e93b15843c6794f6968
+        final String identifier = Stream.of(analysisPage.getMetricsBucket()
+            .get((percent ? "% " : "") + "Sum of " + ACTIVITY_DATE)
+            .getAttribute("class")
+            .split(" "))
+            .filter(e -> e.startsWith("s-id-"))
+            .findFirst()
+            .get()
+            .split("-")[2];
+
+        configuration = analysisPage.removeMetric((percent ? "% " : "") + "Sum of " + ACTIVITY_DATE)
+            .addMetric(ACTIVITY_DATE, FieldType.FACT)
+            .getMetricsBucket()
+            .getMetricConfiguration("Sum of " + ACTIVITY_DATE)
+            .expandConfiguration();
+
+        if (pop) configuration.showPop();
+        if (percent) configuration.showPercents();
+
+        assertTrue(analysisPage.getMetricsBucket()
+            .get((percent ? "% " : "") + "Sum of " + ACTIVITY_DATE)
+            .getAttribute("class")
+            .contains(identifier));
+
+        if (!pop && !percent) {
+            analysisPage.addMetric(ACTIVITY_DATE, FieldType.FACT);
+            assertEquals(browser.findElements(className("s-id-" + identifier)).size(), 2);
+        }
     }
 }
