@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene.indigo.user;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -30,7 +28,6 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
-import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.DeleteGroupDialog;
 import com.gooddata.qa.graphene.fragments.indigo.user.GroupDialog;
@@ -191,20 +188,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
-    public void accessFromEmbeddedDashboardPage() {
-        initDashboardsPage();
-        selectDashboard(DASHBOARD_TEST);
-        publishDashboard(false);
-        DashboardEmbedDialog dialog = dashboardsPage.embedDashboard();
-        String uri = dialog.getPreviewURI();
-        browser.get(uri);
-        waitForElementVisible(dashboardsPage.getContent().getRoot());
-        sleepTight(2000);
-        dashboardsPage.unlistedIconClick().openAddGranteePanel().openUserManagementPage();
-        waitForFragmentVisible(userManagementPage);
-    }
-
-    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
     public void checkEditorCannotAccessFromDashboardPage() throws JSONException{
         initDashboardsPage();
         selectDashboard(DASHBOARD_TEST);
@@ -215,26 +198,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
             initDashboardsPage();
             selectDashboard(DASHBOARD_TEST);
             checkEditorCannotAccessUserGroupsLinkInDashboardPage(dashboardsPage.openPermissionsDialog());
-        } finally {
-            logout();
-            signInAtGreyPages(userManagementAdmin, userManagementPassword);
-        }
-    }
-
-    @Test(dependsOnGroups = { "initialize" }, groups = { "userManagement" })
-    public void checkEditorCannotAccessFromEmbeddedDashboard() throws JSONException{
-        initDashboardsPage();
-        selectDashboard(DASHBOARD_TEST);
-        publishDashboard(false);
-        DashboardEmbedDialog dialog = dashboardsPage.embedDashboard();
-        String uri = dialog.getPreviewURI();
-        try {
-            logout();
-            signIn(false, UserRoles.EDITOR);
-            browser.get(uri);
-            waitForElementVisible(dashboardsPage.getContent().getRoot());
-            sleepTight(2000);
-            checkEditorCannotAccessUserGroupsLinkInDashboardPage(dashboardsPage.unlistedIconClick());
         } finally {
             logout();
             signInAtGreyPages(userManagementAdmin, userManagementPassword);
