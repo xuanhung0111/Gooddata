@@ -800,11 +800,11 @@ public final class RestUtils {
         return response;
     }
 
-    public static JSONObject getProjectModelView(RestApiClient restApiClient, String projectId)
-            throws ParseException, JSONException, IOException {
+    private static JSONObject getProjectModelViewByModelLink(RestApiClient restApiClient, String projectId, 
+                String projectModelViewLink) throws ParseException, JSONException, IOException {
         JSONObject modelViewObject = null;
         String pollingUri =
-                getPollingUriFrom(restApiClient, projectId, format(PROJECT_MODEL_VIEW_LINK, projectId));
+                getPollingUriFrom(restApiClient, projectId, projectModelViewLink);
         HttpRequestBase request = restApiClient.newGetMethod(pollingUri);
         try {
             int status;
@@ -824,6 +824,18 @@ public final class RestUtils {
             request.releaseConnection();
         }
         return modelViewObject;
+    }
+
+    public static JSONObject getProjectModelView(RestApiClient restApiClient, String projectId) 
+            throws ParseException, JSONException, IOException {
+        return getProjectModelViewByModelLink(restApiClient, projectId, format(PROJECT_MODEL_VIEW_LINK, projectId));
+    }
+    
+    public static JSONObject getProductionProjectModelView(RestApiClient restApiClient, String projectId, 
+            boolean includeProduction) throws ParseException, JSONException, IOException {
+        String nonProductionURL = PROJECT_MODEL_VIEW_LINK + "?includeNonProduction=%s";
+        return getProjectModelViewByModelLink(restApiClient, projectId, 
+                format(String.format(nonProductionURL, projectId, includeProduction)));
     }
 
     public static JSONObject getDatasetModelView(RestApiClient restApiClient, String projectId, String dataset)

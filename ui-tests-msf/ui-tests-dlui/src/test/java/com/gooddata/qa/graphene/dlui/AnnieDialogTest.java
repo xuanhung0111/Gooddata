@@ -1,14 +1,21 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
+import java.io.IOException;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterClass;
@@ -20,6 +27,9 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
@@ -429,6 +439,30 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         }
     }
 
+    @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 1)
+    public void addNewDataWithCSVUploader() throws JSONException, IOException {
+        try {
+            uploadCSV(getFilePathFromResource("/" + PAYROLL_CSV + "/payroll.csv"));
+            addMultiFieldsAndAssertAnnieDialog(UserRoles.ADMIN);
+            initManagePage();
+            assertThat(datasetsTable.getAllItems(), containsInAnyOrder("person", "opportunity", "Payroll", 
+                    "Date (Paydate)")); 
+            openProjectDetailPage(getWorkingProject());
+            ScheduleBuilder scheduleBuilder = new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
+                                    .setCronTime(ScheduleCronTimes.CRON_EVERYDAY)
+                                    .setHasDataloadProcess(true)
+                                    .setSynchronizeAllDatasets(false)
+                                    .setScheduleName("2 datasets")
+                                    .setConfirmed(true);
+            createSchedule(scheduleBuilder);
+            scheduleBuilder.setScheduleUrl(browser.getCurrentUrl());
+            scheduleDetail.openDatasetDialog();
+            assertThat(scheduleDetail.getSearchedDatasets(), containsInAnyOrder("person", "opportunity")); 
+        } finally {
+            scheduleDetail.disableSchedule();
+        }
+        
+    }
 
     @AfterClass
     public void cleanUp() {

@@ -4,6 +4,8 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
@@ -58,6 +60,7 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
+import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
@@ -250,6 +253,14 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return getProcessService().executeProcess(new ProcessExecution(process, executable, params)).get();
     }
 
+    protected void createSchedule(ScheduleBuilder scheduleBuilder) {
+        projectDetailPage.clickOnNewScheduleButton();
+        waitForFragmentVisible(scheduleForm);
+        scheduleForm.createNewSchedule(scheduleBuilder);
+        if (scheduleBuilder.isConfirmed())
+        waitForFragmentVisible(scheduleDetail);
+    }
+
     protected DataloadProcess deleteDataloadProcessAndCreateNewOne() {
         final Optional<DataloadProcess> dataloadProcess = getDataloadProcess();
         if (dataloadProcess.isPresent()) {
@@ -362,6 +373,13 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
         log.info("Metric: " + metrics.toString());
         assertTrue(isEqualCollection(metrics, metricValues), "Incorrect metric values!");
+    }
+
+    protected void openProjectDetailPage(ProjectInfo project) {
+        openUrl(DISC_PROJECTS_PAGE_URL);
+        waitForElementVisible(discProjectsList.getRoot());
+        discProjectsList.clickOnProjectTitle(project);
+        waitForElementVisible(projectDetailPage.getRoot());
     }
 
     protected void checkReportAfterAddReferenceToDataset() {

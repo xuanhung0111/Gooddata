@@ -54,13 +54,6 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
         cleanProcessesInWorkingProject();
     }
 
-    protected void openProjectDetailPage(ProjectInfo project) {
-        openUrl(DISC_PROJECTS_PAGE_URL);
-        waitForElementVisible(discProjectsList.getRoot());
-        discProjectsList.clickOnProjectTitle(project);
-        waitForElementVisible(projectDetailPage.getRoot());
-    }
-
     protected void openProjectDetailByUrl(String projectId) {
         openUrl(DISC_PROJECTS_PAGE_URL + "/" + projectId);
         waitForElementVisible(projectDetailPage.getRoot());
@@ -153,14 +146,6 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     protected void createAndAssertSchedule(ScheduleBuilder scheduleBuilder) {
         createSchedule(scheduleBuilder);
         assertSchedule(scheduleBuilder);
-    }
-
-    protected void createSchedule(ScheduleBuilder scheduleBuilder) {
-        projectDetailPage.clickOnNewScheduleButton();
-        waitForFragmentVisible(scheduleForm);
-        scheduleForm.createNewSchedule(scheduleBuilder);
-        if (scheduleBuilder.isConfirmed())
-            waitForFragmentVisible(scheduleDetail);
     }
 
     protected void openScheduleViaUrl(String scheduleUrl) {
