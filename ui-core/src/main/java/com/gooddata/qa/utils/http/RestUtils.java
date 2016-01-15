@@ -911,7 +911,7 @@ public class RestUtils {
 
     public static void deleteObject(RestApiClient restApiClient, String uri) {
         HttpRequestBase request = restApiClient.newDeleteMethod(uri);
-        HttpResponse response = restApiClient.execute(request);
+        HttpResponse response = restApiClient.execute(request, HttpStatus.NO_CONTENT, "Cannot delete object: " + uri);
         EntityUtils.consumeQuietly(response.getEntity());
     }
 

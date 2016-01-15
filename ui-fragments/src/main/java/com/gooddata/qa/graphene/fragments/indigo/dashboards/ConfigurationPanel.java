@@ -5,10 +5,14 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.Collection;
 
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.google.common.base.Predicate;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
@@ -20,7 +24,7 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(css = ".s-metric_select button.is-loaded")
     private WebElement metricSelectLoaded;
 
-    @FindBy(css = ".s-dimension_select button.is-loaded")
+    @FindBy(css = ".s-dimension_select button")
     private WebElement dimensionSelectLoaded;
 
     @FindBy(className = "s-dimension_select")
@@ -43,7 +47,9 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
-        waitForElementVisible(dimensionSelectLoaded);
+        final Predicate<WebDriver> dateDimensionLoaded =
+                browser -> !dimensionSelectLoaded.getAttribute("class").contains("is-loading");
+        Graphene.waitGui().until(dateDimensionLoaded);
         return this;
     }
 
@@ -93,6 +99,10 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public MetricSelect getMetricSelect() {
         return waitForFragmentVisible(metricSelect);
+    }
+
+    public String getSelectedMetric() {
+        return waitForFragmentVisible(metricSelect).getSelection();
     }
 
     public ConfigurationPanel waitForAlertEditWarning() {
