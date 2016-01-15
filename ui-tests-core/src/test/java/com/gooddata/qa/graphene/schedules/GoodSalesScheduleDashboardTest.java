@@ -4,6 +4,8 @@
 package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
+import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
@@ -157,6 +159,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             }
         });
         assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
+        logRedBarMessageInfo(browser);
         waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), browser).click();
         dashboardsPage.getDashboardEditBar().cancelDashboard();
     }

@@ -8,6 +8,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR_WARNING;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
@@ -141,6 +142,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 }
             });
             assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
+            logRedBarMessageInfo(browser);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
             dashboardsPage.getDashboardEditBar().cancelDashboard();
         } finally {
@@ -323,6 +325,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
             });
             assertEquals(browser.findElement(BY_RED_BAR_WARNING).getText(), "0 report(s) deleted."
                     + " 1 report(s) are in use on a dashboard or an email distribution list and were not deleted.");
+            logRedBarMessageInfo(browser);
             waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
         } finally {
             initEmailSchedulesPage();
