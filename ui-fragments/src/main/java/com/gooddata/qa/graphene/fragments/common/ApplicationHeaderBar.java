@@ -16,6 +16,9 @@ public class ApplicationHeaderBar extends AbstractFragment {
     @FindBy(className = "navigation-picker")
     private WebElement navigationPicker;
 
+    @FindBy(className = KPIS_LINK_CLASS)
+    private WebElement kpisLink;
+
     @FindBy(className = "dashboard-link")
     private WebElement dashboardLink;
 
@@ -28,15 +31,25 @@ public class ApplicationHeaderBar extends AbstractFragment {
     @FindBy(className = "analysis-link")
     private WebElement analysisLink;
 
+    @FindBy(className = "csv-uploader-link")
+    private WebElement csvUploaderLink;
+
     @FindBy(className = "users-link")
     private WebElement usersLink;
 
-    @FindBy(className = "search-link")
-    private WebElement searchLink;
+    public static final String KPIS_LINK_CLASS = "kpis-link";
 
     private static ApplicationHeaderBar getInstance(WebDriver browser) {
         return Graphene.createPageFragment(ApplicationHeaderBar.class,
                 waitForElementVisible(By.className("appHeader"), browser));
+    }
+
+    public static void goToKpisPage(WebDriver browser) {
+        waitForElementVisible(getInstance(browser).kpisLink).click();
+    }
+
+    public static void goToCsvUploaderPage(WebDriver browser) {
+        waitForElementVisible(getInstance(browser).csvUploaderLink).click();
     }
 
     public static void goToDashboardsPage(WebDriver browser) {
@@ -65,15 +78,6 @@ public class ApplicationHeaderBar extends AbstractFragment {
 
     public static void goToUserManagementPage(WebDriver browser) {
         waitForElementVisible(getInstance(browser).usersLink).click();
-    }
-
-    public static String getSearchLinkText(WebDriver browser) {
-        return waitForElementVisible(getInstance(browser).searchLink).getText();
-    }
-
-    public static boolean isSearchIconPresent(WebDriver browser) {
-        return waitForElementVisible(getInstance(browser).searchLink).findElements(
-              By.className("search-icon")).size() > 0;
     }
 
     public static void selectProject(String idOrName, WebDriver browser) {
