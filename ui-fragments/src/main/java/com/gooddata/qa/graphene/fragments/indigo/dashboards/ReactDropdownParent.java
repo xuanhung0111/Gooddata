@@ -1,20 +1,17 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 public abstract class ReactDropdownParent extends AbstractFragment {
-
-    @FindBy(css = "button.is-loaded")
-    private WebElement dropdownButtonLoaded;
 
     /**
      * This method is needed to find the correct dropdown, rendered in overlay,
@@ -23,9 +20,26 @@ public abstract class ReactDropdownParent extends AbstractFragment {
      */
     public abstract String getDropdownCssSelector();
 
+    /**
+     * Get css selector for dropdown button
+     * @return css selector for loaded dropdown button
+     */
+    public String getDropdownButtonCssSelector() {
+        return "button.is-loaded";
+    }
+
+    /**
+     * Get css selector for an ordinary (clickable, non-header) item in the list
+     * @return css selector of an item in the list
+     */
+    public String getListItemCssSelector() {
+        return ".gd-list-item:not(.is-header)";
+    }
+
     public boolean isDropdownOpen() {
-        waitForElementVisible(dropdownButtonLoaded);
-        return isElementPresent(By.cssSelector("button.is-loaded.is-active"), this.getRoot());
+        waitForElementPresent(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot());
+
+        return isElementPresent(By.cssSelector(getDropdownCssSelector()), browser);
     }
 
     public void ensureDropdownOpen() {
@@ -35,10 +49,12 @@ public abstract class ReactDropdownParent extends AbstractFragment {
     }
 
     public WebElement getDropdownButton() {
-        return waitForElementPresent(dropdownButtonLoaded);
+        return waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot());
     }
 
     protected boolean hasSearchField() {
+        // wait until dropdown body is loaded and check search field
+        waitForElementNotPresent(By.cssSelector(getDropdownCssSelector() + " .s-isLoading"));
         By searchField = cssSelector(getSearchFieldSelector());
         return isElementPresent(searchField, browser);
     }
@@ -55,7 +71,8 @@ public abstract class ReactDropdownParent extends AbstractFragment {
     }
 
     protected void toggleDropdown() {
-        waitForElementVisible(dropdownButtonLoaded).click();
+        waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot())
+                .click();
     }
 
 }

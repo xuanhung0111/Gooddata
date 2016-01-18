@@ -14,6 +14,7 @@ import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.HeaderAccountMenu;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 public class Header extends AbstractFragment {
 
@@ -21,6 +22,19 @@ public class Header extends AbstractFragment {
     private WebElement accountMenuButton;
 
     public static final By HAMBURGER_LINK = cssSelector(".hamburger-icon");
+
+    @FindBy(className = "gd-header-project-wrapper")
+    private ReactProjectSwitch projectSwitch;
+
+    public void switchProject(String projectName) {
+         waitForFragmentVisible(projectSwitch)
+                .selectByName(projectName);
+    }
+
+    public String getCurrentProjectName() {
+        return waitForFragmentVisible(projectSwitch)
+                .getSelection();
+    }
 
     public HeaderAccountMenu openAccountMenu() {
         waitForElementVisible(accountMenuButton).click();

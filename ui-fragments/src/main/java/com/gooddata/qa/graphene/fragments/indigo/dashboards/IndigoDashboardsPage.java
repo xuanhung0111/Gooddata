@@ -322,4 +322,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
         waitForFragmentVisible(header).closeHamburgerMenu();
         return this;
     }
+
+    public IndigoDashboardsPage switchProject(String name) {
+        System.out.println("Switching to project: " + name);
+        waitForFragmentVisible(header).switchProject(name);
+
+        return this;
+    }
+
+    public String getCurrentProjectName() {
+        return waitForFragmentVisible(header).getCurrentProjectName();
+    }
 }
