@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -253,5 +254,36 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         metricTooltip = metricSelect.getTooltip(LONG_NAME_METRIC);
         takeScreenshot(browser, "Metric tooltip when searching", getClass());
         assertEquals(metricTooltip, LONG_NAME_METRIC);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void deleteMetricUsingInKpi() {
+        final String deletedMetric = "DELETED_METRIC";
+        createMetric(deletedMetric, "SELECT 1", "#,##0");
+
+        initIndigoDashboardsPageWithWidgets()
+            .switchToEditMode()
+            .addWidget(new KpiConfiguration.Builder()
+                .metric(deletedMetric)
+                .dateDimension(DATE_ACTIVITY)
+                .build())
+            .saveEditModeWithKpis();
+
+        initMetricPage();
+        waitForFragmentVisible(metricPage).openMetricDetailPage(deletedMetric);
+        waitForFragmentVisible(metricDetailPage).deleteMetric();
+
+        initIndigoDashboardsPageWithWidgets();
+        takeScreenshot(browser, "Dashboards after deleting metric using in Kpi", getClass());
+
+        indigoDashboardsPage.switchToEditMode().selectLastKpi();
+        takeScreenshot(browser, "Unlisted measure in metric selection", getClass());
+        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedMetric(), "Unlisted measure");
+
+        indigoDashboardsPage.clickLastKpiDeleteButton()
+            .waitForDialog()
+            .submitClick();
+        indigoDashboardsPage.saveEditModeWithKpis();
+        takeScreenshot(browser, "Dashboards after deleting bad Kpi", getClass());
     }
 }
