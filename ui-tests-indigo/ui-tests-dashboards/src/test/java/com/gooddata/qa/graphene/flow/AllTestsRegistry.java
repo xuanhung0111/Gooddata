@@ -5,7 +5,6 @@ import com.gooddata.qa.graphene.indigo.dashboards.DateDimensionTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
-import com.gooddata.qa.graphene.indigo.dashboards.MetricFormattingTest;
 import com.gooddata.qa.graphene.indigo.dashboards.PartialExportDashboardsTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -17,7 +16,6 @@ public class AllTestsRegistry {
                 .register(HeaderTest.class)
                 .register(KpiAlertTest.class)
                 .register(ManipulateWidgetsTest.class)
-                .register(MetricFormattingTest.class)
                 .register(PartialExportDashboardsTest.class)
                 .register(AddKpiWithoutDateDimensionTest.class)
                 .register("testng-desktop-AttributeFiltering.xml")
@@ -27,6 +25,7 @@ public class AllTestsRegistry {
                 .register("testng-desktop-permissions-KpiDrillTo.xml")
                 .register("testng-desktop-KpiPop.xml")
                 .register("testng-desktop-permissions-SplashScreen.xml")
+                .register("testng-desktop-MetricFormatting.xml")
                 .register("testng-desktop-ResponsiveNavigation.xml")
                 .register("testng-desktop-KpiPopChangeValueExceedLimit.xml")
                 .register("testng-mobile-AttributeFiltering.xml")
@@ -34,6 +33,7 @@ public class AllTestsRegistry {
                 .register("testng-mobile-EditMode.xml")
                 .register("testng-mobile-KpiDrillTo.xml")
                 .register("testng-mobile-KpiPop.xml")
+                .register("testng-mobile-MetricFormatting.xml")
                 .register("testng-mobile-ResponsiveNavigation.xml")
                 .register("testng-mobile-SplashScreen.xml")
                 .register("testng-mobile-KpiPopChangeValueExceedLimit.xml")

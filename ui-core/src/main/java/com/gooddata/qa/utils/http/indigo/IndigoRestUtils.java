@@ -142,6 +142,51 @@ public class IndigoRestUtils {
         }
     }
 
+    public static void addKpiWidgetToAnalyticalDashboard(RestApiClient restApiClient, String projectId,
+            String dashboardUri, String widgetUri) throws JSONException, IOException {
+        final JSONObject dashboard = RestUtils.getJSONObjectFrom(restApiClient, dashboardUri);
+        dashboard.getJSONObject("analyticalDashboard")
+            .getJSONObject("content")
+            .getJSONArray("widgets")
+            .put(widgetUri);
+
+        HttpRequestBase putRequest = restApiClient.newPutMethod(dashboardUri, dashboard.toString());
+
+        try {
+            HttpResponse response = restApiClient.execute(putRequest, HttpStatus.OK, "Invalid status code");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            putRequest.releaseConnection();
+        }
+    }
+
+    public static void deleteKpiWidgetFromAnalyticalDashboard(RestApiClient restApiClient, String projectId,
+            String dashboardUri, String widgetUri) throws JSONException, IOException {
+        final JSONObject dashboard = RestUtils.getJSONObjectFrom(restApiClient, dashboardUri);
+        final JSONArray widgets = dashboard.getJSONObject("analyticalDashboard")
+            .getJSONObject("content")
+            .getJSONArray("widgets");
+        JSONArray newWidgets = new JSONArray();
+        for (int i = 0, n = widgets.length(); i < n; i++) {
+            final String uri = widgets.getString(i);
+            if (!widgetUri.equals(uri)) {
+                newWidgets.put(uri);
+            }
+        }
+        dashboard.getJSONObject("analyticalDashboard")
+            .getJSONObject("content")
+            .put("widgets", newWidgets);
+
+        HttpRequestBase putRequest = restApiClient.newPutMethod(dashboardUri, dashboard.toString());
+
+        try {
+            HttpResponse response = restApiClient.execute(putRequest, HttpStatus.OK, "Invalid status code");
+            EntityUtils.consumeQuietly(response.getEntity());
+        } finally {
+            putRequest.releaseConnection();
+        }
+    }
+
     public static String createAnalyticalDashboard(RestApiClient restApiClient, String projectId,
             Collection<String> widgetUris) throws JSONException, IOException {
 
@@ -175,7 +220,7 @@ public class IndigoRestUtils {
         String amountMetricUri = getObjectUri(projectId, AMOUNT_OBJ_ID);
         String lostMetricUri = getObjectUri(projectId, LOST_OBJ_ID);
         String numOfActivitiesUri = getObjectUri(projectId, NUM_OF_ACTIVITIES_OBJ_ID);
-        String dateDimensionUri = getObjectUri(projectId, DATE_DIM_CREATED_OBJ_ID);
+        String dateDimensionUri = getDateDimensionCreatedUri(projectId);
 
         String amountWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
                 .title("Amount")
@@ -210,6 +255,10 @@ public class IndigoRestUtils {
 
         List<String> widgetUris = Arrays.asList(amountWidget, lostWidget, numOfActivitiesWidget, drillToWidget);
         createAnalyticalDashboard(restApiClient, projectId, widgetUris);
+    }
+
+    public static String getDateDimensionCreatedUri(String projectId) {
+        return getObjectUri(projectId, DATE_DIM_CREATED_OBJ_ID);
     }
 
     private static String getObjectUri(String projectId, String objectId) {
