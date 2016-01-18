@@ -4,10 +4,13 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.changeMetricFormat;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,6 +26,7 @@ import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
 import com.gooddata.project.Project;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
@@ -91,6 +95,36 @@ public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractT
 
             browser.close();
             browser.switchTo().window(currentWindowHandle);
+        } finally {
+            changeMetricFormat(getRestApiClient(), percentOfGoalUri, oldPercentOfGoalMetricFormat);
+        }
+    }
+
+    @Test(dependsOnMethods = { "initGoodDataClient" }, dataProvider = "formattingProvider")
+    public void checkDataLabelShowOnBarChart(Formatter format, String expectedValue, boolean compareFormat)
+            throws ParseException, JSONException, IOException {
+        changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
+
+        try {
+            initAnalysePage();
+
+            String dataLabel = analysisPage.addMetric(PERCENT_OF_GOAL)
+                    .addAttribute(IS_WON)
+                    .waitForReportComputing()
+                    .changeReportType(ReportType.BAR_CHART)
+                    .waitForReportComputing()
+                    .getChartReport()
+                    .getDataLabels()
+                    .get(0);
+
+            takeScreenshot(browser,
+                    "Check data label on bar chart with metric format " + format.name(), getClass());
+
+            if (compareFormat) {
+                assertThat(format.toString(), containsString(dataLabel));
+            } else {
+                assertEquals(dataLabel, expectedValue);
+            }
         } finally {
             changeMetricFormat(getRestApiClient(), percentOfGoalUri, oldPercentOfGoalMetricFormat);
         }
