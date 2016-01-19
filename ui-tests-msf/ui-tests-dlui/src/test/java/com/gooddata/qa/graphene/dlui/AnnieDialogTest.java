@@ -240,7 +240,6 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/addUnmappingFieldToLDM.txt"));
 
             annieUIDialog.clickOnApplyButton();
-            checkDataAddingProgress();
             checkFailedDataAddingResult();
             Screenshots.takeScreenshot(browser, "add-new-field-failed", getClass());
             annieUIDialog.clickOnCloseButton();

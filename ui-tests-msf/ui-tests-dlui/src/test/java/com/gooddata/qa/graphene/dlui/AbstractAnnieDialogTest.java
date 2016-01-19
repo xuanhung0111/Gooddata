@@ -188,18 +188,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
                 "Incorrect selected field number in DataSource: " + selectedDataSource.getName());
     }
 
-    protected void checkDataAddingProgress() {
-        assertEquals(annieUIDialog.getAnnieDialogHeadline(), "Adding data...",
-                "Incorrect Annie dialog headline!");
-        assertEquals(annieUIDialog.getRunningStateHeading(), "Adding data to your project...",
-                "Incorrect running state heading!");
-        assertEquals(
-                annieUIDialog.getRunningStateMessage(),
-                "Uploading this data for these fields may take a while - we will send you an email when it's ready. "
-                        + "If you close this dialog, you can still track the progress of data loading on this page:",
-                "Incorrect running state message!");
-    }
-
     protected void checkSuccessfulDataAddingResult() {
         checkDataAddingResult(true);
     }
@@ -244,7 +232,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         Screenshots.takeScreenshot(browser, "select-fields-to-" + screenshotName, getClass());
         annieUIDialog.clickOnApplyButton();
 
-        checkDataAddingProgress();
         checkSuccessfulDataAddingResult();
         Screenshots.takeScreenshot(browser, "sucessful-" + screenshotName, getClass());
         annieUIDialog.clickOnCloseButton();
