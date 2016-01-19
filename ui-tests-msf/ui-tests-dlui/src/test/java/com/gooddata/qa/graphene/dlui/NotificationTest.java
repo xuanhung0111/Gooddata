@@ -239,7 +239,6 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/addUnmappingFieldToLDM.txt"));
 
         annieUIDialog.clickOnApplyButton();
-        checkDataAddingProgress();
         checkFailedDataAddingResult();
         Screenshots.takeScreenshot(browser, screenshotName, getClass());
     }

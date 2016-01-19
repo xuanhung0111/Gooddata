@@ -2,8 +2,8 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -13,6 +13,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.ParseException;
@@ -25,14 +26,16 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Fact;
+
+import static com.gooddata.md.Restriction.*;
+
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
@@ -188,18 +191,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
                 "Incorrect selected field number in DataSource: " + selectedDataSource.getName());
     }
 
-    protected void checkDataAddingProgress() {
-        assertEquals(annieUIDialog.getAnnieDialogHeadline(), "Adding data...",
-                "Incorrect Annie dialog headline!");
-        assertEquals(annieUIDialog.getRunningStateHeading(), "Adding data to your project...",
-                "Incorrect running state heading!");
-        assertEquals(
-                annieUIDialog.getRunningStateMessage(),
-                "Uploading this data for these fields may take a while - we will send you an email when it's ready. "
-                        + "If you close this dialog, you can still track the progress of data loading on this page:",
-                "Incorrect running state message!");
-    }
-
     protected void checkSuccessfulDataAddingResult() {
         checkDataAddingResult(true);
     }
@@ -244,7 +235,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         Screenshots.takeScreenshot(browser, "select-fields-to-" + screenshotName, getClass());
         annieUIDialog.clickOnApplyButton();
 
-        checkDataAddingProgress();
         checkSuccessfulDataAddingResult();
         Screenshots.takeScreenshot(browser, "sucessful-" + screenshotName, getClass());
         annieUIDialog.clickOnCloseButton();
@@ -375,12 +365,12 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     private void checkReportAfterAddNewData(Field addedField,
             ReportWithAddedFields reportWithAddedFields) {
         if (addedField.getType() == FieldTypes.FACT) {
-            initFactPage();
-            factsTable.selectObject(addedField.getName());
-            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, addedField.getName());
+            createMetric(addedField.getName() + " [Sum]", format("SELECT SUM([%s])",
+                    getMdService().getObjUri(getProject(), Fact.class, title(addedField.getName()))), "#,##0.00");
         }
 
-        createAndCheckReport(reportWithAddedFields.getReportDefinition(),
+        createAndCheckReport(reportWithAddedFields.getReportName(), reportWithAddedFields.getAttribute(),
+                reportWithAddedFields.getMetric(),
                 reportWithAddedFields.getAttributeValues(),
                 reportWithAddedFields.getMetricValues());
     }
@@ -410,45 +400,50 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     }
 
     protected enum ReportWithAddedFields {
-        POSITION(new UiReportDefinition().withName("Report with Position").withHows("Position")
-                .withWhats("age [Sum]"), Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6",
-                "J7"), Lists.newArrayList("36.00", "34.00", "10.00", "8.00", "2.00", "40.00",
-                "13.00")),
-        POSITION_CONNECTION_POINT(new UiReportDefinition().withName("Report with Position")
-                .withHows("Position").withWhats("age [Sum]"), Lists.newArrayList("A1", "B2", "C3",
-                "D4", "E5", "F6", "J7"), Lists.newArrayList("36.00", "34.00", "10.00", "8.00",
-                "2.00", "40.00", "13.00")),
-        TOTALPRICE2(
-                new UiReportDefinition().withName("Report with Totalprice2").withHows("name")
-                        .withWhats("Totalprice2 [Sum]"),
+        POSITION("Report with Position", "Position", "age [Sum]",
+                Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6", "J7"),
+                Lists.newArrayList("36", "34", "10", "8", "2", "40", "13")),
+        POSITION_CONNECTION_POINT("Report with Position", "Position", "age [Sum]",
+                Lists.newArrayList("A1", "B2", "C3", "D4", "E5", "F6", "J7"),
+                Lists.newArrayList("36", "34", "10", "8", "2", "40", "13")),
+        TOTALPRICE2("Report with Totalprice2", "name", "Totalprice2 [Sum]",
                 Lists.newArrayList("A", "B", "C", "D", "E", "F"),
-                Lists.newArrayList("400.00", "400.00", "400.00", "400.00", "400.00", "400.00")),
-        LABEL(new UiReportDefinition().withName("Report with Label").withHows("title")
-                .withWhats("price [Sum]"), Lists.newArrayList("opportunityA", "opportunityB",
-                "opportunityC", "opportunityD", "opportunityE", "opportunityF"), Lists
-                .newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00")),
-        LABEL_OF_NEW_FIELD(new UiReportDefinition().withName("Report with Label").withHows("Title2")
-                .withWhats("price [Sum]"), Lists.newArrayList("opportunityA", "opportunityB",
-                "opportunityC", "opportunityD", "opportunityE", "opportunityF"), Lists
-                .newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00")),
-        DATE(new UiReportDefinition().withName("Report with Date").withHows("Date (Date)")
-                .withWhats("age [Sum]"), Lists.newArrayList("01/01/2006", "01/02/2006",
-                "01/02/2007", "01/02/2008", "07/02/2009"), Lists.newArrayList("34.00", "50.00",
-                "36.00", "13.00", "10.00"));
+                Collections.nCopies(6, "400")),
+        LABEL("Report with Label", "title", "price [Sum]",
+                Lists.newArrayList("opportunityA", "opportunityB", "opportunityC", "opportunityD", "opportunityE",
+                "opportunityF"), Collections.nCopies(6, "100")),
+        LABEL_OF_NEW_FIELD("Report with Label", "Title2", "price [Sum]",
+                Lists.newArrayList("opportunityA", "opportunityB", "opportunityC", "opportunityD", "opportunityE",
+                        "opportunityF"), Collections.nCopies(6, "100")),
+        DATE("Report with Date", "Date (Date)", "age [Sum]",
+                Lists.newArrayList("01/01/2006", "01/02/2006", "01/02/2007", "01/02/2008", "07/02/2009"),
+                Lists.newArrayList("34", "50", "36", "13", "10"));
 
-        private UiReportDefinition reportDefinition;
+        private String reportName;
+        private String attribute;
+        private String metric;
         private Collection<String> attributeValues;
         private Collection<String> metricValues;
 
-        private ReportWithAddedFields(UiReportDefinition reportDefinition,
+        private ReportWithAddedFields(String reportName, String attribute, String metric,
                 Collection<String> attributeValues, Collection<String> metricValues) {
-            this.reportDefinition = reportDefinition;
+            this.reportName = reportName;
+            this.attribute = attribute;
+            this.metric = metric;
             this.attributeValues = attributeValues;
             this.metricValues = metricValues;
         }
 
-        public UiReportDefinition getReportDefinition() {
-            return this.reportDefinition;
+        public String getReportName() {
+            return reportName;
+        }
+
+        public String getAttribute() {
+            return attribute;
+        }
+
+        public String getMetric() {
+            return metric;
         }
 
         public Collection<String> getAttributeValues() {
