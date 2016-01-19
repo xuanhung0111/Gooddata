@@ -5,6 +5,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.ParseException;
@@ -21,7 +22,6 @@ import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.google.common.base.Predicate;
@@ -130,23 +130,15 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             checkRemainingAdditionalFields(dataSource);
 
             prepareMetricToCheckNewAddedFields("number");
-            UiReportDefinition reportDefinition1 =
-                    new UiReportDefinition().withName("Report to check reference 1")
-                            .withHows("Trackname").withWhats("number [Sum]");
-            createAndCheckReport(reportDefinition1, Lists.newArrayList("10 trackNameA",
-                    "11 trackNameA", "12 trackNameA", "13 trackNameA", "14 trackNameA",
-                    "1 trackNameA", "2 trackNameA", "3 trackNameA", "4 trackNameA", "5 trackNameA",
-                    "6 trackNameA", "7 trackNameA", "8 trackNameA", "9 trackNameA"),
-                    Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00",
-                            "100.00", "100.00", "100.00", "100.00", "100.00", "100.00"));
-            UiReportDefinition reportDefinition2 =
-                    new UiReportDefinition().withName("Report to check reference 2")
-                            .withHows("authorid").withWhats("number [Sum]");
-            createAndCheckReport(reportDefinition2, Lists.newArrayList("author1",
-                    "author10", "author11", "author12", "author13", "author14", "author19",
-                    "author2", "author3", "author4", "author5", "author6", "author7", "author8"),
-                    Lists.newArrayList("100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00", "100.00",
-                            "100.00", "100.00", "100.00", "100.00", "100.00", "100.00"));
+            createAndCheckReport("Report to check reference 1", "Trackname", "number [Sum]",
+                    Lists.newArrayList("10 trackNameA", "11 trackNameA", "12 trackNameA", "13 trackNameA",
+                        "14 trackNameA", "1 trackNameA", "2 trackNameA", "3 trackNameA", "4 trackNameA",
+                        "5 trackNameA", "6 trackNameA", "7 trackNameA", "8 trackNameA", "9 trackNameA"),
+                    Collections.nCopies(14, "100"));
+            createAndCheckReport("Report to check reference 2", "authorid", "number [Sum]",
+                    Lists.newArrayList("author1", "author10", "author11", "author12", "author13", "author14",
+                        "author19", "author2", "author3", "author4", "author5", "author6", "author7", "author8"),
+                    Collections.nCopies(14, "100"));
         } finally {
             dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/dropMultiAddedReferences_Annie.txt"));
         }

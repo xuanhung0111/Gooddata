@@ -4,19 +4,23 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpResponse;
@@ -29,7 +33,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.prefs.CsvPreference;
 import org.testng.annotations.BeforeClass;
+
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Fact;
+import com.gooddata.md.Metric;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
+
+import static com.gooddata.md.Restriction.*;
 
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
@@ -38,14 +55,13 @@ import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
-import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.DatasetElements;
-import com.gooddata.qa.graphene.enums.metrics.SimpleMetricTypes;
 import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import com.gooddata.report.ReportExportFormat;
 import com.gooddata.warehouse.Warehouse;
 import com.google.common.collect.Lists;
 
@@ -365,40 +381,54 @@ public class AbstractMSFTest extends AbstractProjectTest {
     }
 
     protected void prepareMetricToCheckNewAddedFields(String... facts) {
-        for (String fact : facts) {
-            initFactPage();
-            factsTable.selectObject(fact);
-            waitForFragmentVisible(factDetailPage).createSimpleMetric(SimpleMetricTypes.SUM, fact);
-            initMetricPage();
-            waitForFragmentVisible(metricsTable);
-            metricsTable.selectObject(fact + " [Sum]");
-            waitForFragmentVisible(metricDetailPage).setMetricVisibleToAllUser();
-        }
+        Stream.of(facts).forEach(fact -> {
+            createMetric(fact + " [Sum]", format("SELECT SUM([%s])",
+                    getMdService().getObjUri(getProject(), Fact.class, title(fact))), "#,##0.00");
+        });
     }
 
-    protected void createAndCheckReport(UiReportDefinition reportDefinition, Collection<String> attributeValues,
-            Collection<String> metricValues) {
-        createReport(reportDefinition, reportDefinition.getName());
+    protected void createAndCheckReport(String reportName, String attribute, String metric,
+            Collection<String> attributeValues, Collection<String> metricValues) {
+        final Metric m = getMdService().getObj(getProject(), Metric.class, title(metric));
+        final Attribute attr = getMdService().getObj(getProject(), Attribute.class, title(attribute));
+        ReportDefinition definition = GridReportDefinitionContent.create(
+                reportName,
+                asList("metricGroup"),
+                asList(new AttributeInGrid(attr.getDefaultDisplayForm().getUri())),
+                asList(new GridElement(m.getUri(), metric)));
+        definition = getMdService().createObj(getProject(), definition);
+        final Report report = getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        getGoodDataClient().getReportService().exportReport(report, ReportExportFormat.CSV, output).get();
 
-        List<String> attributes = reportPage.getTableReport().getAttributeElements();
-        System.out.println("Attributes: " + attributes.toString());
+        final List<String> attributes = Lists.newArrayList();
+        final List<String> metrics = Lists.newArrayList();
+        List<String> result;
+        try (CsvListReader reader = new CsvListReader(new InputStreamReader(
+                new ByteArrayInputStream(output.toByteArray())), CsvPreference.STANDARD_PREFERENCE)) {
+            reader.getHeader(true);
+            while ((result = reader.read()) != null) {
+                attributes.add(result.get(0).trim());
+                metrics.add(result.get(1).trim());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        log.info("Attributes: " + attributes.toString());
         assertTrue(CollectionUtils.isEqualCollection(attributes, attributeValues),
                 "Incorrect attribute values!");
 
-        List<String> metrics = reportPage.getTableReport().getRawMetricElements();
-        System.out.println("Metric: " + metrics.toString());
+        log.info("Metric: " + metrics.toString());
         assertTrue(CollectionUtils.isEqualCollection(metrics, metricValues),
                 "Incorrect metric values!");
     }
 
     protected void checkReportAfterAddReferenceToDataset() {
         prepareMetricToCheckNewAddedFields("number");
-        UiReportDefinition reportDefinition =
-                new UiReportDefinition().withName("Report to check reference")
-                        .withHows("artistname").withWhats("number [Sum]");
-        createAndCheckReport(reportDefinition, Lists.newArrayList("OOP1", "OOP2",
-                "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"), Lists.newArrayList("1,000.00",
-                "1,200.00", "1,400.00", "1,600.00", "1,800.00", "2,000.00", "700.00", "800.00"));
+        createAndCheckReport("Report to check reference", "artistname", "number [Sum]",
+            Lists.newArrayList("OOP1", "OOP2", "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"),
+            Lists.newArrayList("1000", "1200", "1400", "1600", "1800", "2000", "700", "800"));
     }
 
     private ProcessInfo getDataloadProcessInfo() throws IOException, JSONException {
