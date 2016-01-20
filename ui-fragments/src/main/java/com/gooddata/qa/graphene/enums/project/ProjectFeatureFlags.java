@@ -9,7 +9,8 @@ public enum ProjectFeatureFlags {
     NPS_STATUS("npsStatus"),
     ANALYTICAL_DESIGNER("analyticalDesigner"),
     ENABLE_CSV_UPLOADER("enableCsvUploader"),
-    ENABLE_ATTRIBUTE_FILTERS("enableAttributeFilters");
+    ENABLE_ATTRIBUTE_FILTERS("enableAttributeFilters"),
+    ENABLE_ANALYTICAL_DASHBOARDS("enableAnalyticalDashboards");
 
     private final String featureFlag;
 

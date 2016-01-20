@@ -1,9 +1,11 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -13,9 +15,12 @@ import org.json.JSONException;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
@@ -103,6 +108,40 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void checkHamburgerMenuNotPresentInDesktop() {
         assertFalse(initIndigoDashboardsPage().isHamburgerMenuLinkPresent());
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void testNavigateToIndigoDashboardWithoutLogin() throws JSONException {
+        try {
+            initDashboardsPage();
+
+            logout();
+            openUrl(getIndigoDashboardsPageUri());
+            waitForStringInUrl(ACCOUNT_PAGE);
+        } finally {
+            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+        }
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void accessDashboardsFromTopMenu() throws JSONException {
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
+
+        try {
+            initDashboardsPage();
+            assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
+
+            ApplicationHeaderBar.goToReportsPage(browser);
+            waitForFragmentVisible(reportsPage);
+            assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
+
+            ApplicationHeaderBar.goToKpisPage(browser);
+            waitForFragmentVisible(indigoDashboardsPage).getSplashScreen();
+        } finally {
+            RestUtils.disableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
+        }
     }
 
     private boolean isDeviceSupportHamburgerMenu() {
