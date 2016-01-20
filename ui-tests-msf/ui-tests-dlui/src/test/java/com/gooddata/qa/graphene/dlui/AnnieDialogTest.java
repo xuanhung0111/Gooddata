@@ -9,7 +9,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterClass;
@@ -21,7 +20,6 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.base.Predicate;
@@ -175,53 +173,6 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         checkAvailableAdditionalFields(dataSource, FieldTypes.ALL);
         Screenshots.takeScreenshot(browser, "cancel-add-new-field", getClass());
         annieUIDialog.clickOnDismissButton();
-    }
-
-    @Test(dataProvider = "basicFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {"basicTest",
-        "addOneField"}, priority = 1)
-    public void adminAddSingleBasicFieldFromADSToLDM(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException {
-        checkNewDataAddingAndCleanAddedData(UserRoles.ADMIN, addedField);
-    }
-
-    @Test(dataProvider = "newFieldData", dependsOnGroups = {"initialDataForDLUI"}, groups = {"addOneField"},
-            priority = 1)
-    public void adminAddSingleFieldFromADSToLDM(AddedFields addedField, ReportWithAddedFields reportWithAddedFields)
-            throws JSONException {
-        checkNewDataAddingAndCleanAddedData(UserRoles.ADMIN, addedField);
-    }
-
-    @Test(dependsOnGroups = {"addOneField"}, priority = 1)
-    public void adminAddMultiFieldsFromADSToLDM() throws JSONException {
-        addMultiFieldsAndAssertAnnieDialog(UserRoles.ADMIN);
-    }
-
-    @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"basicTest"}, priority = 1)
-    public void addEditorUser() {
-        try {
-            addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
-        } catch (Exception e) {
-            throw new IllegalStateException("There is exeception when adding user to project!", e);
-        }
-    }
-
-    @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser"}, groups = {"basicTest",
-        "editorAddOneField"}, priority = 1)
-    public void editorAddSingleBaiscFieldFromADSToLDM(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException {
-        checkNewDataAddingAndCleanAddedData(UserRoles.EDITOR, addedField);
-    }
-
-    @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser"}, groups = {"editorAddOneField"},
-            priority = 1)
-    public void editorAddSingleFieldFromADSToLDM(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException {
-        checkNewDataAddingAndCleanAddedData(UserRoles.EDITOR, addedField);
-    }
-
-    @Test(dependsOnGroups = {"editorAddOneField"}, priority = 1)
-    public void editorAddMultiFieldsFromADSToLDM() throws JSONException {
-        addMultiFieldsAndAssertAnnieDialog(UserRoles.EDITOR);
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 1)

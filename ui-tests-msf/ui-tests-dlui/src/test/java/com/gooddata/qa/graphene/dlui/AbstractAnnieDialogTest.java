@@ -23,7 +23,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
@@ -91,22 +90,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         browser.switchTo().frame(
                 waitForElementVisible(By.xpath("//iframe[contains(@src,'dlui-annie')]"), browser));
         waitForElementVisible(annieUIDialog.getRoot());
-    }
-
-    @DataProvider(name = "basicFieldData")
-    protected static Object[][] basicFieldData() {
-        return new Object[][] {
-            {AddedFields.POSITION, ReportWithAddedFields.POSITION},
-            {AddedFields.TOTALPRICE2, ReportWithAddedFields.TOTALPRICE2}};
-    }
-
-    @DataProvider(name = "newFieldData")
-    protected static Object[][] newFieldData() {
-        return new Object[][] {
-            {AddedFields.LABEL, ReportWithAddedFields.LABEL},
-            {AddedFields.DATE, ReportWithAddedFields.DATE},
-            {AddedFields.POSITION_CONNECTION_POINT, ReportWithAddedFields.POSITION_CONNECTION_POINT},
-            {AddedFields.LABEL_OF_NEW_FIELD, ReportWithAddedFields.LABEL_OF_NEW_FIELD}};
     }
 
     protected void checkAvailableAdditionalFields(DataSource datasource, FieldTypes fieldType) {
@@ -218,17 +201,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
                 });
     }
 
-    protected void checkNewDataAddingAndCleanAddedData(UserRoles role, final AddedFields addedField)
-            throws JSONException {
-        addDataFromAdsToLdmAndDropAfterTest(role, addedField.getCleanupMaqlFile(),
-                new TestAction() {
-                    @Override
-                    public void doAction(UserRoles role) {
-                        checkNewDataAdding(role, addedField);
-                    }
-                });
-    }
-
     protected void checkSuccessfulAddingData(DataSource dataSource, String screenshotName) {
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
@@ -252,16 +224,6 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
             @Override
             public void doAction(UserRoles role) {
                 checkReportWithMultiAddedFields(role);
-            }
-        });
-    }
-
-    protected void addMultiFieldsAndAssertAnnieDialog(UserRoles role) throws JSONException {
-        String maqlFile = "dropMultiAddedFieldsInLDM.txt";
-        addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
-            @Override
-            public void doAction(UserRoles role) {
-                addMultiFields(role);
             }
         });
     }
