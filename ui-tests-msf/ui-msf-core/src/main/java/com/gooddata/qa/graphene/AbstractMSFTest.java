@@ -234,7 +234,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
             assertEquals(errorMessage, "The object (%s) doesn't exist.");
         }
     }
-    
+
     protected void createADS(Warehouse ads) {
         adsHelper.createAds(ads.getTitle(), ads.getAuthorizationToken());
     }
