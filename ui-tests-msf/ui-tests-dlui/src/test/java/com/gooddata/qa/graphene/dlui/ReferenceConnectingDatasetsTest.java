@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -18,14 +19,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
-import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 
 public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
 
@@ -56,16 +54,11 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             ParseException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_AND_REFERECES);
-            createDataLoadProcess();
+            assertTrue(executeProcess(createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, "DATALOAD"), "", SYNCHRONIZE_ALL_PARAM).isSuccess());
 
-            String executionUri = executeDataloadProcess(getRestApiClient(), 
-                    Lists.newArrayList(new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
-            assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
-            
-            List<String> references = getReferencesOfDataset(DATASET_NAME);
-            System.out.println("References: " + references);
-            assertTrue(references.contains("dataset.artist"),
-                    "Reference was not added automatically!");
+            final List<String> references = getReferencesOfDataset(DATASET_NAME);
+            log.info("References: " + references);
+            assertTrue(references.contains("dataset.artist"), "Reference was not added automatically!");
         } finally {
             dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES + "/dropAddedReference_API.txt"));
         }
@@ -76,9 +69,8 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
         try {
             updateFieldToSelected();
             addNewFieldWithAnnieDialog(dataSource);
-            List<String> references = getReferencesOfDataset(DATASET_NAME);
-            assertTrue(references.contains("dataset.artist"),
-                    "Reference was not added automatically!");
+            final List<String> references = getReferencesOfDataset(DATASET_NAME);
+            assertTrue(references.contains("dataset.artist"), "Reference was not added automatically!");
             checkRemainingAdditionalFields(dataSource);
 
             checkReportAfterAddReferenceToDataset();
@@ -97,9 +89,8 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             signIn(true, UserRoles.EDITOR);
 
             addNewFieldWithAnnieDialog(dataSource);
-            List<String> references = getReferencesOfDataset(DATASET_NAME);
-            assertTrue(references.contains("dataset.artist"),
-                    "Reference was not added automatically!");
+            final List<String> references = getReferencesOfDataset(DATASET_NAME);
+            assertTrue(references.contains("dataset.artist"), "Reference was not added automatically!");
             checkRemainingAdditionalFields(dataSource);
         } finally {
             logout();
@@ -122,21 +113,19 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
             updateFieldToSelected();
             addNewFieldWithAnnieDialog(dataSource);
 
-            List<String> references = getReferencesOfDataset("artist");
-            assertTrue(references.contains("dataset.track"),
-                    "Track reference wasn't added automatically!");
-            assertTrue(references.contains("dataset.author"),
-                    "Author reference wasn't added automatically!");
+            final List<String> references = getReferencesOfDataset("artist");
+            assertTrue(references.contains("dataset.track"), "Track reference wasn't added automatically!");
+            assertTrue(references.contains("dataset.author"), "Author reference wasn't added automatically!");
             checkRemainingAdditionalFields(dataSource);
 
             prepareMetricToCheckNewAddedFields("number");
             createAndCheckReport("Report to check reference 1", "Trackname", "number [Sum]",
-                    Lists.newArrayList("10 trackNameA", "11 trackNameA", "12 trackNameA", "13 trackNameA",
+                    asList("10 trackNameA", "11 trackNameA", "12 trackNameA", "13 trackNameA",
                         "14 trackNameA", "1 trackNameA", "2 trackNameA", "3 trackNameA", "4 trackNameA",
                         "5 trackNameA", "6 trackNameA", "7 trackNameA", "8 trackNameA", "9 trackNameA"),
                     Collections.nCopies(14, "100"));
             createAndCheckReport("Report to check reference 2", "authorid", "number [Sum]",
-                    Lists.newArrayList("author1", "author10", "author11", "author12", "author13", "author14",
+                    asList("author1", "author10", "author11", "author12", "author13", "author14",
                         "author19", "author2", "author3", "author4", "author5", "author6", "author7", "author8"),
                     Collections.nCopies(14, "100"));
         } finally {
@@ -146,19 +135,18 @@ public class ReferenceConnectingDatasetsTest extends AbstractAnnieDialogTest {
 
     @AfterClass
     public void cleanUp() {
-        deleteADSInstance(ads);
+        getAdsHelper().removeAds(ads);
     }
 
     private void addNewFieldWithAnnieDialog(DataSource dataSource) {
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
-        Graphene.waitGui().until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver input) {
-                return SUCCESSFUL_ANNIE_DIALOG_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline());
-            }
-        });
+
+        final Predicate<WebDriver> successful =
+            browser -> SUCCESSFUL_ANNIE_DIALOG_HEADLINE.equals(annieUIDialog.getAnnieDialogHeadline());
+        Graphene.waitGui().until(successful);
+
         annieUIDialog.clickOnCloseButton();
     }
 

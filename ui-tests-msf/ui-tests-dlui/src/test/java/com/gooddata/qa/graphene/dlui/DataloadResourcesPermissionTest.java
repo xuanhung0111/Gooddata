@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.dlui;
 
+import static java.lang.String.format;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.apache.http.ParseException;
@@ -9,6 +12,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
@@ -40,7 +44,7 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
         RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.FORBIDDEN,
+                format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.FORBIDDEN,
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
     }
 
@@ -50,8 +54,8 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
                 UserRoles.EDITOR);
         RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getViewerUser(), 
                 UserRoles.VIEWER);
-        adsHelper.addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
-        adsHelper.addUserToAdsInstance(ads, testParams.getViewerUser(), AdsRole.DATA_ADMIN);
+        getAdsHelper().addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
+        getAdsHelper().addUserToAdsInstance(ads, testParams.getViewerUser(), AdsRole.DATA_ADMIN);
     }
 
     @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
@@ -69,8 +73,13 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
         RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
                 String.format(OUTPUT_STAGE_METADATA_URI, testParams.getProjectId()), HttpStatus.OK,
                 ACCEPT_APPLICATION_JSON_WITH_VERSION);
-        RestUtils.getResource(editorRestApi, executeDataloadProcessSuccessfully(editorRestApi),
-                HttpStatus.NO_CONTENT);
+
+        final String uri = DataloadProcess.TEMPLATE
+                .expand(testParams.getProjectId(), getDataloadProcessId()).toString() + "/executions";
+        final String executionUri = RestUtils.executeProcess(restApiClient, uri, "", SYNCHRONIZE_ALL_PARAM);
+        assertTrue(isExecutionSuccessful(restApiClient, executionUri),
+                "Process execution is not successful!");
+        RestUtils.getResource(editorRestApi, executionUri, HttpStatus.NO_CONTENT);
     }
 
     @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
@@ -90,7 +99,7 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
 
     @AfterClass
     public void cleanUp() {
-        deleteADSInstance(ads);
+        getAdsHelper().removeAds(ads);
     }
 
     private void accessToProjectModelView(RestApiClient restApiClient) {

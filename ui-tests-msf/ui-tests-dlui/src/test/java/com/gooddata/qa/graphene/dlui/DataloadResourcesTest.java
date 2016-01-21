@@ -19,11 +19,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
-import com.gooddata.qa.graphene.entity.ExecutionParameter;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.warehouse.Warehouse;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 public class DataloadResourcesTest extends AbstractMSFTest {
     
@@ -77,7 +74,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
     @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void  checkResourcesAfterChangeAdsInstance () throws IOException {
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
-        Warehouse newAds = adsHelper.createAds("ADS Instance for DLUI test", dssAuthorizationToken);
+        final Warehouse newAds = createAds("ADS Instance for DLUI test");
         try {
             setDefaultSchemaForOutputStage(newAds);
 
@@ -94,7 +91,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
                     readAllLinesOfFile("mapping-valid-case.txt"));
         } finally {
             setDefaultSchemaForOutputStage(ads);
-            deleteADSInstance(newAds);
+            getAdsHelper().removeAds(newAds);
         }
     }
 
@@ -120,7 +117,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"}, priority = 2)
     public void checkResourcesWithAllCases() throws IOException, JSONException {
-        Warehouse newAds = adsHelper.createAds("ADS Instance for DLUI test", dssAuthorizationToken);
+        final Warehouse newAds = createAds("ADS Instance for DLUI test");
         setDefaultSchemaForOutputStage(newAds);
         try {
             String dropTableFile = getResourceAsString("/" + MAQL_FILES + "/dropTablesOpportunityPerson.txt");
@@ -140,22 +137,19 @@ public class DataloadResourcesTest extends AbstractMSFTest {
             assertResourceContent(getMappingResourceContent(getRestApiClient(), HttpStatus.OK),
                     readAllLinesOfFile("mapping-all-cases.txt"));
 
-            String execution = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(new ExecutionParameter(
-                    GDC_DE_SYNCHRONIZE_ALL, true)));
-            assertTrue(ProcessUtils.isExecutionSuccessful(restApiClient, execution),
-                    "Process execution is not successful!");
+            assertTrue(executeProcess(createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD), "", SYNCHRONIZE_ALL_PARAM).isSuccess());
         } finally {
             setDefaultSchemaForOutputStage(ads);
-            deleteADSInstance(newAds);
+            getAdsHelper().removeAds(newAds);
         }
     }
 
     @AfterClass
     public void cleanUp() {
-        deleteADSInstance(ads);
+        getAdsHelper().removeAds(ads);
     }
 
-    private List<String> readResourceFile(String file, String key) throws IOException {
+    private List<String> readResourceFile(String file, String key) {
         return asList(getResourceAsString("/" + API_RESOURCES + "/" + file).split(key));
     }
 

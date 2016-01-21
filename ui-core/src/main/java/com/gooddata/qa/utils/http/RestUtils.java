@@ -42,7 +42,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
-public class RestUtils {
+public final class RestUtils {
 
     public static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
     private static final String USERS_LINK = "/gdc/projects/%s/users";
@@ -1087,6 +1087,54 @@ public class RestUtils {
         }
 
         return "";
+    }
+
+    public static String getDataloadProcessOwner(RestApiClient restApiClient, String projectId)
+            throws IOException, JSONException {
+        final String processesUri = format("/gdc/projects/%s/dataload/processes", projectId);
+        final JSONArray processes = getJSONObjectFrom(restApiClient, processesUri, HttpStatus.OK)
+                .getJSONObject("processes").getJSONArray("items");
+
+        JSONObject it;
+        for (int i = 0, n = processes.length(); i < n; i++) {
+            it = processes.getJSONObject(i).getJSONObject("process");
+            if (!"DATALOAD".equals(it.getString("type"))) continue;
+            return it.getString("ownerLogin");
+        }
+        throw new RuntimeException("Cannot find dataload process!");
+    }
+
+    public static String executeProcess(RestApiClient restApiClient, String executionUri, String executable,
+            Map<String, String> params) throws ParseException, JSONException, IOException {
+        final String pollingUri = createProcessExecution(HttpStatus.CREATED, restApiClient, executionUri, executable, params);
+        System.out.println("Execution polling uri: " + pollingUri);
+        return pollingUri;
+    }
+
+    public static String createProcessExecution(HttpStatus expectedStatusCode, RestApiClient restApiClient,
+            String executionUri, String executable, Map<String, String> params)
+                    throws JSONException, ParseException, IOException {
+        final String postBody = new JSONObject().put("execution", new JSONObject() {{
+            put("executable", executable);
+            put("params", params);
+        }}).toString();
+
+        final HttpRequestBase postRequest = restApiClient.newPostMethod(executionUri, postBody);
+        try {
+            final HttpResponse postResponse = restApiClient.execute(postRequest, expectedStatusCode,
+                    "Execution is not created!");
+            System.out.println("Response status: " + postResponse.getStatusLine().getStatusCode());
+
+            final JSONObject responseObject = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+            EntityUtils.consumeQuietly(postResponse.getEntity());
+
+            if (expectedStatusCode != HttpStatus.CREATED)
+                return responseObject.getJSONObject("error").getString("message");
+
+            return responseObject.getJSONObject("executionTask").getJSONObject("links").getString("poll");
+        } finally {
+            postRequest.releaseConnection();
+        }
     }
 
     private static String getWebDavServerUrl(String userUploadsLink, String serverRootUrl) {

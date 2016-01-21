@@ -273,7 +273,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             Screenshots.takeScreenshot(browser, "check-custom-data-source-name-2", getClass());
             annieUIDialog.clickOnDismissButton();
         } finally {
-            deleteOutputStageMetadata();
+            customOutputStageMetadata();
         }
     }
 
@@ -308,7 +308,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             Screenshots.takeScreenshot(browser, "check-custom-data-source-name-Googleanalytics", getClass());
             annieUIDialog.clickOnDismissButton();
         } finally {
-            deleteOutputStageMetadata();
+            customOutputStageMetadata();
         }
     }
 
@@ -343,7 +343,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             Screenshots.takeScreenshot(browser, "check-unicode-data-source-name-4", getClass());
             annieUIDialog.clickOnDismissButton();
         } finally {
-            deleteOutputStageMetadata();
+            customOutputStageMetadata();
         }
     }
 
@@ -364,7 +364,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             Screenshots.takeScreenshot(browser, "check-empty-data-source-name", getClass());
             annieUIDialog.clickOnDismissButton();
         } finally {
-            deleteOutputStageMetadata();
+            customOutputStageMetadata();
         }
     }
 
@@ -387,7 +387,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             checkAvailableAdditionalFields(gaDataSource, FieldTypes.ALL);
             annieUIDialog.clickOnDismissButton();
 
-            deleteOutputStageMetadata();
+            customOutputStageMetadata();
 
             DataSource unknownDataSource =
                     new DataSource().withName(DEFAULT_DATA_SOURCE_NAME).withDatasets(personDataset,
@@ -398,7 +398,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
             Screenshots.takeScreenshot(browser, "delete-data-source-name", getClass());
             annieUIDialog.clickOnDismissButton();
         } finally {
-            deleteOutputStageMetadata();
+            customOutputStageMetadata();
         }
     }
 
@@ -423,7 +423,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
 
             checkSuccessfulAddingData(fbDataSource, "add-data-with-custom-dataSource-name");
         } finally {
-            deleteOutputStageMetadata();
+            customOutputStageMetadata();
             dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
                     + "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
@@ -432,7 +432,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
 
     @AfterClass
     public void cleanUp() {
-        deleteADSInstance(ads);
+        getAdsHelper().removeAds(ads);
     }
 
     private void waitForAddingDataTask() {
@@ -455,5 +455,9 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         } catch (TimeoutException e) {
             return false;
         }
+    }
+
+    private Dataset prepareDataset(AdditionalDatasets additionalDataset) {
+        return additionalDataset.getDataset();
     }
 }

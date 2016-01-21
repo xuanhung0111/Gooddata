@@ -1,5 +1,8 @@
 package com.gooddata.qa.graphene.dlui;
 
+import java.io.IOException;
+
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -57,12 +60,8 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"basicTest"})
-    public void addEditorUser() {
-        try {
-            addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
-        } catch (Exception e) {
-            throw new IllegalStateException("There is exeception when adding user to project!", e);
-        }
+    public void addEditorUser() throws ParseException, IOException, JSONException {
+        addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
     }
 
     @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
@@ -87,6 +86,6 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
 
     @AfterClass
     public void cleanUp() {
-        deleteADSInstance(ads);
+        getAdsHelper().removeAds(ads);
     }
 }
