@@ -244,13 +244,13 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     private void failToLoadData(DataSource dataSource, String screenshotName) {
-        openAnnieDialog();
-        annieUIDialog.selectFields(dataSource);
-        annieUIDialog.clickOnApplyButton();
-
         Collection<ExecutionParameter> params =
                 prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
                         "copyTableWithAdditionalFields_Drop_Person.txt", ads.getId());
+
+        openAnnieDialog();
+        annieUIDialog.selectFields(dataSource);
+        annieUIDialog.clickOnApplyButton();
 
         String executionUri =
                 executeCloudConnectProcess(cloudconnectProcess,
