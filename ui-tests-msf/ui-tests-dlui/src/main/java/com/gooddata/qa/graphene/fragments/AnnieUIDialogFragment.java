@@ -42,8 +42,6 @@ public class AnnieUIDialogFragment extends AbstractFragment {
     private By BY_EMPTY_STATE_MESSAGE = By.cssSelector(".empty-state-paragraph");
 
     private By BY_INTEGRATION_STATUS = By.cssSelector(".integration-status");
-    private By BY_RUNNING_STATE_HEADING = By.cssSelector(".running-state-heading");
-    private By BY_RUNNING_STATE_PARAGRAPH = By.cssSelector(".running-state-paragraph");
     private By BY_INTEGRATION_STATUS_MESSAGE = By.tagName("p");
 
     public WebElement getEmptyState() {
@@ -134,14 +132,6 @@ public class AnnieUIDialogFragment extends AbstractFragment {
 
     public boolean isNoSelectionArea() {
         return getRoot().findElements(BY_SELECTION_AREA).isEmpty();
-    }
-
-    public String getRunningStateHeading() {
-        return waitForElementVisible(BY_RUNNING_STATE_HEADING, getIntegrationStatus()).getText();
-    }
-
-    public String getRunningStateMessage() {
-        return waitForElementVisible(BY_RUNNING_STATE_PARAGRAPH, getIntegrationStatus()).getText();
     }
 
     public SelectionArea getSelectionArea() {
