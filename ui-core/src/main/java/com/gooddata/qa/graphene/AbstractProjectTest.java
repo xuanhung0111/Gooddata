@@ -17,6 +17,7 @@ import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -163,5 +164,11 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected Metric createMetric(String name, String expression, String format) {
         return getMdService().createObj(getProject(), new Metric(name, expression, format));
+    }
+
+    public void setupFeatureFlagInProject(String projectId, ProjectFeatureFlags featureFlag)
+            throws JSONException {
+
+        RestUtils.enableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
     }
 }

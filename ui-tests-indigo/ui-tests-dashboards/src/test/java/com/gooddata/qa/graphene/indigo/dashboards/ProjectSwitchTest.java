@@ -25,14 +25,9 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
-    public void setupDashboardsFeatureFlag() throws JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
-    }
-
-    @Test(dependsOnMethods = {"setupDashboardsFeatureFlag"}, groups = {"desktop"})
     public void switchProjectsTest() throws ParseException, JSONException, IOException {
-        String newProjectUri = createProject(NEW_PROJECT_NAME);
+        String newProjectId = createProject(NEW_PROJECT_NAME);
+        setupFeatureFlagInProject(newProjectId, ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
 
         initIndigoDashboardsPageWithWidgets();
 
@@ -47,7 +42,7 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "switchProjectsTest-switched-back", getClass());
         assertEquals(indigoDashboardsPage.getCurrentProjectName(), projectTitle);
 
-        RestUtils.deleteProject(getRestApiClient(), newProjectUri);
+        RestUtils.deleteProject(getRestApiClient(), newProjectId);
     }
 
     private String createProject(String name) {

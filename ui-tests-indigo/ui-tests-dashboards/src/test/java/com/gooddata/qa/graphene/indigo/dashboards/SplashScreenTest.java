@@ -15,6 +15,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 
 public class SplashScreenTest extends DashboardsTest {
 
@@ -155,10 +156,9 @@ public class SplashScreenTest extends DashboardsTest {
             logout();
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
-            initIndigoDashboardsPage()
-                .getSplashScreen()
-                .waitForCreateKpiDashboardButtonMissing();
-
+            // viewer accessing "dashboards" with no kpi dashboards created should be redirected
+            openUrl(getIndigoDashboardsPageUri());
+            waitForProjectsPageLoaded(browser);
         } finally {
             logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
