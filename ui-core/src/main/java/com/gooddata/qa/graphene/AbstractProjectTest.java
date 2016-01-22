@@ -171,4 +171,10 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
     }
+
+    public void disableFeatureFlagInProject(String projectId, ProjectFeatureFlags featureFlag)
+            throws JSONException {
+
+        RestUtils.disableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
+    }
 }

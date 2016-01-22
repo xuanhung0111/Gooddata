@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 public class ApplicationHeaderBar extends AbstractFragment {
 
@@ -46,6 +47,10 @@ public class ApplicationHeaderBar extends AbstractFragment {
 
     public static void goToKpisPage(WebDriver browser) {
         waitForElementVisible(getInstance(browser).kpisLink).click();
+    }
+
+    public static boolean isKpisLinkVisible(WebDriver browser) {
+        return isElementPresent(By.className(KPIS_LINK_CLASS), browser);
     }
 
     public static void goToCsvUploaderPage(WebDriver browser) {
@@ -90,5 +95,5 @@ public class ApplicationHeaderBar extends AbstractFragment {
 
     public static String getCurrentProjectName(WebDriver browser) {
         return waitForElementVisible(getInstance(browser).navigationPicker).getText();
-    } 
+    }
 }

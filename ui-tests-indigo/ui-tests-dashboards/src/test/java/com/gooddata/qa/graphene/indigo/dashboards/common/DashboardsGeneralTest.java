@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.utils.http.RestUtils;
 import org.json.JSONException;
 
 public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
