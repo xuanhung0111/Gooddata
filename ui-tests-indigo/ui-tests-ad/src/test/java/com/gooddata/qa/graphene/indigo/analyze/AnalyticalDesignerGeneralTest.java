@@ -275,7 +275,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         }
 
         waitForFragmentVisible(comparisonRecommendation);
-        comparisonRecommendation.clickAttributePicker().select(attribute).apply();
+        comparisonRecommendation.select(attribute).apply();
 
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
@@ -299,23 +299,22 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         analysisPage.resetToBlankState().addMetric(metric);
         waitForFragmentVisible(comparisonRecommendation);
 
-        final String attribute2 = comparisonRecommendation.clickAttributePicker().getSuitableAttribute(attribute);
-        comparisonRecommendation.select(attribute2).apply();
+        comparisonRecommendation.select(attribute).apply();
 
-        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(attribute2));
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(attribute2), attribute2 + ": All");
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(attribute));
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(attribute), attribute + ": All");
 
         if (analysisPage.waitForReportComputing().isExplorerMessageVisible()) {
             log.info(format(
                     "Report with metric [%s] and attribute [%s] shows message: %s", metric,
-                    attribute2, analysisPage.getExplorerMessage()));
+                    attribute, analysisPage.getExplorerMessage()));
         } else {
             assertTrue(report.getTrackersCount() >= 1);
             assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
         }
 
         String newAttribute = doSafetyAttributeAction(metric,
-                attr -> this.replaceAttribute(attribute2, attr), "testSimpleComparison");
+                attr -> this.replaceAttribute(attribute, attr), "testSimpleComparison");
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(newAttribute));
         assertEquals(analysisPage.getFilterBuckets().getFilterText(newAttribute), newAttribute + ": All");
