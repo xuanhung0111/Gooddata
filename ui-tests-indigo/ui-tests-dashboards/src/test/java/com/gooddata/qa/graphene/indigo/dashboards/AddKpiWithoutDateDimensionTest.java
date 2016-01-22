@@ -13,7 +13,9 @@ import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.io.ResourceUtils;
+import org.json.JSONException;
 
 public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
 
@@ -32,6 +34,11 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
     public void uploadDatasetHasDateDimension() {
         uploadCSV(ResourceUtils.getFilePathFromResource("/" + UPLOAD_CSV + "/payroll.csv"));
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
+    public void setupFeatureFlag() throws JSONException {
+        setupFeatureFlagInProject(testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})

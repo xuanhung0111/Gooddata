@@ -15,12 +15,10 @@ import org.json.JSONException;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
@@ -125,25 +123,17 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
     public void accessDashboardsFromTopMenu() throws JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
+        initDashboardsPage();
+        assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
 
-        try {
-            initDashboardsPage();
-            assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
+        ApplicationHeaderBar.goToReportsPage(browser);
+        waitForFragmentVisible(reportsPage);
+        assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
 
-            ApplicationHeaderBar.goToReportsPage(browser);
-            waitForFragmentVisible(reportsPage);
-            assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
-
-            ApplicationHeaderBar.goToKpisPage(browser);
-            waitForFragmentVisible(indigoDashboardsPage)
-                .waitForDashboardLoad()
-                .waitForAllKpiWidgetsLoaded();
-        } finally {
-            RestUtils.disableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                    ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
-        }
+        ApplicationHeaderBar.goToKpisPage(browser);
+        waitForFragmentVisible(indigoDashboardsPage)
+            .waitForDashboardLoad()
+            .waitForAllKpiWidgetsLoaded();
     }
 
     private boolean isDeviceSupportHamburgerMenu() {

@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.RestUtils;
@@ -62,10 +63,19 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         imapPassword = testParams.loadProperty("imap.password");
     }
 
-    @Test(dependsOnMethods = "createProject", groups = "desktop")
-    public void setupProjectMaql() throws JSONException, IOException {
+    private void setupProjectMaql() throws JSONException, IOException {
         switchToAdmin();
         setupMaql(MAQL_PATH);
+    }
+
+    private void setupFeatureFlag() throws JSONException {
+        setupFeatureFlagInProject(testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
+    }
+
+    @Test(dependsOnMethods = "createProject", groups = "desktop")
+    public void setupProject() throws JSONException, IOException {
+        setupProjectMaql();
+        setupFeatureFlag();
     }
 
     @DataProvider(name = "alertsProvider")
@@ -76,7 +86,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         };
     }
 
-    @Test(dependsOnMethods = "setupProjectMaql", dataProvider = "alertsProvider", groups = "desktop")
+    @Test(dependsOnMethods = "setupProject", dataProvider = "alertsProvider", groups = "desktop")
     public void checkKpiAlertEvaluation(String factName, String metricTemplate, String format, String threshold)
             throws URISyntaxException, JSONException, IOException, MessagingException {
 

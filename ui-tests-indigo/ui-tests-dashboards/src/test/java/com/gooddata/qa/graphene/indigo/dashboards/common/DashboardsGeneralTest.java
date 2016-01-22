@@ -7,6 +7,8 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import org.json.JSONException;
 
 public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
 
@@ -45,9 +47,11 @@ public abstract class DashboardsGeneralTest extends GoodSalesAbstractTest {
         validateAfterClass = false;
     }
 
+
     @Test(dependsOnMethods = {"createProject"}, groups = {"dashboardsInit"})
     @Parameters({"windowSize"})
-    public void initDashboardTests(@Optional("maximize") String windowSize) {
+    public void initDashboardTests(@Optional("maximize") String windowSize) throws JSONException {
         adjustWindowSize(windowSize);
+        setupFeatureFlagInProject(testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
     }
 }

@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
@@ -26,6 +27,11 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"desktop"})
+    public void setupFeatureFlag() throws JSONException {
+        setupFeatureFlagInProject(testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
+    }
+
+    @Test(dependsOnMethods = {"setupFeatureFlag"}, groups = {"desktop"})
     public void createKpiLinkToDashboardTab() {
         initIndigoDashboardsPage()
             .getSplashScreen()
@@ -42,7 +48,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
             .saveEditModeWithKpis();
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"desktop"})
+    @Test(dependsOnMethods = {"setupFeatureFlag"}, groups = {"desktop"})
     public void exportDashboardsToAnotherProject() throws JSONException, IOException {
         final String oldPid = testParams.getProjectId();
 
