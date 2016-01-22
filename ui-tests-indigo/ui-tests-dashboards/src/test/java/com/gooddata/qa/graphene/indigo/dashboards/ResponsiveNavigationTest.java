@@ -137,7 +137,9 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
             assertTrue(isElementPresent(className(ApplicationHeaderBar.KPIS_LINK_CLASS), browser));
 
             ApplicationHeaderBar.goToKpisPage(browser);
-            waitForFragmentVisible(indigoDashboardsPage).getSplashScreen();
+            waitForFragmentVisible(indigoDashboardsPage)
+                .waitForDashboardLoad()
+                .waitForAllKpiWidgetsLoaded();
         } finally {
             RestUtils.disableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                     ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
