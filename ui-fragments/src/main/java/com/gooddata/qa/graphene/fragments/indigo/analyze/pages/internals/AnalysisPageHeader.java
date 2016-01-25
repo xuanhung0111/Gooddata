@@ -50,6 +50,14 @@ public class AnalysisPageHeader extends AbstractFragment {
         return !isElementDisabled(waitForElementVisible(redoButton));
     }
 
+    public boolean isResetButtonEnabled() {
+        return !isElementDisabled(waitForElementVisible(resetButton));
+    }
+
+    public WebElement getResetButton() {
+        return waitForElementVisible(resetButton);
+    }
+
     public String getExportButtonTooltipText() {
         getActions().moveToElement(exportToReportButton).perform();
         return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText().trim();

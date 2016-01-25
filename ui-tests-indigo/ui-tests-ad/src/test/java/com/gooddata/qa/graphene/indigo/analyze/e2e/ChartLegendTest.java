@@ -2,13 +2,14 @@ package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.tagName;
+import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class ChartLegendTest extends AbstractGoodSalesE2ETest {
+public class ChartLegendTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -17,13 +18,14 @@ public class ChartLegendTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void test_chart_legend_should_not_be_clickable() {
-        String visibleSeriesSelector = ".highcharts-series[visibility=visible]";
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
-
-        expectElementCount(visibleSeriesSelector, 2);
+        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(NUMBER_OF_LOST_OPPS)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends()
+            .size(), 2);
 
         // click legend for Salary and check no impact on visible series
         browser.findElements(className("highcharts-legend-item"))
@@ -32,6 +34,6 @@ public class ChartLegendTest extends AbstractGoodSalesE2ETest {
             .findFirst()
             .get()
             .click();
-        expectElementCount(visibleSeriesSelector, 2);
+        assertEquals(analysisPage.getChartReport().getLegends().size(), 2);
     }
 }

@@ -1,14 +1,20 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class ErrorStatesTest extends AbstractGoodSalesE2ETest {
+public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -17,84 +23,89 @@ public class ErrorStatesTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_result_is_too_large__413() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(accountAttr, CATEGORIES_BUCKET);
-        expectError(".s-error-missing-metric");
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        expectError(".s-error-too-many-data-points");
-        expectExportDisabled();
+        analysisPage.addAttribute(ACCOUNT)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
+
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_error_even_when_there_are_too_many_data_points() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
-        expectError(".s-error-missing-metric");
-        expectExportDisabled();
+        analysisPage.addStack(ACTIVITY_TYPE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_chart_cannot_be_rendered_because_of_it() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(accountAttr, STACKS_BUCKET);
-        expectError(".s-error-too-many-data-points");
-        expectExportDisabled();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addStack(ACCOUNT)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
 
-        click(".s-error-too-many-data-points .s-switch-to-table");
-        expectFind(".s-visualization-picker .vis-type-table.is-selected");
+        waitForElementVisible(cssSelector(".s-error-too-many-data-points .s-switch-to-table"), browser).click();
+        analysisPage.waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-visualization-picker .vis-type-table.is-selected"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_no_data_when_result_is_empty() {
-        String identifier;
-        if (testParams.isReuseProject()) {
-            identifier = getMdService().getObj(getProject(), Metric.class, title("__EMPTY__")).getIdentifier();
-        } else {
+        if (!testParams.isReuseProject()) {
             String activitiesUri = getMdService().getObjUri(getProject(), Metric.class, title("# of Activities"));
-            identifier = createMetric("__EMPTY__", "SELECT [" + activitiesUri + "] WHERE 1 = 0", "#,##0")
-                    .getIdentifier();
+            createMetric("__EMPTY__", "SELECT [" + activitiesUri + "] WHERE 1 = 0", "#,##0");
         }
 
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(".s-id-" + identifier.toLowerCase(), METRICS_BUCKET);
-        expectError(".s-error-empty-result");
-        expectExportDisabled();
+        analysisPage.addMetric("__EMPTY__")
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-error-empty-result"), browser));
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_when_configuration_does_not_contain_one() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        expectError(".s-error-missing-metric");
-        expectExportDisabled();
+        analysisPage.addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_invalid_configuration_error_when_execution_fails() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(accountAttr, STACKS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, METRICS_BUCKET);
+        analysisPage.addStack(ACCOUNT)
+            .addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+            .waitForReportComputing();
 
-        expectError(".s-error-invalid-configuration");
-        expectExportDisabled();
+        assertTrue(isElementPresent(cssSelector(".s-error-invalid-configuration"), browser));
+        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_blank_message_after_reset_from_error_state() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(accountAttr, STACKS_BUCKET);
-        expectError(".s-error-too-many-data-points");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addStack(ACCOUNT)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
 
-        resetReport();
-        expectClean();
+        analysisPage.resetToBlankState();
     }
 }

@@ -1,16 +1,20 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class ResetButtonTest extends AbstractGoodSalesE2ETest {
+public class ResetButtonTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -19,58 +23,53 @@ public class ResetButtonTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_clear_bar_visualization() {
-        visitEditor();
+        initAnalysePageByUrl();
 
         // Render bar chart
-        switchVisualization("bar");
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(accountAttr, STACKS_BUCKET);
-        expectFind(".adi-components .dda-bar-component");
+        analysisPage.changeReportType(ReportType.BAR_CHART)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .addStack(ACCOUNT)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-bar-component"), browser));
 
-        resetReport();
-
-        expectClean();
+        analysisPage.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_clear_table_visualization_properly() {
-        visitEditor();
+        initAnalysePageByUrl();
 
         // Render table
-        switchVisualization("table");
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        expectFind(".adi-components .dda-table-component");
+        analysisPage.changeReportType(ReportType.TABLE)
+            .addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component"), browser));
 
-        resetReport();
-
-        expectClean();
+        analysisPage.resetToBlankState();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_stay_clear_when_dragged_to_a_non_accepting_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
         // The category bucket DOES NOT accept a metric
-        dragFromCatalogue(activitiesMetric, CATEGORIES_BUCKET);
-
-        expectClean();
+        assertTrue(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+                analysisPage.getAttributesBucket().getInvitation())
+                .isBlankState());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_reset_selected_date_dimension() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDate()
+            .getAttributesBucket()
+            .changeDateDimension("Created");
 
-        select(".s-date-dimension-switch", "created.dim_date");
-
-        resetReport();
-
-        expectClean();
-
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
+        analysisPage.resetToBlankState()
+            .addDate();
         assertEquals(new Select(waitForElementVisible(cssSelector(".s-date-dimension-switch"), browser))
             .getFirstSelectedOption().getAttribute("value"), "activity.dim_date");
     }

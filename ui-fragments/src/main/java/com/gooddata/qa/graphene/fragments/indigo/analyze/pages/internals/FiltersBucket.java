@@ -27,6 +27,10 @@ public class FiltersBucket extends AbstractBucket {
     private static final String LOADING = "...";
     private static final By BY_FILTER_TEXT = By.cssSelector(".button-text");
 
+    public int getFiltersCount() {
+        return filters.size();
+    }
+
     public FiltersBucket configDateFilter(String period) {
         WebElement filter = getDateFilter();
         filter.click();
@@ -41,9 +45,10 @@ public class FiltersBucket extends AbstractBucket {
      * @param to   format MM/DD/YYYY
      * @throws ParseException 
      */
-    public void configDateFilter(String from, String to) throws ParseException {
+    public FiltersBucket configDateFilter(String from, String to) throws ParseException {
         WebElement filter = getDateFilter();
         openDatePanelOfFilter(filter).configTimeFilter(from, to);
+        return this;
     }
 
     public FiltersBucket configAttributeFilter(String attribute, String... values) {

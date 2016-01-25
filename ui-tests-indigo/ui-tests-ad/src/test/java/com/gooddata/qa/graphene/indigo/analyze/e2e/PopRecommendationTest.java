@@ -1,16 +1,25 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.TrendingRecommendation;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class PopRecommendationTest extends AbstractGoodSalesE2ETest {
+public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -19,118 +28,145 @@ public class PopRecommendationTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply__period_over_period__recommendation() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
 
-        expectMissing(".s-recommendation-comparison-with-period");
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        analysisPage.addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing();
 
-        expectMissing(".adi-components .visualization-column .highcharts-series [fill=\"rgb(172,220,254)\"]");
+        assertFalse(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
 
-        click(".s-recommendation-comparison-with-period .s-apply-recommendation");
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
-        expectFind(".adi-components .visualization-column .s-property-color.s-id-metricnames");
-        expectFind(".adi-components .visualization-column .s-property-y.s-id-metricvalues");
+        analysisPage.waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .s-property-color.s-id-metricnames"), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .s-property-y.s-id-metricvalues"), browser));
 
-        expectFind(".adi-components .visualization-column .s-property-where" + quarterYearActivityLabel);
-        expectFind(".adi-components .visualization-column .s-property-where.s-where-___between___0_0__");
+        assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where.s-id-" +
+                getAttributeDisplayFormIdentifier("Quarter/Year (Activity)", "Short")), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .s-property-where.s-where-___between___0_0__"), browser));
 
         assertThat(waitForElementVisible(cssSelector(
                 ".adi-components .visualization-column .highcharts-legend-item tspan"), browser).getText(),
                 containsString("# of Activities - previous year"));
-        expectFind(".adi-components .visualization-column .highcharts-series [fill=\"rgb(00,131,255)\"]");
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
 
-        expectMissing(".s-recommendation-comparison-with-period");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_honor_period_change_for__period_over_period() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
 
-        expectMissing(".s-recommendation-comparison-with-period");
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        analysisPage.addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing();
 
-        select(".s-recommendation-comparison-with-period .s-attribute-switch", "GDC.time.month");
-        click(".s-recommendation-comparison-with-period .s-apply-recommendation");
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select("This month").apply();
 
-        expectFind(".adi-components .visualization-column .s-property-where" + monthYearActivityLabel);
-        expectFind(".adi-components .visualization-column .s-property-where.s-where-___between___0_0__");
+        analysisPage.waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where.s-id-" +
+                getAttributeDisplayFormIdentifier("Month/Year (Activity)", "Short")), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .s-property-where.s-where-___between___0_0__"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_widget_after_apply() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
 
-        expectMissing(".s-recommendation-metric-with-period");
-        click(".s-recommendation-trending .s-apply-recommendation");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
+        RecommendationContainer container = Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser));
+        container.<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        expectMissing(".adi-components .visualization-column .highcharts-series [fill=\"rgb(172,220,254)\"]");
+        analysisPage.waitForReportComputing();
+        assertFalse(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
 
-        click(".s-recommendation-metric-with-period .s-apply-recommendation");
+        container.<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
+        analysisPage.waitForReportComputing();
         assertThat(waitForElementVisible(cssSelector(
                 ".adi-components .visualization-column .highcharts-legend-item tspan"), browser).getText(),
-                containsString("# of Activities - previous year"));
-        expectFind(".adi-components .visualization-column .highcharts-series [fill=\"rgb(00,131,255)\"]");
+                containsString(NUMBER_OF_ACTIVITIES + " - previous year"));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .visualization-column .highcharts-series [fill=\"rgb(00,131,255)\"]"), browser));
 
-        expectMissing(".s-recommendation-metric-with-period");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_pop_checkbox_if_date_and_attribute_are_moved_to_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
+        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+                .addDate()
+                .getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
+        assertTrue(configuration.isPopEnabled());
 
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
+        analysisPage.replaceAttribute(ACTIVITY_TYPE);
 
-        expectMissing(".s-show-pop:disabled");
-
-        drag(activityTypeAttr, CATEGORIES_BUCKET + " " + yearActivityLabel);
-
-        expectFind(".s-show-pop:disabled");
+        assertFalse(configuration.isPopEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_the_recommendation_if_something_in_stack_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(accountAttr, STACKS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .addStack(ACCOUNT)
+            .waitForReportComputing();
 
-        expectMissing(".s-recommendation-metric-with-period");
-        expectMissing(".s-recommendation-comparison-with-period");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_the_recommendation_if_date_in_categories_and_something_in_stack_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDate()
+            .addStack(ACTIVITY_TYPE)
+            .waitForReportComputing();
 
-        expectMissing(".s-recommendation-metric-with-period");
-        expectMissing(".s-recommendation-comparison-with-period");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_recommendations_if_categories_empty_and_something_in_stack_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addStack(ACTIVITY_TYPE)
+            .waitForReportComputing();
 
-        expectMissing(".s-recommendation-metric-with-period");
-        expectMissing(".s-recommendation-comparison-with-period");
-        expectFind(".s-recommendation-trending");
-        expectFind(".s-recommendation-comparison");
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
     }
 }

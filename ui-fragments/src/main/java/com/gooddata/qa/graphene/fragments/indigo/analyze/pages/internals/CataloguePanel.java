@@ -85,6 +85,7 @@ public class CataloguePanel extends AbstractFragment {
                 break;
         }
         waitForElementVisible(filter).click();
+        waitForItemLoaded();
         return this;
     }
 
@@ -137,6 +138,7 @@ public class CataloguePanel extends AbstractFragment {
     }
 
     public List<String> getFieldNamesInViewPort() {
+        waitForItemLoaded();
         return getElementTexts(items);
     }
 
@@ -166,7 +168,7 @@ public class CataloguePanel extends AbstractFragment {
         return false;
     }
 
-    private void clearInputText() {
+    public CataloguePanel clearInputText() {
         if (isElementPresent(BY_CLEAR_SEARCH_FIELD, getRoot())) {
             WebElement clearIcon = waitForElementVisible(BY_CLEAR_SEARCH_FIELD, getRoot());
             clearIcon.click();
@@ -175,6 +177,7 @@ public class CataloguePanel extends AbstractFragment {
             waitForElementVisible(searchInput).clear();
         }
         waitForItemLoaded();
+        return this;
     }
 
     public Collection<WebElement> getFieldsInViewPort() {

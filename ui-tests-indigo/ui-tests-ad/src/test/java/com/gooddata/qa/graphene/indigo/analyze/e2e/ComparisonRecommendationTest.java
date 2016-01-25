@@ -1,17 +1,24 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.ComparisonRecommendation;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class ComparisonRecommendationTest extends AbstractGoodSalesE2ETest {
+public class ComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -20,41 +27,51 @@ public class ComparisonRecommendationTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_hide_recommendation() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        select(".s-recommendation-comparison .s-attribute-switch", "attr.activity.activitytype");
-        click(".s-recommendation-comparison .s-apply-recommendation");
-        expectMissing(".s-recommendation-comparison");
-        expectFind(CATEGORIES_BUCKET + " " + activityTypeAttr);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ACTIVITY_TYPE).apply();
+        analysisPage.waitForReportComputing();
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_show_other_recommendations() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        select(".s-recommendation-comparison .s-attribute-switch", "attr.activity.activitytype");
-        click(".s-recommendation-comparison .s-apply-recommendation");
-        expectMissing(".s-recommendation-comparison");
-        expectFind(CATEGORIES_BUCKET + " " + activityTypeAttr);
-        expectFind(".s-recommendation-comparison-with-period");
-        expectFind(".s-recommendation-contribution");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ACTIVITY_TYPE).apply();
+        analysisPage.waitForReportComputing();
+        assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
+        assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(ACTIVITY_TYPE));
+        assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_initial_value_selected_after_resetting_report() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
         String initialValue = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
 
-        select(".s-recommendation-comparison .s-attribute-switch", "attr.activity.activitytype");
+        Graphene.createPageFragment(RecommendationContainer.class,
+            waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+            .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select(ACTIVITY_TYPE);
         String value = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
 
-        resetReport();
+        analysisPage.resetToBlankState();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
         String resetValue = getValueFrom(".s-recommendation-comparison .s-attribute-switch");
         assertEquals(resetValue, initialValue);
         assertNotEquals(resetValue, value);

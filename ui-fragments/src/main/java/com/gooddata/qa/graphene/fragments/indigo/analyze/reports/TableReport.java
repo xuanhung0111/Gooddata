@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.tagName;
 
 import java.util.List;
 import java.util.Objects;
@@ -49,9 +50,28 @@ public class TableReport extends AbstractFragment {
     public TableReport sortBaseOnHeader(final String name) {
         waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
+            .map(e -> e.findElement(BY_LINK))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find table header: " + name))
             .click();
         return this;
+    }
+
+    public boolean isHeaderSortedUp(final String name) {
+        return isHeaderSorted(name, "gd-table-arrow-up");
+    }
+
+    public boolean isHeaderSortedDown(final String name) {
+        return isHeaderSorted(name, "gd-table-arrow-down");
+    }
+
+    private boolean isHeaderSorted(final String name, final String css) {
+        return waitForCollectionIsNotEmpty(headers).stream()
+            .filter(e -> name.equalsIgnoreCase(e.getText()))
+            .findFirst()
+            .get()
+            .findElements(tagName("span"))
+            .stream()
+            .anyMatch(e -> e.getAttribute("class").contains(css));
     }
 }

@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.sort;
@@ -15,17 +16,17 @@ import java.util.stream.IntStream;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
-import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 import com.gooddata.qa.utils.http.RestUtils;
 
-public class TableTest extends AbstractGoodSalesE2ETest {
+public class TableTest extends AbstractAdE2ETest {
 
-    private String emptyMetric;
     private String emptyMetricUri;
 
     @BeforeClass(alwaysRun = true)
@@ -45,30 +46,31 @@ public class TableTest extends AbstractGoodSalesE2ETest {
         }
 
         emptyMetricUri = metric.getUri();
-        emptyMetric = ".s-id-" + metric.getIdentifier().toLowerCase();
     }
 
     @Test(dependsOnGroups = {"init"})
     public void it_should_be_blank_by_default() throws ParseException, JSONException, IOException {
         RestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
 
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(emptyMetric, METRICS_BUCKET);
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        switchVisualization("table");
-        assertTrue(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
+        analysisPage.addMetric("__EMPTY__")
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
+        assertTrue(waitForElementPresent(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void it_should_be_empty_if_formatted() throws ParseException, JSONException, IOException {
         RestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] empty");
 
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(emptyMetric, METRICS_BUCKET);
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        switchVisualization("table");
+        analysisPage.addMetric("__EMPTY__")
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "empty");
     }
 
@@ -76,25 +78,28 @@ public class TableTest extends AbstractGoodSalesE2ETest {
     public void should_show_zeros_as_usual() throws ParseException, JSONException, IOException {
         RestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] 0.00 $");
 
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(emptyMetric, METRICS_BUCKET);
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        switchVisualization("table");
+        analysisPage.addMetric("__EMPTY__")
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .changeReportType(ReportType.TABLE)
+            .waitForReportComputing();
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "0.00 $");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_table_correctly_when_filter_is_removed() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, FILTERS_BUCKET);
-        click(".s-filter-button");
-        selectFirstElementFromAttributeFilter();
-        switchVisualization("table");
-        click(".s-filter-button");
-        selectAllElementsFromAttributeFilter();
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addFilter(ACTIVITY_TYPE)
+            .getFilterBuckets()
+            .configAttributeFilter(ACTIVITY_TYPE, "Email");
+
+        analysisPage.changeReportType(ReportType.TABLE)
+            .getFilterBuckets()
+            .configAttributeFilter(ACTIVITY_TYPE, "All");
+        analysisPage.waitForReportComputing();
         assertFalse(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
     }
 
@@ -102,7 +107,7 @@ public class TableTest extends AbstractGoodSalesE2ETest {
     public void should_be_ordered_by_first_column_in_asc_by_default() {
         beforeOrderingTable();
 
-        expectFind(".adi-component " + activityTypeAttrLabel + " .gd-table-arrow-up");
+        assertTrue(analysisPage.getTableReport().isHeaderSortedUp(ACTIVITY_TYPE));
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -112,7 +117,7 @@ public class TableTest extends AbstractGoodSalesE2ETest {
     public void should_order_the_table_by_attribute() {
         beforeOrderingTable();
 
-        orderBy(activityTypeAttrLabel);
+        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Web Meeting");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "Phone Call");
@@ -122,7 +127,7 @@ public class TableTest extends AbstractGoodSalesE2ETest {
     public void should_order_the_table_by_metric() {
         beforeOrderingTable();
 
-        orderBy(activitiesMetric);
+        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
 
         List<Integer> values = newArrayList();
         IntStream.rangeClosed(0, 3).forEach(i -> values.add(unformatNumber(
@@ -138,26 +143,28 @@ public class TableTest extends AbstractGoodSalesE2ETest {
     public void clean_sorting_if_column_removed() {
         beforeOrderingTable();
 
-        orderBy(activitiesMetric);
-        drag(METRICS_BUCKET + " " + activitiesMetric, TRASH);
-        expectFind(".adi-component " + activityTypeAttrLabel + " .gd-table-arrow-up");
+        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
+        analysisPage.removeMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing();
+        assertTrue(analysisPage.getTableReport().isHeaderSortedUp(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_shift_keep_sorting_on_metric_if_attribute_added() {
         beforeOrderingTable();
 
-        orderBy(activitiesMetric);
-        dragFromCatalogue(departmentAttr, CATEGORIES_BUCKET);
-        expectFind(".adi-component " + activitiesMetric +" .gd-table-arrow-down");
+        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
+        analysisPage.addAttribute(DEPARTMENT)
+            .waitForReportComputing();
+        assertTrue(analysisPage.getTableReport().isHeaderSortedDown(NUMBER_OF_ACTIVITIES));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_order_the_table_in_asc_order_if_same_column_clicked_twice() {
         beforeOrderingTable();
 
-        orderBy(activityTypeAttrLabel);
-        orderBy(activityTypeAttrLabel);
+        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -167,8 +174,8 @@ public class TableTest extends AbstractGoodSalesE2ETest {
     public void should_order_the_table_only_by_one_column_at_the_time() {
         beforeOrderingTable();
 
-        orderBy(activitiesMetric);
-        orderBy(activityTypeAttrLabel);
+        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
+        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -178,15 +185,15 @@ public class TableTest extends AbstractGoodSalesE2ETest {
     public void should_work_with_undo_redo() {
         beforeOrderingTable();
 
-        orderBy(activityTypeAttrLabel);
-        orderBy(activityTypeAttrLabel);
+        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
-        undo();
+        analysisPage.undo();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Web Meeting");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "Phone Call");
 
-        redo();
+        analysisPage.redo();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -194,64 +201,61 @@ public class TableTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drag_more_than_one_attribute_to_category() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        switchVisualization("table");
-
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(accountAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(activityAttr, CATEGORIES_BUCKET);
-
-        expectElementCount(CATEGORIES_BUCKET + " .s-bucket-item", 3);
+        assertEquals(analysisPage.changeReportType(ReportType.TABLE)
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(ACCOUNT)
+            .addAttribute("Activity")
+            .getAttributesBucket()
+            .getItemNames()
+            .size(), 3);
     }
 
-    @Test(dependsOnGroups = {"init"}, expectedExceptions = {MoveTargetOutOfBoundsException.class})
+    @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        switchVisualization("bar");
-
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(accountAttr, CATEGORIES_BUCKET);
-
-        expectElementCount(CATEGORIES_BUCKET + " .s-bucket-item", 1);
+        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
+            .addAttribute(ACTIVITY_TYPE)
+            .drag(analysisPage.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE),
+                    analysisPage.getAttributesBucket().getRoot())
+            .getAttributesBucket()
+            .getItemNames()
+            .size(), 1);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_move_stacks_to_categories_when_switching_to_table() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(accountAttr, STACKS_BUCKET);
-
-        switchVisualization("table");
-        expectElementCount(CATEGORIES_BUCKET + " .s-bucket-item", 2);
+        assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE)
+            .addStack(ACCOUNT)
+            .changeReportType(ReportType.TABLE)
+            .getAttributesBucket()
+            .getItemNames()
+            .size(), 2);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_move_second_category_to_stacks_and_remove_to_rest_when_switching_to_chart() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(accountAttr, STACKS_BUCKET);
+        analysisPage.addAttribute(ACTIVITY_TYPE)
+            .addStack(ACCOUNT)
+            .changeReportType(ReportType.TABLE)
+            .changeReportType(ReportType.BAR_CHART);
 
-        switchVisualization("table");
-        switchVisualization("bar");
-
-        expectElementCount(CATEGORIES_BUCKET + " .s-bucket-item", 1);
-        expectElementCount(STACKS_BUCKET + " .s-bucket-item", 1);
+        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
+        assertFalse(analysisPage.getStacksBucket().isEmpty());
     }
 
     private void beforeOrderingTable() {
-        visitEditor();
-        switchVisualization("table");
-
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-    }
-
-    private void orderBy(String attr) {
-        click(".adi-component " + attr + " a");
+        initAnalysePageByUrl();
+        analysisPage.changeReportType(ReportType.TABLE)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing();
     }
 
     private Integer unformatNumber(String number) {

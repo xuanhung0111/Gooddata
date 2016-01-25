@@ -1,11 +1,19 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static java.util.Arrays.asList;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class ShortcutCanvasTest extends AbstractGoodSalesE2ETest {
+public class ShortcutCanvasTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -14,14 +22,15 @@ public class ShortcutCanvasTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_replace_attribute_when_user_drops_it_on_canvas_shortcut() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        drag(departmentAttr, ".s-shortcut-metric-attribute");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .drag(analysisPage.getCataloguePanel().searchAndGet(DEPARTMENT, FieldType.ATTRIBUTE),
+                    () -> waitForElementPresent(cssSelector(".s-shortcut-metric-attribute"), browser))
+            .waitForReportComputing();
 
-        expectFind(".adi-components .s-id-metricvalues");
-        expectMissing(".adi-components " + activityTypeAttrLabel);
-        expectFind(".adi-components " + departmentAttrLabel);
+        assertTrue(isElementPresent(cssSelector(".adi-components .s-id-metricvalues"), browser));
+        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DEPARTMENT));
     }
 }

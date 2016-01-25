@@ -68,6 +68,11 @@ public class AnalysisPage extends AbstractFragment {
         return this;
     }
 
+    public AnalysisPage stopDrag(Point offset) {
+        getActions().moveByOffset(offset.x, offset.y).release().perform();
+        return this;
+    }
+
     public AnalysisPage drag(WebElement source, Supplier<WebElement> target) {
         startDrag(source);
         try {
@@ -140,6 +145,12 @@ public class AnalysisPage extends AbstractFragment {
         return drag(source, target);
     }
 
+    public AnalysisPage replaceAttributeWithDate(String oldAttr) {
+        WebElement source = getCataloguePanel().getDate();
+        WebElement target = getAttributesBucket().get(oldAttr);
+        return drag(source, target);
+    }
+
     public AnalysisPage replaceAttribute(String attr) {
         WebElement source = getCataloguePanel().searchAndGet(attr, FieldType.ATTRIBUTE);
         WebElement target = getAttributesBucket().getFirst();
@@ -167,6 +178,16 @@ public class AnalysisPage extends AbstractFragment {
                 () -> waitForElementPresent(BY_TRASH_PANEL, browser));
     }
 
+    public AnalysisPage removeDateFilter() {
+        return drag(getFilterBuckets().getDateFilter(),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
+    public AnalysisPage removeStack() {
+        return drag(getStacksBucket().get(),
+                () -> waitForElementPresent(BY_TRASH_PANEL, browser));
+    }
+
     public AnalysisPage changeReportType(ReportType type) {
         waitForFragmentVisible(reportTypePicker).setReportType(type);
         return this;
@@ -178,12 +199,16 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPage resetToBlankState() {
         getPageHeader().resetToBlankState();
-        assertTrue(getFilterBuckets().isEmpty());
-        assertTrue(getMetricsBucket().isEmpty());
-        assertTrue(getAttributesBucket().isEmpty());
-        assertTrue(getStacksBucket().isEmpty());
-        assertTrue(getMainEditor().isEmpty());
+        assertTrue(isBlankState());
         return this;
+    }
+
+    public boolean isBlankState() {
+        return getFilterBuckets().isEmpty() &&
+            getMetricsBucket().isEmpty() &&
+            getAttributesBucket().isEmpty() &&
+            getStacksBucket().isEmpty() &&
+            getMainEditor().isEmpty();
     }
 
     public AnalysisPage exportReport() {

@@ -1,12 +1,14 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static java.lang.String.format;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.Calendar;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -14,9 +16,9 @@ import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class DateFiltersTest extends AbstractGoodSalesE2ETest {
+public class DateFiltersTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -25,149 +27,136 @@ public class DateFiltersTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_add_and_remove_date_from_filter_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-        expectFind(FILTERS_BUCKET + " .s-date-filter");
-
-        // try to drag a second date filter
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-
-        drag(FILTERS_BUCKET + " .s-date-filter", TRASH);
-        expectMissing(FILTERS_BUCKET + " .s-date-filter");
+        assertTrue(analysisPage.addDateFilter()
+            // try to drag a second date filter
+            .addDateFilter()
+            .removeDateFilter()
+            .getFilterBuckets()
+            .isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_reflect_changes_in_category_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
+        analysisPage.addDate()
+            .getAttributesBucket()
+            .changeDateDimension("Created");
 
-        select(CATEGORIES_BUCKET + " .s-date-dimension-switch", "created.dim_date");
-
-        click(".s-date-filter .s-filter-button");
+        analysisPage.getFilterBuckets()
+            .getDateFilter()
+            .click();
 
         assertEquals(getValueFrom(".s-filter-date-dimension-switch"), "created.dim_date");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_picker() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-        expectFind(FILTERS_BUCKET + " .s-date-filter");
-
-        click(".s-date-filter .s-filter-button");
-        expectFind("#gd-overlays .s-filter-picker");
+        analysisPage.addDateFilter()
+            .getFilterBuckets()
+            .getDateFilter()
+            .click();
+        assertTrue(isElementPresent(cssSelector("#gd-overlays .s-filter-picker"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_keep_selection_if_date_dimensions_reloaded_in_the_background() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-
-        click(".s-date-filter .s-filter-button");
-        select(".s-filter-date-dimension-switch", "created.dim_date");
+        analysisPage.addDateFilter()
+            .getFilterBuckets()
+            .changeDateDimension("Activity", "Created");
         assertEquals(getValueFrom(".s-filter-date-dimension-switch"), "created.dim_date");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_reflect_selection_changes() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-        expectFind(FILTERS_BUCKET + " .s-date-filter");
+        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDateFilter()
+            .getFilterBuckets()
+            .getDateFilterText(), "Activity: All time");
 
-        click(".s-date-filter .s-filter-button");
-        assertThat(waitForElementVisible(cssSelector(FILTERS_BUCKET + " .s-date-filter"), browser)
-            .getText(), containsString("Activity: All time"));
+        assertEquals(analysisPage.getFilterBuckets()
+            .configDateFilter("Last year")
+            .getDateFilterText(), "Activity: Last year");
 
-        click("#gd-overlays .s-filter-picker .s-filter-last_year");
+        String yearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Year (Activity)");
+        assertTrue(isElementPresent(cssSelector(".s-date-filter" + yearActivityLabel), browser));
+        assertTrue(isElementPresent(cssSelector(".s-date-filter.s-where-___between____1__1__"), browser));
 
-        assertThat(waitForElementVisible(cssSelector(FILTERS_BUCKET + " .s-date-filter"), browser)
-                .getText(), containsString("Activity: Last year"));
-        expectFind(FILTERS_BUCKET + " .s-date-filter" + yearActivityLabel);
-        expectFind(FILTERS_BUCKET + " .s-date-filter.s-where-___between____1__1__");
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .adi-component .s-property-where" + yearActivityLabel), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .adi-component .s-property-where.s-where-___between____1__1__"), browser));
 
-        expectFind(".adi-components .adi-component .s-property-where" + yearActivityLabel);
-        expectFind(".adi-components .adi-component .s-property-where.s-where-___between____1__1__");
+        assertEquals(analysisPage.getFilterBuckets()
+            .configDateFilter("Last 12 months")
+            .getDateFilterText(), "Activity: Last 12 months");
 
-        click(".s-date-filter .s-filter-button");
-        click("#gd-overlays .s-filter-picker .s-filter-last_12_months");
+        String monthYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Month/Year (Activity)", "Short");
+        assertTrue(isElementPresent(cssSelector(".s-date-filter" + monthYearActivityLabel), browser));
+        assertTrue(isElementPresent(cssSelector(".s-date-filter.s-where-___between____11_0__"), browser));
 
-        assertThat(waitForElementVisible(cssSelector(FILTERS_BUCKET + " .s-date-filter"), browser)
-                .getText(), containsString("Activity: Last 12 months"));
-        expectFind(FILTERS_BUCKET + " .s-date-filter" + monthYearActivityLabel);
-        expectFind(FILTERS_BUCKET + " .s-date-filter.s-where-___between____11_0__");
-
-        expectFind(".adi-components .adi-component .s-property-where" + monthYearActivityLabel);
-        expectFind(".adi-components .adi-component .s-property-where.s-where-___between____11_0__");
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .adi-component .s-property-where" + monthYearActivityLabel), browser));
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .adi-component .s-property-where.s-where-___between____11_0__"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_reset_filters_on_all_time() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-        expectFind(FILTERS_BUCKET + " .s-date-filter");
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addDateFilter()
+            .getFilterBuckets()
+            .configDateFilter("All time");
 
-        click(".s-date-filter .s-filter-button");
-        expectFind("#gd-overlays .s-filter-picker");
-        click("#gd-overlays .s-filter-picker .s-filter-all_time");
-
-        expectFind(".adi-components .adi-component");
-        expectMissing(".adi-components .adi-component.s-property-where");
+        assertTrue(isElementPresent(cssSelector(".adi-components .adi-component"), browser));
+        assertFalse(isElementPresent(cssSelector(".adi-components .adi-component.s-property-where"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_prefill_interval_filters_when_floating_filter_is_selected() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-        click(".s-date-filter .s-filter-button");
-        click(".s-filter-picker .s-filter-last_quarter");
+        analysisPage.addDateFilter()
+            .getFilterBuckets()
+            .configDateFilter("Last quarter")
+            .getDateFilter()
+            .click();
 
-        click(".s-date-filter .s-filter-button");
-        click(".s-filter-picker .s-tab-date-range");
+        waitForElementVisible(cssSelector(".s-filter-picker .s-tab-date-range"), browser).click();
 
-        expectFind(".s-filter-picker .s-interval-from input");
-        expectFind(".s-filter-picker .s-interval-to input");
-
-        click(".s-filter-picker .s-date-range-cancel");
-        expectMissing(".s-filter-picker");
+        assertTrue(isElementPresent(cssSelector(".s-filter-picker .s-interval-from input"), browser));
+        assertTrue(isElementPresent(cssSelector(".s-filter-picker .s-interval-to input"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void should_support_date_ranges() {
-        visitEditor();
+    public void should_support_date_ranges() throws ParseException {
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-
-        click(".s-date-filter .s-filter-button");
-        click(".s-filter-picker .s-tab-date-range");
-
-        fillInDateRange(".s-interval-from input", "11/17/2015");
-        fillInDateRange(".s-interval-to input", "11/19/2015");
-
-        click(".s-filter-picker .s-date-range-apply");
-
-        assertThat(waitForElementVisible(cssSelector(".s-date-filter span"), browser).getText(),
-                containsString("Nov 17, 2015 – Nov 19, 2015"));
-
-        expectMissing(".s-filter-picker");
+        assertTrue(analysisPage.addDateFilter()
+            .getFilterBuckets()
+            .configDateFilter("11/17/2015", "11/19/2015")
+            .getDateFilterText().contains("Nov 17, 2015 – Nov 19, 2015"));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_correct_ranges_when_editing() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, FILTERS_BUCKET);
-
-        click(".s-date-filter .s-filter-button");
-        click(".s-filter-picker .s-tab-date-range");
+        analysisPage.addDateFilter()
+            .getFilterBuckets()
+            .getDateFilter()
+            .click();
+        waitForElementVisible(cssSelector(".s-filter-picker .s-tab-date-range"), browser).click();
 
         String nextYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR) + 1);
         fillInDateRange(".s-interval-from input", "01/01/" + nextYear);
@@ -177,7 +166,7 @@ public class DateFiltersTest extends AbstractGoodSalesE2ETest {
         assertEquals(waitForElementVisible(cssSelector(".s-interval-from input"), browser).getAttribute("value"),
                 "01/01/2003");
         fillInDateRange(".s-interval-to input", "01/01/200");
-        click(".adi-tab-date-range");
+        waitForElementVisible(cssSelector(".adi-tab-date-range"), browser).click();
         assertEquals(waitForElementVisible(cssSelector(".s-interval-from input"), browser).getAttribute("value"),
                 "01/01/2003");
     }

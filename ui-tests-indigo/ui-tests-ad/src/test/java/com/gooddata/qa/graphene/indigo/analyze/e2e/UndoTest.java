@@ -1,18 +1,23 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.util.stream.IntStream;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class UndoTest extends AbstractGoodSalesE2ETest {
+public class UndoTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -21,101 +26,95 @@ public class UndoTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_one_version_per_user_action() {
-        visitEditor();
+        initAnalysePageByUrl();
 
         // 1st version
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        toggleBucketItemConfig(METRICS_BUCKET + " " + activitiesMetric);
+        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .getMetricsBucket()
+            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+            .expandConfiguration();
 
         // 2nd version
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
+        analysisPage.addDate();
 
         // 3rd version
-        click(METRICS_BUCKET + " .s-show-pop");
-        expectFind(METRICS_BUCKET + " .s-show-pop:checked");
+        configuration.showPop();
 
         // 4th version -- switch category and turn off pop
-        drag(activityTypeAttr, CATEGORIES_BUCKET + " " + yearActivityLabel);
+        analysisPage.replaceAttribute(DATE, ACTIVITY_TYPE);
 
-        expectMissing(METRICS_BUCKET + " .s-show-pop:checked");
+        assertFalse(configuration.isPopSelected());
 
-        IntStream.rangeClosed(0, 3).forEach(i -> undo());
+        IntStream.rangeClosed(0, 3).forEach(i -> analysisPage.undo());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_metric_over_time_shortcut_followed_by_filter_change() {
-        visitEditor();
+        initAnalysePageByUrl();
 
         // D&D the first metric to the metric overtime recommendation
-        drag(activitiesMetric, ".s-recommendation-metric-over-time-canvas");
+        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+                () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
+                .waitForReportComputing()
+                .getFilterBuckets()
+                .configDateFilter("Last 12 months");
 
-        click(".adi-filter-button");
-        click(".s-filter-last_12_months");
-
-        undo();
-
-        assertThat(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText(),
-                containsString("Last 4 quarters"));
+        assertEquals(analysisPage.undo()
+            .getFilterBuckets()
+            .getDateFilterText(), "Activity: Last 4 quarters");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_redo_single_visualization_type_change() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        switchVisualization("line");
+        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .changeReportType(ReportType.LINE_CHART)
+            .undo()
+            .isReportTypeSelected(ReportType.COLUMN_CHART));
 
-        undo();
-        expectFind(".vis-type-column.is-selected");
-
-        redo();
-        expectFind(".vis-type-line.is-selected");
+        assertTrue(analysisPage.redo()
+            .isReportTypeSelected(ReportType.LINE_CHART));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_visualization_type_change_for_complex_configuration() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        switchVisualization("table");
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(departmentAttr, CATEGORIES_BUCKET);
-
-        switchVisualization("bar");
-
-        undo();
-
-        expectFind(CATEGORIES_BUCKET + " " + activityTypeAttr);
-        expectFind(CATEGORIES_BUCKET + " " + departmentAttr);
+        assertEquals(analysisPage.changeReportType(ReportType.TABLE)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .addAttribute(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
+            .changeReportType(ReportType.BAR_CHART)
+            .undo()
+            .getAttributesBucket()
+            .getItemNames(), asList(ACTIVITY_TYPE, DEPARTMENT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_properly_deserialize_auto_generated_filters() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        resetReport();
-        undo();
-
-        drag(CATEGORIES_BUCKET + " " + activityTypeAttr, TRASH);
-        expectMissing(FILTERS_BUCKET + " " + activityTypeAttrLabel);
+        assertTrue(analysisPage.addAttribute(ACTIVITY_TYPE)
+            .resetToBlankState()
+            .undo()
+            .removeAttribute(ACTIVITY_TYPE)
+            .getFilterBuckets()
+            .isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_properly_deserialize_modified_filters() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
+        analysisPage.addAttribute(ACTIVITY_TYPE)
+            .getFilterBuckets()
+            .configAttributeFilter(ACTIVITY_TYPE, "Email");
 
-        // modify filter
-        click(".s-filter-button");
-        click(".s-filter-item[title=Email]");
-        click(".s-filter-picker .s-btn-apply");
-
-        undo();
-        redo();
-
-        drag(CATEGORIES_BUCKET + " " + activityTypeAttr, TRASH);
-        expectFind(FILTERS_BUCKET + " " + activityTypeAttrLabel);
+        assertTrue(analysisPage.undo()
+            .redo()
+            .removeAttribute(ACTIVITY_TYPE)
+            .getFilterBuckets()
+            .isFilterVisible(ACTIVITY_TYPE));
     }
 }

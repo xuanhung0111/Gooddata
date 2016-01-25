@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -72,8 +73,8 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
         waitForElementVisible(cancelButton);
     }
 
-    private void selectItem(String item) {
-        searchItem(item);
+    public void selectItem(String item) {
+        searchValidItem(item);
         items.stream()
             .filter(e -> item.equals(e.findElement(tagName("span")).getText()))
             .findFirst()
@@ -82,7 +83,7 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
             .click();
     }
 
-    private void searchItem(String name) {
+    public void searchItem(String name) {
         waitForElementVisible(this.getRoot());
 
         waitForElementVisible(searchInput).clear();
@@ -91,6 +92,36 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
 
         searchInput.clear();
         searchInput.sendKeys(name);
+    }
+
+    public List<String> getItemNames() {
+        return getElementTexts(items, e -> e.findElement(tagName("span")));
+    }
+
+    public String getId(final String item) {
+        return Stream.of(items.stream()
+            .filter(e -> item.equals(e.findElement(tagName("span")).getText()))
+            .findFirst()
+            .get()
+            .findElement(BY_PARENT)
+            .getAttribute("class")
+            .split(" "))
+            .filter(e -> e.startsWith("s-id-"))
+            .findFirst()
+            .get()
+            .split("-")[2];
+    }
+
+    public WebElement getApplyButton() {
+        return applyButton;
+    }
+
+    public WebElement getClearButton() {
+        return clearButton;
+    }
+
+    private void searchValidItem(String name) {
+        searchItem(name);
         waitForCollectionIsNotEmpty(items);
     }
 }

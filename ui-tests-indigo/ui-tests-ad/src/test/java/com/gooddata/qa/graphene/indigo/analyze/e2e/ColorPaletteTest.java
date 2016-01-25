@@ -2,6 +2,9 @@ package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,11 +12,12 @@ import java.util.List;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.ReportType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class ColorPaletteTest extends AbstractGoodSalesE2ETest {
+public class ColorPaletteTest extends AbstractAdE2ETest {
 
-    private List<String> colorPalette = asList(
+    private static final List<String> COLOR_PALETTE = asList(
             "rgb(00,131,255)",
             "rgb(00,192,142)",
             "rgb(241,35,61)",
@@ -39,7 +43,7 @@ public class ColorPaletteTest extends AbstractGoodSalesE2ETest {
             "rgb(250,208,211)"
     );
 
-    private String legendColorAttribute = "fill";
+    private static final String LEGEND_COLOR_ATTRIBUTE = "fill";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -48,60 +52,77 @@ public class ColorPaletteTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_series_order_in_bar_and_column_chart_in_stacked_charts() {
-        visitEditor();
-
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
-        dragFromCatalogue(departmentAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        initAnalysePageByUrl();
 
         List<String> expectedLegend = asList("Email", "In Person Meeting", "Phone Call", "Web Meeting");
-        expectChartLegend(expectedLegend);
+        assertEquals(analysisPage.addStack(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), expectedLegend);
 
-        List<String> legendColors = newArrayList(colorPalette.subList(0, expectedLegend.size()));
+        List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
-        switchVisualization("bar");
-        expectChartLegend(expectedLegend);
-        expectElementAttributes(".highcharts-legend-item path", legendColorAttribute, legendColors);
+        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), expectedLegend);
+
+        expectElementAttributes(".highcharts-legend-item path", LEGEND_COLOR_ATTRIBUTE, legendColors);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_series_colors_in_line_chart_which_has_attribute_in_segment_by() {
-        visitEditor();
-
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
-        dragFromCatalogue(departmentAttr, CATEGORIES_BUCKET);
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        initAnalysePageByUrl();
 
         List<String> expectedLegend = asList("Email", "In Person Meeting", "Phone Call", "Web Meeting");
-        expectChartLegend(expectedLegend);
+        assertEquals(analysisPage.addStack(ACTIVITY_TYPE)
+            .addAttribute(DEPARTMENT)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), expectedLegend);
 
-        List<String> legendColors = newArrayList(colorPalette.subList(0, expectedLegend.size()));
+        List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
-        switchVisualization("line");
-        expectChartLegend(expectedLegend);
-        expectElementAttributes(".highcharts-legend-item path", legendColorAttribute, legendColors);
+        assertEquals(analysisPage.changeReportType(ReportType.LINE_CHART)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), expectedLegend);
+
+        expectElementAttributes(".highcharts-legend-item path", LEGEND_COLOR_ATTRIBUTE, legendColors);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_series_order_in_bar_and_column_chart_in_non_stacked_charts() {
-        visitEditor();
-
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
+        initAnalysePageByUrl();
 
         List<String> expectedLegend = asList("# of Activities", "# of Lost Opps.");
-        expectChartLegend(expectedLegend);
+        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(NUMBER_OF_LOST_OPPS)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), expectedLegend);
 
-        List<String> legendColors = newArrayList(colorPalette.subList(0, expectedLegend.size()));
+        List<String> legendColors = newArrayList(COLOR_PALETTE.subList(0, expectedLegend.size()));
 
-        switchVisualization("bar");
-
-        expectChartLegend(expectedLegend);
-        expectElementAttributes(".highcharts-legend-item path", legendColorAttribute, legendColors);
+        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
+            .waitForReportComputing()
+            .getChartReport()
+            .getLegends(), expectedLegend);
+        expectElementAttributes(".highcharts-legend-item path", LEGEND_COLOR_ATTRIBUTE, legendColors);
 
         // For bar chart, highcharts has series in DOM bottom-up, so check that
         // if we reverse series and check what"s in DOM, it matches
         Collections.reverse(legendColors);
-        expectElementAttributes(".highcharts-series rect", legendColorAttribute, legendColors);
+        expectElementAttributes(".highcharts-series rect", LEGEND_COLOR_ATTRIBUTE, legendColors);
+    }
+
+    private void expectElementAttributes(String elementCssLocators, String attribute, List<String> values) {
+        assertEquals(browser.findElements(cssSelector(elementCssLocators))
+            .stream()
+            .map(e -> e.getAttribute(attribute))
+            .collect(toList()), values);
     }
 }

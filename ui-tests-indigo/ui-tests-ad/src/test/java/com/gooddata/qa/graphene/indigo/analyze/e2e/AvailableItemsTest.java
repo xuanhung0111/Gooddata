@@ -1,18 +1,17 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Attribute;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.CatalogFilterType;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class AvailableItemsTest extends AbstractGoodSalesE2ETest {
+public class AvailableItemsTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -21,109 +20,113 @@ public class AvailableItemsTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_attributes_when_metric_is_added() {
-        visitEditor();
+        initAnalysePageByUrl();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
-        expectFind(activityTypeAttr);
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
-        expectMissing(activityTypeAttr);
+        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
+        analysisPage.addMetric(NUMBER_OF_LOST_OPPS).waitForReportComputing();
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
 
-        drag(METRICS_BUCKET + " " + lostOppsMetric, TRASH);
-        expectFind(activityTypeAttr);
+        analysisPage.removeMetric(NUMBER_OF_LOST_OPPS).waitForReportComputing();
+        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_categories() {
-        visitEditor();
+        initAnalysePageByUrl();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
-        expectFind(lostOppsMetric);
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        expectMissing(lostOppsMetric);
+        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        analysisPage.addAttribute(ACTIVITY_TYPE);
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
 
-        drag(CATEGORIES_BUCKET + " " + activityTypeAttr, TRASH);
-        expectFind(lostOppsMetric);
+        analysisPage.removeAttribute(ACTIVITY_TYPE);
+        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_metrics_when_attribute_is_in_stacks() {
-        visitEditor();
+        initAnalysePageByUrl();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
-        expectFind(lostOppsMetric);
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
-        expectMissing(lostOppsMetric);
+        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
+        analysisPage.addStack(ACTIVITY_TYPE);
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
 
-        drag(STACKS_BUCKET + " " + activityTypeAttr, TRASH);
-        expectFind(lostOppsMetric);
+        analysisPage.removeStack();
+        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_unavailable_facts() {
-        visitEditor();
+        initAnalysePageByUrl();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
-        expectFind(amountFact);
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
-        expectMissing(amountFact);
+        assertTrue(panel.getFieldNamesInViewPort().contains(AMOUNT));
+        analysisPage.addStack(ACTIVITY_TYPE);
+        assertFalse(panel.clearInputText().getFieldNamesInViewPort().contains(AMOUNT));
 
-        drag(STACKS_BUCKET + " " + activityTypeAttr, TRASH);
-        expectFind(amountFact);
+        analysisPage.removeStack();
+        assertTrue(panel.getFieldNamesInViewPort().contains(AMOUNT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_all_items_on_reset() {
-        String productAttr = ".s-id-" + getMdService().getObj(getProject(), Attribute.class,
-                title("Product")).getIdentifier().toLowerCase().replace(".", "_");
+        initAnalysePageByUrl();
 
-        visitEditor();
+        CataloguePanel panel = analysisPage.addStack(ACTIVITY_TYPE)
+            .addMetric(NUMBER_OF_ACTIVITIES)
+            .getCataloguePanel()
+            .filterCatalog(CatalogFilterType.ATTRIBUTES);
 
-        dragFromCatalogue(activityTypeAttr, STACKS_BUCKET);
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        assertFalse(panel.getFieldNamesInViewPort().contains(PRODUCT));
+        assertFalse(panel.filterCatalog(CatalogFilterType.MEASURES)
+                .getFieldNamesInViewPort()
+                .contains(NUMBER_OF_LOST_OPPS));
 
-        switchTabCatalogue(".s-filter-attributes");
-        expectMissing(productAttr);
-        switchTabCatalogue(".s-filter-metrics");
-        expectMissing(lostOppsMetric);
-
-        resetReport();
-        switchTabCatalogue(".s-filter-attributes");
-        expectFind(productAttr);
-        switchTabCatalogue(".s-filter-metrics");
-        expectFind(lostOppsMetric);
+        analysisPage.resetToBlankState();
+        assertTrue(panel.filterCatalog(CatalogFilterType.ATTRIBUTES)
+                .getFieldNamesInViewPort()
+                .contains(PRODUCT));
+        assertTrue(panel.filterCatalog(CatalogFilterType.MEASURES)
+                .getFieldNamesInViewPort()
+                .contains(NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_metric_after_undo() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        expectMissing(lostOppsMetric);
+        CataloguePanel panel = analysisPage.addAttribute(ACTIVITY_TYPE).getCataloguePanel().clearInputText();
+        assertFalse(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
 
-        resetReport();
-        expectFind(lostOppsMetric);
+        analysisPage.resetToBlankState();
+        assertTrue(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
 
-        undo();
-        expectMissing(lostOppsMetric);
+        analysisPage.undo();
+        assertFalse(panel.getFieldNamesInViewPort().contains(NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_attribute_after_undo() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
-        expectMissing(activityTypeAttr);
+        CataloguePanel panel = analysisPage.addMetric(NUMBER_OF_LOST_OPPS).getCataloguePanel().clearInputText();
+        assertFalse(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
 
-        resetReport();
-        expectFind(activityTypeAttr);
+        analysisPage.resetToBlankState();
+        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
 
-        undo();
-        expectMissing(activityTypeAttr);
+        analysisPage.undo();
+        assertFalse(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_special_message_if_only_unavailable_items_matched() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(lostOppsMetric, METRICS_BUCKET);
-        searchCatalogue("Activity Type");
-        assertThat(waitForElementVisible(className("s-unavailable-items-matched"), browser).getText(),
-                containsString("1 unrelated data item hidden"));
+        CataloguePanel panel = analysisPage.addMetric(NUMBER_OF_LOST_OPPS).getCataloguePanel();
+        assertFalse(panel.search(ACTIVITY_TYPE));
+        assertEquals(panel.getUnrelatedItemsHiddenCount(), 1);
     }
 }

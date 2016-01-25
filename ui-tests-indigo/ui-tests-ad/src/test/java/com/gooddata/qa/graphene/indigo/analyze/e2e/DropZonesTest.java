@@ -1,24 +1,29 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class DropZonesTest extends AbstractGoodSalesE2ETest {
+public class DropZonesTest extends AbstractAdE2ETest {
 
-    private static final String ACTIVE_CATEGORIES_SELECTOR = CATEGORIES_BUCKET + " .adi-droppable-active .adi-bucket-invitation";
-    private static final String ACTIVE_METRICS_SELECTOR = METRICS_BUCKET + " .adi-droppable-active .adi-bucket-invitation";
+    private static final By ACTIVE_CATEGORIES_SELECTOR = cssSelector(".s-bucket-categories .adi-droppable-active .adi-bucket-invitation");
+    private static final By ACTIVE_METRICS_SELECTOR = cssSelector(".s-bucket-metrics .adi-droppable-active .adi-bucket-invitation");
+    private static final By ACTIVE_REPLACABLE_SELECTOR = cssSelector(".adi-replace-invitation.adi-droppable-active");
 
-    private static final int[] NON_DROPPABLE_POSITION = {-1, -1};
-
-    private String activeReplaceableMetric;
-    private String activeReplacableAttribute;
+    private static final Point NON_DROPPABLE_POSITION = new Point(-1, -1);
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -27,142 +32,143 @@ public class DropZonesTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_attribute_dropzones() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        expectMissing(ACTIVE_CATEGORIES_SELECTOR);
+        assertFalse(isElementPresent(ACTIVE_CATEGORIES_SELECTOR, browser));
 
-        startDrag(DATE);
+        analysisPage.startDrag(analysisPage.getCataloguePanel().getDate());
 
         try {
-            expectFind(ACTIVE_CATEGORIES_SELECTOR);
+            assertTrue(isElementPresent(ACTIVE_CATEGORIES_SELECTOR, browser));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
 
-        expectMissing(ACTIVE_CATEGORIES_SELECTOR);
+        assertFalse(isElementPresent(ACTIVE_CATEGORIES_SELECTOR, browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_metric_dropzones() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        expectMissing(ACTIVE_METRICS_SELECTOR);
+        assertFalse(isElementPresent(ACTIVE_METRICS_SELECTOR, browser));
 
-        startDrag(activitiesMetric);
+        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC));
 
         try {
-            expectFind(ACTIVE_METRICS_SELECTOR);
+            assertTrue(isElementPresent(ACTIVE_METRICS_SELECTOR, browser));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
 
-        expectMissing(ACTIVE_METRICS_SELECTOR);
+        assertFalse(isElementPresent(ACTIVE_METRICS_SELECTOR, browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_drag_attribute_from_filters_to_shortcut() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, FILTERS_BUCKET);
-        startDrag(FILTERS_BUCKET + " " + activityTypeAttrLabel);
+        WebElement filter = analysisPage.addFilter(ACTIVITY_TYPE)
+            .getFilterBuckets()
+            .getFilter(ACTIVITY_TYPE);
+
+        analysisPage.startDrag(filter);
 
         try {
-            expectFind(".s-blank-canvas-message");
-            expectMissing(".s-recommendation-attribute-canvas");
+            assertTrue(isElementPresent(cssSelector(".s-blank-canvas-message"), browser));
+            assertFalse(isElementPresent(cssSelector(".s-recommendation-attribute-canvas"), browser));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_titles_for_fact_based_metric_dropzones() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        startDrag(amountFact);
+        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
 
         try {
-            expectFind(".s-recommendation-metric-canvas");
+            assertTrue(isElementPresent(cssSelector(".s-recommendation-metric-canvas"), browser));
             assertThat(waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser)
-                    .getText(), containsString("Sum of Amount"));
+                    .getText(), containsString("Sum of " + AMOUNT));
 
-            expectFind(".s-recommendation-metric-over-time-canvas");
+            assertTrue(isElementPresent(cssSelector(".s-recommendation-metric-over-time-canvas"), browser));
             assertThat(waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser)
-                    .getText(), containsString("Sum of Amount"));
+                    .getText(), containsString("Sum of " + AMOUNT));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void createActiveReplaceElements() {
-        activeReplaceableMetric = activitiesMetric + ".adi-droppable-active";
-        activeReplacableAttribute = activityTypeAttrLabel + ".adi-droppable-active";
-    }
-
-    @Test(dependsOnMethods = {"createActiveReplaceElements"})
     public void should_highlight_possible_attribute_replacement() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
+        analysisPage.addAttribute(ACTIVITY_TYPE);
 
-        expectMissing(activeReplacableAttribute);
+        assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
 
-        startDrag(accountAttr);
+        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE));
 
         try {
-            expectFind(activeReplacableAttribute);
+            assertTrue(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
 
-        expectMissing(activeReplacableAttribute);
+        assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
     }
 
-    @Test(dependsOnMethods = {"createActiveReplaceElements"})
+    @Test(dependsOnGroups = {"init"})
     public void should_highlight_possible_metric_replacement() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
 
-        expectMissing(activeReplaceableMetric);
+        assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
 
-        startDrag(lostOppsMetric);
+        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_LOST_OPPS, FieldType.METRIC));
 
         try {
-            expectFind(activeReplaceableMetric);
+            assertTrue(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
 
-        expectMissing(activeReplaceableMetric);
+        assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
     }
 
-    @Test(dependsOnMethods = {"createActiveReplaceElements"})
+    @Test(dependsOnGroups = {"init"})
     public void should_not_highlight_attribute_when_already_present_in_the_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
+        WebElement source = analysisPage.addAttribute(ACTIVITY_TYPE)
+            .getAttributesBucket()
+            .getFirst();
 
-        startDrag(activityTypeAttr);
+        analysisPage.startDrag(source);
 
         try {
-            expectMissing(activeReplacableAttribute);
+            assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_highlight_date_when_already_present_in_the_bucket() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(DATE, CATEGORIES_BUCKET);
-        startDrag(DATE);
+        WebElement date = analysisPage.addDate()
+            .getAttributesBucket()
+            .getFirst();
+        analysisPage.startDrag(date);
 
         try {
-            expectMissing(CATEGORIES_BUCKET + " .adi-droppable-active");
+            assertFalse(isElementPresent(cssSelector(".s-bucket-categories .adi-droppable-active"), browser));
         } finally {
-            stopDrag(NON_DROPPABLE_POSITION);
+            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 }

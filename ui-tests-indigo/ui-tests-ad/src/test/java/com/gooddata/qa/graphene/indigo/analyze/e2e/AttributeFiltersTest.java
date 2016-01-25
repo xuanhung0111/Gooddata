@@ -1,21 +1,22 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
-import java.util.stream.Stream;
-
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributeFilterPickerPanel;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class AttributeFiltersTest extends AbstractGoodSalesE2ETest {
-
-    private static final String CONTEXT = "#gd-overlays";
+public class AttributeFiltersTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -26,158 +27,163 @@ public class AttributeFiltersTest extends AbstractGoodSalesE2ETest {
     public void should_reset_search_results_after_closing() {
         beforeEach();
 
-        click(".s-filter-button");
+        WebElement filter = analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE);
+        filter.click();
 
-        fillIn(".s-filter-picker .searchfield-input", "asdf");
-        expectFind(".gd-list-noResults");
+        AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
+                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
+        panel.searchItem("asdf");
 
-        click(".s-btn-cancel");
-        click(".s-filter-button");
+        sleepTightInSeconds(1);
+        waitForElementVisible(cssSelector(".gd-list-noResults"), browser);
 
-        expectElementCount(".s-filter-item", 4);
+        panel.discard();
+
+        filter.click();
+        assertEquals(panel.getItemNames().size(), 4);
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_add_and_remove_attribute_from_filters_bucket() {
         beforeEach();
 
-        expectFind(FILTERS_BUCKET + " .s-attr-filter" + activityTypeAttrLabel);
+        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE);
 
         // try to drag a duplicate attribute filter
-        dragFromCatalogue(activityTypeAttr, FILTERS_BUCKET);
-
-        drag(FILTERS_BUCKET + " .s-attr-filter" + activityTypeAttrLabel, TRASH);
-        expectMissing(FILTERS_BUCKET + " .s-attr-filter");
+        assertTrue(analysisPage.addFilter(ACTIVITY_TYPE)
+            .removeFilter(ACTIVITY_TYPE)
+            .getFilterBuckets()
+            .isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_allow_moving_other_buckets_items_to_filters_bucket() {
         beforeEach();
 
-        dragFromCatalogue(activityTypeAttr, CATEGORIES_BUCKET);
-        drag(FILTERS_BUCKET + " .s-attr-filter" + activityTypeAttrLabel, TRASH);
-        expectMissing(FILTERS_BUCKET + " .s-attr-filter" + activityTypeAttrLabel);
+        assertTrue(analysisPage.addAttribute(ACTIVITY_TYPE)
+            .removeFilter(ACTIVITY_TYPE)
+            .getFilterBuckets()
+            .isEmpty());
 
-        drag(CATEGORIES_BUCKET + " " + activityTypeAttr, FILTERS_BUCKET);
-        expectMissing(FILTERS_BUCKET + " .s-attr-filter" + activityTypeAttrLabel);
+        assertTrue(analysisPage.drag(analysisPage.getAttributesBucket().getFirst(),
+                analysisPage.getFilterBuckets().getInvitation())
+            .getFilterBuckets()
+            .isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_set_in_filter_where_clause() {
         beforeEach();
 
-        click(".s-filter-button");
-        clearFilter(CONTEXT);
-        String id = Stream.of(waitForElementVisible(cssSelector(".s-filter-item[title=Email]"), browser)
-                .getAttribute("class")
-                .split(" "))
-                .filter(e -> e.startsWith("s-id-"))
-                .findFirst()
-                .get()
-                .split("-")[2];
-        click(".s-filter-item.s-id-" + id, CONTEXT);
-        click(".s-apply", CONTEXT);
+        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
+                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
+        String id = panel.getId("Email");
+        panel.discard();
 
-        expectFind(".adi-components .adi-component .s-property-where.s-where-___in_____id__" + id + "___");
+        analysisPage.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email");
+        analysisPage.waitForReportComputing();
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .adi-component .s-property-where.s-where-___in_____id__" + id + "___"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_set_not_in_filter_where_clause() {
         beforeEach();
 
-        click(".s-filter-button");
+        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
+                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
+        String id = panel.getId("Email");
+        panel.selectItem("Email");
+        panel.getApplyButton().click();
 
-        String id = Stream.of(waitForElementVisible(cssSelector(".s-filter-item[title=Email]"), browser)
-            .getAttribute("class")
-            .split(" "))
-            .filter(e -> e.startsWith("s-id-"))
-            .findFirst()
-            .get()
-            .split("-")[2];
-        click(".s-filter-item.s-id-" + id, CONTEXT);
-        click(".s-apply", CONTEXT);
+        analysisPage.waitForReportComputing();
 
-        expectFind(".adi-components .adi-component .s-property-where.s-where-___not_____in_____id__" + id + "____");
+        assertTrue(isElementPresent(cssSelector(
+                ".adi-components .adi-component .s-property-where.s-where-___not_____in_____id__" + id + "____"),
+                browser));;
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
     public void should_disable_apply_button_if_nothing_changed() {
-        beforeEachDisablingApplyButton();
-
-        expectFind(".s-apply.disabled", CONTEXT);
+        assertTrue(beforeEachDisablingApplyButton()
+                .getApplyButton()
+                .getAttribute("class")
+                .contains("disabled"));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
     public void should_disable_apply_button_if_nothing_is_selected() {
-        beforeEachDisablingApplyButton();
-
-        clearFilter(CONTEXT);
-        expectFind(".s-apply.disabled", CONTEXT);
+        AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
+        panel.getClearButton().click();
+        assertTrue(panel.getApplyButton()
+                .getAttribute("class")
+                .contains("disabled"));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
     public void should_disable_apply_button_if_everything_is_unselected() {
-        beforeEachDisablingApplyButton();
-
-        clearFilter(CONTEXT);
-        expectFind(".s-apply.disabled", CONTEXT);
+        AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
+        panel.getClearButton().click();
+        assertTrue(panel.getApplyButton()
+                .getAttribute("class")
+                .contains("disabled"));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
     public void should_not_disable_apply_button_if_selection_is_inverted() {
-        beforeEachDisablingApplyButton();
+        AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
+        panel.select("Email");
 
-        click(".s-filter-item[title=Email]", CONTEXT);
-        click(".s-apply", CONTEXT);
-
-        click(".s-filter-button");
-        click(".s-clear", CONTEXT);
-        click(".s-filter-item[title=Email]", CONTEXT);
-        expectFind(".s-apply:not(.disabled)", CONTEXT);
+        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        panel.getClearButton().click();
+        panel.searchItem("Email");
+        assertTrue(panel.getApplyButton()
+                .getAttribute("class")
+                .contains("disabled"));
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
     public void should_not_disable_apply_button_if_single_item_is_filtered() {
-        beforeEachDisablingApplyButton();
+        AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
 
-        clearFilter(CONTEXT);
-        fillIn(".s-filter-picker .searchfield-input", "Email");
-        click(".s-filter-item[title=Email]", CONTEXT);
-        expectFind(".s-apply:not(.disabled)", CONTEXT);
-        click(".s-apply", CONTEXT);
-        assertThat(waitForElementVisible(className("s-attribute-filter-label"), browser).getText(),
-                containsString("Activity Type: Email"));
+        panel.getClearButton().click();
+        panel.selectItem("Email");
+        assertFalse(panel.getApplyButton()
+                .getAttribute("class")
+                .contains("disabled"));
+
+        panel.getApplyButton().click();
+        assertEquals(analysisPage.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
     public void should_disable_apply_button_if_selection_is_in_different_order() {
-        beforeEachDisablingApplyButton();
+        AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
+        panel.select("Email", "In Person Meeting");
 
-        clearFilter(CONTEXT);
-        click(".s-filter-item[title=Email]", CONTEXT);
-        click(".s-filter-item[title='In Person Meeting']", CONTEXT);
-        click(".s-apply", CONTEXT);
-
-        click(".s-filter-button");
-
-        clearFilter(CONTEXT);
-        click(".s-filter-item[title='In Person Meeting']", CONTEXT);
-        click(".s-filter-item[title=Email]", CONTEXT);
-
-        expectFind(".s-apply.disabled", CONTEXT);
+        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        panel.getClearButton().click();
+        panel.searchItem("Email");
+        panel.searchItem("In Person Meeting");
+        assertTrue(panel.getApplyButton()
+                .getAttribute("class")
+                .contains("disabled"));
     }
 
     private void beforeEach() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        dragFromCatalogue(activitiesMetric, METRICS_BUCKET);
-        dragFromCatalogue(activityTypeAttr, FILTERS_BUCKET);
+        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addFilter(ACTIVITY_TYPE);
     }
 
-    private void beforeEachDisablingApplyButton() {
+    private AttributeFilterPickerPanel beforeEachDisablingApplyButton() {
         beforeEach();
 
-        click(".s-filter-button");
-        expectFind(".s-filter-picker", CONTEXT);
+        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        return Graphene.createPageFragment(AttributeFilterPickerPanel.class,
+                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
     }
 }

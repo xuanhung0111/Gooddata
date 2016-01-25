@@ -1,21 +1,16 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.md.Restriction.title;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-
-import java.util.List;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.md.Metric;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractGoodSalesE2ETest;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 
-public class CatalogueSearchTest extends AbstractGoodSalesE2ETest {
-
-    private String openOppsMetric;
-    private String wonOppsMetric;
+public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
@@ -24,66 +19,44 @@ public class CatalogueSearchTest extends AbstractGoodSalesE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_empty_catalogue_if_no_catalogue_item_is_matched() {
-        visitEditor();
+        initAnalysePageByUrl();
 
-        searchCatalogue("xyz");
-
-        expectMatchedItems(emptyList());
-        expectFind(".adi-no-items");
+        assertFalse(analysisPage.getCataloguePanel().search("xyz"));
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void loadMetricIds() {
-        openOppsMetric = ".s-id-" + getMdService().getObj(getProject(), Metric.class,
-                title("# of Open Opps.")).getIdentifier().toLowerCase();
-        wonOppsMetric = ".s-id-" + getMdService().getObj(getProject(), Metric.class,
-                title("# of Won Opps.")).getIdentifier().toLowerCase();
-    }
-
-    @Test(dependsOnMethods = {"loadMetricIds"})
     public void should_show_only_matched_items() {
-        visitEditor();
+        initAnalysePageByUrl();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
-        searchCatalogue("Opps.");
-        expectMatchedItems(asList(lostOppsMetric, openOppsMetric, wonOppsMetric));
+        panel.search("Opps.");
+        assertTrue(panel.getFieldNamesInViewPort()
+                .containsAll(asList(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS, NUMBER_OF_WON_OPPS)));
 
-        searchCatalogue("Da");
-        expectMatchedItems(emptyList());
+        assertFalse(panel.search("Dada"));
     }
 
-    @Test(dependsOnMethods = {"loadMetricIds"})
+    @Test(dependsOnGroups = {"init"})
     public void should_be_case_insensitive() {
-        visitEditor();
+        initAnalysePageByUrl();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
-        searchCatalogue("opps.");
-        expectMatchedItems(asList(lostOppsMetric, openOppsMetric, wonOppsMetric));
+        panel.search("opps.");
+        assertTrue(panel.getFieldNamesInViewPort()
+                .containsAll(asList(NUMBER_OF_LOST_OPPS, NUMBER_OF_OPEN_OPPS, NUMBER_OF_WON_OPPS)));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_cancel_search() {
-        visitEditor();
+        initAnalysePageByUrl();
+        CataloguePanel panel = analysisPage.getCataloguePanel();
 
-        searchCatalogue("# of Lost Opps.");
-        expectMissingItems(asList(activityTypeAttr));
+        panel.search(NUMBER_OF_LOST_OPPS);
+        assertFalse(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
 
-        cancelSearch();
+        panel.clearInputText();
 
         // catalog contains all items again, including activity type
-        expectFind(".s-catalogue " + activityTypeAttr);
-    }
-
-    private void expectMissingItems(List<String> expectedMissingItems) {
-        expectedMissingItems.stream()
-            .forEach(expectedMissingItem -> expectMissing(".s-catalogue " + expectedMissingItem));
-    }
-
-    private void expectMatchedItems(List<String> expectedItems) {
-        expectMatchedItemsCount(expectedItems.size());
-
-        expectedItems.stream().forEach(expectedItem -> expectFind(".s-catalogue " + expectedItem));
-    }
-
-    private void expectMatchedItemsCount(int expectedCount) {
-        expectElementCount(".adi-catalogue-item:not(.type-header)", expectedCount);
+        assertTrue(panel.getFieldNamesInViewPort().contains(ACTIVITY_TYPE));
     }
 }
