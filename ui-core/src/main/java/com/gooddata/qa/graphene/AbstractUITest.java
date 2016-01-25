@@ -234,7 +234,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     @FindBy(className = AnalysisPage.MAIN_CLASS)
     protected AnalysisPage analysisPage;
 
-    @FindBy(css = ".ember-application")
+    @FindBy(css = ".ember-application .main")
     protected UserManagementPage userManagementPage;
 
     @FindBy(id = IndigoDashboardsPage.MAIN_ID)

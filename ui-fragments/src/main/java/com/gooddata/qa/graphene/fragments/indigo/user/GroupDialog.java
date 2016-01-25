@@ -65,17 +65,19 @@ public class GroupDialog extends AbstractFragment {
         waitForElementNotVisible(this.getRoot());
     }
 
-    public void enterGroupName(String name) {
+    public GroupDialog enterGroupName(String name) {
         waitForElementVisible(nameInput).clear();
         nameInput.sendKeys(name);
+        return this;
     }
 
-    public void verifyStateOfDialog(State state) {
+    public GroupDialog verifyStateOfDialog(State state) {
         assertTrue(state.title.equals(waitForElementVisible(title).getText()));
         assertTrue(state.submitButtonName.equals(waitForElementVisible(submitButton).getText()));
         assertFalse(isSubmitButtonVisible());
         assertEquals(waitForElementVisible(nameInput).getAttribute("value").trim().isEmpty(),
                 state.isGroupNameEmpty);
+        return this;
     }
 
     public static enum State {

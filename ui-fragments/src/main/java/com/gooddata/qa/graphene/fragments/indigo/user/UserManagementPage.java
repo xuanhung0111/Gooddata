@@ -1,14 +1,17 @@
 package com.gooddata.qa.graphene.fragments.indigo.user;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -17,6 +20,7 @@ import com.gooddata.qa.graphene.enums.user.UserStates;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.common.DropDown;
 import com.gooddata.qa.utils.CssUtils;
+import com.google.common.base.Predicate;
 
 public class UserManagementPage extends AbstractFragment {
 
@@ -82,7 +86,7 @@ public class UserManagementPage extends AbstractFragment {
     private static final String GROUP_NAME_CHECKBOX_CSS = ".s-${groupName} .input-checkbox";
     private static final String GROUP_LINK_XPATH =
             "//span[contains(@class, 'menu-item-title') and (text() = '${groupName}')]";
-    
+
     public static final String ALL_ACTIVE_USERS_GROUP = "All active users";
     public static final String UNGROUPED_USERS = "Ungrouped users";
 
@@ -98,20 +102,36 @@ public class UserManagementPage extends AbstractFragment {
                 waitForElementVisible(GroupDialog.LOCATOR, browser));
     }
 
-    public void createNewGroup(String name) {
+    public UserManagementPage createNewGroup(String name) {
+        int userGroupCount = getUserGroupsCount();
         openGroupDialog(GroupDialog.State.CREATE).submitDialogGroup(name);
+        Predicate<WebDriver> newGroupCreated = browser -> getUserGroupsCount() == userGroupCount + 1;
+        Graphene.waitGui().until(newGroupCreated);
+        waitForUsersContentLoaded();
+        return this;
     }
 
-    public void renameUserGroup(String newName) {
+    public UserManagementPage renameUserGroup(String newName) {
         openGroupDialog(GroupDialog.State.EDIT).submitDialogGroup(newName);
+        waitForUsersContentLoaded();
+        return this;
     }
 
-    public void deleteUserGroup() {
+    public UserManagementPage deleteUserGroup() {
+        int userGroupCount = getUserGroupsCount();
         openDeleteGroupDialog().submit();
+        waitForElementNotPresent(DeleteGroupDialog.LOCATOR);
+        Predicate<WebDriver> newGroupCreated = browser -> getUserGroupsCount() == userGroupCount - 1;
+        Graphene.waitGui().until(newGroupCreated);
+        waitForUsersContentLoaded();
+        return this;
     }
 
-    public void cancelDeleteUserGroup() {
+    public UserManagementPage cancelDeleteUserGroup() {
         openDeleteGroupDialog().cancel();
+        waitForElementNotPresent(DeleteGroupDialog.LOCATOR);
+        waitForUsersContentLoaded();
+        return this;
     }
     
     public boolean isDeleteGroupLinkPresent() {
@@ -125,12 +145,15 @@ public class UserManagementPage extends AbstractFragment {
                 waitForElementVisible(DeleteGroupDialog.LOCATOR, browser));
     }
 
-    public void cancelCreatingNewGroup(String name) {
+    public UserManagementPage cancelCreatingNewGroup(String name) {
         openGroupDialog(GroupDialog.State.CREATE).cancelSubmitDialogGroup(name);
+        return this;
     }
 
-    public void cancelRenamingUserGroup(String newName) {
+    public UserManagementPage cancelRenamingUserGroup(String newName) {
         openGroupDialog(GroupDialog.State.EDIT).cancelSubmitDialogGroup(newName);
+        waitForUsersContentLoaded();
+        return this;
     }
 
     public UserManagementPage changeRoleOfUsers(UserRoles role, String... emails) {
@@ -143,7 +166,7 @@ public class UserManagementPage extends AbstractFragment {
     }
 
     public boolean isChangeRoleButtonPresent() {
-        return browser.findElements(BY_CHANGE_ROLE_BUTTON).size() > 0;
+        return isElementPresent(BY_CHANGE_ROLE_BUTTON, browser);
     }
 
     public UserManagementPage addUsersToGroup(String group, String... emails) {
@@ -181,9 +204,7 @@ public class UserManagementPage extends AbstractFragment {
 
     public UserManagementPage openSpecificGroupPage(String groupName) {
         waitForElementVisible(By.xpath(GROUP_LINK_XPATH.replace("${groupName}", groupName)), browser).click();
-        waitForElementVisible(userContentColumn);
-        browser.navigate().refresh();
-        waitForElementVisible(this.getRoot());
+        waitForUsersContentLoaded();
         return this;
     }
 
@@ -197,6 +218,7 @@ public class UserManagementPage extends AbstractFragment {
 
     public UserManagementPage filterUserState(UserStates state) {
         waitForElementVisible(By.className(state.getClassName()), browser).click();
+        waitForUsersContentLoaded();
         return this;
     }
 
@@ -247,8 +269,9 @@ public class UserManagementPage extends AbstractFragment {
         return waitForElementVisible(BY_MESSAGE_TEXT, browser).getText().trim();
     }
 
-    public void waitForEmptyGroup() {
+    public UserManagementPage waitForEmptyGroup() {
         waitForElementVisible(BY_EMPTY_GROUP, browser);
+        return this;
     }
 
     public String getStateGroupMessage() {
@@ -272,6 +295,12 @@ public class UserManagementPage extends AbstractFragment {
         return activeLinks;
     }
 
+    public UserManagementPage waitForUsersContentLoaded() {
+        waitForElementVisible(userContentColumn);
+        waitForElementVisible(By.cssSelector(".users-content-column .list-state,table"), browser);
+        return this;
+    }
+
     private UserManagementPage changeGroupOfUsers(boolean isSelect, String group, String... emails) {
         // Deselect all selected users of current page first
         deselectAllUserEmails();
@@ -280,7 +309,7 @@ public class UserManagementPage extends AbstractFragment {
         waitForElementVisible(changeGroupButton).click();
         selectUserGroup(group, isSelect);
         waitForElementVisible(changeGroupApplyButton).click();
-
+        waitForElementVisible(BY_MESSAGE_TEXT, browser);
         return this;
     }
 
