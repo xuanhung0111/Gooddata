@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,10 +31,8 @@ public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTe
 
         try {
             testParams.setProjectId(otherProjectId);
-            initProjectsPage();
-            projectsPage.goToProject(otherProjectId);
 
-            waitForDashboardPageLoaded(browser);
+            initDashboardsPage();
             assertThat(browser.getCurrentUrl(), containsString(otherProjectId));
 
             createReport(new UiReportDefinition()
