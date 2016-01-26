@@ -1,15 +1,17 @@
 package com.gooddata.qa.graphene;
 
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.SQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.ZIP_FILES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.isNull;
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -19,10 +21,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -37,6 +41,10 @@ import org.supercsv.io.CsvListReader;
 import org.supercsv.prefs.CsvPreference;
 import org.testng.annotations.BeforeClass;
 
+import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.dataload.processes.ProcessExecution;
+import com.gooddata.dataload.processes.ProcessExecutionDetail;
+import com.gooddata.dataload.processes.ProcessService;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
@@ -45,31 +53,23 @@ import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-
-import static com.gooddata.md.Restriction.*;
-
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
-import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.entity.ProcessInfo;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.utils.AdsHelper;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.webdav.WebDavClient;
+import static com.gooddata.qa.utils.http.RestUtils.*;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.warehouse.Warehouse;
 import com.google.common.collect.Lists;
 
 public class AbstractMSFTest extends AbstractProjectTest {
 
-    private static final String DATALOAD = "DATALOAD";
+    protected static final String DATALOAD = "DATALOAD";
 
-    protected static final String DATALOAD_PROCESS_URI = "/gdc/projects/%s/dataload/processes/";
     protected static final String OUTPUTSTAGE_URI = "/gdc/dataload/projects/%s/outputStage/";
     protected static final String OUTPUT_STAGE_METADATA_URI = OUTPUTSTAGE_URI + "metadata";
     protected static final String INTERNAL_OUTPUT_STAGE_URI = "/gdc/dataload/internal/projects/%s/outputStage/";
@@ -86,25 +86,21 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected static final String ACCEPT_APPLICATION_JSON_WITH_VERSION = "application/json; version=1";
     protected static final String ACCEPT_TEXT_PLAIN_WITH_VERSION = "text/plain; version=1";
 
-    protected static final String EXECUTABLE = "executable";
-    protected static final String GDC_DE_SYNCHRONIZE_ALL = "GDC_DE_SYNCHRONIZE_ALL";
-    protected static final String ADS_USER_PARAM = "ADS_USER";
-    protected static final String ADS_PASSWORD_PARAM = "ADS_PASSWORD";
-    protected static final String ADS_URL_PARAM = "ADS_URL";
-    protected static final String CREATE_ADS_TABLE_PARAM = "CREATE_TABLE";
-    protected static final String COPY_ADS_TABLE_PARAM = "COPY_TABLE";
-    
+    @SuppressWarnings("serial")
+    protected static final Map<String, String> SYNCHRONIZE_ALL_PARAM = unmodifiableMap(new HashMap<String, String>() {{
+        put("GDC_DE_SYNCHRONIZE_ALL", Boolean.TRUE.toString());
+    }});
 
-    protected String dssAuthorizationToken;
+    private String dssAuthorizationToken;
+    private AdsHelper adsHelper;
+
     protected String technicalUser;
     protected String technicalUserPassword;
     protected String initialLdmMaqlFile = "create-ldm.txt";
 
     protected ProjectInfo workingProject;
-    protected ProcessInfo cloudconnectProcess;
-    protected ProcessInfo dataloadProcess;
+    protected DataloadProcess cloudconnectProcess;
     protected Warehouse ads;
-    protected AdsHelper adsHelper;
 
     @BeforeClass(alwaysRun = true)
     public void initialProperties() {
@@ -114,20 +110,33 @@ public class AbstractMSFTest extends AbstractProjectTest {
         technicalUserPassword = testParams.loadProperty("technicalUserPassword");
     }
 
-    protected ProjectInfo getWorkingProject() {
-        if (workingProject == null)
-            workingProject = new ProjectInfo(projectTitle, testParams.getProjectId());
-        return workingProject;
+    /*
+     * Hook methods for prepareLDMAndADSInstance
+     */
+    protected void addUsersToProject() {}
+    protected void addUsersToAdsInstance() {}
+
+    protected AdsHelper getAdsHelper() {
+        if (isNull(adsHelper))
+            adsHelper = new AdsHelper(getGoodDataClient(), getRestApiClient());
+        return adsHelper;
     }
 
-    protected void prepareLDMAndADSInstance() throws JSONException {
+    protected Warehouse createAds(final String name) {
+        return getAdsHelper().createAds(name, dssAuthorizationToken);
+    }
+
+    protected ProcessService getProcessService() {
+        return getGoodDataClient().getProcessService();
+    }
+
+    protected void prepareLDMAndADSInstance() {
         // Override this method in test class if it's necessary to add more users to project
         addUsersToProject();
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
-        
-        adsHelper = new AdsHelper(getGoodDataClient(), getRestApiClient());
-        ads = adsHelper.createAds("ADS Instance for DLUI test", dssAuthorizationToken);
-        
+
+        ads = createAds("ADS Instance for DLUI test");
+
         // Override this method in test class if it's necessary to add more users to ads instance
         addUsersToAdsInstance();
     }
@@ -135,86 +144,71 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected void setUpOutputStageAndCreateCloudConnectProcess() {
         // Override this method in test class if using other user to set default schema for output stage
         setDefaultSchemaForOutputStage(ads);
-        assertTrue(isDataloadProcessCreated(), "DATALOAD process is not created!");
+        assertTrue(getDataloadProcess().isPresent(), "DATALOAD process is not created!");
 
-        cloudconnectProcess = new ProcessInfo().withProjectId(testParams.getProjectId())
-                        .withProcessName("Initial Data for ADS Instance").withProcessType("GRAPH");
-        assertEquals(createCloudConnectProcess(cloudconnectProcess), HttpStatus.CREATED.value());
+        cloudconnectProcess = createProcess("Initial Data for ADS Instance", "GRAPH",
+                getResourceAsFile("/" + ZIP_FILES + "/" + CLOUDCONNECT_PROCESS_PACKAGE));
     }
 
-    protected boolean isDataloadProcessCreated() {
-        int dataloadProcessNumber = 0;
-        try {
-            dataloadProcessNumber =
-                    ProcessUtils.getProcessesList(getRestApiClient(),
-                            getWorkingProject().getProjectId()).getDataloadProcessCount();
-        } catch (Exception e) {
-            throw new IllegalStateException("There is an exeception when getting process list!", e);
-        }
-
-        return dataloadProcessNumber > 0;
+    protected void setDefaultSchemaForOutputStage(final Warehouse ads) {
+        getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
     }
 
-    protected void addUsersToProject() {}
+    protected void customOutputStageMetadata(final DataSource... dataSources) {
+        String putBody = prepareOutputStageMetadata(dataSources);
 
-    protected void addUsersToAdsInstance() {}
+        String putUri = format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
 
-    protected void setDefaultSchemaForOutputStage(Warehouse ads) {
-        adsHelper.associateAdsWithProject(ads, testParams.getProjectId());
+        HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
+        putRequest.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION);
+
+        final HttpResponse putResponse = getRestApiClient().execute(putRequest, HttpStatus.OK,
+                "Metadata is not updated successfully! Put body: " + putBody);
+        EntityUtils.consumeQuietly(putResponse.getEntity());
     }
 
-    protected void createUpdateADSTableBySQLFiles(String createTableFile, String copyTableFile, Warehouse ads) {
-        Collection<ExecutionParameter> params =
-                prepareParamsToUpdateADS(createTableFile, copyTableFile, ads.getId());
-
-        String executionUri =
-                executeCloudConnectProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params);
-        assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
+    protected void createUpdateADSTableBySQLFiles(final String createTableFile, final String copyTableFile,
+            final Warehouse ads) {
+        final Map<String, String> params = prepareParamsToUpdateADS(createTableFile, copyTableFile, ads.getId());
+        assertTrue(executeProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params).isSuccess());
     }
 
-    protected Collection<ExecutionParameter> prepareParamsToUpdateADS(String createTableSqlFile,
-            String copyTableSqlFile, String adsId) {
-        List<ExecutionParameter> params = Lists.newArrayList();
+    protected DataSource prepareADSTable(final ADSTables adsTable) {
+        createUpdateADSTable(adsTable);
+        return new DataSource().withName(adsTable.datasourceName).withDatasets(adsTable.getDatasets());
+    }
 
-        params.add(new ExecutionParameter(ADS_USER_PARAM, testParams.getUser()));
-        params.add(new ExecutionParameter(ADS_PASSWORD_PARAM, testParams.getPassword()));
-        params.add(new ExecutionParameter(ADS_URL_PARAM, ADS_URL.replace("${host}", testParams.getHost()).replace(
-                "${adsId}", adsId)));
-        String createTableSql = getResourceAsString("/" + SQL_FILES + "/" + createTableSqlFile);
-        String copyTableSql = getResourceAsString("/" + SQL_FILES + "/" + copyTableSqlFile);
-        params.add(new ExecutionParameter(CREATE_ADS_TABLE_PARAM, createTableSql));
-        params.add(new ExecutionParameter(COPY_ADS_TABLE_PARAM, copyTableSql));
+    protected void createUpdateADSTable(final ADSTables adsTable) {
+        createUpdateADSTableBySQLFiles(adsTable.createTableSqlFile, adsTable.copyTableSqlFile, ads);
+    }
+
+    protected Map<String, String> prepareParamsToUpdateADS(final String createTableSqlFile,
+            final String copyTableSqlFile, final String adsId) {
+        final Map<String, String> params = new HashMap<>();
+        final String createTableSql = getResourceAsString("/" + SQL_FILES + "/" + createTableSqlFile);
+        final String copyTableSql = getResourceAsString("/" + SQL_FILES + "/" + copyTableSqlFile);
+        final String adsUrl = ADS_URL.replace("${host}", testParams.getHost()).replace("${adsId}", adsId);
+
+        params.put("CREATE_TABLE", createTableSql);
+        params.put("COPY_TABLE", copyTableSql);
+        params.put("ADS_URL", adsUrl);
+        params.put("ADS_USER", testParams.getUser());
+        params.put("ADS_PASSWORD", testParams.getPassword());
         return params;
     }
 
-    protected String executeCloudConnectProcess(ProcessInfo processInfo, String executable,
-            Collection<ExecutionParameter> params) {
-        String executionUri =
-                ProcessUtils.executeProcess(getRestApiClient(), processInfo, executable, params);
-
-        return executionUri;
-    }
-
-    protected int createCloudConnectProcess(ProcessInfo processInfo) {
-        String uploadFilePath =
-                uploadZipFileToWebDavWithoutWebContainer(CLOUDCONNECT_PROCESS_PACKAGE);
-        return ProcessUtils.createCloudConnectProcess(getRestApiClient(), processInfo,
-                uploadFilePath.substring(uploadFilePath.indexOf("/uploads")) + "/"
-                        + CLOUDCONNECT_PROCESS_PACKAGE);
-    }
-
-    protected void updateModelOfGDProject(String maql) {
-        System.out.println("Update model of GD project!");
+    protected void updateModelOfGDProject(final String maql) {
+        log.info("Update model of GD project!");
         String pollingUri = sendRequestToUpdateModel(maql);
-        RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
-        assertEquals(RestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri), "OK",
+        waitingForAsyncTask(getRestApiClient(), pollingUri);
+        assertEquals(getAsyncTaskStatus(getRestApiClient(), pollingUri), "OK",
                 "Model is not updated successfully!");
     }
 
-    protected void dropAddedFieldsInLDM(String maql) {
+    protected void dropAddedFieldsInLDM(final String maql) {
         String pollingUri = sendRequestToUpdateModel(maql);
-        RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
-        if (!"OK".equals(RestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri))) {
+        waitingForAsyncTask(getRestApiClient(), pollingUri);
+        if (!"OK".equals(getAsyncTaskStatus(getRestApiClient(), pollingUri))) {
             HttpRequestBase getRequest = getRestApiClient().newGetMethod(pollingUri);
             HttpResponse getResponse = getRestApiClient().execute(getRequest);
             String errorMessage = "";
@@ -230,165 +224,113 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
             EntityUtils.consumeQuietly(getResponse.getEntity());
 
-            System.out.println("LDM update is failed with error message: " + errorMessage);
+            log.info("LDM update is failed with error message: " + errorMessage);
             assertEquals(errorMessage, "The object (%s) doesn't exist.");
         }
     }
 
-    protected void createADS(Warehouse ads) {
-        adsHelper.createAds(ads.getTitle(), ads.getAuthorizationToken());
+    protected DataloadProcess createProcess(final String name, final String type, File processData) {
+        return getProcessService().createProcess(getProject(), new DataloadProcess(name, type), processData);
     }
 
-    protected void deleteADSInstance(Warehouse ads) {
-        adsHelper.removeAds(ads);
-    }
-
-    protected String uploadZipFileToWebDavWithoutWebContainer(String zipFileName) {
-        WebDavClient webDav =
-                WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
-        File resourceFile = getResourceAsFile("/" + ZIP_FILES + "/" + zipFileName);
-        System.out.println("Resource file: " + resourceFile.getAbsolutePath());
-        openUrl(PAGE_GDC);
-        waitForElementPresent(gdcFragment.getRoot());
-        assertTrue(webDav.createStructure(gdcFragment.getUserUploadsURL()),
-                " Create WebDav storage structure");
-
-        webDav.uploadFile(resourceFile);
-
-        return webDav.getWebDavStructure();
-    }
-
-    protected int createDataLoadProcess() {
-        return createDataLoadProcess(new ProcessInfo().withProcessName(
-                DEFAULT_DATAlOAD_PROCESS_NAME).withProjectId(getWorkingProject().getProjectId()));
-    }
-
-    protected int createDataLoadProcess(ProcessInfo processInfo) {
-        return ProcessUtils.createDataloadProcess(getRestApiClient(), processInfo);
-    }
-
-    protected String failedToCreateDataloadExecution(HttpStatus expectedStatusCode,
-            Collection<ExecutionParameter> params) throws IOException, JSONException {
-        return ProcessUtils.failedToCreateDataloadProcessExecution(getRestApiClient(),
-                expectedStatusCode, getDataloadProcessInfo(), params);
-    }
-
-    protected String executeDataloadProcess(RestApiClient restApiClient, Collection<ExecutionParameter> params)
-            throws IOException, JSONException {
-        return ProcessUtils
-                .executeProcess(restApiClient, getDataloadProcessInfo(), "", params);
-    }
-
-    protected String executeDataloadProcessSuccessfully(RestApiClient restApiClient)
-            throws IOException, JSONException {
-        String executionUri =
-                executeDataloadProcess(restApiClient, Lists.newArrayList(new ExecutionParameter(
-                        GDC_DE_SYNCHRONIZE_ALL, true)));
-
-        assertTrue(ProcessUtils.isExecutionSuccessful(restApiClient, executionUri),
-                "Process execution is not successful!");
-        return executionUri;
-    }
-
-    protected void deleteDataloadProcessAndCreateNewOne() throws IOException, JSONException {
-        if (!getDataloadProcessId().isEmpty()) {
-            ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
-                    testParams.getProjectId());
+    protected DataloadProcess createProcess(final String name, final String type) {
+        if (DATALOAD.equals(type)) {
+            final Optional<DataloadProcess> dataloadProcess = getProcessService()
+                .listProcesses(getProject())
+                .stream()
+                .filter(process -> type.equals(process.getType()))
+                .findFirst();
+            if (dataloadProcess.isPresent()) return dataloadProcess.get();
         }
-        createDataLoadProcess();
-        assertFalse(getDataloadProcessId().isEmpty());
+        return getProcessService().createProcess(getProject(), new DataloadProcess(name, type));
     }
 
-    protected DataSource prepareADSTable(ADSTables adsTable) {
-        createUpdateADSTable(adsTable);
-        DataSource dataSource =
-                new DataSource().withName(adsTable.datasourceName).withDatasets(
-                        adsTable.getDatasets());
-
-        return dataSource;
+    protected ProcessExecutionDetail executeProcess(final DataloadProcess process, final String executable,
+            final Map<String, String> params) {
+        return getProcessService().executeProcess(new ProcessExecution(process, executable, params)).get();
     }
 
-    protected Dataset prepareDataset(AdditionalDatasets additionalDataset) {
-        return additionalDataset.getDataset();
+    protected DataloadProcess deleteDataloadProcessAndCreateNewOne() {
+        final Optional<DataloadProcess> dataloadProcess = getDataloadProcess();
+        if (dataloadProcess.isPresent()) {
+            getProcessService().removeProcess(dataloadProcess.get());
+        }
+        return createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD);
     }
 
-    protected void createUpdateADSTable(ADSTables adsTable) {
-        createUpdateADSTableBySQLFiles(adsTable.createTableSqlFile, adsTable.copyTableSqlFile, ads);
+    protected String getDataloadProcessUri() {
+        return getDataloadProcess().get().getUri();
     }
 
-    protected void deleteOutputStageMetadata() {
-        customOutputStageMetadata();
+    protected String getDataloadProcessId() {
+        return getDataloadProcess().get().getId();
     }
 
-    protected void customOutputStageMetadata(DataSource... dataSources) {
-        String putBody = prepareOutputStageMetadata(dataSources);
-
-        String putUri =
-                String.format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
-
-        HttpRequestBase putRequest = getRestApiClient().newPutMethod(putUri, putBody);
-        putRequest.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION);
-
-        HttpResponse putResponse =
-                getRestApiClient().execute(putRequest, HttpStatus.OK,
-                        "Metadata is not updated successfully! Put body: " + putBody);
-
-        EntityUtils.consumeQuietly(putResponse.getEntity());
+    protected Optional<DataloadProcess> getDataloadProcess() {
+        return getProcessService()
+            .listProcesses(getProject())
+            .stream()
+            .filter(process -> DATALOAD.equals(process.getType()))
+            .findFirst();
     }
 
-    protected String getDataloadProcessUri() throws IOException, JSONException {
-        return format(DATALOAD_PROCESS_URI, testParams.getProjectId()) + getDataloadProcessId();
+    protected String getExecutionStatus(final RestApiClient restApiClient, final String executionUri)
+            throws JSONException, IOException {
+        return getJSONObjectFrom(restApiClient, executionUri + "/detail")
+                .getJSONObject("executionDetail")
+                .getString("status");
     }
 
-    protected String getDataloadProcessId() throws IOException, JSONException {
-        return ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
-                .getDataloadProcess().getProcessId();
+    protected boolean isExecutionSuccessful(final RestApiClient restApiClient, final String executionUri)
+            throws JSONException, IOException {
+        waitingForAsyncTask(restApiClient, executionUri);
+        return "OK".equals(getExecutionStatus(restApiClient, executionUri));
     }
 
-    protected String getDiffResourceContent(RestApiClient restApiClient, HttpStatus status) {
-        return RestUtils.getResourceWithCustomAcceptHeader(restApiClient, 
-                format(OUTPUTSTAGE_URI, testParams.getProjectId()) + "diff",
-                status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
-    }
+    protected int redeployDataLoadProcess(final RestApiClient restApiClient) throws IOException, JSONException {
+        final String body = new JSONObject().put("process", new JSONObject() {{
+            put("type", DATALOAD);
+            put("name", DEFAULT_DATAlOAD_PROCESS_NAME);
+        }}).toString();
 
-    protected String getMappingResourceContent(RestApiClient restApiClient, HttpStatus status) {
-        return RestUtils.getResourceWithCustomAcceptHeader(restApiClient,
-                format(MAPPING_RESOURCE, testParams.getProjectId()), status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
-    }
-
-    protected List<String> getReferencesOfDataset(String dataset) throws ParseException, JSONException,
-            IOException {
-        JSONArray array = RestUtils.getDatasetElementFromModelView(getRestApiClient(), testParams.getProjectId(),
-                dataset, DatasetElements.REFERENCES, JSONArray.class);
-        return new ObjectMapper().readValue(array.toString(), new TypeReference<List<String>>() {
-        });
-    }
-
-    protected int redeployDataLoadProcess(RestApiClient restApiClient) throws IOException, JSONException {
-        HttpRequestBase putRequest = restApiClient.newPutMethod(getDataloadProcessUri(), ProcessUtils
-                .prepareProcessCreationBody(DATALOAD, DEFAULT_DATAlOAD_PROCESS_NAME).toString());
-        int responseStatusCode;
+        final HttpRequestBase putRequest = restApiClient.newPutMethod(getDataloadProcessUri(), body);
         try {
-            HttpResponse postResponse = restApiClient.execute(putRequest);
-            responseStatusCode = postResponse.getStatusLine().getStatusCode();
+            final HttpResponse postResponse = restApiClient.execute(putRequest);
+            final int responseStatusCode = postResponse.getStatusLine().getStatusCode();
             EntityUtils.consumeQuietly(postResponse.getEntity());
-            System.out.println("Response status: " + responseStatusCode);
+            log.info("Response status: " + responseStatusCode);
+            return responseStatusCode;
         } finally {
             putRequest.releaseConnection();
         }
-
-        return responseStatusCode;
     }
 
-    protected void prepareMetricToCheckNewAddedFields(String... facts) {
+    protected String getDiffResourceContent(final RestApiClient restApiClient, final HttpStatus status) {
+        return getResourceWithCustomAcceptHeader(restApiClient, 
+                format(OUTPUTSTAGE_URI, testParams.getProjectId()) + "diff", status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
+    }
+
+    protected String getMappingResourceContent(final RestApiClient restApiClient, final HttpStatus status) {
+        return getResourceWithCustomAcceptHeader(restApiClient,
+                format(MAPPING_RESOURCE, testParams.getProjectId()), status, ACCEPT_TEXT_PLAIN_WITH_VERSION);
+    }
+
+    protected List<String> getReferencesOfDataset(final String dataset) throws ParseException, JSONException,
+            IOException {
+        JSONArray array = getDatasetElementFromModelView(getRestApiClient(), testParams.getProjectId(),
+                dataset, DatasetElements.REFERENCES, JSONArray.class);
+        return new ObjectMapper().readValue(array.toString(), new TypeReference<List<String>>() {});
+    }
+
+    protected void prepareMetricToCheckNewAddedFields(final String... facts) {
         Stream.of(facts).forEach(fact -> {
             createMetric(fact + " [Sum]", format("SELECT SUM([%s])",
                     getMdService().getObjUri(getProject(), Fact.class, title(fact))), "#,##0.00");
         });
     }
 
-    protected void createAndCheckReport(String reportName, String attribute, String metric,
-            Collection<String> attributeValues, Collection<String> metricValues) {
+    protected void createAndCheckReport(final String reportName, final String attribute, final String metric,
+            final Collection<String> attributeValues, final Collection<String> metricValues) {
         final Metric m = getMdService().getObj(getProject(), Metric.class, title(metric));
         final Attribute attr = getMdService().getObj(getProject(), Attribute.class, title(attribute));
         ReportDefinition definition = GridReportDefinitionContent.create(
@@ -416,39 +358,36 @@ public class AbstractMSFTest extends AbstractProjectTest {
         }
 
         log.info("Attributes: " + attributes.toString());
-        assertTrue(CollectionUtils.isEqualCollection(attributes, attributeValues),
-                "Incorrect attribute values!");
+        assertTrue(isEqualCollection(attributes, attributeValues), "Incorrect attribute values!");
 
         log.info("Metric: " + metrics.toString());
-        assertTrue(CollectionUtils.isEqualCollection(metrics, metricValues),
-                "Incorrect metric values!");
+        assertTrue(isEqualCollection(metrics, metricValues), "Incorrect metric values!");
     }
 
     protected void checkReportAfterAddReferenceToDataset() {
         prepareMetricToCheckNewAddedFields("number");
         createAndCheckReport("Report to check reference", "artistname", "number [Sum]",
-            Lists.newArrayList("OOP1", "OOP2", "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"),
-            Lists.newArrayList("1000", "1200", "1400", "1600", "1800", "2000", "700", "800"));
+            asList("OOP1", "OOP2", "OOP3", "OOP4", "OOP5", "OOP6", "OOP7", "OOP8"),
+            asList("1000", "1200", "1400", "1600", "1800", "2000", "700", "800"));
     }
 
-    private ProcessInfo getDataloadProcessInfo() throws IOException, JSONException {
-        return new ProcessInfo().withProjectId(getWorkingProject().getProjectId()).withProcessId(
-                getDataloadProcessId());
+    protected ProjectInfo getWorkingProject() {
+        if (workingProject == null)
+            workingProject = new ProjectInfo(projectTitle, testParams.getProjectId());
+        return workingProject;
     }
 
-    private String prepareOutputStageMetadata(DataSource... dataSources) {
+    private String prepareOutputStageMetadata(final DataSource... dataSources) {
         JSONObject metaObject = new JSONObject();
 
         try {
             Collection<JSONObject> metadataObjects = Lists.newArrayList();
             for (DataSource dataSource : dataSources) {
                 for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
-                    metadataObjects.add(prepareMetadataObject(dataset.getName(),
-                            dataSource.getName(), new JSONArray()));
+                    metadataObjects.add(prepareMetadataObject(dataset.getName(), dataSource.getName()));
                 }
             }
-            metaObject.put("outputStageMetadata",
-                    new JSONObject().put("tableMeta", metadataObjects));
+            metaObject.put("outputStageMetadata", new JSONObject().put("tableMeta", metadataObjects));
         } catch (JSONException e) {
             throw new IllegalStateException(
                     "There is JSONExcetion during prepareOutputStageMetadata!", e);
@@ -457,13 +396,12 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return metaObject.toString();
     }
 
-    private JSONObject prepareMetadataObject(String tableName, String dataSourceName,
-            JSONArray metaColumns) {
+    private JSONObject prepareMetadataObject(final String tableName, final String dataSourceName) {
         JSONObject metadataObject = new JSONObject();
         try {
             metadataObject.put("tableMetadata",
                     new JSONObject().put("table", tableName).put("defaultSource", dataSourceName)
-                            .put("columnMeta", metaColumns));
+                            .put("columnMeta", new JSONArray()));
         } catch (JSONException e) {
             throw new IllegalStateException("JSONExeception", e);
         }
@@ -471,10 +409,10 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return metadataObject;
     }
 
-    private String sendRequestToUpdateModel(String maql) {
+    private String sendRequestToUpdateModel(final String maql) {
         String pollingUri = "";
         try {
-            pollingUri = RestUtils.executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(), maql);
+            pollingUri = executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(), maql);
         } catch (Exception e) {
             throw new IllegalStateException("There is an exeception during LDM update!", e);
         }

@@ -4,7 +4,7 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertTrue;
 
-import java.util.Collection;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.testng.annotations.AfterClass;
@@ -14,14 +14,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
-import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.warehouse.Warehouse;
 
@@ -53,9 +51,9 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, groups = {"george", "basicTest"})
-    public void signInWithGeorge() {
+    public void signInWithGeorge() throws JSONException {
         logout();
-        signInAtUI(technicalUser, technicalUserPassword);
+        signInAtGreyPages(technicalUser, technicalUserPassword);
     }
 
     @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithGeorge", groups = {
@@ -142,9 +140,9 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnGroups = "george", groups = {"basicTest"}, alwaysRun = true)
-    public void signInWithAnnie() {
+    public void signInWithAnnie() throws JSONException {
         logout();
-        signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
+        signInAtGreyPages(testParams.getEditorUser(), testParams.getEditorPassword());
     }
 
     @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithAnnie", groups = {
@@ -204,10 +202,10 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @AfterClass
-    public void cleanUp() {
+    public void cleanUp() throws JSONException {
         logout();
-        signInAtUI(testParams.getUser(), testParams.getPassword());
-        deleteADSInstance(ads);
+        signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+        getAdsHelper().removeAds(ads);
     }
 
     @Override
@@ -229,7 +227,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Override
     protected void addUsersToAdsInstance() {
-        adsHelper.addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
+        getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
     }
 
     private void failToAddData(DataSource dataSource, String screenshotName) {
@@ -244,18 +242,15 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     private void failToLoadData(DataSource dataSource, String screenshotName) {
-        Collection<ExecutionParameter> params =
-                prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
-                        "copyTableWithAdditionalFields_Drop_Person.txt", ads.getId());
+        final Map<String, String> params = prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
+                "copyTableWithAdditionalFields_Drop_Person.txt", ads.getId());
 
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
 
-        String executionUri =
-                executeCloudConnectProcess(cloudconnectProcess,
-                        DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params);
-        assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
+        assertTrue(executeProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params)
+                .isSuccess());
 
         checkFailedDataAddingResult();
         Screenshots.takeScreenshot(browser, screenshotName, getClass());

@@ -31,7 +31,6 @@ import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
@@ -54,8 +53,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     @AfterClass
     public void tearDown() throws IOException, JSONException {
-        ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
-                getWorkingProject().getProjectId());
+        getProcessService().removeProcess(getDataloadProcess().get());
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"dataloadSchedulesTest"})
@@ -233,7 +231,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, 
                     UserRoles.ADMIN);
-            adsHelper.addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
+            getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
 
             logout();
             signInAtGreyPages(technicalUser, technicalUserPassword);
@@ -565,9 +563,9 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
     @AfterClass
     public void cleanUp() {
-        deleteADSInstance(ads);
+        getAdsHelper().removeAds(ads);
     }
-    
+
     private void searchDatasetAndCheckResult(String searchKey, List<String> expectedResult) {
         scheduleDetail.searchDatasets(searchKey);
         assertTrue(CollectionUtils.isEqualCollection(scheduleDetail.getSearchedDatasets(), expectedResult), 

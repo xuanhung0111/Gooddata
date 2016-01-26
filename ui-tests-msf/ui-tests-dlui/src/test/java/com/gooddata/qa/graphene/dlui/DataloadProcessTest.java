@@ -3,16 +3,20 @@ package com.gooddata.qa.graphene.dlui;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
+import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,12 +28,12 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodDataException;
+import com.gooddata.dataload.processes.DataloadProcess;
+import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.graphene.AbstractMSFTest;
-import com.gooddata.qa.graphene.dto.Processes;
-import com.gooddata.qa.graphene.entity.ExecutionParameter;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
-import com.gooddata.qa.graphene.utils.ProcessUtils;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
@@ -58,77 +62,80 @@ public class DataloadProcessTest extends AbstractMSFTest {
     @Test(dependsOnGroups = {"initialData"}, priority = 0)
     public void autoCreateDataloadProcess() throws IOException, JSONException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
-        assertTrue(isDataloadProcessCreated(), "DATALOAD process is not created!");
-        Processes dataloadProcessList =
-                ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId());
-        assertEquals(dataloadProcessList.getDataloadProcess().getName(),
-                DEFAULT_DATAlOAD_PROCESS_NAME);
-        assertEquals(dataloadProcessList.getDataloadProcessCount(), 1);
-        assertEquals(createDataLoadProcess(), HttpStatus.CONFLICT.value());
+        assertTrue(getDataloadProcess().isPresent(), "DATALOAD process is not created!");
+        assertTrue(getProcessService().listProcesses(getProject())
+                .stream()
+                .anyMatch(process -> DEFAULT_DATAlOAD_PROCESS_NAME.equals(process.getName())));
 
-        executeDataloadProcessSuccessfully(getRestApiClient());
+        try {
+            getProcessService().createProcess(getProject(),
+                new DataloadProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD));
+            fail("Still create another dataload process.");
+        } catch (GoodDataException e) {}
+
+        assertTrue(executeProcess(createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, "DATALOAD"), "",SYNCHRONIZE_ALL_PARAM).isSuccess());
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void changeAdsInstanceWhenHavingDataloadProcess() throws IOException, JSONException {
-        createDataLoadProcess();
-        String dataloadProcessId = getDataloadProcessId();
-        Warehouse newAds = adsHelper.createAds("ADS Instance for DLUI test 2", dssAuthorizationToken);
+        final String dataloadProcessId = createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD).getId();
+        final Warehouse newAds = createAds("ADS Instance for DLUI test 2");
         setDefaultSchemaForOutputStage(newAds);
+
         try {
-            assertEquals(
-                    ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
-                            .getDataloadProcessCount(), 1);
-            assertEquals(getDataloadProcessId(), dataloadProcessId);
+            assertTrue(getProcessService().listProcesses(getProject())
+                    .stream()
+                    .anyMatch(process -> dataloadProcessId.equals(process.getId())));
         } finally {
             setDefaultSchemaForOutputStage(ads);
-            adsHelper.removeAds(newAds);
+            getAdsHelper().removeAds(newAds);
         }
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 1)
     public void changeAdsInstanceAfterDeleteDataloadProcess() throws IOException, JSONException {
-        createDataLoadProcess();
-        ProcessUtils.deleteDataloadProcess(getRestApiClient(), getDataloadProcessUri(),
-                testParams.getProjectId());
-        assertEquals(ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
-                .getDataloadProcessCount(), 0);
+        final DataloadProcess dataloadProcess = createProcess(DEFAULT_DATAlOAD_PROCESS_NAME, DATALOAD);
+        getProcessService().removeProcess(dataloadProcess);
+        assertFalse(getDataloadProcess().isPresent());
+
         setDefaultSchemaForOutputStage(ads);
-        Processes dataloadProcessList =
-                ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId());
-        assertEquals(dataloadProcessList.getDataloadProcessCount(), 1);
-        assertEquals(dataloadProcessList.getDataloadProcess().getName(),
-                DEFAULT_DATAlOAD_PROCESS_NAME);
+        assertTrue(getProcessService().listProcesses(getProject())
+                .stream()
+                .anyMatch(process -> DEFAULT_DATAlOAD_PROCESS_NAME.equals(process.getName())));
     }
 
     @Test(dependsOnMethods = {"addUsersToProjects"}, priority = 2)
     public void checkProcessOwner() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
+
         // Delete old dataload process and create new one to ensure that
         // execution result isn't influenced by others
-        deleteDataloadProcessAndCreateNewOne();
+        final DataloadProcess dataloadProcess = deleteDataloadProcessAndCreateNewOne();
 
-        assertEquals(getOwnerLogin(), testParams.getUser(), "Process owner of dataload is incorrect!");
-        String executionUri = executeDataloadProcessSuccessfully(getRestApiClient());
-        assertTrue(getLogContent(getRestApiClient(), executionUri)
-                .contains(String.format("user: %s", testParams.getUser())));
+        assertTrue(getProcessService().listUserProcesses()
+              .stream()
+              .anyMatch(process -> DEFAULT_DATAlOAD_PROCESS_NAME.equals(process.getName())));
+        final ProcessExecutionDetail executionDetail = executeProcess(dataloadProcess, "", SYNCHRONIZE_ALL_PARAM);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        getProcessService().getExecutionLog(executionDetail, outputStream);
+        assertTrue(new String(outputStream.toByteArray(), StandardCharsets.UTF_8)
+            .contains(format("user: %s", testParams.getUser())));
 
         logout();
         signInAtGreyPages(technicalUser, technicalUserPassword);
-        RestApiClient restApi = getRestApiClient(technicalUser, technicalUserPassword);
+        final RestApiClient restApi = getRestApiClient(technicalUser, technicalUserPassword);
         assertEquals(redeployDataLoadProcess(restApi), HttpStatus.OK.value());
         assertEquals(getOwnerLogin(), technicalUser,
                 "Process owner of dataload after redeployed is not changed!");
 
-        String executionByTechnicalUser = executeDataloadProcessSuccessfully(restApi);
+        final String executionByTechnicalUser = executeDataloadProcessSuccessfully(restApi);
         assertTrue(getLogContent(restApi, executionByTechnicalUser).contains(
                 String.format("user: %s", technicalUser)));
 
         logout();
         signIn(true, UserRoles.EDITOR);
-        RestApiClient editorRestApi =
-                getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
-        String executionByEditor = executeDataloadProcessSuccessfully(editorRestApi);
+        final RestApiClient editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
+        final String executionByEditor = executeDataloadProcessSuccessfully(editorRestApi);
         assertTrue(getLogContent(editorRestApi, executionByEditor).contains(
                 String.format("user: %s", technicalUser)));
         assertEquals(getOwnerLogin(), technicalUser,
@@ -138,9 +145,12 @@ public class DataloadProcessTest extends AbstractMSFTest {
     @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkSuccessfulExecutionLog() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
-        deleteDataloadProcessAndCreateNewOne();
-        String executionUri = executeDataloadProcessSuccessfully(getRestApiClient());
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_successful.txt");
+        final DataloadProcess dataloadProcess = deleteDataloadProcessAndCreateNewOne();
+        final ProcessExecutionDetail executionDetail = executeProcess(dataloadProcess, "", SYNCHRONIZE_ALL_PARAM);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        getProcessService().getExecutionLog(executionDetail, outputStream);
+        assertContentLogFile(new String(outputStream.toByteArray(), StandardCharsets.UTF_8),
+                "execution_log_successful.txt");
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 3)
@@ -148,50 +158,44 @@ public class DataloadProcessTest extends AbstractMSFTest {
         createUpdateADSTable(ADSTables.WITH_ERROR_MAPPING);
         deleteDataloadProcessAndCreateNewOne();
 
-        String executionUri = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(
-                new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
+        final String executionUri = executeDataloadProcess(getRestApiClient(), SYNCHRONIZE_ALL_PARAM);
         waitForExecutionInRunningState(executionUri);
-        assertEquals(ProcessUtils.waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE);
+        assertEquals(waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE);
 
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_mapping.txt");
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException {
-        List<String> deleteFiles = new ArrayList<String>(Arrays.asList("f_opportunity.csv",
-                "dataset.opportunity.csv", "f_person.csv", "dataset.person.csv"));
+        final List<String> deleteFiles = Lists.newArrayList("f_opportunity.csv", "dataset.opportunity.csv",
+                "f_person.csv", "dataset.person.csv");
 
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
         deleteDataloadProcessAndCreateNewOne();
 
-        String webDavUrl = getWebDavUrl();
-        String executionUri = executeDataloadProcess(getRestApiClient(), Lists.newArrayList(
-                new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true)));
+        final String webDavUrl = getWebDavUrl();
+        final String executionUri = executeDataloadProcess(getRestApiClient(), SYNCHRONIZE_ALL_PARAM);
         waitForExecutionInRunningState(executionUri);
-        String etlTrigerParams = waitForTriggerEtlPullAndGetParams(executionUri);
+        final String etlTrigerParams = waitForTriggerEtlPullAndGetParams(executionUri);
 
         deleteFilesFromWebdav(webDavUrl + "/" + etlTrigerParams, deleteFiles);
-        assertEquals(ProcessUtils.waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE,
+        assertEquals(waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE,
                 "Execution is not failed because of ETL pull error!");
 
         assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_etl.txt");
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 3)
-    public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException,
-            IOException {
+    public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
         deleteDataloadProcessAndCreateNewOne();
 
-        Collection<ExecutionParameter> dataloadExecutionParams =
-                Lists.newArrayList(new ExecutionParameter(GDC_DE_SYNCHRONIZE_ALL, true));
-        String executionUri = executeDataloadProcess(getRestApiClient(), dataloadExecutionParams);
+        final String executionUri = executeDataloadProcess(getRestApiClient(), SYNCHRONIZE_ALL_PARAM);
         waitForExecutionInRunningState(executionUri);
         // Check that the second execution will be failed because the first execution is running
-        String errorMessage =
-                failedToCreateDataloadExecution(HttpStatus.CONFLICT, dataloadExecutionParams);
+        final String errorMessage = failedToCreateDataloadExecution(HttpStatus.CONFLICT, SYNCHRONIZE_ALL_PARAM);
         assertEquals(errorMessage, CONCURRENT_DATA_LOAD_MESSAGE);
-        assertTrue(ProcessUtils.isExecutionSuccessful(getRestApiClient(), executionUri));
+        assertTrue(isExecutionSuccessful(getRestApiClient(), executionUri));
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 2)
@@ -199,22 +203,22 @@ public class DataloadProcessTest extends AbstractMSFTest {
         RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, UserRoles.ADMIN);
         RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
                 UserRoles.EDITOR);
-        adsHelper.addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
-        adsHelper.addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
+        getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
+        getAdsHelper().addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
     }
 
     @AfterClass
     public void cleanUp() throws JSONException {
         logout();
         signIn(true, UserRoles.ADMIN);
-        deleteADSInstance(ads);
+        getAdsHelper().removeAds(ads);
     }
 
     private void waitForExecutionInRunningState(String executionUri) throws ParseException, IOException,
             JSONException {
         String state = "";
         do {
-            state = ProcessUtils.getExecutionStatus(getRestApiClient(), executionUri);
+            state = getExecutionStatus(getRestApiClient(), executionUri);
             if (RUNNING_STATE.equals(state))
                 break;
         } while (!ERROR_STATE.equals(state) && !OK_STATE.equals(state));
@@ -231,7 +235,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
             Matcher m = myPattern.matcher(logContent);
 
             if (m.find()) {
-                state = ProcessUtils.getExecutionStatus(getRestApiClient(), executionUri);
+                state = getExecutionStatus(getRestApiClient(), executionUri);
                 assertEquals(state, RUNNING_STATE);
                 return m.group(1);
             }
@@ -240,12 +244,11 @@ public class DataloadProcessTest extends AbstractMSFTest {
                 break;
             }
         }
-        throw new IllegalStateException("ETL pull triggered params not found!");
+        throw new IllegalStateException("ETL pull triggered SYNCHRONIZE_ALL_PARAM not found!");
     }
 
     private String getOwnerLogin() throws IOException, JSONException {
-        return ProcessUtils.getProcessesList(getRestApiClient(), testParams.getProjectId())
-                .getDataloadProcess().getOwnerLogin();
+        return RestUtils.getDataloadProcessOwner(getRestApiClient(), testParams.getProjectId());
     }
 
     private String getLogContent(RestApiClient restApiClient, String executionUri) {
@@ -300,5 +303,39 @@ public class DataloadProcessTest extends AbstractMSFTest {
         Pattern myPattern = Pattern.compile("Selected datasets: dataset.opportunity,\\s?dataset.person");
         Matcher m = myPattern.matcher(logContent);
         assertTrue(m.find(), "Log content is not correct!");
+    }
+
+    private String failedToCreateDataloadExecution(HttpStatus expectedStatusCode, Map<String, String> params)
+            throws IOException, JSONException {
+        final String executionUri = DataloadProcess.TEMPLATE
+                .expand(testParams.getProjectId(), getDataloadProcessId()).toString() + "/executions";
+        return RestUtils.createProcessExecution(expectedStatusCode, getRestApiClient(), executionUri, "", params);
+    }
+
+    private String executeDataloadProcessSuccessfully(RestApiClient restApiClient)
+            throws IOException, JSONException {
+        final String executionUri = executeDataloadProcess(restApiClient, SYNCHRONIZE_ALL_PARAM);
+        RestUtils.waitingForAsyncTask(restApiClient, executionUri);
+        assertTrue("OK".equals(getExecutionStatus(restApiClient, executionUri)));
+        return executionUri;
+    }
+
+    private String executeDataloadProcess(RestApiClient restApiClient, Map<String, String> params)
+            throws IOException, JSONException {
+        final String executionUri = DataloadProcess.TEMPLATE
+                .expand(testParams.getProjectId(), getDataloadProcessId()).toString() + "/executions";
+        return RestUtils.executeProcess(restApiClient, executionUri, "", params);
+    }
+
+    private String waitForRunningExecutionByStatus(RestApiClient restApiClient,
+            String executionUri) throws JSONException, IOException {
+        String status;
+        do {
+            status = getExecutionStatus(restApiClient, executionUri);
+            System.out.println("Current execution status is: " + status);
+            sleepTightInSeconds(2);
+        } while("QUEUED".equals(status) || "RUNNING".equals(status));
+
+        return status;
     }
 }
