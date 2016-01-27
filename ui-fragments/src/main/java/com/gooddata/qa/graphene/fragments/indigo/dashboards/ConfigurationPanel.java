@@ -118,4 +118,8 @@ public class ConfigurationPanel extends AbstractFragment {
 
         return this;
     }
+
+    public String getKpiAlertMessage() {
+        return waitForElementVisible(alertEditWarning).getText();
+    }
 }
