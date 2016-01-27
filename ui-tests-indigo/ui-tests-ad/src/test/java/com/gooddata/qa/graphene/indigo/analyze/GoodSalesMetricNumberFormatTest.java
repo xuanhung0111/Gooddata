@@ -5,7 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.changeMetricFormat;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

@@ -14,10 +14,10 @@ import org.testng.annotations.Test;
 
 import com.gooddata.dataload.processes.DataloadProcess;
 import com.gooddata.qa.graphene.AbstractMSFTest;
-import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.process.ProcessRestUtils;
 
 public class DataloadResourcesPermissionTest extends AbstractMSFTest {
 
@@ -30,7 +30,7 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "initialData" })
-    public void initialData() throws JSONException {
+    public void initialData() throws JSONException, IOException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();
 
@@ -43,17 +43,15 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
             throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         deleteDataloadProcessAndCreateNewOne();
-        RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.FORBIDDEN,
-                ACCEPT_APPLICATION_JSON_WITH_VERSION);
+        RestUtils.getResource(editorRestApi,
+                editorRestApi.newGetMethod(format(MAPPING_RESOURCE, testParams.getProjectId())),
+                req -> req.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION),
+                HttpStatus.FORBIDDEN);
     }
 
     @Test(dependsOnGroups = { "initialData" }, priority = 1)
     private void addUsersToProjects() throws ParseException, IOException, JSONException {
-        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
-                UserRoles.EDITOR);
-        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getViewerUser(), 
-                UserRoles.VIEWER);
+        addUsersWithOtherRolesToProject();
         getAdsHelper().addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
         getAdsHelper().addUserToAdsInstance(ads, testParams.getViewerUser(), AdsRole.DATA_ADMIN);
     }
@@ -61,22 +59,26 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
     @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
     public void editorAccessToDataloadResources() throws ParseException, JSONException, IOException {
         deleteDataloadProcessAndCreateNewOne();
-        RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.OK,
-                ACCEPT_APPLICATION_JSON_WITH_VERSION);
-        RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                String.format(OUTPUT_STATE_MODEL_RESOURCE, testParams.getProjectId()), HttpStatus.OK,
-                ACCEPT_APPLICATION_JSON_WITH_VERSION);
-        RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                String.format(OUTPUTSTAGE_URI, testParams.getProjectId()), HttpStatus.OK,
-                ACCEPT_APPLICATION_JSON_WITH_VERSION);
-        RestUtils.getResourceWithCustomAcceptHeader(editorRestApi,
-                String.format(OUTPUT_STAGE_METADATA_URI, testParams.getProjectId()), HttpStatus.OK,
-                ACCEPT_APPLICATION_JSON_WITH_VERSION);
+        RestUtils.getResource(editorRestApi,
+                editorRestApi.newGetMethod(format(MAPPING_RESOURCE, testParams.getProjectId())),
+                req -> req.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION),
+                HttpStatus.OK);
+        RestUtils.getResource(editorRestApi,
+                editorRestApi.newGetMethod(format(OUTPUT_STATE_MODEL_RESOURCE, testParams.getProjectId())),
+                req -> req.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION),
+                HttpStatus.OK);
+        RestUtils.getResource(editorRestApi,
+                editorRestApi.newGetMethod(format(OUTPUTSTAGE_URI, testParams.getProjectId())),
+                req -> req.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION),
+                HttpStatus.OK);
+        RestUtils.getResource(editorRestApi,
+                editorRestApi.newGetMethod(format(OUTPUT_STAGE_METADATA_URI, testParams.getProjectId())),
+                req -> req.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION),
+                HttpStatus.OK);
 
         final String uri = DataloadProcess.TEMPLATE
                 .expand(testParams.getProjectId(), getDataloadProcessId()).toString() + "/executions";
-        final String executionUri = RestUtils.executeProcess(restApiClient, uri, "", SYNCHRONIZE_ALL_PARAM);
+        final String executionUri = ProcessRestUtils.executeProcess(restApiClient, uri, "", SYNCHRONIZE_ALL_PARAM);
         assertTrue(isExecutionSuccessful(restApiClient, executionUri),
                 "Process execution is not successful!");
         RestUtils.getResource(editorRestApi, executionUri, HttpStatus.NO_CONTENT);
@@ -85,9 +87,10 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
     @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
     public void viewerCannotAccessToMappingResource() throws ParseException, JSONException, IOException {
         deleteDataloadProcessAndCreateNewOne();
-        RestUtils.getResourceWithCustomAcceptHeader(viewerRestApi,
-                String.format(MAPPING_RESOURCE, testParams.getProjectId()), HttpStatus.FORBIDDEN,
-                ACCEPT_APPLICATION_JSON_WITH_VERSION);
+        RestUtils.getResource(viewerRestApi,
+                viewerRestApi.newGetMethod(format(MAPPING_RESOURCE, testParams.getProjectId())),
+                req -> req.setHeader("Accept", ACCEPT_APPLICATION_JSON_WITH_VERSION),
+                HttpStatus.FORBIDDEN);
     }
 
     @Test(dependsOnMethods = { "addUsersToProjects" }, priority = 2)
@@ -102,8 +105,8 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
         getAdsHelper().removeAds(ads);
     }
 
-    private void accessToProjectModelView(RestApiClient restApiClient) {
-        RestUtils.getResource(restApiClient, String.format(PROJECT_MODEL_VIEW, testParams.getProjectId()),
+    private void accessToProjectModelView(RestApiClient restApiClient) throws ParseException, IOException {
+        RestUtils.getResource(restApiClient, format(PROJECT_MODEL_VIEW, testParams.getProjectId()),
                 HttpStatus.ACCEPTED);
     }
 }

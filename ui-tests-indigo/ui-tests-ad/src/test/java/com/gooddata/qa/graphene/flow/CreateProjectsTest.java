@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.collect.Lists;
 
 public class CreateProjectsTest extends AbstractProjectTest {
@@ -47,14 +47,14 @@ public class CreateProjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"setupNoDateProject"}, groups = {"setupProjects"})
     public void setupBlankProject() throws ParseException, JSONException, IOException {
-        String pid = RestUtils.createBlankProject(getRestApiClient(), "[E2E] Blank project", "",
+        String pid = ProjectRestUtils.createBlankProject(getRestApiClient(), "[E2E] Blank project", "",
                 testParams.getAuthorizationToken(), testParams.getDwhDriver(), testParams.getProjectEnvironment());
         pids.add(pid);
     }
 
     @Test(dependsOnMethods = {"setupBlankProject"}, groups = {"setupProjects"})
     public void setupGoodSalesProject() throws ParseException, JSONException, IOException {
-        String pid = RestUtils.createProject(getRestApiClient(), "[E2E] GoodSales project", "", "/projectTemplates/GoodSalesDemo/2",
+        String pid = ProjectRestUtils.createProject(getRestApiClient(), "[E2E] GoodSales project", "", "/projectTemplates/GoodSalesDemo/2",
                 testParams.getAuthorizationToken(), testParams.getDwhDriver(), testParams.getProjectEnvironment());
         pids.add(pid);
 
@@ -81,7 +81,7 @@ public class CreateProjectsTest extends AbstractProjectTest {
     @Test(groups = {"teardownProjects", PROJECT_INIT_GROUP})
     public void teardownProjects() throws ParseException, JSONException, IOException {
         for (String pid : testParams.getProjectId().split(",")) {
-            RestUtils.deleteProject(getRestApiClient(), pid);
+            ProjectRestUtils.deleteProject(getRestApiClient(), pid);
         }
         signIn(true, UserRoles.ADMIN);
         initProjectsPage();

@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.reset;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractUITest;
 import com.gooddata.qa.graphene.fragments.account.LostPasswordPage;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 
 public class ResetPasswordTest extends AbstractUITest {
@@ -125,7 +125,7 @@ public class ResetPasswordTest extends AbstractUITest {
             loginFragment.login(testParams.getUser(), NEW_PASSWORD, true);
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
-            RestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
+            UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
             testParams.setPassword(oldPassword);
         }
     }
@@ -146,7 +146,7 @@ public class ResetPasswordTest extends AbstractUITest {
     @Test(dependsOnMethods = { "openOneProject" })
     public void checkSectionManagementVulnerability() throws ParseException, JSONException, IOException {
         initDashboardsPage();
-        RestUtils.updateCurrentUserPassword(getRestApiClient(), oldPassword, NEW_PASSWORD);
+        UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), oldPassword, NEW_PASSWORD);
 
         try {
             sleepTightInSeconds(600);
@@ -164,7 +164,7 @@ public class ResetPasswordTest extends AbstractUITest {
             waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
 
             testParams.setPassword(NEW_PASSWORD);
-            RestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
+            UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), NEW_PASSWORD, oldPassword);
 
             testParams.setPassword(oldPassword);
             logout();

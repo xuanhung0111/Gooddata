@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -36,6 +36,9 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.process.ProcessRestUtils;
+import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 import com.gooddata.warehouse.Warehouse;
 import com.google.common.collect.Lists;
@@ -54,7 +57,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = { "initialData" })
-    public void initialData() throws JSONException {
+    public void initialData() throws JSONException, IOException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();
     }
@@ -200,8 +203,8 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
     @Test(dependsOnGroups = {"initialData"}, priority = 2)
     public void addUsersToProjects() throws ParseException, IOException, JSONException {
-        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, UserRoles.ADMIN);
-        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
+        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, UserRoles.ADMIN);
+        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), testParams.getEditorUser(), 
                 UserRoles.EDITOR);
         getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
         getAdsHelper().addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
@@ -248,10 +251,11 @@ public class DataloadProcessTest extends AbstractMSFTest {
     }
 
     private String getOwnerLogin() throws IOException, JSONException {
-        return RestUtils.getDataloadProcessOwner(getRestApiClient(), testParams.getProjectId());
+        return ProcessRestUtils.getDataloadProcessOwner(getRestApiClient(), testParams.getProjectId());
     }
 
-    private String getLogContent(RestApiClient restApiClient, String executionUri) {
+    private String getLogContent(RestApiClient restApiClient, String executionUri)
+            throws ParseException, IOException {
         return RestUtils.getResource(restApiClient, executionUri + "/log", HttpStatus.OK);
     }
 
@@ -309,13 +313,13 @@ public class DataloadProcessTest extends AbstractMSFTest {
             throws IOException, JSONException {
         final String executionUri = DataloadProcess.TEMPLATE
                 .expand(testParams.getProjectId(), getDataloadProcessId()).toString() + "/executions";
-        return RestUtils.createProcessExecution(expectedStatusCode, getRestApiClient(), executionUri, "", params);
+        return ProcessRestUtils.createProcessExecution(expectedStatusCode, getRestApiClient(), executionUri, "", params);
     }
 
     private String executeDataloadProcessSuccessfully(RestApiClient restApiClient)
             throws IOException, JSONException {
         final String executionUri = executeDataloadProcess(restApiClient, SYNCHRONIZE_ALL_PARAM);
-        RestUtils.waitingForAsyncTask(restApiClient, executionUri);
+        RolapRestUtils.waitingForAsyncTask(restApiClient, executionUri);
         assertTrue("OK".equals(getExecutionStatus(restApiClient, executionUri)));
         return executionUri;
     }
@@ -324,7 +328,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
             throws IOException, JSONException {
         final String executionUri = DataloadProcess.TEMPLATE
                 .expand(testParams.getProjectId(), getDataloadProcessId()).toString() + "/executions";
-        return RestUtils.executeProcess(restApiClient, executionUri, "", params);
+        return ProcessRestUtils.executeProcess(restApiClient, executionUri, "", params);
     }
 
     private String waitForRunningExecutionByStatus(RestApiClient restApiClient,

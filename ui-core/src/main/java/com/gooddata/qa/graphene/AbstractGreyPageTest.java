@@ -42,7 +42,8 @@ import com.gooddata.qa.graphene.fragments.greypages.md.query.attributes.QueryAtt
 import com.gooddata.qa.graphene.fragments.greypages.md.validate.ValidateFragment;
 import com.gooddata.qa.graphene.fragments.greypages.projects.ProjectFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.model.ModelRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
 
 public class AbstractGreyPageTest extends AbstractTest {
@@ -245,15 +246,15 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     protected void addUserToProject(String email, UserRoles userRole) throws ParseException, IOException, JSONException {
-        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), email, userRole);
+        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), email, userRole);
     }
-    
+
     private String getLDMImageFile() throws ParseException, IOException, JSONException {
-        String imageURI = RestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(), 
+        String imageURI = ModelRestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(), 
                 testParams.getHost());
         int indexSVG = imageURI.indexOf(".svg");
-        String imageFileName = imageURI.substring(0, indexSVG+4);
-        imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/")+1);
+        String imageFileName = imageURI.substring(0, indexSVG + 4);
+        imageFileName = imageFileName.substring(imageFileName.lastIndexOf("/") + 1);
         downloadFile(imageURI, imageFileName);
         return imageFileName;
     }

@@ -1,38 +1,43 @@
 package com.gooddata.qa.utils.http.indigo;
 
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
+import static com.gooddata.qa.utils.http.RestUtils.deleteObject;
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
+import com.gooddata.GoodData;
+import com.gooddata.md.Dimension;
+import com.gooddata.md.MetadataService;
+import com.gooddata.md.Metric;
+import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class IndigoRestUtils {
 
     private static final String ANALYTICAL_DASHBOARD_BODY;
     private static final String KPI_WIDGET_BODY;
 
-    private static final String AMOUNT_OBJ_ID = "1279";
-    private static final String LOST_OBJ_ID = "1283";
-    private static final String NUM_OF_ACTIVITIES_OBJ_ID = "14636";
-    private static final String DATE_DIM_CREATED_OBJ_ID = "1";
+    private static final String AMOUNT = "Amount";
+    private static final String LOST = "Lost";
+    private static final String NUM_OF_ACTIVITIES = "# of Activities";
+    private static final String DATE_DIM_CREATED = "Date dimension (Created)";
 
     static {
         try {
@@ -71,33 +76,22 @@ public class IndigoRestUtils {
         }
     }
 
-    public static List<String> getAnalyticalDashboards(RestApiClient restApiClient, String projectId)
+    public static List<String> getAnalyticalDashboards(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
-        String analyticalDashboardsUri = "/gdc/md/" + projectId + "/query/analyticaldashboard";
-
-        HttpRequestBase request = restApiClient.newGetMethod(analyticalDashboardsUri);
-
-        try {
-            HttpResponse response = restApiClient.execute(request);
-            JSONObject JSONresponse = new JSONObject(EntityUtils.toString(response.getEntity()));
-
-            JSONArray entries = JSONresponse.getJSONObject("query").getJSONArray("entries");
-            EntityUtils.consumeQuietly(response.getEntity());
-
-            List<String> dashboardLinks = new ArrayList<>();
-            for (int i = 0; i < entries.length(); i++) {
-                String dashboardLink = entries.getJSONObject(i).getString("link");
-                dashboardLinks.add(dashboardLink);
-            }
-
-            return dashboardLinks;
-        } finally {
-            request.releaseConnection();
+        final String analyticalDashboardsUri = "/gdc/md/" + projectId + "/query/analyticaldashboard";
+        final JSONArray entries = getJsonObject(restApiClient, analyticalDashboardsUri)
+                .getJSONObject("query")
+                .getJSONArray("entries");
+        final List<String> dashboardLinks = new ArrayList<>();
+        for (int i = 0, n = entries.length(); i < n; i++) {
+            dashboardLinks.add(entries.getJSONObject(i).getString("link"));
         }
+
+        return dashboardLinks;
     }
 
-    public static String createKpiWidget(RestApiClient restApiClient, String projectId, KpiMDConfiguration kpiConfig)
-            throws JSONException, IOException {
+    public static String createKpiWidget(final RestApiClient restApiClient, final String projectId,
+            final KpiMDConfiguration kpiConfig) throws JSONException, IOException {
         String content = KPI_WIDGET_BODY
                 .replace("${title}", kpiConfig.getTitle())
                 .replace("${metric}", kpiConfig.getMetric())
@@ -105,7 +99,7 @@ public class IndigoRestUtils {
                 .replace("${comparisonType}", kpiConfig.getComparisonType().getJsonKey());
 
         if (kpiConfig.hasComparison()) {
-            JSONObject contentJson = new JSONObject(content);
+            final JSONObject contentJson = new JSONObject(content);
 
             contentJson.getJSONObject("kpi")
                 .getJSONObject("content")
@@ -115,7 +109,7 @@ public class IndigoRestUtils {
         }
 
         if (kpiConfig.hasDrillTo()) {
-            JSONObject contentJson = new JSONObject(content);
+            final JSONObject contentJson = new JSONObject(content);
 
             contentJson.getJSONObject("kpi")
                 .getJSONObject("content")
@@ -127,46 +121,31 @@ public class IndigoRestUtils {
             content = contentJson.toString();
         }
 
-        HttpRequestBase postRequest = restApiClient.newPostMethod(format(RestUtils.CREATE_AND_GET_OBJ_LINK,
-                projectId), content);
-
-        try {
-            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
-            HttpEntity entity = postResponse.getEntity();
-            String uri =  new JSONObject(EntityUtils.toString(entity)).getJSONObject("kpi")
-                    .getJSONObject("meta").getString("uri");
-            EntityUtils.consumeQuietly(entity);
-            return uri;
-        } finally {
-            postRequest.releaseConnection();
-        }
+        return getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+                    .getJSONObject("kpi")
+                    .getJSONObject("meta")
+                    .getString("uri");
     }
 
-    public static void addKpiWidgetToAnalyticalDashboard(RestApiClient restApiClient, String projectId,
-            String dashboardUri, String widgetUri) throws JSONException, IOException {
-        final JSONObject dashboard = RestUtils.getJSONObjectFrom(restApiClient, dashboardUri);
+    public static void addKpiWidgetToAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
+            final String dashboardUri, final String widgetUri) throws JSONException, IOException {
+        final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
         dashboard.getJSONObject("analyticalDashboard")
             .getJSONObject("content")
             .getJSONArray("widgets")
             .put(widgetUri);
 
-        HttpRequestBase putRequest = restApiClient.newPutMethod(dashboardUri, dashboard.toString());
-
-        try {
-            HttpResponse response = restApiClient.execute(putRequest, HttpStatus.OK, "Invalid status code");
-            EntityUtils.consumeQuietly(response.getEntity());
-        } finally {
-            putRequest.releaseConnection();
-        }
+        executeRequest(restApiClient, restApiClient.newPutMethod(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
 
-    public static void deleteKpiWidgetFromAnalyticalDashboard(RestApiClient restApiClient, String projectId,
-            String dashboardUri, String widgetUri) throws JSONException, IOException {
-        final JSONObject dashboard = RestUtils.getJSONObjectFrom(restApiClient, dashboardUri);
+    public static void deleteKpiWidgetFromAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
+            final String dashboardUri, final String widgetUri) throws JSONException, IOException {
+        final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
         final JSONArray widgets = dashboard.getJSONObject("analyticalDashboard")
             .getJSONObject("content")
             .getJSONArray("widgets");
-        JSONArray newWidgets = new JSONArray();
+        final JSONArray newWidgets = new JSONArray();
         for (int i = 0, n = widgets.length(); i < n; i++) {
             final String uri = widgets.getString(i);
             if (!widgetUri.equals(uri)) {
@@ -177,73 +156,59 @@ public class IndigoRestUtils {
             .getJSONObject("content")
             .put("widgets", newWidgets);
 
-        HttpRequestBase putRequest = restApiClient.newPutMethod(dashboardUri, dashboard.toString());
-
-        try {
-            HttpResponse response = restApiClient.execute(putRequest, HttpStatus.OK, "Invalid status code");
-            EntityUtils.consumeQuietly(response.getEntity());
-        } finally {
-            putRequest.releaseConnection();
-        }
+        executeRequest(restApiClient, restApiClient.newPutMethod(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
 
-    public static String createAnalyticalDashboard(RestApiClient restApiClient, String projectId,
-            Collection<String> widgetUris) throws JSONException, IOException {
+    public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
+            final Collection<String> widgetUris) throws JSONException, IOException {
 
         // TODO: consider better with .put() and have clever template
-        String widgets = new JSONArray(widgetUris).toString();
-        String content = ANALYTICAL_DASHBOARD_BODY.replace("\"widgets\":[]", "\"widgets\":"+widgets);
+        final String widgets = new JSONArray(widgetUris).toString();
+        final String content = ANALYTICAL_DASHBOARD_BODY.replace("\"widgets\":[]", "\"widgets\":" + widgets);
 
-        HttpRequestBase postRequest = restApiClient.newPostMethod(format(RestUtils.CREATE_AND_GET_OBJ_LINK, projectId),
-                content);
-
-        try {
-            HttpResponse postResponse = restApiClient.execute(postRequest, HttpStatus.OK, "Invalid status code");
-            HttpEntity entity = postResponse.getEntity();
-            String uri =  new JSONObject(EntityUtils.toString(entity)).getJSONObject("analyticalDashboard")
-                    .getJSONObject("meta").getString("uri");
-            EntityUtils.consumeQuietly(entity);
-            return uri;
-        } finally {
-            postRequest.releaseConnection();
-        }
-
+        return getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+                    .getJSONObject("analyticalDashboard")
+                    .getJSONObject("meta")
+                    .getString("uri");
     }
 
-    public static void prepareAnalyticalDashboardTemplate(RestApiClient restApiClient, String projectId)
-            throws JSONException, IOException {
+    public static void prepareAnalyticalDashboardTemplate(final RestApiClient restApiClient,
+            final GoodData goodData, final String projectId) throws JSONException, IOException {
         // delete all dashboards, if some exist
         for (String dashboardLink: getAnalyticalDashboards(restApiClient, projectId)) {
-            RestUtils.deleteObject(restApiClient, dashboardLink);
+            deleteObject(restApiClient, dashboardLink);
         }
 
-        String amountMetricUri = getObjectUri(projectId, AMOUNT_OBJ_ID);
-        String lostMetricUri = getObjectUri(projectId, LOST_OBJ_ID);
-        String numOfActivitiesUri = getObjectUri(projectId, NUM_OF_ACTIVITIES_OBJ_ID);
-        String dateDimensionUri = getDateDimensionCreatedUri(projectId);
+        final Project project = goodData.getProjectService().getProjectById(projectId);
+        final MetadataService service = goodData.getMetadataService();
+        final String amountMetricUri = service.getObjUri(project, Metric.class, title(AMOUNT));
+        final String lostMetricUri = service.getObjUri(project, Metric.class, title(LOST));
+        final String numOfActivitiesUri = service.getObjUri(project, Metric.class, title(NUM_OF_ACTIVITIES));
+        final String dateDimensionUri = getDateDimensionCreatedUri(goodData, projectId);
 
-        String amountWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
-                .title("Amount")
+        final String amountWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+                .title(AMOUNT)
                 .metric(amountMetricUri)
                 .dateDimension(dateDimensionUri)
                 .comparisonType(ComparisonType.NO_COMPARISON)
                 .comparisonDirection(ComparisonDirection.NONE)
                 .build());
-        String lostWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
-                .title("Lost")
+        final String lostWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+                .title(LOST)
                 .metric(lostMetricUri)
                 .dateDimension(dateDimensionUri)
                 .comparisonType(Kpi.ComparisonType.LAST_YEAR)
                 .comparisonDirection(Kpi.ComparisonDirection.BAD)
                 .build());
-        String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
-                .title("# of Activities")
+        final String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+                .title(NUM_OF_ACTIVITIES)
                 .metric(numOfActivitiesUri)
                 .dateDimension(dateDimensionUri)
                 .comparisonType(Kpi.ComparisonType.PREVIOUS_PERIOD)
                 .comparisonDirection(Kpi.ComparisonDirection.GOOD)
                 .build());
-        String drillToWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
+        final String drillToWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
                 .title("DrillTo")
                 .metric(amountMetricUri)
                 .dateDimension(dateDimensionUri)
@@ -253,16 +218,14 @@ public class IndigoRestUtils {
                 .drillToDashboardTab("adzD7xEmdhTx")
                 .build());
 
-        List<String> widgetUris = Arrays.asList(amountWidget, lostWidget, numOfActivitiesWidget, drillToWidget);
+        final List<String> widgetUris = asList(amountWidget, lostWidget, numOfActivitiesWidget, drillToWidget);
         createAnalyticalDashboard(restApiClient, projectId, widgetUris);
     }
 
-    public static String getDateDimensionCreatedUri(String projectId) {
-        return getObjectUri(projectId, DATE_DIM_CREATED_OBJ_ID);
-    }
-
-    private static String getObjectUri(String projectId, String objectId) {
-        return "/gdc/md/${projectId}/obj/${objectId}".replace("${projectId}", projectId)
-                .replace("${objectId}", objectId);
+    public static String getDateDimensionCreatedUri(final GoodData goodData, final String projectId) {
+        return goodData.getMetadataService()
+            .getObjUri(goodData.getProjectService().getProjectById(projectId),
+                    Dimension.class,
+                    title(DATE_DIM_CREATED));
     }
 }

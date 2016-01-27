@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.AfterClass;
@@ -72,7 +73,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 1)
-    public void  checkResourcesAfterChangeAdsInstance () throws IOException {
+    public void  checkResourcesAfterChangeAdsInstance () throws IOException, ParseException, JSONException {
         createUpdateADSTable(ADSTables.WITHOUT_ADDITIONAL_FIELDS);
         final Warehouse newAds = createAds("ADS Instance for DLUI test");
         try {
@@ -96,7 +97,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 1)
-    public void repairWrongMappingUsingDiffContent() throws IOException {
+    public void repairWrongMappingUsingDiffContent() throws IOException, ParseException, JSONException {
         createUpdateADSTableBySQLFiles("createTableWithErrorMapping_DiffTest.txt",
                 "copyTableWithErrorMapping_DiffTest.txt", ads);
 

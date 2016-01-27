@@ -5,8 +5,12 @@ import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_LAST_YEAR;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_THIS_YEAR;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.executeMAQL;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.waitingForAsyncTask;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
@@ -28,7 +32,10 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -43,7 +50,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.RestApiClient;
 
 public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
@@ -160,16 +167,16 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
     }
 
     private void uploadDatasetFromCsv(String csvFilePath) throws JSONException, URISyntaxException, IOException {
-      String pollingUri = RestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
+      String pollingUri = executeMAQL(getRestApiClient(), testParams.getProjectId(),
               getResourceAsString(KPI_ERROR_DATA_RESOURCE + "user.maql"));
-      RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
+      waitingForAsyncTask(getRestApiClient(), pollingUri);
 
       setupData(csvFilePath, KPI_ERROR_DATA_RESOURCE + "upload_info.json");
     }
 
     private void setupData(String csvPath, String uploadInfoPath)
             throws JSONException, URISyntaxException, ParseException, IOException {
-        String webdavServerUrl = RestUtils.getWebDavServerUrl(getRestApiClient(), getRootUrl());
+        String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
 
         String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
 
@@ -180,7 +187,35 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
         uploadFileToWebDav(uploadInfoResource, webdavUrl);
 
         String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
-        assertTrue(RestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
+        assertTrue(postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
                 integrationEntry), "Etl pull is not ok!");
+    }
+
+    private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
+            throws IOException, JSONException {
+        final JSONArray links = getJsonObject(restApiClient, "/gdc", HttpStatus.OK)
+                .getJSONObject("about")
+                .getJSONArray("links");
+
+        JSONObject link;
+        for (int i = 0, n = links.length(); i < n; i++) {
+            link = links.getJSONObject(i);
+            if (!"user-uploads".equals(link.getString("title"))) continue;
+            return getWebDavServerUrl(link.getString("link"), serverRootUrl);
+        }
+
+        return "";
+    }
+
+    private String getWebDavServerUrl(String userUploadsLink, String serverRootUrl) {
+        String webdavServerUrl = "";
+        if (userUploadsLink.startsWith("https://")) {
+            webdavServerUrl = userUploadsLink;
+        } else if (userUploadsLink.startsWith("/")) {
+            webdavServerUrl = serverRootUrl + userUploadsLink.substring(1);
+        } else {
+            webdavServerUrl = serverRootUrl + userUploadsLink;
+        }
+        return webdavServerUrl;
     }
 }

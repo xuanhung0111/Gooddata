@@ -5,11 +5,10 @@ package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
-
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -23,10 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
@@ -45,9 +41,10 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEmbedDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.RestUtils;
-import com.gooddata.qa.utils.http.RestUtils.FeatureFlagOption;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils.FeatureFlagOption;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 
@@ -152,7 +149,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         initDashboardsPage();
         dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
         dashboardsPage.editDashboard();
-        dashboardsPage.getDashboardEditBar().tryToDeleteDashboard();
+        final DashboardEditBar editBar = dashboardsPage.getDashboardEditBar();
+        editBar.tryToDeleteDashboard();
         Graphene.waitGui().until(new Predicate<WebDriver>() {
             @Override
             public boolean apply(WebDriver browser) {
@@ -162,7 +160,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         assertEquals(browser.findElement(BY_RED_BAR).getText(), CANNOT_DELETE_DASHBOARD_MESSAGE);
         logRedBarMessageInfo(browser);
         waitForElementVisible(By.cssSelector("div#status .s-btn-dismiss"), browser).click();
-        dashboardsPage.getDashboardEditBar().cancelDashboard();
+        editBar.cancelDashboard();
     }
 
     @Test(dependsOnGroups = {"schedules"}, alwaysRun = true)
@@ -341,18 +339,18 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
         String userB = "qa+test+schedule+b@gooddata.com";
         String scheduleUserA = "Schedule with deleted bcc email";
         String scheduleUserB = "Schedule with deleted author";
-        String userAUri = RestUtils.createNewUser(getRestApiClient(), userA, testParams.getPassword());
-        String userBUri = RestUtils.createNewUser(getRestApiClient(), userB, testParams.getPassword());
+        String userAUri = UserManagementRestUtils.createUser(getRestApiClient(), userA, testParams.getPassword());
+        String userBUri = UserManagementRestUtils.createUser(getRestApiClient(), userB, testParams.getPassword());
 
         try {
-        	String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
-            RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userA, UserRoles.EDITOR);
-            RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userB, UserRoles.ADMIN);
+            String userUri = getGoodDataClient().getAccountService().getCurrent().getUri();
+            UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userA, UserRoles.EDITOR);
+            UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), userB, UserRoles.ADMIN);
 
             initDashboardsPage();
             dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
             createDashboardSchedule(scheduleUserA, asList(userA));
-            RestUtils.deleteUser(getRestApiClient(), userAUri);
+            UserManagementRestUtils.deleteUser(getRestApiClient(), userAUri);
 
             initEmailSchedulesPage();
             assertDashboardScheduleInfo(scheduleUserA, userUri, asList(userA));
@@ -364,15 +362,15 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
             logout();
             signIn(true, UserRoles.ADMIN);
-            RestUtils.deleteUser(getRestApiClient(), userBUri);
+            UserManagementRestUtils.deleteUser(getRestApiClient(), userBUri);
 
             initEmailSchedulesPage();
             assertFalse(emailSchedulesPage.isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");
         } finally {
             loginAs(UserRoles.ADMIN);
-            RestUtils.deleteUser(getRestApiClient(), userAUri);
-            RestUtils.deleteUser(getRestApiClient(), userBUri);
+            UserManagementRestUtils.deleteUser(getRestApiClient(), userAUri);
+            UserManagementRestUtils.deleteUser(getRestApiClient(), userBUri);
         }
     }
 
@@ -418,44 +416,37 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     private String getScheduleUri(String scheduleTitle) throws JSONException, IOException {
-        String schedulesUri = "/gdc/md/" + testParams.getProjectId() + "/query/scheduledmails";
+        final String schedulesUri = "/gdc/md/" + testParams.getProjectId() + "/query/scheduledmails";
+        final JSONArray schedules = RestUtils.getJsonObject(getRestApiClient(), schedulesUri)
+            .getJSONObject("query")
+            .getJSONArray("entries");
 
-        // re-initialize of the rest client is necessary to prevent execution freeze
-        restApiClient = null;
-        final RestApiClient rac = getRestApiClient();
-        final HttpGet getRequest = rac.newGetMethod(schedulesUri);
-        final HttpResponse getResponse = rac.execute(getRequest);
-        JSONArray schedules = new JSONObject(EntityUtils.toString(getResponse.getEntity()))
-                .getJSONObject("query").getJSONArray("entries");
-
-        String uri = null;
-        for (int i = 0; i < schedules.length(); i++) {
-            JSONObject schedule = schedules.getJSONObject(i);
+        for (int i = 0, n = schedules.length(); i < n; i++) {
+            final JSONObject schedule = schedules.getJSONObject(i);
             if (schedule.getString("title").equals(scheduleTitle)) {
-                uri = schedule.getString("link");
-                break;
+                return schedule.getString("link");
             }
         }
-        return uri;
+        return null;
     }
 
     private void enableHideDashboardScheduleFlag() throws JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE);
     }
 
     private void disableHideDashboardScheduleFlag() throws JSONException, IOException {
-        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(), FeatureFlagOption
+        ProjectRestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(), FeatureFlagOption
                 .createFeatureClassOption(ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE.getFlagName(), false));
     }
 
     private void enableDashboardScheduleRecipientsFlag() throws JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
     }
 
     private void disableDashboardScheduleRecipientsFlag() throws JSONException, IOException {
-        RestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(), FeatureFlagOption
+        ProjectRestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(), FeatureFlagOption
                 .createFeatureClassOption(ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS.getFlagName(), false));
     }
 

@@ -33,7 +33,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.ConfigurationPanel;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DrillToSelect;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.google.common.base.Predicate;
 
 public class KpiDrillToTest extends DashboardWithWidgetsTest {
@@ -294,7 +294,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
                 waitForElementVisible(BY_DISMISS_BUTTON, browser).click();
                 dashboardsPage.getDashboardEditBar().saveDashboard();
 
-                RestUtils.deleteDashboardTab(getRestApiClient(), getObjectUriFromUrl(browser.getCurrentUrl()),
+                DashboardsRestUtils.deleteDashboardTab(getRestApiClient(), getObjectUriFromUrl(browser.getCurrentUrl()),
                         newTab);
 
                 initIndigoDashboardsPageWithWidgets()

@@ -8,9 +8,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.AfterClass;
@@ -24,6 +21,7 @@ import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectExecutionContex
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectScheduledEmailFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.query.scheduledemails.QueryScheduledEmailsFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -146,8 +144,7 @@ public class GoodSalesScheduleDialogFiltersTest extends AbstractGoodSalesEmailSc
     }
 
     private void deleteObject(int objectId) {
-        HttpRequestBase request = restApiClient.newDeleteMethod(getRootUrl() + mdBaseUri + "/obj/" + Integer.toString(objectId));
-        HttpResponse response = restApiClient.execute(request);
-        EntityUtils.consumeQuietly(response.getEntity());
+        RestUtils.executeRequest(restApiClient,
+                restApiClient.newDeleteMethod(getRootUrl() + mdBaseUri + "/obj/" + Integer.toString(objectId)));
     }
 }

@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
@@ -42,7 +42,7 @@ import com.gooddata.qa.graphene.fragments.reports.report.OneNumberReport;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.graphene.utils.frame.InFrameAction;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.collect.Lists;
 
 public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
@@ -412,7 +412,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void createScheduleOfEmbeddedDashboard() throws JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
 
         String defaultScheduleSubject = EMBEDDED_DASHBOARD_NAME + " Dashboard";

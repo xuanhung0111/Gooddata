@@ -1,12 +1,15 @@
 package com.gooddata.qa.graphene.utils;
 
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static com.gooddata.qa.utils.http.RestUtils.getResource;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.waitingForAsyncTask;
 import static java.lang.String.format;
 import static org.apache.commons.lang.Validate.notNull;
 import static org.testng.Assert.assertEquals;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
+import java.io.IOException;
+
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -14,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import com.gooddata.GoodData;
 import com.gooddata.project.Environment;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.warehouse.Warehouse;
 
 public final class AdsHelper {
@@ -68,50 +70,36 @@ public final class AdsHelper {
         }
     }
 
-    public void associateAdsWithProject(Warehouse adsInstance, String projectId) {
-        String schemaUri = format(ADS_INSTANCE_SCHEMA_URI, adsInstance.getId());
-        JSONObject outputStageObj = new JSONObject();
-        try {
-            outputStageObj.put("outputStage", new JSONObject().put("schema", schemaUri));
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is a problem with JSON object when set default schema for outputStage! ", e);
-        }
+    public void associateAdsWithProject(final Warehouse adsInstance, final String projectId)
+            throws JSONException, ParseException, IOException {
+        final JSONObject outputStageObj = new JSONObject() {{
+            put("outputStage", new JSONObject() {{
+                put("schema", format(ADS_INSTANCE_SCHEMA_URI, adsInstance.getId()));
+            }});
+        }};
+        final String outputStageUri = format(OUTPUT_STAGE_URI, projectId);
 
-        String outputStageUri = format(OUTPUT_STAGE_URI, projectId);
-        HttpRequestBase putRequest = restApiClient.newPutMethod(outputStageUri, outputStageObj.toString());
-        putRequest.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION);
-
-        HttpResponse putResponse = restApiClient.execute(putRequest);
-        int responseStatusCode = putResponse.getStatusLine().getStatusCode();
-
-        System.out.println(putResponse.toString());
-        EntityUtils.consumeQuietly(putResponse.getEntity());
-        System.out.println("Response status: " + responseStatusCode);
-        assertEquals(responseStatusCode, HttpStatus.OK.value(), "Default schema is not set successfully!");
+        getResource(restApiClient,
+                restApiClient.newPutMethod(outputStageUri, outputStageObj.toString()),
+                req -> req.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION),
+                HttpStatus.OK);
     }
 
-    public void addUserToAdsInstance(Warehouse adsInstance, String user, AdsRole role) {
-        String adsUserUri = String.format(ADS_INSTANCES_USERS_URI, adsInstance.getId());
-        String contentBody = ADD_USER_CONTENT_BODY.replace("${role}", role.getName()).replace("${email}", user);
+    public void addUserToAdsInstance(final Warehouse adsInstance, final String user, final AdsRole role)
+            throws ParseException, JSONException, IOException {
+        final String adsUserUri = String.format(ADS_INSTANCES_USERS_URI, adsInstance.getId());
+        final String contentBody = ADD_USER_CONTENT_BODY.replace("${role}", role.getName()).replace("${email}", user);
         System.out.println("Content of json: " + contentBody);
-        HttpRequestBase postRequest = restApiClient.newPostMethod(adsUserUri, contentBody);
-        try {
-            HttpResponse postResponse =
-                    restApiClient.execute(postRequest, HttpStatus.ACCEPTED, "Invalid status code");
-            JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
-            String pollingUri =
-                    json.getJSONObject("asyncTask").getJSONObject("links").getString("poll");
-            assertEquals(RestUtils.waitingForAsyncTask(restApiClient, pollingUri), HttpStatus.CREATED.value(),
-                    "User isn't added properly into the ads instance");
-            System.out.println(format("Successfully added user %s to ads instance %s", user, adsInstance.getId()));
 
-            EntityUtils.consumeQuietly(postResponse.getEntity());
-        } catch (Exception e) {
-            throw new IllegalStateException("There is a exception when adding user to ads instance", e);
-        } finally {
-            postRequest.releaseConnection();
-        }
+        final String pollingUri = getJsonObject(restApiClient,
+                restApiClient.newPostMethod(adsUserUri, contentBody), HttpStatus.ACCEPTED)
+                    .getJSONObject("asyncTask")
+                    .getJSONObject("links")
+                    .getString("poll");
+
+        assertEquals(waitingForAsyncTask(restApiClient, pollingUri), HttpStatus.CREATED.value(),
+                "User isn't added properly into the ads instance");
+        System.out.println(format("Successfully added user %s to ads instance %s", user, adsInstance.getId()));
     }
 
     public enum AdsRole {

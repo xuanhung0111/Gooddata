@@ -23,7 +23,7 @@ import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class TableTest extends AbstractAdE2ETest {
 
@@ -50,7 +50,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void it_should_be_blank_by_default() throws ParseException, JSONException, IOException {
-        RestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
+        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
 
         initAnalysePageByUrl();
 
@@ -63,7 +63,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void it_should_be_empty_if_formatted() throws ParseException, JSONException, IOException {
-        RestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] empty");
+        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] empty");
 
         initAnalysePageByUrl();
 
@@ -76,7 +76,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_zeros_as_usual() throws ParseException, JSONException, IOException {
-        RestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] 0.00 $");
+        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] 0.00 $");
 
         initAnalysePageByUrl();
 

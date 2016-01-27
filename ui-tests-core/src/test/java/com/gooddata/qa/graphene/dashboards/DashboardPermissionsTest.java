@@ -1,11 +1,11 @@
 package com.gooddata.qa.graphene.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog.ALERT_INFOBOX_CSS_SELECTOR;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -27,7 +27,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.AddGranteesDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.PermissionsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SaveAsDialog.PermissionType;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.collect.Lists;
 
 public class DashboardPermissionsTest extends GoodSalesAbstractTest {
@@ -314,10 +314,10 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        String userGroup1Uri =
-                RestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(), ALCOHOLICS_ANONYMOUS);
-        String userGroup2Uri =
-                RestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(), XENOFOBES_XYLOPHONES);
+        String userGroup1Uri = UserManagementRestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(),
+                ALCOHOLICS_ANONYMOUS);
+        String userGroup2Uri = UserManagementRestUtils.addUserGroup(getRestApiClient(), testParams.getProjectId(),
+                XENOFOBES_XYLOPHONES);
         userGroup1Id = getUserGroupID(userGroup1Uri);
         userGroup2Id = getUserGroupID(userGroup2Uri);
     }
@@ -558,8 +558,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
         logout();
         signIn(false, UserRoles.ADMIN);
 
-        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup1Id, editorProfileUri);
-        RestUtils.addUsersToUserGroup(getRestApiClient(), userGroup2Id, viewerProfileUri);
+        UserManagementRestUtils.addUsersToUserGroup(getRestApiClient(), userGroup1Id, editorProfileUri);
+        UserManagementRestUtils.addUsersToUserGroup(getRestApiClient(), userGroup2Id, viewerProfileUri);
     }
 
     @Test(dependsOnMethods = {"prepareUsergroupTests"}, groups = {"acl-tests-usergroups", "sanity"})

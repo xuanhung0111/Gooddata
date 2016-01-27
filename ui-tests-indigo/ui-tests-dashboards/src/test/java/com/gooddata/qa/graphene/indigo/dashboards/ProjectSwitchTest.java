@@ -1,18 +1,21 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import com.gooddata.qa.utils.http.RestUtils;
-import java.io.IOException;
-import java.util.UUID;
-import org.apache.http.ParseException;
-import org.json.JSONException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
+
+import java.io.IOException;
+import java.util.UUID;
+
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
     private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 10);
@@ -42,7 +45,7 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "switchProjectsTest-switched-back", getClass());
         assertEquals(indigoDashboardsPage.getCurrentProjectName(), projectTitle);
 
-        RestUtils.deleteProject(getRestApiClient(), newProjectId);
+        ProjectRestUtils.deleteProject(getRestApiClient(), newProjectId);
     }
 
     private String createProject(String name) {

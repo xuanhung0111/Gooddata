@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static com.gooddata.qa.utils.http.model.ModelRestUtils.getProductionProjectModelView;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
@@ -31,7 +32,6 @@ import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
 public class UploadTest extends AbstractCsvUploaderTest {
@@ -261,9 +261,9 @@ public class UploadTest extends AbstractCsvUploaderTest {
         String datasetName = getNewDataset(fileToUpload);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         datasetNames.addAll(Lists.newArrayList("opportunity", "person", datasetName, "Date (Paydate)"));
-        JSONObject onlyProductionDataModel = RestUtils.getProductionProjectModelView(getRestApiClient(),
+        JSONObject onlyProductionDataModel = getProductionProjectModelView(getRestApiClient(),
                 testParams.getProjectId(), false);
-        JSONObject allDataModel = RestUtils.getProductionProjectModelView(getRestApiClient(), testParams.getProjectId(),
+        JSONObject allDataModel = getProductionProjectModelView(getRestApiClient(), testParams.getProjectId(),
                 true);
         assertThat(getListOfDatasets(onlyProductionDataModel), containsInAnyOrder("opportunity", "person"));
         assertThat(getListOfDatasets(allDataModel), containsInAnyOrder("opportunity", "person", datasetName));

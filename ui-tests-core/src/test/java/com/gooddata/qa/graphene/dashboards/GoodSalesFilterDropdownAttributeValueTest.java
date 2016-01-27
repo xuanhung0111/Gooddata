@@ -3,10 +3,10 @@ package com.gooddata.qa.graphene.dashboards;
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
-import static com.gooddata.qa.utils.http.RestUtils.addMUFToUser;
-import static com.gooddata.qa.utils.http.RestUtils.createMUFObj;
-import static com.gooddata.qa.utils.http.RestUtils.executePostRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJSONObjectFrom;
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMUFToUser;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMUFObj;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
+import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -397,9 +398,11 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     private void configureUseAvailableToDashboard(String dashboardUri) throws IOException, JSONException {
-        JSONObject json = getJSONObjectFrom(getRestApiClient(), dashboardUri);
+        JSONObject json = getJsonObject(getRestApiClient(), dashboardUri);
         json = addUseAvailableContentToJson(json);
-        executePostRequest(getRestApiClient(), dashboardUri + "?mode=edit", json.toString());
+        executeRequest(getRestApiClient(),
+                getRestApiClient().newPostMethod(dashboardUri + "?mode=edit", json.toString()),
+                HttpStatus.OK);
     }
 
     private String buildFirstMetricExpression(String amountUri, String stageNameUri) {
@@ -434,9 +437,11 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     private void editMetricExpression(String expression) throws IOException, JSONException {
-        JSONObject json = getJSONObjectFrom(getRestApiClient(), metricAvailable.getUri());
+        JSONObject json = getJsonObject(getRestApiClient(), metricAvailable.getUri());
         json.getJSONObject("metric").getJSONObject("content").put("expression", expression);
-        executePostRequest(getRestApiClient(), metricAvailable.getUri() + "?mode=edit", json.toString());
+        executeRequest(getRestApiClient(),
+                getRestApiClient().newPostMethod(metricAvailable.getUri() + "?mode=edit", json.toString()),
+                HttpStatus.OK);
     }
 
     private JSONObject addUseAvailableContentToJson(JSONObject json) throws JSONException {
@@ -458,7 +463,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     }
 
     private boolean isUseAvailableStillRemainInDashboard(String dashboardUri) throws IOException, JSONException {
-        JSONObject json = getJSONObjectFrom(getRestApiClient(), dashboardUri);
+        JSONObject json = getJsonObject(getRestApiClient(), dashboardUri);
         JSONArray filters = json.getJSONObject("projectDashboard").getJSONObject("content")
                 .getJSONArray("filters");
         JSONObject currentObj;

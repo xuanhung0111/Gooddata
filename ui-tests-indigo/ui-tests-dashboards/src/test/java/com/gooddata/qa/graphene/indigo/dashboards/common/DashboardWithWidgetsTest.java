@@ -37,7 +37,8 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"dashboardWidgetsInit"})
     public void initDashboardWithWidgets() throws JSONException, IOException {
-        IndigoRestUtils.prepareAnalyticalDashboardTemplate(getRestApiClient(), testParams.getProjectId());
+        IndigoRestUtils.prepareAnalyticalDashboardTemplate(getRestApiClient(), getGoodDataClient(),
+                testParams.getProjectId());
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"dashboardWidgetsInit"})

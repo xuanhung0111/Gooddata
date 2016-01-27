@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.dlui;
 
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
@@ -26,9 +27,6 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
-
-import static com.gooddata.md.Restriction.*;
-
 import com.gooddata.qa.graphene.AbstractMSFTest;
 import com.gooddata.qa.graphene.entity.DataSource;
 import com.gooddata.qa.graphene.entity.Dataset;
@@ -40,7 +38,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.DataSourcesFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -77,8 +75,8 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     public void prepareDataForDLUI() throws JSONException, ParseException, IOException {
         initManagePage();
         assertThat(browser.findElements(By.cssSelector(ADD_DATA_BUTTON_CSS_LOCATOR)), is(empty()));
-        
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+
+        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
 
         prepareLDMAndADSInstance();
@@ -192,7 +190,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
 
     protected void checkNewAddedDataReportAndCleanAddedData(UserRoles role,
             final AddedFields addedField, final ReportWithAddedFields reportWithAddedFields)
-            throws JSONException {
+            throws JSONException, IOException {
         addDataFromAdsToLdmAndDropAfterTest(role, addedField.getCleanupMaqlFile(),
                 new TestAction() {
                     @Override
@@ -219,7 +217,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         annieUIDialog.clickOnDismissButton();
     }
 
-    protected void addMultiFieldsAndCheckReport(UserRoles role) throws JSONException {
+    protected void addMultiFieldsAndCheckReport(UserRoles role) throws JSONException, IOException {
         String maqlFile = "dropMultiAddedFieldsInLDM.txt";
         addDataFromAdsToLdmAndDropAfterTest(role, maqlFile, new TestAction() {
             @Override
@@ -229,7 +227,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         });
     }
 
-    protected void addMultiFieldsAndAssertAnnieDialog(UserRoles role) throws JSONException {
+    protected void addMultiFieldsAndAssertAnnieDialog(UserRoles role) throws JSONException, IOException {
         String maqlFile = "dropMultiAddedFieldsInLDM.txt";
         addDataFromAdsToLdmAndDropAfterTest(UserRoles.ADMIN, maqlFile, new TestAction() {
             @Override
@@ -349,7 +347,7 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
     }
 
     private void addDataFromAdsToLdmAndDropAfterTest(UserRoles role, String maqlFile,
-            TestAction testAction) throws JSONException {
+            TestAction testAction) throws JSONException, IOException {
         try {
             if (role == UserRoles.EDITOR) {
                 signInWithOtherRole(UserRoles.EDITOR);

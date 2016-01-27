@@ -1,7 +1,10 @@
 package com.gooddata.qa.graphene.connectors;
 
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.util.Arrays.asList;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -9,15 +12,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.utils.http.RestApiClient;
 
@@ -102,18 +105,11 @@ public class ZendeskHelper {
 
     public int createNewZendeskObject(String url, String jsonContent, ZendeskObject objectName)
             throws IOException, JSONException {
-        HttpRequestBase postRequest = apiClient.newPostMethod(url, jsonContent);
-        try {
-            HttpResponse postResponse = apiClient.execute(postRequest);
-            checkStatusCode(postResponse, 201);
-            String result = EntityUtils.toString(postResponse.getEntity());
-            JSONObject json = new JSONObject(result);
-            int id = json.getJSONObject(objectName.getName()).getInt("id");
-            System.out.println("New Zendesk " + objectName.getName() + " created, id: " + id);
-            return id;
-        } finally {
-            postRequest.releaseConnection();
-        }
+        final int id = getJsonObject(apiClient, apiClient.newPostMethod(url, jsonContent), HttpStatus.CREATED)
+            .getJSONObject(objectName.getName())
+            .getInt("id");
+        System.out.println("New Zendesk " + objectName.getName() + " created, id: " + id);
+        return id;
     }
 
     private int getZendeskEntityCount(String url, ZendeskObject objectType)
@@ -151,26 +147,19 @@ public class ZendeskHelper {
 
     private JSONObject retrieveEntitiesJsonFromUrl(String url)
             throws IOException, JSONException {
-        HttpRequestBase getRequest = apiClient.newGetMethod(url);
-        try {
-            HttpResponse getResponse = apiClient.execute(getRequest);
-            int retryCounter = 0;
-            while (getResponse.getStatusLine().getStatusCode() == 429 && retryCounter < 5) {
-                System.out.println("API limits reached, retrying ... ");
-                sleepTightInSeconds(30);
-                getRequest.releaseConnection();
-                getRequest = apiClient.newGetMethod(url);
-                getResponse = apiClient.execute(getRequest);
-                retryCounter++;
-            }
-            checkStatusCode(getResponse, 200);
-            String result = EntityUtils.toString(getResponse.getEntity());
-            JSONObject json = new JSONObject(result);
-            System.out.println("Total " + json.getInt("count") + " entities returned from " + url);
-            return json;
-        } finally {
-            getRequest.releaseConnection();
+        final Supplier<HttpRequestBase> request = () -> apiClient.newGetMethod(url);
+        int retryCounter = 0;
+        int statusCode;
+
+        while ((statusCode = executeRequest(apiClient, request.get())) == 429 && retryCounter < 5) {
+            System.out.println("API limits reached, retrying ... ");
+            sleepTightInSeconds(30);
+            retryCounter++;
         }
+        assertEquals(statusCode, 200, "Invalid status code");
+        final JSONObject json = getJsonObject(apiClient, url);
+        System.out.println("Total " + json.getInt("count") + " entities returned from " + url);
+        return json;
     }
 
     private Set<Integer> getSetOfActiveZendeskEntities(String url, ZendeskObject objectType, int pageNumber)
@@ -229,40 +218,21 @@ public class ZendeskHelper {
 
     private void deleteZendeskEntity(String url, int id) throws IOException {
         final String objectUrl = url + "/" + id;
-        HttpRequestBase deleteRequest = apiClient.newDeleteMethod(objectUrl);
-        try {
-            System.out.println("Going to delete object on url " + objectUrl);
-            HttpResponse deleteResponse = apiClient.execute(deleteRequest);
-            checkStatusCode(deleteResponse, 204, 200);
-            System.out.println("Deleted object on url " + objectUrl);
-        } finally {
-            deleteRequest.releaseConnection();
-        }
+        System.out.println("Going to delete object on url " + objectUrl);
+        assertTrue(asList(204, 200)
+                .contains(executeRequest(apiClient, apiClient.newDeleteMethod(objectUrl))),
+                "Invalid status code");
+        System.out.println("Deleted object on url " + objectUrl);
     }
 
     public void updateZendeskObject(String url, String jsonContent, ZendeskObject objectName)
             throws IOException, JSONException {
-        HttpRequestBase putRequest = apiClient.newPutMethod(url, jsonContent);
-        try {
-            HttpResponse putResponse = apiClient.execute(putRequest);
-            checkStatusCode(putResponse, 200);
-            JSONObject json = new JSONObject(EntityUtils.toString(putResponse.getEntity()));
-            int id = json.getJSONObject(objectName.getName()).getInt("id");
-            System.out.println("Zendesk " + objectName.getName() + " was updated, id: " + id);
-        } finally {
-            putRequest.releaseConnection();
-        }
+        final int id = getJsonObject(apiClient, apiClient.newPutMethod(url, jsonContent))
+            .getJSONObject(objectName.getName()).getInt("id");
+        System.out.println("Zendesk " + objectName.getName() + " was updated, id: " + id);
     }
 
     public static String getCurrentTimeIdentifier() {
         return dateFormat.format(new Date());
-    }
-
-    private void checkStatusCode(HttpResponse response, Integer ... expectedStatus) {
-        final boolean hasExpectedStatus = asList(expectedStatus).contains(response.getStatusLine().getStatusCode());
-        if (hasExpectedStatus) {
-            System.out.println("Response status reason phrase: " + response.getStatusLine().getReasonPhrase());
-        }
-        assertTrue(hasExpectedStatus, "Invalid status code");
     }
 }

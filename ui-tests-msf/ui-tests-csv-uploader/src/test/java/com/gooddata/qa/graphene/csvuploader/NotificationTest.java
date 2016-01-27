@@ -19,7 +19,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
@@ -58,7 +58,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         String projectId = testParams.getProjectId();
         String GoodSalesProjectID = "";
         try {
-            GoodSalesProjectID = RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
+            GoodSalesProjectID = ProjectRestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
                     GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getDwhDriver(),
                     testParams.getProjectEnvironment());
             testParams.setProjectId(GoodSalesProjectID);
@@ -77,7 +77,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         } finally {
             testParams.setProjectId(projectId);
             if (!GoodSalesProjectID.isEmpty()) {
-                RestUtils.deleteProject(getRestApiClient(), GoodSalesProjectID);
+                ProjectRestUtils.deleteProject(getRestApiClient(), GoodSalesProjectID);
             }
         }
     }

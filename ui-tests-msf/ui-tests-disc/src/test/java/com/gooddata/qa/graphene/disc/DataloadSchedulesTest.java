@@ -1,10 +1,12 @@
 package com.gooddata.qa.graphene.disc;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -31,8 +33,8 @@ import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
-import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.collect.Lists;
 
 public class DataloadSchedulesTest extends AbstractSchedulesTest {
@@ -196,11 +198,11 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             openScheduleViaUrl(schedule2.getScheduleUrl());
             scheduleDetail.tryToRun();
-            Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule2-Failed", getClass());
+            takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule2-Failed", getClass());
             assertConcurrentDataloadScheduleFailed();
 
             openScheduleViaUrl(schedule1.getScheduleUrl());
-            Screenshots.takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule1-Successful", getClass());
+            takeScreenshot(browser, "Concurrent-Dataload-Schedule-Schedule1-Successful", getClass());
             assertSuccessfulExecution();
         } finally {
             openScheduleViaUrl(schedule1.getScheduleUrl());
@@ -229,7 +231,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
             assertTrue(getScheduleDetail(schedule.getScheduleUrl()).contains(scheduleOwner),
                     "Schedule owner is not admin user");
 
-            RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser, 
+            UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(), technicalUser,
                     UserRoles.ADMIN);
             getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
 
@@ -283,7 +285,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkManualDataloadOfAllDatasets() {
+    public void checkManualDataloadOfAllDatasets() throws IOException, JSONException {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
@@ -306,7 +308,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkManualDataloadOfOneDataset() {
+    public void checkManualDataloadOfOneDataset() throws IOException, JSONException {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYDAY).setHasDataloadProcess(true)
@@ -336,7 +338,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkAutoDataloadOfAllDatasets() {
+    public void checkAutoDataloadOfAllDatasets() throws IOException, JSONException {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
@@ -361,7 +363,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"dataloadScheduleReportTest"}, priority = 1)
-    public void checkAutoDataloadOfOneDataset() {
+    public void checkAutoDataloadOfOneDataset() throws IOException, JSONException {
         ScheduleBuilder scheduleBuilder =
                 new ScheduleBuilder().setProcessName(DEFAULT_DATAlOAD_PROCESS_NAME)
                         .setCronTime(ScheduleCronTimes.CRON_EVERYHOUR).setMinuteInHour("${minute}")
@@ -411,7 +413,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
 
             sleepTight(3000); // Wait for project model updating
             List<String> references = getReferencesOfDataset("track");
-            System.out.println("References: " + references);
+            log.info("References: " + references);
             assertTrue(references.contains("dataset.artist"), "Reference was not added automatically!");
 
             checkReportAfterAddReferenceToDataset();
@@ -588,14 +590,14 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
         assertNull(scheduleDetail.getLastExecutionLogLink(), "Log link is not null!");
     }
 
-    private String getScheduleDetail(String scheduleUrl) {
+    private String getScheduleDetail(String scheduleUrl) throws ParseException, IOException {
         Pattern myPattern = Pattern.compile("/schedules/(.*)");
         Matcher m = myPattern.matcher(scheduleUrl);
         String scheduleId = "";
         if (m.find()) {
             scheduleId = m.group(1);
             return RestUtils.getResource(getRestApiClient(),
-                    String.format(SCHEDULE_DETAIL_URI, testParams.getProjectId(), scheduleId), HttpStatus.OK);
+                    format(SCHEDULE_DETAIL_URI, testParams.getProjectId(), scheduleId), HttpStatus.OK);
         }
 
         throw new IllegalStateException("Schedule ID wasn't found, we could not get schedule detail content!");
@@ -604,10 +606,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     private void runManualAndCheckExecutionSuccessful(String screenShot) {
         scheduleDetail.manualRun();
         assertSuccessfulExecution();
-        Screenshots.takeScreenshot(browser, screenShot, getClass());
+        takeScreenshot(browser, screenShot, getClass());
     }
     
-    private void deleteAndCreateDefaultModel() {
+    private void deleteAndCreateDefaultModel() throws IOException, JSONException {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/dropDefaultModel.txt"));
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
     }
@@ -615,10 +617,10 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     private void checkReportOfAllDatasets() {
         prepareMetricToCheckNewAddedFields("age", "price");
         createAndCheckReport("Opportunity dataset", "name", "price [Sum]",
-                Lists.newArrayList("A", "B", "C", "D", "E", "F"),
+                asList("A", "B", "C", "D", "E", "F"),
                 Collections.nCopies(6, "100"));
         createAndCheckReport("Person dataset", "person", "age [Sum]",
-                Lists.newArrayList("A", "B", "C", "D", "E", "F", "J"),
-                Lists.newArrayList("36", "34", "10", "8", "2", "40", "13"));
+                asList("A", "B", "C", "D", "E", "F", "J"),
+                asList("36", "34", "10", "8", "2", "40", "13"));
     }
 }

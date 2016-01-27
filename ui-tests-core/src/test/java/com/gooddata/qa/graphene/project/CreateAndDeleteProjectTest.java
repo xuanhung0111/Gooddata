@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class CreateAndDeleteProjectTest extends AbstractProjectTest {
 
@@ -45,7 +45,7 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
         openUrl(PAGE_GDC_PROJECTS);
         assertEquals(waitForFragmentVisible(gpProject).getDwhDriverSelected(), DWHDriver.PG.getValue());
 
-        secondProjectId = RestUtils.createBlankProject(getRestApiClient(), projectTitle, projectTitle,
+        secondProjectId = ProjectRestUtils.createBlankProject(getRestApiClient(), projectTitle, projectTitle,
                 testParams.getAuthorizationToken(), testParams.getDwhDriver(),
                 testParams.getProjectEnvironment());
     }

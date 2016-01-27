@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.manage;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -33,7 +33,7 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
@@ -311,10 +311,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             signInAtUI(testParams.getUser(), testParams.getPassword());
             restApiClient = getRestApiClient();
 
-            String mufURI =
-                    RestUtils.createMUFObj(restApiClient, testParams.getProjectId(), "Status User Filters",
-                            buildConditions());
-            RestUtils.addMUFToUser(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
+            String mufURI = DashboardsRestUtils.createMUFObj(restApiClient, testParams.getProjectId(),
+                    "Status User Filters", buildConditions());
+            DashboardsRestUtils.addMUFToUser(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
                     mufURI);
             logout();
 

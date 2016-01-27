@@ -1,8 +1,8 @@
 package com.gooddata.qa.graphene.connectors;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
@@ -10,9 +10,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +17,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.springframework.http.HttpStatus;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -28,6 +26,7 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.enums.Connectors;
 import com.gooddata.qa.graphene.fragments.greypages.connectors.ConnectorFragment;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
 
@@ -297,11 +296,9 @@ public abstract class AbstractConnectorsCheckTest extends AbstractProjectTest {
     }
 
     protected void runConnectorProjectFullLoad() throws JSONException, IOException {
-        getRestApiClient();
-        HttpRequestBase postRequest = restApiClient.newPostMethod("/" + getProcessesUri(), PROCESS_FULL_LOAD_JSON);
-        HttpResponse postResponse = restApiClient.execute(postRequest);
-        assertEquals(postResponse.getStatusLine().getStatusCode(), 201, "Invalid return code when running connector full load");
-        JSONObject json = new JSONObject(EntityUtils.toString(postResponse.getEntity()));
+        final JSONObject json = RestUtils.getJsonObject(getRestApiClient(),
+                getRestApiClient().newPostMethod("/" + getProcessesUri(), PROCESS_FULL_LOAD_JSON),
+                HttpStatus.CREATED);
         browser.get(getBasicRootUrl() + json.getString("uri"));
         waitForIntegrationProcessSynchronized(browser, integrationProcessCheckLimit);
     }

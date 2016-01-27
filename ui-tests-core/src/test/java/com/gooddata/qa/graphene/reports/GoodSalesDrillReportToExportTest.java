@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.reports;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -23,7 +23,7 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardDrillDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 @Test(groups = {"GoodSalesDrillReportToExport"}, description = "Drill report to export")
 public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
@@ -139,13 +139,15 @@ public class GoodSalesDrillReportToExportTest extends GoodSalesAbstractTest {
     }
     
     private void setDrillReportTargetAsPopup() throws JSONException, IOException {
-        RestUtils.setDrillReportTargetAsPopup(getRestApiClient(), testParams.getProjectId(), getDashboardID());
+        DashboardsRestUtils.setDrillReportTargetAsPopup(getRestApiClient(), testParams.getProjectId(),
+                getDashboardID());
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
     }
     
     private void setDrillReportTargetAsExport(String exportFormat) throws JSONException, IOException {
-        RestUtils.setDrillReportTargetAsExport(getRestApiClient(), testParams.getProjectId(), getDashboardID(), exportFormat);
+        DashboardsRestUtils.setDrillReportTargetAsExport(getRestApiClient(), testParams.getProjectId(),
+                getDashboardID(), exportFormat);
         browser.navigate().refresh();
         waitForDashboardPageLoaded(browser);
     }

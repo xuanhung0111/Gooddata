@@ -13,7 +13,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTest {
 
@@ -25,7 +25,7 @@ public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTe
     @Test(dependsOnGroups = {"init"})
     public void openAnalysePageAfterDeleteAnotherProject() throws ParseException, JSONException, IOException {
         String projectId = testParams.getProjectId();
-        String otherProjectId = RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
+        String otherProjectId = ProjectRestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
                 GOODSALES_TEMPLATE, testParams.getAuthorizationToken(),
                 testParams.getDwhDriver(), testParams.getProjectEnvironment());
 
