@@ -4,6 +4,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.stream.Collectors.toList;
 import static org.openqa.selenium.By.className;
+import static org.openqa.selenium.By.tagName;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +39,10 @@ public class TableReport extends AbstractFragment {
     public String getFormatFromValue() {
         return waitForCollectionIsNotEmpty(rows).stream()
             .map(e -> e.findElements(className(CELL_CONTENT)))
-            .map(es -> es.stream().map(e -> e.getAttribute("style")).collect(toList()))
+            .map(es -> es.stream()
+                    .map(e -> e.findElement(tagName("span")))
+                    .map(e -> e.getAttribute("style"))
+                    .collect(toList()))
             .flatMap(e -> e.stream())
             .filter(Objects::nonNull)
             .distinct()
@@ -49,6 +53,7 @@ public class TableReport extends AbstractFragment {
     public TableReport sortBaseOnHeader(final String name) {
         waitForCollectionIsNotEmpty(headers).stream()
             .filter(e -> name.equalsIgnoreCase(e.getText()))
+            .map(e -> e.findElement(BY_LINK))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find table header: " + name))
             .click();
