@@ -28,7 +28,6 @@ import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.jboss.arquillian.graphene.Graphene;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,7 +68,8 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     private final String CUSTOM_MESSAGE = "Extremely useful message";
     private final List<String> CUSTOM_RECIPIENTS = asList("bear+1@gooddata.com", "bear+2@gooddata.com");
     private final List<String> SCHEDULED_TABS = asList("Waterfall Analysis", "What's Changed");
-    private final String SCHEDULE_INFO = "This dashboard will be sent daily at 12:30 AM %s to %s and 2 other recipients as a PDF attachment.";
+    private final String SCHEDULE_INFO = "^This dashboard will be sent daily at 12:30 AM .* to %s "
+            + "and 2 other recipients as a PDF attachment.$";
     private DateTimeZone tz = DateTimeZone.getDefault();
 
     @BeforeClass
@@ -128,11 +128,12 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             assertEquals(dashboardScheduleDialog.getCustomEmailSubject(), CUSTOM_SUBJECT,
                     "Update of Tabs is not reflected in subject.");
             dashboardScheduleDialog.selectTime(1);
+            String expectedRegularExpression = String.format(SCHEDULE_INFO, testParams.getViewerUser())
+                                                    .replaceAll("\\+", "\\\\+");
             String infoText = dashboardScheduleDialog.getInfoText();
-            String tzId = tz.getShortName(DateTimeUtils.currentTimeMillis());
-            assertTrue(infoText.contains(String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser())),
-                    "Custom time is in info message, expected " + 
-                    String.format(SCHEDULE_INFO, tzId, testParams.getViewerUser()) + ", found " + infoText + ".");
+            assertTrue(infoText.matches(expectedRegularExpression),
+                    "Custom time is in info message, expected regular expression: " + 
+                    expectedRegularExpression + ", found " + infoText + ".");
             // check time in info text
             dashboardScheduleDialog.setCustomEmailMessage(CUSTOM_MESSAGE);
             Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog", this.getClass());
