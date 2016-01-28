@@ -39,7 +39,10 @@ public class TableReport extends AbstractFragment {
     public String getFormatFromValue() {
         return waitForCollectionIsNotEmpty(rows).stream()
             .map(e -> e.findElements(className(CELL_CONTENT)))
-            .map(es -> es.stream().map(e -> e.getAttribute("style")).collect(toList()))
+            .map(es -> es.stream()
+                    .map(e -> e.findElement(tagName("span")))
+                    .map(e -> e.getAttribute("style"))
+                    .collect(toList()))
             .flatMap(e -> e.stream())
             .filter(Objects::nonNull)
             .distinct()

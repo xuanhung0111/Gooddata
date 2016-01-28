@@ -60,7 +60,7 @@ public class AnalysisPageHeader extends AbstractFragment {
 
     public String getExportButtonTooltipText() {
         getActions().moveToElement(exportToReportButton).perform();
-        return waitForElementVisible(cssSelector(".bubble-overlay .content"), browser).getText().trim();
+        return waitForElementVisible(cssSelector(".gd-bubble .content"), browser).getText().trim();
     }
 
     private boolean isElementDisabled(WebElement element) {
