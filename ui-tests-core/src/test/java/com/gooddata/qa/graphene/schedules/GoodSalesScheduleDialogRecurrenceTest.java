@@ -3,12 +3,10 @@
  */
 package com.gooddata.qa.graphene.schedules;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
@@ -24,7 +22,7 @@ import com.gooddata.qa.utils.http.RestUtils;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {
-    private final String SCHEDULE_INFO = "This dashboard will be sent %s %s to %s as a PDF attachment.";
+    private final String SCHEDULE_INFO = "^This dashboard will be sent %s .* to %s as a PDF attachment.$";
     private DashboardScheduleDialog dashboardScheduleDialog;
     private AbstractRecurrenceTestCase[] CASES = new AbstractRecurrenceTestCase[]{
             new WeeklyTestCase(
@@ -67,10 +65,6 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             )
     };
 
-    private String getTimezoneShortName() {
-        return DateTimeZone.getDefault().getShortName(DateTimeUtils.currentTimeMillis());
-    }
-
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void setFeatureFlags() throws JSONException, IOException {
         RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
@@ -88,10 +82,11 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
             testCase.setDialogConfiguration(dashboardScheduleDialog);
             String scheduleInfo = testCase.getMessage();
             String infoText = dashboardScheduleDialog.getInfoText();
-            String fullText = String.format(SCHEDULE_INFO, scheduleInfo, getTimezoneShortName(), testParams.getUser());
+            String fullText = String.format(SCHEDULE_INFO, scheduleInfo, testParams.getUser()).replaceAll("\\+", "\\\\+");
             Screenshots.takeScreenshot(browser, "Goodsales-schedules-dashboard-dialog-recurrence-weekly-" + scheduleInfo, this.getClass());
-
-            assertEquals(infoText, fullText, "Custom time is in info message");
+            log.info("Actual message: " + infoText);
+            log.info("Expected regular expression: " + fullText);
+            assertTrue(infoText.matches(fullText), "Custom time is in info message");
         }
     }
 }
