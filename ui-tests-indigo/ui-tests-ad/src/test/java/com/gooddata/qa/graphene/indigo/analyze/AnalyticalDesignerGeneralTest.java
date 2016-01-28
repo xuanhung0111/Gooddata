@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -96,7 +97,8 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
                 final boolean goodMetric = isGoodMetric(metric);
                 analysisPage.resetToBlankState();
                 if (!goodMetric) {
-                    log.info(format("Metric [%s] is not good to test. Maybe it has empty value or no data.", metric));
+                    log.info(format("Metric [%s] is not good to test."
+                        + " Maybe it has empty value, no data or it's not connected to any attributes.", metric));
                 }
                 return goodMetric;
             })
@@ -749,8 +751,18 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         if (analysisPage.isExplorerMessageVisible())
             return false;
 
-        return analysisPage.getChartReport()
-                .getTrackersCount() > 0;
+        if (analysisPage.getChartReport().getTrackersCount() == 0)
+            return false;
+
+        if (!isElementPresent(RecommendationContainer.LOCATOR, browser))
+            return false;
+
+        if (!Graphene.createPageFragment(RecommendationContainer.class,
+                waitForElementVisible(RecommendationContainer.LOCATOR, browser))
+                .isRecommendationVisible(RecommendationStep.COMPARE))
+            return false;
+
+        return true;
     }
 
     private String doSafetyMetricAction(Consumer<String> action, Consumer<String> failedAction, String screenshot) {

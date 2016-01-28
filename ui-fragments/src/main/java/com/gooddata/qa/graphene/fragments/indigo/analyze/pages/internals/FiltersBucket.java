@@ -21,7 +21,7 @@ import com.google.common.base.Predicate;
 
 public class FiltersBucket extends AbstractBucket {
 
-    @FindBy(css = ".adi-bucket-item > button")
+    @FindBy(css = ".adi-bucket-item button")
     private List<WebElement> filters;
 
     private static final String LOADING = "...";
