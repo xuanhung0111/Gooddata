@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
@@ -127,7 +127,7 @@ public class AbstractGreyPageTest extends AbstractTest {
     public String validateProject() throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
         waitForElementPresent(validateFragment.getRoot());
-        int timeout = testParams.getDwhDriver() == DWHDriver.VERTICA ?
+        int timeout = testParams.getProjectDriver() == ProjectDriver.VERTICA ?
                 testParams.getExtendedTimeout() : testParams.getDefaultTimeout();
         String statusReturning = validateFragment.validate(timeout);
         Screenshots.takeScreenshot(browser, testParams.getProjectId() + "-validation", this.getClass());

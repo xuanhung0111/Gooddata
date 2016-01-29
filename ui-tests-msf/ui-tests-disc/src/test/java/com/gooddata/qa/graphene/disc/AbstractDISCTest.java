@@ -320,7 +320,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
             waitForElementVisible(gpProject.getRoot());
             try {
                 project.setProjectId(gpProject.createProject(project.getProjectName(), project.getProjectName(),
-                        null, testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                        null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                         testParams.getProjectEnvironment(), projectCreateCheckIterations));
             } catch (JSONException e) {
                 fail("There is problem when creating new project: " + e);

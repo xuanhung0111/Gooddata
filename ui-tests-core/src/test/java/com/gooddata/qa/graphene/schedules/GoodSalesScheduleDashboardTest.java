@@ -43,7 +43,6 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils.FeatureFlagOption;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -431,23 +430,23 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
     }
 
     private void enableHideDashboardScheduleFlag() throws JSONException {
-        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE);
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, true);
     }
 
     private void disableHideDashboardScheduleFlag() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(), FeatureFlagOption
-                .createFeatureClassOption(ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE.getFlagName(), false));
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.HIDE_DASHBOARD_SCHEDULE, false);
     }
 
     private void enableDashboardScheduleRecipientsFlag() throws JSONException {
-        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
     }
 
     private void disableDashboardScheduleRecipientsFlag() throws JSONException, IOException {
-        ProjectRestUtils.setFeatureFlagsToProject(getRestApiClient(), testParams.getProjectId(), FeatureFlagOption
-                .createFeatureClassOption(ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS.getFlagName(), false));
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, false);
     }
 
     private void assertDashboardScheduleInfo(String title, String authorUri, Collection<String> bccEmails) {

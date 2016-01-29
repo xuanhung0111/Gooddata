@@ -76,8 +76,8 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         initManagePage();
         assertThat(browser.findElements(By.cssSelector(ADD_DATA_BUTTON_CSS_LOCATOR)), is(empty()));
 
-        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_DATA_EXPLORER);
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_DATA_EXPLORER, true);
 
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();

@@ -14,7 +14,9 @@ import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
+
 import org.json.JSONException;
 
 public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
@@ -38,7 +40,8 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
     public void setupFeatureFlag() throws JSONException {
-        setupFeatureFlagInProject(testParams.getProjectId(), ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})

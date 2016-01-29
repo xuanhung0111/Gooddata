@@ -5,10 +5,8 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-import java.io.IOException;
 import java.util.UUID;
 
-import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -28,9 +26,10 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
-    public void switchProjectsTest() throws ParseException, JSONException, IOException {
+    public void switchProjectsTest() throws JSONException {
         String newProjectId = createProject(NEW_PROJECT_NAME);
-        setupFeatureFlagInProject(newProjectId, ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS);
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
+                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
 
         initIndigoDashboardsPageWithWidgets();
 
@@ -45,7 +44,7 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "switchProjectsTest-switched-back", getClass());
         assertEquals(indigoDashboardsPage.getCurrentProjectName(), projectTitle);
 
-        ProjectRestUtils.deleteProject(getRestApiClient(), newProjectId);
+        ProjectRestUtils.deleteProject(getGoodDataClient(), newProjectId);
     }
 
     private String createProject(String name) {
@@ -55,7 +54,7 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
         waitForElementVisible(gpProject.getRoot());
         try {
             projectId = gpProject.createProject(name, name,
-                    null, testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                    null, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                     testParams.getProjectEnvironment(), 60);
 
         } catch (JSONException e) {

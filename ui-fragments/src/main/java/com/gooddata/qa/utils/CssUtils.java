@@ -3,7 +3,10 @@
  */
 package com.gooddata.qa.utils;
 
-public class CssUtils {
+public final class CssUtils {
+
+    private CssUtils() {
+    }
 
     /**
      * Helper method to convert name of object to derived

@@ -3,7 +3,9 @@ package com.gooddata.qa.utils.http.process;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -13,6 +15,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
+import com.gooddata.GoodData;
+import com.gooddata.dataload.processes.ProcessExecutionDetail;
 import com.gooddata.qa.utils.http.RestApiClient;
 
 public final class ProcessRestUtils {
@@ -20,6 +24,12 @@ public final class ProcessRestUtils {
     private static final Logger log = Logger.getLogger(ProcessRestUtils.class.getName());
 
     private ProcessRestUtils() {
+    }
+
+    public static String getExecutionLog(final GoodData goodData, final ProcessExecutionDetail executionDetail) {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        goodData.getProcessService().getExecutionLog(executionDetail, outputStream);
+        return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
     }
 
     public static String getDataloadProcessOwner(final RestApiClient restApiClient, final String projectId)

@@ -10,7 +10,8 @@ public enum ProjectFeatureFlags {
     ANALYTICAL_DESIGNER("analyticalDesigner"),
     ENABLE_CSV_UPLOADER("enableCsvUploader"),
     ENABLE_ATTRIBUTE_FILTERS("enableAttributeFilters"),
-    ENABLE_ANALYTICAL_DASHBOARDS("enableAnalyticalDashboards");
+    ENABLE_ANALYTICAL_DASHBOARDS("enableAnalyticalDashboards"),
+    DISABLE_SAVED_FILTERS("disableSavedFilters");
 
     private final String featureFlag;
 

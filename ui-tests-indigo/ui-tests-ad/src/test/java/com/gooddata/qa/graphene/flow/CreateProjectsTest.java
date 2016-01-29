@@ -47,15 +47,15 @@ public class CreateProjectsTest extends AbstractProjectTest {
 
     @Test(dependsOnMethods = {"setupNoDateProject"}, groups = {"setupProjects"})
     public void setupBlankProject() throws ParseException, JSONException, IOException {
-        String pid = ProjectRestUtils.createBlankProject(getRestApiClient(), "[E2E] Blank project", "",
-                testParams.getAuthorizationToken(), testParams.getDwhDriver(), testParams.getProjectEnvironment());
+        String pid = ProjectRestUtils.createBlankProject(getGoodDataClient(), "[E2E] Blank project",
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
         pids.add(pid);
     }
 
     @Test(dependsOnMethods = {"setupBlankProject"}, groups = {"setupProjects"})
     public void setupGoodSalesProject() throws ParseException, JSONException, IOException {
-        String pid = ProjectRestUtils.createProject(getRestApiClient(), "[E2E] GoodSales project", "", "/projectTemplates/GoodSalesDemo/2",
-                testParams.getAuthorizationToken(), testParams.getDwhDriver(), testParams.getProjectEnvironment());
+        String pid = ProjectRestUtils.createProject(getGoodDataClient(), "[E2E] GoodSales project", "/projectTemplates/GoodSalesDemo/2",
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
         pids.add(pid);
 
         testParams.setProjectId(pid);
@@ -79,9 +79,9 @@ public class CreateProjectsTest extends AbstractProjectTest {
     }
 
     @Test(groups = {"teardownProjects", PROJECT_INIT_GROUP})
-    public void teardownProjects() throws ParseException, JSONException, IOException {
+    public void teardownProjects() throws JSONException {
         for (String pid : testParams.getProjectId().split(",")) {
-            ProjectRestUtils.deleteProject(getRestApiClient(), pid);
+            ProjectRestUtils.deleteProject(getGoodDataClient(), pid);
         }
         signIn(true, UserRoles.ADMIN);
         initProjectsPage();

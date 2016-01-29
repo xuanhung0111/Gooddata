@@ -264,7 +264,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkCustomDataSourceName() throws ParseException, IOException {
+    public void checkCustomDataSourceName() throws ParseException, IOException, JSONException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -289,7 +289,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkDataSourceNameCaseSensitive() throws ParseException, IOException {
+    public void checkDataSourceNameCaseSensitive() throws ParseException, IOException, JSONException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -324,7 +324,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkUnicodeDataSourceName() throws ParseException, IOException {
+    public void checkUnicodeDataSourceName() throws ParseException, IOException, JSONException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -359,7 +359,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkEmptyDataSourceName() throws ParseException, IOException {
+    public void checkEmptyDataSourceName() throws ParseException, IOException, JSONException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -380,7 +380,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void deleteDataSourceName() throws ParseException, IOException {
+    public void deleteDataSourceName() throws ParseException, IOException, JSONException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
