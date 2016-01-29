@@ -336,7 +336,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                 "Date", "Date", "Date", "Date", "Measure"), 10),
         AMBIGUOUS_DATE_YEARDAY_DAYYEAR("6ambiguous.dates.yearday.dayyear", Lists.newArrayList("Date 1", "Date 2",
                 "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date", "Date",
-                "Date", "Date", "Date", "Measure"), 100);
+                "Date", "Date", "Date", "Measure"), 100),
+        PAYROLL_MORE_COLUMN_NAMES("payroll.more.column.names"),
+        DATA_LESS_THAN_50_ROWS("data.less.than.50rows");
 
         private final String name;
         private final List<String> columnNames = Lists.newArrayList();
