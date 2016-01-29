@@ -1,9 +1,11 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,11 +13,16 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.testng.Assert.assertEquals;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.ParseException;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -24,6 +31,7 @@ import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestUtils;
 import com.google.common.collect.Lists;
 
 public class UploadTest extends AbstractCsvUploaderTest {
@@ -244,6 +252,22 @@ public class UploadTest extends AbstractCsvUploaderTest {
         this.assertEmptyMetricInReport(metricIndexes, metricValues);
         System.out.println("Null numbers are displayed well in report!");
     }
+    
+    @Test(dependsOnMethods = "createProject")
+    public void checkCSVUploaderWithLDMModeler() throws ParseException, JSONException, IOException {
+        updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
+        CsvFile fileToUpload = CsvFile.PAYROLL;
+        checkCsvUpload(fileToUpload, this::uploadCsv, true);
+        String datasetName = getNewDataset(fileToUpload);
+        waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
+        datasetNames.addAll(Lists.newArrayList("opportunity", "person", datasetName, "Date (Paydate)"));
+        JSONObject onlyProductionDataModel = RestUtils.getProductionProjectModelView(getRestApiClient(),
+                testParams.getProjectId(), false);
+        JSONObject allDataModel = RestUtils.getProductionProjectModelView(getRestApiClient(), testParams.getProjectId(),
+                true);
+        assertThat(getListOfDatasets(onlyProductionDataModel), containsInAnyOrder("opportunity", "person"));
+        assertThat(getListOfDatasets(allDataModel), containsInAnyOrder("opportunity", "person", datasetName));
+    }
 
     private void assertMetricValuesInReport(List<Integer> metricIndexes, List<Float> metricValues,
                                             List<Double> expectedMetricValues) {
@@ -268,5 +292,16 @@ public class UploadTest extends AbstractCsvUploaderTest {
         initManagePage();
         datasetsTable.selectObject(datasetName);
         datasetDetailPage.deleteDataset();
+    }
+
+    private List<String> getListOfDatasets(JSONObject dataModel) throws JSONException {
+        List<String> datasetNames = new ArrayList<String>();
+        JSONArray datasets = dataModel.getJSONObject("projectModelView").getJSONObject("model")
+                .getJSONObject("projectModel").getJSONArray("datasets");
+        for (int i = 0; i < datasets.length(); i++) {
+            JSONObject object = datasets.getJSONObject(i).getJSONObject("dataset");
+            datasetNames.add(object.getString("title"));
+        }
+        return datasetNames;
     }
 }

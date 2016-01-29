@@ -23,7 +23,7 @@ public class ScheduleBuilder {
     private boolean confirmed = true;
     private boolean dataloadProcess;
     private boolean synchronizeAllDatasets;
-    private List<String> datasetsToSynchronize;
+    private List<String> datasetsToSynchronize = new ArrayList<String>();
     private List<String> allDatasets;
 
     public ScheduleBuilder setProcessName(String processName) {
@@ -151,9 +151,9 @@ public class ScheduleBuilder {
 
 
     public ScheduleBuilder setDatasetsToSynchronize(List<String> datasetsToSynchronize) {
-        this.datasetsToSynchronize = datasetsToSynchronize;
         if (datasetsToSynchronize != null) {
             this.synchronizeAllDatasets = false;
+            this.datasetsToSynchronize = datasetsToSynchronize;
         }
 
         if (datasetsToSynchronize == null || datasetsToSynchronize.isEmpty()) {

@@ -229,6 +229,16 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         });
     }
 
+    protected void addMultiFieldsAndAssertAnnieDialog(UserRoles role) throws JSONException {
+        String maqlFile = "dropMultiAddedFieldsInLDM.txt";
+        addDataFromAdsToLdmAndDropAfterTest(UserRoles.ADMIN, maqlFile, new TestAction() {
+            @Override
+            public void doAction(UserRoles role) {
+                addMultiFields(role);
+            }
+        });
+    }
+
     protected void checkNewDataAdding(UserRoles role, final AddedFields addedField) {
         DataSource dataSource =
                 prepareADSTable(addedField.getADSTable()).updateDatasetStatus(
