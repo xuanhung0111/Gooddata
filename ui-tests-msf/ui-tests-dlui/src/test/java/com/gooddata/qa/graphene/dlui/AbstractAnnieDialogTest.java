@@ -65,11 +65,12 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
             "https://support.gooddata.com/?utm_source=de&utm_campaign=error_message&utm_medium=dialog";
 
     private static final String ADD_DATA_BUTTON_CSS_LOCATOR = ".s-btn-add_data";
-
+    protected static final String ANNIE_DIALOG_CSS_LOCATOR = ".annie-dialog-main";
+    
     @FindBy(css = ADD_DATA_BUTTON_CSS_LOCATOR)
     private WebElement addDataButton;
 
-    @FindBy(css = ".annie-dialog-main")
+    @FindBy(css = ANNIE_DIALOG_CSS_LOCATOR)
     protected AnnieUIDialogFragment annieUIDialog;
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"initialDataForDLUI"})
