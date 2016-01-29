@@ -11,11 +11,14 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static java.lang.String.format;
 
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
@@ -342,6 +345,26 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL_COLUMN_TYPES);
+    }
+
+    @DataProvider(name = "csvDataProvider")
+    public Object[][] csvDataProvider() {
+        return new Object[][] {
+            {CsvFile.PAYROLL, "Previewing first 50 rows out of total %s.", "3876"},
+            {CsvFile.PAYROLL_MORE_COLUMN_NAMES, "Previewing first 50 rows out of total %s.", "3876"},
+            {CsvFile.DATA_LESS_THAN_50_ROWS, "Viewing all %s rows of the file.", "16"}
+        };
+    }
+
+    @Test(dependsOnMethods = {"createProject"}, dataProvider = "csvDataProvider")
+    public void checkPreviewPageDisplayWithMaximun50Row(CsvFile csvFile, String rowCountMessage, String row) {
+        initDataUploadPage();
+
+        uploadFile(csvFile);
+        waitForFragmentVisible(dataPreviewPage);
+
+        takeScreenshot(browser, csvFile.getFileName() + " dislays with correct rows: " + row, getClass());
+        assertEquals(dataPreviewPage.getRowCountMessage(), format(rowCountMessage, row));
     }
 
     private void checkDataPreview(CsvFile csvFile) {
