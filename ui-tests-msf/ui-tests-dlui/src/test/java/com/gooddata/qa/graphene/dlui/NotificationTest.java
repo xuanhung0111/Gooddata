@@ -7,6 +7,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.Map;
 
 import org.json.JSONException;
+import org.openqa.selenium.By;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -19,6 +20,7 @@ import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.AdsHelper;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.warehouse.Warehouse;
@@ -131,12 +133,18 @@ public class NotificationTest extends AbstractDLUINotificationTest {
                             selectedDataset);
 
             failToLoadData(dataSource, "george-fail-to-load-data");
+            checkFailedDataAddingEmail(requestTime, "Position");
+        } catch (Throwable t) {
+            if (ElementUtils.isElementPresent(By.cssSelector(ANNIE_DIALOG_CSS_LOCATOR), browser) 
+                    && annieUIDialog.getAnnieDialogHeadline().equals(SUCCESSFUL_ANNIE_DIALOG_HEADLINE)) {
+                log.warning("Dataload process is finished before data in ADS is cleaned!");
+            } else {
+                throw t;
+            }
         } finally {
             dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
                     + "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
-
-        checkFailedDataAddingEmail(requestTime, "Position");
     }
 
     @Test(dependsOnGroups = "george", groups = {"basicTest"}, alwaysRun = true)
@@ -192,13 +200,19 @@ public class NotificationTest extends AbstractDLUINotificationTest {
                             selectedDataset);
 
             failToLoadData(dataSource, "annie-fail-to-load-data");
+            checkFailedDataAddingEmail(requestTime, "Position");
+            checkFailedDataAddingEmailForEditor(requestTime, "Position");
+        } catch (Throwable t) {
+            if (ElementUtils.isElementPresent(By.cssSelector(ANNIE_DIALOG_CSS_LOCATOR), browser) 
+                    && annieUIDialog.getAnnieDialogHeadline().equals(SUCCESSFUL_ANNIE_DIALOG_HEADLINE)) {
+                log.warning("Dataload process is finished before data in ADS is cleaned!");
+            } else {
+                throw t;
+            }
         } finally {
             dropAddedFieldsInLDM(getResourceAsString("/" + MAQL_FILES
                     + "/dropAddedAttributeInLDM_Person_Position.txt"));
         }
-
-        checkFailedDataAddingEmail(requestTime, "Position");
-        checkFailedDataAddingEmailForEditor(requestTime, "Position");
     }
 
     @AfterClass
