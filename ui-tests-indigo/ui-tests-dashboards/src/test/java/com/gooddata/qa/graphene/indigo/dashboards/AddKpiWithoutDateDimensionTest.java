@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.graphene.enums.ResourceDirectory.UPLOAD_CSV;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertFalse;
 
@@ -15,15 +14,15 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.io.ResourceUtils;
-
+import java.io.IOException;
+import java.net.URISyntaxException;
 import org.json.JSONException;
 
 public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
 
-    private static final String METRIC_CONNECT_WITH_DATE_DIMENSION = "Amount[Sum]";
-    private static final String METRIC_NOT_CONNECT_WITH_DATE_DIMENSION = "Age[Sum]";
-    private static final String DATE_DIMENSION = "Paydate";
+    private static final String METRIC_CONNECT_WITH_DATE_DIMENSION = "Connected";
+    private static final String METRIC_NOT_CONNECT_WITH_DATE_DIMENSION = "NotConnected";
+    private static final String DATE_DIMENSION = "templ:minimalistic";
 
     private MetadataService mdService;
     private Project project;
@@ -31,11 +30,6 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
     @BeforeClass
     public void initProperties() {
         projectTitle = "Add-kpi-without-date-dimension-test";
-    }
-
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
-    public void uploadDatasetHasDateDimension() {
-        uploadCSV(ResourceUtils.getFilePathFromResource("/" + UPLOAD_CSV + "/payroll.csv"));
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
@@ -51,26 +45,18 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
         project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
     }
 
-    @Test(dependsOnMethods = {"uploadDatasetHasDateDimension", "initializeGoodDataSDK"}, groups = {"precondition"})
-    public void createMetricConnectWithDateDimension() {
-        String amount = mdService.getObjUri(project, Fact.class, identifier("fact.csv_payroll.amount"));
-        mdService.createObj(project, new Metric(METRIC_CONNECT_WITH_DATE_DIMENSION,
-                "SELECT SUM([" + amount + "])", "#,##0"));
-    }
+    @Test(dependsOnGroups = {"precondition"}, groups = {"nodate-precondition"})
+    public void setupForNoDate()
+            throws JSONException, IOException, URISyntaxException {
+        setupMaql("/no-date/no-date-maql.txt");
+        setupData("/no-date/no-date.csv", "/no-date/upload_info.json");
 
-    @Test(dependsOnMethods = {"createMetricConnectWithDateDimension"}, groups = {"precondition"})
-    public void uploadDatasetWithoutDateDimension() {
-        uploadCSV(ResourceUtils.getFilePathFromResource("/" + UPLOAD_CSV + "/customer.csv"));
-    }
-
-    @Test(dependsOnMethods = {"uploadDatasetWithoutDateDimension"}, groups = {"precondition"})
-    public void createMetricNotConnectWithDateDimension() {
-        String age = mdService.getObjUri(project, Fact.class, identifier("fact.csv_customer.age"));
+        String age = mdService.getObjUri(project, Fact.class, identifier("fact.fact"));
         mdService.createObj(project, new Metric(METRIC_NOT_CONNECT_WITH_DATE_DIMENSION,
                 "SELECT SUM([" + age + "])", "#,##0"));
     }
 
-    @Test(dependsOnGroups = {"precondition"})
+    @Test(dependsOnGroups = {"nodate-precondition"}, groups = {"nodate-test"})
     public void testAddKpiNotConnectedWithDateDimension() {
         initIndigoDashboardsPage()
             .getSplashScreen()
@@ -86,9 +72,24 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
 
         indigoDashboardsPage.saveEditModeWithKpis();
 
-        takeScreenshot(browser, "add-kip-not-connect-with-date-dimension", getClass());
+        takeScreenshot(browser, "add-kpi-not-connect-with-date-dimension", getClass());
+    }
 
-        indigoDashboardsPage
+    @Test(dependsOnGroups = {"nodate-test"}, groups = {"date-precondition"})
+    public void setupWithDate()
+            throws JSONException, IOException, URISyntaxException {
+        setupMaql("/add-date/add-date-maql.txt");
+        setupData("/add-date/add-date.csv", "/add-date/upload_info.json");
+
+        String age = mdService.getObjUri(project, Fact.class, identifier("fact.fact"));
+        mdService.createObj(project, new Metric(METRIC_CONNECT_WITH_DATE_DIMENSION,
+                "SELECT 1", "#,##0"));
+    }
+
+    @Test(dependsOnGroups = {"date-precondition"}, groups = {"date-test"})
+    public void testUpdateKpiConnectedWithDateDimension() {
+
+        initIndigoDashboardsPage()
             .switchToEditMode()
             .selectLastKpi();
 
@@ -97,6 +98,6 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
             .selectDateDimensionByName(DATE_DIMENSION);
 
         indigoDashboardsPage.saveEditModeWithKpis();
-        takeScreenshot(browser, "update-kip-connect-with-date-dimension", getClass());
+        takeScreenshot(browser, "update-kpi-connect-with-date-dimension", getClass());
     }
 }

@@ -1,0 +1,4 @@
+INCLUDE TEMPLATE "URN:GOODDATA:DATE" MODIFY (IDENTIFIER "dt_nodate", TITLE "templ:Minimalistic");
+ALTER ATTRIBUTE {dt_nodate.date} ADD KEYS {tab.min_date_id};
+
+SYNCHRONIZE {dataset.ds_nodate};

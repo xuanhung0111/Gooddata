@@ -8,15 +8,10 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.executeMAQL;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
-import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.waitingForAsyncTask;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
-import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,10 +19,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.UUID;
-
-import org.apache.http.ParseException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -77,9 +68,11 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
         // when the time pass to another period.
         // So updating Csv file with new date data every time the test is executing
         // to make sure the data is always valid.
-        String updatedCsvFilePath = updateCsvFile(getResourceAsFile(KPI_ERROR_DATA_RESOURCE + "user.csv"));
+        String updatedCsvFilename = "data.csv";
+        String updatedResourceName = KPI_ERROR_DATA_RESOURCE + updatedCsvFilename;
+        updateCsvFile(getResourceAsFile(KPI_ERROR_DATA_RESOURCE + "user.csv"), updatedCsvFilename);
 
-        uploadDatasetFromCsv(updatedCsvFilePath);
+        uploadDatasetFromCsv(updatedResourceName);
     }
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"precondition"})
@@ -154,68 +147,18 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
                 .replace("${lastYear}", lastYear);
     }
 
-    private String updateCsvFile(File csvFile) throws IOException {
+    private void updateCsvFile(File csvFile, String updatedFileName) throws IOException {
         String csvData = getCsvData(csvFile);
-        String updatedCsvFilePath = csvFile.getParent() + "/data.csv";
+        String updatedCsvFilePath = csvFile.getParent() + "/" + updatedFileName;
 
         try (FileWriter fw = new FileWriter(updatedCsvFilePath)) {
             fw.append(changeDateFromCsvData(csvData));
             fw.flush();
         }
-
-        return updatedCsvFilePath;
     }
 
     private void uploadDatasetFromCsv(String csvFilePath) throws JSONException, URISyntaxException, IOException {
-      String pollingUri = executeMAQL(getRestApiClient(), testParams.getProjectId(),
-              getResourceAsString(KPI_ERROR_DATA_RESOURCE + "user.maql"));
-      waitingForAsyncTask(getRestApiClient(), pollingUri);
-
-      setupData(csvFilePath, KPI_ERROR_DATA_RESOURCE + "upload_info.json");
-    }
-
-    private void setupData(String csvPath, String uploadInfoPath)
-            throws JSONException, URISyntaxException, ParseException, IOException {
-        String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
-
-        String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
-
-        URL csvResource = new File(csvPath).toURI().toURL();
-        URL uploadInfoResource = getClass().getResource(uploadInfoPath);
-
-        uploadFileToWebDav(csvResource, webdavUrl);
-        uploadFileToWebDav(uploadInfoResource, webdavUrl);
-
-        String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
-        assertTrue(postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                integrationEntry), "Etl pull is not ok!");
-    }
-
-    private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
-            throws IOException, JSONException {
-        final JSONArray links = getJsonObject(restApiClient, "/gdc", HttpStatus.OK)
-                .getJSONObject("about")
-                .getJSONArray("links");
-
-        JSONObject link;
-        for (int i = 0, n = links.length(); i < n; i++) {
-            link = links.getJSONObject(i);
-            if (!"user-uploads".equals(link.getString("title"))) continue;
-            return getWebDavServerUrl(link.getString("link"), serverRootUrl);
-        }
-
-        return "";
-    }
-
-    private String getWebDavServerUrl(String userUploadsLink, String serverRootUrl) {
-        String webdavServerUrl = "";
-        if (userUploadsLink.startsWith("https://")) {
-            webdavServerUrl = userUploadsLink;
-        } else if (userUploadsLink.startsWith("/")) {
-            webdavServerUrl = serverRootUrl + userUploadsLink.substring(1);
-        } else {
-            webdavServerUrl = serverRootUrl + userUploadsLink;
-        }
-        return webdavServerUrl;
+        setupMaql(KPI_ERROR_DATA_RESOURCE + "user.maql");
+        setupData(csvFilePath, KPI_ERROR_DATA_RESOURCE + "upload_info.json");
     }
 }
