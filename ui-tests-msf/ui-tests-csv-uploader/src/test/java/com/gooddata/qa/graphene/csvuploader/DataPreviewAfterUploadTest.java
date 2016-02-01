@@ -16,9 +16,13 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -41,6 +45,21 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
                 new CsvFile.Column("", "Measure"))
         .rows("Xen", "01/01/2006", "29")
         .rows("Gooddata", "31/01/2015", "100");
+
+    private static final String ATTRIBUTE = "Attribute";
+    private static final String FACT = "Measure";
+    private static final String DATE = "Date";
+
+    private static final String DISABLED_DATE_DESCRIPTION = "Date must be in one of the supported date formats. "
+            + "Learn more.";
+
+    private static final String DISABLED_FACT_DESCRIPTION = "Data can't contain text, only a numerical "
+            + "value or amount.";
+
+    private static final String ATTRIBUTE_INFO = "Represents non-measurable descriptors "
+            + "(for example, name, title, phone) by which you break down your data.";
+
+    private static final String FACT_INFO = "Represents the value or amount that you want to measure.";
 
     @FindBy(css = ".bubble-negative .content")
     private WebElement errorBubbleMessage;
@@ -363,6 +382,52 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         assertEquals(dataPreviewPage.getRowCountMessage(), format(rowCountMessage, csvFile.getDataRowCount()));
     }
 
+    @Test(dependsOnMethods = {"createProject"})
+    public void testDropdownMenu() throws IOException {
+        initDataUploadPage();
+
+        // This test case just need a simple csv data which has enough column type: Attribute, Fact, and Date
+        final CsvFile csvFile = new CsvFile("dropdown.menu")
+                .columns(new CsvFile.Column("Firstname"), new CsvFile.Column("Paydate"),
+                        new CsvFile.Column("Amount"))
+                .rows("Nowmer", "2006-01-01", "10230");
+        csvFile.saveToDisc(testParams.getCsvFolder());
+
+        try {
+            datasetsListPage.uploadFile(csvFile.getFilePath());
+            waitForFragmentVisible(dataPreviewPage);
+
+            WebElement attribute = getItemFromSpecificDropdown(ATTRIBUTE, ColumnType.ATTRIBUTE);
+            WebElement fact = getItemFromSpecificDropdown(FACT, ColumnType.ATTRIBUTE);
+            WebElement date = getItemFromSpecificDropdown(DATE, ColumnType.ATTRIBUTE);
+
+            takeScreenshot(browser, "Attribute dropdown menu", getClass());
+            assertFalse(isItemDisable(attribute), "Attribute item in dropdown is disabled");
+
+            assertTrue(isItemDisable(fact), "Fact item in dropdown is not disabled");
+            assertTrue(isItemDisable(date), "Date item in dropdown is not disabled");
+
+            assertEquals(getItemInfo(attribute), ATTRIBUTE_INFO);
+            assertEquals(getDisabledItemDescription(fact), DISABLED_FACT_DESCRIPTION);
+            assertEquals(getDisabledItemDescription(date), DISABLED_DATE_DESCRIPTION);
+
+            fact = getItemFromSpecificDropdown(FACT, ColumnType.DATE);
+
+            takeScreenshot(browser, "Date dropdown menu", getClass());
+            assertTrue(isItemDisable(fact), "Fact item in dropdown is not disabled");
+
+            fact = getItemFromSpecificDropdown(FACT, ColumnType.FACT);
+            date = getItemFromSpecificDropdown(DATE, ColumnType.FACT);
+
+            takeScreenshot(browser, "Fact dropdown menu", getClass());
+            assertTrue(isItemDisable(date), "Date item in dropdown is not disabled");
+            assertEquals(getItemInfo(fact), FACT_INFO);
+
+        } finally {
+            deleteFile(csvFile.getFilePath());
+        }
+    }
+
     private void checkDataPreview(CsvFile csvFile) {
         checkDataPreview(csvFile.getColumnNames(), csvFile.getColumnTypes());
     }
@@ -376,5 +441,32 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
     private String getErrorBubbleMessage() {
         return waitForElementVisible(errorBubbleMessage).getText();
+    }
+
+    private void deleteFile(String fileName) throws IOException {
+        Files.deleteIfExists(Paths.get(fileName));
+    }
+
+    private WebElement getItemFromSpecificDropdown(String item, ColumnType typeDropdown) {
+        return waitForFragmentVisible(dataPreviewPage)
+                .getDataPreviewTable()
+                .getColumnTypeDropdown(typeDropdown)
+                .getItemElement(item);
+    }
+
+    private boolean isItemDisable(WebElement item) {
+        return item.getAttribute("class").contains("is-disabled");
+    }
+
+    private String getDisabledItemDescription(WebElement item) {
+        return item.findElement(By.className("type-desc")).getText();
+    }
+
+    private String getItemInfo(WebElement item) {
+        new Actions(browser)
+                .moveToElement(item.findElement(By.className("icon-circle-question")))
+                .perform();
+
+        return waitForElementVisible(By.cssSelector(".overlay-wrapper .content"), browser).getText();
     }
 }
