@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_COLUMN_NAMES;
+import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_COLUMN_TYPES;
+import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_DATA_ROW_COUNT;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -8,7 +11,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static com.gooddata.qa.utils.http.model.ModelRestUtils.getProductionProjectModelView;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.is;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -17,7 +20,6 @@ import static org.testng.Assert.assertEquals;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.ParseException;
@@ -29,6 +31,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
+import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.utils.graphene.Screenshots;
@@ -54,63 +57,58 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkUploadedDatasetAtManagePage() {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String datasetName = getNewDataset(fileToUpload);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String datasetName = getNewDataset(PAYROLL);
 
         waitForDatasetName(datasetName);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "uploading-dataset", datasetName), getClass());
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
+        datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
 
         initManagePage();
         waitForFragmentVisible(datasetsTable).selectObject(datasetName);
         waitForFragmentVisible(datasetDetailPage);
         assertThat(datasetDetailPage.getAttributes(), containsInAnyOrder("Lastname", "Firstname", "Education",
-                "Position", "Department", "State", "County", String.format("Records of %s", datasetName)));
+                "Position", "Department", "State", "County", format("Records of %s", datasetName)));
         assertThat(datasetDetailPage.getFacts(), containsInAnyOrder("Amount"));
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkOnlyUploadedDatasetSync() throws JSONException {
-        CsvFile fileToUploadFirst = CsvFile.PAYROLL;
-        checkCsvUpload(fileToUploadFirst, this::uploadCsv, true);
-        String firstDatasetUploadName = getNewDataset(fileToUploadFirst);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String firstDatasetUploadName = getNewDataset(PAYROLL);
         waitForDatasetName(firstDatasetUploadName);
         waitForDatasetStatus(firstDatasetUploadName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        datasetNames.addAll(Lists.newArrayList(firstDatasetUploadName, "Date (Paydate)"));
+        datasetNames.addAll(asList(firstDatasetUploadName, "Date (Paydate)"));
 
         initManagePage();
         datasetsTable.selectObject(firstDatasetUploadName);
         String latestUploadDate = waitForFragmentVisible(datasetDetailPage).getLatestUploadDate();
 
-        CsvFile secondFileUpload = CsvFile.PAYROLL;
-        checkCsvUpload(secondFileUpload, this::uploadCsv, true);
-        String secondDatasetUploadName = getNewDataset(secondFileUpload);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String secondDatasetUploadName = getNewDataset(PAYROLL);
         waitForDatasetName(secondDatasetUploadName);
         waitForDatasetStatus(secondDatasetUploadName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         datasetNames.add(secondDatasetUploadName);
 
         initManagePage();
         datasetsTable.selectObject(firstDatasetUploadName);
-        assertThat(waitForFragmentVisible(datasetDetailPage).getLatestUploadDate(), is(latestUploadDate));
+        assertEquals(waitForFragmentVisible(datasetDetailPage).getLatestUploadDate(), latestUploadDate);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadOneCsvFileMultipleTime() {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String firstDatasetName = getNewDataset(fileToUpload);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String firstDatasetName = getNewDataset(PAYROLL);
 
         waitForDatasetName(firstDatasetName);
         waitForDatasetStatus(firstDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", firstDatasetName),
                 getClass());
-        datasetNames.addAll(Lists.newArrayList(firstDatasetName, "Date (Paydate)"));
+        datasetNames.addAll(asList(firstDatasetName, "Date (Paydate)"));
 
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String secondDatasetName = getNewDataset(fileToUpload);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String secondDatasetName = getNewDataset(PAYROLL);
 
         waitForDatasetName(secondDatasetName);
         waitForDatasetStatus(secondDatasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
@@ -121,42 +119,38 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkDatasetAnalyzeLink() {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String datasetName = getNewDataset(fileToUpload);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String datasetName = getNewDataset(PAYROLL);
 
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
-        String adReportLink = String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
+        datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
+        String adReportLink = format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
                 getDatasetId(datasetName));
-        assertThat(datasetsListPage.getDatasetAnalyzeLink(datasetName), is(adReportLink));
+        assertEquals(datasetsListPage.getDatasetAnalyzeLink(datasetName), adReportLink);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
 
         waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
-        assertThat(waitForFragmentVisible(csvDatasetDetailPage).getDatasetAnalyzeLink(), is(adReportLink));
+        assertEquals(waitForFragmentVisible(csvDatasetDetailPage).getDatasetAnalyzeLink(), adReportLink);
         takeScreenshot(browser, toScreenshotName(DATASET_DETAIL_PAGE_NAME, datasetName), getClass());
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkBasicUploadProgress() {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String datasetName = getNewDataset(PAYROLL);
 
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String datasetName = getNewDataset(fileToUpload);
+        takeScreenshot(browser, toScreenshotName("Upload-progress-of", PAYROLL.getFileName()), getClass());
 
-        takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
-
-        assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
-                is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
+        assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                format(SUCCESSFUL_DATA_MESSAGE, datasetName));
         takeScreenshot(browser, toScreenshotName("Successful-upload-data-to-dataset", datasetName), getClass());
-        datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
+        datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadWithoutAttributeCSV() {
-        CsvFile fileToUpload = CsvFile.WITHOUT_ATTRIBUTE;
+        CsvFile fileToUpload = new CsvFile("without.attribute", asList("Amount"), asList("Measure"), 44);
 
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
@@ -171,7 +165,8 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadWithoutDateCSV() {
-        CsvFile fileToUpload = CsvFile.WITHOUT_DATE;
+        CsvFile fileToUpload = new CsvFile("without.date", asList("state", "county", "name", "censusarea"),
+              asList("Attribute", "Attribute", "Attribute", "Measure"), 3273);
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
         waitForDatasetName(datasetName);
@@ -183,14 +178,13 @@ public class UploadTest extends AbstractCsvUploaderTest {
     @Test(enabled = false, dependsOnMethods = {"createProject"})
     public void uploadSpecialUnicodeCharacterColumnName() {
         initDataUploadPage();
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-        uploadFile(fileToUpload);
+        uploadFile(PAYROLL);
         DataPreviewTable dataPreviewTable = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable();
         dataPreviewTable.changeColumnName("Firstname", "A~!@#$%^&*()<>/?;'");
         dataPreviewTable.changeColumnName("Lastname", "kiểm tra ký tự đặc biệt");
         takeScreenshot(browser, "check-special-character-column-name", this.getClass());
 
-        List<String> customHeaderColumns = Lists.newArrayList(CsvFile.PAYROLL.getColumnNames());
+        List<String> customHeaderColumns = Lists.newArrayList(PAYROLL.getColumnNames());
         customHeaderColumns.set(customHeaderColumns.indexOf("Firstname"), "A~!@#$%^&*()<>/?;'");
         customHeaderColumns.set(customHeaderColumns.indexOf("Lastname"), "kiểm tra ký tự đặc biệt");
 
@@ -198,24 +192,24 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
         dataPreviewPage.triggerIntegration();
 
-        String datasetName = getNewDataset(fileToUpload);
+        String datasetName = getNewDataset(PAYROLL);
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         datasetNames.add(datasetName);
 
         datasetsListPage.clickDatasetDetailButton(datasetName);
         waitForFragmentVisible(csvDatasetDetailPage);
-        checkCsvDatasetDetail(datasetName, customHeaderColumns, CsvFile.PAYROLL.getColumnTypes());
+        checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadNegativeNumber() {
-        CsvFile fileToUpload = CsvFile.PAYROLL_NEGATIVE_NUMBER;
+        CsvFile fileToUpload = new CsvFile("payroll.negative.number", PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES, 3568);
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
+        datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
 
         createMetric("Min of Amount", format("SELECT MIN([%s])",
                 getMdService().getObjUri(getProject(), Fact.class, title("Amount"))), "#,##0.00");
@@ -225,20 +219,24 @@ public class UploadTest extends AbstractCsvUploaderTest {
         List<Float> metricValues = reportPage.getTableReport().getMetricElements();
         Screenshots.takeScreenshot(browser, "report-with-negative-number", this.getClass());
         System.out.println("Check the negative number in report!");
-        List<Integer> metricIndexes = Arrays.asList(0, 1, 2, 3, 4);
-        List<Double> expectedMetricValues = Arrays.asList(-6080.0, -10230.0, -3330.0, -6630.0, -4670.0);
+        List<Integer> metricIndexes = asList(0, 1, 2, 3, 4);
+        List<Double> expectedMetricValues = asList(-6080.0, -10230.0, -3330.0, -6630.0, -4670.0);
         this.assertMetricValuesInReport(metricIndexes, metricValues, expectedMetricValues);
         System.out.println("Negative numbers are displayed well in report!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadNullNumber() {
-        CsvFile fileToUpload = CsvFile.PAYROLL_NULL_NUMBER;
+        CsvFile fileToUpload = new CsvFile("payroll.null.number",
+                asList("Lastname", "Firstname", "Education", "Position", "Department", "State", "County",
+                        "Paydate", "Amount", "Amount1"),
+                asList("Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
+                      "Attribute", "Date [2015-12-31]", "Measure", "Measure"), PAYROLL_DATA_ROW_COUNT);
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        datasetNames.addAll(Lists.newArrayList(datasetName, "Date (Paydate)"));
+        datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
 
         createMetric("Sum of Amount", format("SELECT SUM([%s])",
                 getMdService().getObjUri(getProject(), Fact.class, title("Amount1"))), "#,##0.00");
@@ -248,7 +246,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         List<Float> metricValues = reportPage.getTableReport().getMetricElements();
         Screenshots.takeScreenshot(browser, "report-with-null-number", this.getClass());
         System.out.println("Check the null number in report!");
-        List<Integer> metricIndexes = Arrays.asList(0, 1, 2, 3);
+        List<Integer> metricIndexes = asList(0, 1, 2, 3);
         this.assertEmptyMetricInReport(metricIndexes, metricValues);
         System.out.println("Null numbers are displayed well in report!");
     }
@@ -256,11 +254,10 @@ public class UploadTest extends AbstractCsvUploaderTest {
     @Test(dependsOnMethods = "createProject")
     public void checkCSVUploaderWithLDMModeler() throws ParseException, JSONException, IOException {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String datasetName = getNewDataset(fileToUpload);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String datasetName = getNewDataset(PAYROLL);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        datasetNames.addAll(Lists.newArrayList("opportunity", "person", datasetName, "Date (Paydate)"));
+        datasetNames.addAll(asList("opportunity", "person", datasetName, "Date (Paydate)"));
         JSONObject onlyProductionDataModel = getProductionProjectModelView(getRestApiClient(),
                 testParams.getProjectId(), false);
         JSONObject allDataModel = getProductionProjectModelView(getRestApiClient(), testParams.getProjectId(),

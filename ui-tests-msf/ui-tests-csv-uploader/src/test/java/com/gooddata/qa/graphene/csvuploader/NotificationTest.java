@@ -3,8 +3,8 @@ package com.gooddata.qa.graphene.csvuploader;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
@@ -40,14 +40,12 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkNotificationForSuccessfulUpload() {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
         takeScreenshot(browser,
-                toScreenshotName("Upload-csv-file-to-check-successful-notification", fileToUpload.getFileName()),
+                toScreenshotName("Upload-csv-file-to-check-successful-notification", PAYROLL.getFileName()),
                 getClass());
 
-        String datasetName = getNewDataset(fileToUpload);
+        String datasetName = getNewDataset(PAYROLL);
         checkSuccessfulNotification(getSuccessfulNotification(1), datasetName);
     }
 
@@ -60,15 +58,14 @@ public class NotificationTest extends AbstractCsvUploaderTest {
                     GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                     testParams.getProjectEnvironment());
             testParams.setProjectId(GoodSalesProjectID);
-            CsvFile fileToUpload = CsvFile.PAYROLL;
 
-            checkCsvUpload(fileToUpload, this::uploadCsv, false);
+            checkCsvUpload(PAYROLL, this::uploadCsv, false);
 
-            assertThat(csvDatasetMessageBar.waitForErrorMessageBar().getText(),
-                    is(String.format("Failed to add data from \"%s\" due to internal error. Check your email for "
-                            + "instructions or contact support.", fileToUpload.getDatasetNameOfFirstUpload())));
+            assertEquals(csvDatasetMessageBar.waitForErrorMessageBar().getText(),
+                    format("Failed to add data from \"%s\" due to internal error. Check your email for "
+                            + "instructions or contact support.", PAYROLL.getDatasetNameOfFirstUpload()));
             takeScreenshot(browser,
-                    toScreenshotName("Upload-csv-file-to-check-failed-notification", fileToUpload.getFileName()),
+                    toScreenshotName("Upload-csv-file-to-check-failed-notification", PAYROLL.getFileName()),
                     getClass());
 
             checkFailureNotification(getFailedNotification(1));
@@ -84,15 +81,14 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     public void checkNotificationForSuccessfulUpdate() {
         initDataUploadPage();
 
-        CsvFile fileToUpload = CsvFile.PAYROLL_REFRESH;
-        String datasetName = CsvFile.PAYROLL.getDatasetNameOfFirstUpload();
+        String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
         datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
 
         waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
 
-        refreshCsv(fileToUpload, datasetName, true);
+        refreshCsv(PAYROLL_REFRESH, datasetName, true);
         takeScreenshot(browser,
-                toScreenshotName("Update-csv-file-to-check-successful-notification", fileToUpload.getFileName()),
+                toScreenshotName("Update-csv-file-to-check-successful-notification", PAYROLL_REFRESH.getFileName()),
                 getClass());
 
         checkSuccessfulNotification(getSuccessfulNotification(2), datasetName);
@@ -100,29 +96,28 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     private void checkSuccessfulNotification(Document message, String datasetName) {
         checkGeneralNotification(message);
-        String datasetUrl = String.format(DATASET_LINK, testParams.getHost(), testParams.getProjectId(),
+        String datasetUrl = format(DATASET_LINK, testParams.getHost(), testParams.getProjectId(),
                 getDatasetId(datasetName));
-        assertThat(message.getElementsContainingText(datasetName).attr("href"), is(datasetUrl));
+        assertEquals(message.getElementsContainingText(datasetName).attr("href"), datasetUrl);
 
-        String analysisUrl = String.format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
+        String analysisUrl = format(AD_REPORT_LINK, testParams.getHost(), testParams.getProjectId(),
                 getDatasetId(datasetName));
-        assertThat(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"),
-                is(analysisUrl));
+        assertEquals(message.getElementsMatchingOwnText("Explore the newly added data").attr("href"),
+                analysisUrl);
     }
 
     private void checkFailureNotification(Document message) {
         checkGeneralNotification(message);
-        String datasetManageUrl = String.format(MANAGE_DATASETS_PAGE_URL, testParams.getHost(),
+        String datasetManageUrl = format(MANAGE_DATASETS_PAGE_URL, testParams.getHost(),
                 testParams.getProjectId());
-        assertThat(message.getElementsContainingText("delete the loaded file").attr("href"), is(datasetManageUrl));
+        assertEquals(message.getElementsContainingText("delete the loaded file").attr("href"), datasetManageUrl);
     }
 
     private void checkGeneralNotification(Document message) {
-        String projectUrl = String.format(PROJECT_PAGE_URL, testParams.getHost(), testParams.getProjectId());
-        assertThat(message.getElementsMatchingOwnText(projectTitle).attr("href"), is(projectUrl));
-
-        assertThat(message.getElementsMatchingOwnText(GOODDATA_SUPPORT_URL).attr("href"),
-                is(GOODDATA_SUPPORT_URL));
+        String projectUrl = format(PROJECT_PAGE_URL, testParams.getHost(), testParams.getProjectId());
+        assertEquals(message.getElementsMatchingOwnText(projectTitle).attr("href"), projectUrl);
+        assertEquals(message.getElementsMatchingOwnText(GOODDATA_SUPPORT_URL).attr("href"),
+                GOODDATA_SUPPORT_URL);
     }
 
     private Document getNotification(String subject, int expectedMessageCount) {
@@ -135,14 +130,12 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     }
 
     private Document getSuccessfulNotification(int expectedMessageCount) {
-        String subject = String.format("New data is ready to use in the %s project", projectTitle);
-
+        String subject = format("New data is ready to use in the %s project", projectTitle);
         return getNotification(subject, expectedMessageCount);
     }
 
     private Document getFailedNotification(int expectedMessageCount) {
-        String subject = String.format("Error adding new data to %s project", projectTitle);
-
+        String subject = format("Error adding new data to %s project", projectTitle);
         return getNotification(subject, expectedMessageCount);
     }
 

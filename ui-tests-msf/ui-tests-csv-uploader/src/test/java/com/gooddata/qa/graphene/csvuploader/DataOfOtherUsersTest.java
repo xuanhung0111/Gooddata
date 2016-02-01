@@ -5,10 +5,11 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -30,10 +31,8 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
     public void checkMyDataAndNoDataOfOthers() {
         initDataUploadPage();
 
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-
-        checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String myDatasetName = getNewDataset(fileToUpload);
+        checkCsvUpload(PAYROLL, this::uploadCsv, true);
+        String myDatasetName = getNewDataset(PAYROLL);
 
         waitForDatasetName(myDatasetName);
         List<String> myDatasetNames = datasetsListPage.getMyDatasetsTable().getDatasetNames();
@@ -60,8 +59,8 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             initDataUploadPage();
             datasetsListPage.waitForMyDatasetsEmptyStateLoaded();
 
-            assertThat(datasetsListPage.getOthersDatasetsTable().getNumberOfDatasets(),
-                    is(projectOwnerDatasetNames.size()));
+            assertEquals(datasetsListPage.getOthersDatasetsTable().getNumberOfDatasets(),
+                    projectOwnerDatasetNames.size());
             assertThat(datasetsListPage.getOthersDatasetsTable().getDatasetNames(),
                     contains(projectOwnerDatasetNames.toArray()));
         } finally {
@@ -80,13 +79,10 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
 
             initDataUploadPage();
-
             datasetsListPage.waitForMyDatasetsEmptyStateLoaded();
 
-            CsvFile fileToUpload = CsvFile.PAYROLL;
-
-            checkCsvUpload(fileToUpload, this::uploadCsv, true);
-            String myDatasetName = getNewDataset(fileToUpload);
+            checkCsvUpload(PAYROLL, this::uploadCsv, true);
+            String myDatasetName = getNewDataset(PAYROLL);
 
             waitForDatasetName(myDatasetName);
             assertThat(datasetsListPage.getMyDatasetsTable().getDatasetNames(), hasItem(myDatasetName));
@@ -95,8 +91,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     getClass());
 
             waitForCollectionIsNotEmpty(datasetsListPage.getOthersDatasetsTable().getRows());
-            assertThat(datasetsListPage.getOtherDatasetsCount(),
-                    is(projectOwnerDatasetNames.size()));
+            assertEquals(datasetsListPage.getOtherDatasetsCount(), projectOwnerDatasetNames.size());
             assertThat(datasetsListPage.getOthersDatasetsTable().getDatasetNames(),
                     contains(projectOwnerDatasetNames.toArray()));
         } finally {
@@ -112,7 +107,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
 
             initDataUploadPage();
-            String datasetName = CsvFile.PAYROLL.getDatasetNameOfFirstUpload();
+            String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
 
             final int datasetCountBeforeDelete = datasetsListPage.getOtherDatasetsCount();
 
@@ -120,8 +115,8 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             waitForFragmentVisible(datasetDeleteDialog).clickDelete();
             waitForFragmentNotVisible(datasetDeleteDialog);
 
-            assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
-                    is(String.format("\"%s\" was successfully deleted!", datasetName)));
+            assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                    format("\"%s\" was successfully deleted!", datasetName));
             final int datasetCountAfterDelete = datasetCountBeforeDelete - 1;
             Predicate<WebDriver> datasetsCountEqualsExpected = input ->
                     waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount() == datasetCountAfterDelete;
@@ -131,7 +126,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                             waitForFragmentVisible(datasetsListPage).getOtherDatasetsCount()
                             + "> in the dataset list doesn't match expected value <" + datasetCountAfterDelete + ">.")
                     .until(datasetsCountEqualsExpected);
-            removeDatasetFromUploadHistory(CsvFile.PAYROLL, datasetName);
+            removeDatasetFromUploadHistory(PAYROLL, datasetName);
         } finally {
             logout();
             signInAtGreyPages(testParams.getUser(), testParams.getPassword());
@@ -151,9 +146,8 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
             initDataUploadPage();
             final int datasetCount = datasetsListPage.getMyDatasetsCount();
-            CsvFile fileToUpload = CsvFile.PAYROLL;
-            checkCsvUpload(fileToUpload, this::uploadCsv, true);
-            String datasetName = getNewDataset(fileToUpload);
+            checkCsvUpload(PAYROLL, this::uploadCsv, true);
+            String datasetName = getNewDataset(PAYROLL);
             waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
             assertTrue(datasetsListPage.getMyDatasetsTable().isDeleteButtonVisible(datasetName),
                     "Delete button is not shown in editor's dataset");
@@ -173,17 +167,17 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     "Analyze button is not shown in editor's dataset");
 
             csvDatasetDetailPage.clickRefreshButton();
-            refreshCsv(CsvFile.PAYROLL_REFRESH, datasetName, true);
+            refreshCsv(PAYROLL_REFRESH, datasetName, true);
             waitForFragmentVisible(csvDatasetDetailPage);
 
             csvDatasetDetailPage.clickBackButton();
             waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
             waitForFragmentVisible(datasetDeleteDialog).clickDelete();
             waitForFragmentNotVisible(datasetDeleteDialog);
-            removeDatasetFromUploadHistory(fileToUpload, datasetName);
+            removeDatasetFromUploadHistory(PAYROLL, datasetName);
 
-            assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
-                    is(String.format("\"%s\" was successfully deleted!", datasetName)));
+            assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                    format("\"%s\" was successfully deleted!", datasetName));
             Predicate<WebDriver> datasetsCountEqualsExpected = input ->
                     waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCount;
 
@@ -203,10 +197,8 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         try {
             initDataUploadPage();
 
-            CsvFile fileToUpload = CsvFile.PAYROLL;
-
-            checkCsvUpload(fileToUpload, this::uploadCsv, true);
-            String datasetName = getNewDataset(fileToUpload);
+            checkCsvUpload(PAYROLL, this::uploadCsv, true);
+            String datasetName = getNewDataset(PAYROLL);
             waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
 
             logout();

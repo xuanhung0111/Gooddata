@@ -18,9 +18,7 @@ public class EmptyStateTest extends AbstractCsvUploaderTest {
     public void checkEmptyState() {
         initDataUploadPage();
         datasetsListPage.waitForEmptyStateLoaded();
-
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "empty"), getClass());
-
         log.info("Empty state message: " + datasetsListPage.getEmptyStateMessage());
     }
 }
