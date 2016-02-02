@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.cssSelector;
@@ -43,8 +43,9 @@ public abstract class ReactDropdown extends ReactDropdownParent {
         }
     }
 
-    public boolean hasItem(String name) {
-        return isElementPresent(cssSelector(getDropdownCssSelector() + " .s-" + simplifyText(name)), browser);
+    public void waitForItem(String name) {
+        searchByName(name);
+        waitForElementPresent(cssSelector(getDropdownCssSelector() + " .s-" + simplifyText(name)), browser);
     }
 
     protected WebElement getElementByName(String name) {

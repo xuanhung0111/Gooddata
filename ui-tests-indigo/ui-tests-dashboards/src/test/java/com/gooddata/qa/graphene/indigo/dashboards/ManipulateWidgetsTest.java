@@ -238,8 +238,8 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
                 .clickAddWidget()
                 .getConfigurationPanel()
                 .getMetricSelect();
+        metricSelect.waitForItem(LONG_NAME_METRIC);
         takeScreenshot(browser, "Metric with longer name", getClass());
-        assertTrue(metricSelect.hasItem(LONG_NAME_METRIC), "Item: " + LONG_NAME_METRIC + " not exist in list");
 
         metricSelect.searchByName(PATTERN_OF_METRIC_NAME);
         assertTrue(metricSelect.isNameShortened(LONG_NAME_METRIC), "The metric still displays full name");
