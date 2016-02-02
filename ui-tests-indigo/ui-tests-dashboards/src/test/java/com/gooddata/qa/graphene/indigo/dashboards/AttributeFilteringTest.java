@@ -24,8 +24,8 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void setupAttributeFiltersFeatureFlag() throws JSONException {
-        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS);
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS, true);
     }
 
     @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = {"desktop", "mobile"})

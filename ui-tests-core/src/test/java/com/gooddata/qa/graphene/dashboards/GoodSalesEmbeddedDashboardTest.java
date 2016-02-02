@@ -135,7 +135,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         waitForElementVisible(gpProject.getRoot());
         additionalProjectId =
                 gpProject.createProject(ADDITIONAL_PROJECT_TITLE, ADDITIONAL_PROJECT_TITLE, GOODSALES_TEMPLATE,
-                        testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                         testParams.getProjectEnvironment(), projectCreateCheckIterations);
     }
 
@@ -412,8 +412,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "createAdditionalProject")
     public void createScheduleOfEmbeddedDashboard() throws JSONException {
-        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS, true);
 
         String defaultScheduleSubject = EMBEDDED_DASHBOARD_NAME + " Dashboard";
 

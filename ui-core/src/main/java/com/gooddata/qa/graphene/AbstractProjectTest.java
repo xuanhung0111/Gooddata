@@ -16,8 +16,7 @@ import org.testng.annotations.Test;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
+import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
@@ -65,32 +64,32 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
         if (!canAccessGreyPage(browser)) {
             System.out.println("Use REST api to create project.");
-            testParams.setProjectId(ProjectRestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
-                    projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG,
+            testParams.setProjectId(ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
+                    projectTemplate, testParams.getAuthorizationToken(), ProjectDriver.POSTGRES,
                     testParams.getProjectEnvironment()));
 
         } else {
             openUrl(PAGE_GDC_PROJECTS);
             waitForElementVisible(gpProject.getRoot());
 
-            projectTitle += "-" + testParams.getDwhDriver().name();
+            projectTitle += "-" + testParams.getProjectDriver().name();
             if (projectTemplate.isEmpty()) {
                 testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                        testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                         testParams.getProjectEnvironment(), projectCreateCheckIterations));
             } else {
                 testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, projectTemplate,
-                        testParams.getAuthorizationToken(), DWHDriver.PG, testParams.getProjectEnvironment(),
+                        testParams.getAuthorizationToken(), ProjectDriver.POSTGRES, testParams.getProjectEnvironment(),
                         projectCreateCheckIterations));
 
-                if (testParams.getDwhDriver().equals(DWHDriver.VERTICA)) {
+                if (testParams.getProjectDriver().equals(ProjectDriver.VERTICA)) {
                     String exportToken = exportProject(true, true, false, projectCreateCheckIterations * 5);
                     deleteProject(testParams.getProjectId());
 
                     openUrl(PAGE_GDC_PROJECTS);
                     waitForElementVisible(gpProject.getRoot());
                     testParams.setProjectId(gpProject.createProject(projectTitle, projectTitle, null,
-                            testParams.getAuthorizationToken2(), testParams.getDwhDriver(),
+                            testParams.getAuthorizationToken2(), testParams.getProjectDriver(),
                             testParams.getProjectEnvironment(), projectCreateCheckIterations));
                     importProject(exportToken, projectCreateCheckIterations * 5);
                 }
@@ -164,17 +163,5 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected Metric createMetric(String name, String expression, String format) {
         return getMdService().createObj(getProject(), new Metric(name, expression, format));
-    }
-
-    public void setupFeatureFlagInProject(String projectId, ProjectFeatureFlags featureFlag)
-            throws JSONException {
-
-        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
-    }
-
-    public void disableFeatureFlagInProject(String projectId, ProjectFeatureFlags featureFlag)
-            throws JSONException {
-
-        ProjectRestUtils.disableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
     }
 }

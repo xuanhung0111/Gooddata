@@ -16,8 +16,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.Assert;
 
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
-import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
+import com.gooddata.project.Environment;
+import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.fragments.greypages.AbstractGreyPagesFragment;
 
 public class ProjectFragment extends AbstractGreyPagesFragment {
@@ -47,13 +47,13 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
     private WebElement submit;
 
     public String createProject(String title, String summary, String template, String authorizationToken,
-            DWHDriver dwhDriver, ProjectEnvironment enviroment, int checkIterations) throws JSONException {
+            ProjectDriver projectDriver, Environment enviroment, int checkIterations) throws JSONException {
         waitForElementVisible(this.title).sendKeys(title);
         if (summary != null && summary.length() > 0) this.summary.sendKeys(summary);
         if (template != null && template.length() > 0) this.projectTemplate.sendKeys(template);
 
-        switch (dwhDriver) {
-            case PG: this.pg.click(); break;
+        switch (projectDriver) {
+            case POSTGRES: this.pg.click(); break;
             case VERTICA: this.vertica.click(); break;
             default: this.pg.click();
         }
@@ -84,7 +84,7 @@ public class ProjectFragment extends AbstractGreyPagesFragment {
         return projectUrl.substring(projectUrl.lastIndexOf("/") + 1);
     }
 
-    private void selectEnviroment(ProjectEnvironment enviroment) {
+    private void selectEnviroment(Environment enviroment) {
         waitForElementVisible(By.id(enviroment.toString()), getRoot()).click();
     }
 

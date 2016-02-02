@@ -1,12 +1,14 @@
 package com.gooddata.qa.graphene.common;
 
+import static com.gooddata.qa.utils.EnumUtils.lookup;
+
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
+import com.gooddata.project.Environment;
+import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.project.DeleteMode;
-import com.gooddata.qa.graphene.enums.project.ProjectEnvironment;
 
 public class TestParameters {
 
@@ -24,9 +26,9 @@ public class TestParameters {
     private String adminPassword;
     private String authorizationToken;
     private String authorizationToken2;
-    private DWHDriver dwhDriver = DWHDriver.PG;
+    private ProjectDriver projectDriver = ProjectDriver.POSTGRES;
     private DeleteMode deleteMode = DeleteMode.DELETE_NEVER;
-    private ProjectEnvironment projectEnvironment = ProjectEnvironment.TESTING;
+    private Environment projectEnvironment = Environment.TESTING;
     private String testIdentification;
     private String downloadFolder;
     private int defaultTimeout;
@@ -48,11 +50,11 @@ public class TestParameters {
         viewerPassword = loadProperty("viewerPassword");
         adminUser = loadProperty("adminUser");
         adminPassword = loadProperty("adminPassword");
-        dwhDriver = DWHDriver.getDriverByName(loadProperty("project.dwhDriver"));
+        projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
         authorizationToken2 = loadProperty("project.authorizationToken2");
-        deleteMode = DeleteMode.getModeByName(loadProperty("deleteMode"));
-        projectEnvironment = ProjectEnvironment.getEnvironmentByName(loadProperty("project.environment"));
+        deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.DELETE_NEVER);
+        projectEnvironment = lookup(loadProperty("project.environment"), Environment.TESTING);
         downloadFolder = loadProperty("browserDownloadFolder");
         defaultTimeout = Integer.parseInt(loadProperty("timeout"));
         extendedTimeoutMultiple = Integer.parseInt(loadProperty("extendedTimeoutMultiple"));
@@ -142,11 +144,11 @@ public class TestParameters {
         return authorizationToken2;
     }
 
-    public DWHDriver getDwhDriver() {
-        return dwhDriver;
+    public ProjectDriver getProjectDriver() {
+        return projectDriver;
     }
 
-    public ProjectEnvironment getProjectEnvironment() {
+    public Environment getProjectEnvironment() {
         return projectEnvironment;
     }
 

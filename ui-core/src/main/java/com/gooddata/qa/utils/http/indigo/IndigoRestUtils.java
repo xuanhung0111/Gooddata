@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,17 +32,14 @@ import com.gooddata.qa.utils.http.RestApiClient;
 
 public class IndigoRestUtils {
 
-    private static final String ANALYTICAL_DASHBOARD_BODY;
-    private static final String KPI_WIDGET_BODY;
-
     private static final String AMOUNT = "Amount";
     private static final String LOST = "Lost";
     private static final String NUM_OF_ACTIVITIES = "# of Activities";
     private static final String DATE_DIM_CREATED = "Date dimension (Created)";
 
-    static {
+    private static final Supplier<String> ANALYTICAL_DASHBOARD_BODY = () -> {
         try {
-            ANALYTICAL_DASHBOARD_BODY = new JSONObject() {{
+            return new JSONObject() {{
                 put("analyticalDashboard", new JSONObject() {{
                     put("meta", new JSONObject() {{
                         put("title", "title");
@@ -55,11 +53,11 @@ public class IndigoRestUtils {
         } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
-    }
+    };
 
-    static {
+    private static final Supplier<String> KPI_WIDGET_BODY = () -> {
         try {
-            KPI_WIDGET_BODY = new JSONObject() {{
+            return new JSONObject() {{
                 put("kpi", new JSONObject() {{
                     put("meta", new JSONObject() {{
                         put("title", "${title}");
@@ -74,7 +72,7 @@ public class IndigoRestUtils {
         } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
-    }
+    };
 
     public static List<String> getAnalyticalDashboards(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
@@ -92,7 +90,7 @@ public class IndigoRestUtils {
 
     public static String createKpiWidget(final RestApiClient restApiClient, final String projectId,
             final KpiMDConfiguration kpiConfig) throws JSONException, IOException {
-        String content = KPI_WIDGET_BODY
+        String content = KPI_WIDGET_BODY.get()
                 .replace("${title}", kpiConfig.getTitle())
                 .replace("${metric}", kpiConfig.getMetric())
                 .replace("${dateDimension}", kpiConfig.getDateDimension())
@@ -164,7 +162,7 @@ public class IndigoRestUtils {
 
         // TODO: consider better with .put() and have clever template
         final String widgets = new JSONArray(widgetUris).toString();
-        final String content = ANALYTICAL_DASHBOARD_BODY.replace("\"widgets\":[]", "\"widgets\":" + widgets);
+        final String content = ANALYTICAL_DASHBOARD_BODY.get().replace("\"widgets\":[]", "\"widgets\":" + widgets);
 
         return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))

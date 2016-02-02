@@ -25,9 +25,8 @@ public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTe
     @Test(dependsOnGroups = {"init"})
     public void openAnalysePageAfterDeleteAnotherProject() throws ParseException, JSONException, IOException {
         String projectId = testParams.getProjectId();
-        String otherProjectId = ProjectRestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
-                GOODSALES_TEMPLATE, testParams.getAuthorizationToken(),
-                testParams.getDwhDriver(), testParams.getProjectEnvironment());
+        String otherProjectId = ProjectRestUtils.createProject(getGoodDataClient(), projectTitle, GOODSALES_TEMPLATE,
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
 
         try {
             testParams.setProjectId(otherProjectId);

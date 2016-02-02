@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import org.apache.http.ParseException;
@@ -35,13 +36,9 @@ public final class DashboardsRestUtils {
     private static final String OBJ_LINK = "/gdc/md/%s/obj/";
     private static final String DASHBOARD_EDIT_MODE_LINK = "/gdc/md/%s/obj/%s?mode=edit";
 
-    private static final String MUF_OBJ;
-    private static final String USER_FILTER;
-    private static final String CREATE_COMMENT_CONTENT_BODY;
-
-    static {
+    private static final Supplier<String> MUF_OBJ =  () -> {
         try {
-            MUF_OBJ = new JSONObject() {{
+            return new JSONObject() {{
                 put("userFilter", new JSONObject() {{
                     put("content", new JSONObject() {{
                         put("expression", "${MUFExpression}");
@@ -55,11 +52,11 @@ public final class DashboardsRestUtils {
         } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
-    }
+    };
 
-    static {
+    private static final Supplier<String> USER_FILTER = () -> {
         try {
-            USER_FILTER = new JSONObject() {{
+            return new JSONObject() {{
                 put("userFilters", new JSONObject() {{
                     put("items", new JSONArray() {{
                         put(new JSONObject() {{
@@ -72,14 +69,13 @@ public final class DashboardsRestUtils {
                 }});
             }}.toString();
         } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is an exception during json object initialization! ", e);
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
-    }
+    };
 
-    static {
+    private static final Supplier<String> CREATE_COMMENT_CONTENT_BODY = () -> {
         try {
-            CREATE_COMMENT_CONTENT_BODY = new JSONObject() {{
+            return new JSONObject() {{
                 put("comment", new JSONObject() {{
                     put("meta", new JSONObject() {{
                         put("title", "${title}");
@@ -93,7 +89,7 @@ public final class DashboardsRestUtils {
         } catch (JSONException e) {
             throw new IllegalStateException("There is an exception during json object initialization! ", e);
         }
-    }
+    };
 
     public static void deleteDashboardTab(final RestApiClient restApiClient, final String dashboardUri,
             final String tabName) throws IOException, JSONException {
@@ -123,7 +119,7 @@ public final class DashboardsRestUtils {
         log.info("Verify object id: " + objectUri);
         getJsonObject(restApiClient, objectUri);
 
-        final String content = CREATE_COMMENT_CONTENT_BODY.replace("${title}", comment)
+        final String content = CREATE_COMMENT_CONTENT_BODY.get().replace("${title}", comment)
                 .replace("#{related}", objectUri);
         return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
@@ -153,7 +149,7 @@ public final class DashboardsRestUtils {
                     throws IOException, JSONException {
         final String mdObjURI = format(OBJ_LINK, projectID);
         final String MUFExpressions = buildFilterExpression(projectID, conditions);
-        final String contentBody = MUF_OBJ.replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
+        final String contentBody = MUF_OBJ.get().replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
 
         return getJsonObject(restApiClient, restApiClient.newPostMethod(mdObjURI, contentBody)).getString("uri");
     }
@@ -161,7 +157,7 @@ public final class DashboardsRestUtils {
     public static void addMUFToUser(final RestApiClient restApiClient, final String projectURI, final String user,
             final String mufURI) throws ParseException, IOException {
         final String urserFilter = format(MUF_LINK, projectURI);
-        final String contentBody = USER_FILTER.replace("${email}", user).replace("$MUFExpression", mufURI);
+        final String contentBody = USER_FILTER.get().replace("${email}", user).replace("$MUFExpression", mufURI);
 
         executeRequest(restApiClient, restApiClient.newPostMethod(urserFilter, contentBody), HttpStatus.OK);
     }

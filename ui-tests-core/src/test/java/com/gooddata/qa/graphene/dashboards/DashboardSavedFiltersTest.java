@@ -5,8 +5,6 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.setFeatureFlags;
-import static com.gooddata.qa.utils.http.project.ProjectRestUtils.FeatureFlagOption.createFeatureClassOption;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -25,12 +23,14 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.dashboard.DashFilterTypes;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditFilter;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardSettingsDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget.SavedViewPopupMenu;
 import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 @Test(groups = {"dashboardSavedFilters"}, description = "Test saved filters work on dashboard in Portal")
 public class DashboardSavedFiltersTest extends AbstractProjectTest{
@@ -41,8 +41,6 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     private static final int    THIS_YEAR             = Calendar.getInstance().get(Calendar.YEAR);
     private static final String LAST_YEAR             = String.valueOf(THIS_YEAR - 1);
     private static final String PENULTIMATE_YEAR      = String.valueOf(THIS_YEAR - 2);
-
-    private static final String DISABLE_SAVED_FILTERS = "disableSavedFilters";
 
     @BeforeClass
     public void initProjectTitle() {
@@ -93,7 +91,8 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnGroups = {"init-data"}, priority = 2)
     public void checkDisableSavedFiltersFeatureFlagsTest() throws IOException, JSONException {
         try {
-            disableSavedFilters(true);
+            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(),
+                    testParams.getProjectId(), ProjectFeatureFlags.DISABLE_SAVED_FILTERS, true);
 
             initDashboardsPage();
             browser.navigate().refresh();
@@ -112,7 +111,8 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
             waitForElementNotVisible(dashboardSettingsDialog.getRoot());
             dashboardEditBar.cancelDashboard();
         } finally {
-            disableSavedFilters(false);
+            ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(),
+                    testParams.getProjectId(), ProjectFeatureFlags.DISABLE_SAVED_FILTERS, false);
     
             browser.navigate().refresh();
             waitForDashboardPageLoaded(browser);
@@ -450,9 +450,5 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
                 "Notification 'Saved Views disabled' is not shown!");
         assertEquals(notification.getText(), "Saved Views disabled",
                   "Notification text is not correct!");
-    }
-
-    private void disableSavedFilters(boolean on) throws IOException, JSONException {
-        setFeatureFlags(getRestApiClient(), createFeatureClassOption(DISABLE_SAVED_FILTERS, on));
     }
 }

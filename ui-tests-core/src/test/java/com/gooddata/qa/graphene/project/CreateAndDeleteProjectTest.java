@@ -15,8 +15,8 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
+import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.AbstractProjectTest;
-import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
@@ -43,11 +43,10 @@ public class CreateAndDeleteProjectTest extends AbstractProjectTest {
     @Test(dependsOnMethods = {"initData"})
     public void createProjectByRestApi() throws ParseException, JSONException, IOException {
         openUrl(PAGE_GDC_PROJECTS);
-        assertEquals(waitForFragmentVisible(gpProject).getDwhDriverSelected(), DWHDriver.PG.getValue());
+        assertEquals(waitForFragmentVisible(gpProject).getDwhDriverSelected(), ProjectDriver.POSTGRES.getValue());
 
-        secondProjectId = ProjectRestUtils.createBlankProject(getRestApiClient(), projectTitle, projectTitle,
-                testParams.getAuthorizationToken(), testParams.getDwhDriver(),
-                testParams.getProjectEnvironment());
+        secondProjectId = ProjectRestUtils.createBlankProject(getGoodDataClient(), projectTitle,
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(), testParams.getProjectEnvironment());
     }
 
     @Test(dependsOnMethods = {"createProjectByRestApi"})

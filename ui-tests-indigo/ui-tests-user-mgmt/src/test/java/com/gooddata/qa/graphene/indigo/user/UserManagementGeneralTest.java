@@ -35,7 +35,6 @@ import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils.FeatureFlagOption;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
@@ -51,14 +50,12 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private static final String GROUP2 = "Group2";
     private static final String GROUP3 = "Group3";
 
-    private boolean canAccessUserManagementByDefault;
     private String userManagementAdmin;
     private String userManagementPassword;
     private String editorUser;
     private String viewerUser;
     private String domainAdminUser;
 
-    private static final String FEATURE_FLAG = ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT.getFlagName();
     private static final String CHANGE_GROUP_SUCCESSFUL_MESSAGE = "Group membership successfully changed.";
     private static final String DEACTIVATE_SUCCESSFUL_MESSAGE = "The selected users have been deactivated.";
     private static final String ACTIVATE_SUCCESSFUL_MESSAGE = "The selected users have been activated.";
@@ -101,7 +98,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
         imapUser = testParams.loadProperty("imap.user");
         imapPassword = testParams.loadProperty("imap.password");
 
-        enableUserManagementFeature();
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, true);
     }
 
     @Test(dependsOnMethods = { "initData" }, groups = { "initialize", "sanity" })
@@ -594,7 +592,8 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     @Test(dependsOnGroups = { "activeUser", "userManagement", "verifyUI", "initialize", "deleteGroup" },
             alwaysRun = true)
     public void turnOffUserManagementFeature() throws IOException, JSONException {
-        disableUserManagementFeature();
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, false);
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {
@@ -606,21 +605,6 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     private void checkUserEmailsStillAvailableAfterDeletingGroup(List<String> emailsList) {
         assertTrue(userManagementPage.filterUserState(UserStates.ACTIVE)
                 .getAllUserEmails().containsAll(emailsList), "missing user email");
-    }
-
-    private void enableUserManagementFeature() throws IOException, JSONException {
-        canAccessUserManagementByDefault = ProjectRestUtils.isFeatureFlagEnabled(getRestApiClient(), FEATURE_FLAG);
-        if (!canAccessUserManagementByDefault) {
-            ProjectRestUtils.setFeatureFlags(getRestApiClient(),
-                    FeatureFlagOption.createFeatureClassOption(FEATURE_FLAG, true));
-        }
-    }
-
-    private void disableUserManagementFeature() throws IOException, JSONException {
-        if (!canAccessUserManagementByDefault) {
-            ProjectRestUtils.setFeatureFlags(getRestApiClient(),
-                    FeatureFlagOption.createFeatureClassOption(FEATURE_FLAG, false));
-        }
     }
 
     private <T> boolean compareCollections(Collection<T> collectionA, Collection<T> collectionB) {

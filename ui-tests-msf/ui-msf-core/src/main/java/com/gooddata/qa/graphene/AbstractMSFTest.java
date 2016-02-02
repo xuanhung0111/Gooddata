@@ -162,7 +162,8 @@ public class AbstractMSFTest extends AbstractProjectTest {
         getAdsHelper().associateAdsWithProject(ads, testParams.getProjectId());
     }
 
-    protected void customOutputStageMetadata(final DataSource... dataSources) throws ParseException, IOException {
+    protected void customOutputStageMetadata(final DataSource... dataSources)
+            throws ParseException, IOException, JSONException {
         final String putBody = prepareOutputStageMetadata(dataSources);
         final String putUri = format(OUTPUT_STAGE_METADATA_URI, getWorkingProject().getProjectId());
         getResource(getRestApiClient(),
@@ -389,47 +390,32 @@ public class AbstractMSFTest extends AbstractProjectTest {
         return workingProject;
     }
 
-    private String prepareOutputStageMetadata(final DataSource... dataSources) {
-        JSONObject metaObject = new JSONObject();
+    private String prepareOutputStageMetadata(final DataSource... dataSources) throws JSONException {
+        final JSONObject metaObject = new JSONObject();
 
-        try {
-            Collection<JSONObject> metadataObjects = Lists.newArrayList();
-            for (DataSource dataSource : dataSources) {
-                for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
-                    metadataObjects.add(prepareMetadataObject(dataset.getName(), dataSource.getName()));
-                }
+        final Collection<JSONObject> metadataObjects = Lists.newArrayList();
+        for (DataSource dataSource : dataSources) {
+            for (Dataset dataset : dataSource.getAvailableDatasets(FieldTypes.ALL)) {
+                metadataObjects.add(prepareMetadataObject(dataset.getName(), dataSource.getName()));
             }
-            metaObject.put("outputStageMetadata", new JSONObject().put("tableMeta", metadataObjects));
-        } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is JSONExcetion during prepareOutputStageMetadata!", e);
         }
+        metaObject.put("outputStageMetadata", new JSONObject().put("tableMeta", metadataObjects));
 
         return metaObject.toString();
     }
 
-    private JSONObject prepareMetadataObject(final String tableName, final String dataSourceName) {
-        JSONObject metadataObject = new JSONObject();
-        try {
-            metadataObject.put("tableMetadata",
-                    new JSONObject().put("table", tableName).put("defaultSource", dataSourceName)
-                            .put("columnMeta", new JSONArray()));
-        } catch (JSONException e) {
-            throw new IllegalStateException("JSONExeception", e);
-        }
-
-        return metadataObject;
+    private JSONObject prepareMetadataObject(final String tableName, final String dataSourceName) throws JSONException {
+        return new JSONObject() {{
+            put("tableMetadata", new JSONObject() {{
+                put("table", tableName);
+                put("defaultSource", dataSourceName);
+                put("columnMeta", new JSONArray());
+            }});
+        }};
     }
 
-    private String sendRequestToUpdateModel(final String maql) {
-        String pollingUri = "";
-        try {
-            pollingUri = executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(), maql);
-        } catch (Exception e) {
-            throw new IllegalStateException("There is an exeception during LDM update!", e);
-        }
-
-        return pollingUri;
+    private String sendRequestToUpdateModel(final String maql) throws ParseException, JSONException, IOException {
+        return executeMAQL(getRestApiClient(), getWorkingProject().getProjectId(), maql);
     }
 
     protected enum AdditionalDatasets {

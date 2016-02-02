@@ -27,20 +27,17 @@ public final class RolapRestUtils {
     private static final String LDM_MANAGE_LINK = "/gdc/md/%s/ldm/manage2";
     private static final String PULL_DATA_LINK = "/gdc/md/%s/etl/pull2";
 
-    private static final String MAQL_EXECUTION_BODY;
-
-    static {
+    private static final Supplier<String> MAQL_EXECUTION_BODY = () -> {
         try {
-            MAQL_EXECUTION_BODY = new JSONObject() {{
+            return new JSONObject() {{
                 put("manage", new JSONObject() {{
                     put("maql", "${maql}");
                 }});
             }}.toString();
         } catch (JSONException e) {
-            throw new IllegalStateException(
-                    "There is an exeception during json object initialization! ", e);
+            throw new IllegalStateException("There is an exeception during json object initialization! ", e);
         }
-    }
+    };
 
     public static int waitingForAsyncTask(final RestApiClient restApiClient, final String pollingUri) {
         final Supplier<HttpRequestBase> request = () -> restApiClient.newGetMethod(pollingUri);
@@ -84,7 +81,7 @@ public final class RolapRestUtils {
 
     public static String executeMAQL(final RestApiClient restApiClient, final String projectId, final String maql)
             throws ParseException, JSONException, IOException {
-        final String contentBody = MAQL_EXECUTION_BODY.replace("${maql}", maql);
+        final String contentBody = MAQL_EXECUTION_BODY.get().replace("${maql}", maql);
         return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(String.format(LDM_MANAGE_LINK, projectId), contentBody))
                     .getJSONArray("entries")

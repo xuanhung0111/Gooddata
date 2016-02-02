@@ -7,12 +7,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import javax.mail.Message;
 
-import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.testng.annotations.BeforeClass;
@@ -54,12 +52,12 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkNotificationForFailedUpload() throws JSONException, JSONException, IOException {
+    public void checkNotificationForFailedUpload() {
         String projectId = testParams.getProjectId();
         String GoodSalesProjectID = "";
         try {
-            GoodSalesProjectID = ProjectRestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
-                    GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+            GoodSalesProjectID = ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
+                    GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                     testParams.getProjectEnvironment());
             testParams.setProjectId(GoodSalesProjectID);
             CsvFile fileToUpload = CsvFile.PAYROLL;
@@ -77,7 +75,7 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         } finally {
             testParams.setProjectId(projectId);
             if (!GoodSalesProjectID.isEmpty()) {
-                ProjectRestUtils.deleteProject(getRestApiClient(), GoodSalesProjectID);
+                ProjectRestUtils.deleteProject(getGoodDataClient(), GoodSalesProjectID);
             }
         }
     }

@@ -11,10 +11,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -119,9 +117,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
               .stream()
               .anyMatch(process -> DEFAULT_DATAlOAD_PROCESS_NAME.equals(process.getName())));
         final ProcessExecutionDetail executionDetail = executeProcess(dataloadProcess, "", SYNCHRONIZE_ALL_PARAM);
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        getProcessService().getExecutionLog(executionDetail, outputStream);
-        assertTrue(new String(outputStream.toByteArray(), StandardCharsets.UTF_8)
+        assertTrue(ProcessRestUtils.getExecutionLog(getGoodDataClient(), executionDetail)
             .contains(format("user: %s", testParams.getUser())));
 
         logout();
@@ -150,9 +146,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
         final DataloadProcess dataloadProcess = deleteDataloadProcessAndCreateNewOne();
         final ProcessExecutionDetail executionDetail = executeProcess(dataloadProcess, "", SYNCHRONIZE_ALL_PARAM);
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        getProcessService().getExecutionLog(executionDetail, outputStream);
-        assertContentLogFile(new String(outputStream.toByteArray(), StandardCharsets.UTF_8),
+        assertContentLogFile(ProcessRestUtils.getExecutionLog(getGoodDataClient(), executionDetail),
                 "execution_log_successful.txt");
     }
 
