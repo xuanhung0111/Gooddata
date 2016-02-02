@@ -570,9 +570,10 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
                     ".adi-no-items:contains('No data matching\"abcxyz\"')"), browser));
         });
 
+        analysisPage.getCataloguePanel().filterCatalog(CatalogFilterType.ALL);
         analysisPage.addAttribute(ACTIVITY_TYPE);
         Stream.of(CatalogFilterType.values()).forEach(type -> {
-            assertFalse(analysisPage.getCataloguePanel().search("Am"));
+            assertFalse(analysisPage.getCataloguePanel().filterCatalog(type).search("Am"));
             assertTrue(isElementPresent(ByJQuery.selector(
                     ".adi-no-items:contains('No data matching\"Am\"')"), browser));
 
