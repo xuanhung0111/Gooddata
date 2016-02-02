@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.id;
@@ -26,7 +26,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.google.common.collect.Lists;
 
 public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstractTest {
@@ -77,7 +77,7 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
         waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
         String oldFormat = waitForFragmentVisible(metricDetailPage).getMetricFormat();
         String metricUri = format("/gdc/md/%s/obj/14636", testParams.getProjectId());
-        RestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat + "[red]");
+        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat + "[red]");
 
         try {
             initAnalysePage();
@@ -91,7 +91,7 @@ public class GoodSalesBasicDataCombinationTest extends AnalyticalDesignerAbstrac
             TableReport tableReport = analysisPage.changeReportType(ReportType.TABLE).getTableReport();
             assertEquals(tableReport.getFormatFromValue(), "color: rgb(255, 0, 0);");
         } finally {
-            RestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat);
+            DashboardsRestUtils.changeMetricFormat(getRestApiClient(), metricUri, oldFormat);
             initMetricPage();
             waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
             assertEquals(metricDetailPage.getMetricFormat(), oldFormat);

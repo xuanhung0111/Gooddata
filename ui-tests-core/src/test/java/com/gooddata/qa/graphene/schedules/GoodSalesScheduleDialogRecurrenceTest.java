@@ -18,7 +18,7 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardScheduleDialog;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 @Test(groups = {"GoodSalesShareDashboard"}, description = "Tests for GoodSales project - schedule dashboard")
 public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmailSchedulesTest {
@@ -67,7 +67,7 @@ public class GoodSalesScheduleDialogRecurrenceTest extends AbstractGoodSalesEmai
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void setFeatureFlags() throws JSONException, IOException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DASHBOARD_SCHEDULE_RECIPIENTS);
     }
 

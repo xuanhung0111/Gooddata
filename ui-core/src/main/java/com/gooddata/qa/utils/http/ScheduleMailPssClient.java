@@ -3,9 +3,8 @@
  */
 package com.gooddata.qa.utils.http;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
+import static java.lang.String.format;
 
 /**
  * Simple control over fast and standard mode of scheduled emails
@@ -29,16 +28,12 @@ public class ScheduleMailPssClient {
     }
 
     public void accelerate() {
-        String uri = String.format(ACCELERATE_URI, projectId);
-        HttpRequestBase request = restApiClient.newPutMethod(uri, "{\"accelerate\":{}}");
-        HttpResponse response = restApiClient.execute(request);
-        EntityUtils.consumeQuietly(response.getEntity());
+        executeRequest(restApiClient,
+                restApiClient.newPutMethod(format(ACCELERATE_URI, projectId), "{\"accelerate\":{}}"));
     }
 
     public void decelerate() {
-        String uri = String.format(ACCELERATE_URI, projectId);
-        HttpRequestBase request = restApiClient.newDeleteMethod(uri);
-        HttpResponse response = restApiClient.execute(request);
-        EntityUtils.consumeQuietly(response.getEntity());
+        executeRequest(restApiClient,
+                restApiClient.newDeleteMethod(format(ACCELERATE_URI, projectId)));
     }
 }

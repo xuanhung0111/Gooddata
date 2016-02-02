@@ -15,8 +15,8 @@ import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class PartialExportDashboardsTest extends AbstractProjectTest {
 
@@ -55,7 +55,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
         final String dashboardUri = IndigoRestUtils.getAnalyticalDashboards(getRestApiClient(), oldPid).get(0);
         final String token = exportPartialProject(dashboardUri, DEFAULT_PROJECT_CHECK_LIMIT);
 
-        final String newPid = RestUtils.createProject(getRestApiClient(), "Copy of " + projectTitle, "", projectTemplate,
+        final String newPid = ProjectRestUtils.createProject(getRestApiClient(), "Copy of " + projectTitle, "", projectTemplate,
                 testParams.getAuthorizationToken(), testParams.getDwhDriver(), testParams.getProjectEnvironment());
 
         try {
@@ -75,7 +75,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
             testParams.setProjectId(oldPid);
 
             if (nonNull(newPid)) {
-                RestUtils.deleteProject(getRestApiClient(), newPid);
+                ProjectRestUtils.deleteProject(getRestApiClient(), newPid);
             }
         }
     }

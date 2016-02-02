@@ -4,8 +4,10 @@ import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Map;
 
+import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.testng.annotations.AfterClass;
@@ -20,8 +22,8 @@ import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.utils.AdsHelper;
-import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
+import com.gooddata.qa.graphene.utils.ElementUtils;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.warehouse.Warehouse;
 
@@ -61,20 +63,20 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithGeorge", groups = {
         "george", "basicTest"})
     public void checkNotificationForAddingSingleBasicField(AddedFields addedField)
-            throws JSONException {
+            throws JSONException, IOException {
         long requestTime = System.currentTimeMillis();
         addNewFieldAndCheckNotification(UserRoles.ADMIN, addedField, requestTime);
     }
 
     @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithGeorge",
             groups = {"george"})
-    public void checkNotificationForAddingSingleField(AddedFields addedField) throws JSONException {
+    public void checkNotificationForAddingSingleField(AddedFields addedField) throws JSONException, IOException {
         long requestTime = System.currentTimeMillis();
         addNewFieldAndCheckNotification(UserRoles.ADMIN, addedField, requestTime);
     }
 
     @Test(dependsOnMethods = {"signInWithGeorge"}, groups = {"george"})
-    public void addMultiFieldsFromADSToLDM() {
+    public void addMultiFieldsFromADSToLDM() throws IOException, JSONException {
         long requestTime = System.currentTimeMillis();
         try {
             Dataset personDataset =
@@ -100,7 +102,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnMethods = "signInWithGeorge", groups = {"george"})
-    public void failToAddNewField() {
+    public void failToAddNewField() throws IOException, JSONException {
         long requestTime = System.currentTimeMillis();
         try {
             Dataset selectedDataset =
@@ -120,7 +122,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnMethods = "signInWithGeorge", groups = {"george"})
-    public void failToLoadDataForNewField() {
+    public void failToLoadDataForNewField() throws IOException, JSONException {
 
         long requestTime = System.currentTimeMillis();
         try {
@@ -155,19 +157,19 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithAnnie", groups = {
         "basicTest"})
-    public void checkBasicNotificationWithEditorRole(AddedFields addedField) throws JSONException {
+    public void checkBasicNotificationWithEditorRole(AddedFields addedField) throws JSONException, IOException {
         long requestTime = System.currentTimeMillis();
         addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
     }
 
     @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithAnnie")
-    public void checkExtendedNotificationWithEditor(AddedFields addedField) throws JSONException {
+    public void checkExtendedNotificationWithEditor(AddedFields addedField) throws JSONException, IOException {
         long requestTime = System.currentTimeMillis();
         addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
     }
 
     @Test(dependsOnMethods = "signInWithAnnie")
-    public void failToAddNewFieldWithEditorRole() {
+    public void failToAddNewFieldWithEditorRole() throws IOException, JSONException {
         long requestTime = System.currentTimeMillis();
         try {
             Dataset selectedDataset =
@@ -188,7 +190,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     @Test(dependsOnMethods = "signInWithAnnie")
-    public void failToLoadDataForNewFieldWithEdiorRole() {
+    public void failToLoadDataForNewFieldWithEdiorRole() throws IOException, JSONException {
         long requestTime = System.currentTimeMillis();
         try {
             Dataset selectedDataset =
@@ -224,8 +226,12 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Override
     protected void setDefaultSchemaForOutputStage(Warehouse ads) {
-        new AdsHelper(getGoodDataClient(), getRestApiClient(technicalUser, technicalUserPassword))
-                .associateAdsWithProject(ads, testParams.getProjectId());
+        try {
+            new AdsHelper(getGoodDataClient(), getRestApiClient(technicalUser, technicalUserPassword))
+                    .associateAdsWithProject(ads, testParams.getProjectId());
+        } catch (ParseException | JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -241,10 +247,14 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Override
     protected void addUsersToAdsInstance() {
-        getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
+        try {
+            getAdsHelper().addUserToAdsInstance(ads, technicalUser, AdsRole.DATA_ADMIN);
+        } catch (ParseException | JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void failToAddData(DataSource dataSource, String screenshotName) {
+    private void failToAddData(DataSource dataSource, String screenshotName) throws IOException, JSONException {
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
 
@@ -271,7 +281,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     private void addNewFieldAndCheckNotification(UserRoles role, AddedFields addedField,
-            long requestTime) throws JSONException {
+            long requestTime) throws JSONException, IOException {
         try {
             checkNewDataAdding(role, addedField);
             checkSuccessfulDataAddingNotification(role, requestTime, addedField.getField()

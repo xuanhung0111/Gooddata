@@ -1,8 +1,9 @@
 package com.gooddata.qa.graphene.manage;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.IMAGES;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
-import static org.testng.Assert.assertEquals;
+import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -13,12 +14,8 @@ import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
@@ -60,12 +57,9 @@ public class GoodSalesViewModelVisualizationTest extends GoodSalesAbstractTest {
     }
 
     private File getLDMImageFromGrayPage() throws IOException, ParseException, JSONException {
-        getRestApiClient();
-        HttpRequestBase getRequest = restApiClient.newGetMethod(String.format(MODEL_URI, testParams.getProjectId()));
-        HttpResponse getResponse = restApiClient.execute(getRequest);
-        assertEquals(getResponse.getStatusLine().getStatusCode(), 200, "Invalid status code");
-        URL url = new URL(new JSONObject(EntityUtils.toString(getResponse.getEntity())).get("uri").toString());
-        File image = new File(testParams.loadProperty("user.home"), MODEL_IMAGE_FILE);
+        final URL url = new URL(getJsonObject(getRestApiClient(), format(MODEL_URI, testParams.getProjectId()))
+            .getString("uri"));
+        final File image = new File(testParams.loadProperty("user.home"), MODEL_IMAGE_FILE);
         FileUtils.copyURLToFile(url, image);
         return image;
     }

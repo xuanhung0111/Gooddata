@@ -29,7 +29,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 
 public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
@@ -135,7 +135,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     private UserProfilePage openUserProfileInProject(RestApiClient restApiClient, String projectId)
             throws ParseException, JSONException, IOException {
-        String userProfileUri = RestUtils.getCurrentUserProfile(restApiClient)
+        String userProfileUri = UserManagementRestUtils.getCurrentUserProfile(restApiClient)
                 .getJSONObject("links")
                 .getString("self");
         openUrl(format(USER_PROFILE_PAGE_URL, projectId, userProfileUri));
@@ -145,10 +145,10 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
     private void deleteUserIfExist(RestApiClient restApiClient, String userEmail)
             throws ParseException, JSONException, IOException {
-        JSONObject userProfile = RestUtils.getUserProfileByEmail(restApiClient, userEmail);
+        JSONObject userProfile = UserManagementRestUtils.getUserProfileByEmail(restApiClient, userEmail);
         if (Objects.nonNull(userProfile)) {
             String userProfileUri = userProfile.getJSONObject("links").getString("self");
-            RestUtils.deleteUser(restApiClient, userProfileUri);
+            UserManagementRestUtils.deleteUser(restApiClient, userProfileUri);
         }
     }
 }

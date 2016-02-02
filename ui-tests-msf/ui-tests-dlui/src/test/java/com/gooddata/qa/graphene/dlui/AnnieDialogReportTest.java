@@ -42,20 +42,20 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "basicFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
             groups = {"addOneField", "basicTest"})
     public void adminCheckReportWithBasicSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, IOException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"prepareMetricsToCheckReport"},
             groups = {"addOneField"})
     public void adminCheckReportWithSingleField(AddedFields addedField, ReportWithAddedFields reportWithAddedFields)
-            throws JSONException {
+            throws JSONException, IOException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.ADMIN, addedField, reportWithAddedFields);
     }
 
     @Test(dependsOnMethods = {"prepareMetricsToCheckReport"}, dependsOnGroups = {"addOneField"},
             groups = "annieDialogTest")
-    public void adminCheckReportWithMultiAddedFields() throws JSONException {
+    public void adminCheckReportWithMultiAddedFields() throws JSONException, IOException {
         addMultiFieldsAndCheckReport(UserRoles.ADMIN);
     }
 
@@ -67,20 +67,20 @@ public class AnnieDialogReportTest extends AbstractAnnieDialogTest {
     @Test(dataProvider = "basicFieldData", dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
             groups = {"editorAddOneField", "basicTest"})
     public void editorCheckReportWithBasicSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, IOException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
     @Test(dataProvider = "newFieldData", dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
             groups = {"editorAddOneField"})
     public void editorCheckReportWithSingleField(AddedFields addedField,
-            ReportWithAddedFields reportWithAddedFields) throws JSONException {
+            ReportWithAddedFields reportWithAddedFields) throws JSONException, IOException {
         checkNewAddedDataReportAndCleanAddedData(UserRoles.EDITOR, addedField, reportWithAddedFields);
     }
 
     @Test(dependsOnMethods = {"addEditorUser", "prepareMetricsToCheckReport"},
             dependsOnGroups = {"editorAddOneField"})
-    public void editorCheckReportWithMultiAddedFields() throws JSONException {
+    public void editorCheckReportWithMultiAddedFields() throws JSONException, IOException {
         addMultiFieldsAndCheckReport(UserRoles.EDITOR);
     }
 

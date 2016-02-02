@@ -8,6 +8,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 
+import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
@@ -17,14 +18,13 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.utils.http.RestUtils;
-import org.json.JSONException;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
     public void setupAttributeFiltersFeatureFlag() throws JSONException {
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
+        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.ENABLE_ATTRIBUTE_FILTERS);
     }
 

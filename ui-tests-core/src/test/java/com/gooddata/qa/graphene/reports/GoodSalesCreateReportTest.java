@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.reports;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,7 +34,7 @@ import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
 
@@ -213,7 +213,7 @@ public class GoodSalesCreateReportTest extends GoodSalesAbstractTest {
         definition = mdService.createObj(project, definition);
         mdService.createObj(project, new Report(definition.getTitle(), definition));
 
-        RestUtils.changeMetricExpression(getRestApiClient(), testMetric.getUri(),
+        DashboardsRestUtils.changeMetricExpression(getRestApiClient(), testMetric.getUri(),
                 "SELECT ["+ amount.getUri() + "]");
         initReportsPage();
         reportsPage.getReportsList().openReport(reportName);

@@ -32,7 +32,7 @@ import com.gooddata.qa.graphene.enums.disc.NotificationEvents;
 import com.gooddata.qa.graphene.enums.disc.ScheduleStatus;
 import com.gooddata.qa.graphene.fragments.disc.NotificationRule;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
@@ -170,7 +170,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected String createGdcUserWithImapUser(String imapUser, String imapPassword) {
         try {
-            return RestUtils.createNewUser(getRestApiClient(), imapUser, imapPassword);
+            return UserManagementRestUtils.createUser(getRestApiClient(), imapUser, imapPassword);
         } catch (Exception e) {
             throw new IllegalStateException("There is an exception when creating a new user!", e);
         }
@@ -178,7 +178,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected void deleteImapUser(String imapUserUri) {
         if (!imapUserUri.isEmpty())
-            RestUtils.deleteUser(getRestApiClient(), imapUserUri);
+            UserManagementRestUtils.deleteUser(getRestApiClient(), imapUserUri);
     }
 
     protected void editNotification(NotificationBuilder newNotificationBuilder) {

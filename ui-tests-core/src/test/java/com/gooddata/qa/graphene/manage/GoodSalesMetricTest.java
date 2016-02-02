@@ -49,7 +49,7 @@ import com.gooddata.qa.graphene.enums.metrics.MetricTypes;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 @Test(groups = {"GoodSalesMetrics"},
         description = "Tests for GoodSales project (metric creation functionality) in GD platform")
@@ -591,14 +591,14 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
         assertNull(firstRow.get(3));
 
-        RestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
+        DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
                 "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW");
         try {
             openReport(reportName);
             takeScreenshot(browser, "checkReportRenderedWell - report not computable", getClass());
             assertThat(reportPage.getInvalidDataReportMessage(), equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
         } finally {
-            RestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
+            DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
                     "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW");
         }
     }

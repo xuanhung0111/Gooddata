@@ -31,7 +31,7 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 
 public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
@@ -252,10 +252,10 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     private void deleteUserIfExist(RestApiClient restApiClient, String userEmail)
             throws ParseException, JSONException, IOException {
-        JSONObject userProfile = RestUtils.getUserProfileByEmail(restApiClient, userEmail);
+        JSONObject userProfile = UserManagementRestUtils.getUserProfileByEmail(restApiClient, userEmail);
         if (Objects.nonNull(userProfile)) {
             String userProfileUri = userProfile.getJSONObject("links").getString("self");
-            RestUtils.deleteUser(restApiClient, userProfileUri);
+            UserManagementRestUtils.deleteUser(restApiClient, userProfileUri);
         }
     }
 

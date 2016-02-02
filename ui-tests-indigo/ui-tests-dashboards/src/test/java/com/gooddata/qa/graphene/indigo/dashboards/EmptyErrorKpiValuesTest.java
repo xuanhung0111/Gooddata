@@ -16,7 +16,7 @@ import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 
 public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
 
@@ -49,7 +49,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"testEmptyMetricWithoutConditionalFormat"}, groups = {"desktop"})
     public void testEmptyMetricWithConditionalFormat() throws ParseException, JSONException, IOException {
-        RestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "[=NULL]empty;#,##0.00");
+        DashboardsRestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "[=NULL]empty;#,##0.00");
 
         try {
             Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
@@ -60,14 +60,14 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
 
             assertEquals(lastKpi.getValue(), "empty");
         } finally {
-            RestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "#,##0.00");
+            DashboardsRestUtils.changeMetricFormat(getRestApiClient(), errorMetric.getUri(), "#,##0.00");
         }
     }
 
     @Test(dependsOnMethods = {"testEmptyMetricWithoutConditionalFormat"}, groups = {"desktop"})
     public void testInvalidKpiValue() throws ParseException, JSONException, IOException {
         String accountUri = getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(ACCOUNT));
-        RestUtils.changeMetricExpression(getRestApiClient(), errorMetric.getUri(),
+        DashboardsRestUtils.changeMetricExpression(getRestApiClient(), errorMetric.getUri(),
                 "SELECT [" + accountUri + "] WHERE 2 = 1");
 
         Kpi lastKpi = initIndigoDashboardsPageWithWidgets()

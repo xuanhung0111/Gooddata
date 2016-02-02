@@ -20,7 +20,7 @@ import com.gooddata.qa.graphene.enums.project.DWHDriver;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 public abstract class AbstractProjectTest extends AbstractUITest {
 
@@ -65,7 +65,7 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
         if (!canAccessGreyPage(browser)) {
             System.out.println("Use REST api to create project.");
-            testParams.setProjectId(RestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
+            testParams.setProjectId(ProjectRestUtils.createProject(getRestApiClient(), projectTitle, projectTitle,
                     projectTemplate, testParams.getAuthorizationToken(), DWHDriver.PG,
                     testParams.getProjectEnvironment()));
 
@@ -169,12 +169,12 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     public void setupFeatureFlagInProject(String projectId, ProjectFeatureFlags featureFlag)
             throws JSONException {
 
-        RestUtils.enableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
+        ProjectRestUtils.enableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
     }
 
     public void disableFeatureFlagInProject(String projectId, ProjectFeatureFlags featureFlag)
             throws JSONException {
 
-        RestUtils.disableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
+        ProjectRestUtils.disableFeatureFlagInProject(getRestApiClient(), projectId, featureFlag);
     }
 }

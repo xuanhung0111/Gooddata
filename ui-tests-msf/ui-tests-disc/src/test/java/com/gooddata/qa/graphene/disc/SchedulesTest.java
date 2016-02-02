@@ -1,9 +1,9 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -28,7 +28,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
 import com.gooddata.qa.graphene.utils.Sleeper;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class SchedulesTest extends AbstractSchedulesTest {
 
@@ -1036,7 +1035,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
 
             scheduleDetail.manualRun();
             assertSuccessfulExecution();
-            RestUtils.verifyValidLink(getRestApiClient(), scheduleDetail.getLastExecutionLogLink());
+            verifyValidLink(getRestApiClient(), scheduleDetail.getLastExecutionLogLink());
             scheduleDetail.clickOnCloseScheduleButton();
 
             ScheduleBuilder failedSchedule =
@@ -1046,7 +1045,7 @@ public class SchedulesTest extends AbstractSchedulesTest {
 
             scheduleDetail.manualRun();
             assertFailedExecution(failedSchedule.getExecutable());
-            RestUtils.verifyValidLink(getRestApiClient(), scheduleDetail.getLastExecutionLogLink());
+            verifyValidLink(getRestApiClient(), scheduleDetail.getLastExecutionLogLink());
         } finally {
             cleanProcessesInWorkingProject();
         }

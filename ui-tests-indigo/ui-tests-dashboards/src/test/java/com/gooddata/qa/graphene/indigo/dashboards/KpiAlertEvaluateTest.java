@@ -28,6 +28,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Fact;
+import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.GDEmails;
@@ -35,6 +37,7 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
@@ -137,7 +140,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             if (metricUri != null) {
                 RestUtils.deleteObject(restApiClient, metricUri);
             }
-            RestUtils.deleteUser(restApiClient, userUri);
+            UserManagementRestUtils.deleteUser(restApiClient, userUri);
         }
     }
 
@@ -158,8 +161,8 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     }
 
     private String addImapUserToProject(String email, String password) throws ParseException, IOException, JSONException {
-        String userUri = RestUtils.createNewUser(getRestApiClient(), email, password);
-        RestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(),
+        String userUri = UserManagementRestUtils.createUser(getRestApiClient(), email, password);
+        UserManagementRestUtils.addUserToProject(getRestApiClient(), testParams.getProjectId(),
                 email, UserRoles.ADMIN);
 
         return userUri;
@@ -190,7 +193,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     private String createMetricFromFact(String metricName, String factName, String template, String format)
             throws JSONException, IOException {
 
-        String factUri = RestUtils.getFactUriByName(restApiClient, testParams.getProjectId(), factName);
+        String factUri = getMdService().getObjUri(getProject(), Fact.class, Restriction.title(factName));
         return createMetric(metricName, template.replace("%s", factUri), format).getUri();
     }
 

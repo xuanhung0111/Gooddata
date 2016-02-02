@@ -17,7 +17,6 @@ import org.jsoup.nodes.Element;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.base.Predicate;
@@ -121,7 +120,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
 
         assertEquals(getElementLink(message, getWorkingProject().getProjectName()),
                 getWorkingProjectLink(), "Incorrect project link in email content!");
-        RestUtils.verifyValidLink(getRestApiClient(), getElementLink(message, "execution log"));
+        verifyValidLink(getRestApiClient(), getElementLink(message, "execution log"));
         assertEquals(getElementLink(message, gdSupportLinkTitle), GD_SUPPORT_LINK,
                 "Incorrect support link in email content!");
 

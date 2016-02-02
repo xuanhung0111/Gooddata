@@ -18,7 +18,6 @@ import javax.mail.Part;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -30,6 +29,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.RestUtils;
 
 public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
 
@@ -96,10 +96,7 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
      */
     private void setSchedule(String scheduleUri, String schedule) {
         System.out.println("Update scheduledMail: " + scheduleUri);
-        HttpRequestBase postRequest = restApiClient.newPostMethod(scheduleUri, schedule);
-        HttpResponse postResponse = restApiClient.execute(postRequest);
-        System.out.println(" - status: " + postResponse.getStatusLine().getStatusCode());
-        EntityUtils.consumeQuietly(postResponse.getEntity());
+        RestUtils.executeRequest(restApiClient, restApiClient.newPostMethod(scheduleUri, schedule));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

@@ -2,18 +2,19 @@ package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.PAYROLL_CSV;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 import java.io.IOException;
 
+import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.TimeoutException;
@@ -186,7 +187,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 1)
-    public void checkFailToAddNewField() {
+    public void checkFailToAddNewField() throws IOException, JSONException {
         try {
             Dataset selectedDataset =
                     new Dataset().withName("person").withFields(
@@ -213,7 +214,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"})
-    public void checkConcurrentDataLoadWithAnnieDialog() {
+    public void checkConcurrentDataLoadWithAnnieDialog() throws IOException, JSONException {
         Dataset dataset =
                 new Dataset().withName("person").withFields(
                         new Field("Position", FieldTypes.ATTRIBUTE, FieldStatus.SELECTED));
@@ -263,7 +264,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkCustomDataSourceName() {
+    public void checkCustomDataSourceName() throws ParseException, IOException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -288,7 +289,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkDataSourceNameCaseSensitive() {
+    public void checkDataSourceNameCaseSensitive() throws ParseException, IOException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -323,7 +324,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkUnicodeDataSourceName() {
+    public void checkUnicodeDataSourceName() throws ParseException, IOException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -358,7 +359,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void checkEmptyDataSourceName() {
+    public void checkEmptyDataSourceName() throws ParseException, IOException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -379,7 +380,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 0)
-    public void deleteDataSourceName() {
+    public void deleteDataSourceName() throws ParseException, IOException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 
@@ -413,7 +414,7 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
     }
 
     @Test(dependsOnGroups = {"initialDataForDLUI"}, priority = 1)
-    public void addNewDataWithCustomDataSourceName() {
+    public void addNewDataWithCustomDataSourceName() throws IOException, JSONException {
         try {
             createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS);
 

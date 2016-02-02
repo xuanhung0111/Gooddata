@@ -1,10 +1,10 @@
 package com.gooddata.qa.graphene.rolap;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -16,10 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
@@ -37,6 +34,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.SavedViewWidget;
 import com.gooddata.qa.utils.CssUtils;
 import com.gooddata.qa.utils.http.RestUtils;
+import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 
@@ -142,14 +141,14 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     @Test(dependsOnMethods = {"createProject"}, groups = {"group1"})
     public void deleteComment() throws IOException, JSONException {
         String[] objectLinks = {
-            RestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
                     NEW_LOST_DRILL_IN_REPORT.reportDef),
-            RestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, ACCOUNT_ATTRIBUTE.id),
-            RestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, ACCOUNT_ATTRIBUTE.id),
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT,
                     NUMBER_OF_OPPORTUNITIES_METRIC.id),
-            RestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, ACCOUNT_DATASET.id),
-            RestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, QUOTA_VARIABLE.id),
-            RestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, VELOCITY_FACT.id)
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, ACCOUNT_DATASET.id),
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, QUOTA_VARIABLE.id),
+            DashboardsRestUtils.addComment(getRestApiClient(), testParams.getProjectId(), COMMENT, VELOCITY_FACT.id)
         };
 
         dropAllComments(objectLinks, DropStrategy.CASCADE);
@@ -447,7 +446,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private String getIdentifierFromObjLink(String link, ObjectType type) throws IOException, JSONException {
-        JSONObject json = RestUtils.getJSONObjectFrom(getRestApiClient(), link);
+        JSONObject json = RestUtils.getJsonObject(getRestApiClient(), link);
         return json.getJSONObject(type.toString()).getJSONObject("meta").getString("identifier");
     }
 
@@ -460,7 +459,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     private boolean isObjectDeleted(String object, Places place) throws IOException, JSONException {
         switch (place) {
             case GREY_PAGE:
-                JSONObject json = RestUtils.getJSONObjectFrom(getRestApiClient(), object,
+                JSONObject json = RestUtils.getJsonObject(getRestApiClient(), object,
                         HttpStatus.NOT_FOUND);
                 if (!json.has("error"))
                     return false;
@@ -533,28 +532,21 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
 
     private void tryDropObject(final String identifier, final DropStrategy strategy) throws JSONException,
             ParseException, IOException {
-        String pollingUri = RestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
+        String pollingUri = RolapRestUtils.executeMAQL(getRestApiClient(), testParams.getProjectId(),
                 strategy.getMaql(identifier));
-        RestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
-        assertEquals(RestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri), "ERROR");
+        RolapRestUtils.waitingForAsyncTask(getRestApiClient(), pollingUri);
+        assertEquals(RolapRestUtils.getAsyncTaskStatus(getRestApiClient(), pollingUri), "ERROR");
         assertTrue(getErrorMessageFromPollingUri(pollingUri).startsWith(DROP_OBJECT_ERROR_MESSAGE));
     }
 
-    private String getErrorMessageFromPollingUri(String pollingUri) throws ParseException, JSONException,
-        IOException {
-        HttpRequestBase getRequest = getRestApiClient().newGetMethod(pollingUri);
-
-        try {
-            HttpResponse getResponse = getRestApiClient().execute(getRequest);
-            String errorMessage = new JSONObject(EntityUtils.toString(getResponse.getEntity()))
-                .getJSONObject("wTaskStatus").getJSONArray("messages").getJSONObject(0).getJSONObject("error")
+    private String getErrorMessageFromPollingUri(String pollingUri)
+            throws ParseException, JSONException, IOException {
+        return RestUtils.getJsonObject(getRestApiClient(), pollingUri)
+                .getJSONObject("wTaskStatus")
+                .getJSONArray("messages")
+                .getJSONObject(0)
+                .getJSONObject("error")
                 .getString("message");
-            EntityUtils.consumeQuietly(getResponse.getEntity());
-    
-            return errorMessage;
-        } finally {
-            getRequest.releaseConnection();
-        }
     }
 
     private void createDashboardWithGeoChart(String metric) {
@@ -644,7 +636,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private String createUserFilterFrom(AttributeInfo attribute) throws IOException, JSONException {
-        return RestUtils.createMUFObj(getRestApiClient(), testParams.getProjectId(),
+        return DashboardsRestUtils.createMUFObj(getRestApiClient(), testParams.getProjectId(),
                 "User filter " + System.currentTimeMillis(), attribute.getConnectionBetweenAttributeAndElements());
     }
 
