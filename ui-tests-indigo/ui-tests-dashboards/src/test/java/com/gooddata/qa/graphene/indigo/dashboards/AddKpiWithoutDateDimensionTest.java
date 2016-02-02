@@ -90,6 +90,7 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
     public void testUpdateKpiConnectedWithDateDimension() {
 
         initIndigoDashboardsPage()
+            .waitForDashboardLoad()
             .switchToEditMode()
             .selectLastKpi();
 
