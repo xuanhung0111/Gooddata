@@ -12,6 +12,7 @@ import javax.mail.MessagingException;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -20,6 +21,7 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.google.common.base.Predicate;
 
 public class ProjectAndUsersPage extends AbstractFragment {
 
@@ -43,6 +45,12 @@ public class ProjectAndUsersPage extends AbstractFragment {
 
     @FindBy(css = ".s-btn-invite_users")
     private WebElement inviteUserButton;
+
+    @FindBy(css = ".s-filterActive")
+    private WebElement filterActiveButton;
+
+    @FindBy(css = ".s-filterDisabled")
+    private WebElement filterDeactivatedButton;
 
     private static final By BY_PROJECTS_LIST = By.className("userProjects");
     private static final By BY_LEAVE_PROJECT_DIALOG_BUTTON = By.cssSelector("form .s-btn-leave");
@@ -117,11 +125,44 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(inviteUserButton).click();
     }
 
+    public void disableUser(final String userEmail) {
+        openActiveUserTab();
+        int numberOfUsers = getUsersCount();
+        users.stream()
+                .filter(e -> e.findElement(By.cssSelector(".email")).getText().equals(userEmail))
+                .map(e -> e.findElement(By.tagName("button")))
+                .findFirst()
+                .get()
+                .click();
+        Predicate<WebDriver> predicate = input -> getUsersCount() < numberOfUsers;
+        Graphene.waitGui().until(predicate);
+    }
+
+    public boolean isUserDisplayedInList(final String userEmail) {
+        return users.stream()
+                .map(e -> e.findElement(By.cssSelector(".email")))
+                .filter(e -> e.getText().equals(userEmail))
+                .findFirst()
+                .isPresent();
+    }
+
+    public void openDeactivatedUserTab() {
+        waitForElementVisible(filterDeactivatedButton).click();
+    }
+
     private String inviteUsers(ImapClient imapClient, String emailSubject,
             UserRoles role, String message, String...emails) throws MessagingException, IOException {
         waitForElementVisible(inviteUserButton).click();
         InviteUserDialog inviteUserDialog = Graphene.createPageFragment(InviteUserDialog.class,
                 waitForElementVisible(INVITE_USER_DIALOG_LOCATOR, browser));
         return inviteUserDialog.inviteUsers(imapClient, emailSubject, role, message, emails);
+    }
+
+    private int getUsersCount() {
+        return users.size();
+    }
+
+    private void openActiveUserTab() {
+        waitForElementVisible(filterActiveButton).click();
     }
 }
