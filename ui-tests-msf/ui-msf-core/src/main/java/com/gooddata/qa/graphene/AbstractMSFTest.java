@@ -355,9 +355,11 @@ public class AbstractMSFTest extends AbstractProjectTest {
         try (CsvListReader reader = new CsvListReader(new InputStreamReader(
                 new ByteArrayInputStream(output.toByteArray())), CsvPreference.STANDARD_PREFERENCE)) {
             reader.getHeader(true);
-            while ((result = reader.read()) != null) {
-                attributes.add(result.get(0).trim());
-                metrics.add(result.get(1).trim());
+            while ((result = reader.read()) != null && !result.isEmpty()) {
+                String attributeValue = (result.get(0) != null) ? result.get(0).trim() : "(empty value)";
+                attributes.add(attributeValue);
+                String metricValue = (result.get(1) != null) ? result.get(1).trim() : "";
+                metrics.add(metricValue);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
