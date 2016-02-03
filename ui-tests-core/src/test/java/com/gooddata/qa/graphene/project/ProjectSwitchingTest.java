@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -113,8 +114,8 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
             restApiClient = getRestApiClient(editorUser, editorPassword);
 
             for (int i = 0; i < 3; i++) {
-                projectIds.add(RestUtils.createBlankProject(restApiClient, "Project switching " + i,
-                        "Project switching " + i, testParams.getAuthorizationToken(), testParams.getDwhDriver(),
+                projectIds.add(ProjectRestUtils.createBlankProject(getGoodDataClient(), "Project switching " + i,
+                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                         testParams.getProjectEnvironment()));
             }
 
@@ -131,7 +132,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
 
             } finally {
                 for (String projectId : projectIds) {
-                    RestUtils.deleteProject(restApiClient, projectId);
+                    ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
                 }
             }
         } finally {
