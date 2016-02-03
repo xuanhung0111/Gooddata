@@ -183,7 +183,7 @@ public class MetricConfiguration extends AbstractFragment {
         @FindBy(xpath = "//*[contains(@class, 'adi-filter-item')]")
         private List<WebElement> items;
 
-        @FindBy(css = ".s-btn-apply:not(.disabled)")
+        @FindBy(css = ".s-apply:not(.disabled)")
         private WebElement applyButton;
 
         private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";

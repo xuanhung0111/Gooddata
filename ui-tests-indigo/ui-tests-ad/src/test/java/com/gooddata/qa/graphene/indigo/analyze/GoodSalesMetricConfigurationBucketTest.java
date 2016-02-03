@@ -48,7 +48,7 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
         amountConfiguration.expandConfiguration();
         analysisPage.addMetric(AMOUNT);
         assertFalse(amountConfiguration.isConfigurationCollapsed());
-        assertFalse(activitiesConfiguration.isConfigurationCollapsed());
+        assertTrue(activitiesConfiguration.isConfigurationCollapsed());
         checkingOpenAsReport("MetricConfigurationBucket-testBuiltInMetric");
     }
 
@@ -78,7 +78,7 @@ public class GoodSalesMetricConfigurationBucketTest extends AnalyticalDesignerAb
         assertTrue(isEqualCollection(analysisPage.getMetricsBucket().getItemNames(),
                 asList(averageAmount, runningSumOfDuration)));
 
-        assertFalse(amountConfiguration.isConfigurationCollapsed());
+        assertTrue(amountConfiguration.isConfigurationCollapsed());
         assertFalse(durationConfiguration.isConfigurationCollapsed());
         checkingOpenAsReport("MetricConfigurationBucket-testMetricFromFact");
     }

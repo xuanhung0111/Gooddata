@@ -1,7 +1,9 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -128,6 +130,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
         // Check the attribute filter dropdown status
         // is revived correctly. i.e check 2nd attribute element
         // is not selected.
+        waitForElementNotPresent(className("filter-items-loading"));
         assertTrue(isElementPresent(cssSelector(".s-filter-item[title='In Person Meeting']:not(.is-selected)"), browser));
     }
 

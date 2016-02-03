@@ -1,8 +1,10 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static org.openqa.selenium.By.className;
@@ -32,10 +34,10 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
     @FindBy(css = ".s-filter-item > div")
     private List<WebElement> items;
 
-    @FindBy(className = "s-btn-cancel")
+    @FindBy(className = "s-cancel")
     private WebElement cancelButton;
 
-    @FindBy(className = "s-btn-apply")
+    @FindBy(className = "s-apply")
     private WebElement applyButton;
 
     public static final By LOCATOR = className("adi-attr-filter-picker");
@@ -43,7 +45,7 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
     private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
 
     public void select(String... values) {
-        waitForCollectionIsNotEmpty(items);
+        waitForCollectionIsNotEmpty(getItems());
         if (values.length == 1 && "All".equals(values[0])) {
             selectAll();
             return;
@@ -75,7 +77,7 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
 
     public void selectItem(String item) {
         searchValidItem(item);
-        items.stream()
+        getItems().stream()
             .filter(e -> item.equals(e.findElement(tagName("span")).getText()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find: " + item))
@@ -86,20 +88,20 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
     public void searchItem(String name) {
         waitForElementVisible(this.getRoot());
 
-        waitForElementVisible(searchInput).clear();
+        clearSearchField();
         searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        waitForCollectionIsEmpty(items);
+        waitForCollectionIsEmpty(getItems());
 
-        searchInput.clear();
+        clearSearchField();
         searchInput.sendKeys(name);
     }
 
     public List<String> getItemNames() {
-        return getElementTexts(items, e -> e.findElement(tagName("span")));
+        return getElementTexts(getItems(), e -> e.findElement(tagName("span")));
     }
 
     public String getId(final String item) {
-        return Stream.of(items.stream()
+        return Stream.of(getItems().stream()
             .filter(e -> item.equals(e.findElement(tagName("span")).getText()))
             .findFirst()
             .get()
@@ -113,15 +115,29 @@ public class AttributeFilterPickerPanel extends AbstractFragment {
     }
 
     public WebElement getApplyButton() {
-        return applyButton;
+        return waitForElementVisible(applyButton);
     }
 
     public WebElement getClearButton() {
-        return clearButton;
+        return waitForElementVisible(clearButton);
     }
 
     private void searchValidItem(String name) {
         searchItem(name);
-        waitForCollectionIsNotEmpty(items);
+        waitForCollectionIsNotEmpty(getItems());
+    }
+
+    private void clearSearchField() {
+        final By searchFieldClear = className("searchfield-clear");
+        if (isElementPresent(searchFieldClear, getRoot())) {
+            waitForElementVisible(searchFieldClear, getRoot()).click();
+        } else {
+            waitForElementVisible(searchInput).clear();
+        }
+    }
+
+    private List<WebElement> getItems() {
+        waitForElementNotPresent(className("filter-items-loading"));
+        return items;
     }
 }

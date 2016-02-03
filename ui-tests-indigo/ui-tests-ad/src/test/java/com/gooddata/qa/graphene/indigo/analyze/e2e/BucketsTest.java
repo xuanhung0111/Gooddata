@@ -179,21 +179,21 @@ public class BucketsTest extends AbstractAdE2ETest {
     public void should_disable_metric_properties_when_there_are_two_metrics() {
         initAnalysePageByUrl();
 
-        MetricConfiguration activitiesConfig = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+            .addMetric(NUMBER_OF_LOST_OPPS)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
+        assertFalse(configuration.isPopEnabled());
+        assertFalse(configuration.isShowPercentEnabled());
 
-        MetricConfiguration lostConfig = analysisPage.addMetric(NUMBER_OF_LOST_OPPS)
-            .getMetricsBucket()
-            .getMetricConfiguration(NUMBER_OF_LOST_OPPS)
-            .expandConfiguration();
+        configuration = analysisPage.getMetricsBucket()
+                .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
+                .expandConfiguration();
 
-        assertFalse(activitiesConfig.isPopEnabled());
-        assertFalse(activitiesConfig.isShowPercentEnabled());
-        assertFalse(lostConfig.isPopEnabled());
-        assertFalse(lostConfig.isShowPercentEnabled());
+        assertFalse(configuration.isPopEnabled());
+        assertFalse(configuration.isShowPercentEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
