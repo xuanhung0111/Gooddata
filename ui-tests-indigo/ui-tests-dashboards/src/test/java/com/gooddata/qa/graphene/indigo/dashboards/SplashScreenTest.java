@@ -12,10 +12,12 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import java.util.Arrays;
 
 public class SplashScreenTest extends DashboardsTest {
 
@@ -45,7 +47,7 @@ public class SplashScreenTest extends DashboardsTest {
 
     @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
     public void checkCreateNewKpiDashboard() {
-        setupKpiFromSplashScreen(kpi);
+        setupKpisFromSplashScreen(Arrays.asList(kpi));
 
         takeScreenshot(browser, "checkCreateNewKpiDashboard", getClass());
 
@@ -77,7 +79,7 @@ public class SplashScreenTest extends DashboardsTest {
 
     @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
     public void checkCreateNewKpiDashboardRemoveAndCreateAgain() {
-        setupKpiFromSplashScreen(kpi);
+        setupKpisFromSplashScreen(Arrays.asList(kpi));
         teardownKpiWithDashboardDelete();
 
         // do not use setupKpi here - it refreshes the page
@@ -105,7 +107,7 @@ public class SplashScreenTest extends DashboardsTest {
 
     @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
     public void checkDeleteDashboardWithCancelAndConfirm() {
-        setupKpiFromSplashScreen(kpi);
+        setupKpisFromSplashScreen(Arrays.asList(kpi));
 
         indigoDashboardsPage
                 .switchToEditMode()
@@ -123,6 +125,31 @@ public class SplashScreenTest extends DashboardsTest {
         indigoDashboardsPage.getSplashScreen();
 
         takeScreenshot(browser, "checkDeleteDashboardWithCancelAndConfirm-confirm", getClass());
+    }
+
+    @Test(dependsOnGroups = {"empty-state"}, groups = {"desktop"})
+    public void checkDefaultDateFilterWhenCreatingDashboard() {
+        String dateFilterDefault = DATE_FILTER_THIS_MONTH;
+
+        setupKpisFromSplashScreen(Arrays.asList(kpi));
+
+        String dateFilterSelection = initIndigoDashboardsPageWithWidgets()
+                .waitForDateFilter()
+                .getSelection();
+
+        takeScreenshot(browser, "checkDefaultDateFilterWhenCreatingDashboard-" + dateFilterDefault, getClass());
+        assertEquals(dateFilterSelection, dateFilterDefault);
+
+        DateFilter dateFilterAfterRefresh = refreshIndigoDashboardPage().waitForDateFilter();
+
+        takeScreenshot(browser, "Default date interval when refresh Indigo dashboard page-" + dateFilterDefault, getClass());
+        assertEquals(dateFilterAfterRefresh.getSelection(), dateFilterDefault);
+
+        indigoDashboardsPage
+                .switchToEditMode()
+                .deleteDashboard(true);
+
+        indigoDashboardsPage.getSplashScreen();
     }
 
     @Test(dependsOnMethods = {"checkNewProjectWithoutKpisFallsToSplashCreen"}, groups = {"desktop", "empty-state"})

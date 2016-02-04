@@ -22,18 +22,27 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
         Kpi lost = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(LOST);
         assertTrue(lost.hasPopSection());
 
-        // "All time" is the default filter
-        assertEquals(lost.getPopSection().getChangeTitle(), "change");
-        assertEquals(lost.getPopSection().getPeriodTitle(), "prev. year");
-
         Kpi numberOfActivities = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(NUMBER_OF_ACTIVITIES);
         assertTrue(numberOfActivities.hasPopSection());
 
         assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
         assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. period");
 
-        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_THIS_MONTH);
+        // When project is created by REST API (and not using SplashScreen)
+        // "All time" is the initial filter --> switch to "This month"
+        initIndigoDashboardsPageWithWidgets()
+                .waitForDateFilter()
+                .selectByName(DATE_FILTER_THIS_MONTH);
+
         takeScreenshot(browser, "checkKpiPopInMobile-thisMonth", getClass());
+
+        assertEquals(lost.getPopSection().getChangeTitle(), "change");
+        assertEquals(lost.getPopSection().getPeriodTitle(), "prev. year");
+
+        numberOfActivities = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(NUMBER_OF_ACTIVITIES);
+        assertTrue(numberOfActivities.hasPopSection());
+
+        assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
         assertEquals(numberOfActivities.getPopSection().getPeriodTitle(), "prev. month");
     }
 

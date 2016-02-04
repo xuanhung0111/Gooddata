@@ -1,6 +1,9 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
+import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import java.util.List;
 
 public abstract class DashboardsTest extends DashboardsGeneralTest {
 
@@ -28,15 +31,18 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
     public static final String DRILL_TO_WHATS_CHANGED = "What's Changed";
     public static final String DRILL_TO_WATERFALL_ANALYSIS = "Waterfall Analysis";
 
-    protected void setupKpiFromSplashScreen(KpiConfiguration config) {
+    protected void setupKpisFromSplashScreen(List<KpiConfiguration> configs) {
+        if (configs.isEmpty()) {
+            throw new IllegalArgumentException("Cannot setup dashboard with no KPIs.");
+        }
+
         initIndigoDashboardsPage()
                 .getSplashScreen()
                 .startEditingWidgets();
 
-        indigoDashboardsPage
-                .waitForDashboardLoad()
-                .addWidget(config)
-                .saveEditModeWithKpis();
+        IndigoDashboardsPage dashboard = indigoDashboardsPage.waitForDashboardLoad();
+        configs.forEach(config -> dashboard.addWidget(config));
+        dashboard.saveEditModeWithKpis();
     }
 
     protected void teardownKpiWithDashboardDelete() {
@@ -55,4 +61,11 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
                 .getSplashScreen();
     }
 
+    protected IndigoDashboardsPage refreshIndigoDashboardPage() {
+        browser.navigate().refresh();
+
+        return waitForFragmentVisible(indigoDashboardsPage)
+                .waitForDashboardLoad()
+                .waitForAllKpiWidgetsLoaded();
+    }
 }
