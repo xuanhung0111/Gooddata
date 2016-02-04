@@ -1,12 +1,10 @@
 package com.gooddata.qa.graphene.csvuploader;
 
-import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_COLUMN_NAMES;
-import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_COLUMN_TYPES;
-import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_DATA_ROW_COUNT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -17,7 +15,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.util.Collections;
+import java.io.IOException;
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
@@ -26,6 +24,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
+import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.google.common.collect.Lists;
@@ -37,16 +36,24 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     private static final int PAYROLL_FILE_DEFAULT_ROW_COUNT = 3876;
     private static final int PAYROLL_FILE_DEFAULT_COLUMN_COUNT = 9;
 
-    private static final CsvFile NO_HEADER = new CsvFile("payroll.no.header",
-            Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT);
+    private static final CsvFile NO_HEADER = new CsvFile("no.header")
+        .columns(new CsvFile.Column("", "Attribute"), new CsvFile.Column("", "Date (Day/Month/Year)"),
+                new CsvFile.Column("", "Measure"))
+        .rows("Xen", "01/01/2006", "29")
+        .rows("Gooddata", "31/01/2015", "100");
 
     @FindBy(css = ".bubble-negative .content")
     private WebElement errorBubbleMessage;
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkNoHeaderCsvFile() {
+    public void checkNoHeaderCsvFile() throws IOException {
         initDataUploadPage();
         int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
+
+        final List<String> columnNames = asList("Attribute", "Date", "Measure");
+        if (NO_HEADER.getFilePath().isEmpty()) {
+            NO_HEADER.saveToDisc(testParams.getCsvFolder());
+        }
 
         uploadFile(NO_HEADER);
         checkDataPreview(NO_HEADER);
@@ -55,7 +62,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be disabled when column names are invalid");
 
-        waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().setColumnsName(PAYROLL_COLUMN_NAMES);
+        waitForFragmentVisible(dataPreviewPage).getDataPreviewTable().setColumnsName(columnNames);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "set-column-names", NO_HEADER.getFileName()),
                 getClass());
         assertFalse(waitForFragmentVisible(dataPreviewPage).isIntegrationButtonDisabled(), "Add data button should be enabled");
@@ -70,7 +77,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
-        checkCsvDatasetDetail(datasetName, PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES);
+        checkCsvDatasetDetail(datasetName, columnNames, NO_HEADER.getColumnTypes());
 
         csvDatasetDetailPage.clickBackButton();
         waitForFragmentVisible(datasetsListPage);
@@ -137,10 +144,9 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     public void checkCsvFileWithMultipleHeaderRows() {
         initDataUploadPage();
         int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
-        CsvFile fileToUpload = new CsvFile("multiple.column.name.rows",
-                asList("Id4", "Name4", "Lastname4", "Age4", "Amount4"),
-                asList("Measure", "Attribute", "Attribute", "Measure", "Measure"),
-                5);
+        CsvFile fileToUpload = CsvFile.loadFile(getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/multiple.column.name.rows.csv"))
+            .setColumnTypes("Measure", "Attribute", "Attribute", "Measure", "Measure");
+
         uploadFile(fileToUpload);
         waitForFragmentVisible(dataPreviewPage).selectHeader();
 
@@ -235,7 +241,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
-        checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL_COLUMN_TYPES);
+        checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -284,33 +290,36 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void setHeaderForNoHeaderCsvFile() {
+    public void setHeaderForNoHeaderCsvFile() throws IOException {
         initDataUploadPage();
         int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
+
+        if (NO_HEADER.getFilePath().isEmpty()) {
+            NO_HEADER.saveToDisc(testParams.getCsvFolder());
+        }
+
         uploadFile(NO_HEADER);
         checkDataPreview(NO_HEADER);
         DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
         assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewTable.isEmptyColumnNameError(0), "Error is not shown!");
-        assertTrue(dataPreviewTable.isEmptyColumnNameError(3), "Error is not shown!");
-        assertTrue(dataPreviewTable.isEmptyColumnNameError(6), "Error is not shown!");
-        dataPreviewTable.getColumnNameInputs().get(3).click();
+        assertTrue(dataPreviewTable.isEmptyColumnNameError(1), "Error is not shown!");
+        assertTrue(dataPreviewTable.isEmptyColumnNameError(2), "Error is not shown!");
+        dataPreviewTable.getColumnNameInputs().get(1).click();
         assertEquals(getErrorBubbleMessage(), EMPTY_COLUMN_NAME_ERROR);
 
         waitForFragmentVisible(dataPreviewPage);
-        dataPreviewPage.selectHeader().getRowSelectionTable().getRow(2).click();
+        dataPreviewPage.selectHeader().getRowSelectionTable().getRow(0).click();
 
-        List<String> customHeaderColumns =
-                Lists.newArrayList("Nowmer", "Sheri", "Graduate Degree", "President", "Foodz, Inc.", "Washington",
-                        "Spokane", "2006-03-01", "10230");
+        List<String> customHeaderColumns = Lists.newArrayList("Xen", "01/01/2006", "29");
         assertThat(dataPreviewTable.getHeaderColumns(), contains(customHeaderColumns.toArray()));
 
         dataPreviewPage.triggerIntegration();
 
-        dataPreviewTable.changeColumnName("2006 03 01", "Paydate");
-        dataPreviewTable.changeColumnName("10230", "Amount");
-        customHeaderColumns.set(customHeaderColumns.indexOf("2006-03-01"), "Paydate");
-        customHeaderColumns.set(customHeaderColumns.indexOf("10230"), "Amount");
+        dataPreviewTable.changeColumnName("01 01 2006", "Paydate");
+        dataPreviewTable.changeColumnName("29", "Amount");
+        customHeaderColumns.set(customHeaderColumns.indexOf("01/01/2006"), "Paydate");
+        customHeaderColumns.set(customHeaderColumns.indexOf("29"), "Amount");
 
         assertFalse(dataPreviewTable.isColumnNameError("Paydate"), "Error is still shown!");
         assertFalse(dataPreviewTable.isColumnNameError("Amount"), "Error is still shown!");
@@ -327,26 +336,31 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
-        checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL_COLUMN_TYPES);
+        checkCsvDatasetDetail(datasetName, customHeaderColumns, NO_HEADER.getColumnTypes());
     }
 
     @DataProvider(name = "csvDataProvider")
-    public Object[][] csvDataProvider() {
+    public Object[][] csvDataProvider() throws IOException {
+        final CsvFile lessThan50Rows = new CsvFile("data.less.than.50rows")
+            .columns(new CsvFile.Column("Measure", "Measure"))
+            .rows("10")
+            .rows("20");
+        lessThan50Rows.saveToDisc(testParams.getCsvFolder());
+
         return new Object[][] {
-            {PAYROLL, "Previewing first 50 rows out of total %s.", "3876"},
-            {new CsvFile("payroll.more.column.names"), "Previewing first 50 rows out of total %s.", "3876"},
-            {new CsvFile("data.less.than.50rows"), "Viewing all %s rows of the file.", "16"}
+            {PAYROLL, "Previewing first 50 rows out of total %s."},
+            {lessThan50Rows, "Viewing all %s rows of the file."}
         };
     }
 
     @Test(dependsOnMethods = {"createProject"}, dataProvider = "csvDataProvider")
-    public void checkPreviewPageDisplayWithMaximun50Row(CsvFile csvFile, String rowCountMessage, String row) {
+    public void checkPreviewPageDisplayWithMaximun50Row(CsvFile csvFile, String rowCountMessage) {
         initDataUploadPage();
         uploadFile(csvFile);
         waitForFragmentVisible(dataPreviewPage);
 
-        takeScreenshot(browser, csvFile.getFileName() + " dislays with correct rows: " + row, getClass());
-        assertEquals(dataPreviewPage.getRowCountMessage(), format(rowCountMessage, row));
+        takeScreenshot(browser, csvFile.getFileName() + " dislays with correct rows: " + csvFile.getDataRowCount(), getClass());
+        assertEquals(dataPreviewPage.getRowCountMessage(), format(rowCountMessage, csvFile.getDataRowCount()));
     }
 
     private void checkDataPreview(CsvFile csvFile) {

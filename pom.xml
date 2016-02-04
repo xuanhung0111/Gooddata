@@ -40,7 +40,9 @@
         <extendedTimeoutMultiple>10</extendedTimeoutMultiple>
         <file.separator>/</file.separator>
         <test.module>.</test.module>
-        <browserDownloadFolder>${user.dir}${file.separator}${test.module}${file.separator}target${file.separator}downloads</browserDownloadFolder>
+        <targetFolder>${user.dir}${file.separator}${test.module}${file.separator}target</targetFolder>
+        <browserDownloadFolder>${targetFolder}${file.separator}downloads</browserDownloadFolder>
+        <csvFolder>${targetFolder}${file.separator}csv</csvFolder>
         <video.recording>false</video.recording>
 
         <testng.suite.xml>testng-basic.xml</testng.suite.xml>
@@ -296,6 +298,10 @@
                                             <property>
                                                 <name>browserDownloadFolder</name>
                                                 <value>${browserDownloadFolder}</value>
+                                            </property>
+                                            <property>
+                                                <name>csvFolder</name>
+                                                <value>${csvFolder}</value>
                                             </property>
                                             <property>
                                                 <name>test.module</name>

@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.csvuploader;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -20,6 +21,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
+import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.DateFormat;
 import com.gooddata.qa.graphene.utils.Sleeper;
@@ -30,53 +32,51 @@ import com.gooddata.qa.graphene.utils.Sleeper;
  */
 public class UploadDateTest extends AbstractCsvUploaderTest {
 
-    private static final CsvFile DATE_YYYY_FILE = new CsvFile("24dates.yyyy",
-            asList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Date 9",
-                    "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15", "Date 16", "Date 17",
-                    "Date 18", "Date 19", "Date 20", "Date 21", "Date 22", "Date 23", "Date 24", "Number"),
-            asList("Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
+    private static final CsvFile DATE_YYYY_FILE = CsvFile.loadFile(
+            getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"))
+            .setColumnTypes("Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
                     "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
                     "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
                     "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
                     "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
                     "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
-                    "Date (Day Month Year)", "Date (Year Month Day)", "Measure"), 100);
+                    "Date (Day Month Year)", "Date (Year Month Day)", "Measure");
 
     @DataProvider(name = "dateDataProvider")
     public Object[][] dateDataProvider() {
+        final CsvFile datesYY = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.csv"))
+                .setColumnTypes("Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
+                        "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
+                        "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
+                        "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)", 
+                        "Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
+                        "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
+                        "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
+                        "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)", "Measure");
+
+        final CsvFile dateYYYY = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/date.yyyymmdd.yymmdd.csv"))
+                .setColumnTypes("Date (YearMonthDay)", "Date (YearMonthDay)", "Measure");
+
+        final CsvFile unsupportedDateFormats = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/unsupported.date.formats.csv"))
+                .setColumnTypes("Measure", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
+                        "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
+                        "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Measure");
+
+        final CsvFile ambiguousDate = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/8ambiguous.dates.starting.with.year.csv"))
+                .setColumnTypes("Date (Year-Month-Day)", "Date (Year/Month/Day)", "Date (Year.Month.Day)",
+                        "Date (Year Month Day)", "Date (Year-Month-Day)", "Date (Year/Month/Day)",
+                        "Date (Year.Month.Day)", "Date (Year Month Day)", "Measure");
+
         return new Object[][]{
                 {DATE_YYYY_FILE},
-                {new CsvFile("24dates.yy",
-                        asList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Date 7", "Date 8",
-                                "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
-                                "Date 16", "Date 17", "Date 18", "Date 19", "Date 20", "Date 21", "Date 22",
-                                "Date 23", "Date 24", "Number"),
-                        asList("Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
-                                "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
-                                "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)", 
-                                "Date (Month.Day.Year)", "Date (Day.Month.Year)", "Date (Year.Month.Day)",
-                                "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)",
-                                "Date (Month Day Year)", "Date (Day Month Year)", "Date (Year Month Day)", "Measure"),
-                        100)},
-                {new CsvFile("date.yyyymmdd.yymmdd",
-                        asList("Date 1", "Date 2", "Number"),
-                        asList("Date (YearMonthDay)", "Date (YearMonthDay)", "Measure"), 100)},
-                {new CsvFile("unsupported.date.formats",
-                        asList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Date 7", "Date 8",
-                                "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
-                                "Date 16", "Date 17", "Number"),
-                        asList("Measure", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
-                                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
-                                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Measure"),
-                        100)},
-                {new CsvFile("8ambiguous.dates.starting.with.year", asList("Date 1", "Date 2", "Date 3", "Date 4",
-                        "Date 5", "Date 6", "Date 7", "Date 8", "Number"),
-                        asList("Date (Year-Month-Day)", "Date (Year/Month/Day)", "Date (Year.Month.Day)",
-                                "Date (Year Month Day)", "Date (Year-Month-Day)", "Date (Year/Month/Day)",
-                                "Date (Year.Month.Day)", "Date (Year Month Day)", "Measure"),
-                        10)}
+                {datesYY},
+                {dateYYYY},
+                {unsupportedDateFormats},
+                {ambiguousDate}
         };
     }
 
@@ -101,35 +101,41 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
 
     @DataProvider(name = "ambiguousDateDataProvider")
     public Object[][] ambiguousDateDataProvider() {
+        final CsvFile dateYear = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/6ambiguous.dates.yearday.dayyear.csv"))
+                .setColumnTypes("Date", "Date", "Date", "Date", "Date", "Date", "Measure");
+
+        final CsvFile dateMonth = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/6ambiguous.dates.monthday.daymotnh.csv"))
+                .setColumnTypes("Date", "Date", "Date", "Date", "Date", "Date", "Measure");
+
+        final CsvFile dateFormat = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/4ambiguous.dates.3formats.csv"))
+                .setColumnTypes("Date", "Date", "Date", "Date", "Measure");
+
         return new Object[][]{
-                {new CsvFile("6ambiguous.dates.yearday.dayyear",
-                        asList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Number"),
-                        asList("Date", "Date", "Date", "Date", "Date", "Date", "Measure"), 100),
-                        asList(DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_DOT,
-                                DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_DOT,
-                                DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_SLASH,
-                                DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_SLASH,
-                                DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_HYPHEN,
-                                DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN),
-                        2},
-                {new CsvFile("6ambiguous.dates.monthday.daymotnh",
-                        asList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Number"),
-                        asList("Date", "Date", "Date", "Date", "Date", "Date", "Measure"), 10),
-                        asList(DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_DOT,
-                                DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN,
-                                DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_SLASH,
-                                DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_DOT,
-                                DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_HYPHEN,
-                                DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_SLASH),
-                        2},
-                {new CsvFile("4ambiguous.dates.3formats",
-                        asList("Date 1", "Date 2", "Date 3", "Date 4", "Number"),
-                        asList("Date", "Date", "Date", "Date", "Measure"), 10),
-                        asList(DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_DOT,
-                              DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_HYPHEN,
-                              DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_SLASH,
-                              DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_SPACE),
-                        3},
+                {dateYear,
+                 asList(DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_DOT,
+                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_DOT,
+                        DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_SLASH,
+                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_SLASH,
+                        DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_HYPHEN,
+                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN),
+                 2},
+                {dateMonth,
+                 asList(DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_DOT,
+                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN,
+                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_SLASH,
+                        DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_DOT,
+                        DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_HYPHEN,
+                        DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_SLASH),
+                 2},
+                {dateFormat,
+                 asList(DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_DOT,
+                        DateFormat.YEAR_MONTH_DAY_SEPARATED_BY_HYPHEN,
+                        DateFormat.DAY_MONTH_YEAR_SEPARATED_BY_SLASH,
+                        DateFormat.MONTH_DAY_YEAR_SEPARATED_BY_SPACE),
+                 3},
         };
     }
 
@@ -182,7 +188,8 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(datasetsListPage);
 
         datasetsListPage.getMyDatasetsTable().getDatasetRefreshButton(datasetName).click();
-        final CsvFile dateInvalidYYYY = new CsvFile("24dates.yyyy.invalid");
+        final CsvFile dateInvalidYYYY = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.invalid.csv"));
         doUploadFromDialog(dateInvalidYYYY);
 
         List<String> backendValidationErrors =

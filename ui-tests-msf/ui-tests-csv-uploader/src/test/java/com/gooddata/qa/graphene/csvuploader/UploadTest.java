@@ -1,14 +1,12 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_COLUMN_NAMES;
-import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_COLUMN_TYPES;
-import static com.gooddata.qa.graphene.entity.csvuploader.CsvFile.PAYROLL_DATA_ROW_COUNT;
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.MAQL_FILES;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static com.gooddata.qa.utils.http.model.ModelRestUtils.getProductionProjectModelView;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -33,6 +31,7 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
+import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.google.common.collect.Lists;
@@ -149,11 +148,15 @@ public class UploadTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void uploadWithoutAttributeCSV() {
-        CsvFile fileToUpload = new CsvFile("without.attribute", asList("Amount"), asList("Measure"), 44);
+    public void uploadWithoutAttributeCSV() throws IOException {
+        final CsvFile fileToUpload = new CsvFile("without attribute")
+            .columns(new CsvFile.Column("Amount", "Measure"))
+            .rows("10")
+            .rows("20");
+        fileToUpload.saveToDisc(testParams.getCsvFolder());
 
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String datasetName = getNewDataset(fileToUpload);
+        final String datasetName = getNewDataset(fileToUpload);
 
         takeScreenshot(browser, toScreenshotName("Upload-progress-of", fileToUpload.getFileName()), getClass());
 
@@ -164,11 +167,19 @@ public class UploadTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void uploadWithoutDateCSV() {
-        CsvFile fileToUpload = new CsvFile("without.date", asList("state", "county", "name", "censusarea"),
-              asList("Attribute", "Attribute", "Attribute", "Measure"), 3273);
+    public void uploadWithoutDateCSV() throws IOException {
+        final CsvFile fileToUpload = new CsvFile("without date")
+            .columns(new CsvFile.Column("state", "Attribute"),
+                    new CsvFile.Column("county", "Attribute"),
+                    new CsvFile.Column("name", "Attribute"),
+                    new CsvFile.Column("censusarea", "Measure"))
+            .rows("0400000US05", "", "Arkansas", "52035.477")
+            .rows("", "0500000US13059", "Clarke", "119.2");
+        fileToUpload.saveToDisc(testParams.getCsvFolder());
+
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
-        String datasetName = getNewDataset(fileToUpload);
+        final String datasetName = getNewDataset(fileToUpload);
+
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         Screenshots.takeScreenshot(browser, "without-date-csv-upload" + "-dashboard", this.getClass());
@@ -203,8 +214,11 @@ public class UploadTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void uploadNegativeNumber() {
-        CsvFile fileToUpload = new CsvFile("payroll.negative.number", PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES, 3568);
+    public void uploadNegativeNumber() throws IOException {
+        final CsvFile fileToUpload = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.negative.number.csv"))
+                .setColumnTypes(PAYROLL_COLUMN_TYPES);
+
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
         waitForDatasetName(datasetName);
@@ -218,39 +232,44 @@ public class UploadTest extends AbstractCsvUploaderTest {
 
         List<Float> metricValues = reportPage.getTableReport().getMetricElements();
         Screenshots.takeScreenshot(browser, "report-with-negative-number", this.getClass());
-        System.out.println("Check the negative number in report!");
+        log.info("Check the negative number in report!");
         List<Integer> metricIndexes = asList(0, 1, 2, 3, 4);
         List<Double> expectedMetricValues = asList(-6080.0, -10230.0, -3330.0, -6630.0, -4670.0);
         this.assertMetricValuesInReport(metricIndexes, metricValues, expectedMetricValues);
-        System.out.println("Negative numbers are displayed well in report!");
+        log.info("Negative numbers are displayed well in report!");
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void uploadNullNumber() {
-        CsvFile fileToUpload = new CsvFile("payroll.null.number",
-                asList("Lastname", "Firstname", "Education", "Position", "Department", "State", "County",
-                        "Paydate", "Amount", "Amount1"),
-                asList("Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
-                      "Attribute", "Date [2015-12-31]", "Measure", "Measure"), PAYROLL_DATA_ROW_COUNT);
+    public void uploadNullNumber() throws IOException {
+        final CsvFile fileToUpload = new CsvFile("null number")
+            .columns(new CsvFile.Column("Attribute", "Attribute"),
+                    new CsvFile.Column("Measure", "Measure"),
+                    new CsvFile.Column("Nullable", "Measure"))
+            .rows("Conan", "-10230", null)
+            .rows("Luffy", "5020", null)
+            .rows("Bleach", "-336.96", "20");
+        fileToUpload.saveToDisc(testParams.getCsvFolder());
+
         checkCsvUpload(fileToUpload, this::uploadCsv, true);
         String datasetName = getNewDataset(fileToUpload);
+
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        datasetNames.addAll(asList(datasetName, "Date (Paydate)"));
+        datasetNames.add(datasetName);
 
-        createMetric("Sum of Amount", format("SELECT SUM([%s])",
-                getMdService().getObjUri(getProject(), Fact.class, title("Amount1"))), "#,##0.00");
-        createReport(new UiReportDefinition().withName("Report with negative number").withHows("Lastname")
-                .withWhats("Sum of Amount"), "Report with null number");
+        createMetric("Sum of Nullable", format("SELECT SUM([%s])",
+                getMdService().getObjUri(getProject(), Fact.class, title("Nullable"))), "#,##0.00");
+        createReport(new UiReportDefinition().withName("Report with negative number").withHows("Attribute")
+                .withWhats("Sum of Nullable"), "Report with null number");
 
         List<Float> metricValues = reportPage.getTableReport().getMetricElements();
         Screenshots.takeScreenshot(browser, "report-with-null-number", this.getClass());
-        System.out.println("Check the null number in report!");
-        List<Integer> metricIndexes = asList(0, 1, 2, 3);
+        log.info("Check the null number in report!");
+        List<Integer> metricIndexes = asList(1, 2);
         this.assertEmptyMetricInReport(metricIndexes, metricValues);
-        System.out.println("Null numbers are displayed well in report!");
+        log.info("Null numbers are displayed well in report!");
     }
-    
+
     @Test(dependsOnMethods = "createProject")
     public void checkCSVUploaderWithLDMModeler() throws ParseException, JSONException, IOException {
         updateModelOfGDProject(getResourceAsString("/" + MAQL_FILES + "/" + initialLdmMaqlFile));

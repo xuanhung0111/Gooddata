@@ -31,6 +31,7 @@ public class TestParameters {
     private Environment projectEnvironment = Environment.TESTING;
     private String testIdentification;
     private String downloadFolder;
+    private String csvFolder;
     private int defaultTimeout;
     private int extendedTimeoutMultiple;
     private String folderSeparator;
@@ -56,6 +57,7 @@ public class TestParameters {
         deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.DELETE_NEVER);
         projectEnvironment = lookup(loadProperty("project.environment"), Environment.TESTING);
         downloadFolder = loadProperty("browserDownloadFolder");
+        csvFolder = loadProperty("csvFolder");
         defaultTimeout = Integer.parseInt(loadProperty("timeout"));
         extendedTimeoutMultiple = Integer.parseInt(loadProperty("extendedTimeoutMultiple"));
         testIdentification = loadProperty("testIdentification");
@@ -162,6 +164,10 @@ public class TestParameters {
 
     public String getDownloadFolder() {
         return downloadFolder;
+    }
+
+    public String getCsvFolder() {
+        return csvFolder;
     }
 
     public int getDefaultTimeout() {
