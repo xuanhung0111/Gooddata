@@ -17,7 +17,7 @@ public final class ProjectRestUtils {
 
     public static String createBlankProject(final GoodData goodData, final String title,
             final String authorizationToken, final ProjectDriver projectDriver, final Environment environment) {
-        return createProject(goodData ,title, null, authorizationToken, projectDriver, environment);
+        return createProject(goodData, title, null, authorizationToken, projectDriver, environment);
     }
 
     public static String createProject(final GoodData goodData, final String title, final String template,

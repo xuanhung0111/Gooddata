@@ -1,0 +1,8 @@
+CREATE ATTRIBUTE {attr.attribute} AS KEYS {tab.attribute} PRIMARY WITH LABELS {lab.attribute} VISUAL (TITLE "Lab") AS {tab.attribute_lab};
+
+CREATE FACT {fact.fact} VISUAL(TITLE "Fact" ) AS {tab.fact};
+
+CREATE DATASET {dataset.ds_nodate};
+ALTER DATASET {dataset.ds_nodate} ADD {attr.attribute}, {fact.fact};
+
+SYNCHRONIZE {dataset.ds_nodate};

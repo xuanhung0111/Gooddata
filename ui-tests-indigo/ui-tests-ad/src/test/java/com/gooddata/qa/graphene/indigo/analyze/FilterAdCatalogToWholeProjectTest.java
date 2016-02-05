@@ -21,6 +21,7 @@ import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
+import java.io.IOException;
 
 public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstractTest {
 
@@ -44,7 +45,7 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
-    public void setupProductionData() throws JSONException, URISyntaxException {
+    public void setupProductionData() throws JSONException, URISyntaxException, IOException {
         postMAQL(getResourceAsString(MAQL_PATH), DEFAULT_PROJECT_CHECK_LIMIT);
         setupData(QUOTES_CSV_PATH, UPLOAD_INFO_PATH);
     }
@@ -112,16 +113,5 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
         assertTrue(cataloguePanel.search("County"));
         assertFalse(cataloguePanel.search("Id"));
-    }
-
-    private void setupData(String csvPath, String uploadInfoPath) throws JSONException, URISyntaxException {
-        URL csvResource = getClass().getResource(csvPath);
-        String webdavURL = uploadFileToWebDav(csvResource, null);
-
-        URL uploadInfoResource = getClass().getResource(uploadInfoPath);
-        uploadFileToWebDav(uploadInfoResource, webdavURL);
-
-        postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()),
-                DEFAULT_PROJECT_CHECK_LIMIT);
     }
 }

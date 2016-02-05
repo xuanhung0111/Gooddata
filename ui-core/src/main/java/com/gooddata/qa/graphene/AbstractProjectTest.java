@@ -19,7 +19,17 @@ import com.gooddata.project.Project;
 import com.gooddata.project.ProjectDriver;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.utils.graphene.Screenshots;
+import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.UUID;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 
 public abstract class AbstractProjectTest extends AbstractUITest {
 
@@ -163,5 +173,55 @@ public abstract class AbstractProjectTest extends AbstractUITest {
 
     protected Metric createMetric(String name, String expression, String format) {
         return getMdService().createObj(getProject(), new Metric(name, expression, format));
+    }
+
+    public void setupMaql(String maqlPath) throws JSONException, IOException {
+        URL maqlResource = getClass().getResource(maqlPath);
+        postMAQL(IOUtils.toString(maqlResource), 60);
+    }
+
+    private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
+            throws IOException, JSONException {
+        final JSONArray links = getJsonObject(restApiClient, "/gdc", HttpStatus.OK)
+                .getJSONObject("about")
+                .getJSONArray("links");
+
+        JSONObject link;
+        for (int i = 0, n = links.length(); i < n; i++) {
+            link = links.getJSONObject(i);
+            if (!"user-uploads".equals(link.getString("title"))) continue;
+            return getWebDavServerUrl(link.getString("link"), serverRootUrl);
+        }
+
+        return "";
+    }
+
+    private String getWebDavServerUrl(String userUploadsLink, String serverRootUrl) {
+        String webdavServerUrl = "";
+        if (userUploadsLink.startsWith("https://")) {
+            webdavServerUrl = userUploadsLink;
+        } else if (userUploadsLink.startsWith("/")) {
+            webdavServerUrl = serverRootUrl + userUploadsLink.substring(1);
+        } else {
+            webdavServerUrl = serverRootUrl + userUploadsLink;
+        }
+        return webdavServerUrl;
+    }
+
+    public void setupData(String csvPath, String uploadInfoPath)
+            throws JSONException, IOException, URISyntaxException {
+        String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
+
+        String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
+
+        URL csvResource = getClass().getResource(csvPath);
+        URL uploadInfoResource = getClass().getResource(uploadInfoPath);
+
+        uploadFileToWebDav(csvResource, webdavUrl);
+        uploadFileToWebDav(uploadInfoResource, webdavUrl);
+
+        String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
+        RolapRestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
+                integrationEntry);
     }
 }

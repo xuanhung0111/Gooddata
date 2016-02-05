@@ -81,19 +81,4 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
             analysisPage.stopDrag(new Point(-1, -1));
         }
     }
-
-    private void setupMaql(String maqlPath) throws JSONException, IOException {
-        URL maqlResource = getClass().getResource(maqlPath);
-        postMAQL(IOUtils.toString(maqlResource), 60);
-    }
-
-    private void setupData(String csvPath, String uploadInfoPath) throws JSONException, IOException, URISyntaxException {
-        URL csvResource = getClass().getResource(csvPath);
-        String webdavURL = uploadFileToWebDav(csvResource, null);
-
-        URL uploadInfoResource = getClass().getResource(uploadInfoPath);
-        uploadFileToWebDav(uploadInfoResource, webdavURL);
-
-        postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), 60);
-    }
 }

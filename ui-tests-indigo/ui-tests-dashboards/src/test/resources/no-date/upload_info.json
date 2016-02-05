@@ -1,0 +1,23 @@
+{
+    "dataSetSLIManifest": {
+        "parts": [
+            {
+                "columnName" : "tab.fact",
+                "populates" : [
+                "fact.fact"
+                ],
+                "mode" : "FULL"
+            },
+            {
+                "columnName" : "tab.attribute",
+                "populates" : [
+                "lab.attribute"
+                ],
+                "mode" : "FULL",
+                "referenceKey" : 1
+            }
+        ],
+        "file": "no-date.csv",
+        "dataSet": "dataset.ds_nodate"
+    }
+}
