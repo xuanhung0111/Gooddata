@@ -39,18 +39,29 @@ public final class ModelRestUtils {
         return uri;
     }
 
-    public static JSONObject getProjectModelView(final RestApiClient restApiClient, final String projectId) 
-            throws ParseException, JSONException, IOException {
-        return getProjectModelViewByModelLink(restApiClient, format(PROJECT_MODEL_VIEW_LINK, projectId));
-    }
-
     public static JSONObject getProductionProjectModelView(final RestApiClient restApiClient, final String projectId, 
             final boolean includeProduction) throws ParseException, JSONException, IOException {
         final String nonProductionURL = PROJECT_MODEL_VIEW_LINK + "?includeNonProduction=%s";
         return getProjectModelViewByModelLink(restApiClient, format(nonProductionURL, projectId, includeProduction));
        }
 
-    public static JSONObject getDatasetModelView(final RestApiClient restApiClient, final String projectId,
+    public static <T> T getDatasetElementFromModelView(final RestApiClient restApiClient, final String projectId,
+            final String dataset, final DatasetElements element, final Class<T> returnType)
+                    throws ParseException, JSONException, IOException {
+        final Object object = getDatasetModelView(restApiClient, projectId, dataset).get(element.toString().toLowerCase());
+        log.info(format("Get %s of dataset %s...", element, dataset));
+        if(returnType.isInstance(object)) {
+            return returnType.cast(object);
+        }
+        throw new NoSuchElementException("Dataset element not found!");
+    }
+
+    private static JSONObject getProjectModelView(final RestApiClient restApiClient, final String projectId) 
+            throws ParseException, JSONException, IOException {
+        return getProjectModelViewByModelLink(restApiClient, format(PROJECT_MODEL_VIEW_LINK, projectId));
+    }
+
+    private static JSONObject getDatasetModelView(final RestApiClient restApiClient, final String projectId,
             final String dataset) throws ParseException, JSONException, IOException {
         final JSONArray datasets = getProjectModelView(restApiClient, projectId)
                 .getJSONObject("projectModelView")
@@ -67,20 +78,9 @@ public final class ModelRestUtils {
         throw new NoSuchElementException("Dataset json object not found!");
     }
 
-    public static <T> T getDatasetElementFromModelView(final RestApiClient restApiClient, final String projectId,
-            final String dataset, final DatasetElements element, final Class<T> returnType)
-                    throws ParseException, JSONException, IOException {
-        final Object object = getDatasetModelView(restApiClient, projectId, dataset).get(element.toString().toLowerCase());
-        log.info(format("Get %s of dataset %s...", element, dataset));
-        if(returnType.isInstance(object)) {
-            return returnType.cast(object);
-        }
-        throw new NoSuchElementException("Dataset element not found!");
-    }
-
     private static JSONObject getProjectModelViewByModelLink(final RestApiClient restApiClient,
             final String projectModelViewLink) throws ParseException, JSONException, IOException {
-        final String pollingUri = getJsonObject(restApiClient, projectModelViewLink)
+        final String pollingUri = getJsonObject(restApiClient, projectModelViewLink, HttpStatus.ACCEPTED)
             .getJSONObject("asyncTask")
             .getJSONObject("link")
             .getString("poll");

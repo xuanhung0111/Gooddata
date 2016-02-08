@@ -21,7 +21,6 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
-import com.gooddata.qa.utils.http.RestUtils;
 
 public class ProjectSwitchingTest extends AbstractProjectTest {
 
