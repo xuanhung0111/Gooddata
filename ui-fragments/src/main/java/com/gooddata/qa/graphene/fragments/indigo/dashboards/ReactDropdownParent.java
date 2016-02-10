@@ -12,6 +12,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 public abstract class ReactDropdownParent extends AbstractFragment {
+    private static final String DISABLED_CLASS = "disabled";
 
     /**
      * This method is needed to find the correct dropdown, rendered in overlay,
@@ -71,7 +72,8 @@ public abstract class ReactDropdownParent extends AbstractFragment {
     }
 
     protected void toggleDropdown() {
-        waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot())
+        String enabledButtonCSSSelector = getDropdownButtonCssSelector() + ":not(." + DISABLED_CLASS + ")";
+        waitForElementVisible(By.cssSelector(enabledButtonCSSSelector), this.getRoot())
                 .click();
     }
 
