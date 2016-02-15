@@ -54,9 +54,13 @@ public abstract class ReactDropdownParent extends AbstractFragment {
         return waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot());
     }
 
+    private void waitForDropdownLoaded() {
+        waitForElementNotPresent(By.cssSelector(getDropdownCssSelector() + " .s-isLoading"));
+    }
+
     protected boolean hasSearchField() {
         // wait until dropdown body is loaded and check search field
-        waitForElementNotPresent(By.cssSelector(getDropdownCssSelector() + " .s-isLoading"));
+        waitForDropdownLoaded();
         By searchField = cssSelector(getSearchFieldSelector());
         return isElementPresent(searchField, browser);
     }
@@ -69,6 +73,7 @@ public abstract class ReactDropdownParent extends AbstractFragment {
         By searchField = cssSelector(getSearchFieldSelector());
         waitForElementVisible(searchField, browser).clear();
         waitForElementVisible(searchField, browser).sendKeys(text);
+        waitForDropdownLoaded();
         return this;
     }
 
