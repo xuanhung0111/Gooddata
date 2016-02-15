@@ -110,10 +110,10 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
         try {
             logout();
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
-            restApiClient = getRestApiClient(editorUser, editorPassword);
+            goodDataClient = getGoodDataClient(editorUser, editorPassword);
 
             for (int i = 0; i < 3; i++) {
-                projectIds.add(ProjectRestUtils.createBlankProject(getGoodDataClient(), "Project switching " + i,
+                projectIds.add(ProjectRestUtils.createBlankProject(goodDataClient, "Project switching " + i,
                         testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                         testParams.getProjectEnvironment()));
             }
@@ -131,7 +131,7 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
 
             } finally {
                 for (String projectId : projectIds) {
-                    ProjectRestUtils.deleteProject(getGoodDataClient(), projectId);
+                    ProjectRestUtils.deleteProject(goodDataClient, projectId);
                 }
             }
         } finally {
