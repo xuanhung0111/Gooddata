@@ -23,9 +23,9 @@ import com.google.common.collect.Iterables;
 public class LostPasswordPage extends AbstractFragment {
 
     public static final String LOST_PASSWORD_PAGE_CLASS_NAME = "lostPasswordPage";
+    public static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".validation-error, #gd-overlays div.content");
 
-    private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector("#gd-overlays div.content");
-    private static final By PAGE_MESSAGE_LOCATOR = By.cssSelector(".message");
+    private static final By PAGE_MESSAGE_LOCATOR = By.className("login-message");
 
     private static final String RESET_PASSWORD_EMAIL_SUBJECT = "GoodData password reset request";
 

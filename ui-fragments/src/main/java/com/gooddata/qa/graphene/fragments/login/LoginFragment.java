@@ -33,7 +33,7 @@ public class LoginFragment extends AbstractFragment {
     private WebElement registrationLink;
 
     private static final String ERROR_CLASS = "has-error";
-    private static final By NOTIFICATION_MESSAGE_LOCATOR = By.cssSelector(".message.is-success");
+    private static final By NOTIFICATION_MESSAGE_LOCATOR = By.cssSelector(".login-message.is-success");
 
     public void login(String username, String password, boolean validLogin) {
         waitForElementVisible(email).clear();

@@ -260,7 +260,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     }
 
     private String getPageErrorMessage() {
-        return waitForElementVisible(By.xpath("//*[@class='message is-error']/p[1]"), browser).getText();
+        return waitForElementVisible(By.xpath("//*[@class='login-message is-error']/p[1]"), browser).getText();
     }
 
 }
