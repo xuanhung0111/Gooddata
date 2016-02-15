@@ -44,7 +44,7 @@ public class ResetPasswordTest extends AbstractUITest {
 
     private static final String INVALID_EMAIL_MESSAGE = "This is not a valid email address.";
 
-    private static final String PASSWORD_PAGE_LOCAL_MESSAGE = "CHECK YOUR EMAIL"
+    private static final String PASSWORD_PAGE_LOCAL_MESSAGE = "Check your email"
             + "\nAn email has been sent with instructions for resetting your password.";
 
     private static final String RESET_PASSWORD_SUCCESS_MESSAGE = "Your password has been reset"

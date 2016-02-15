@@ -100,12 +100,18 @@ public final class UserManagementRestUtils {
     }
 
     public static JSONObject getUserProfileByEmail(final RestApiClient restApiClient, final String email)
-            throws ParseException, JSONException, IOException {
+            throws ParseException, IOException {
         final String userUri = DOMAIN_USER_LINK + "?login=" + email.replace("@", "%40");
-        return getJsonObject(restApiClient, userUri).getJSONObject("accountSettings")
+
+        try {
+            return getJsonObject(restApiClient, userUri).getJSONObject("accountSettings")
                     .getJSONArray("items")
                     .getJSONObject(0)
                     .getJSONObject("accountSetting");
+
+        } catch (JSONException e) {
+            return null;
+        }
     }
 
     public static String updateFirstNameOfCurrentAccount(final RestApiClient restApiClient, final String newFirstName)
