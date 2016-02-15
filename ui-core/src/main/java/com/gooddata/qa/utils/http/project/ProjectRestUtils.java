@@ -41,7 +41,7 @@ public final class ProjectRestUtils {
         final Project project = service.getProjectById(projectId);
 
         final ProjectFeatureFlag flag;
-        if (service.listAggregatedFeatureFlags(project).stream()
+        if (service.listFeatureFlags(project).stream()
                 .anyMatch(e -> e.getName().equals(featureFlag.getFlagName()))) {
             flag = service.getFeatureFlag(service.getProjectById(projectId), featureFlag.getFlagName());
         } else {
