@@ -195,4 +195,9 @@ public final class WaitUtils {
         Predicate<WebDriver> containsString = driver -> driver.getCurrentUrl().contains(url);
         Graphene.waitGui().until(containsString);
     }
+
+    public static void waitForStringMissingInUrl(final String url) {
+        Predicate<WebDriver> missingString = driver -> !driver.getCurrentUrl().contains(url);
+        Graphene.waitGui().until(missingString);
+    }
 }
