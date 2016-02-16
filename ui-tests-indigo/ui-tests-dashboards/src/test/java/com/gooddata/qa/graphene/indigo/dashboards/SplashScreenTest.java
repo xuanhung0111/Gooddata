@@ -16,8 +16,10 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringMissingInUrl;
 import java.util.Arrays;
+import org.openqa.selenium.By;
 
 public class SplashScreenTest extends DashboardsTest {
 
@@ -185,7 +187,11 @@ public class SplashScreenTest extends DashboardsTest {
 
             // viewer accessing "dashboards" with no kpi dashboards created should be redirected
             openUrl(getIndigoDashboardsPageUri());
-            waitForProjectsPageLoaded(browser);
+
+            // check that we are not on dashboards page
+            waitForElementVisible(By.className("s-displayed"), browser);
+            waitForStringMissingInUrl("/dashboards");
+
         } finally {
             logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);

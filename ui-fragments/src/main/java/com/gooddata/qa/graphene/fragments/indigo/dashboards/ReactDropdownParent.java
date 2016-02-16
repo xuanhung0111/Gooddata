@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
@@ -38,7 +39,8 @@ public abstract class ReactDropdownParent extends AbstractFragment {
     }
 
     public boolean isDropdownOpen() {
-        waitForElementPresent(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot());
+        String enabledButtonCSSSelector = getDropdownButtonCssSelector() + ":not(." + DISABLED_CLASS + ")";
+        waitForElementVisible(By.cssSelector(enabledButtonCSSSelector), this.getRoot());
 
         return isElementPresent(By.cssSelector(getDropdownCssSelector()), browser);
     }
@@ -53,9 +55,13 @@ public abstract class ReactDropdownParent extends AbstractFragment {
         return waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot());
     }
 
+    private void waitForDropdownLoaded() {
+        waitForElementNotPresent(By.cssSelector(getDropdownCssSelector() + " .s-isLoading"));
+    }
+
     protected boolean hasSearchField() {
         // wait until dropdown body is loaded and check search field
-        waitForElementNotPresent(By.cssSelector(getDropdownCssSelector() + " .s-isLoading"));
+        waitForDropdownLoaded();
         By searchField = cssSelector(getSearchFieldSelector());
         return isElementPresent(searchField, browser);
     }
@@ -68,12 +74,13 @@ public abstract class ReactDropdownParent extends AbstractFragment {
         By searchField = cssSelector(getSearchFieldSelector());
         waitForElementVisible(searchField, browser).clear();
         waitForElementVisible(searchField, browser).sendKeys(text);
+        Sleeper.sleepTight(500);
+        waitForDropdownLoaded();
         return this;
     }
 
     protected void toggleDropdown() {
-        String enabledButtonCSSSelector = getDropdownButtonCssSelector() + ":not(." + DISABLED_CLASS + ")";
-        waitForElementVisible(By.cssSelector(enabledButtonCSSSelector), this.getRoot())
+        waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot())
                 .click();
     }
 
