@@ -298,7 +298,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
             put("name", DEFAULT_DATAlOAD_PROCESS_NAME);
         }}).toString();
 
-        return executeRequest(getRestApiClient(), restApiClient.newPutMethod(getDataloadProcessUri(), body));
+        return executeRequest(restApiClient, restApiClient.newPutMethod(getDataloadProcessUri(), body));
     }
 
     protected void verifyValidLink(final RestApiClient restApiClient, final String link) {
