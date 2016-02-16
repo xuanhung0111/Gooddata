@@ -38,7 +38,8 @@ public abstract class ReactDropdownParent extends AbstractFragment {
     }
 
     public boolean isDropdownOpen() {
-        waitForElementPresent(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot());
+        String enabledButtonCSSSelector = getDropdownButtonCssSelector() + ":not(." + DISABLED_CLASS + ")";
+        waitForElementVisible(By.cssSelector(enabledButtonCSSSelector), this.getRoot());
 
         return isElementPresent(By.cssSelector(getDropdownCssSelector()), browser);
     }
@@ -72,8 +73,7 @@ public abstract class ReactDropdownParent extends AbstractFragment {
     }
 
     protected void toggleDropdown() {
-        String enabledButtonCSSSelector = getDropdownButtonCssSelector() + ":not(." + DISABLED_CLASS + ")";
-        waitForElementVisible(By.cssSelector(enabledButtonCSSSelector), this.getRoot())
+        waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot())
                 .click();
     }
 
