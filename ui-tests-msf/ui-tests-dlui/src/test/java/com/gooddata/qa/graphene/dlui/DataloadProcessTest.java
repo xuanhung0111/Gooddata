@@ -118,7 +118,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
               .anyMatch(process -> DEFAULT_DATAlOAD_PROCESS_NAME.equals(process.getName())));
         final ProcessExecutionDetail executionDetail = executeProcess(dataloadProcess, "", SYNCHRONIZE_ALL_PARAM);
         assertTrue(ProcessRestUtils.getExecutionLog(getGoodDataClient(), executionDetail)
-            .contains(format("user: %s", testParams.getUser())));
+            .contains(format("user=%s", testParams.getUser())));
 
         logout();
         signInAtGreyPages(technicalUser, technicalUserPassword);
@@ -129,14 +129,14 @@ public class DataloadProcessTest extends AbstractMSFTest {
 
         final String executionByTechnicalUser = executeDataloadProcessSuccessfully(restApi);
         assertTrue(getLogContent(restApi, executionByTechnicalUser).contains(
-                String.format("user: %s", technicalUser)));
+                String.format("user=%s", technicalUser)));
 
         logout();
         signIn(true, UserRoles.EDITOR);
         final RestApiClient editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
         final String executionByEditor = executeDataloadProcessSuccessfully(editorRestApi);
         assertTrue(getLogContent(editorRestApi, executionByEditor).contains(
-                String.format("user: %s", technicalUser)));
+                String.format("user=%s", technicalUser)));
         assertEquals(getOwnerLogin(), technicalUser,
                 "Process owner of dataload is changed after executed process!");
     }
