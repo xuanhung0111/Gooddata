@@ -87,12 +87,12 @@ public final class WaitUtils {
     }
 
     public static WebElement waitForElementVisible(By byElement, SearchContext searchContext) {
-        Graphene.waitGui().until().element(byElement).is().visible();
+        Graphene.waitGui().until().element(searchContext, byElement).is().visible();
         return searchContext.findElement(byElement);
     }
 
     public static WebElement waitForElementVisible(By byElement, SearchContext searchContext, int timeout) {
-        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(byElement).is().visible();
+        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(searchContext, byElement).is().visible();
         return searchContext.findElement(byElement);
     }
 
@@ -140,16 +140,16 @@ public final class WaitUtils {
         // check for regularly disabled input, checks 'disabled' attribute, this will return true for the most elements
         // since they don't contain 'disabled' attribute
         Graphene.waitGui().until().element(element).is().enabled();
-    
+
         // check for other elements styled as button, input, etc. that are disabled programmatically and styled with css
         Predicate<WebDriver> elementEnabled = browser -> !element.getAttribute("class").contains("disabled");
         Graphene.waitGui().until(elementEnabled);
-    
+
         return element;
     }
 
     public static WebElement waitForElementPresent(By byElement, SearchContext searchContext) {
-        Graphene.waitGui().until().element(byElement).is().present();
+        Graphene.waitGui().until().element(searchContext, byElement).is().present();
         return searchContext.findElement(byElement);
     }
 
@@ -187,12 +187,17 @@ public final class WaitUtils {
     public static <T extends Collection<?>> T waitForCollectionIsNotEmpty(final T items) {
         Predicate<WebDriver> collectionNotEmpty = browser -> !items.isEmpty();
         Graphene.waitGui().until(collectionNotEmpty);
-    
+
         return items;
     }
 
     public static void waitForStringInUrl(final String url) {
         Predicate<WebDriver> containsString = driver -> driver.getCurrentUrl().contains(url);
         Graphene.waitGui().until(containsString);
+    }
+
+    public static void waitForStringMissingInUrl(final String url) {
+        Predicate<WebDriver> missingString = driver -> !driver.getCurrentUrl().contains(url);
+        Graphene.waitGui().until(missingString);
     }
 }
