@@ -1,4 +1,4 @@
-Output stage to LDM replication started, user:
+Output stage to LDM replication started, user=
 Synchronization mode: all datasets
  
 =============== Mapping ===============
