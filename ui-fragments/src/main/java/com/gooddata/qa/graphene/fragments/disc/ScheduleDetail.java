@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,6 +71,8 @@ public class ScheduleDetail extends ScheduleForm {
     private static final By BY_PARAMETERS_EDIT_SECTION = By.cssSelector(".parameters-section.modified");
     private static final By BY_TOOLTIP = By.cssSelector(".bubble-content .content");
     private static final By BY_EXECUTION_TOOLTIP = By.cssSelector(".execution-tooltip");
+
+    private static final String SCHEDULE_STOP_BUTTON_CLASS = "ait-schedule-stop-btn";
 
     @FindBy(css = ".ait-schedule-title-section-heading")
     private WebElement scheduleTitle;
@@ -149,7 +152,7 @@ public class ScheduleDetail extends ScheduleForm {
     @FindBy(css = ".ait-schedule-run-confirm-btn")
     private WebElement confirmRunButton;
 
-    @FindBy(css = ".ait-schedule-stop-btn")
+    @FindBy(className = SCHEDULE_STOP_BUTTON_CLASS)
     private WebElement manualStopButton;
 
     @FindBy(css = ".overlay .dialog-main")
@@ -533,6 +536,10 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public boolean isStarted() {
+        if (!isElementPresent(className(SCHEDULE_STOP_BUTTON_CLASS), getRoot())) {
+            return false;
+        }
+
         return waitForElementVisible(manualStopButton).isDisplayed();
     }
 

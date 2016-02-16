@@ -4,9 +4,9 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertNotNull;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -41,9 +41,6 @@ public class ProjectsList extends AbstractTable {
 
     @FindBy(xpath = "//div[@class='error-bar']/div[@class='error-bar-title']")
     private WebElement errorBar;
-
-    @FindBy(css = ".page-cell")
-    private List<WebElement> projectPages;
 
     @FindBy(css = ".ait-project-detail-fragment")
     private WebElement projectDetail;
@@ -134,19 +131,29 @@ public class ProjectsList extends AbstractTable {
     }
 
     private WebElement selectProject(Predicate<WebElement> predicate) {
-        Iterator<WebElement> iterator = projectPages.iterator();
-        do {
+        final By nextButtonLocator = className("s-btn-next");
+
+        while (true) {
             if (!isElementPresent(BY_EMPTY_STATE, getRoot()))
                 waitForCollectionIsNotEmpty(rows);
+
             Optional<WebElement> project = Iterables.tryFind(rows, predicate);
             if (project.isPresent())
                 return project.get();
-            if (iterator.hasNext()) {
-                iterator.next().click();
-                waitForElementVisible(getRoot());
-            } else
-                return null;
-        } while (projectPages.size() > 0);
+
+            if (!isElementPresent(nextButtonLocator, getRoot())) {
+                break;
+            }
+
+            final WebElement nextButton = waitForElementVisible(nextButtonLocator, getRoot());
+            if (nextButton.getAttribute("class").contains("disabled")) {
+                break;
+            }
+
+            nextButton.click();
+            waitForElementVisible(getRoot());
+        }
+
         return null;
     }
 }
