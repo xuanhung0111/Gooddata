@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.utils.Sleeper;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
@@ -73,6 +74,7 @@ public abstract class ReactDropdownParent extends AbstractFragment {
         By searchField = cssSelector(getSearchFieldSelector());
         waitForElementVisible(searchField, browser).clear();
         waitForElementVisible(searchField, browser).sendKeys(text);
+        Sleeper.sleepTight(500);
         waitForDropdownLoaded();
         return this;
     }
