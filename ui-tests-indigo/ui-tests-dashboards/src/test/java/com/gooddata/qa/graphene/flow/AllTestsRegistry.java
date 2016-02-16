@@ -5,6 +5,7 @@ import com.gooddata.qa.graphene.indigo.dashboards.DateDimensionTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
+import com.gooddata.qa.graphene.indigo.dashboards.MetricsDropdownTest;
 import com.gooddata.qa.graphene.indigo.dashboards.PartialExportDashboardsTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
@@ -18,6 +19,7 @@ public class AllTestsRegistry {
                 .register(ManipulateWidgetsTest.class)
                 .register(PartialExportDashboardsTest.class)
                 .register(AddKpiWithoutDateDimensionTest.class)
+                .register(MetricsDropdownTest.class)
                 .register("testng-desktop-AttributeFiltering.xml")
                 .register("testng-desktop-DateFiltering.xml")
                 .register("testng-desktop-permissions-EditMode.xml")
