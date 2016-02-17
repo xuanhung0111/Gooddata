@@ -291,6 +291,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementNotPresent(BY_LOGGED_USER_BUTTON);
     }
 
+    public void logoutAndLoginAs(boolean greyPages, UserRoles userRole) throws JSONException {
+        logout();
+        signIn(greyPages, userRole);
+    }
+
     public void verifyProjectDashboardsAndTabs(boolean validation, Map<String, String[]> expectedDashboardsAndTabs,
             boolean openPage) {
         // sleep to avoid RED BAR - An error occurred while performing this operation.
