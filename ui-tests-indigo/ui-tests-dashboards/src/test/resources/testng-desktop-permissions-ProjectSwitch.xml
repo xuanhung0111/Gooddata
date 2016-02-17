@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <test name="project-switch-test">
+        <groups>
+            <run>
+                <include name="desktop" />
+                <include name="precondition" />
+                <include name="switchProject" />
+                <include name="dashboardWidgetsInit" />
+                <include name="dashboardsInit" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+            <dependencies>
+                <group name="desktop" depends-on="projectInit" />
+            </dependencies>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.dashboards.ProjectSwitchTest" />
+        </classes>
+    </test>
+
+</suite>
