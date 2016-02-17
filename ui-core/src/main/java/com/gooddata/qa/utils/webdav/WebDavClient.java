@@ -49,6 +49,19 @@ public class WebDavClient {
         return true;
     }
 
+    public boolean createStructureIfNotExists(String userUploads) {
+        try {
+            if (!sardine.exists(userUploads)) {
+                return createStructure(userUploads);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
     public boolean uploadFile(File file) {
         try {
             InputStream fis = new FileInputStream(file);

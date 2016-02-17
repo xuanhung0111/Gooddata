@@ -147,8 +147,15 @@ public class AbstractGreyPageTest extends AbstractTest {
         if (webContainer == null) {
             openUrl(PAGE_GDC);
             waitForElementPresent(gdcFragment.getRoot());
-            assertTrue(webDav.createStructure(gdcFragment.getUserUploadsURL()), " Create WebDav storage structure");
-        } else webDav.setWebDavStructure(webContainer);
+            assertTrue(webDav.createStructure(gdcFragment.getUserUploadsURL()),
+                    "Create WebDav storage structure");
+        } else {
+            openUrl(PAGE_GDC);
+            waitForElementPresent(gdcFragment.getRoot());
+            assertTrue(webDav.createStructureIfNotExists(gdcFragment.getUserUploadsURL()),
+                    "Create WebDav storage structure if not exists");
+            webDav.setWebDavStructure(webContainer);
+        }
 
         webDav.uploadFile(resourceFile);
         return webDav.getWebDavStructure();
@@ -250,7 +257,7 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     private String getLDMImageFile() throws ParseException, IOException, JSONException {
-        String imageURI = ModelRestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(), 
+        String imageURI = ModelRestUtils.getLDMImageURI(getRestApiClient(), testParams.getProjectId(),
                 testParams.getHost());
         int indexSVG = imageURI.indexOf(".svg");
         String imageFileName = imageURI.substring(0, indexSVG + 4);
@@ -258,7 +265,7 @@ public class AbstractGreyPageTest extends AbstractTest {
         downloadFile(imageURI, imageFileName);
         return imageFileName;
     }
-    
+
     private void downloadFile(String href, String filename) throws IOException {
         URL url = new URL(href);
         InputStream in = new BufferedInputStream(url.openStream());
