@@ -370,8 +370,8 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
             browser.get(embedUri);
             waitForFragmentVisible(loginFragment);
             String notAuthorizedMessage = loginFragment.getNotAuthorizedMessage();
-            System.out.println("Not authorized message: " + notAuthorizedMessage);
-            assertTrue(notAuthorizedMessage.contains("Access denied"));
+            log.info("Not authorized message: " + notAuthorizedMessage);
+            assertTrue(notAuthorizedMessage.contains("ACCESS DENIED"));
             assertTrue(notAuthorizedMessage
                     .contains("You are not authorized to access this area. Please contact your administrator."));
         } finally {
