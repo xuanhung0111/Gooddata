@@ -8,6 +8,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.function.Supplier;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -17,6 +18,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AnalysisPageHeader;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.CataloguePanel;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
@@ -277,5 +279,15 @@ public class AnalysisPage extends AbstractFragment {
 
     public AnalysisPageHeader getPageHeader() {
         return waitForFragmentVisible(pageHeader);
+    }
+
+    public AnalysisPage switchProject(String name) {
+        log.info("Switching to project: " + name);
+
+        Graphene.createPageFragment(Header.class,
+                waitForElementVisible(By.className("gd-header"), browser))
+                .switchProject(name);
+
+        return this;
     }
 }
