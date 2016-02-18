@@ -2,14 +2,9 @@ package com.gooddata.qa.graphene.indigo.analyze;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -34,8 +29,6 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
     protected static final String ACCOUNT = "Account";
     protected static final String DEPARTMENT = "Department";
 
-    protected boolean isWalkmeTurnOff = false;
-
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
         projectCreateCheckIterations = 60; // 5 minutes
@@ -43,31 +36,8 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
     }
 
     /* A hook for setup test project */
-    @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
-    public void prepareSetupProject() {
-    }
-
-    @Test(dependsOnGroups = {"setupProject"}, groups = {"turnOffWalkme"}, priority = 1)
-    public void turnOffWalkme() {
-        if (isWalkmeTurnOff) {
-            return;
-        }
-
-        initAnalysePage();
-
-        try {
-            WebElement walkmeCloseElement = waitForElementVisible(By.className("walkme-action-cancel"), browser);
-            walkmeCloseElement.click();
-            waitForElementNotPresent(walkmeCloseElement);
-        } catch (TimeoutException e) {
-            takeScreenshot(browser, "Walkme dialog is not appeared", getClass());
-            log.info("Walkme dialog is not appeared!");
-        }
-    }
-
-    /* Make sure Ad tests will always be run */
-    @Test(dependsOnGroups = {"turnOffWalkme"}, alwaysRun = true, groups = {"init"})
-    public void prepareToTestAdAfterTurnOffWalkme() {
+    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
+    public void prepareSetupProject() throws Throwable{
     }
 
     protected void checkingOpenAsReport(String screenShot) {

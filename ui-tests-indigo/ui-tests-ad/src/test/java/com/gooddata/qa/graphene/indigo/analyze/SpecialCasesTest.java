@@ -29,8 +29,8 @@ public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
         projectTitle = "Indigo-Special-Cases-Test";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
-    public void uploadDatasets() {
+    @Override
+    public void prepareSetupProject() {
         uploadCSV(getFilePathFromResource(MANY_COLUMNS_CSV_PATH));
         takeScreenshot(browser, "uploaded-" + MANY_CLOUMNS_DATASET +"-dataset", getClass());
     }
