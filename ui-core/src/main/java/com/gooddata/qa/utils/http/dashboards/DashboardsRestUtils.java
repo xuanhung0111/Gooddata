@@ -91,6 +91,43 @@ public final class DashboardsRestUtils {
         }
     };
 
+    private static final Supplier<String> DASHBOARD_BODY = () -> {
+        try {
+            return new JSONObject() {{
+              put("projectDashboard", new JSONObject() {{
+                  put("content", new JSONObject() {{
+                      put("rememberFilters", 0);
+                      put("tabs", new JSONArray() {{
+                          put(new JSONObject() {{
+                              put("title", "First Tab");
+                              put("items", new JSONArray());
+                          }});
+                      }});
+                      put("filters", new JSONArray());
+                  }});
+                  put("meta", new JSONObject() {{
+                      put("title", "$title");
+                      put("locked", 0);
+                      put("unlisted", 1);
+                  }});
+              }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
+
+    public static String createDashboard(final RestApiClient restApiClient, final String projectId, final String title)
+            throws JSONException, IOException {
+        final String content = DASHBOARD_BODY.get().replace("$title", title);
+
+        return getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+                    .getJSONObject("projectDashboard")
+                    .getJSONObject("meta")
+                    .getString("uri");
+    }
+
     public static void deleteDashboardTab(final RestApiClient restApiClient, final String dashboardUri,
             final String tabName) throws IOException, JSONException {
         final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
