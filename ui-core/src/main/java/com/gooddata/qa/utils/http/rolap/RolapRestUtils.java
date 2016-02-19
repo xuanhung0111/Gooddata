@@ -17,6 +17,9 @@ import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.utils.http.RestApiClient;
 
+/**
+ * REST utilities for rolap task
+ */
 public final class RolapRestUtils {
 
     private static final Logger log = Logger.getLogger(RolapRestUtils.class.getName());
@@ -39,6 +42,13 @@ public final class RolapRestUtils {
         }
     };
 
+    /**
+     * waiting for asynchronous task
+     *  
+     * @param restApiClient
+     * @param pollingUri
+     * @return status code
+     */
     public static int waitingForAsyncTask(final RestApiClient restApiClient, final String pollingUri) {
         final Supplier<HttpRequestBase> request = () -> restApiClient.newGetMethod(pollingUri);
         while (executeRequest(restApiClient, request.get()) == HttpStatus.ACCEPTED.value()) {
@@ -48,6 +58,13 @@ public final class RolapRestUtils {
         return executeRequest(restApiClient, request.get());
     }
 
+    /**
+     * Get asynchronous task status
+     * 
+     * @param restApiClient
+     * @param pollingUri
+     * @return status
+     */
     public static String getAsyncTaskStatus(final RestApiClient restApiClient, final String pollingUri)
             throws IOException, JSONException {
         final JSONObject taskObject = getJsonObject(restApiClient, pollingUri);
@@ -63,6 +80,14 @@ public final class RolapRestUtils {
         return status;
     }
 
+    /**
+     * Post etl pull integration
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param integrationEntry
+     * @return is the integration successful or not
+     */
     public static boolean postEtlPullIntegration(final RestApiClient restApiClient, final String projectId,
             final String integrationEntry) throws JSONException, ParseException, IOException {
         final String content = new JSONObject().put("pullIntegration", integrationEntry).toString();
@@ -79,6 +104,14 @@ public final class RolapRestUtils {
         return "OK".equals(getJsonObject(restApiClient, pullingUri).getJSONObject("wTaskStatus").getString("status"));
     }
 
+    /**
+     * Execute MAQL
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param maql
+     * @return polling uri
+     */
     public static String executeMAQL(final RestApiClient restApiClient, final String projectId, final String maql)
             throws ParseException, JSONException, IOException {
         final String contentBody = MAQL_EXECUTION_BODY.get().replace("${maql}", maql);

@@ -17,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.utils.http.RestApiClient;
 
+/**
+ * REST utilities for model task
+ */
 public final class ModelRestUtils {
 
     private static final Logger log = Logger.getLogger(ModelRestUtils.class.getName());
@@ -27,6 +30,14 @@ public final class ModelRestUtils {
     private static final String LDM_LINK = "/gdc/projects/%s/ldm";
     private static final String PROJECT_MODEL_VIEW_LINK = "/gdc/projects/%s/model/view";
 
+    /**
+     * Get LDM image uri
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param host
+     * @return LDM image uri
+     */
     public static String getLDMImageURI(final RestApiClient restApiClient, final String projectId,
             final String host) throws ParseException, IOException, JSONException {
         final String ldmUri = format(LDM_LINK, projectId);
@@ -39,12 +50,30 @@ public final class ModelRestUtils {
         return uri;
     }
 
+    /**
+     * Get production project model view
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param includeProduction
+     * @return model view
+     */
     public static JSONObject getProductionProjectModelView(final RestApiClient restApiClient, final String projectId, 
             final boolean includeProduction) throws ParseException, JSONException, IOException {
         final String nonProductionURL = PROJECT_MODEL_VIEW_LINK + "?includeNonProduction=%s";
         return getProjectModelViewByModelLink(restApiClient, format(nonProductionURL, projectId, includeProduction));
-       }
+    }
 
+    /**
+     * Get dataset element from model view
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param dataset
+     * @param element
+     * @param returnType
+     * @return dataset element
+     */
     public static <T> T getDatasetElementFromModelView(final RestApiClient restApiClient, final String projectId,
             final String dataset, final DatasetElements element, final Class<T> returnType)
                     throws ParseException, JSONException, IOException {
