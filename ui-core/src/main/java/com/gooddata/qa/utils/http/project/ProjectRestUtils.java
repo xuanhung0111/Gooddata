@@ -1,6 +1,6 @@
 package com.gooddata.qa.utils.http.project;
 
-import static java.util.Objects.nonNull;
+import org.apache.commons.lang3.StringUtils;
 
 import com.gooddata.GoodData;
 import com.gooddata.project.Environment;
@@ -23,7 +23,7 @@ public final class ProjectRestUtils {
     public static String createProject(final GoodData goodData, final String title, final String template,
             final String authorizationToken, final ProjectDriver projectDriver, final Environment environment) {
         final Project project = new Project(title, authorizationToken);
-        if (nonNull(template)) project.setProjectTemplate(template);
+        if (!StringUtils.isBlank(template)) project.setProjectTemplate(template);
         project.setDriver(projectDriver);
         project.setEnvironment(environment);
 
