@@ -30,6 +30,9 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirect
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.http.RestApiClient;
 
+/**
+ * REST utilities for Indigo task
+ */
 public class IndigoRestUtils {
 
     private static final String AMOUNT = "Amount";
@@ -74,6 +77,13 @@ public class IndigoRestUtils {
         }
     };
 
+    /**
+     * Get analytical dashboards of a project
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @return list of analytical dashboard links
+     */
     public static List<String> getAnalyticalDashboards(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
         final String analyticalDashboardsUri = "/gdc/md/" + projectId + "/query/analyticaldashboard";
@@ -88,6 +98,14 @@ public class IndigoRestUtils {
         return dashboardLinks;
     }
 
+    /**
+     * Create KPI widget
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param kpiConfig
+     * @return KPI uri
+     */
     public static String createKpiWidget(final RestApiClient restApiClient, final String projectId,
             final KpiMDConfiguration kpiConfig) throws JSONException, IOException {
         String content = KPI_WIDGET_BODY.get()
@@ -126,6 +144,14 @@ public class IndigoRestUtils {
                     .getString("uri");
     }
 
+    /**
+     * Add KPI to analytical dashboard
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param dashboardUri
+     * @param widgetUri
+     */
     public static void addKpiWidgetToAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
             final String dashboardUri, final String widgetUri) throws JSONException, IOException {
         final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
@@ -137,6 +163,14 @@ public class IndigoRestUtils {
         executeRequest(restApiClient, restApiClient.newPutMethod(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
 
+    /**
+     * Delete KPI from analytical dashboard
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param dashboardUri
+     * @param widgetUri
+     */
     public static void deleteKpiWidgetFromAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
             final String dashboardUri, final String widgetUri) throws JSONException, IOException {
         final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
@@ -157,6 +191,14 @@ public class IndigoRestUtils {
         executeRequest(restApiClient, restApiClient.newPutMethod(dashboardUri, dashboard.toString()), HttpStatus.OK);
     }
 
+    /**
+     * Create new analytical dashboard
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param widgetUris
+     * @return new analytical dashboard uri
+     */
     public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
             final Collection<String> widgetUris) throws JSONException, IOException {
 
@@ -171,6 +213,13 @@ public class IndigoRestUtils {
                     .getString("uri");
     }
 
+    /**
+     * A helper method to prepare analytical dashboard with some kpis added
+     *  
+     * @param restApiClient
+     * @param goodData
+     * @param projectId
+     */
     public static void prepareAnalyticalDashboardTemplate(final RestApiClient restApiClient,
             final GoodData goodData, final String projectId) throws JSONException, IOException {
         // delete all dashboards, if some exist
@@ -220,6 +269,13 @@ public class IndigoRestUtils {
         createAnalyticalDashboard(restApiClient, projectId, widgetUris);
     }
 
+    /**
+     * Get date dimension created uri
+     * 
+     * @param goodData
+     * @param projectId
+     * @return date dimension created uri
+     */
     public static String getDateDimensionCreatedUri(final GoodData goodData, final String projectId) {
         return goodData.getMetadataService()
             .getObjUri(goodData.getProjectService().getProjectById(projectId),

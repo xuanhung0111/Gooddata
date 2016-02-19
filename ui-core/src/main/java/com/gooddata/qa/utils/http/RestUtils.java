@@ -14,7 +14,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-
+/**
+ * General REST utilities for executing request, uri or fetching json object, resource from request
+ */
 public final class RestUtils {
 
     public static final String CREATE_AND_GET_OBJ_LINK = "/gdc/md/%s/obj?createAndGet=true";
@@ -22,6 +24,13 @@ public final class RestUtils {
     private RestUtils() {
     }
 
+    /**
+     * Execute request with expected status code
+     * 
+     * @param restApiClient
+     * @param request
+     * @param expectedStatusCode
+     */
     public static void executeRequest(final RestApiClient restApiClient, final HttpRequestBase request,
             final HttpStatus expectedStatusCode) {
         try {
@@ -32,6 +41,13 @@ public final class RestUtils {
         }
     }
 
+    /**
+     * Execute request
+     * 
+     * @param restApiClient
+     * @param request
+     * @return status code
+     */
     public static int executeRequest(final RestApiClient restApiClient, final HttpRequestBase request) {
         try {
             final HttpResponse response = restApiClient.execute(request);
@@ -43,6 +59,15 @@ public final class RestUtils {
         }
     }
 
+    /**
+     * Get resource from request with expected status code
+     * 
+     * @param restApiClient
+     * @param request
+     * @param setupRequest        setup request before executing like configure header, ...
+     * @param expectedStatusCode
+     * @return entity from response in String form
+     */
     public static String getResource(final RestApiClient restApiClient, final HttpRequestBase request,
             final Consumer<HttpRequestBase> setupRequest, final HttpStatus expectedStatusCode)
                     throws ParseException, IOException {
@@ -61,6 +86,14 @@ public final class RestUtils {
         }
     }
 
+    /**
+     * Get resource from request with expected status code
+     * 
+     * @param restApiClient
+     * @param request
+     * @param expectedStatusCode
+     * @return entity from response in json form
+     */
     public static String getResource(final RestApiClient restApiClient, final HttpRequestBase request,
             final HttpStatus expectedStatusCode) throws ParseException, IOException {
         return getResource(restApiClient,
@@ -69,6 +102,14 @@ public final class RestUtils {
                 expectedStatusCode);
     }
 
+    /**
+     * Get resource from uri with expected status code
+     * 
+     * @param restApiClient
+     * @param uri
+     * @param expectedStatusCode
+     * @return entity from response in json form
+     */
     public static String getResource(final RestApiClient restApiClient, final String uri,
             final HttpStatus expectedStatusCode) throws ParseException, IOException {
         return getResource(restApiClient,
@@ -77,26 +118,62 @@ public final class RestUtils {
                 expectedStatusCode);
     }
 
+    /**
+     * Get json object from uri, expected status code is OK (200)
+     * 
+     * @param restApiClient
+     * @param uri
+     * @return
+     */
     public static JSONObject getJsonObject(final RestApiClient restApiClient, final String uri)
             throws IOException, JSONException {
         return getJsonObject(restApiClient, uri, HttpStatus.OK);
     }
 
+    /**
+     * Get json object from uri with expected status code
+     * 
+     * @param restApiClient
+     * @param uri
+     * @param expectedStatusCode
+     * @return
+     */
     public static JSONObject getJsonObject(final RestApiClient restApiClient, final String uri,
             final HttpStatus expectedStatusCode) throws IOException, JSONException {
         return new JSONObject(getResource(restApiClient, uri, expectedStatusCode));
     }
 
+    /**
+     * Get json object from request with expected status code
+     * 
+     * @param restApiClient
+     * @param request
+     * @param expectedStatusCode
+     * @return
+     */
     public static JSONObject getJsonObject(final RestApiClient restApiClient, final HttpRequestBase request,
             final HttpStatus expectedStatusCode) throws ParseException, JSONException, IOException {
         return new JSONObject(getResource(restApiClient, request, expectedStatusCode));
     }
 
+    /**
+     * Get json object from request, expected status code is OK (200)
+     * 
+     * @param restApiClient
+     * @param request
+     * @return
+     */
     public static JSONObject getJsonObject(final RestApiClient restApiClient, final HttpRequestBase request)
             throws ParseException, JSONException, IOException {
         return new JSONObject(getResource(restApiClient, request, HttpStatus.OK));
     }
 
+    /**
+     * Delete object from uri
+     * 
+     * @param restApiClient
+     * @param uri
+     */
     public static void deleteObject(final RestApiClient restApiClient, final String uri) {
         executeRequest(restApiClient, restApiClient.newDeleteMethod(uri));
     }

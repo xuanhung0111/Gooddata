@@ -21,7 +21,9 @@ import org.springframework.http.HttpStatus;
 
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.google.common.collect.Lists;
-
+/**
+ * REST utilities for old dashboards task
+ */
 public final class DashboardsRestUtils {
 
     private static final Logger log = Logger.getLogger(DashboardsRestUtils.class.getName());
@@ -117,6 +119,14 @@ public final class DashboardsRestUtils {
         }
     };
 
+    /**
+     * Create dashboard
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param title
+     * @return new dashboard uri
+     */
     public static String createDashboard(final RestApiClient restApiClient, final String projectId, final String title)
             throws JSONException, IOException {
         final String content = DASHBOARD_BODY.get().replace("$title", title);
@@ -128,6 +138,13 @@ public final class DashboardsRestUtils {
                     .getString("uri");
     }
 
+    /**
+     * Delete dashboard tab
+     * 
+     * @param restApiClient
+     * @param dashboardUri
+     * @param tabName
+     */
     public static void deleteDashboardTab(final RestApiClient restApiClient, final String dashboardUri,
             final String tabName) throws IOException, JSONException {
         final JSONObject dashboard = getJsonObject(restApiClient, dashboardUri);
@@ -149,6 +166,15 @@ public final class DashboardsRestUtils {
                 HttpStatus.OK);
     }
 
+    /**
+     * Add comment for object
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param comment
+     * @param objectId
+     * @return comment uri
+     */
     public static String addComment(final RestApiClient restApiClient, final String projectId,
             final String comment, final String objectId) throws ParseException, JSONException, IOException {
         final String objectUri = format(OBJ_LINK, projectId) + objectId;
@@ -165,6 +191,13 @@ public final class DashboardsRestUtils {
                     .getString("uri");
     }
 
+    /**
+     * Change metric format
+     * 
+     * @param restApiClient
+     * @param metricUri
+     * @param newFormat
+     */
     public static void changeMetricFormat(final RestApiClient restApiClient, final String metricUri,
             final String newFormat) throws ParseException, JSONException, IOException {
         final JSONObject json = getJsonObject(restApiClient, metricUri);
@@ -173,6 +206,13 @@ public final class DashboardsRestUtils {
         executeRequest(restApiClient, restApiClient.newPutMethod(metricUri, json.toString()), HttpStatus.OK);
     }
 
+    /**
+     * Change metric expression
+     * 
+     * @param restApiClient
+     * @param metricUri
+     * @param newExpression
+     */
     public static void changeMetricExpression(final RestApiClient restApiClient, final String metricUri,
             final String newExpression) throws ParseException, JSONException, IOException {
         final JSONObject json = getJsonObject(restApiClient, metricUri);
@@ -181,6 +221,15 @@ public final class DashboardsRestUtils {
         executeRequest(restApiClient, restApiClient.newPutMethod(metricUri, json.toString()), HttpStatus.OK);
     }
 
+    /**
+     * Create mandatory user filter object
+     * 
+     * @param restApiClient
+     * @param projectID
+     * @param mufTitle
+     * @param conditions
+     * @return mandatory user filter uri
+     */
     public static String createMUFObj(final RestApiClient restApiClient, final String projectID,
             final String mufTitle, final Map<String, Collection<String>> conditions)
                     throws IOException, JSONException {
@@ -191,6 +240,14 @@ public final class DashboardsRestUtils {
         return getJsonObject(restApiClient, restApiClient.newPostMethod(mdObjURI, contentBody)).getString("uri");
     }
 
+    /**
+     * Add mandatory user filter to specific user
+     * 
+     * @param restApiClient
+     * @param projectURI
+     * @param user
+     * @param mufURI
+     */
     public static void addMUFToUser(final RestApiClient restApiClient, final String projectURI, final String user,
             final String mufURI) throws ParseException, IOException {
         final String urserFilter = format(MUF_LINK, projectURI);
@@ -199,11 +256,26 @@ public final class DashboardsRestUtils {
         executeRequest(restApiClient, restApiClient.newPostMethod(urserFilter, contentBody), HttpStatus.OK);
     }
 
+    /**
+     * Set drill report as popup for specific dashboard
+     * 
+     * @param restApiClient
+     * @param projectID
+     * @param dashboardID
+     */
     public static void setDrillReportTargetAsPopup(final RestApiClient restApiClient, final String projectID,
             final String dashboardID) throws JSONException, IOException {
         setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_POPUP, null);
     }
 
+    /**
+     * Set drill report as export for specific dashboard
+     * 
+     * @param restApiClient
+     * @param projectID
+     * @param dashboardID
+     * @param exportFormat
+     */
     public static void setDrillReportTargetAsExport(final RestApiClient restApiClient, final String projectID,
             final String dashboardID, final String exportFormat) throws JSONException, IOException {
         setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_EXPORT, exportFormat);
