@@ -6,7 +6,6 @@ import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.PartialExportDashboardsTest;
-import com.gooddata.qa.graphene.indigo.dashboards.ProjectSwitchTest;
 import com.gooddata.qa.utils.flow.TestsRegistry;
 
 public class AllTestsRegistry {
@@ -19,7 +18,6 @@ public class AllTestsRegistry {
                 .register(ManipulateWidgetsTest.class)
                 .register(PartialExportDashboardsTest.class)
                 .register(AddKpiWithoutDateDimensionTest.class)
-                .register(ProjectSwitchTest.class)
                 .register("testng-desktop-AttributeFiltering.xml")
                 .register("testng-desktop-DateFiltering.xml")
                 .register("testng-desktop-permissions-EditMode.xml")
@@ -39,6 +37,8 @@ public class AllTestsRegistry {
                 .register("testng-mobile-ResponsiveNavigation.xml")
                 .register("testng-mobile-SplashScreen.xml")
                 .register("testng-mobile-KpiPopChangeValueExceedLimit.xml")
+                .register("testng-desktop-permissions-ProjectSwitch.xml")
+                .register("testng-mobile-ProjectSwitch.xml")
                 .toTextFile();
     }
 }

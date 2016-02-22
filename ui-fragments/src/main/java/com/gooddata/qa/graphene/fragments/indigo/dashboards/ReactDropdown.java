@@ -18,8 +18,7 @@ public abstract class ReactDropdown extends ReactDropdownParent {
         getElementByName(name).click();
 
         // wait until the selection is made and propagated to the button title
-        By buttonTitle = cssSelector(getDropdownButtonCssSelector() + ".s-" + simplifyText(name));
-        waitForElementVisible(buttonTitle, this.getRoot());
+        waitForSelectionIsApplied(name);
 
         return this;
     }
@@ -50,5 +49,10 @@ public abstract class ReactDropdown extends ReactDropdownParent {
 
     protected WebElement getElementByName(String name) {
         return waitForElementVisible(cssSelector(getDropdownCssSelector() + " .s-" + simplifyText(name)), browser);
+    }
+
+    private void waitForSelectionIsApplied(String name) {
+        By buttonTitle = cssSelector(getDropdownButtonCssSelector() + ".s-" + simplifyText(name));
+        waitForElementVisible(buttonTitle, this.getRoot());
     }
 }
