@@ -19,4 +19,15 @@ public class ReactProjectSwitch extends ReactDropdown {
         return ".overlay.project-picker-dropdown";
     }
 
+    // When switch project with Embeded Dashboard role, user is directed to Projects.html page 
+    // and project picker button will disappears
+    // So override the origin action because cannot wait that button here
+    @Override
+    public ReactDropdown selectByName(String name) {
+        searchByName(name);
+        getElementByName(name).click();
+
+        return this;
+    }
+
 }
