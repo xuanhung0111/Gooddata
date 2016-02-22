@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javax.mail.MessagingException;
 
@@ -56,6 +57,9 @@ public class ProjectAndUsersPage extends AbstractFragment {
     private static final By BY_LEAVE_PROJECT_DIALOG_BUTTON = By.cssSelector("form .s-btn-leave");
     private static final By PROJECT_NAME_INPUT_LOCATOR = By.cssSelector(".ipeEditor");
     private static final By SAVE_BUTTON_LOCATOR = By.cssSelector(".s-ipeSaveButton");
+    private static final By USER_EMAIL_LOCATOR = By.cssSelector(".email");
+    private static final By DEACTIVATE_BUTTON_LOCATOR = By.cssSelector(".s-btn-deactivate");
+    private static final By ENABLE_BUTTON_LOCATOR = By.cssSelector(".s-btn-enable");
     private static final By CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR = By
             .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .s-btn-cancel");
 
@@ -112,7 +116,7 @@ public class ProjectAndUsersPage extends AbstractFragment {
 
     public UserProfilePage openUserProfile(final String userEmail) {
         users.stream()
-                .filter(e -> e.findElement(By.cssSelector(".email")).getText().equals(userEmail))
+                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
                 .map(e -> e.findElement(By.cssSelector(".name")))
                 .findFirst()
                 .get()
@@ -125,29 +129,31 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(inviteUserButton).click();
     }
 
-    public void disableUser(final String userEmail) {
+    public ProjectAndUsersPage disableUser(final String userEmail) {
         openActiveUserTab();
         int numberOfUsers = getUsersCount();
         users.stream()
-                .filter(e -> e.findElement(By.cssSelector(".email")).getText().equals(userEmail))
-                .map(e -> e.findElement(By.tagName("button")))
+                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
+                .map(e -> e.findElement(DEACTIVATE_BUTTON_LOCATOR))
                 .findFirst()
                 .get()
                 .click();
         Predicate<WebDriver> predicate = input -> getUsersCount() < numberOfUsers;
         Graphene.waitGui().until(predicate);
+        return this;
     }
 
     public boolean isUserDisplayedInList(final String userEmail) {
         return users.stream()
-                .map(e -> e.findElement(By.cssSelector(".email")))
+                .map(e -> e.findElement(USER_EMAIL_LOCATOR))
                 .filter(e -> e.getText().equals(userEmail))
                 .findFirst()
                 .isPresent();
     }
 
-    public void openDeactivatedUserTab() {
+    public ProjectAndUsersPage openDeactivatedUserTab() {
         waitForElementVisible(filterDeactivatedButton).click();
+        return this;
     }
 
     private String inviteUsers(ImapClient imapClient, String emailSubject,
@@ -162,7 +168,33 @@ public class ProjectAndUsersPage extends AbstractFragment {
         return users.size();
     }
 
-    private void openActiveUserTab() {
+    public ProjectAndUsersPage openActiveUserTab() {
         waitForElementVisible(filterActiveButton).click();
+        return this;
     }
+
+    public ProjectAndUsersPage enableUser(String userEmail) {
+        openDeactivatedUserTab();
+        int numberOfUsers = getUsersCount();
+        users.stream()
+                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
+                .map(e -> e.findElement(ENABLE_BUTTON_LOCATOR))
+                .findFirst()
+                .get()
+                .click();
+        Predicate<WebDriver> predicate = input -> getUsersCount() == numberOfUsers - 1;
+        Graphene.waitGui().until(predicate);
+        return this;
+    }
+
+    public boolean isDeactivePermissionAvailable(String userEmail) {
+        Optional<WebElement> user = users.stream()
+                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
+                .findFirst();
+
+        if (!user.isPresent()) return false;
+
+        return isElementPresent(DEACTIVATE_BUTTON_LOCATOR, user.get());
+    }
+
 }
