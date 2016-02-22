@@ -29,6 +29,7 @@ public abstract class ReactDropdown extends ReactDropdownParent {
 
     public Collection<String> getValues() {
         ensureDropdownOpen();
+        waitForDropdownLoaded();
 
         String itemSelector = getDropdownCssSelector() + " " + getListItemCssSelector();
         return getElementTexts(cssSelector(itemSelector), browser);

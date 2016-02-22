@@ -10,10 +10,12 @@ import org.openqa.selenium.WebElement;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
 public abstract class ReactDropdownParent extends AbstractFragment {
     private static final String DISABLED_CLASS = "disabled";
+    private static final String NO_MATCHING_DATA_MESSAGE_CLASS = "no-matching-data";
+    private static final String IS_LOADING_CLASS = "s-isLoading";
+    private static final String SEARCHFIELD_INPUT_CLASS = "searchfield-input";
 
     /**
      * This method is needed to find the correct dropdown, rendered in overlay,
@@ -51,23 +53,41 @@ public abstract class ReactDropdownParent extends AbstractFragment {
         }
     }
 
+    public void ensureDropdownClosed() {
+        if (this.isDropdownOpen()) {
+            this.toggleDropdown();
+        }
+    }
+
     public WebElement getDropdownButton() {
         return waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot());
     }
 
-    private void waitForDropdownLoaded() {
-        waitForElementNotPresent(By.cssSelector(getDropdownCssSelector() + " .s-isLoading"));
+    public boolean isShowingNoMatchingDataMessage() {
+        waitForDropdownLoaded();
+        return isElementPresent(cssSelector(getNoMatchingDataMessageSelector()), browser);
+    }
+
+    public String getSearchText() {
+        return waitForElementVisible(cssSelector(getSearchFieldSelector()), browser).getText();
+    }
+
+    protected String getNoMatchingDataMessageSelector() {
+        return getDropdownCssSelector() + " ." + NO_MATCHING_DATA_MESSAGE_CLASS;
+    }
+
+    protected void waitForDropdownLoaded() {
+        waitForElementNotPresent(By.cssSelector(getDropdownCssSelector() + "." + IS_LOADING_CLASS));
     }
 
     protected boolean hasSearchField() {
         // wait until dropdown body is loaded and check search field
         waitForDropdownLoaded();
-        By searchField = cssSelector(getSearchFieldSelector());
-        return isElementPresent(searchField, browser);
+        return isElementPresent(cssSelector(getSearchFieldSelector()), browser);
     }
 
     protected String getSearchFieldSelector() {
-        return getDropdownCssSelector() + " .searchfield-input";
+        return getDropdownCssSelector() + " ." + SEARCHFIELD_INPUT_CLASS;
     }
 
     protected ReactDropdownParent searchForText(String text) {
@@ -83,5 +103,4 @@ public abstract class ReactDropdownParent extends AbstractFragment {
         waitForElementVisible(By.cssSelector(getDropdownButtonCssSelector()), this.getRoot())
                 .click();
     }
-
 }
