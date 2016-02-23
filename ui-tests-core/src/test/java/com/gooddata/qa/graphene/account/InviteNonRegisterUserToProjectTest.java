@@ -159,7 +159,7 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         JSONObject userProfile = UserManagementRestUtils.getUserProfileByEmail(restApiClient, userEmail);
         if (Objects.nonNull(userProfile)) {
             String userProfileUri = userProfile.getJSONObject("links").getString("self");
-            UserManagementRestUtils.deleteUser(restApiClient, userProfileUri);
+            UserManagementRestUtils.deleteUserByUri(restApiClient, userProfileUri);
         }
     }
 

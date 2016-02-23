@@ -177,8 +177,8 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
         logout();
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-        UserManagementRestUtils.deleteUser(getRestApiClient(), newAdminUserUri);
-        UserManagementRestUtils.deleteUser(getRestApiClient(), embededDashboardUserUri);
+        UserManagementRestUtils.deleteUserByUri(getRestApiClient(), newAdminUserUri);
+        UserManagementRestUtils.deleteUserByUri(getRestApiClient(), embededDashboardUserUri);
     }
 
     private String generateUniqueUserEmail(String email) {

@@ -9,9 +9,11 @@ import javax.mail.MessagingException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 
+import com.gooddata.qa.graphene.entity.mail.Email;
 import com.gooddata.qa.graphene.enums.GDEmails;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class ImapUtils {
@@ -74,4 +76,16 @@ public class ImapUtils {
             }
         });
     }
+
+    public static Email getLastEmail(final String host, final String email,
+            final String password, final GDEmails from,
+            final String subject, final int expectedMessageCount) {
+
+        return ImapClientAction.Utils.doActionWithImapClient(host, email, password, (imapClient) -> {
+            Collection<Message> messages = waitForMessageWithExpectedCount(imapClient,
+                    from, subject, expectedMessageCount);
+            return Email.getInstance(Iterables.getLast(messages));
+        });
+    }
+
 }

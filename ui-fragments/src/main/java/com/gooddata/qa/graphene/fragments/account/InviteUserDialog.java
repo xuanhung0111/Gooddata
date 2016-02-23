@@ -27,6 +27,7 @@ import com.google.common.collect.Iterables;
 public class InviteUserDialog extends AbstractFragment {
 
     public static final By INVITE_USER_DIALOG_LOCATOR = By.cssSelector(".c-invitationDialog");
+    private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector(".c-validationErrorMessages");
 
     @FindBy
     private WebElement invitationEmailAddresses;
@@ -58,6 +59,10 @@ public class InviteUserDialog extends AbstractFragment {
         waitForFragmentNotVisible(this);
     }
 
+    public String getErrorMessage() {
+        return waitForElementVisible(ERROR_MESSAGE_LOCATOR, browser).getText();
+    }
+
     private InviteUserDialog enterEmails(String... emails) {
         waitForElementVisible(invitationEmailAddresses).sendKeys(Joiner.on(",").join(emails));
         return this;
@@ -77,13 +82,18 @@ public class InviteUserDialog extends AbstractFragment {
         return this;
     }
 
-    private void inviteUsers(UserRoles role, String message, String... emails) {
+    public InviteUserDialog inviteUsers(UserRoles role, String message, String... emails) {
         if (emails.length == 0) {
             throw new IllegalArgumentException("Must provide at least 1 email.");
         }
 
         enterEmails(emails).selectRole(role).enterMessage(message);
         waitForElementVisible(inviteButton).click();
+        return this;
+    }
+
+    public Select getInvitationRole() {
+        return waitForElementVisible(invitationRole);
     }
 
     private String getInvitationLink(ImapClient imapClient, String emailSubject, int expectedMessageCount)

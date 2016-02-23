@@ -6,6 +6,9 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertFalse;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -35,6 +38,8 @@ public final class UserManagementRestUtils {
     private static final String USER_GROUP_MODIFY_MEMBERS_LINK = "/gdc/userGroups/%s/modifyMembers";
     private static final String USERS_LINK = "/gdc/projects/%s/users";
     private static final String ROLE_LINK = "/gdc/projects/%s/roles/%s";
+    private static final String INVITATION_LINK = "/gdc/projects/%s/invitations";
+    private static final String USER_FILTER_LINK = "/gdc/md/%s/userfilters";
 
     private static final Supplier<String> CREATE_USER_CONTENT_BODY = () -> {
         try {
@@ -87,6 +92,31 @@ public final class UserManagementRestUtils {
         }
     };
 
+    private static final Supplier<String> INVITE_USER_WITH_MUF_CONTENT_BODY = () -> {
+        try {
+            return new JSONObject() {{
+                put("invitations", new JSONArray() {{
+                    put(new JSONObject() {{
+                        put("invitation", new JSONObject() {{
+                            put("content", new JSONObject() {{
+                                put("email", "${email}");
+                                put("userFilters", new JSONArray(){{
+                                    put("${userFilter}");
+                                }});
+                                put("role", "${role}");
+                                put("action", new JSONObject() {{
+                                    put("setMessage", "${message}");
+                                }});
+                            }});
+                        }});
+                    }});
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
+
     /**
      * Create new user
      * 
@@ -97,7 +127,7 @@ public final class UserManagementRestUtils {
      */
     public static String createUser(final RestApiClient restApiClient, final String username,
             final String password) throws ParseException, JSONException, IOException {
-        Optional<JSONObject> userProfile = Optional.ofNullable(getUserProfileByEmail(restApiClient, username));
+        final Optional<JSONObject> userProfile = Optional.ofNullable(getUserProfileByEmail(restApiClient, username));
         if (userProfile.isPresent()) {
             log.info("the user " + username + " does exist in the server already. "
                     + "Please check deletion process to avoid this case");
@@ -117,8 +147,25 @@ public final class UserManagementRestUtils {
      * @param restApiClient
      * @param userUri
      */
-    public static void deleteUser(final RestApiClient restApiClient, final String userUri) {
+    public static void deleteUserByUri(final RestApiClient restApiClient, final String userUri) {
         executeRequest(restApiClient, restApiClient.newDeleteMethod(userUri), HttpStatus.OK);
+    }
+
+    /**
+     *delete user based on email
+     * 
+     * @param restApiClient
+     * @param userEmail
+     */
+    public static void deleteUserByEmail(final RestApiClient restApiClient, final String userEmail)
+            throws ParseException, IOException, JSONException {
+        final JSONObject userProfile = getUserProfileByEmail(restApiClient, userEmail);
+
+        if (Objects.nonNull(userProfile)) {
+            final String userProfileUri = userProfile.getJSONObject("links").getString("self");
+            deleteUserByUri(restApiClient, userProfileUri);
+            log.info("successfully deleted" + userEmail);
+        }
     }
 
     /**
@@ -200,6 +247,79 @@ public final class UserManagementRestUtils {
                 .replace("${verifyPassword}", newPassword);
         executeRequest(restApiClient, restApiClient.newPutMethod(userProfileUri, content), HttpStatus.OK);
     }
+
+    /**
+     * Invite an user and assign MUF
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param email
+     * @param mufURI
+     * @param userRole
+     * @param message
+     * @return invitation uri
+     */
+    public static String inviteUserWithMufObj(final RestApiClient restApiClient, final String projectId,
+            final String email, final String mufURI, final UserRoles userRole, final String message)
+                    throws ParseException, JSONException, IOException {
+        final String roleUri = format(ROLE_LINK, projectId, userRole.getRoleId());
+        final String invitationUri = format(INVITATION_LINK, projectId);
+        final String contentBody = INVITE_USER_WITH_MUF_CONTENT_BODY.get()
+                .replace("${email}", email)
+                .replace("${userFilter}", mufURI)
+                .replace("${role}", roleUri)
+                .replace("${message}", message);
+    
+        return getJsonObject(restApiClient, restApiClient.newPostMethod(invitationUri, contentBody))
+                .getJSONObject("createdInvitations").getJSONArray("uri").get(0).toString();
+    }
+
+    /**
+     * get MUF uri from an invitation
+     * 
+     * @param restApiClient
+     * @param invitationUri
+     * @return muf uri
+     */
+    public static String getMufUriFromInvitation(final RestApiClient restApiClient,
+            final String invitationUri) throws JSONException, IOException {
+        return getInvitationContent(restApiClient, invitationUri)
+                .getJSONArray("userFilters").get(0).toString();
+    }
+
+    /**
+     * get role uri from an invitation
+     * 
+     * @param restApiClient
+     * @param invitationUri
+     * @return role uri
+     */
+    public static String getRoleUriFromInvitation(final RestApiClient restApiClient,
+            final String invitationUri) throws JSONException, IOException {
+        return getInvitationContent(restApiClient, invitationUri).getString("role");
+    }
+
+    /**
+     * get users who are using a specified muf uri
+     * 
+     * @param restApiClient
+     * @param projectId
+     * @param mufUri
+     * @return list of users
+     */
+    public static List<String> getUsersUsingMuf(final RestApiClient restApiClient, final String projectId,
+            final String mufUri) throws JSONException, IOException {
+        final JSONArray items = getJsonObject(restApiClient, format(USER_FILTER_LINK, projectId))
+                .getJSONObject("userFilters").getJSONArray("items");
+
+        final List<String> users = new ArrayList<String>();
+        for (int i = 0, n = items.length(); i < n; i++) {
+            final String json = items.getString(i);
+            if (json.contains(mufUri))
+                users.add(new JSONObject(json).getString("user"));
+        }
+        return users;
+    } 
 
     /**
      * Add user to project with specific role
@@ -305,5 +425,10 @@ public final class UserManagementRestUtils {
         }}.toString();
 
         executeRequest(restApiClient, restApiClient.newPostMethod(modifyMemberUri, content), HttpStatus.NO_CONTENT);
+    }
+
+    private static JSONObject getInvitationContent(final RestApiClient restApiClient, final String invitationUri)
+            throws JSONException, IOException {
+        return getJsonObject(restApiClient, invitationUri).getJSONObject("invitation").getJSONObject("content");
     }
 }
