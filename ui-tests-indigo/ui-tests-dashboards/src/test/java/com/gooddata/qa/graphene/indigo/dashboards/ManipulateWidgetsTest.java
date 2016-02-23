@@ -23,6 +23,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
     private static final String PATTERN_OF_METRIC_NAME = "is shortened";
 
     @BeforeClass(alwaysRun = true)
+    @Override
     public void before() {
         super.before();
         validateAfterClass = true;
@@ -285,5 +286,12 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .submitClick();
         indigoDashboardsPage.saveEditModeWithKpis();
         takeScreenshot(browser, "Dashboards after deleting bad Kpi", getClass());
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop", "mobile"})
+    public void checkNoVisualizationOnDashboard() {
+        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+
+        assertEquals(visualizationsCount, 0);
     }
 }
