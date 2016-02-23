@@ -4,29 +4,30 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 
 public class UploadErrorTest extends AbstractCsvUploaderTest {
-
-    private static final CsvFile PAYROLL_FILE = CsvFile.PAYROLL;
 
     private static final String TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR = "Row %d contains a value that exceeds the limit of 255 characters, or has more than the limit of 250 columns.";
     private static final String ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW = "Row %s contains more columns than the header row.";
@@ -34,15 +35,17 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
             "Try removing comments and multi-row headers from the beginning of the file. " +
             "Only files with at least one numerical column are supported.";
 
+    private static final CsvFile BAD_STRUCTURE_FILE = new CsvFile("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList(), 0);
+
     @DataProvider(name = "errorCsvFileProvider")
     public Object[][] errorCsvFileProvider() {
         return new Object[][]{
-                {CsvFile.WITHOUT_FACT, Arrays.asList(DATA_WITHOUT_FACT)},
-                {CsvFile.INVALID_DELIMITER, Arrays.asList(DATA_WITHOUT_FACT)},
-                {CsvFile.BAD_STRUCTURE, Arrays.asList(String.format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2))},
-                {CsvFile.TOO_MANY_COLUMNS, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 1))},
-                {CsvFile.TOO_LONG_FIELD, Arrays.asList(String.format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 2))},
-                {CsvFile.CRAZY_DATA, Arrays.asList("There are 5 rows containing less columns than the header row: 44-48.",
+                {new CsvFile("payroll.without.fact"), asList(DATA_WITHOUT_FACT)},
+                {new CsvFile("invalid.delimiter"), asList(DATA_WITHOUT_FACT)},
+                {BAD_STRUCTURE_FILE, asList(format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2))},
+                {new CsvFile("too.many.columns"), asList(format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 1))},
+                {new CsvFile("payroll.too.long.field"), asList(format(TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR, 2))},
+                {new CsvFile("crazy.data"), asList("There are 5 rows containing less columns than the header row: 44-48.",
                         "There are 5 rows without at least one numerical value: 44-48. "
                                 + "Each row must contain numerical data for analysis.")}
         };
@@ -50,11 +53,10 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkCsvBadFormat() throws Exception {
-        CsvFile fileToUpload = CsvFile.BAD_STRUCTURE;
-        uploadCsvFileWithErrors(fileToUpload,
-                Arrays.asList(String.format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2)));
+        uploadCsvFileWithErrors(BAD_STRUCTURE_FILE,
+                asList(format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2)));
 
-        String datasetName = fileToUpload.getDatasetNameOfFirstUpload();
+        String datasetName = BAD_STRUCTURE_FILE.getDatasetNameOfFirstUpload();
         assertThat("Dataset with name '" + datasetName + "' should not be in datasets list.",
                 datasetsListPage.getMyDatasetsTable().getDatasetNames(),
                 not(hasItem(datasetName)));
@@ -63,7 +65,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
     @Test(dependsOnMethods = {"createProject"})
     public void checkNoFactAndNumericColumnNameCsvConfig() {
         initDataUploadPage();
-        uploadFile(PAYROLL_FILE);
+        uploadFile(PAYROLL);
         waitForFragmentVisible(dataPreviewPage);
 
         final String factColumnName = "Amount";
@@ -85,7 +87,7 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
         String columnName = "the same";
 
         initDataUploadPage();
-        uploadFile(PAYROLL_FILE);
+        uploadFile(PAYROLL);
         waitForFragmentVisible(dataPreviewPage);
 
         // set up the same names
@@ -109,21 +111,22 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void uploadTooLargeCsvFile() throws IOException {
-        CsvFile fileToUpload = CsvFile.TOO_LARGE_FILE;
-        String csvFileName = fileToUpload.getFileName();
-        File tooLargeFile = new File(fileToUpload.getCsvFileToUpload());
+        final CsvFile payrollTooLarge = new CsvFile("payroll.too.large");
+        final String csvFileName = payrollTooLarge.getFileName();
+        final String payrollTooLargeFilePath = getCsvFilePathFromResource(payrollTooLarge);
+        File tooLargeFile = new File(payrollTooLargeFilePath);
         RandomAccessFile file = new RandomAccessFile(tooLargeFile, "rw");
         try {
             file.setLength(1100 * 1024 * 1024);
 
             initDataUploadPage();
             waitForFragmentVisible(datasetsListPage).clickAddDataButton();
-            waitForFragmentVisible(fileUploadDialog).pickCsvFile(fileToUpload.getCsvFileToUpload());
+            waitForFragmentVisible(fileUploadDialog).pickCsvFile(payrollTooLargeFilePath);
 
             // this is workaround for bug MSF-9734
             String validationErrorMessage = waitForFragmentVisible(fileUploadDialog).getValidationErrorMessage();
-            assertThat(validationErrorMessage,
-                    is("The selected file is larger than 1 GB. Try uploading a subset of the data from the file."));
+            assertEquals(validationErrorMessage,
+                    "The selected file is larger than 1 GB. Try uploading a subset of the data from the file.");
 //            List<String> backendValidationErrors = waitForFragmentVisible(fileUploadDialog)
 //                    .getBackendValidationErrors();
 //            assertThat(backendValidationErrors,
@@ -155,11 +158,11 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
     }
 
     private String createErrorFailedToUploadFile(CsvFile csvFile) {
-        return String.format("Failed to upload the \"%s\" file.", csvFile.getFileName());
+        return format("Failed to upload the \"%s\" file.", csvFile.getFileName());
     }
 
     private void checkButtonOnErrorUploadDialog() {
-        assertThat(waitForFragmentVisible(fileUploadDialog).isUploadButtonDisabled(), is(true));
+        assertTrue(waitForFragmentVisible(fileUploadDialog).isUploadButtonDisabled());
         waitForFragmentVisible(fileUploadDialog).clickCancelButton();
         waitForFragmentNotVisible(fileUploadDialog);
     }

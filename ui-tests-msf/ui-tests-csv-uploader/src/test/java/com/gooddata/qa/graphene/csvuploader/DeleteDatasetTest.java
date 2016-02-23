@@ -7,8 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -18,6 +17,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
+import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
@@ -42,8 +42,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void deleteCsvDatasetFromList() throws Exception {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-        String datasetName = uploadData(fileToUpload);
+        String datasetName = uploadData(PAYROLL);
 
         createObjectsUsingUploadedData();
         initDataUploadPage();
@@ -52,16 +51,16 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         datasetsListPage.getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
         takeScreenshot(browser, DELETE_DATASET_DIALOG_NAME, getClass());
         waitForFragmentVisible(datasetDeleteDialog);
-        assertThat(datasetDeleteDialog.getMessage(), is(CONFIRM_DELETE_MESSAGE));
+        assertEquals(datasetDeleteDialog.getMessage(), CONFIRM_DELETE_MESSAGE);
         datasetDeleteDialog.clickDelete();
 
-        assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
-                is(String.format(SUCCESSFUL_REMOVE_DATASET, datasetName)));
+        assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                format(SUCCESSFUL_REMOVE_DATASET, datasetName));
 
         waitForExpectedDatasetsCount(datasetCountBeforeDelete - 1);
 
         checkForDatasetRemoved(datasetName);
-        removeDatasetFromUploadHistory(fileToUpload, datasetName);
+        removeDatasetFromUploadHistory(PAYROLL, datasetName);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, datasetName, "dataset-deleted"), getClass());
 
         checkObjectsCreatedAfterDatasetRemoved();
@@ -69,8 +68,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void deleteCsvDatasetFromDetail() throws Exception {
-        CsvFile fileToUpload = CsvFile.PAYROLL;
-        String datasetName = uploadData(fileToUpload);
+        String datasetName = uploadData(PAYROLL);
 
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
 
@@ -78,20 +76,20 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         waitForFragmentVisible(csvDatasetDetailPage).clickDeleteButton();
         waitForFragmentVisible(datasetDeleteDialog).clickDelete();
 
-        assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
-                is(String.format(SUCCESSFUL_REMOVE_DATASET, datasetName)));
+        assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                format(SUCCESSFUL_REMOVE_DATASET, datasetName));
 
         waitForExpectedDatasetsCount(datasetCountBeforeDelete - 1);
 
         checkForDatasetRemoved(datasetName);
-        removeDatasetFromUploadHistory(fileToUpload, datasetName);
+        removeDatasetFromUploadHistory(PAYROLL, datasetName);
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, datasetName, "dataset-deleted"), getClass());
     }
 
     @Test(dependsOnMethods = {"deleteCsvDatasetFromList"})
     public void cancelDeleteDataset() {
-        String datasetName = uploadData(CsvFile.PAYROLL);
+        String datasetName = uploadData(PAYROLL);
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
 
         datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
@@ -111,7 +109,7 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"deleteCsvDatasetFromList"})
     public void uploadAfterDeleteDataset() {
-        uploadData(CsvFile.PAYROLL);
+        uploadData(PAYROLL);
     }
 
     private String uploadData(CsvFile fileToUpload) {

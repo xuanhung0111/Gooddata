@@ -4,21 +4,23 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.WordUtils;
 import org.jboss.arquillian.graphene.Graphene;
@@ -27,15 +29,14 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 
 import com.gooddata.qa.graphene.AbstractMSFTest;
+import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
-import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDeleteDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.csvuploader.InsufficientAccessRightsPage;
-import com.gooddata.qa.utils.io.ResourceUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
@@ -55,12 +56,8 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
      */
     protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = ".*rows.*data\\s+fields.*";
 
-    protected static final List<String> PAYROLL_COLUMN_TYPES = Lists.newArrayList("Attribute", "Attribute",
-            "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Date (Year-Month-Day)", "Measure");
-    protected static final List<String> PAYROLL_COLUMN_NAMES = Lists.newArrayList("Lastname", "Firstname",
-            "Education", "Position", "Department", "State", "County", "Paydate", "Amount");
-
-    private static final long PAYROLL_DATA_ROW_COUNT = 3876;
+    protected static final CsvFile PAYROLL = new CsvFile("payroll");
+    protected static final CsvFile PAYROLL_REFRESH = new CsvFile("payroll.refresh");
 
     protected List<UploadHistory> uploadHistory = Lists.newArrayList();
 
@@ -87,44 +84,37 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         projectTitle = "Csv-uploader-test";
     }
 
-    protected void checkCsvDatasetDetail(CsvFile csvFile, String datasetName) {
-        checkCsvDatasetDetail(datasetName, csvFile.getColumnNames(), csvFile.getColumnTypes());
+    public static final List<String> simplifyHeaderNames(List<String> columnNames) {
+        return columnNames.stream()
+                .map(e -> e.replaceAll("[\\,,\\-,.]", ""))
+                .collect(toList());
+    }
+
+    public static final String getDatasetId(String datasetName) {
+        return "dataset.csv_" + WordUtils.uncapitalize(datasetName).replace(" ", "_").replace("_(", "").replace(")", "");
     }
 
     protected void checkCsvDatasetDetail(String datasetName, List<String> expectedColumnNames,
                                          List<String> expectedColumnTypes) {
-        waitForFragmentVisible(csvDatasetDetailPage);
-
-        assertThat(csvDatasetDetailPage.getDatasetName(), is(datasetName));
+        assertEquals(waitForFragmentVisible(csvDatasetDetailPage).getDatasetName(), datasetName);
         assertThat(csvDatasetDetailPage.getColumnNames(),
                 containsInAnyOrder(simplifyHeaderNames(expectedColumnNames).toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
     }
 
-    protected List<String> simplifyHeaderNames(List<String> columnNames) {
-        return columnNames.stream()
-                .map(e -> e.replaceAll("[\\,,\\-,.]", ""))
-                .collect(Collectors.toList());
-    }
-
     protected void checkCsvUpload(CsvFile csvFile, Consumer<CsvFile> uploadCsvFunction, boolean newDatasetExpected) {
         initDataUploadPage();
-
         final int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
-
         uploadCsvFunction.accept(csvFile);
-
         waitForExpectedDatasetsCount(newDatasetExpected ? datasetCountBeforeUpload + 1 : datasetCountBeforeUpload);
     }
 
     protected void uploadCsv(CsvFile csvFile) {
         uploadFile(csvFile);
-
         takeScreenshot(browser, toScreenshotName("before-data-preview", csvFile.getFileName()), getClass());
 
-        waitForFragmentVisible(dataPreviewPage);
-        assertThat(dataPreviewPage.getRowCountMessage(), containsString(Long.toString(csvFile.getDataRowCount())));
-
+        assertThat(waitForFragmentVisible(dataPreviewPage).getRowCountMessage(),
+                containsString(Long.toString(csvFile.getDataRowCount())));
         takeScreenshot(browser, toScreenshotName(DATA_PREVIEW_PAGE, csvFile.getFileName()), getClass());
 
         dataPreviewPage.triggerIntegration();
@@ -144,21 +134,12 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
         Optional<UploadHistory> fileUpload = uploadHistory.stream()
                 .filter(upload -> upload.getCsvFile() == csvFile)
                 .findAny();
-        assertThat(fileUpload.isPresent(), is(true));
+        assertTrue(fileUpload.isPresent());
         fileUpload.get().removeDatasetName(datasetName);
-    }
-
-    protected String getDatasetId(String datasetName) {
-        String newDatasetId =
-                "dataset.csv_"
-                        + WordUtils.uncapitalize(datasetName).replace(" ", "_").replace("_(", "").replace(")", "");
-
-        return newDatasetId;
     }
 
     protected void uploadFile(CsvFile csvFile) {
         waitForFragmentVisible(datasetsListPage).clickAddDataButton();
-
         doUploadFromDialog(csvFile);
     }
 
@@ -201,13 +182,9 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     protected void doUploadFromDialog(CsvFile csvFile) {
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "initial-state", csvFile.getFileName()), getClass());
-
-        waitForFragmentVisible(fileUploadDialog).pickCsvFile(csvFile.getCsvFileToUpload());
-
+        waitForFragmentVisible(fileUploadDialog).pickCsvFile(getCsvFilePathFromResource(csvFile));
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "csv-file-picked", csvFile.getFileName()), getClass());
-
         fileUploadDialog.clickUploadButton();
-
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFile.getFileName()), getClass());
         if (!isElementPresent(className("s-progress-dialog"), browser)) {
             log.warning("Progress dialog is not show or graphene is too slow to capture it!");
@@ -216,18 +193,19 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     protected void refreshCsv(CsvFile refreshData, String datasetName, boolean isOwner) {
         doUploadFromDialog(refreshData);
-
         waitForFragmentVisible(dataPreviewPage);
-
         takeScreenshot(browser, toScreenshotName(DATA_PREVIEW_PAGE, refreshData.getFileName()), getClass());
-
         dataPreviewPage.triggerIntegration();
 
         // TODO workaround for bug: MSF-9563 Green message isn't shown after updating successfully by other admin
         if (isOwner) {
-            assertThat(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
-                    is(String.format(SUCCESSFUL_DATA_MESSAGE, datasetName)));
+            assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+                    format(SUCCESSFUL_DATA_MESSAGE, datasetName));
         }
+    }
+
+    protected String getCsvFilePathFromResource(CsvFile csvFile) {
+        return getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + csvFile.getFileName());
     }
 
     public class UploadHistory {
@@ -266,132 +244,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
                     entry.setValue(false);
                 }
             }
-        }
-    }
-
-    protected enum CsvFile {
-        PAYROLL("payroll"),
-        PAYROLL_REFRESH("payroll.refresh"),
-        PAYROLL_REFRESH_BAD("payroll.refresh.bad"),
-        MULTIPLE_COLUMN_NAME_ROWS("multiple.column.name.rows", Lists.newArrayList("Id4", "Name4", "Lastname4",
-                "Age4", "Amount4"), Lists.newArrayList("Measure", "Attribute", "Attribute", "Measure", "Measure"), 5),
-        /**
-         * This csv file has incorrect column count (one more than expected) on the line number 2.
-         */
-        BAD_STRUCTURE("payroll.bad", Collections.<String>emptyList(), Collections.<String>emptyList(), 0),
-        NO_HEADER("payroll.no.header", Collections.nCopies(9, ""), PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT),
-        TOO_LARGE_FILE("payroll.too.large"),
-        WITHOUT_FACT("payroll.without.fact"),
-        INVALID_DELIMITER("invalid.delimiter"),
-        CRAZY_DATA("crazy.data"),
-        TOO_MANY_COLUMNS("too.many.columns"),
-        TOO_LONG_FIELD("payroll.too.long.field"),
-        PAYROLL_TOO_LONG_FACT_VALUE("payroll.too.long.fact.value"),
-        PAYROLL_NEGATIVE_NUMBER("payroll.negative.number", PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES, 3568),
-        PAYROLL_NULL_NUMBER("payroll.null.number", Lists.newArrayList("Lastname", "Firstname",
-                "Education", "Position", "Department", "State", "County", "Paydate", "Amount", "Amount1"),
-                Lists.newArrayList("Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
-                        "Attribute", "Date [2015-12-31]", "Measure", "Measure"), PAYROLL_DATA_ROW_COUNT),
-        WITHOUT_ATTRIBUTE("without.attribute", Lists.newArrayList("Amount"), Lists.newArrayList("Measure"), 44),
-        WITHOUT_DATE("without.date", Lists.newArrayList("state", "county", "name", "censusarea"),
-                Lists.newArrayList("Attribute", "Attribute", "Attribute", "Measure"), 3273),
-        DATE_YYYY("24dates.yyyy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6",
-                "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
-                "Date 16", "Date 17", "Date 18", "Date 19", "Date 20", "Date 21", "Date 22", "Date 23", "Date 24",
-                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)",
-                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
-                "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
-                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
-                "Date (Day Month Year)", "Date (Year Month Day)", "Measure"), 100),
-        DATE_INVALID_YYYY("24dates.yyyy.invalid"),
-        DATE_YY("24dates.yy", Lists.newArrayList("Date 1", "Date 2", "Date 3", "Date 4", "Date 5", "Date 6",
-                "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12", "Date 13", "Date 14", "Date 15",
-                "Date 16", "Date 17", "Date 18", "Date 19", "Date 20", "Date 21", "Date 22", "Date 23", "Date 24",
-                "Number"), Lists.newArrayList("Date (Month.Day.Year)", "Date (Day.Month.Year)",
-                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
-                "Date (Day Month Year)", "Date (Year Month Day)", "Date (Month.Day.Year)", "Date (Day.Month.Year)",
-                "Date (Year.Month.Day)", "Date (Month/Day/Year)", "Date (Day/Month/Year)", "Date (Year/Month/Day)",
-                "Date (Month-Day-Year)", "Date (Day-Month-Year)", "Date (Year-Month-Day)", "Date (Month Day Year)",
-                "Date (Day Month Year)", "Date (Year Month Day)", "Measure"), 100),
-        DATE_YY_AND_YYYY("date.yyyymmdd.yymmdd", Lists.newArrayList("Date 1", "Date 2", "Number"),
-                Lists.newArrayList("Date (YearMonthDay)", "Date (YearMonthDay)", "Measure"), 100),
-        UNSUPPORTED_DATE_FORMAT("unsupported.date.formats", Lists.newArrayList("Date 1", "Date 2", "Date 3",
-                "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Date 9", "Date 10", "Date 11", "Date 12",
-                "Date 13", "Date 14", "Date 15", "Date 16", "Date 17", "Number"), Lists.newArrayList("Measure",
-                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
-                "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute", "Attribute",
-                "Attribute", "Attribute", "Measure"), 100),
-        AMBIGUOUS_DATE_START_WITH_YEAR("8ambiguous.dates.starting.with.year", Lists.newArrayList("Date 1", "Date 2",
-                "Date 3", "Date 4", "Date 5", "Date 6", "Date 7", "Date 8", "Number"), Lists.newArrayList(
-                "Date (Year-Month-Day)", "Date (Year/Month/Day)", "Date (Year.Month.Day)", "Date (Year Month Day)",
-                "Date (Year-Month-Day)", "Date (Year/Month/Day)", "Date (Year.Month.Day)", "Date (Year Month Day)",
-                "Measure"), 10),
-        AMBIGUOUS_DATE_3_FORMATS("4ambiguous.dates.3formats", Lists.newArrayList("Date 1", "Date 2",
-                "Date 3", "Date 4", "Number"), Lists.newArrayList("Date", "Date", "Date", "Date", "Measure"), 10),
-        AMBIGUOUS_DATE_MONTHDAY_DAYMONTH("6ambiguous.dates.monthday.daymotnh", Lists.newArrayList("Date 1",
-                "Date 2", "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date",
-                "Date", "Date", "Date", "Date", "Measure"), 10),
-        AMBIGUOUS_DATE_YEARDAY_DAYYEAR("6ambiguous.dates.yearday.dayyear", Lists.newArrayList("Date 1", "Date 2",
-                "Date 3", "Date 4", "Date 5", "Date 6", "Number"), Lists.newArrayList("Date", "Date", "Date",
-                "Date", "Date", "Date", "Measure"), 100),
-        PAYROLL_MORE_COLUMN_NAMES("payroll.more.column.names"),
-        DATA_LESS_THAN_50_ROWS("data.less.than.50rows");
-
-        private final String name;
-        private final List<String> columnNames = Lists.newArrayList();
-        private final List<String> columnTypes = Lists.newArrayList();
-        //number of rows with data (rows with facts)
-        private final long dataRowCount;
-
-        private CsvFile(String fileName) {
-            this(fileName, PAYROLL_COLUMN_NAMES, PAYROLL_COLUMN_TYPES, PAYROLL_DATA_ROW_COUNT);
-        }
-
-        private CsvFile(String fileName, List<String> columnNames, List<String> columnTypes, long dataRowCount) {
-            this.name = fileName;
-            this.columnNames.addAll(columnNames);
-            this.columnTypes.addAll(columnTypes);
-            this.dataRowCount = dataRowCount;
-        }
-
-        public String getFileName() {
-            return this.name + ".csv";
-        }
-
-        public String getDatasetNameOfFirstUpload() {
-            String datasetName = this.name.replace(".", " ");
-            return WordUtils.capitalize(datasetName);
-        }
-
-        public String getDatasetName(long datasetIndex) {
-            assertThat(datasetIndex > 0, is(true));
-            return String.format("%s (%s)", getDatasetNameOfFirstUpload(), datasetIndex);
-        }
-
-        public List<String> getColumnNames() {
-            return Collections.unmodifiableList(this.columnNames);
-        }
-
-        public List<String> changeColumnType(String columnName, ColumnType type) {
-            int columnIndex = getColumnNames().indexOf(columnName);
-            List<String> changedColumnTypes = Lists.newArrayList(this.columnTypes);
-            changedColumnTypes.set(columnIndex, type.getVisibleText());
-            return changedColumnTypes;
-        }
-
-        public List<String> getColumnTypes() {
-            return Collections.unmodifiableList(this.columnTypes);
-        }
-
-        public String getCsvFileToUpload() {
-            return ResourceUtils.getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + this.getFileName());
-        }
-
-        public long getDataRowCount() {
-            return dataRowCount;
         }
     }
 }
