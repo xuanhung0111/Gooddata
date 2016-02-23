@@ -75,39 +75,6 @@ public class ProjectSwitchTest  extends DashboardWithWidgetsTest {
         assertEquals(indigoDashboardsPage.getCurrentProjectName(), projectTitle);
     }
 
-    @Test(dependsOnGroups = {"switchProject"}, groups = {"desktop", "mobile"})
-    public void checkLastVisitedProject() throws JSONException {
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), newProjectId,
-                ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
-
-        initIndigoDashboardsPageWithWidgets()
-                .switchProject(NEW_PROJECT_NAME)
-                .getSplashScreen();
-
-        logout();
-        signIn(false, UserRoles.ADMIN);
-
-        takeScreenshot(browser, "Last visited project is updated with project: " + NEW_PROJECT_NAME, getClass());
-        assertThat(browser.getCurrentUrl(), containsString(newProjectId));
-
-        testParams.setProjectId(newProjectId);
-        try {
-            initProjectsAndUsersPage();
-
-            projectAndUsersPage.deteleProject();
-            waitForProjectsPageLoaded(browser);
-
-        } finally {
-            testParams.setProjectId(currentProjectId);
-        }
-
-        initIndigoDashboardsPageWithWidgets();
-
-        takeScreenshot(browser,
-                "User is directed to Kpi Dashboard correctly after deleting another project", getClass());
-        assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
-    }
-
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void switchProjectWithEmbededDashboardUser() throws ParseException, IOException, JSONException {
         String embededDashboardUser = testParams.getEditorUser();
