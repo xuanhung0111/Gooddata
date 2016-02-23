@@ -479,6 +479,83 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         }
     }
 
+    @DataProvider(name = "likeProvider")
+    public Object[][] likeProvider() {
+        return new Object[][] {
+            {MetricTypes.LIKE, "%m%", asList(
+                    asList("Email", "33920"))},
+            {MetricTypes.NOT_LIKE, "%m%", asList(
+                    asList("In Person Meeting", "35975"),
+                    asList("Phone Call", "50780"),
+                    asList("Web Meeting", "33596"))},
+            {MetricTypes.ILIKE, "%M%", asList(
+                    asList("Email", "33920"),
+                    asList("In Person Meeting", "35975"),
+                    asList("Web Meeting", "33596"))},
+            {MetricTypes.NOT_ILIKE, "%M%", asList(
+                    asList("Phone Call", "50780"))}
+        };
+    }
+
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"}, dataProvider = "likeProvider")
+    public void testLikeFunctions(MetricTypes metricType, String pattern, List<List<String>> expectedResult) 
+            throws IOException {
+        Metric metricObj = mdService.getObj(project, Metric.class, Restriction.title("# of Activities"));
+        Attribute attrObj = mdService.getObj(project, Attribute.class, Restriction.title("Activity Type"));
+        String metric = createLikeMetric(metricType, attrObj, metricObj, pattern);
+        UiReportDefinition rd = new UiReportDefinition().withName("Report for " + metricType.getLabel())
+                .withHows("Activity Type")
+                .withWhats(metric);
+        createReport(rd, rd.getName());
+        openReport(rd.getName());
+
+        List<List<String>> actualResult = new ArrayList<>();
+        try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
+                reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
+            reader.getHeader(true);
+            List<String> reportResult;
+            while ((reportResult = reader.read()) != null) {
+                actualResult.add(reportResult);
+            }
+        }
+        assertEquals(actualResult, expectedResult);
+    }
+
+    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
+    public void testLikeFunctionWithVariousPattern() throws IOException {
+        List<List<String>> expectedResult = asList(asList("Explorer", "1465", "1465", "1465", null));
+        String reportName = "LIKE_OPERATOR_with_various_pattern";
+        Metric metricObj = mdService.getObj(project, Metric.class, Restriction.title("# of Opportunities"));
+        Attribute attrObj = mdService.getObj(project, Attribute.class, Restriction.title("Product"));
+
+        String metricWithFullStringPattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Explorer");
+        String metricWithPercentSignPattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "%lorer");
+        //one underscore presents for one character, so if two characters are missing, it requires two underscores
+        String metricWithUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Expl__er");
+        String metricWithWrongUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, 
+                "Expl_r");
+
+        UiReportDefinition rd = new UiReportDefinition().withName(reportName)
+                .withHows("Product")
+                .withWhats(metricWithFullStringPattern)
+                .withWhats(metricWithPercentSignPattern)
+                .withWhats(metricWithUnderscorePattern)
+                .withWhats(metricWithWrongUnderscorePattern);
+        createReport(rd, rd.getName());
+        openReport(reportName);
+
+        List<List<String>> actualResult = new ArrayList<>();
+        try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
+                reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
+            reader.getHeader(true);
+            List<String> reportResult;
+            while ((reportResult = reader.read()) != null) {
+                actualResult.add(reportResult);
+            }
+        }
+        assertEquals(actualResult, expectedResult);
+    }
+
     @DataProvider(name = "greatestLeastProvider")
     public Object[][] greatestLeastProvider() {
         return new Object[][] {
@@ -530,11 +607,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         metrics.stream().forEach(metric -> rd.withWhats(metric));
         greatestLeastMetrics.stream().forEach(metric -> rd.withWhats(metric));
         createReport(rd, rd.getName());
-
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded(browser);
-
+        openReport(reportName);
+        
         List<List<String>> actualResult = new ArrayList<>();
         try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
                 reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
@@ -830,6 +904,17 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
 
         assertTrue(metricPage.isMetricCreatedSuccessfully(customMetricInfo.getName(), expectedMaql,
                 DEFAULT_METRIC_NUMBER_FORMAT));
+    }
+
+    private String createLikeMetric(MetricTypes metricLikeType, Attribute attrObj, Metric metricObj , String pattern){
+        String metricMaql = metricLikeType.getMaql()
+                .replace("__metric__", format("[%s]", metricObj.getUri()))
+                .replace("__attr__", format("[%s]", attrObj.getDisplayForms().iterator().next().getUri()))
+                .replace("__like.pattern__", pattern);
+        log.info(metricMaql);
+        String likeMetricName = metricLikeType.getLabel() + System.currentTimeMillis(); 
+        mdService.createObj(project, new Metric(likeMetricName, metricMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+        return likeMetricName;
     }
 
     private List<String> createGreatestAndLeastMetric(String attribute, List<String> metrics) {
