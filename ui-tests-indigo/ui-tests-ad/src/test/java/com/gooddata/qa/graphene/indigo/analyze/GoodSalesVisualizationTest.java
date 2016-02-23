@@ -20,10 +20,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.http.ParseException;
@@ -64,67 +62,9 @@ public class GoodSalesVisualizationTest extends AnalyticalDesignerAbstractTest {
     private Project project;
     private MetadataService mdService;
 
-    @SuppressWarnings("serial")
-    private static final Map<String, String> walkmeContents = new HashMap<String, String>() {{
-        put("Welcome to the Analytical Designer", "This interactive environment allows you to explore your data "
-                + "and create visualizations quickly and easily. Intelligent on-screen recommendations help you "
-                + "discover new and surprising insights. Let's get started!");
-
-        put("Begin by exploring your data", "Measures represent quantitative data (values).\n\n"
-                + "Attributes represent qualitative data (categories).\n\n"
-                + "Date is a special item which represents all the dates in your project.");
-
-        put("Create a new visualization", "Drag data from the list onto the canvas and watch as your "
-                + "visualization takes shape!");
-
-        put("Remove data", "Drag data items from these zones back to the list to remove them from your "
-                + "visualization.");
-
-        put("Change visualization type", "Choose how to visualize your data.");
-
-        put("Filter your visualization", "Drag the Date field or any attribute here.");
-
-        put("Save your visualization as a report", "When you are ready, open your visualization in the "
-                + "Report Editor. From there you can save it and add it to a dashboard.");
-
-        put("Clear your canvas", "Restart your exploration at any time.");
-
-        put("You're ready.", "Go ahead. Start discovering what insights await in your data!");
-    }};
-
     @BeforeClass(alwaysRun = true)
     public void initialize() {
         projectTitle = "Indigo-GoodSales-Demo-Visualization-Test";
-    }
-
-    @Test(dependsOnGroups = {"setupProject"}, groups = {"turnOfWalkme"}, priority = 0)
-    public void testWalkme() {
-        initAnalysePage();
-
-        final By title = By.className("walkme-custom-balloon-title");
-        final By content = By.className("walkme-custom-balloon-content");
-        final By nextBtn = By.className("walkme-action-next");
-        final By backBtn = By.className("walkme-action-back");
-        final By doneBtn = By.className("walkme-action-done");
-
-        waitForElementVisible(title, browser);
-        while (true) {
-            assertEquals(waitForElementVisible(content, browser).getText(),
-                    walkmeContents.get(waitForElementVisible(title, browser).getText()));
-
-            waitForElementVisible(nextBtn, browser).click();
-
-            if (!browser.findElements(doneBtn).isEmpty()) {
-                break;
-            }
-
-            waitForElementVisible(backBtn, browser).click();
-            assertEquals(waitForElementVisible(content, browser).getText(),
-                    walkmeContents.get(waitForElementVisible(title, browser).getText()));
-            waitForElementVisible(nextBtn, browser).click();
-        }
-        waitForElementVisible(doneBtn, browser).click();
-        isWalkmeTurnOff = true;
     }
 
     @Test(dependsOnGroups = {"init"})
