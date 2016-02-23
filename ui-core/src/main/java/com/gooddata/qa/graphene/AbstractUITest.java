@@ -21,6 +21,7 @@ import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.util.List;
@@ -43,6 +44,7 @@ import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -505,6 +507,15 @@ public class AbstractUITest extends AbstractGreyPageTest {
         Predicate<WebDriver> datasetsCountEqualsExpected = input ->
             waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCountBeforeUpload + 1;
         Graphene.waitGui(browser).until(datasetsCountEqualsExpected);
+        
+        waitForElementNotPresent(By.cssSelector(".item-in-progress"));
+        DatasetMessageBar csvDatasetMessageBar = Graphene.createPageFragment(DatasetMessageBar.class, 
+                waitForElementVisible(By.className("gd-messages"), browser));
+        if (datasetsListPage.getMyDatasetsCount() == datasetCountBeforeUpload + 1) {
+            log.info("Upload succeeds with message: " + csvDatasetMessageBar.waitForSuccessMessageBar().getText());
+        } else {
+            fail("Upload failed with error message: " + csvDatasetMessageBar.waitForErrorMessageBar().getText());
+        }
     }
 
     private void waitForDashboardPage() {
