@@ -11,7 +11,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -44,16 +43,10 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
         projectTitle = "Indigo-Filter-Catalog-Whole-Project-Test";
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"setupProject"})
-    public void setupProductionData() throws JSONException, URISyntaxException, IOException {
-        postMAQL(getResourceAsString(MAQL_PATH), DEFAULT_PROJECT_CHECK_LIMIT);
-        setupData(QUOTES_CSV_PATH, UPLOAD_INFO_PATH);
-    }
-
-    @Test(dependsOnMethods = {"setupProductionData"}, groups = {"setupProject"})
-    public void uploadPayrollDataset() {
-        uploadCSV(getFilePathFromResource(PAYROLL_CSV_PATH));
-        takeScreenshot(browser, "uploaded-payroll", getClass());
+    @Override
+    public void prepareSetupProject() throws JSONException, URISyntaxException, IOException {
+        setupProductionData();
+        uploadPayrollDataset();
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -113,5 +106,15 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
         takeScreenshot(browser, "searchDataAfterSelectDataset - search in payroll data", getClass());
         assertTrue(cataloguePanel.search("County"));
         assertFalse(cataloguePanel.search("Id"));
+    }
+
+    private void setupProductionData() throws JSONException, URISyntaxException, IOException {
+        postMAQL(getResourceAsString(MAQL_PATH), DEFAULT_PROJECT_CHECK_LIMIT);
+        setupData(QUOTES_CSV_PATH, UPLOAD_INFO_PATH);
+    }
+
+    private void uploadPayrollDataset() {
+        uploadCSV(getFilePathFromResource(PAYROLL_CSV_PATH));
+        takeScreenshot(browser, "uploaded-payroll", getClass());
     }
 }
