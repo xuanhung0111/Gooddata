@@ -31,6 +31,7 @@ public class AllTestsRegistry {
                 .register("testng-desktop-ResponsiveNavigation.xml")
                 .register("testng-desktop-KpiPopChangeValueExceedLimit.xml")
                 .register("testng-desktop-permissions-MetricsAccessibility.xml")
+                .register("testng-desktop-ProjectSwitch.xml")
                 .register("testng-mobile-AttributeFiltering.xml")
                 .register("testng-mobile-DateFiltering.xml")
                 .register("testng-mobile-EditMode.xml")
@@ -40,8 +41,7 @@ public class AllTestsRegistry {
                 .register("testng-mobile-ResponsiveNavigation.xml")
                 .register("testng-mobile-SplashScreen.xml")
                 .register("testng-mobile-KpiPopChangeValueExceedLimit.xml")
-//                .register("testng-desktop-permissions-ProjectSwitch.xml")
-//                .register("testng-mobile-ProjectSwitch.xml")
+                .register("testng-mobile-ProjectSwitch.xml")
                 .toTextFile();
     }
 }
