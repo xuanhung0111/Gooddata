@@ -27,6 +27,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = Kpi.KPI_CSS_SELECTOR)
     private List<Kpi> kpis;
 
+    @FindBy(css = Visualization.MAIN_SELECTOR)
+    private List<Visualization> visualizations;
+
     @FindBy(className = "splashscreen")
     private SplashScreen splashScreen;
 
@@ -132,6 +135,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public int getKpisCount() {
         return kpis.size();
+    }
+
+    public int getVisualizationsCount() {
+        return visualizations.size();
     }
 
     public Kpi selectKpi(int index) {
