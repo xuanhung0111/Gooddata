@@ -37,7 +37,7 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
 
     /* A hook for setup test project */
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
-    public void prepareSetupProject() throws Throwable{
+    public void prepareSetupProject() throws Throwable {
     }
 
     protected void checkingOpenAsReport(String screenShot) {
