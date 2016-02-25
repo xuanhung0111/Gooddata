@@ -70,7 +70,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
             "<li>Go to the <a href=\"%s\">schedule page</a></li>";
     protected static final String NOTIFICATION_SUPPORT_MESSAGE =
             "<p>If you require assistance with troubleshooting data uploading, please visit the "
-                    + "<a href=\"http://support.gooddata.com/entries/23541617-Automatic-Disabling-of-Failed-Schedules\">GoodData Support Portal</a>.</p>";
+                    + "<a href=\"https://help.gooddata.com/display/doc/Troubleshooting+Failed+Schedules\">GoodData Support Portal</a>.</p>";
     protected static final String NOTIFICATION_RULES_EMPTY_STATE_MESSAGE =
             "No event (eg. schedule start, finish, fail, etc.) will trigger a notification email.";
 
