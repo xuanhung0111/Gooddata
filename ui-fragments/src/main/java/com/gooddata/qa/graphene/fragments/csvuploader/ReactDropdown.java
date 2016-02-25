@@ -55,9 +55,7 @@ public class ReactDropdown extends AbstractFragment {
 
     public Collection<String> getTypeValues() {
         ensureTypeDropdownOpen();
-
-        String itemSelector = dropdownSelector + " .gd-list-item:not(.is-header)";
-        return getElementTexts(cssSelector(itemSelector), browser);
+        return getElementTexts(getItemSelector(), browser);
     }
 
     public ReactDropdown selectFormatByValue(final String value) {
@@ -71,9 +69,18 @@ public class ReactDropdown extends AbstractFragment {
 
     public Collection<String> getFormatValues() {
         ensureFormatDropdownOpen();
+        return getElementTexts(getItemSelector(), browser);
+    }
 
-        String itemSelector = dropdownSelector + " .gd-list-item:not(.is-header)";
-        return getElementTexts(cssSelector(itemSelector), browser);
+    public WebElement getItemElement(final String itemType) {
+        ensureTypeDropdownOpen();
+
+        return browser
+                .findElements(getItemSelector())
+                .stream()
+                .filter(e -> e.findElement(By.className("type-name")).getText().contains(itemType))
+                .findFirst()
+                .get();
     }
 
     private boolean isFormatDropdownOpen() {
@@ -122,5 +129,9 @@ public class ReactDropdown extends AbstractFragment {
                 .get()
                 .click();
         return this;
+    }
+
+    private By getItemSelector() {
+        return cssSelector(dropdownSelector + " .gd-list-item:not(.is-header)");
     }
 }

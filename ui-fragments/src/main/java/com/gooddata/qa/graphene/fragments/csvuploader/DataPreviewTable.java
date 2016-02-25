@@ -145,6 +145,13 @@ public class DataPreviewTable extends FixedDataTable {
         return getColumns(getHeaderRow());
     }
 
+    public ReactDropdown getColumnTypeDropdown(final ColumnType columnType) {
+        return columnTypes.stream()
+                .filter(e -> e.getTypeSelection().contains(columnType.getVisibleText()))
+                .findFirst()
+                .get();
+    }
+
     private boolean isErrorInput(WebElement input) {
         return input.getAttribute("class").contains("is-error");
     }
