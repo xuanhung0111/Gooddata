@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.csvuploader;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
+import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,6 +18,7 @@ import org.json.JSONException;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
+import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public class RefreshTest extends HappyUploadTest {
@@ -62,7 +64,8 @@ public class RefreshTest extends HappyUploadTest {
         datasetsListPage.getMyDatasetsTable()
                 .getDatasetRefreshButton(PAYROLL.getDatasetNameOfFirstUpload()).click();
 
-        final CsvFile payrollRefreshBadFile = new CsvFile("payroll.refresh.bad");
+        final CsvFile payrollRefreshBadFile = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.refresh.bad.csv"));
         doUploadFromDialog(payrollRefreshBadFile);
 
         List<String> backendValidationErrors =

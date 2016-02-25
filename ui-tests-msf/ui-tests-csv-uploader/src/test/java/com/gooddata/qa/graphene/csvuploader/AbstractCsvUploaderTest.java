@@ -54,10 +54,18 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
      * Successful load contains information about number of rows and columns,
      * so status message of such load should match the following regular expression.
      */
-    protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = ".*rows.*data\\s+fields.*";
+    protected static final String SUCCESSFUL_STATUS_MESSAGE_REGEX = "\\d+ row[s]?, \\d+ data field[s]?";
 
-    protected static final CsvFile PAYROLL = new CsvFile("payroll");
-    protected static final CsvFile PAYROLL_REFRESH = new CsvFile("payroll.refresh");
+    protected static final String[] PAYROLL_COLUMN_TYPES = {"Attribute", "Attribute", "Attribute", "Attribute",
+        "Attribute", "Attribute", "Attribute", "Date (Year-Month-Day)", "Measure"};
+
+    protected static final CsvFile PAYROLL = CsvFile.loadFile(
+            getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.csv"))
+            .setColumnTypes(PAYROLL_COLUMN_TYPES);
+
+    protected static final CsvFile PAYROLL_REFRESH = CsvFile.loadFile(
+            getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.refresh.csv"))
+            .setColumnTypes(PAYROLL_COLUMN_TYPES);
 
     protected List<UploadHistory> uploadHistory = Lists.newArrayList();
 
@@ -182,7 +190,7 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
 
     protected void doUploadFromDialog(CsvFile csvFile) {
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "initial-state", csvFile.getFileName()), getClass());
-        waitForFragmentVisible(fileUploadDialog).pickCsvFile(getCsvFilePathFromResource(csvFile));
+        waitForFragmentVisible(fileUploadDialog).pickCsvFile(csvFile.getFilePath());
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "csv-file-picked", csvFile.getFileName()), getClass());
         fileUploadDialog.clickUploadButton();
         takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "upload-in-progress", csvFile.getFileName()), getClass());
@@ -202,10 +210,6 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
             assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     format(SUCCESSFUL_DATA_MESSAGE, datasetName));
         }
-    }
-
-    protected String getCsvFilePathFromResource(CsvFile csvFile) {
-        return getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + csvFile.getFileName());
     }
 
     public class UploadHistory {
