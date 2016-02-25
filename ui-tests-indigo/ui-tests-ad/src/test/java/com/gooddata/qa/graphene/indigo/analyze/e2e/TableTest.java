@@ -34,8 +34,8 @@ public class TableTest extends AbstractAdE2ETest {
         projectTitle = "Table-E2E-Test";
     }
 
-    @Test(dependsOnGroups = {"turnOffWalkme"}, groups = {"init"})
-    public void createEmptyMetric() {
+    @Override
+    public void prepareSetupProject() {
         Metric metric;
 
         if (testParams.isReuseProject()) {
