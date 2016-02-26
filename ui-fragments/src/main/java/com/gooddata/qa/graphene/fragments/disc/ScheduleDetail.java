@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.fragments.disc;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -867,12 +868,20 @@ public class ScheduleDetail extends ScheduleForm {
                 .isDisplayed();
     }
 
-    public WebElement getOkExecutionIcon(WebElement execution) {
-        return waitForElementVisible(BY_OK_STATUS_ICON, execution.findElement(BY_EXECUTION_STATUS));
+    public boolean isOkExecutionIconDisplayed(WebElement execution) {
+        if (!isElementPresent(BY_OK_STATUS_ICON, execution.findElement(BY_EXECUTION_STATUS))) {
+            return false;
+        }
+
+        return getOkExecutionIcon(execution).isDisplayed();
     }
 
     public boolean isLastExecutionLogLinkEnabled() {
         return waitForElementVisible(BY_EXECUTION_LOG, getLastExecution()).isEnabled();
+    }
+
+    private WebElement getOkExecutionIcon(WebElement execution) {
+        return waitForElementPresent(BY_OK_STATUS_ICON, execution.findElement(BY_EXECUTION_STATUS));
     }
 
     private void waitForExecutionHistoryLoading() {
