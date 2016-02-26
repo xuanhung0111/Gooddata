@@ -30,6 +30,7 @@ public class AllTestsRegistry {
                 .register("testng-desktop-MetricFormatting.xml")
                 .register("testng-desktop-ResponsiveNavigation.xml")
                 .register("testng-desktop-KpiPopChangeValueExceedLimit.xml")
+                .register("testng-desktop-permissions-MetricsAccessibility.xml")
                 .register("testng-mobile-AttributeFiltering.xml")
                 .register("testng-mobile-DateFiltering.xml")
                 .register("testng-mobile-EditMode.xml")
