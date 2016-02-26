@@ -72,6 +72,11 @@ public enum MetricTypes {
     GREATEST("SELECT GREATEST (__metric__, __metric__, __metric__) BY __attr__", "Filters-SDK"),
     LEAST("SELECT LEAST (__metric__, __metric__, __metric__) BY __attr__", "Filters-SDK"),
 
+    LIKE("SELECT __metric__ WHERE __attr__ LIKE \"__like.pattern__\"", "Filters-SDK"),
+    NOT_LIKE("SELECT __metric__ WHERE __attr__ NOT LIKE \"__like.pattern__\"", "Filters-SDK"),
+    ILIKE("SELECT __metric__ WHERE __attr__ ILIKE \"__like.pattern__\"", "Filters-SDK"),
+    NOT_ILIKE("SELECT __metric__ WHERE __attr__ NOT ILIKE \"__like.pattern__\"", "Filters-SDK"),
+
     // Logical
     AND("SELECT __metric__ WHERE __attr__ = __attrValue__ AND __attr__ = __attrValue__", "Logical"),
     OR("SELECT __metric__ WHERE __attr__ = __attrValue__ OR __attr__ = __attrValue__", "Logical"),
