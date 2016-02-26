@@ -340,7 +340,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     }
 
     private void assertOkExecutionGroupInfo(WebElement okExecutionGroup, String groupDescription) {
-        assertTrue(scheduleDetail.getOkExecutionIcon(okExecutionGroup).isDisplayed(),
+        assertTrue(scheduleDetail.isOkExecutionIconDisplayed(okExecutionGroup),
                 "OK icon is not shown for OK execution group!");
         assertThat(scheduleDetail.getExecutionDescription(okExecutionGroup).getText(),
                 containsString(groupDescription));
@@ -364,7 +364,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
     private void assertExecutionItemsInfo(int okGroupIndex, int okExecutionNumber, String groupDescription) {
         WebElement scheduleExecutionItem = scheduleDetail.getExecutionItem(okGroupIndex);
         WebElement executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
-        assertTrue(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
+        assertTrue(scheduleDetail.isOkExecutionIconDisplayed(scheduleExecutionItem),
                 "OK icon is not shown for OK execution group!");
         System.out.println("Execution description at " + okGroupIndex + " index: " + executionDescription.getText());
         assertThat(executionDescription.getText(), containsString(groupDescription));
@@ -382,7 +382,7 @@ public abstract class AbstractDISCTest extends AbstractMSFTest {
             WebElement executionDate = scheduleDetail.getExecutionDate(scheduleExecutionItem);
             executionDescription = scheduleDetail.getExecutionDescription(scheduleExecutionItem);
 
-            assertFalse(scheduleDetail.getOkExecutionIcon(scheduleExecutionItem).isDisplayed(),
+            assertFalse(scheduleDetail.isOkExecutionIconDisplayed(scheduleExecutionItem),
                     "OK icon is shown for executions in group!");
             System.out.println("Execution description at " + i + " index: " + executionDescription.getText());
             assertTrue(executionDescription.isDisplayed(), "Execution description is not shown!");
