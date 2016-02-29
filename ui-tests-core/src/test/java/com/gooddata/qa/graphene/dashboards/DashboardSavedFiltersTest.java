@@ -395,7 +395,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
     @Test(dependsOnMethods = {"savedViewFilterDoNotApplyOnFiltersAfterRemovingTest"})
     public void dashboardHasManyFiltersInManyTabsTest() {
         initDashboardsPage();
-        dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
+        dashboardsPage.selectDashboard(SECOND_DASHBOARD_NAME);
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         dashboardsPage.addNewTab("second tab");
