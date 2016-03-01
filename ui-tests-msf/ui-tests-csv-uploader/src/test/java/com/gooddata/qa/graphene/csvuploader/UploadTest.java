@@ -129,8 +129,9 @@ public class UploadTest extends AbstractCsvUploaderTest {
         assertEquals(datasetsListPage.getDatasetAnalyzeLink(datasetName), adReportLink);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
-        assertEquals(waitForFragmentVisible(csvDatasetDetailPage).getDatasetAnalyzeLink(), adReportLink);
+        assertEquals(waitForFragmentVisible(datasetsListPage)
+                .openDatasetDetailPage(datasetName)
+                .getDatasetAnalyzeLink(), adReportLink);
         takeScreenshot(browser, toScreenshotName(DATASET_DETAIL_PAGE_NAME, datasetName), getClass());
     }
 
@@ -208,8 +209,7 @@ public class UploadTest extends AbstractCsvUploaderTest {
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         datasetNames.add(datasetName);
 
-        datasetsListPage.clickDatasetDetailButton(datasetName);
-        waitForFragmentVisible(csvDatasetDetailPage);
+        datasetsListPage.openDatasetDetailPage(datasetName);
         checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
     }
 

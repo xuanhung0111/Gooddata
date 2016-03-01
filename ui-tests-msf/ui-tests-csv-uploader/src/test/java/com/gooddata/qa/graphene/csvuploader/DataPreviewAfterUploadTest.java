@@ -94,7 +94,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, columnNames, NO_HEADER.getColumnTypes());
 
@@ -117,7 +117,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, DATA_PAGE_NAME + "-dataset-uploaded-" + datasetName, getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, PAYROLL.getColumnNames(), PAYROLL.getColumnTypes());
 
@@ -151,7 +151,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "-changed-type-dataset-uploaded-", datasetName),
                 getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, PAYROLL.getColumnNames(), changedTypes);
 
@@ -197,7 +197,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "changed-type-dataset-uploaded", datasetName),
                 getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, fileToUpload.getColumnNames(), fileToUpload.getColumnTypes());
     }
@@ -253,12 +253,15 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         int numberOfRows = PAYROLL_FILE_DEFAULT_ROW_COUNT - 3; // All rows above header shouldn't be added
         String expectedDatasetStatus =
                 String.format("%s rows, %s data fields", numberOfRows, String.valueOf(PAYROLL_FILE_DEFAULT_COLUMN_COUNT));
-        assertTrue(waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetStatus(datasetName)
+        assertTrue(waitForFragmentVisible(datasetsListPage)
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .getStatus()
                 .equals(expectedDatasetStatus), "Incorrect row/colum number!");
 
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, customHeaderColumns, PAYROLL.getColumnTypes());
     }
@@ -303,7 +306,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, PAYROLL.getColumnNames(), PAYROLL.getColumnTypes());
     }
@@ -353,7 +356,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "dataset-uploaded", datasetName), getClass());
 
-        waitForFragmentVisible(datasetsListPage).clickDatasetDetailButton(datasetName);
+        waitForFragmentVisible(datasetsListPage).openDatasetDetailPage(datasetName);
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
         checkCsvDatasetDetail(datasetName, customHeaderColumns, NO_HEADER.getColumnTypes());
     }

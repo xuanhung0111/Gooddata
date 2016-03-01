@@ -57,6 +57,6 @@ public class DatasetDetailTest extends HappyUploadTest {
 
     private void openDatasetDetailsPage() {
         initDataUploadPage();
-        datasetsListPage.clickDatasetDetailButton(PAYROLL_DATASET_NAME);
+        datasetsListPage.openDatasetDetailPage(PAYROLL_DATASET_NAME);
     }
 }

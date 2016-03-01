@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static java.lang.String.format;
@@ -82,9 +81,12 @@ public class NotificationTest extends AbstractCsvUploaderTest {
         initDataUploadPage();
 
         String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
-        datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
 
-        waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
+        datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .openDetailPage()
+                .clickRefreshButton();
 
         refreshCsv(PAYROLL_REFRESH, datasetName, true);
         takeScreenshot(browser,

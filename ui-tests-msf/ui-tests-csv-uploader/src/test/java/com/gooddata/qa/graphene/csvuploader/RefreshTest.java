@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 
 public class RefreshTest extends HappyUploadTest {
 
@@ -27,7 +28,10 @@ public class RefreshTest extends HappyUploadTest {
     public void checkCsvRefreshFromList() {
         initDataUploadPage();
         String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
-        datasetsListPage.getMyDatasetsTable().getDatasetRefreshButton(datasetName).click();
+        datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .clickUpdateButton();
 
         refreshCsv(PAYROLL_REFRESH, datasetName, true);
         waitForDatasetStatus(PAYROLL.getDatasetNameOfFirstUpload(), SUCCESSFUL_STATUS_MESSAGE_REGEX);
@@ -37,9 +41,12 @@ public class RefreshTest extends HappyUploadTest {
     public void checkCsvRefreshFromDetail() {
         initDataUploadPage();
         String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
-        datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
+        datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .openDetailPage()
+                .clickRefreshButton();
 
-        waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
         refreshCsv(PAYROLL_REFRESH, datasetName, true);
         waitForFragmentVisible(csvDatasetDetailPage);
     }
@@ -49,7 +56,11 @@ public class RefreshTest extends HappyUploadTest {
         initDataUploadPage();
         String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
 
-        waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetRefreshButton(datasetName).click();
+        waitForFragmentVisible(datasetsListPage)
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .clickUpdateButton();
+
         doUploadFromDialog(PAYROLL_REFRESH);
         waitForFragmentVisible(dataPreviewPage);
         assertTrue(dataPreviewPage.isSetHeaderButtonHidden());
@@ -61,8 +72,10 @@ public class RefreshTest extends HappyUploadTest {
     public void checkCsvRefreshWithIncorrectMetadata() {
         initDataUploadPage();
 
-        datasetsListPage.getMyDatasetsTable()
-                .getDatasetRefreshButton(PAYROLL.getDatasetNameOfFirstUpload()).click();
+        datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(PAYROLL.getDatasetNameOfFirstUpload())
+                .clickUpdateButton();
 
         final CsvFile payrollRefreshBadFile = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.refresh.bad.csv"));
@@ -82,14 +95,19 @@ public class RefreshTest extends HappyUploadTest {
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCancelCsvRefresh() {
         initDataUploadPage();
-        datasetsListPage.getMyDatasetsTable()
-                .getDatasetRefreshButton(PAYROLL.getDatasetNameOfFirstUpload()).click();
+
+        Dataset dataset = datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(PAYROLL.getDatasetNameOfFirstUpload());
+
+        dataset.clickUpdateButton();
+
         doUploadFromDialog(PAYROLL_REFRESH);
         waitForFragmentVisible(dataPreviewPage).cancelTriggerIntegration();
         waitForFragmentVisible(datasetsListPage);
-        datasetsListPage.getMyDatasetsTable()
-                .getDatasetDetailButton(PAYROLL.getDatasetNameOfFirstUpload()).click();
-        waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
+
+        waitForFragmentVisible(dataset).openDetailPage().clickRefreshButton();
+
         doUploadFromDialog(PAYROLL_REFRESH);
         waitForFragmentVisible(dataPreviewPage).cancelTriggerIntegration();
         waitForFragmentVisible(csvDatasetDetailPage);
@@ -109,14 +127,18 @@ public class RefreshTest extends HappyUploadTest {
             signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
 
             initDataUploadPage();
-            datasetsListPage.getOthersDatasetsTable().getDatasetRefreshButton(datasetName).click();
+
+            Dataset dataset = datasetsListPage.getOthersDatasetsTable().getDataset(datasetName);
+
+            dataset.clickUpdateButton();
             refreshCsv(PAYROLL_REFRESH, datasetName, false);
 
             assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
                     format(SUCCESSFUL_DATA_MESSAGE, datasetName));
-            datasetsListPage.getOthersDatasetsTable().getDatasetDetailButton(datasetName).click();
-            waitForFragmentVisible(csvDatasetDetailPage).clickRefreshButton();
+
+            dataset.openDetailPage().clickRefreshButton();
             refreshCsv(PAYROLL_REFRESH, datasetName, false);
+
         } finally {
             logout();
             signInAtGreyPages(testParams.getUser(), testParams.getPassword());
