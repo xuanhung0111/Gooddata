@@ -6,6 +6,7 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertFalse;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -92,10 +93,17 @@ public final class UserManagementRestUtils {
      * @param restApiClient
      * @param username
      * @param password
-     * @return new user uri
+     * @return new user uri or return existing uri if this user does exist in the system
      */
     public static String createUser(final RestApiClient restApiClient, final String username,
             final String password) throws ParseException, JSONException, IOException {
+        Optional<JSONObject> userProfile = Optional.ofNullable(getUserProfileByEmail(restApiClient, username));
+        if (userProfile.isPresent()) {
+            log.info("the user " + username + " does exist in the server already. "
+                    + "Please check deletion process to avoid this case");
+            return userProfile.get().getJSONObject("links").getString("self");
+        }
+
         final String contentBody = CREATE_USER_CONTENT_BODY.get()
                 .replace("${userEmail}", username)
                 .replace("${userPassword}", password);
