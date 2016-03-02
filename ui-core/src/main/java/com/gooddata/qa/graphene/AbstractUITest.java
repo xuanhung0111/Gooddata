@@ -597,9 +597,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForProjectPageLoaded(browser);
     }
 
-    public void initUserManagementPage() {
+    public UserManagementPage initUserManagementPage() {
         openUrl(PAGE_USER_MANAGEMENT);
-        waitForFragmentVisible(userManagementPage);
+        return waitForFragmentVisible(userManagementPage);
     }
 
     public void initUngroupedUsersPage() {
