@@ -301,6 +301,14 @@ public class UserManagementPage extends AbstractFragment {
         return this;
     }
 
+    public UserManagementPage selectAllUserEmails() {
+        waitForFragmentVisible(usersTable);
+        if (!waitForElementVisible(checkAllUserEmailCheckbox).isSelected()) {
+            checkAllUserEmailCheckbox.click();
+        }
+        return this;
+    }
+
     private UserManagementPage changeGroupOfUsers(boolean isSelect, String group, String... emails) {
         // Deselect all selected users of current page first
         deselectAllUserEmails();
@@ -311,12 +319,6 @@ public class UserManagementPage extends AbstractFragment {
         waitForElementVisible(changeGroupApplyButton).click();
         waitForElementVisible(BY_MESSAGE_TEXT, browser);
         return this;
-    }
-
-    private void selectAllUserEmails() {
-        if (!waitForElementVisible(checkAllUserEmailCheckbox).isSelected()) {
-            checkAllUserEmailCheckbox.click();
-        }
     }
 
     private void deselectAllUserEmails() {
