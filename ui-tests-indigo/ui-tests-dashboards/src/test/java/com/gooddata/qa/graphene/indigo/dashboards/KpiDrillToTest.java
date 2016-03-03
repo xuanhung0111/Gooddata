@@ -282,7 +282,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
             try {
                 initDashboardsPage();
-                assertTrue(dashboardsPage.selectDashboard(newDashboard));
+                dashboardsPage.selectDashboard(newDashboard);
                 dashboardsPage.editDashboard();
                 dashboardsPage.getDashboardEditBar().tryToDeleteDashboard();
 

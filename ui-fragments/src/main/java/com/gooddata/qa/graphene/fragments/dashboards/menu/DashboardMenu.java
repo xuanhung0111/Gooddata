@@ -1,18 +1,16 @@
 package com.gooddata.qa.graphene.fragments.dashboards.menu;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.gooddata.qa.graphene.fragments.common.SimpleMenu;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 public class DashboardMenu extends SimpleMenu {
 
@@ -26,44 +24,37 @@ public class DashboardMenu extends SimpleMenu {
 
     public Collection<String> getAllItemNames() {
         waitForAllItemsVisible();
-        return Lists.newArrayList(Iterables.transform(Iterables.skip(items, 1), new Function<WebElement, String>() {
-            @Override 
-            public String apply(WebElement elem) {
-                return elem.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title");
-            }
-        }));
+
+        return items.stream()
+            .skip(1)
+            .map(e -> e.findElement(BY_DASHBOARD_SELECTOR_TITLE))
+            .map(e -> e.getAttribute("title"))
+            .collect(toList());
     }
 
-    public boolean selectDashboardByIndex(final int index) {
-        return selectDashboardByPredicate(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement e) {
-                return Integer.valueOf(e.getAttribute("gdc:index")) == index;
-            }
-        });
+    public void selectDashboardByIndex(final int index) {
+        final Predicate<WebElement> indexPredicate =
+                e -> Integer.valueOf(e.getAttribute("gdc:index")) == index;
+        selectDashboardByPredicate(indexPredicate);
     }
 
-    public boolean selectDashboardByName(final String name) {
-        return selectDashboardByPredicate(new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement e) {
-                return name.equals(e.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title"));
-            }
-        });
+    public void selectDashboardByName(final String name) {
+        final Predicate<WebElement> namePredicate =
+                e -> name.equals(e.findElement(BY_DASHBOARD_SELECTOR_TITLE).getAttribute("title"));
+        selectDashboardByPredicate(namePredicate);
     }
 
-    private boolean selectDashboardByPredicate(Predicate<WebElement> predicate) {
+    private void selectDashboardByPredicate(final Predicate<WebElement> predicate) {
         waitForAllItemsVisible();
-        WebElement dashboard = Iterables.find(items, predicate, null);
 
-        if (dashboard == null) {
-            System.out.println("Dashboard not selected because it's not present!!!!");
-            return false;
-        }
+        items.stream()
+            .filter(predicate)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Dashboard not selected because it's not present!!!!"))
+            .findElement(BY_LINK)
+            .click();
 
-        dashboard.findElement(BY_LINK).click();
         sleepTightInSeconds(3);
         waitForDashboardPageLoaded(browser);
-        return true;
     }
 }
