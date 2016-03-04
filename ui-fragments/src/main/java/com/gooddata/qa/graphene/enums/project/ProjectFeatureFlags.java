@@ -11,6 +11,7 @@ public enum ProjectFeatureFlags {
     ENABLE_CSV_UPLOADER("enableCsvUploader"),
     ENABLE_ATTRIBUTE_FILTERS("enableAttributeFilters"),
     ENABLE_ANALYTICAL_DASHBOARDS("enableAnalyticalDashboards"),
+    ENABLE_ANALYTICAL_DASHBOARDS_VISUALIZATIONS("enableAnalyticalDashboardsVisualizations"),
     DISABLE_SAVED_FILTERS("disableSavedFilters");
 
     private final String featureFlag;

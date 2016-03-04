@@ -63,6 +63,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
     @FindBy(css = ".dash-filters-attribute.are-loaded")
     private AttributeFiltersPanel attributeFiltersPanel;
 
+    @FindBy(className = "visualizations-list")
+    private VisualizationsList visualizationsList;
+
     private static final String EDIT_BUTTON_CLASS_NAME = "s-edit_button";
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
@@ -162,6 +165,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return getKpiByIndex(kpis.size() - 1);
     }
 
+    public Visualization getLastVisualization() {
+        return getVisualizationByIndex(visualizations.size() - 1);
+    }
+
     public IndigoDashboardsPage clickLastKpiDeleteButton() {
         selectLastKpi().clickKpiDeleteButton();
 
@@ -186,6 +193,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public Kpi getKpiByIndex(int index) {
         return kpis.get(index);
+    }
+
+    public Visualization getVisualizationByIndex(int index) {
+        return visualizations.get(index);
     }
 
     public Kpi getKpiByHeadline(final String headline) {
@@ -339,5 +350,13 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     public String getCurrentProjectName() {
         return waitForFragmentVisible(header).getCurrentProjectName();
+    }
+
+    public void waitForVisualizationsListAbsent() {
+        waitForFragmentNotVisible(visualizationsList);
+    }
+
+    public VisualizationsList getVisualizationsList() {
+        return waitForFragmentVisible(visualizationsList);
     }
 }
