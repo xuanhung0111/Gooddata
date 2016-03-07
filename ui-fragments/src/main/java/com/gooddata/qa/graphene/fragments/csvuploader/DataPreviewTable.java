@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.fragments.csvuploader;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static java.util.stream.Collectors.toList;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementVisible;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +24,10 @@ public class DataPreviewTable extends FixedDataTable {
     private static final By NON_SELECTABLE_PRE_HEADER_ROW = By.className("non-selectable-pre-header");
     private static final By PRE_HEADER_ROW = By.className("pre-header");
     private static final By SELECTED_HEADER_ROW = By.className("header");
-    
+
+    private static final By BY_VERTICAL_SCROLLBAR = By.className("ScrollbarLayout_faceVertical");
+    private static final By BY_HORIZONTAL_SCROLLBAR = By.className("ScrollbarLayout_faceHorizontal");
+
     @FindBy(className = "input-text")
     private List<WebElement> columnNames;
 
@@ -150,6 +154,14 @@ public class DataPreviewTable extends FixedDataTable {
                 .filter(e -> e.getTypeSelection().contains(columnType.getVisibleText()))
                 .findFirst()
                 .get();
+    }
+
+    public boolean isVerticalScrollbarVisible() {
+        return isElementVisible(BY_VERTICAL_SCROLLBAR, getRoot());
+    }
+
+    public boolean isHorizontalScrollbarVisible() {
+        return isElementVisible(BY_HORIZONTAL_SCROLLBAR, getRoot());
     }
 
     private boolean isErrorInput(WebElement input) {
