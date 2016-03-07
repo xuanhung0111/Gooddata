@@ -5,9 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_BLUE_BAR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -122,6 +120,11 @@ public class ReportPage extends AbstractFragment {
 
     private static final By ADD_TO_GLOBAL_METRICS_LOCATOR = xpath("//input[contains(@class,'s-sme-global')]");
 
+    private static final By NO_MATCHING_METRIC = By.cssSelector(".sndPanel .s-snd-MetricsContainer + .noMatch");
+
+    private static final By NO_MATCHING_ATTRIBUTE = 
+            By.cssSelector(".sndPanel .s-snd-AttributesContainer + .noMatch");
+
     public ReportPage initPage() {
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(this);
@@ -214,7 +217,7 @@ public class ReportPage extends AbstractFragment {
         filterInput.clear();
         filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
         sleepTightInSeconds(1);
-        waitForElementNotPresent(ATTRIBUTES_CONTAINER_LOCATOR);
+        waitForElementVisible(NO_MATCHING_ATTRIBUTE, browser);
 
         filterInput.clear();
         filterInput.sendKeys(attribute);
@@ -731,12 +734,12 @@ public class ReportPage extends AbstractFragment {
         filterInput.clear();
         filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
         sleepTightInSeconds(1);
-        waitForCollectionIsEmpty(metrics);
+        waitForElementVisible(NO_MATCHING_METRIC, browser);
 
         filterInput.clear();
         filterInput.sendKeys(metric);
         sleepTightInSeconds(1);
-        waitForCollectionIsNotEmpty(metrics);
+        waitForElementNotVisible(NO_MATCHING_METRIC);
 
         howToSelect.accept(metrics.stream()
             .filter(e -> metric.equals(e.getText()))
