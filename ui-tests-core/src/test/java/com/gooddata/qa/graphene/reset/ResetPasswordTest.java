@@ -36,8 +36,7 @@ public class ResetPasswordTest extends AbstractUITest {
             + "Minimum length is 7 characters.";
     
     private static final String COMMONLY_PASSWORD_ERROR_MESSAGE = "You selected a commonly used password. "
-            + "Choose something unique."
-            + "\nSequential and repeated characters are not allowed in passwords.";
+            + "Choose something unique.";
 
     private static final String SEQUENTIAL_PASSWORD_ERROR_MESSAGE = "Sequential and repeated characters are "
             + "not allowed in passwords.";
