@@ -292,6 +292,16 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
     public void checkNoVisualizationOnDashboard() {
         int visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
 
+        takeScreenshot(browser, "checkNoVisualizationOnDashboard", getClass());
         assertEquals(visualizationsCount, 0);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
+    public void checkNoVisualizationListInPanel() {
+        initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode();
+
+        takeScreenshot(browser, "checkNoVisualizationListInPanel", getClass());
+        indigoDashboardsPage.waitForVisualizationsListAbsent();
     }
 }

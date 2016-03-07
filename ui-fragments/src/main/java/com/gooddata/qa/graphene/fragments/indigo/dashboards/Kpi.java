@@ -40,7 +40,7 @@ public class Kpi extends AbstractFragment {
 
     public static final By HINT_LOCATOR = By.cssSelector(".inplaceedit:hover");
 
-    @FindBy(css = ".dash-item-action-delete")
+    @FindBy(className = "dash-item-action-delete")
     protected WebElement deleteButton;
 
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)
@@ -55,7 +55,7 @@ public class Kpi extends AbstractFragment {
     @FindBy(css = ".kpi-headline > h3 textarea")
     private WebElement headlineTextarea;
 
-    @FindBy(css = ".kpi-value")
+    @FindBy(className = "kpi-value")
     private WebElement value;
 
     @FindBy(className = KPI_POP_SECTION_CLASS)
