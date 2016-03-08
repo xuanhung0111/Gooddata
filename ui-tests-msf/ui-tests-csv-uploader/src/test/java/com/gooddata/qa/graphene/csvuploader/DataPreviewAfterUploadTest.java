@@ -428,6 +428,25 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         }
     }
 
+    @Test(dependsOnMethods = "createProject")
+    public void checkScrollbarShowInPreviewTable() {
+        final CsvFile csvFileWithManyColumnRow = CsvFile.loadFile(
+                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/unsupported.date.formats.csv"));
+
+        initDataUploadPage();
+
+        datasetsListPage.uploadFile(csvFileWithManyColumnRow.getFilePath());
+        waitForFragmentVisible(dataPreviewPage);
+
+        takeScreenshot(browser, "Scrollbars-show-in-preview-table", getClass());
+
+        assertTrue(dataPreviewPage.getDataPreviewTable().isVerticalScrollbarVisible(),
+                "Vertical scrollbar does not show in preview table");
+
+        assertTrue(dataPreviewPage.getDataPreviewTable().isHorizontalScrollbarVisible(),
+                "Horizontal scrollbar does not show in preview table");
+    }
+
     private void checkDataPreview(CsvFile csvFile) {
         checkDataPreview(csvFile.getColumnNames(), csvFile.getColumnTypes());
     }

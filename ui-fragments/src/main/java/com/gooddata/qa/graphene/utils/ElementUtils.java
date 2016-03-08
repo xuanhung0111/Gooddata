@@ -26,6 +26,12 @@ public final class ElementUtils {
         return context.findElements(locatorKey).size() > 0;
     }
 
+    public static boolean isElementVisible(By locatorKey, SearchContext context) {
+        if (!isElementPresent(locatorKey, context)) return false;
+
+        return context.findElement(locatorKey).isDisplayed();
+    }
+
     /**
      * Get texts of all elements matching given By selector under specified context
      * @param selector selector to match items
