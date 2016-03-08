@@ -91,8 +91,10 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         Message[] reportMessages = new Message[0];
         Message[] dashboardMessages = new Message[0];
 
-        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops(); !bothEmailsArrived(reportMessages,
-                dashboardMessages) && loop < maxLoops; loop++) {
+        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();; loop++) {
+            if (loop >= maxLoops)
+                throw new RuntimeException("No message arrived!");
+
             System.out.println("Waiting for messages, try " + (loop + 1));
             reportMessages = imapClient.getMessagesFromInbox(FROM, reportTitle);
             dashboardMessages = imapClient.getMessagesFromInbox(FROM, dashboardTitle);

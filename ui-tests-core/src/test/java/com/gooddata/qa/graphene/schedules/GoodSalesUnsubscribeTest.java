@@ -10,6 +10,7 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -18,7 +19,6 @@ import java.util.regex.Pattern;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
@@ -98,8 +98,15 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
                     this.getClass());
             }
 
-            emailMessages = getMessagesFromInbox(imapClient, FROM, reportTitle, 0);
-            assertEquals(emailMessages.length, 0);
+            pssClient.accelerate();
+            try {
+                // check that we will get exception because no more email is sent
+                getMessagesFromInbox(imapClient, FROM, reportTitle, expectedMessageCount + 1);
+                fail("Expected no more email will be sent but it's not!");
+            } catch (RuntimeException e) {
+                assertEquals(e.getMessage(), format("Expected: %s message(s) but actual: %s message(s)",
+                        expectedMessageCount + 1, expectedMessageCount));
+            }
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
             pssClient.decelerate();
@@ -144,28 +151,31 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
     private Message[] getMessagesFromInbox(ImapClient imapClient, String from, String subject,
             int expectedMessagesCount) {
-        Message[] reportMessages = new Message[0];
+        int totalMessages = 0;
 
-        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();
-             !messagesArrived(reportMessages, expectedMessagesCount) && loop < maxLoops; loop++) {
+        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();; loop++) {
+            
+            if (loop >= maxLoops) {
+                throw new RuntimeException(format("Expected: %s message(s) but actual: %s message(s)",
+                        expectedMessagesCount, totalMessages));
+            }
+
             System.out.println("Waiting for messages, try " + (loop + 1));
 
             Message[] receivedMessages = imapClient.getMessagesFromInbox(from, subject);
-            reportMessages = ArrayUtils.addAll(reportMessages, receivedMessages);
+            totalMessages = receivedMessages.length;
 
-            if (messagesArrived(reportMessages, expectedMessagesCount)) {
+            if (messagesArrived(totalMessages, expectedMessagesCount)) {
                 System.out.println(format("Report export messages from %s arrived (subj: %s)", from, subject));
-                break;
+                return receivedMessages;
             }
 
             sleepTight(MAILBOX_POLL_INTERVAL_MILLIS);
         }
-
-        return reportMessages;
     }
 
-    private boolean messagesArrived(Message[] reportMessages, int expectedMessagesCount) {
-        return reportMessages.length >= expectedMessagesCount;
+    private boolean messagesArrived(int totalMessages, int expectedMessagesCount) {
+        return totalMessages >= expectedMessagesCount;
     }
 
     private String getBccEmail() {
