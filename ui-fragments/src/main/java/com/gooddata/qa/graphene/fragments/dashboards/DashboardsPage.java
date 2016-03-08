@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.util.ArrayList;
@@ -184,13 +185,10 @@ public class DashboardsPage extends AbstractFragment {
         return 0;
     }
 
-    public void editDashboard() {
+    public DashboardEditBar editDashboard() {
         waitForDashboardPageLoaded(browser);
-        SimpleMenu menu = openEditExportEmbedMenu();
-        if (menu == null)
-            return;
-        menu.select("Edit");
-        waitForElementPresent(editDashboardBar.getRoot());
+        openEditExportEmbedMenu().select("Edit");
+        return waitForFragmentVisible(editDashboardBar);
     }
 
     public String exportDashboardTab(int tabIndex) {
@@ -278,7 +276,7 @@ public class DashboardsPage extends AbstractFragment {
         waitForDashboardPageLoaded(browser);
     }
 
-    public void addNewDashboard(String dashboardName) {
+    public DashboardsPage addNewDashboard(String dashboardName) {
         openEditExportEmbedMenu().select("Add Dashboard");
         waitForElementVisible(newDashboardNameInput);
 
@@ -287,6 +285,7 @@ public class DashboardsPage extends AbstractFragment {
         newDashboardNameInput.sendKeys(dashboardName);
         newDashboardNameInput.sendKeys(Keys.ENTER);
         editDashboardBar.saveDashboard();
+        return this;
     }
 
     public void deleteDashboard() {
@@ -396,7 +395,7 @@ public class DashboardsPage extends AbstractFragment {
 
     private SimpleMenu openEditExportEmbedMenu() {
         if (waitForElementPresent(editExportEmbedButton).getAttribute("class").contains("gdc-hidden")) {
-            return null;
+            throw new RuntimeException("Embed menu is not visible");
         }
         editExportEmbedButton.click();
         SimpleMenu menu = Graphene.createPageFragment(SimpleMenu.class,

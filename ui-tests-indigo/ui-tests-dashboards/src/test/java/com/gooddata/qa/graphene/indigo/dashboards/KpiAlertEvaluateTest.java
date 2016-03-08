@@ -2,7 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
-import static com.gooddata.qa.graphene.utils.NavigateUtils.replaceInUrl;
+import static com.gooddata.qa.graphene.utils.UrlParserUtils.replaceInUrl;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.io.IOException;
