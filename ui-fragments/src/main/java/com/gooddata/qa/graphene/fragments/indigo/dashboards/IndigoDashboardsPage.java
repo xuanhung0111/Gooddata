@@ -195,6 +195,10 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return kpis.get(index);
     }
 
+    public String getKpiTitle(int index) {
+        return getKpiByIndex(index).getHeadline();
+    }
+
     public Visualization getVisualizationByIndex(int index) {
         return visualizations.get(index);
     }
