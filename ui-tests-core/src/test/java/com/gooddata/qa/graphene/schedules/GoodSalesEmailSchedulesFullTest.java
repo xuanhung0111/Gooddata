@@ -480,7 +480,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     private void checkMailbox(ImapClient imapClient) throws MessagingException, IOException {
-        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops(); loop < maxLoops; loop++) {
+        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();; loop++) {
+            if (loop >= maxLoops)
+                throw new RuntimeException("No message arrived!");
+
             System.out.println("Waiting for messages, try " + (loop + 1));
             getMessagesFromInbox(imapClient);
 
