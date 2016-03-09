@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.flow;
 
 import com.gooddata.qa.graphene.indigo.dashboards.AddKpiWithoutDateDimensionTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DateDimensionTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
 import com.gooddata.qa.graphene.indigo.dashboards.ManipulateWidgetsTest;
@@ -18,6 +19,7 @@ public class AllTestsRegistry {
                 .register(HeaderTest.class)
                 .register(KpiAlertTest.class)
                 .register(ManipulateWidgetsTest.class)
+                .register(DragWidgetsTest.class)
                 .register(PartialExportDashboardsTest.class)
                 .register(AddKpiWithoutDateDimensionTest.class)
                 .register(MetricsDropdownTest.class)
