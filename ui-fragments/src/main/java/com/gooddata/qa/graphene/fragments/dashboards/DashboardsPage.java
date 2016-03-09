@@ -139,24 +139,23 @@ public class DashboardsPage extends AbstractFragment {
         return name;
     }
 
-    public boolean selectDashboard(String dashboardName) {
+    public void selectDashboard(String dashboardName) {
         if (getDashboardName().contains(dashboardName)) {
-            System.out.println("Dashboard '" + dashboardName + "'already selected");
-            return true;
+            log.info("Dashboard '" + dashboardName + "'already selected");
+            return;
         }
 
-        return openDashboardMenu().selectDashboardByName(dashboardName);
+        openDashboardMenu().selectDashboardByName(dashboardName);
     }
 
-    public boolean selectDashboard(int dashboardIndex) {
+    public void selectDashboard(int dashboardIndex) {
         DashboardMenu menu = openDashboardMenu();
         if (menu == null) {
-            System.out.println("This project has only one dashboard!");
-            return false;
+            throw new RuntimeException("This project has only one dashboard!");
         }
-        sleepTightInSeconds(3);
 
-        return menu.selectDashboardByIndex(dashboardIndex);
+        sleepTightInSeconds(3);
+        menu.selectDashboardByIndex(dashboardIndex);
     }
 
     public List<String> getDashboardsNames() {
