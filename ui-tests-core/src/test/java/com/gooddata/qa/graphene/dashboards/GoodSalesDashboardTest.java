@@ -5,8 +5,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
 
@@ -106,15 +104,13 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
     public void deleteNewDashboard() {
         initDashboardsPage();
         int dashboardsCount = dashboardsPage.getDashboardsCount();
-        if (dashboardsPage.selectDashboard("test")) {
-            dashboardsPage.deleteDashboard();
-            sleepTightInSeconds(3);
-            waitForDashboardPageLoaded(browser);
-            assertEquals(dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
-            checkRedBar(browser);
-        } else {
-            fail("Dashboard wasn't selected and not deleted");
-        }
+        dashboardsPage.selectDashboard("test");
+        dashboardsPage.deleteDashboard();
+        sleepTightInSeconds(3);
+        waitForDashboardPageLoaded(browser);
+        assertEquals(dashboardsPage.getDashboardsCount(), dashboardsCount - 1, "Dashboard wasn't deleted");
+        checkRedBar(browser);
+
         // webapp can use this time to update a dashboard has been deleted
         // to avoid RED BAR - Dashboard no longer exists
         sleepTightInSeconds(5);
@@ -127,7 +123,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     private void deleteTab(int offset) {
         initDashboardsPage();
-        assertTrue(dashboardsPage.selectDashboard("Pipeline Analysis"), "Dashboard wasn't selected");
+        dashboardsPage.selectDashboard("Pipeline Analysis");
         waitForDashboardPageLoaded(browser);
         sleepTightInSeconds(5);
         int tabsCount = dashboardsPage.getTabs().getNumberOfTabs();

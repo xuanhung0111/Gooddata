@@ -364,7 +364,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void addNewTabOnDashboard(String dashboardName, String tabName, String screenshotName) {
         initDashboardsPage();
-        assertTrue(dashboardsPage.selectDashboard(dashboardName), "Dashboard wasn't selected");
+        dashboardsPage.selectDashboard(dashboardName);
         waitForDashboardPageLoaded(browser);
         sleepTightInSeconds(3);
         DashboardTabs tabs = dashboardsPage.getTabs();
@@ -420,8 +420,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void selectDashboard(String name) {
         initDashboardsPage();
-        assertTrue(dashboardsPage.selectDashboard(name),
-                String.format("Cannot select dashboard named: %s", name));
+        dashboardsPage.selectDashboard(name);
         waitForDashboardPage();
     }
 
