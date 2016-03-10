@@ -47,6 +47,7 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
+import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -515,6 +516,25 @@ public class AbstractUITest extends AbstractGreyPageTest {
         } else {
             fail("Upload failed with error message: " + csvDatasetMessageBar.waitForErrorMessageBar().getText());
         }
+    }
+
+    public void updateCsvDataset(String datasetName, String filePath) {
+        initDataUploadPage();
+
+        datasetsListPage.getMyDatasetsTable()
+                .getDatasetRefreshButton(datasetName)
+                .click();
+
+        Graphene.createPageFragment(FileUploadDialog.class,
+                waitForElementVisible(className("s-upload-dialog"), browser))
+                .pickCsvFile(filePath)
+                .clickUploadButton();
+
+        Graphene.createPageFragment(DataPreviewPage.class,
+                waitForElementVisible(className("s-data-preview"), browser))
+                .triggerIntegration();
+
+        waitForElementVisible(By.cssSelector(".gd-message.success"), browser);
     }
 
     private void waitForDashboardPage() {
