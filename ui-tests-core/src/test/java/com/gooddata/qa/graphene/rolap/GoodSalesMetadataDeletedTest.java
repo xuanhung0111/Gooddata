@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
@@ -636,8 +637,24 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private String createUserFilterFrom(AttributeInfo attribute) throws IOException, JSONException {
-        return DashboardsRestUtils.createMUFObj(getRestApiClient(), testParams.getProjectId(),
-                "User filter " + System.currentTimeMillis(), attribute.getConnectionBetweenAttributeAndElements());
+        return DashboardsRestUtils.createMufObjByUri(getRestApiClient(),
+                testParams.getProjectId(), "User filter "+ System.currentTimeMillis(),
+                getConditionInUriFormat(attribute.getConnectionBetweenAttributeAndElements()));
+    }
+
+    private Map<String, Collection<String>> getConditionInUriFormat(final Map<String, Collection<String>> condition) {
+        final String attributeUri = "/gdc/md/%s/obj/%s";
+        final String elementUri = "/gdc/md/%s/obj/%s/elements?id=%s";
+        final Map<String, Collection<String>> conditionInUriFormat = new HashMap<String, Collection<String>>();
+
+        for (final String attributeId : condition.keySet()) {
+            conditionInUriFormat.put(String.format(attributeUri, testParams.getProjectId(), attributeId),
+                    condition.get(attributeId).stream()
+                    .map(e -> String.format(elementUri, testParams.getProjectId(), attributeId, e))
+                    .collect(Collectors.toList()));
+        }
+
+        return conditionInUriFormat;
     }
 
     @SuppressWarnings("unchecked")
