@@ -24,7 +24,14 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
-public class RefreshTest extends HappyUploadTest {
+public class RefreshTest extends AbstractCsvUploaderTest {
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkCsvUploadHappyPath() {
+        assertTrue(uploadCsv(PAYROLL)
+            .getStatus()
+            .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
+    }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshFromList() {
