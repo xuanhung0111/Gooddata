@@ -3,11 +3,15 @@ package com.gooddata.qa.graphene.account;
 import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkGreenBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -19,6 +23,9 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -31,6 +38,7 @@ import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
+import com.google.common.base.Predicate;
 
 public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
@@ -103,6 +111,9 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
 
         initRegistrationPage();
         registrationPage.registerNewUser(registrationForm);
+        waitForFragmentNotVisible(registrationPage);
+
+        waitForWalkmeAndTurnOff();
         assertEquals(waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).getText(),
                 registrationForm.getFirstName() + " " + registrationForm.getLastName());
 
@@ -149,6 +160,30 @@ public class InviteNonRegisterUserToProjectTest extends AbstractProjectTest {
         if (Objects.nonNull(userProfile)) {
             String userProfileUri = userProfile.getJSONObject("links").getString("self");
             UserManagementRestUtils.deleteUser(restApiClient, userProfileUri);
+        }
+    }
+
+    private void waitForWalkmeAndTurnOff() {
+        final int walkmeLoadTimeoutSeconds = 30;
+
+        final By dashboardPageLocator = By.cssSelector("#p-projectDashboardPage.s-displayed");
+        final By walkmeCloseLocator = By.className("walkme-action-close");
+
+        Predicate<WebDriver> dashboardOrWalkmeAppear = browser ->
+                isElementPresent(dashboardPageLocator, browser) || isElementPresent(walkmeCloseLocator, browser);
+
+        Graphene.waitGui().until(dashboardOrWalkmeAppear);
+
+        try {
+            WebElement walkmeCloseElement = 
+                    waitForElementVisible(walkmeCloseLocator, browser, walkmeLoadTimeoutSeconds);
+
+            walkmeCloseElement.click();
+            waitForElementNotPresent(walkmeCloseElement);
+
+        } catch (TimeoutException e) {
+            takeScreenshot(browser, "Walkme dialog is not appeared", getClass());
+            log.info("Walkme dialog is not appeared!");
         }
     }
 }
