@@ -309,17 +309,19 @@ public class AbstractUITest extends AbstractGreyPageTest {
         sleepTightInSeconds(5);
         waitForElementVisible(dashboardsPage.getRoot());
         if (expectedDashboardsAndTabs == null || expectedDashboardsAndTabs.isEmpty()) {
-            System.out.println("Going to check all dashboard & tabs");
+            log.info("Going to check all dashboard & tabs");
             int dashboardsCount = dashboardsPage.getDashboardsCount();
-            System.out.println("Dashboards count: " + dashboardsCount);
+            log.info("Dashboards count: " + dashboardsCount);
             for (int i = 1; i <= dashboardsCount; i++) {
-                dashboardsPage.selectDashboard(i);
-                sleepTightInSeconds(5);
-                System.out.println("Current dashboard index: " + i);
+                if (dashboardsCount > 1) {
+                    dashboardsPage.selectDashboard(i);
+                    sleepTightInSeconds(5);
+                    log.info("Current dashboard index: " + i);
+                }
                 singleDashboardWalkthrough(validation, null, dashboardsPage.getDashboardName());
             }
         } else {
-            System.out.println("Going to check expected dashboards & tabs");
+            log.info("Going to check expected dashboards & tabs");
             for (String dashboardName : expectedDashboardsAndTabs.keySet()) {
                 int dashboardsCount = dashboardsPage.getDashboardsCount();
                 assertEquals(dashboardsCount, expectedDashboardsAndTabs.size(),
@@ -327,7 +329,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
                 dashboardsPage.selectDashboard(dashboardName);
                 sleepTightInSeconds(5);
                 String[] expectedTabs = expectedDashboardsAndTabs.get(dashboardName);
-                System.out.println("Current dashboard: " + dashboardName);
+                log.info("Current dashboard: " + dashboardName);
                 singleDashboardWalkthrough(validation, expectedTabs, dashboardName);
             }
         }
