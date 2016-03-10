@@ -1,11 +1,9 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
-import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -64,16 +62,12 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnGroups = {"precondition"})
     public void switchProjectsTest() {
-        initDataUploadPage();
-
-        datasetsListPage.switchProject(NEW_PROJECT_NAME);
-        waitForFragmentVisible(datasetsListPage);
+        initDataUploadPage().switchProject(NEW_PROJECT_NAME);
 
         takeScreenshot(browser, "Switch-to-project-" + NEW_PROJECT_NAME, getClass());
         assertThat(browser.getCurrentUrl(), containsString(newProjectId));
 
         datasetsListPage.switchProject(projectTitle);
-        waitForFragmentVisible(datasetsListPage);
 
         takeScreenshot(browser, "Switch-to-project-" + projectTitle, getClass());
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
@@ -102,9 +96,7 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws JSONException {
-        logout();
-        signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
-
+        logoutAndLoginAs(true, UserRoles.ADMIN);
         UserManagementRestUtils.deleteUserByUri(getRestApiClient(), newAdminUserUri);
     }
 

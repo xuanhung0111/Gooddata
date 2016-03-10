@@ -6,6 +6,7 @@ import static org.openqa.selenium.By.className;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -15,8 +16,8 @@ import com.gooddata.qa.graphene.utils.ElementUtils;
 
 public class DatasetsListPage extends AbstractFragment {
 
-    private static final By BY_EMPTY_STATE = By.className("datasets-empty-state");
-    private static final By BY_MY_DATASETS_EMPTY_STATE = By.className("my-datasets-empty-state");
+    private static final By BY_EMPTY_STATE = className("datasets-empty-state");
+    private static final By BY_MY_DATASETS_EMPTY_STATE = className("my-datasets-empty-state");
 
     @FindBy(className = "s-datasets-list-header")
     private WebElement datasetsHeader;
@@ -30,14 +31,20 @@ public class DatasetsListPage extends AbstractFragment {
     @FindBy(className = "others-datasets")
     private DatasetsTable othersDatasetsTable;
 
+    public static DatasetsListPage getInstance(SearchContext context) {
+        return Graphene.createPageFragment(DatasetsListPage.class,
+                waitForElementVisible(className("s-datasets-list"), context));
+    }
+
     public DatasetDetailPage openDatasetDetailPage(String datasetName) {
         return getMyDatasetsTable().getDataset(datasetName).openDetailPage();
     }
 
-    public void clickAddDataButton() {
+    public FileUploadDialog clickAddDataButton() {
         waitForAddDataButtonVisible().click();
+        return FileUploadDialog.getInstane(browser);
     }
-    
+
     public String getDatasetAnalyzeLink(String datasetName) {
         return getMyDatasetsTable().getDataset(datasetName).getAnalyzeLink();
     }
@@ -65,17 +72,19 @@ public class DatasetsListPage extends AbstractFragment {
     public DatasetsTable getMyDatasetsTable() {
         return waitForFragmentVisible(myDatasetsTable);
     }
-    
+
     public boolean isMyDatasetsEmpty() {
         return getMyDatasetsTable().getRoot().getAttribute("class").contains("empty-state");
     }
 
     public int getMyDatasetsCount() {
-        return isMyDatasetsEmpty()? 0 : getMyDatasetsTable().getNumberOfDatasets();
+        return isMyDatasetsEmpty() ? 0 : getMyDatasetsTable().getNumberOfDatasets();
     }
 
     public boolean isOtherDatasetsEmpty() {
-        waitForFragmentVisible(myDatasetsTable); //this is used as indicator for datasets table is loaded
+        // this is used as indicator for datasets table is loaded
+        waitForFragmentVisible(myDatasetsTable);
+
         return !ElementUtils.isElementPresent(By.cssSelector(".others-datasets"), getRoot());
     }
 
@@ -84,25 +93,46 @@ public class DatasetsListPage extends AbstractFragment {
     }
 
     public int getOtherDatasetsCount() {
-        return isOtherDatasetsEmpty()? 0 : waitForFragmentVisible(othersDatasetsTable).getNumberOfDatasets();
+        return isOtherDatasetsEmpty() ? 0 : waitForFragmentVisible(othersDatasetsTable).getNumberOfDatasets();
     }
 
-    public void uploadFile(String filePath) {
+    public DataPreviewPage uploadFile(String filePath) {
         waitForElementVisible(addDataButton).click();
 
-        Graphene.createPageFragment(FileUploadDialog.class,
-                waitForElementVisible(className("s-upload-dialog"), browser))
-                .pickCsvFile(filePath)
-                .clickUploadButton();
+        FileUploadDialog.getInstane(browser)
+            .pickCsvFile(filePath)
+            .clickUploadButton();
+
+        return DataPreviewPage.getInstance(browser);
+    }
+
+    public FileUploadDialog tryUploadFile(String filePath) {
+        waitForElementVisible(addDataButton).click();
+
+        FileUploadDialog dialog = FileUploadDialog.getInstane(browser);
+        dialog.pickCsvFile(filePath).clickUploadButton();
+
+        return dialog;
+    }
+
+    public DataPreviewPage updateCsv(String datasetName, String filePath) {
+        return updateCsv(getMyDatasetsTable().getDataset(datasetName), filePath);
+    }
+
+    public DataPreviewPage updateCsv(Dataset dataset, String filePath) {
+        dataset.clickUpdateButton()
+            .pickCsvFile(filePath)
+            .clickUploadButton();
+
+        return DataPreviewPage.getInstance(browser);
     }
 
     public DatasetsListPage switchProject(String name) {
         log.info("Switching to project: " + name);
 
-        Graphene.createPageFragment(Header.class,
-                waitForElementVisible(By.className("gd-header"), browser))
+        Graphene.createPageFragment(Header.class, waitForElementVisible(By.className("gd-header"), browser))
                 .switchProject(name);
 
-        return this;
+        return waitForFragmentVisible(this);
     }
 }

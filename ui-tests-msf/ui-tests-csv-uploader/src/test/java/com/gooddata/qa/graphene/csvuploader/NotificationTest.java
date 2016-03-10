@@ -1,7 +1,6 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -16,6 +15,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.GDEmails;
+import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
@@ -39,37 +40,41 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkNotificationForSuccessfulUpload() {
-        checkCsvUpload(PAYROLL, this::uploadCsv, true);
-        takeScreenshot(browser,
-                toScreenshotName("Upload-csv-file-to-check-successful-notification", PAYROLL.getFileName()),
-                getClass());
+        final String datasetName = uploadCsv(PAYROLL).getName();
 
-        String datasetName = getNewDataset(PAYROLL);
+        takeScreenshot(browser, "Upload-csv-file-to-check-successful-notification" + PAYROLL.getFileName(), getClass());
+
         checkSuccessfulNotification(getSuccessfulNotification(1), datasetName);
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkNotificationForFailedUpload() {
-        String projectId = testParams.getProjectId();
+        final String projectId = testParams.getProjectId();
         String GoodSalesProjectID = "";
+
         try {
             GoodSalesProjectID = ProjectRestUtils.createProject(getGoodDataClient(), projectTitle,
                     GOODSALES_TEMPLATE, testParams.getAuthorizationToken(), testParams.getProjectDriver(),
                     testParams.getProjectEnvironment());
+
             testParams.setProjectId(GoodSalesProjectID);
 
-            checkCsvUpload(PAYROLL, this::uploadCsv, false);
+            try {
+                uploadCsv(PAYROLL);
+            } catch (RuntimeException e) {
+                assertEquals(e.getMessage(), "Uploading csv file is FAILED!");
+            }
 
-            assertEquals(csvDatasetMessageBar.waitForErrorMessageBar().getText(),
+            assertEquals(DatasetMessageBar.getInstance(browser).waitForErrorMessageBar().getText(),
                     format("Failed to add data from \"%s\" due to internal error. Check your email for "
                             + "instructions or contact support.", PAYROLL.getDatasetNameOfFirstUpload()));
-            takeScreenshot(browser,
-                    toScreenshotName("Upload-csv-file-to-check-failed-notification", PAYROLL.getFileName()),
-                    getClass());
+
+            takeScreenshot(browser, "Upload-csv-file-to-check-failed-notification-" + PAYROLL.getFileName(), getClass());
 
             checkFailureNotification(getFailedNotification(1));
         } finally {
             testParams.setProjectId(projectId);
+
             if (!GoodSalesProjectID.isEmpty()) {
                 ProjectRestUtils.deleteProject(getGoodDataClient(), GoodSalesProjectID);
             }
@@ -78,20 +83,15 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"checkNotificationForSuccessfulUpload"})
     public void checkNotificationForSuccessfulUpdate() {
-        initDataUploadPage();
+        final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
 
-        String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
+        final Dataset dataset = initDataUploadPage()
+            .getMyDatasetsTable()
+            .getDataset(datasetName);
 
-        datasetsListPage
-                .getMyDatasetsTable()
-                .getDataset(datasetName)
-                .openDetailPage()
-                .clickRefreshButton();
+        updateCsvInDetailPage(PAYROLL_REFRESH, dataset, true);
 
-        refreshCsv(PAYROLL_REFRESH, datasetName, true);
-        takeScreenshot(browser,
-                toScreenshotName("Update-csv-file-to-check-successful-notification", PAYROLL_REFRESH.getFileName()),
-                getClass());
+        takeScreenshot(browser, "Update-csv-check-successful-notification" + PAYROLL_REFRESH.getFileName(), getClass());
 
         checkSuccessfulNotification(getSuccessfulNotification(2), datasetName);
     }
@@ -124,7 +124,10 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     private Document getNotification(String subject, int expectedMessageCount) {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
-            Message notification = getNotification(imapClient, subject, expectedMessageCount);
+            Collection<Message> notifications = ImapUtils.waitForMessage(imapClient, GDEmails.NO_REPLY, subject);
+            assertTrue(notifications.size() == expectedMessageCount, "Number of notifcation is wrong!");
+            Message notification = Iterables.getLast(notifications);
+
             return Jsoup.parse(ImapClient.getEmailBody(notification));
         } catch (Exception e) {
             throw new IllegalStateException("There is an exception when checking notification content!", e);
@@ -139,11 +142,5 @@ public class NotificationTest extends AbstractCsvUploaderTest {
     private Document getFailedNotification(int expectedMessageCount) {
         String subject = format("Error adding new data to %s project", projectTitle);
         return getNotification(subject, expectedMessageCount);
-    }
-
-    private static Message getNotification(final ImapClient imapClient, final String subject, int exptectedMessageCount) {
-        Collection<Message> notifications = ImapUtils.waitForMessage(imapClient, GDEmails.NO_REPLY, subject);
-        assertTrue(notifications.size() == exptectedMessageCount, "Number of notifcation is wrong!");
-        return Iterables.getLast(notifications);
     }
 }

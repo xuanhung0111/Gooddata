@@ -17,7 +17,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
-import static org.openqa.selenium.By.className;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -45,9 +44,9 @@ import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
+import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
-import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
@@ -494,30 +493,23 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void uploadCSV(String filePath, Map<String, ColumnType> columnsWithExpectedType) {
-        initDataUploadPage();
+        final int datasetCountBeforeUpload = initDataUploadPage().getMyDatasetsCount();
 
-        final int datasetCountBeforeUpload = datasetsListPage.getMyDatasetsCount();
-
-        datasetsListPage.uploadFile(filePath);
+        final DataPreviewPage dataPreviewPage = datasetsListPage.uploadFile(filePath);
         takeScreenshot(browser, "upload-definition", this.getClass());
 
-        DataPreviewPage dataPreviewPage = Graphene.createPageFragment(DataPreviewPage.class,
-                waitForElementVisible(className("s-data-preview"), browser));
         if (columnsWithExpectedType != null) {
             DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
             for (String columnName : columnsWithExpectedType.keySet()) {
                 dataPreviewTable.changeColumnType(columnName, columnsWithExpectedType.get(columnName));
             }
         }
+
         dataPreviewPage.triggerIntegration();
+        Dataset.waitForDatasetLoaded(browser);
 
-        Predicate<WebDriver> datasetsCountEqualsExpected = input ->
-            waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCountBeforeUpload + 1;
-        Graphene.waitGui(browser).until(datasetsCountEqualsExpected);
+        final DatasetMessageBar csvDatasetMessageBar = DatasetMessageBar.getInstance(browser);
 
-        waitForElementNotPresent(By.cssSelector(".item-in-progress"));
-        DatasetMessageBar csvDatasetMessageBar = Graphene.createPageFragment(DatasetMessageBar.class,
-                waitForElementVisible(By.className("gd-messages"), browser));
         if (datasetsListPage.getMyDatasetsCount() == datasetCountBeforeUpload + 1) {
             log.info("Upload succeeds with message: " + csvDatasetMessageBar.waitForSuccessMessageBar().getText());
         } else {
@@ -526,23 +518,16 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void updateCsvDataset(String datasetName, String filePath) {
-        initDataUploadPage();
+        initDataUploadPage()
+            .getMyDatasetsTable()
+            .getDataset(datasetName)
+            .clickUpdateButton()
+            .pickCsvFile(filePath)
+            .clickUploadButton();
+        DataPreviewPage.getInstance(browser).triggerIntegration();
+        Dataset.waitForDatasetLoaded(browser);
 
-        datasetsListPage
-                .getMyDatasetsTable()
-                .getDataset(datasetName)
-                .clickUpdateButton();
-
-        Graphene.createPageFragment(FileUploadDialog.class,
-                waitForElementVisible(className("s-upload-dialog"), browser))
-                .pickCsvFile(filePath)
-                .clickUploadButton();
-
-        Graphene.createPageFragment(DataPreviewPage.class,
-                waitForElementVisible(className("s-data-preview"), browser))
-                .triggerIntegration();
-
-        waitForElementVisible(By.cssSelector(".gd-message.success"), browser);
+        DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar();
     }
 
     private DashboardsPage waitForDashboardPage() {
@@ -550,9 +535,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return waitForFragmentVisible(dashboardsPage);
     }
 
-    public void initDataUploadPage() {
+    public DatasetsListPage initDataUploadPage() {
         openUrl(format(DATA_UPLOAD_PAGE_URI_TEMPLATE, testParams.getProjectId()));
-        waitForFragmentVisible(datasetsListPage);
+        return waitForFragmentVisible(datasetsListPage);
     }
 
     public void initProjectsPage() {

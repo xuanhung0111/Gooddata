@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -26,13 +24,18 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
+import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 public class UploadErrorTest extends AbstractCsvUploaderTest {
 
-    private static final String TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR = "Row %d contains a value that exceeds the limit of 255 characters, or has more than the limit of 250 columns.";
-    private static final String ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW = "Row %s contains more columns than the header row.";
-    private static final String DATA_WITHOUT_FACT = "The file seems to contain no numerical data for analysis on first 20 rows. " +
+    private static final String TOO_LONG_COLUMN_OR_TOO_MANY_COLUMNS_ERROR =
+            "Row %d contains a value that exceeds the limit of 255 characters, or has more than the limit of 250 columns.";
+    private static final String ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW =
+            "Row %s contains more columns than the header row.";
+    private static final String DATA_WITHOUT_FACT =
+            "The file seems to contain no numerical data for analysis on first 20 rows. " +
             "Try removing comments and multi-row headers from the beginning of the file. " +
             "Only files with at least one numerical column are supported.";
 
@@ -69,11 +72,11 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkCsvBadFormat() throws Exception {
+    public void checkCsvBadFormat() {
         uploadCsvFileWithErrors(BAD_STRUCTURE_FILE,
                 asList(format(ROW_CONTAINS_MORE_COLUMNS_THAN_THE_HEADER_ROW, 2)));
 
-        String datasetName = BAD_STRUCTURE_FILE.getDatasetNameOfFirstUpload();
+        final String datasetName = BAD_STRUCTURE_FILE.getDatasetNameOfFirstUpload();
         assertThat("Dataset with name '" + datasetName + "' should not be in datasets list.",
                 datasetsListPage.getMyDatasetsTable().getDatasetNames(),
                 not(hasItem(datasetName)));
@@ -81,47 +84,52 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkNoFactAndNumericColumnNameCsvConfig() {
-        initDataUploadPage();
-        uploadFile(PAYROLL);
-        waitForFragmentVisible(dataPreviewPage);
+        final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(PAYROLL.getFilePath());
 
         final String factColumnName = "Amount";
 
-        dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Mark at least one column as measure. Only files with at least one numerical column are supported."));
-        dataPreviewPage.getDataPreviewTable().changeColumnType(factColumnName, DataPreviewTable.ColumnType.FACT);
+        waitForFragmentVisible(dataPreviewPage)
+            .getDataPreviewTable()
+            .changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
 
-        dataPreviewPage.selectHeader().getRowSelectionTable().getRow(3).click(); // select data row as header
-        dataPreviewPage.triggerIntegration();                                    // confirm header row
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(),
+                containsString("Mark at least one column as measure. Only files with at least one numerical column are supported."));
+
+        dataPreviewPage.getDataPreviewTable()
+            .changeColumnType(factColumnName, DataPreviewTable.ColumnType.FACT);
+
+        dataPreviewPage.selectHeader()
+            .getRowSelectionTable()
+            .getRow(3)
+            .click(); // select data row as header
+
+        dataPreviewPage.triggerIntegration(); // confirm header row
+
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(),
+                containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when column names start with numbers");
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void checkCsvDuplicateColumnNames() {
-
-        String columnName = "the same";
-
-        initDataUploadPage();
-        uploadFile(PAYROLL);
-        waitForFragmentVisible(dataPreviewPage);
+        final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(PAYROLL.getFilePath());
 
         // set up the same names
-        DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
+        final String columnName = "the same";
+        final DataPreviewTable dataPreviewTable = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable();
         dataPreviewTable.changeColumnName(0, columnName);
         dataPreviewTable.changeColumnName(1, columnName);
+        takeScreenshot(browser, "columnNameValidationErrors", getClass());
 
-        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNameValidationErrors"), getClass());
-
-        assertThat(dataPreviewPage.getPreviewPageErrorMessage(), containsString("Fill in or correct the names and types for highlighted columns"));
+        assertThat(dataPreviewPage.getPreviewPageErrorMessage(),
+                containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when columns have the same names");
 
         // fix it by editing the first column
         dataPreviewTable.changeColumnName(0, RandomStringUtils.randomAlphabetic(20));
-
-        takeScreenshot(browser, toScreenshotName(DATA_PAGE_NAME, "columnNamesValid"), getClass());
+        takeScreenshot(browser, "columnNamesValid", getClass());
 
         assertFalse(dataPreviewPage.isIntegrationButtonDisabled(), "Add data button should be enabled");
     }
@@ -134,26 +142,21 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
             .saveToDisc(testParams.getCsvFolder());
         final File tooLargeFile = new File(filePath);
         final RandomAccessFile file = new RandomAccessFile(tooLargeFile, "rw");
+
         try {
             file.setLength(1100 * 1024 * 1024);
 
-            initDataUploadPage();
-            waitForFragmentVisible(datasetsListPage).clickAddDataButton();
-            waitForFragmentVisible(fileUploadDialog).pickCsvFile(filePath);
+            final FileUploadDialog fileUploadDialog = initDataUploadPage().clickAddDataButton();
+            fileUploadDialog.pickCsvFile(filePath);
 
             // this is workaround for bug MSF-9734
-            String validationErrorMessage = waitForFragmentVisible(fileUploadDialog).getValidationErrorMessage();
+            String validationErrorMessage = fileUploadDialog.getValidationErrorMessage();
+            takeScreenshot(browser, "validation-errors-upload-file-larger-1GB", getClass());
+
             assertEquals(validationErrorMessage,
                     "The selected file is larger than 1 GB. Try uploading a subset of the data from the file.");
-//            List<String> backendValidationErrors = waitForFragmentVisible(fileUploadDialog)
-//                    .getBackendValidationErrors();
-//            assertThat(backendValidationErrors,
-//                    hasItems("The selected file is larger than 1 GB. "
-//                            + "Try uploading a subset of the data from the file."));
-            takeScreenshot(browser, toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", tooLargeFile.getName()),
-                    getClass());
 
-            checkButtonOnErrorUploadDialog();
+            checkButtonOnErrorUploadDialog(fileUploadDialog);
         } finally {
             file.setLength(0);
             file.close();
@@ -162,27 +165,19 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, dataProvider = "errorCsvFileProvider")
-    public void uploadCsvFileWithErrors(CsvFile fileToUpload, List<String> errorMessages) {
-        initDataUploadPage();
-        uploadFile(fileToUpload);
+    public void uploadCsvFileWithErrors(CsvFile csvFile, List<String> errorMessages) {
+        final FileUploadDialog fileUploadDialog = initDataUploadPage().tryUploadFile(csvFile.getFilePath());
 
-        List<String> backendValidationErrors =
-                waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
-        assertThat(backendValidationErrors, hasItem(createErrorFailedToUploadFile(fileToUpload)));
+        final List<String> backendValidationErrors = fileUploadDialog.getBackendValidationErrors();
+        assertThat(backendValidationErrors, hasItem(format("Failed to upload the \"%s\" file.", csvFile.getFileName())));
         errorMessages.stream().forEach(error -> assertThat(backendValidationErrors, hasItem(error)));
-        takeScreenshot(browser,
-                toScreenshotName(UPLOAD_DIALOG_NAME, "validation-errors", fileToUpload.getFileName()), getClass());
+        takeScreenshot(browser, "validation-errors-" + csvFile.getFileName(), getClass());
 
-        checkButtonOnErrorUploadDialog();
+        checkButtonOnErrorUploadDialog(fileUploadDialog);
     }
 
-    private String createErrorFailedToUploadFile(CsvFile csvFile) {
-        return format("Failed to upload the \"%s\" file.", csvFile.getFileName());
-    }
-
-    private void checkButtonOnErrorUploadDialog() {
+    private void checkButtonOnErrorUploadDialog(FileUploadDialog fileUploadDialog) {
         assertTrue(waitForFragmentVisible(fileUploadDialog).isUploadButtonDisabled());
         waitForFragmentVisible(fileUploadDialog).clickCancelButton();
-        waitForFragmentNotVisible(fileUploadDialog);
     }
 }

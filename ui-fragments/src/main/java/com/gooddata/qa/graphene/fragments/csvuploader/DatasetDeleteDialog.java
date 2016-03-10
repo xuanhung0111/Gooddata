@@ -1,7 +1,11 @@
 package com.gooddata.qa.graphene.fragments.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static org.openqa.selenium.By.className;
 
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -26,12 +30,19 @@ public class DatasetDeleteDialog extends AbstractFragment {
     @FindBy(css = ".gd-dialog-content span")
     private WebElement message;
 
+    public static DatasetDeleteDialog getInstance(SearchContext context) {
+        return Graphene.createPageFragment(DatasetDeleteDialog.class,
+                waitForElementVisible(className("s-dataset-delete-dialog"), context));
+    }
+
     public void clickDelete() {
         waitForElementVisible(deleteButton).click();
+        waitForFragmentNotVisible(this);
     }
 
     public void clickCancel() {
         waitForElementVisible(cancelButton).click();
+        waitForFragmentNotVisible(this);
     }
 
     public String getMessage() {
