@@ -23,6 +23,7 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
@@ -39,6 +40,7 @@ import javax.mail.MessagingException;
 import javax.mail.Part;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
 import org.supercsv.io.CsvListReader;
@@ -81,6 +83,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private Project project;
     private MetadataService mdService;
+    private int scheduledTimeInMinute;
 
     private Map<String, Message[]> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
@@ -121,6 +124,9 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Scheduled email test - empty dashboard.", "First Tab");
         checkRedBar(browser);
         takeScreenshot(browser, "Goodsales-schedules-empty-dashboard", this.getClass());
+        DateTime dateTime = new DateTime();
+        // gets minute of schedule time
+        scheduledTimeInMinute = dateTime.getMinuteOfHour();
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -418,7 +424,17 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     @Test(dependsOnMethods = {"waitForMessages"})
     public void verifyEmptyDashboardSchedule() {
         System.out.println("Email checks ...");
-        assertEquals(attachments.get(emptyDashboardTitle).totalMessage, 1, "ERROR: Dashboard message arrived.");
+        int arrivedMessageCount = attachments.get(emptyDashboardTitle).totalMessage;
+        if (arrivedMessageCount == 2) {
+            if ((scheduledTimeInMinute <= 59 && scheduledTimeInMinute >= 50) || 
+                    (scheduledTimeInMinute <= 29 && scheduledTimeInMinute >= 20)) {
+                log.info("scheduled email is set up so close to the default scheduled time. So we get 2 emails.");
+            } else {
+                fail("ERROR: There are two message dashboard message arrived instead one.");
+            }
+        } else {
+            assertEquals(arrivedMessageCount, 1, "ERROR: Dashboard message arrived.");
+        }
         assertEquals(attachments.get(emptyDashboardTitle).savedAttachments.size(), 1,
                 "ERROR: Dashboard message does not have correct number of attachments.");
         assertTrue(attachments.get(emptyDashboardTitle).savedAttachments.get(0).contentType
