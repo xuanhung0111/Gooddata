@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.utils.ElementUtils;
 
 public class DatasetsListPage extends AbstractFragment {
@@ -93,5 +94,15 @@ public class DatasetsListPage extends AbstractFragment {
                 waitForElementVisible(className("s-upload-dialog"), browser))
                 .pickCsvFile(filePath)
                 .clickUploadButton();
+    }
+
+    public DatasetsListPage switchProject(String name) {
+        log.info("Switching to project: " + name);
+
+        Graphene.createPageFragment(Header.class,
+                waitForElementVisible(By.className("gd-header"), browser))
+                .switchProject(name);
+
+        return this;
     }
 }

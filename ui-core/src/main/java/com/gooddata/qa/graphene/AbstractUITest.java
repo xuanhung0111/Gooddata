@@ -616,9 +616,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForDataPageLoaded(browser);
     }
 
-    public void initProjectsAndUsersPage() {
+    public ProjectAndUsersPage initProjectsAndUsersPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectPage|");
         waitForProjectPageLoaded(browser);
+
+        return projectAndUsersPage;
     }
 
     public UserManagementPage initUserManagementPage() {
