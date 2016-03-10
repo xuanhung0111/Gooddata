@@ -97,7 +97,8 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
                 takeScreenshot(browser, "Goodsales-schedules-unsubscribe-link-" + message.getAllRecipients()[0],
                     this.getClass());
             }
-
+            initEmailSchedulesPage();
+            updateRecurrencyString(emailSchedulesPage.getScheduleMailUriByName(reportTitle));
             pssClient.accelerate();
             try {
                 // check that we will get exception because no more email is sent
