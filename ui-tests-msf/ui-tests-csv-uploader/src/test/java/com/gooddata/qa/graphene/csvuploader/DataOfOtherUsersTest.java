@@ -23,6 +23,8 @@ import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.google.common.base.Predicate;
 
 public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
@@ -111,7 +113,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
             final int datasetCountBeforeDelete = datasetsListPage.getOtherDatasetsCount();
 
-            datasetsListPage.getOthersDatasetsTable().getDatasetDeleteButton(datasetName).click();
+            datasetsListPage.getOthersDatasetsTable().getDataset(datasetName).clickDeleteButton();
             waitForFragmentVisible(datasetDeleteDialog).clickDelete();
             waitForFragmentNotVisible(datasetDeleteDialog);
 
@@ -149,29 +151,29 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
             checkCsvUpload(PAYROLL, this::uploadCsv, true);
             String datasetName = getNewDataset(PAYROLL);
             waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-            assertTrue(datasetsListPage.getMyDatasetsTable().isDeleteButtonVisible(datasetName),
+
+            Dataset dataset = datasetsListPage.getMyDatasetsTable().getDataset(datasetName);
+
+            assertTrue(dataset.isDeleteButtonVisible(), "Delete button is not shown in editor's dataset");
+            assertTrue(dataset.isUpdateButtonVisible(), "Update button is still shown in editor's dataset");
+            assertFalse(dataset.isAnalyzeLinkDisabled(), "Analyze button is not shown in editor's dataset");
+            assertTrue(dataset.isDetailButtonVisible(), "Detail button is not shown in editor's dataset");
+
+            DatasetDetailPage datasetDetailPage = dataset.openDetailPage();
+
+            assertTrue(datasetDetailPage.isDeleteButtonVisible(),
                     "Delete button is not shown in editor's dataset");
-            assertTrue(datasetsListPage.getMyDatasetsTable().isRefreshButtonVisible(datasetName),
-                    "Update button is still shown in editor's dataset");
-            assertTrue(datasetsListPage.getMyDatasetsTable().isAnalyzeButtonVisble(datasetName),
-                    "Analyze button is not shown in editor's dataset");
-            assertTrue(datasetsListPage.getMyDatasetsTable().isDetailButtonVisble(datasetName),
-                    "Detail button is not shown in editor's dataset");
-            datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
-            waitForFragmentVisible(csvDatasetDetailPage);
-            assertTrue(csvDatasetDetailPage.isDeleteButtonVisible(),
-                    "Delete button is not shown in editor's dataset");
-            assertTrue(csvDatasetDetailPage.isRefreshButtonVisible(),
+            assertTrue(datasetDetailPage.isRefreshButtonVisible(),
                     "Update button is not shown in editor's dataset");
-            assertTrue(csvDatasetDetailPage.isAnalyzeButtonVisible(),
+            assertTrue(datasetDetailPage.isAnalyzeButtonVisible(),
                     "Analyze button is not shown in editor's dataset");
 
-            csvDatasetDetailPage.clickRefreshButton();
+            datasetDetailPage.clickRefreshButton();
             refreshCsv(PAYROLL_REFRESH, datasetName, true);
-            waitForFragmentVisible(csvDatasetDetailPage);
 
-            csvDatasetDetailPage.clickBackButton();
-            waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
+            waitForFragmentVisible(datasetDetailPage).clickBackButton();
+            waitForFragmentVisible(dataset).clickDeleteButton();
+
             waitForFragmentVisible(datasetDeleteDialog).clickDelete();
             waitForFragmentNotVisible(datasetDeleteDialog);
             removeDatasetFromUploadHistory(PAYROLL, datasetName);
@@ -206,20 +208,18 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
             initDataUploadPage();
 
-            assertFalse(datasetsListPage.getOthersDatasetsTable().isDeleteButtonVisible(datasetName),
-                    "Delete button is still shown in other dataset");
-            assertFalse(datasetsListPage.getOthersDatasetsTable().isRefreshButtonVisible(datasetName),
-                    "Update button is still shown in other dataset");
-            assertTrue(datasetsListPage.getOthersDatasetsTable().isAnalyzeButtonVisble(datasetName),
-                    "Analyze button is not shown in other dataset");
-            assertTrue(datasetsListPage.getOthersDatasetsTable().isDetailButtonVisble(datasetName),
-                    "Detail button is not shown in other dataset");
+            Dataset dataset = datasetsListPage.getOthersDatasetsTable().getDataset(datasetName);
 
-            datasetsListPage.getOthersDatasetsTable().getDatasetDetailButton(datasetName).click();
-            waitForFragmentVisible(csvDatasetDetailPage);
-            assertFalse(csvDatasetDetailPage.isDeleteButtonVisible(),
+            assertFalse(dataset.isDeleteButtonVisible(), "Delete button is still shown in other dataset");
+            assertFalse(dataset.isUpdateButtonVisible(), "Update button is still shown in other dataset");
+            assertFalse(dataset.isAnalyzeLinkDisabled(), "Analyze button is not shown in other dataset");
+            assertTrue(dataset.isDetailButtonVisible(), "Detail button is not shown in other dataset");
+
+            DatasetDetailPage datasetDetailPage = dataset.openDetailPage();
+
+            assertFalse(datasetDetailPage.isDeleteButtonVisible(),
                     "Delete button is still shown in other dataset");
-            assertFalse(csvDatasetDetailPage.isRefreshButtonVisible(),
+            assertFalse(datasetDetailPage.isRefreshButtonVisible(),
                     "Update button is still shown in other dataset");
         } finally {
             logout();

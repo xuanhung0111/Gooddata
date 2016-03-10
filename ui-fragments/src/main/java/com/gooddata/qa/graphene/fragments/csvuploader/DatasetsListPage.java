@@ -30,8 +30,8 @@ public class DatasetsListPage extends AbstractFragment {
     @FindBy(className = "others-datasets")
     private DatasetsTable othersDatasetsTable;
 
-    public void clickDatasetDetailButton(String datasetName) {
-        getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
+    public DatasetDetailPage openDatasetDetailPage(String datasetName) {
+        return getMyDatasetsTable().getDataset(datasetName).openDetailPage();
     }
 
     public void clickAddDataButton() {
@@ -39,7 +39,7 @@ public class DatasetsListPage extends AbstractFragment {
     }
     
     public String getDatasetAnalyzeLink(String datasetName) {
-        return getMyDatasetsTable().getDatasetAnalyzeButton(datasetName).getAttribute("href");
+        return getMyDatasetsTable().getDataset(datasetName).getAnalyzeLink();
     }
 
     public WebElement waitForHeaderVisible() {

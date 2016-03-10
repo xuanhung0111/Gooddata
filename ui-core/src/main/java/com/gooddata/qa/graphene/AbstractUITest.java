@@ -523,9 +523,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void updateCsvDataset(String datasetName, String filePath) {
         initDataUploadPage();
 
-        datasetsListPage.getMyDatasetsTable()
-                .getDatasetRefreshButton(datasetName)
-                .click();
+        datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .clickUpdateButton();
 
         Graphene.createPageFragment(FileUploadDialog.class,
                 waitForElementVisible(className("s-upload-dialog"), browser))

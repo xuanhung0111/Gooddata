@@ -24,6 +24,8 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.DateFormat;
+import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.utils.Sleeper;
 
 /**
@@ -93,8 +95,12 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         Sleeper.sleepTightInSeconds(5);
-        datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
-        waitForFragmentVisible(csvDatasetDetailPage);
+
+        DatasetDetailPage csvDatasetDetailPage = datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .openDetailPage();
+
         assertThat(csvDatasetDetailPage.getColumnNames(), contains(fileToUpload.getColumnNames().toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), contains(fileToUpload.getColumnTypes().toArray()));
     }
@@ -165,8 +171,12 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         Sleeper.sleepTightInSeconds(5);
-        datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
-        waitForFragmentVisible(csvDatasetDetailPage);
+
+        DatasetDetailPage csvDatasetDetailPage = datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .openDetailPage();
+
         List<String> columnTypes = dateFormats.stream()
                 .map(DateFormat::getColumnType)
                 .collect(toList());
@@ -183,11 +193,15 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         waitForDatasetName(datasetName);
         waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
         Sleeper.sleepTightInSeconds(5);
-        datasetsListPage.getMyDatasetsTable().getDatasetRefreshButton(datasetName).click();
+
+        Dataset dataset = datasetsListPage.getMyDatasetsTable().getDataset(datasetName);
+
+        dataset.clickUpdateButton();
         refreshCsv(DATE_YYYY_FILE, datasetName, true);
         waitForFragmentVisible(datasetsListPage);
 
-        datasetsListPage.getMyDatasetsTable().getDatasetRefreshButton(datasetName).click();
+        dataset.clickUpdateButton();
+
         final CsvFile dateInvalidYYYY = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.invalid.csv"));
         doUploadFromDialog(dateInvalidYYYY);

@@ -176,14 +176,17 @@ public class AbstractCsvUploaderTest extends AbstractMSFTest {
     protected void waitForDatasetStatus(final String datasetName, final String expectedStatusMessageRegex) {
         Predicate<WebDriver> datasetHasSuccessfulStatus = input -> {
             final String datasetStatus =
-                    waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetStatus(datasetName);
+                    waitForFragmentVisible(datasetsListPage)
+                    .getMyDatasetsTable()
+                    .getDataset(datasetName)
+                    .getStatus();
             return isNotEmpty(datasetStatus) && datasetStatus.matches(expectedStatusMessageRegex);
         };
 
         Graphene.waitGui(browser)
                 .withMessage("Dataset '" + datasetName + "' has incorrect status. "
                         + "Expected: '" + expectedStatusMessageRegex
-                        + "', but was: '" + datasetsListPage.getMyDatasetsTable().getDatasetStatus(datasetName)
+                        + "', but was: '" + datasetsListPage.getMyDatasetsTable().getDataset(datasetName).getStatus()
                         + "'.")
                 .until(datasetHasSuccessfulStatus);
     }

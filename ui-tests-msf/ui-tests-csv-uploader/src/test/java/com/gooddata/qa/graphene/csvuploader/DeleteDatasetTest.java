@@ -12,6 +12,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
@@ -21,6 +22,7 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.dashboard.WidgetTypes;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.google.common.base.Predicate;
 
@@ -48,10 +50,15 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         initDataUploadPage();
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
 
-        datasetsListPage.getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
-        takeScreenshot(browser, DELETE_DATASET_DIALOG_NAME, getClass());
+        datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .clickDeleteButton();
+
         waitForFragmentVisible(datasetDeleteDialog);
+        takeScreenshot(browser, DELETE_DATASET_DIALOG_NAME, getClass());
         assertEquals(datasetDeleteDialog.getMessage(), CONFIRM_DELETE_MESSAGE);
+
         datasetDeleteDialog.clickDelete();
 
         assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
@@ -72,8 +79,10 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
 
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
 
-        datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
-        waitForFragmentVisible(csvDatasetDetailPage).clickDeleteButton();
+        datasetsListPage.getMyDatasetsTable()
+                .getDataset(datasetName)
+                .openDetailPage()
+                .clickDeleteButton();
         waitForFragmentVisible(datasetDeleteDialog).clickDelete();
 
         assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
@@ -92,16 +101,24 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
         String datasetName = uploadData(PAYROLL);
         final int datasetCountBeforeDelete = datasetsListPage.getMyDatasetsCount();
 
-        datasetsListPage.getMyDatasetsTable().getDatasetDetailButton(datasetName).click();
-        waitForFragmentVisible(csvDatasetDetailPage).clickDeleteButton();
-        waitForFragmentVisible(datasetDeleteDialog).clickCancel();
+        DatasetDetailPage datasetDetailPage = datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .openDetailPage();
 
+        datasetDetailPage.clickDeleteButton();
+        waitForFragmentVisible(datasetDeleteDialog).clickCancel();
         waitForFragmentNotVisible(datasetDeleteDialog);
-        csvDatasetDetailPage.clickBackButton();
+
+        datasetDetailPage.clickBackButton();
         waitForFragmentVisible(datasetsListPage);
         waitForExpectedDatasetsCount(datasetCountBeforeDelete);
 
-        datasetsListPage.getMyDatasetsTable().getDatasetDeleteButton(datasetName).click();
+        datasetsListPage
+                .getMyDatasetsTable()
+                .getDataset(datasetName)
+                .clickDeleteButton();
+
         waitForFragmentVisible(datasetDeleteDialog).clickCancel();
         waitForFragmentNotVisible(datasetDeleteDialog);
         waitForExpectedDatasetsCount(datasetCountBeforeDelete);
@@ -123,7 +140,14 @@ public class DeleteDatasetTest extends AbstractCsvUploaderTest {
 
     private void checkForDatasetRemoved(final String csvDatasetName) {
         Predicate<WebDriver> datasetSuccessfullyRemoved = input ->
-                waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDatasetRow(csvDatasetName) == null;
+                { 
+                    try {
+                        waitForFragmentVisible(datasetsListPage).getMyDatasetsTable().getDataset(csvDatasetName);
+                        return false;
+                    } catch (NoSuchElementException e) {
+                        return true;
+                    }
+                };
 
         Graphene.waitGui(browser)
                 .withMessage("Dataset '" + csvDatasetName + "' has not been removed from the dataset list.")
