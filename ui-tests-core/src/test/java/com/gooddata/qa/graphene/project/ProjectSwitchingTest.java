@@ -9,38 +9,71 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.util.Objects.isNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
+
 import org.apache.http.ParseException;
 import org.json.JSONException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.GoodData;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 
 public class ProjectSwitchingTest extends AbstractProjectTest {
 
-    private List<String> projectIds = new ArrayList<>();
+    private static final String UNIQUE_ID = UUID.randomUUID().toString().substring(0, 6);
+    private static final String NEW_PROJECT_NAME = "New-project-switch-" + UNIQUE_ID;
 
-    private String editorUser;
-    private String editorPassword;
+    private String newAdminUser;
+    private String newAdminPassword;
+    private String newAdminUserUri;
+
     private String embededDashboardUser;
     private String embededDashboardUserPassword;
 
+    private String currentProjectId;
+    private String newProjectId;
+
+    private GoodData newAdminGoodDataClient;
+
+    @BeforeClass(alwaysRun = true)
+    public void initialize() {
+        projectTitle = "Project-switch-" + UNIQUE_ID;
+    }
+
     @Test(dependsOnMethods = {"createProject"})
     public void inviteUsersToProject() throws ParseException, IOException, JSONException {
-        editorUser = testParams.getEditorUser();
-        editorPassword = testParams.getEditorPassword();
+        newAdminUser = generateUniqueUserEmail(testParams.getUser());
+        newAdminPassword = testParams.getPassword();
+
+        newAdminUserUri = UserManagementRestUtils.createUser(getRestApiClient(), newAdminUser, newAdminPassword);
 
         embededDashboardUser = testParams.getViewerUser();
         embededDashboardUserPassword = testParams.getViewerPassword();
 
-        addUserToProject(editorUser, UserRoles.EDITOR);
+        addUserToProject(newAdminUser, UserRoles.ADMIN);
+        addUserToProject(testParams.getEditorUser(), UserRoles.EDITOR);
         addUserToProject(embededDashboardUser, UserRoles.DASHBOARD_ONLY);
+
+        logout();
+        signInAtGreyPages(newAdminUser, newAdminPassword);
+    }
+
+    @Test(dependsOnMethods = "inviteUsersToProject")
+    public void getMoreProject() {
+        currentProjectId = testParams.getProjectId();
+
+        newProjectId = ProjectRestUtils.createBlankProject(getNewAdminGoodDataClient(), NEW_PROJECT_NAME,
+                testParams.getAuthorizationToken(), testParams.getProjectDriver(),
+                testParams.getProjectEnvironment());
     }
 
     @Test(dependsOnMethods = {"inviteUsersToProject"})
@@ -61,15 +94,14 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
 
         } finally {
             logout();
-            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+            signInAtGreyPages(newAdminUser, newAdminPassword);
         }
     }
 
     @Test(dependsOnMethods = {"inviteUsersToProject"})
     public void tryOpenProjectByDisabledUser() throws JSONException {
         try {
-            logout();
-            signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             initProjectsPage();
             assertTrue(projectsPage.isProjectDisplayed(testParams.getProjectId()),
@@ -79,19 +111,18 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
             waitForDashboardPageLoaded(browser);
 
             logout();
-            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+            signInAtGreyPages(newAdminUser, newAdminPassword);
 
             initProjectsAndUsersPage();
-            projectAndUsersPage.disableUser(editorUser);
-            assertFalse(projectAndUsersPage.isUserDisplayedInList(editorUser),
+            projectAndUsersPage.disableUser(testParams.getEditorUser());
+            assertFalse(projectAndUsersPage.isUserDisplayedInList(testParams.getEditorUser()),
                     "User is not disabled and still displays in Active tab");
 
             projectAndUsersPage.openDeactivatedUserTab();
-            assertTrue(projectAndUsersPage.isUserDisplayedInList(editorUser),
+            assertTrue(projectAndUsersPage.isUserDisplayedInList(testParams.getEditorUser()),
                     "User does not display in Deactivated tab after disabled");
 
-            logout();
-            signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             initProjectsPage();
 
@@ -101,42 +132,51 @@ public class ProjectSwitchingTest extends AbstractProjectTest {
 
         } finally {
             logout();
-            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+            signInAtGreyPages(newAdminUser, newAdminPassword);
         }
     }
 
     @Test(dependsOnMethods = {"inviteUsersToProject"})
     public void switchProjects() throws ParseException, JSONException, IOException {
         try {
-            logout();
-            signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
-            goodDataClient = getGoodDataClient(editorUser, editorPassword);
+            initDashboardsPage();
 
-            for (int i = 0; i < 3; i++) {
-                projectIds.add(ProjectRestUtils.createBlankProject(goodDataClient, "Project switching " + i,
-                        testParams.getAuthorizationToken(), testParams.getProjectDriver(),
-                        testParams.getProjectEnvironment()));
-            }
+            switchProject(NEW_PROJECT_NAME);
 
-            try {
-                initDashboardsPage();
+            takeScreenshot(browser, "Switch-to-project-" + NEW_PROJECT_NAME, getClass());
+            assertThat(browser.getCurrentUrl(), containsString(newProjectId));
 
-                for (String projectId : projectIds) {
-                    selectProject(projectId, browser);
-                    waitForDashboardPageLoaded(browser);
+            switchProject(projectTitle);
 
-                    takeScreenshot(browser, "Switch to project: " + projectId, getClass());
-                    assertThat(browser.getCurrentUrl(), containsString(projectId));
-                }
+            takeScreenshot(browser, "Switch-to-project-" + projectTitle, getClass());
+            assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
 
-            } finally {
-                for (String projectId : projectIds) {
-                    ProjectRestUtils.deleteProject(goodDataClient, projectId);
-                }
-            }
         } finally {
-            logout();
-            signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
+            ProjectRestUtils.deleteProject(getNewAdminGoodDataClient(), newProjectId);
         }
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDown() throws JSONException {
+        logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+
+        UserManagementRestUtils.deleteUser(getRestApiClient(), newAdminUserUri);
+    }
+
+    private String generateUniqueUserEmail(String email) {
+        return email.replace("@", "+" + UUID.randomUUID().toString().substring(0, 6) + "@");
+    }
+
+    private GoodData getNewAdminGoodDataClient() {
+        if (isNull(newAdminGoodDataClient)) {
+            newAdminGoodDataClient = getGoodDataClient(newAdminUser, newAdminPassword);
+        }
+
+        return newAdminGoodDataClient;
+    }
+
+    private void switchProject(String name) {
+        selectProject(name, browser);
+        waitForDashboardPageLoaded(browser);
     }
 }
