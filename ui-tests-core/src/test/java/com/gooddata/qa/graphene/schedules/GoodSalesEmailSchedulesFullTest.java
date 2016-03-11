@@ -13,8 +13,8 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMUFToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMUFObj;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjByUri;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -49,16 +49,13 @@ import org.supercsv.prefs.CsvPreference;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
@@ -81,8 +78,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     private String numericVariableReportTitle = "Numeric-Variable-Report";
     private String mufReportTitle = "MUF-Report";
 
-    private Project project;
-    private MetadataService mdService;
     private int scheduledTimeInMinute;
 
     private Map<String, Message[]> messages;
@@ -106,13 +101,6 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         messages.put(filteredVariableReportTitle += identification, emptyMessage);
         messages.put(numericVariableReportTitle += identification, emptyMessage);
         messages.put(mufReportTitle += identification, emptyMessage);
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
-    public void initializeGoodDataClient() {
-        GoodData goodDataClient = getGoodDataClient();
-        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-        mdService = goodDataClient.getMetadataService();
     }
 
     @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
@@ -169,20 +157,20 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         waitForFragmentVisible(emailSchedulesPage).deleteSchedule(emptyDashboardTitle);
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleEmptyReport() {
         initReportsPage();
         String expression = "SELECT AVG([/gdc/md/${pid}/obj/1145]) where [/gdc/md/${pid}/obj/1093] not in "
                 + "([/gdc/md/${pid}/obj/1093/elements?id=13], [/gdc/md/${pid}/obj/1093/elements?id=7], "
                 + "[/gdc/md/${pid}/obj/1093/elements?id=11])";
 
-        Metric metric = mdService.createObj(project, new Metric("NO DATA",
+        Metric metric = getMdService().createObj(getProject(), new Metric("NO DATA",
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
         ReportDefinition definition = GridReportDefinitionContent.create(NO_DATA_REPORT,
                 singletonList("metricGroup"), Collections.<AttributeInGrid>emptyList(),
                 singletonList(new GridElement(metric.getUri(), "metric")));
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), noDataReportTitle,
@@ -191,17 +179,17 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-no-data-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleIncomputableReport() {
         initReportsPage();
-        String amountMetricUri = mdService.getObjUri(project, Metric.class, identifier("ah1EuQxwaCqs"));
-        Attribute activity = mdService.getObj(project, Attribute.class, identifier("attr.activity.id"));
+        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        Attribute activity = getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.id"));
         ReportDefinition definition = GridReportDefinitionContent.create(INCOMPUTABLE_REPORT,
                 singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(activity.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(amountMetricUri, "metric")));
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), incomputableReportTitle,
@@ -210,21 +198,21 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-incomputable-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleTooLargeReport() {
         initReportsPage();
-        Attribute account = mdService.getObj(project, Attribute.class, identifier("attr.account.id"));
-        Attribute activity = mdService.getObj(project, Attribute.class, identifier("attr.activity.id"));
+        Attribute account = getMdService().getObj(getProject(), Attribute.class, identifier("attr.account.id"));
+        Attribute activity = getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.id"));
         Attribute activityType =
-                mdService.getObj(project, Attribute.class, identifier("attr.activity.activitytype"));
+                getMdService().getObj(getProject(), Attribute.class, identifier("attr.activity.activitytype"));
         ReportDefinition definition = GridReportDefinitionContent.create(TOO_LARGE_REPORT,
                 singletonList("metricGroup"),
                 asList(new AttributeInGrid(account.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(activity.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(activityType.getDefaultDisplayForm().getUri())),
                 Collections.<GridElement>emptyList());
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), tooLargeReportTitle,
@@ -233,7 +221,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-too-large-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleReportApplyFilteredVariable() {
         initVariablePage();
         variablePage.createVariable(new AttributeVariable("FVariable")
@@ -253,7 +241,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-filtered-variable-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleReportApplyNumericVariable() {
         initVariablePage();
         String variableUri = variablePage.createVariable(new NumericVariable("NVariable").withDefaultNumber(2012));
@@ -261,14 +249,14 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String report = "Sum amount in 2012";
         String expression = "SELECT SUM ([/gdc/md/${pid}/obj/1279])"
                 + " WHERE [/gdc/md/${pid}/obj/513] = [" + variableUri + "]";
-        Metric metric = mdService.createObj(project, new Metric(report,
+        Metric metric = getMdService().createObj(getProject(), new Metric(report,
                 expression.replace("${pid}", testParams.getProjectId()), "#,##0"));
-        Attribute yearSnapshot = mdService.getObj(project, Attribute.class, identifier("snapshot.year"));
+        Attribute yearSnapshot = getMdService().getObj(getProject(), Attribute.class, identifier("snapshot.year"));
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(yearSnapshot.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(metric.getUri(), "metric")));
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), numericVariableReportTitle,
@@ -277,24 +265,26 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-numeric-variable-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"verifyEmptySchedules", "initializeGoodDataClient"}, groups = {"schedules"})
+    @Test(dependsOnMethods = {"verifyEmptySchedules"}, groups = {"schedules"})
     public void scheduleMufReport() throws IOException, JSONException {
         initEmailSchedulesPage();
-        Attribute product = mdService.getObj(project, Attribute.class, identifier("attr.product.id"));
-        String amountUri = mdService.getObjUri(project, Metric.class, identifier("ah1EuQxwaCqs"));
-        String explorerId = "169655";
+        Attribute product = getMdService().getObj(getProject(), Attribute.class, identifier("attr.product.id"));
+        String amountUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
         String report = "MUF report";
 
+        final String explorerUri = getMdService().getAttributeElements(product).stream()
+                .filter(e -> e.getTitle().equals("Explorer")).findFirst().get().getUri();
+
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
-        conditions.put(product.getUri(), singletonList(explorerId));
-        String mufUri = createMUFObj(getRestApiClient(), project.getId(), "Product user filter", conditions);
-        addMUFToUser(getRestApiClient(), project.getId(), testParams.getUser(), mufUri);
+        conditions.put(product.getUri(), singletonList(explorerUri));
+        String mufUri = createMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
+        addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
 
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 singletonList(new AttributeInGrid(product.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(amountUri, "metric")));
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), mufReportTitle,
@@ -303,18 +293,18 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         takeScreenshot(browser, "Goodsales-schedules-muf-report", this.getClass());
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataClient"}, groups = {"verify-UI"})
+    @Test(dependsOnMethods = {"createProject"}, groups = {"verify-UI"})
     public void deleteReport() {
         String title = "verify-UI-title";
         String report = "# test report";
 
         initReportsPage();
-        String amountMetricUri = mdService.getObjUri(project, Metric.class, identifier("ah1EuQxwaCqs"));
+        String amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),
                 Collections.<AttributeInGrid>emptyList(),
                 singletonList(new GridElement(amountMetricUri, "metric")));
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         initEmailSchedulesPage();
         emailSchedulesPage.scheduleNewReportEmail(testParams.getUser(), title,

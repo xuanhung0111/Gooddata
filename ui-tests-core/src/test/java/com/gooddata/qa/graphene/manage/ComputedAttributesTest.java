@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -24,6 +25,9 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.md.AttributeElement;
+import com.gooddata.md.Restriction;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -62,9 +66,6 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     private static final String VARIABLE_NAME = "F Stage Name";
     private static final String EXPECTED_DELETE_DESCRIPTION = "To delete this computed attribute you must delete "
             + "its data set. Go to its Data Set administration page and click Delete.";
-    private static final String ATTRIBUTE_STATUS_ID = "1093";
-    private static final String STATUS_WON_ID = "11";
-    private static final String STATUS_LOST_ID = "13";
 
     @BeforeClass
     public void setProjectTitle() {
@@ -284,7 +285,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = {"createReportWithComputedAttribute"})
-    public void applyMUFFiltersOnReportWithComputedAttribute() throws IOException, JSONException {
+    public void applyMufFiltersOnReportWithComputedAttribute() throws IOException, JSONException {
         try {
             initReportsPage();
             reportsPage.getReportsList().openReport(REPORT_NAME);
@@ -311,10 +312,9 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
             signInAtUI(testParams.getUser(), testParams.getPassword());
             restApiClient = getRestApiClient();
 
-            String mufURI = DashboardsRestUtils.createMUFObj(restApiClient, testParams.getProjectId(),
-                    "Status User Filters", buildConditions());
-            DashboardsRestUtils.addMUFToUser(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
-                    mufURI);
+            String mufUri = createStageMuf(Arrays.asList("Won", "Lost"), "Status User Filters");
+            DashboardsRestUtils.addMufToUser(restApiClient, testParams.getProjectId(), testParams.getEditorUser(),
+                    mufUri);
             logout();
 
             signInAtUI(testParams.getEditorUser(), testParams.getEditorPassword());
@@ -338,7 +338,7 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"createReportWithComputedAttribute",
         "applyListFiltersOnReportWithComputedAttribute", "computedAttributeReportOnDashboard",
-        "applyMUFFiltersOnReportWithComputedAttribute"})
+        "applyMufFiltersOnReportWithComputedAttribute"})
     public void deleteAttributeAndMetricUsedInComputedAttribute() {
         initAttributePage();
         attributePage.initAttribute("Sales Rep");
@@ -418,10 +418,18 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         assertEquals(attributeDetailPage.getDeleteButtonDescription(), EXPECTED_DELETE_DESCRIPTION);
     }
 
-    private Map<String, Collection<String>> buildConditions() {
-        Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
-        conditions.put(ATTRIBUTE_STATUS_ID, Arrays.asList(STATUS_WON_ID, STATUS_LOST_ID));
-        return conditions;
+    private String createStageMuf(final List<String> expectedStageElements, final String mufTitle)
+                    throws ParseException, JSONException, IOException {
+        final Attribute stage = getMdService().getObj(getProject(), Attribute.class, Restriction.identifier("attr.stage.status"));
+        final List<AttributeElement> filteredElements = getMdService().getAttributeElements(stage).stream()
+                .filter(e -> expectedStageElements.contains(e.getTitle())).collect(Collectors.toList());
+
+        final List<String> elementUris = filteredElements.stream().map(e -> e.getUri()).collect(Collectors.toList());
+
+        final Map<String, Collection<String>> conditions = new HashMap<>();
+        conditions.put(stage.getUri(), elementUris);
+
+        return DashboardsRestUtils.createMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
     }
 
 }

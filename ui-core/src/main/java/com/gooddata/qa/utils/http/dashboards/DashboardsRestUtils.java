@@ -222,7 +222,7 @@ public final class DashboardsRestUtils {
     }
 
     /**
-     * Create mandatory user filter object
+     * Create mandatory user filter object using uri
      * 
      * @param restApiClient
      * @param projectID
@@ -230,14 +230,21 @@ public final class DashboardsRestUtils {
      * @param conditions
      * @return mandatory user filter uri
      */
-    public static String createMUFObj(final RestApiClient restApiClient, final String projectID,
+    public static String createMufObjByUri(final RestApiClient restApiClient, final String projectID,
             final String mufTitle, final Map<String, Collection<String>> conditions)
-                    throws IOException, JSONException {
-        final String mdObjURI = format(OBJ_LINK, projectID);
-        final String MUFExpressions = buildFilterExpression(projectID, conditions);
-        final String contentBody = MUF_OBJ.get().replace("${MUFExpression}", MUFExpressions).replace("${MUFTitle}", mufTitle);
+                    throws ParseException, JSONException, IOException {
+        final String expression = "(%s IN (%s))";
+        final List<String> expressions = Lists.newArrayList();
 
-        return getJsonObject(restApiClient, restApiClient.newPostMethod(mdObjURI, contentBody)).getString("uri");
+        for (final String attribute : conditions.keySet()) {
+            expressions.add(format(expression,
+                    format("[%s]", attribute),
+                    conditions.get(attribute).stream().map(e -> format("[%s]", e)).collect(joining(","))));
+        }
+        final String contentBody = MUF_OBJ.get().replace("${MUFExpression}", expressions.stream()
+                .collect(joining(" AND "))).replace("${MUFTitle}", mufTitle);
+
+        return getJsonObject(restApiClient, restApiClient.newPostMethod(format(OBJ_LINK, projectID), contentBody)).getString("uri");
     }
 
     /**
@@ -248,7 +255,7 @@ public final class DashboardsRestUtils {
      * @param user
      * @param mufURI
      */
-    public static void addMUFToUser(final RestApiClient restApiClient, final String projectURI, final String user,
+    public static void addMufToUser(final RestApiClient restApiClient, final String projectURI, final String user,
             final String mufURI) throws ParseException, IOException {
         final String urserFilter = format(MUF_LINK, projectURI);
         final String contentBody = USER_FILTER.get().replace("${email}", user).replace("$MUFExpression", mufURI);
@@ -279,27 +286,6 @@ public final class DashboardsRestUtils {
     public static void setDrillReportTargetAsExport(final RestApiClient restApiClient, final String projectID,
             final String dashboardID, final String exportFormat) throws JSONException, IOException {
         setDrillReportTarget(restApiClient, projectID, dashboardID, TARGET_EXPORT, exportFormat);
-    }
-
-    private static String buildFilterExpression(final String projectID, final Map<String, Collection<String>> conditions) {
-        // syntax: "([<Attribute_URI_1>] IN ([<element_URI_1>], [element_URI_2], [...] )) AND
-        // ([<Attribute_URI_2>] IN ([<element_URI_1>], [element_URI_2], [...]))";
-
-        final List<String> expressions = Lists.newArrayList();
-        final String attributeURI = "[/gdc/md/%s/obj/%s]";
-        final String elementURI = "[/gdc/md/%s/obj/%s/elements?id=%s]";
-        final String expression = "(%s IN (%s))";
-
-        for (final String attributeID : conditions.keySet()) {
-            expressions.add(format(expression,
-                    format(attributeURI, projectID, attributeID),
-                    conditions.get(attributeID)
-                        .stream()
-                        .map(s -> format(elementURI, projectID, attributeID, s))
-                        .collect(joining(","))
-            ));
-        }
-        return expressions.stream().collect(joining(" AND "));
     }
 
     private static void setDrillReportTarget(final RestApiClient restApiClient, final String projectID,

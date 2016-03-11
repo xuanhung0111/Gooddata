@@ -5,8 +5,8 @@ import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMUFToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMUFObj;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjByUri;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
@@ -18,6 +18,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -31,16 +32,13 @@ import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
 import com.gooddata.md.Attribute;
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.report.AttributeInGrid;
 import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
@@ -57,7 +55,6 @@ import com.google.common.base.Function;
 
 public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstractTest {
 
-    private static final String STAGE_NAME_ID = "1095";
     private static final String SHORT_LIST_ID = "1251";
     private static final String RISK_ASSESSMENT_ID = "966645";
     private static final String CONVICTION_ID = "966646";
@@ -81,9 +78,6 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     private static final String USE_AVAILABLE_DASHBOARD_2 = "UseAvailable2";
     private static final String USE_AVAILABLE_DASHBOARD = "UseAvailable";
 
-    private Project project;
-    private MetadataService mdService;
-
     private Metric metricAvailable;
     private Attribute stageName;
     private String amountMetricUri;
@@ -95,11 +89,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
     public void initialization() {
-        GoodData goodDataClient = getGoodDataClient();
-        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-        mdService = goodDataClient.getMetadataService();
-        amountMetricUri = mdService.getObjUri(project, Metric.class, identifier("ah1EuQxwaCqs"));
-        stageName = mdService.getObj(project, Attribute.class, identifier("attr.stage.name"));
+        amountMetricUri = getMdService().getObjUri(getProject(), Metric.class, identifier("ah1EuQxwaCqs"));
+        stageName = getMdService().getObj(getProject(), Attribute.class, identifier("attr.stage.name"));
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"init"})
@@ -113,18 +104,18 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     @Test(dependsOnMethods = {"initialization", "createVariable"}, groups = {"init"})
     public void prepareMetricAndReports() throws IOException, JSONException {
         // *** create metric available ***
-        metricAvailable = mdService.createObj(project, new Metric(METRIC_AVAILABLE,
+        metricAvailable = getMdService().createObj(getProject(), new Metric(METRIC_AVAILABLE,
                 buildFirstMetricExpression(amountMetricUri, stageName.getUri()), "#,##0.00"));
 
         // *** create report 1 ***
-        String yearSnapshotUri = mdService.getObj(project, Attribute.class, identifier("snapshot.year"))
+        String yearSnapshotUri = getMdService().getObj(getProject(), Attribute.class, identifier("snapshot.year"))
                 .getDefaultDisplayForm().getUri();
         ReportDefinition definition = GridReportDefinitionContent.create(REPORT_1, singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri()),
                         new AttributeInGrid(yearSnapshotUri)), singletonList(new GridElement(amountMetricUri,
                                 AMOUNT)));
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         // *** create report 2 ***
         initReportsPage();
@@ -234,8 +225,8 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         ReportDefinition definition = GridReportDefinitionContent.create(REPORT_3, singletonList("metricGroup"),
                 asList(new AttributeInGrid(stageName.getDefaultDisplayForm().getUri())),
                 singletonList(new GridElement(amountMetricUri, "Amount")));
-        definition = mdService.createObj(project, definition);
-        mdService.createObj(project, new Report(definition.getTitle(), definition));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_1);
         try {
@@ -332,10 +323,13 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
     @Test(dependsOnGroups = {"init"}, priority = 1)
     public void combineMufAndUseAvailable() throws IOException, JSONException {
         String stageNameUri = stageName.getUri();
+
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
-        conditions.put(STAGE_NAME_ID, asList(RISK_ASSESSMENT_ID, CONVICTION_ID, NEGOTIATION_ID));
-        String mufUri = createMUFObj(getRestApiClient(), project.getId(), "Stage Name user filter", conditions);
-        addMUFToUser(getRestApiClient(), project.getId(), testParams.getUser(), mufUri);
+        conditions.put(stageNameUri, buildStageElementUris());
+
+        String mufUri = createMufObjByUri(getRestApiClient(),
+                getProject().getId(), "Stage Name user filter", conditions);
+        addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
 
         makeCopyFromDashboard(USE_AVAILABLE_DASHBOARD_2);
 
@@ -365,7 +359,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         } finally {
             dashboardsPage.deleteDashboard();
             editMetricExpression(buildFirstMetricExpression(amountMetricUri, stageNameUri));
-            addMUFToUser(getRestApiClient(), project.getId(), testParams.getUser(), "");
+            addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), "");
         }
     }
 
@@ -485,5 +479,13 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
 
     private String buildAttributeElementUri(String attributeUri, String elementId) {
         return attributeUri + "/elements?id=" + elementId;
+    }
+
+    private Collection<String> buildStageElementUris() {
+        final String stageUri = stageName.getUri();
+
+        return Arrays.asList(buildAttributeElementUri(stageUri, RISK_ASSESSMENT_ID),
+                buildAttributeElementUri(stageUri, CONVICTION_ID),
+                buildAttributeElementUri(stageUri, NEGOTIATION_ID));
     }
 }
