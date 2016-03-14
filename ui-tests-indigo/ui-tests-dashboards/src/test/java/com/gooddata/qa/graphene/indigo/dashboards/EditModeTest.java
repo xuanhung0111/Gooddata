@@ -54,15 +54,11 @@ public class EditModeTest extends DashboardWithWidgetsTest {
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
     public void checkViewerCannotEditDashboard() throws JSONException {
         try {
-            initDashboardsPage();
-
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
             assertFalse(initIndigoDashboardsPageWithWidgets().isEditButtonVisible());
 
         } finally {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
@@ -70,15 +66,11 @@ public class EditModeTest extends DashboardWithWidgetsTest {
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
     public void checkEditorCanEditDashboard() throws JSONException {
         try {
-            initDashboardsPage();
-
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             assertTrue(initIndigoDashboardsPageWithWidgets().isEditButtonVisible());
 
         } finally {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
@@ -120,15 +112,11 @@ public class EditModeTest extends DashboardWithWidgetsTest {
 
         // add alert as different user
         try {
-            initDashboardsPage();
-
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
         } finally {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
 
@@ -151,18 +139,15 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfig);
 
         try {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
         } finally {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
 
@@ -188,7 +173,6 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         try {
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             initIndigoDashboardsPageWithWidgets()
@@ -204,7 +188,6 @@ public class EditModeTest extends DashboardWithWidgetsTest {
                     .leaveEditMode();
 
         } finally {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
 
