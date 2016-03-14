@@ -85,8 +85,9 @@
         <version.org.testng>6.9.10</version.org.testng>
         <version.org.apache.maven.surefire-plugin>2.19.1</version.org.apache.maven.surefire-plugin>
         <json-path.version>0.9.1</json-path.version>
-        <gooddata-http-client.version>0.8.2</gooddata-http-client.version>
-        <gooddata-java.version>0.20.0</gooddata-java.version>
+        <gooddata-http-client.version>0.9.3</gooddata-http-client.version>
+        <gooddata-java.version>1.5.0</gooddata-java.version>
+        <jackson.version>2.7.0</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -149,7 +150,7 @@
         </dependency>
 
         <dependency>
-            <groupId>cz.geek</groupId>
+            <groupId>com.gooddata</groupId>
             <artifactId>gooddata-java</artifactId>
             <version>${gooddata-java.version}</version>
         </dependency>
@@ -161,15 +162,21 @@
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>1.9.12</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.12</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
