@@ -4,14 +4,10 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_LAST_YEAR;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_THIS_YEAR;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
-import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.testng.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,10 +19,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,7 +34,9 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
-import com.gooddata.qa.utils.http.RestApiClient;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
 
 public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
@@ -100,7 +95,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
                 new KpiMDConfiguration.Builder()
                 .title("Number")
                 .metric(numberMetricUri)
-                .dateDimension(dateDimensionUri)
+                .dateDataSet(dateDimensionUri)
                 .comparisonType(ComparisonType.PREVIOUS_PERIOD)
                 .comparisonDirection(ComparisonDirection.GOOD)
                 .build());

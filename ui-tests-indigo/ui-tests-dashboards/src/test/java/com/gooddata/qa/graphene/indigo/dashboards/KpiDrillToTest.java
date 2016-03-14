@@ -5,15 +5,9 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.stream.Stream;
@@ -35,19 +29,25 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.google.common.base.Predicate;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
     private static final KpiConfiguration kpiWithDrillTo = new KpiConfiguration.Builder()
         .metric(AMOUNT)
-        .dateDimension(DATE_CREATED)
+        .dataSet(DATE_CREATED)
         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
         .drillTo(DRILL_TO_OUTLOOK)
         .build();
 
     private static final KpiConfiguration kpiWithoutDrillTo = new KpiConfiguration.Builder()
         .metric(AMOUNT)
-        .dateDimension(DATE_CREATED)
+        .dataSet(DATE_CREATED)
         .build();
 
     @BeforeClass(alwaysRun = true)
@@ -226,7 +226,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         try {
             setupKpi(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
-                .dateDimension(DATE_CREATED)
+                .dataSet(DATE_CREATED)
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                 .drillTo(personalTab)
                 .build());
@@ -275,7 +275,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         try {
             setupKpi(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
-                .dateDimension(DATE_CREATED)
+                .dataSet(DATE_CREATED)
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                 .drillTo(newTab)
                 .build());

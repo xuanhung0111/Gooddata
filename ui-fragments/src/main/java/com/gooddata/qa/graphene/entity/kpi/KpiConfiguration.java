@@ -3,13 +3,13 @@ package com.gooddata.qa.graphene.entity.kpi;
 public class KpiConfiguration {
 
     private final String metric;
-    private final String dateDimension;
+    private final String dataSet;
     private final String comparison;
     private final String drillTo;
 
-    private KpiConfiguration(final String newMetric, final String newDateDimension, final String newComparison, final String newDrillTo) {
+    private KpiConfiguration(final String newMetric, final String newDataSet, final String newComparison, final String newDrillTo) {
         this.metric = newMetric;
-        this.dateDimension = newDateDimension;
+        this.dataSet = newDataSet;
         this.comparison = newComparison;
         this.drillTo = newDrillTo;
     }
@@ -18,8 +18,8 @@ public class KpiConfiguration {
         return metric;
     }
 
-    public String getDateDimension() {
-        return dateDimension;
+    public String getDataSet() {
+        return dataSet;
     }
 
     public String getComparison() {
@@ -41,7 +41,7 @@ public class KpiConfiguration {
     public static class Builder {
 
         private String nestedMetric;
-        private String nestedDateDimension;
+        private String nestedDataSet;
         private String nestedComparison = null;
         private String nestedDrillTo = null;
 
@@ -50,8 +50,8 @@ public class KpiConfiguration {
             return this;
         }
 
-        public Builder dateDimension(String newDateDimension) {
-            this.nestedDateDimension = newDateDimension;
+        public Builder dataSet(String newDataSet) {
+            this.nestedDataSet = newDataSet;
             return this;
         }
 
@@ -66,7 +66,7 @@ public class KpiConfiguration {
         }
 
         public KpiConfiguration build() {
-            return new KpiConfiguration(nestedMetric, nestedDateDimension, nestedComparison, nestedDrillTo);
+            return new KpiConfiguration(nestedMetric, nestedDataSet, nestedComparison, nestedDrillTo);
         }
     }
 }

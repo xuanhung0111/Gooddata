@@ -1,8 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -17,6 +14,9 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
 
@@ -33,7 +33,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
     public void testEmptyMetricWithoutConditionalFormat() {
         setupKpi(new KpiConfiguration.Builder()
             .metric(errorMetric.getTitle())
-            .dateDimension(DATE_CREATED)
+            .dataSet(DATE_CREATED)
             .build());
 
         Kpi lastKpi = initIndigoDashboardsPageWithWidgets()

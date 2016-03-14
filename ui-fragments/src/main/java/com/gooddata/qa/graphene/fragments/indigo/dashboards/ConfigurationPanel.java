@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import java.util.Collection;
@@ -13,6 +12,7 @@ import org.openqa.selenium.support.FindBy;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import com.google.common.base.Predicate;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 
@@ -24,11 +24,11 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(css = ".s-metric_select button.is-loaded")
     private WebElement metricSelectLoaded;
 
-    @FindBy(css = ".s-dimension_select button")
-    private WebElement dimensionSelectLoaded;
+    @FindBy(css = ".s-dataSet_select button")
+    private WebElement dataSetSelectLoaded;
 
-    @FindBy(className = "s-dimension_select")
-    private DateDimensionSelect dateDimensionSelect;
+    @FindBy(className = "s-dataSet_select")
+    private DataSetSelect dataSetSelect;
 
     @FindBy(className = "s-compare_with_select")
     private ComparisonSelect comparisonSelect;
@@ -47,9 +47,9 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
-        final Predicate<WebDriver> dateDimensionLoaded =
-                browser -> !dimensionSelectLoaded.getAttribute("class").contains("is-loading");
-        Graphene.waitGui().until(dateDimensionLoaded);
+        final Predicate<WebDriver> dataSetLoaded =
+                browser -> !dataSetSelectLoaded.getAttribute("class").contains("is-loading");
+        Graphene.waitGui().until(dataSetLoaded);
         return this;
     }
 
@@ -58,8 +58,8 @@ public class ConfigurationPanel extends AbstractFragment {
         return this;
     }
 
-    public ConfigurationPanel selectDateDimensionByName(String name) {
-        waitForFragmentVisible(dateDimensionSelect).selectByName(name);
+    public ConfigurationPanel selectDataSetByName(String name) {
+        waitForFragmentVisible(dataSetSelect).selectByName(name);
         return this;
     }
 
@@ -82,16 +82,16 @@ public class ConfigurationPanel extends AbstractFragment {
         return this;
     }
 
-    public String getSelectedDateDimension() {
-        return waitForFragmentVisible(dateDimensionSelect).getSelection();
+    public String getSelectedDataSet() {
+        return waitForFragmentVisible(dataSetSelect).getSelection();
     }
 
-    public Collection<String> getDateDimensions() {
-        return waitForFragmentVisible(dateDimensionSelect).getValues();
+    public Collection<String> getDataSets() {
+        return waitForFragmentVisible(dataSetSelect).getValues();
     }
 
-    public boolean isDateDimensionEnabled() {
-        return !waitForFragmentVisible(dateDimensionSelect)
+    public boolean isDataSetEnabled() {
+        return !waitForFragmentVisible(dataSetSelect)
                 .getDropdownButton()
                 .getAttribute("class")
                 .contains("disabled");

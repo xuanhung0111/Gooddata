@@ -3,9 +3,6 @@ package com.gooddata.qa.utils.http.indigo;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.utils.http.RestUtils.CREATE_AND_GET_OBJ_LINK;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObject;
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
@@ -20,7 +17,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.GoodData;
-import com.gooddata.md.Dimension;
+import com.gooddata.md.Dataset;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
@@ -29,6 +26,12 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.http.RestApiClient;
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static java.lang.String.format;
+import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
+import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
+import static java.lang.String.format;
 
 /**
  * REST utilities for Indigo task
@@ -38,7 +41,7 @@ public class IndigoRestUtils {
     private static final String AMOUNT = "Amount";
     private static final String LOST = "Lost";
     private static final String NUM_OF_ACTIVITIES = "# of Activities";
-    private static final String DATE_DIM_CREATED = "Date dimension (Created)";
+    private static final String DATE_DATA_SET_CREATED = "Date (Created)";
 
     private static final Supplier<String> ANALYTICAL_DASHBOARD_BODY = () -> {
         try {
@@ -68,7 +71,7 @@ public class IndigoRestUtils {
                     put("content", new JSONObject() {{
                         put("comparisonType", "${comparisonType}");
                         put("metric", "${metric}");
-                        put("dateDimension", "${dateDimension}");
+                        put("dateDataset", "${dateDataSet}");
                     }});
                 }});
             }}.toString();
@@ -111,7 +114,7 @@ public class IndigoRestUtils {
         String content = KPI_WIDGET_BODY.get()
                 .replace("${title}", kpiConfig.getTitle())
                 .replace("${metric}", kpiConfig.getMetric())
-                .replace("${dateDimension}", kpiConfig.getDateDimension())
+                .replace("${dateDataSet}", kpiConfig.getDateDataSet())
                 .replace("${comparisonType}", kpiConfig.getComparisonType().getJsonKey());
 
         if (kpiConfig.hasComparison()) {
@@ -232,33 +235,33 @@ public class IndigoRestUtils {
         final String amountMetricUri = service.getObjUri(project, Metric.class, title(AMOUNT));
         final String lostMetricUri = service.getObjUri(project, Metric.class, title(LOST));
         final String numOfActivitiesUri = service.getObjUri(project, Metric.class, title(NUM_OF_ACTIVITIES));
-        final String dateDimensionUri = getDateDimensionCreatedUri(goodData, projectId);
+        final String dataSetUri = getDateDataSetCreatedUri(goodData, projectId);
 
         final String amountWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
                 .title(AMOUNT)
                 .metric(amountMetricUri)
-                .dateDimension(dateDimensionUri)
+                .dateDataSet(dataSetUri)
                 .comparisonType(ComparisonType.NO_COMPARISON)
                 .comparisonDirection(ComparisonDirection.NONE)
                 .build());
         final String lostWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
                 .title(LOST)
                 .metric(lostMetricUri)
-                .dateDimension(dateDimensionUri)
+                .dateDataSet(dataSetUri)
                 .comparisonType(Kpi.ComparisonType.LAST_YEAR)
                 .comparisonDirection(Kpi.ComparisonDirection.BAD)
                 .build());
         final String numOfActivitiesWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
                 .title(NUM_OF_ACTIVITIES)
                 .metric(numOfActivitiesUri)
-                .dateDimension(dateDimensionUri)
+                .dateDataSet(dataSetUri)
                 .comparisonType(Kpi.ComparisonType.PREVIOUS_PERIOD)
                 .comparisonDirection(Kpi.ComparisonDirection.GOOD)
                 .build());
         final String drillToWidget = createKpiWidget(restApiClient, projectId, new KpiMDConfiguration.Builder()
                 .title("DrillTo")
                 .metric(amountMetricUri)
-                .dateDimension(dateDimensionUri)
+                .dateDataSet(dataSetUri)
                 .comparisonType(ComparisonType.NO_COMPARISON)
                 .comparisonDirection(ComparisonDirection.NONE)
                 .drillToDashboard("/gdc/md/p8aqohkx4htbrau1wpk6k68crltlojig/obj/916")
@@ -270,16 +273,16 @@ public class IndigoRestUtils {
     }
 
     /**
-     * Get date dimension created uri
+     * Get date data set created uri
      * 
      * @param goodData
      * @param projectId
-     * @return date dimension created uri
+     * @return date data set created uri
      */
-    public static String getDateDimensionCreatedUri(final GoodData goodData, final String projectId) {
+    public static String getDateDataSetCreatedUri(final GoodData goodData, final String projectId) {
         return goodData.getMetadataService()
             .getObjUri(goodData.getProjectService().getProjectById(projectId),
-                    Dimension.class,
-                    title(DATE_DIM_CREATED));
+                    Dataset.class,
+                    title(DATE_DATA_SET_CREATED));
     }
 }

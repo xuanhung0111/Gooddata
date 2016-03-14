@@ -96,7 +96,7 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
                     new KpiMDConfiguration.Builder()
                     .title(metric.getTitle())
                     .metric(getMdService().createObj(getProject(), metric).getUri())
-                    .dateDimension(dateDimensionUri)
+                    .dateDataSet(dateDimensionUri)
                     .comparisonType(ComparisonType.PREVIOUS_PERIOD)
                     .comparisonDirection(ComparisonDirection.GOOD)
                     .build()));

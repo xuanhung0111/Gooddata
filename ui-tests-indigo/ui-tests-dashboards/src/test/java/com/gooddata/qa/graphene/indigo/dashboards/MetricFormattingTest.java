@@ -1,14 +1,10 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.RestUtils.deleteObject;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.addKpiWidgetToAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.deleteKpiWidgetFromAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getAnalyticalDashboards;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getDateDimensionCreatedUri;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -26,6 +22,10 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirect
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getDateDataSetCreatedUri;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
@@ -51,7 +51,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
 
         setupKpi(new KpiConfiguration.Builder()
             .metric(customFormatMetricName)
-            .dateDimension(DATE_CREATED)
+            .dataSet(DATE_CREATED)
             .build()
         );
 
@@ -89,7 +89,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
                 new KpiMDConfiguration.Builder()
                     .title(xssMetricName)
                     .metric(xssMetric.getUri())
-                    .dateDimension(getDateDimensionCreatedUri(getGoodDataClient(), projectId))
+                    .dateDataSet(getDateDataSetCreatedUri(getGoodDataClient(), projectId))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
@@ -131,7 +131,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
                 new KpiMDConfiguration.Builder()
                     .title(xssFormatMetricName)
                     .metric(xssFormatMetric.getUri())
-                    .dateDimension(getDateDimensionCreatedUri(getGoodDataClient(), projectId))
+                    .dateDataSet(getDateDataSetCreatedUri(getGoodDataClient(), projectId))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()
@@ -164,7 +164,7 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
                 new KpiMDConfiguration.Builder()
                     .title(invalidMetricName)
                     .metric(invalidMetric.getUri())
-                    .dateDimension(getDateDimensionCreatedUri(getGoodDataClient(), projectId))
+                    .dateDataSet(getDateDataSetCreatedUri(getGoodDataClient(), projectId))
                     .comparisonType(ComparisonType.NO_COMPARISON)
                     .comparisonDirection(ComparisonDirection.NONE)
                     .build()

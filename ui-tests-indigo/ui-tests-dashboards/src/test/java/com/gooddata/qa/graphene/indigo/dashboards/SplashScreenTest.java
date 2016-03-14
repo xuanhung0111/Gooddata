@@ -1,9 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -16,10 +13,13 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringMissingInUrl;
 import java.util.Arrays;
 import org.openqa.selenium.By;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class SplashScreenTest extends DashboardsTest {
 
@@ -27,7 +27,7 @@ public class SplashScreenTest extends DashboardsTest {
 
     private static final KpiConfiguration kpi = new KpiConfiguration.Builder()
         .metric(AMOUNT)
-        .dateDimension(DATE_CREATED)
+        .dataSet(DATE_CREATED)
         .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
         .drillTo(DRILL_TO_OUTLOOK)
         .build();
@@ -180,9 +180,6 @@ public class SplashScreenTest extends DashboardsTest {
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
     public void checkViewerCannotCreateDashboard() throws JSONException {
         try {
-            initDashboardsPage();
-
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
             // viewer accessing "dashboards" with no kpi dashboards created should be redirected
@@ -193,7 +190,6 @@ public class SplashScreenTest extends DashboardsTest {
             waitForStringMissingInUrl("/dashboards");
 
         } finally {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }
@@ -201,9 +197,6 @@ public class SplashScreenTest extends DashboardsTest {
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
     public void checkEditorCanCreateDashboard() throws JSONException {
         try {
-            initDashboardsPage();
-
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
             initIndigoDashboardsPage()
@@ -211,7 +204,6 @@ public class SplashScreenTest extends DashboardsTest {
                 .waitForCreateKpiDashboardButtonVisible();
 
         } finally {
-            logout();
             signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
         }
     }

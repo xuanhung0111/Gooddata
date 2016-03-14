@@ -1,9 +1,6 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
@@ -21,6 +18,9 @@ import com.gooddata.qa.graphene.fragments.indigo.HamburgerMenu;
 import com.gooddata.qa.graphene.fragments.indigo.Header;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.google.common.collect.Iterables;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 public class IndigoDashboardsPage extends AbstractFragment {
 
@@ -44,6 +44,9 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = SAVE_BUTTON_CLASS_NAME)
     private WebElement saveButton;
+    
+    @FindBy(css = "." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)")
+    private WebElement enabledSaveButton;
 
     @FindBy(className = "configuration-panel")
     private ConfigurationPanel configurationPanel;
@@ -103,16 +106,15 @@ public class IndigoDashboardsPage extends AbstractFragment {
     }
 
     public IndigoDashboardsPage saveEditModeWithKpis() {
-        waitForElementVisible(saveButton).click();
+        waitForElementVisible(enabledSaveButton).click();
         waitForElementVisible(editButton);
 
         return this;
     }
 
     public IndigoDashboardsPage saveEditModeWithoutKpis() {
-        waitForElementVisible(saveButton).click();
-        this.waitForDialog()
-                .submitClick();
+        waitForElementVisible(enabledSaveButton).click();
+        this.waitForDialog().submitClick();
         waitForFragmentVisible(splashScreen);
 
         return this;
@@ -121,7 +123,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public boolean isSaveEnabled() {
         return isElementPresent(SAVE_BUTTON_ENABLED, browser);
     }
-
+    
     // if save is disabled, use cancel. But leave edit mode in any case
     public IndigoDashboardsPage leaveEditMode() {
         if (isSaveEnabled()) {
@@ -255,7 +257,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
         clickAddWidget();
         configurationPanel
             .selectMetricByName(config.getMetric())
-            .selectDateDimensionByName(config.getDateDimension());
+            .selectDataSetByName(config.getDataSet());
 
         if (config.hasComparison()) {
             configurationPanel.selectComparisonByName(config.getComparison());

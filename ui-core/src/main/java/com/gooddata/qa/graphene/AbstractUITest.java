@@ -510,9 +510,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         Predicate<WebDriver> datasetsCountEqualsExpected = input ->
             waitForFragmentVisible(datasetsListPage).getMyDatasetsCount() == datasetCountBeforeUpload + 1;
         Graphene.waitGui(browser).until(datasetsCountEqualsExpected);
-        
+
         waitForElementNotPresent(By.cssSelector(".item-in-progress"));
-        DatasetMessageBar csvDatasetMessageBar = Graphene.createPageFragment(DatasetMessageBar.class, 
+        DatasetMessageBar csvDatasetMessageBar = Graphene.createPageFragment(DatasetMessageBar.class,
                 waitForElementVisible(By.className("gd-messages"), browser));
         if (datasetsListPage.getMyDatasetsCount() == datasetCountBeforeUpload + 1) {
             log.info("Upload succeeds with message: " + csvDatasetMessageBar.waitForSuccessMessageBar().getText());
