@@ -349,7 +349,7 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
             initDashboardsPage();
             dashboardsPage.selectDashboard(PIPELINE_ANALYSIS_DASHBOARD);
             createDashboardSchedule(scheduleUserA, asList(userA));
-            UserManagementRestUtils.deleteUser(getRestApiClient(), userAUri);
+            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userAUri);
 
             initEmailSchedulesPage();
             assertDashboardScheduleInfo(scheduleUserA, userUri, asList(userA));
@@ -361,15 +361,15 @@ public class GoodSalesScheduleDashboardTest extends AbstractGoodSalesEmailSchedu
 
             logout();
             signIn(true, UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUser(getRestApiClient(), userBUri);
+            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userBUri);
 
             initEmailSchedulesPage();
             assertFalse(emailSchedulesPage.isPrivateSchedulePresent(scheduleUserB),
                     "Schedule of deleted user was not hidden.");
         } finally {
             loginAs(UserRoles.ADMIN);
-            UserManagementRestUtils.deleteUser(getRestApiClient(), userAUri);
-            UserManagementRestUtils.deleteUser(getRestApiClient(), userBUri);
+            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userAUri);
+            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), userBUri);
         }
     }
 

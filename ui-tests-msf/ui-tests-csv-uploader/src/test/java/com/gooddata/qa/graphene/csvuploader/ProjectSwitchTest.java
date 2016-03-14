@@ -105,7 +105,7 @@ public class ProjectSwitchTest extends AbstractCsvUploaderTest {
         logout();
         signIn(canAccessGreyPage(browser), UserRoles.ADMIN);
 
-        UserManagementRestUtils.deleteUser(getRestApiClient(), newAdminUserUri);
+        UserManagementRestUtils.deleteUserByUri(getRestApiClient(), newAdminUserUri);
     }
 
     private String generateUniqueUserEmail(String email) {

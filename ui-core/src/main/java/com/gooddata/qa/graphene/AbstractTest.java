@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.http.HttpHost;
@@ -136,5 +137,9 @@ public abstract class AbstractTest extends Arquillian {
     public GoodData getGoodDataClient(final String userLogin, final String userPassword) {
         final HttpHost httpHost = RestApiClient.parseHost(testParams.getHost());
         return new GoodData(httpHost.getHostName(), userLogin, userPassword, httpHost.getPort());
+    }
+
+    public String generateEmail(String email) {
+        return email.replace("@", "+" + UUID.randomUUID().toString().substring(0, 5) + "@");
     }
 }

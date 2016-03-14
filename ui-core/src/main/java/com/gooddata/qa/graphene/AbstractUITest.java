@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAccountPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
@@ -14,7 +15,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
@@ -44,8 +44,8 @@ import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.graphene.fragments.common.ApplicationHeaderBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
-import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
@@ -83,6 +83,7 @@ import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
+import com.gooddata.qa.utils.mail.ImapClientAction;
 import com.google.common.base.Predicate;
 
 public class AbstractUITest extends AbstractGreyPageTest {
@@ -689,5 +690,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
     public void initRegistrationPage() {
         openUrl(PAGE_REGISTRATION);
         waitForFragmentVisible(registrationPage);
+    }
+
+    public <T> T doActionWithImapClient(ImapClientAction<T> action) {
+        return ImapClientAction.Utils.doActionWithImapClient(imapHost, imapUser, imapPassword, action);
     }
 }

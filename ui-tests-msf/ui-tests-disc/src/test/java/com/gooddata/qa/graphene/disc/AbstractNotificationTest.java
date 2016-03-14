@@ -178,7 +178,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
 
     protected void deleteImapUser(String imapUserUri) {
         if (!imapUserUri.isEmpty())
-            UserManagementRestUtils.deleteUser(getRestApiClient(), imapUserUri);
+            UserManagementRestUtils.deleteUserByUri(getRestApiClient(), imapUserUri);
     }
 
     protected void editNotification(NotificationBuilder newNotificationBuilder) {

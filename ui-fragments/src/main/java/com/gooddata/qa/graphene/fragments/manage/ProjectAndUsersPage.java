@@ -3,11 +3,14 @@ package com.gooddata.qa.graphene.fragments.manage;
 import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE_USER_DIALOG_LOCATOR;
 import static com.gooddata.qa.graphene.fragments.profile.UserProfilePage.USER_PROFILE_PAGE_LOCATOR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.MessagingException;
 
@@ -44,6 +47,9 @@ public class ProjectAndUsersPage extends AbstractFragment {
     @FindBy(css = ".item.user")
     private List<WebElement> users;
 
+    @FindBy(css = ".item.invitation")
+    private List<WebElement> invitations;
+
     @FindBy(css = ".s-btn-invite_users")
     private WebElement inviteUserButton;
 
@@ -52,17 +58,23 @@ public class ProjectAndUsersPage extends AbstractFragment {
 
     @FindBy(css = ".s-filterDisabled")
     private WebElement filterDeactivatedButton;
+    
+    @FindBy(css = ".s-filterInvited")
+    private WebElement filterInvitedButton;
 
     private static final By BY_PROJECTS_LIST = By.className("userProjects");
+    private static final By STATUS_BAR_SELECTOR = By.className("c-status");
     private static final By BY_LEAVE_PROJECT_DIALOG_BUTTON = By.cssSelector("form .s-btn-leave");
     private static final By PROJECT_NAME_INPUT_LOCATOR = By.cssSelector(".ipeEditor");
     private static final By SAVE_BUTTON_LOCATOR = By.cssSelector(".s-ipeSaveButton");
     private static final By USER_EMAIL_LOCATOR = By.cssSelector(".email");
     private static final By DEACTIVATE_BUTTON_LOCATOR = By.cssSelector(".s-btn-deactivate");
+    private static final By RESEND_INVITATION_BUTTON_LOCATOR = By.cssSelector(".s-btn-resend_invitation");
+    private static final By CANCEL_INVITATION_BUTTON_LOCATOR = By.cssSelector(".s-btn-cancel_invitation");
+    private static final By DISMISS_BUTTON_LOCATOR = By.cssSelector(".s-statusbar-dismiss");
     private static final By ENABLE_BUTTON_LOCATOR = By.cssSelector(".s-btn-enable");
     private static final By CANCEL_CONFIRMATION_DIALOG_BUTTON_LOCATOR = By
             .cssSelector(".yui3-d-modaldialog:not(.gdc-hidden) .s-btn-cancel");
-
     private static final By EMAILING_DASHBOARDS_TAB_LOCATOR = By.cssSelector(".s-menu-schedulePage");
 
     public void deteleProject() {
@@ -129,6 +141,17 @@ public class ProjectAndUsersPage extends AbstractFragment {
         waitForElementVisible(inviteUserButton).click();
     }
 
+    public InviteUserDialog openInviteUserDialog() {
+        waitForElementVisible(inviteUserButton).click();
+        final InviteUserDialog inviteUserDialog = Graphene.createPageFragment(InviteUserDialog.class,
+                waitForElementVisible(INVITE_USER_DIALOG_LOCATOR, browser));
+        final Predicate<WebDriver> predicate = browser -> inviteUserDialog.getInvitationRole()
+                .getFirstSelectedOption().getText().equals(UserRoles.EDITOR.getName());
+        Graphene.waitGui().until(predicate);
+
+        return inviteUserDialog;
+    }
+
     public ProjectAndUsersPage disableUser(final String userEmail) {
         openActiveUserTab();
         int numberOfUsers = getUsersCount();
@@ -156,8 +179,8 @@ public class ProjectAndUsersPage extends AbstractFragment {
         return this;
     }
 
-    private String inviteUsers(ImapClient imapClient, String emailSubject,
-            UserRoles role, String message, String...emails) throws MessagingException, IOException {
+    public String inviteUsers(ImapClient imapClient, String emailSubject,
+            UserRoles role, String message, String... emails) throws MessagingException, IOException {
         waitForElementVisible(inviteUserButton).click();
         InviteUserDialog inviteUserDialog = Graphene.createPageFragment(InviteUserDialog.class,
                 waitForElementVisible(INVITE_USER_DIALOG_LOCATOR, browser));
@@ -170,6 +193,11 @@ public class ProjectAndUsersPage extends AbstractFragment {
 
     public ProjectAndUsersPage openActiveUserTab() {
         waitForElementVisible(filterActiveButton).click();
+        return this;
+    }
+
+    public ProjectAndUsersPage openInvitedUserTab() {
+        waitForElementVisible(filterInvitedButton).click();
         return this;
     }
 
@@ -186,15 +214,90 @@ public class ProjectAndUsersPage extends AbstractFragment {
         Graphene.waitGui().until(predicate);
         return this;
     }
+    
+    public ProjectAndUsersPage resendInvitation(String userEmail) {
+        openInvitedUserTab();
+        waitForCollectionIsNotEmpty(invitations);
+        final WebElement resendButton = getUserProfileByEmail(userEmail, invitations)
+                .map(e -> e.findElement(RESEND_INVITATION_BUTTON_LOCATOR)).get();
+
+        waitForElementVisible(resendButton).click();
+        waitForElementVisible(By.cssSelector(".item.invitation .loader"), browser);
+        waitForElementVisible(resendButton);
+
+        return this;
+    }
+
+    public ProjectAndUsersPage cancelAllInvitations() {
+        openInvitedUserTab();
+
+        while (true) {
+            if (invitations.isEmpty()) break;
+
+            final int currentInvitations = invitations.size();
+            invitations.iterator().next().findElement(CANCEL_INVITATION_BUTTON_LOCATOR).click();
+
+            final Predicate<WebDriver> invitationCanceled = input -> invitations.size() == currentInvitations - 1;
+            Graphene.waitGui().until(invitationCanceled);
+        }
+
+        return this;
+    }
 
     public boolean isDeactivePermissionAvailable(String userEmail) {
-        Optional<WebElement> user = users.stream()
-                .filter(e -> e.findElement(USER_EMAIL_LOCATOR).getText().equals(userEmail))
-                .findFirst();
+        final Optional<WebElement> user = getUserProfileByEmail(userEmail, users);
 
         if (!user.isPresent()) return false;
-
+        
         return isElementPresent(DEACTIVATE_BUTTON_LOCATOR, user.get());
     }
 
+    public boolean isResendInvitationAvailable(String userEmail) {
+        return isUserActionAvailable(userEmail, "resend");
+    }
+
+    public boolean isCancelInvitationAvailable(String userEmail) {
+        return isUserActionAvailable(userEmail, "cancel");
+    }
+
+    public String getUserRole(String userEmail) {
+        final List<String> roles = Stream.of(UserRoles.values()).map(UserRoles::getName).collect(Collectors.toList());
+
+        final List<String> content = Stream.of(getUserProfileByEmail(userEmail, users)
+                .map(e -> e.findElement(By.cssSelector(".info")))
+                .get()
+                .getText()
+                .split("\\r?\\n"))
+                .collect(Collectors.toList());
+
+        return content.stream().filter(c -> roles.contains(c)).findFirst().get();
+    }
+
+    public String getStatusMessage() {
+        return waitForElementVisible(STATUS_BAR_SELECTOR, browser)
+                .findElement(By.className("leftContainer")).getText();
+    }
+
+    public ProjectAndUsersPage dismissStatusBar() {
+        waitForElementVisible(DISMISS_BUTTON_LOCATOR, browser).click();
+        return this;
+    }
+
+    private Optional<WebElement> getUserProfileByEmail(String userEmail, List<WebElement> elements) {
+        return elements.stream()
+                .filter(e -> e.findElement(By.cssSelector(".email span")).getAttribute("title").equals(userEmail))
+                .findFirst();
+    }
+
+    private boolean isUserActionAvailable(String userEmail, String action) {
+        Optional<WebElement> user = getUserProfileByEmail(userEmail, invitations);
+
+        if (!user.isPresent()) return false;
+
+        if(action.equals("resend")) return isElementPresent(RESEND_INVITATION_BUTTON_LOCATOR, user.get());
+
+        if(action.equals("cancel")) return isElementPresent(CANCEL_INVITATION_BUTTON_LOCATOR, user.get());
+
+        throw new IllegalArgumentException("action argument is not valid");
+    }
 }

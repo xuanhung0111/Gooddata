@@ -11,7 +11,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -21,7 +20,6 @@ import java.util.regex.Pattern;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -142,7 +140,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             if (metricUri != null) {
                 RestUtils.deleteObject(restApiClient, metricUri);
             }
-            UserManagementRestUtils.deleteUser(restApiClient, userUri);
+            UserManagementRestUtils.deleteUserByUri(restApiClient, userUri);
         }
     }
 
