@@ -37,6 +37,7 @@ public class AllTestsRegistry {
                 .register("testng-desktop-permissions-MetricsAccessibility.xml")
                 .register("testng-desktop-ProjectSwitch.xml")
                 .register("testng-desktop-imap-KpiAlertNullValue.xml")
+                .register("testng-desktop-imap-KpiValueFormatInAlertEmail.xml")
                 .register("testng-mobile-AttributeFiltering.xml")
                 .register("testng-mobile-DateFiltering.xml")
                 .register("testng-mobile-EditMode.xml")
