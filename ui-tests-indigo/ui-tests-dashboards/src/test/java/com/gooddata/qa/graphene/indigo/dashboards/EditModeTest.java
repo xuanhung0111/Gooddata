@@ -206,4 +206,22 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             teardownKpi();
         }
     }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "mobile"})
+    public void checkNoVisualizationOnDashboard() {
+        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+
+        takeScreenshot(browser, "checkNoVisualizationOnDashboard", getClass());
+        assertEquals(visualizationsCount, 0);
+    }
+
+    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop"})
+    public void checkNoVisualizationsList() {
+        boolean isVisualizationsListPresent = initIndigoDashboardsPageWithWidgets()
+                .switchToEditMode()
+                .isVisualizationsListPresent();
+
+        takeScreenshot(browser, "checkNoVisualizationsList", getClass());
+        assertFalse(isVisualizationsListPresent);
+    }
 }
