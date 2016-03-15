@@ -275,7 +275,8 @@ public class GoodSalesRecommendationTest extends AnalyticalDesignerAbstractTest 
         Supplier<WebElement> trendRecommendation = () ->
             waitForElementPresent(ShortcutPanel.TRENDED_OVER_TIME.getLocator(), browser);
 
-        analysisPage.drag(metric, trendRecommendation);
+        analysisPage.drag(metric, trendRecommendation)
+            .waitForReportComputing();
 
         assertTrue(analysisPage.getAttributesBucket().getItemNames().contains(DATE));
         assertTrue(analysisPage.getFilterBuckets().isFilterVisible("Activity"));
