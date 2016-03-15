@@ -13,11 +13,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
 /**
  * Kpi - key performance indicator widget
  */
-public class Kpi extends AbstractFragment {
+public class Kpi extends Widget {
     // TODO: when having more widget types, separate, keep "Add widget" in mind
     public static final String MAIN_SELECTOR = ".dash-item.type-kpi";
     public static final String KPI_CSS_SELECTOR = MAIN_SELECTOR + ":not(.is-placeholder)";
@@ -39,9 +38,6 @@ public class Kpi extends AbstractFragment {
     public static final By ALERT_DIALOG = By.className(KPI_ALERT_DIALOG_CLASS);
 
     public static final By HINT_LOCATOR = By.cssSelector(".inplaceedit:hover");
-
-    @FindBy(className = "dash-item-action-delete")
-    protected WebElement deleteButton;
 
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)
     private WebElement alertButton;
@@ -114,10 +110,6 @@ public class Kpi extends AbstractFragment {
 
     public KpiPopSection getPopSection() {
         return waitForFragmentVisible(popSection);
-    }
-
-    public void clickKpiDeleteButton() {
-        waitForElementVisible(deleteButton).click();
     }
 
     public Kpi waitForAlertButtonVisible() {

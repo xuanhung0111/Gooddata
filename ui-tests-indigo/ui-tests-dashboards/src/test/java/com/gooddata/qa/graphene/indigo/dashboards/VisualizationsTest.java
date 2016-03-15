@@ -60,8 +60,8 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
 
         initIndigoDashboardsPage()
                 .switchToEditMode()
-                .getLastVisualization()
-                .clickDelete();
+                .selectLastVisualization()
+                .clickDeleteButton();
 
         indigoDashboardsPage
                 .leaveEditMode();

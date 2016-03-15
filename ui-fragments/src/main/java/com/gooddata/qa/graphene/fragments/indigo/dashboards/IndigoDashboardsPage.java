@@ -44,7 +44,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
 
     @FindBy(className = SAVE_BUTTON_CLASS_NAME)
     private WebElement saveButton;
-    
+
     @FindBy(css = "." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)")
     private WebElement enabledSaveButton;
 
@@ -123,7 +123,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public boolean isSaveEnabled() {
         return isElementPresent(SAVE_BUTTON_ENABLED, browser);
     }
-    
+
     // if save is disabled, use cancel. But leave edit mode in any case
     public IndigoDashboardsPage leaveEditMode() {
         if (isSaveEnabled()) {
@@ -171,20 +171,30 @@ public class IndigoDashboardsPage extends AbstractFragment {
         return getVisualizationByIndex(visualizations.size() - 1);
     }
 
+    public Visualization selectVisualization(int index) {
+        Visualization visualization = getVisualizationByIndex(index);
+        waitForElementPresent(visualization.getRoot()).click();
+        return visualization;
+    }
+
+    public Visualization selectLastVisualization() {
+        return selectVisualization(visualizations.size() - 1);
+    }
+
     public IndigoDashboardsPage clickLastKpiDeleteButton() {
-        selectLastKpi().clickKpiDeleteButton();
+        selectLastKpi().clickDeleteButton();
 
         return this;
     }
 
     public IndigoDashboardsPage deleteKpi(int index) {
-        selectKpi(index).clickKpiDeleteButton();
+        selectKpi(index).clickDeleteButton();
 
         return this;
     }
 
     public IndigoDashboardsPage deleteKpi(Kpi kpi) {
-        kpi.clickKpiDeleteButton();
+        kpi.clickDeleteButton();
 
         return this;
     }
