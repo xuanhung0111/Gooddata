@@ -1,9 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -11,6 +7,10 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class KpiPopTest extends DashboardWithWidgetsTest {
 
@@ -52,7 +52,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
-                .dateDimension(DATE_CREATED)
+                .dataSet(DATE_CREATED)
                 .build())
             .selectLastKpi();
 
@@ -83,7 +83,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
-                .dateDimension(DATE_CREATED)
+                .dataSet(DATE_CREATED)
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                 .build())
             .selectLastKpi();
@@ -128,7 +128,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
-                .dateDimension(DATE_CREATED)
+                .dataSet(DATE_CREATED)
                 .comparison(comparisonType.toString())
                 .build())
             .saveEditModeWithKpis();

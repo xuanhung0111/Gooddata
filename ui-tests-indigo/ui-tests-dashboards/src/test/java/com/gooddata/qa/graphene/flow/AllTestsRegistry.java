@@ -1,7 +1,7 @@
 package com.gooddata.qa.graphene.flow;
 
-import com.gooddata.qa.graphene.indigo.dashboards.AddKpiWithoutDateDimensionTest;
-import com.gooddata.qa.graphene.indigo.dashboards.DateDimensionTest;
+import com.gooddata.qa.graphene.indigo.dashboards.AddKpiWithoutDataSetTest;
+import com.gooddata.qa.graphene.indigo.dashboards.DataSetTest;
 import com.gooddata.qa.graphene.indigo.dashboards.DragWidgetsTest;
 import com.gooddata.qa.graphene.indigo.dashboards.HeaderTest;
 import com.gooddata.qa.graphene.indigo.dashboards.KpiAlertTest;
@@ -15,13 +15,13 @@ public class AllTestsRegistry {
 
     public static void main(String[] args) throws Throwable {
         TestsRegistry.getInstance()
-                .register(DateDimensionTest.class)
+                .register(DataSetTest.class)
                 .register(HeaderTest.class)
                 .register(KpiAlertTest.class)
                 .register(ManipulateWidgetsTest.class)
                 .register(DragWidgetsTest.class)
                 .register(PartialExportDashboardsTest.class)
-                .register(AddKpiWithoutDateDimensionTest.class)
+                .register(AddKpiWithoutDataSetTest.class)
                 .register(MetricsDropdownTest.class)
                 .register(VisualizationsTest.class)
                 .register("testng-desktop-AttributeFiltering.xml")

@@ -7,7 +7,7 @@ public class KpiMDConfiguration {
 
     private final String title;
     private final String metric;
-    private final String dateDimension;
+    private final String dateDataSet;
     private final ComparisonType comparisonType;
     private final ComparisonDirection comparisonDirection;
     private final String drillToDashboard;
@@ -16,7 +16,7 @@ public class KpiMDConfiguration {
     private KpiMDConfiguration(
         final String newTitle,
         final String newMetric,
-        final String newDateDimension,
+        final String newDateDataSet,
         final ComparisonType newComparisonType,
         final ComparisonDirection newComparisonDirection,
         final String newDrillToDashboard,
@@ -24,7 +24,7 @@ public class KpiMDConfiguration {
     {
         this.title = newTitle;
         this.metric = newMetric;
-        this.dateDimension = newDateDimension;
+        this.dateDataSet = newDateDataSet;
         this.comparisonType = newComparisonType;
         this.comparisonDirection = newComparisonDirection;
         this.drillToDashboard = newDrillToDashboard;
@@ -39,8 +39,8 @@ public class KpiMDConfiguration {
         return metric;
     }
 
-    public String getDateDimension() {
-        return dateDimension;
+    public String getDateDataSet() {
+        return dateDataSet;
     }
 
     public ComparisonType getComparisonType() {
@@ -71,7 +71,7 @@ public class KpiMDConfiguration {
 
         private String nestedTitle;
         private String nestedMetric;
-        private String nestedDateDimension;
+        private String nestedDateDataSet;
         private ComparisonType nestedComparisonType;
         private ComparisonDirection nestedComparisonDirection;
         private String nestedDrillToDashboard = null;
@@ -87,8 +87,8 @@ public class KpiMDConfiguration {
             return this;
         }
 
-        public Builder dateDimension(String newDateDimension) {
-            this.nestedDateDimension = newDateDimension;
+        public Builder dateDataSet(String newDateDataSet) {
+            this.nestedDateDataSet = newDateDataSet;
             return this;
         }
 
@@ -116,7 +116,7 @@ public class KpiMDConfiguration {
             return new KpiMDConfiguration(
                     nestedTitle,
                     nestedMetric,
-                    nestedDateDimension,
+                    nestedDateDataSet,
                     nestedComparisonType,
                     nestedComparisonDirection,
                     nestedDrillToDashboard,

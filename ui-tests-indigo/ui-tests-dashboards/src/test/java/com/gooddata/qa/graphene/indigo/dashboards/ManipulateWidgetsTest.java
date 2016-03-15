@@ -1,11 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -14,6 +9,11 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
@@ -116,7 +116,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(AMOUNT)
-            .selectDateDimensionByName(DATE_CREATED);
+            .selectDataSetByName(DATE_CREATED);
 
         String metricHeadline = selectedKpi.getHeadline();
 
@@ -124,7 +124,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(LOST)
-            .selectDateDimensionByName(DATE_CREATED);
+            .selectDataSetByName(DATE_CREATED);
         assertNotEquals(selectedKpi.getHeadline(), metricHeadline);
     }
 
@@ -136,7 +136,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(AMOUNT)
-            .selectDateDimensionByName(DATE_CREATED);
+            .selectDataSetByName(DATE_CREATED);
 
         selectedKpi.setHeadline(TEST_HEADLINE);
         String metricHeadline = selectedKpi.getHeadline();
@@ -145,7 +145,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         indigoDashboardsPage.getConfigurationPanel()
             .selectMetricByName(AMOUNT)
-            .selectDateDimensionByName(DATE_CREATED);
+            .selectDataSetByName(DATE_CREATED);
 
         assertEquals(selectedKpi.getHeadline(), TEST_HEADLINE);
 
@@ -162,7 +162,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
-                .dateDimension(DATE_CREATED)
+                .dataSet(DATE_CREATED)
                 .build())
             .saveEditModeWithKpis();
 
@@ -207,7 +207,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
-                .dateDimension(DATE_CREATED)
+                .dataSet(DATE_CREATED)
                 .build())
             .cancelEditMode()
             .waitForDialog()
@@ -266,7 +266,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(deletedMetric)
-                .dateDimension(DATE_ACTIVITY)
+                .dataSet(DATE_ACTIVITY)
                 .build())
             .saveEditModeWithKpis();
 

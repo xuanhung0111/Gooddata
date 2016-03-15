@@ -4,10 +4,6 @@ import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialo
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
 import static com.gooddata.qa.graphene.utils.NavigateUtils.replaceInUrl;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -40,6 +36,10 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Need to run on empty project because neither csv upload (upload.html) nor
@@ -206,7 +206,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     private KpiConfiguration getKpiConfiguration(String metricName, String dateDimension) {
         return new KpiConfiguration.Builder()
             .metric(metricName)
-            .dateDimension(dateDimension)
+            .dataSet(dateDimension)
             .build();
     }
 

@@ -1,12 +1,8 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static java.lang.String.join;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.testng.Assert.assertEquals;
 
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -19,6 +15,10 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static org.testng.Assert.assertEquals;
 
 public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
@@ -78,7 +78,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
         setupKpi(new KpiConfiguration.Builder()
             .metric(accountFilterMetricName)
-            .dateDimension(DATE_CREATED)
+            .dataSet(DATE_CREATED)
             .build()
         );
 

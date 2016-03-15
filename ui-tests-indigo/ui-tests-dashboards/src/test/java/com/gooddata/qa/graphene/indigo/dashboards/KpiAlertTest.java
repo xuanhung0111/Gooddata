@@ -2,10 +2,6 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 import java.util.UUID;
 
@@ -19,17 +15,21 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.RestUtils;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class KpiAlertTest extends DashboardWithWidgetsTest {
 
     private static final KpiConfiguration kpiConfig = new KpiConfiguration.Builder()
         .metric(AMOUNT)
-        .dateDimension(DATE_CREATED)
+        .dataSet(DATE_CREATED)
         .build();
     private static final String METRIC_IN_PERCENT = "M" + UUID.randomUUID().toString().substring(0, 6);
     private static final KpiConfiguration kpiConfigWithMetricInPercent = new KpiConfiguration.Builder()
         .metric(METRIC_IN_PERCENT)
-        .dateDimension(DATE_CREATED)
+        .dataSet(DATE_CREATED)
         .build();
 
     private static final String KPI_ALERT_DIALOG_HEADER = "Email me when this KPI is";

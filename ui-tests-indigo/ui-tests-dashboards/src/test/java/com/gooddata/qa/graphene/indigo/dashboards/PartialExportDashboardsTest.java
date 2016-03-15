@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.util.Objects.nonNull;
-import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -17,6 +15,8 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertTrue;
 
 public class PartialExportDashboardsTest extends AbstractProjectTest {
 
@@ -42,7 +42,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
             .waitForDashboardLoad()
             .addWidget(new KpiConfiguration.Builder()
                 .metric("Sales")
-                .dateDimension("Date")
+                .dataSet("Date")
                 .comparison(Kpi.ComparisonType.NO_COMPARISON.toString())
                 .drillTo("Sales Forecast")
                 .build())

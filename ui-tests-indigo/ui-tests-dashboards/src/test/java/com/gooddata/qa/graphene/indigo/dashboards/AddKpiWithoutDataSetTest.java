@@ -1,8 +1,6 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertFalse;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -17,19 +15,21 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.json.JSONException;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertFalse;
 
-public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
+public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
 
-    private static final String METRIC_CONNECT_WITH_DATE_DIMENSION = "Connected";
-    private static final String METRIC_NOT_CONNECT_WITH_DATE_DIMENSION = "NotConnected";
-    private static final String DATE_DIMENSION = "templ:minimalistic";
+    private static final String METRIC_CONNECT_WITH_DATA_SET = "Connected";
+    private static final String METRIC_NOT_CONNECT_WITH_DATA_SET = "NotConnected";
+    private static final String DATA_SET = "templ:minimalistic";
 
     private MetadataService mdService;
     private Project project;
 
     @BeforeClass
     public void initProperties() {
-        projectTitle = "Add-kpi-without-date-dimension-test";
+        projectTitle = "Add-kpi-without-data-set-test";
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
@@ -52,12 +52,12 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
         setupData("/no-date/no-date.csv", "/no-date/upload_info.json");
 
         String age = mdService.getObjUri(project, Fact.class, identifier("fact.fact"));
-        mdService.createObj(project, new Metric(METRIC_NOT_CONNECT_WITH_DATE_DIMENSION,
+        mdService.createObj(project, new Metric(METRIC_NOT_CONNECT_WITH_DATA_SET,
                 "SELECT SUM([" + age + "])", "#,##0"));
     }
 
     @Test(dependsOnGroups = {"nodate-precondition"}, groups = {"nodate-test"})
-    public void testAddKpiNotConnectedWithDateDimension() {
+    public void testAddKpiNotConnectedWithDataSet() {
         initIndigoDashboardsPage()
             .getSplashScreen()
             .startEditingWidgets();
@@ -67,12 +67,12 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
             .clickAddWidget();
 
         assertFalse(indigoDashboardsPage.getConfigurationPanel()
-                .selectMetricByName(METRIC_NOT_CONNECT_WITH_DATE_DIMENSION)
-                .isDateDimensionEnabled());
+                .selectMetricByName(METRIC_NOT_CONNECT_WITH_DATA_SET)
+                .isDataSetEnabled());
 
         indigoDashboardsPage.saveEditModeWithKpis();
 
-        takeScreenshot(browser, "add-kpi-not-connect-with-date-dimension", getClass());
+        takeScreenshot(browser, "add-kpi-not-connect-with-data-set", getClass());
     }
 
     @Test(dependsOnGroups = {"nodate-test"}, groups = {"date-precondition"})
@@ -82,12 +82,12 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
         setupData("/add-date/add-date.csv", "/add-date/upload_info.json");
 
         String age = mdService.getObjUri(project, Fact.class, identifier("fact.fact"));
-        mdService.createObj(project, new Metric(METRIC_CONNECT_WITH_DATE_DIMENSION,
+        mdService.createObj(project, new Metric(METRIC_CONNECT_WITH_DATA_SET,
                 "SELECT 1", "#,##0"));
     }
 
     @Test(dependsOnGroups = {"date-precondition"}, groups = {"date-test"})
-    public void testUpdateKpiConnectedWithDateDimension() {
+    public void testUpdateKpiConnectedWithDataSet() {
 
         initIndigoDashboardsPage()
             .waitForDashboardLoad()
@@ -95,10 +95,10 @@ public class AddKpiWithoutDateDimensionTest extends AbstractProjectTest {
             .selectLastKpi();
 
         indigoDashboardsPage.getConfigurationPanel()
-            .selectMetricByName(METRIC_CONNECT_WITH_DATE_DIMENSION)
-            .selectDateDimensionByName(DATE_DIMENSION);
+            .selectMetricByName(METRIC_CONNECT_WITH_DATA_SET)
+            .selectDataSetByName(DATA_SET);
 
         indigoDashboardsPage.saveEditModeWithKpis();
-        takeScreenshot(browser, "update-kpi-connect-with-date-dimension", getClass());
+        takeScreenshot(browser, "update-kpi-connect-with-data-set", getClass());
     }
 }
