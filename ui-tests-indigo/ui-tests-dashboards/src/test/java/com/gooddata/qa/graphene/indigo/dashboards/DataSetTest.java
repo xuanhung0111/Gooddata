@@ -12,9 +12,6 @@ import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTes
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public class DataSetTest extends DashboardWithWidgetsTest {
 

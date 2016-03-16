@@ -30,7 +30,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
-import com.gooddata.md.Dimension;
+import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
 import com.gooddata.qa.graphene.AbstractProjectTest;
@@ -74,8 +74,8 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
         String firstNameAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title("Firstname"));
         String firstNameValueUri = firstNameAttributeUri + "/elements?id=2";
 
-        String dateDimensionUri = getMdService().getObjUri(getProject(), Dimension.class,
-                identifier("date.dim_date"));
+        String dateDatasetUri = getMdService().getObjUri(getProject(), Dataset.class,
+                identifier("date.dataset.dt"));
 
         String maqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
                 numberFactUri, firstNameAttributeUri, firstNameValueUri);
@@ -96,7 +96,7 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
                     new KpiMDConfiguration.Builder()
                     .title(metric.getTitle())
                     .metric(getMdService().createObj(getProject(), metric).getUri())
-                    .dateDataSet(dateDimensionUri)
+                    .dateDataSet(dateDatasetUri)
                     .comparisonType(ComparisonType.PREVIOUS_PERIOD)
                     .comparisonDirection(ComparisonDirection.GOOD)
                     .build()));

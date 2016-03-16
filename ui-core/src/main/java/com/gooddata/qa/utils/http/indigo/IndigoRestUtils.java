@@ -29,9 +29,6 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static java.lang.String.format;
-import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
-import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
-import static java.lang.String.format;
 
 /**
  * REST utilities for Indigo task

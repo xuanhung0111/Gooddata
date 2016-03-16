@@ -24,7 +24,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
-import com.gooddata.md.Dimension;
+import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
 import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
@@ -83,7 +83,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
         String firstNameAttributeUri = mdService.getObjUri(project, Attribute.class, title("firstname"));
         String firstNameValueUri = firstNameAttributeUri + "/elements?id=2";
 
-        String dateDimensionUri = mdService.getObjUri(project, Dimension.class, identifier("user_date.dim_date"));
+        String dateDatasetUri = mdService.getObjUri(project, Dataset.class, identifier("user_date.dataset.dt"));
 
         String maqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
                 numberFactUri, firstNameAttributeUri, firstNameValueUri);
@@ -95,7 +95,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
                 new KpiMDConfiguration.Builder()
                 .title("Number")
                 .metric(numberMetricUri)
-                .dateDataSet(dateDimensionUri)
+                .dateDataSet(dateDatasetUri)
                 .comparisonType(ComparisonType.PREVIOUS_PERIOD)
                 .comparisonDirection(ComparisonDirection.GOOD)
                 .build());
