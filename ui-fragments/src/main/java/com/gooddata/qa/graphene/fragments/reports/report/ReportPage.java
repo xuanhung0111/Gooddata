@@ -381,9 +381,8 @@ public class ReportPage extends AbstractFragment {
         waitForElementVisible(xpath(exportXpath), browser).click();
 
         sleepTightInSeconds(5);
-        // waitForElementVisible(BY_EXPORTING_STATUS); //this waiting is causing
-        // some unexpected issues in tests when the export (xls/csv) is too fast
-        waitForElementVisible(exportButton);
+        final int reportExportingTimeoutInSeconds = 300;
+        waitForElementVisible(exportButton, reportExportingTimeoutInSeconds);
 
         sleepTightInSeconds(3);
         System.out.println("Report " + reportName + " exported to " + format.getName());
