@@ -11,7 +11,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsAndUsersPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
@@ -359,7 +359,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public void deleteProject(String projectId) {
         openUrl(PAGE_UI_PROJECT_PREFIX + projectId + "|projectPage");
-        waitForProjectPageLoaded(browser);
+        waitForProjectsAndUsersPageLoaded(browser);
         waitForElementVisible(projectAndUsersPage.getRoot());
         System.out.println("Going to delete project: " + projectId);
         projectAndUsersPage.deteleProject();
@@ -622,7 +622,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     public ProjectAndUsersPage initProjectsAndUsersPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|projectPage|");
-        waitForProjectPageLoaded(browser);
+        waitForProjectsAndUsersPageLoaded(browser);
 
         return projectAndUsersPage;
     }
