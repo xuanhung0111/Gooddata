@@ -20,16 +20,18 @@ import com.google.common.base.Predicate;
 
 public final class WaitUtils {
 
+    private static final int TIMEOUT_WAIT_OLD_CLIENT_LOADED = 3; // minutes
+
     private WaitUtils() {
     }
 
     public static void waitForDashboardPageLoaded(final SearchContext searchContext) {
         if (isElementPresent(By.cssSelector(".embedded"), searchContext))
-            waitForElementVisible(By.cssSelector(".s-dashboardLoaded"), searchContext);
+            waitForElementVisible(By.cssSelector(".s-dashboardLoaded"), searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
         else
             waitForElementVisible(
                     By.xpath("//div[@id='p-projectDashboardPage' and contains(@class,'s-displayed')]"),
-                    searchContext);
+                    searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
         if (searchContext.findElements(BY_RED_BAR).size() != 0) {
             if ("Dashboard no longer exists".equals(searchContext.findElement(BY_RED_BAR).getText())) {
                 waitForElementVisible(BY_DISMISS_BUTTON, searchContext).click();
@@ -45,23 +47,28 @@ public final class WaitUtils {
     }
 
     public static void waitForReportsPageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='p-domainPage' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='p-domainPage' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
     public static void waitForDataPageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='p-dataPage' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='p-dataPage' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
-    public static void waitForProjectPageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"), searchContext);
+    public static void waitForProjectsAndUsersPageLoaded(SearchContext searchContext) {
+        waitForElementVisible(By.xpath("//div[@id='p-projectPage' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
     public static void waitForProjectsPageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='projectsCentral' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
     public static void waitForEmailSchedulePageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
     public static void waitForAnalysisPageLoaded(SearchContext searchContext) {
@@ -69,7 +76,8 @@ public final class WaitUtils {
     }
 
     public static void waitForSchedulesPageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='p-emailSchedulePage' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
     public static void waitForObjectPageLoaded(SearchContext searchContext) {
@@ -77,13 +85,13 @@ public final class WaitUtils {
     }
 
     public static void waitForAccountPageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By
-                .xpath("//div[@id='p-accountPage' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='p-accountPage' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
     public static void waitForUserProfilePageLoaded(SearchContext searchContext) {
-        waitForElementVisible(By
-                .xpath("//div[@id='p-profilePage' and contains(@class,'s-displayed')]"), searchContext);
+        waitForElementVisible(By.xpath("//div[@id='p-profilePage' and contains(@class,'s-displayed')]"),
+                searchContext, TIMEOUT_WAIT_OLD_CLIENT_LOADED);
     }
 
     public static WebElement waitForElementVisible(By byElement, SearchContext searchContext) {
