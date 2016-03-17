@@ -20,7 +20,7 @@ import com.google.common.base.Predicate;
 
 public final class WaitUtils {
 
-    private static final int TIMEOUT_WAIT_OLD_CLIENT_LOADED = 3; // minutes
+    private static final int TIMEOUT_WAIT_OLD_CLIENT_LOADED = 3 * 60; // minutes
 
     private WaitUtils() {
     }
