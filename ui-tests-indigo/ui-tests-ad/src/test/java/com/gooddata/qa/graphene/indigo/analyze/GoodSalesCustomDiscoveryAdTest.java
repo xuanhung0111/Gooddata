@@ -82,7 +82,7 @@ public class GoodSalesCustomDiscoveryAdTest extends AnalyticalDesignerAbstractTe
         Supplier<WebElement> recommendation = () ->
             waitForElementPresent(ShortcutPanel.AS_A_COLUMN_CHART.getLocator(), browser);
 
-            ChartReport report = analysisPage.drag(metric, recommendation)
+        ChartReport report = analysisPage.drag(metric, recommendation)
                     .getChartReport();
 
         assertThat(report.getTrackersCount(), equalTo(1));
