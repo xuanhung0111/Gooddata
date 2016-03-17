@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.json.JSONException;
 import org.testng.ITestContext;
@@ -176,8 +177,34 @@ public abstract class AbstractProjectTest extends AbstractUITest {
     }
 
     public void setupMaql(String maqlPath) throws JSONException, IOException {
-        URL maqlResource = getClass().getResource(maqlPath);
-        postMAQL(IOUtils.toString(maqlResource), 60);
+        getGoodDataClient()
+                .getModelService()
+                .updateProjectModel(getProject(), IOUtils.toString(getClass().getResource(maqlPath)))
+                .get();
+    }
+
+    public void setupDataViaRest(String datasetId, InputStream dataset) {
+        getGoodDataClient()
+                .getDatasetService()
+                .loadDataset(getProject(), datasetId, dataset)
+                .get();
+    }
+
+    public void setupData(String csvPath, String uploadInfoPath)
+            throws JSONException, IOException, URISyntaxException {
+        String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
+
+        String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
+
+        URL csvResource = getClass().getResource(csvPath);
+        URL uploadInfoResource = getClass().getResource(uploadInfoPath);
+
+        uploadFileToWebDav(csvResource, webdavUrl);
+        uploadFileToWebDav(uploadInfoResource, webdavUrl);
+
+        String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
+        RolapRestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
+                integrationEntry);
     }
 
     private String getWebDavServerUrl(final RestApiClient restApiClient, final String serverRootUrl)
@@ -206,22 +233,5 @@ public abstract class AbstractProjectTest extends AbstractUITest {
             webdavServerUrl = serverRootUrl + userUploadsLink;
         }
         return webdavServerUrl;
-    }
-
-    public void setupData(String csvPath, String uploadInfoPath)
-            throws JSONException, IOException, URISyntaxException {
-        String webdavServerUrl = getWebDavServerUrl(getRestApiClient(), getRootUrl());
-
-        String webdavUrl = webdavServerUrl + "/" + UUID.randomUUID().toString();
-
-        URL csvResource = getClass().getResource(csvPath);
-        URL uploadInfoResource = getClass().getResource(uploadInfoPath);
-
-        uploadFileToWebDav(csvResource, webdavUrl);
-        uploadFileToWebDav(uploadInfoResource, webdavUrl);
-
-        String integrationEntry = webdavUrl.substring(webdavUrl.lastIndexOf("/") + 1, webdavUrl.length());
-        RolapRestUtils.postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
-                integrationEntry);
     }
 }
