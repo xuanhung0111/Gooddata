@@ -176,7 +176,8 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         initAnalysePageByUrl();
 
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addFilter(ACTIVITY_TYPE);
+            .addFilter(ACTIVITY_TYPE)
+            .waitForReportComputing();
     }
 
     private AttributeFilterPickerPanel beforeEachDisablingApplyButton() {
