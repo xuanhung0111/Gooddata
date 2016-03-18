@@ -86,6 +86,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .configDateFilter("Last year")
             .getDateFilterText(), "Activity: Last year");
 
+        analysisPage.waitForReportComputing();
         String yearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Year (Activity)");
         assertTrue(isElementPresent(cssSelector(".s-date-filter" + yearActivityLabel), browser));
         assertTrue(isElementPresent(cssSelector(".s-date-filter.s-where-___between____1__1__"), browser));
@@ -99,6 +100,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .configDateFilter("Last 12 months")
             .getDateFilterText(), "Activity: Last 12 months");
 
+        analysisPage.waitForReportComputing();
         String monthYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Month/Year (Activity)", "Short");
         assertTrue(isElementPresent(cssSelector(".s-date-filter" + monthYearActivityLabel), browser));
         assertTrue(isElementPresent(cssSelector(".s-date-filter.s-where-___between____11_0__"), browser));
@@ -118,6 +120,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
             .getFilterBuckets()
             .configDateFilter("All time");
 
+        analysisPage.waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .adi-component"), browser));
         assertFalse(isElementPresent(cssSelector(".adi-components .adi-component.s-property-where"), browser));
     }

@@ -8,11 +8,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -73,9 +71,9 @@ public class CreateProjectsTest extends AbstractProjectTest {
                 .append(pids.stream().collect(joining(",")));
         }
 
-        System.out.println("PIDs file path: " + exportPidsFile.getAbsolutePath());
-        System.out.println("Content: ");
-        FileUtils.readLines(exportPidsFile).stream().forEach(System.out::println);
+        log.info("PIDs file path: " + exportPidsFile.getAbsolutePath());
+        log.info("Content: ");
+        FileUtils.readLines(exportPidsFile).stream().forEach(log::info);
     }
 
     @Test(groups = {"teardownProjects", PROJECT_INIT_GROUP})

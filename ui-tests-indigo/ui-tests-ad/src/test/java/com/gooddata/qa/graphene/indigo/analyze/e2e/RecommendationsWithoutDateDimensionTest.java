@@ -7,9 +7,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.Point;
 import org.testng.annotations.BeforeClass;

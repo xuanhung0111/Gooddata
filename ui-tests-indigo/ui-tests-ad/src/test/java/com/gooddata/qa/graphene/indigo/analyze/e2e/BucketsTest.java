@@ -110,6 +110,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
         StacksBucket stacksBucket = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
+            .waitForReportComputing()
             .getStacksBucket();
         assertFalse(stacksBucket.getWarningMessage().isEmpty());
         assertFalse(stacksBucket.getInvitation().isDisplayed());
@@ -119,9 +120,8 @@ public class BucketsTest extends AbstractAdE2ETest {
     public void should_be_possible_to_drag_item_from_stack_by_to_category() {
         initAnalysePageByUrl();
 
-        analysisPage.addStack(ACTIVITY_TYPE);
-
-        analysisPage.drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getInvitation());
+        analysisPage.addStack(ACTIVITY_TYPE)
+            .drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getInvitation());
 
         assertTrue(analysisPage.getStacksBucket().isEmpty());
 
@@ -132,9 +132,8 @@ public class BucketsTest extends AbstractAdE2ETest {
     public void should_be_possible_to_drag_item_from_category_to_stack_by() {
         initAnalysePageByUrl();
 
-        analysisPage.addAttribute(ACTIVITY_TYPE);
-
-        analysisPage.drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().getInvitation());
+        analysisPage.addAttribute(ACTIVITY_TYPE)
+            .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().getInvitation());
 
         assertFalse(analysisPage.getStacksBucket().isEmpty());
         assertTrue(analysisPage.getAttributesBucket().isEmpty());
@@ -145,9 +144,8 @@ public class BucketsTest extends AbstractAdE2ETest {
         initAnalysePageByUrl();
 
         analysisPage.addAttribute(ACTIVITY_TYPE)
-            .addStack(ACCOUNT);
-
-        analysisPage.drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
+            .addStack(ACCOUNT)
+            .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
 
         assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ACCOUNT));
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), ACTIVITY_TYPE);
@@ -269,6 +267,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
         assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
+            .waitForReportComputing()
             .getFilterBuckets()
             .isFilterVisible(ACTIVITY_TYPE));
 
