@@ -2,15 +2,25 @@ package com.gooddata.qa.graphene.utils;
 
 import static java.util.stream.Collectors.toList;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 public final class ElementUtils {
+
+    public static final By BY_BUBBLE_CONTENT = By.cssSelector(".bubble-content .content");
 
     private ElementUtils() {
     }
@@ -53,5 +63,24 @@ public final class ElementUtils {
             .map(func::apply)
             .map(WebElement::getText)
             .collect(toList());
+    }
+
+    public static String getTooltipFromElement(By locator, WebDriver browser) throws AWTException {
+        return getTooltipFromElement(waitForElementVisible(locator, browser), browser);
+    }
+
+    public static String getTooltipFromElement(WebElement element, WebDriver browser) throws AWTException {
+        // Move mouse to offset (-1,-1) on screen to make sure there is no bubble displayed before
+        // moving to target element 
+        new Robot().mouseMove(-1, -1);
+        waitForElementNotPresent(BY_BUBBLE_CONTENT);
+
+        new Actions(browser).moveToElement(element).perform();
+
+        return getBubbleMessage(browser);
+    }
+
+    public static String getBubbleMessage(WebDriver browser) {
+        return waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText();
     }
 }

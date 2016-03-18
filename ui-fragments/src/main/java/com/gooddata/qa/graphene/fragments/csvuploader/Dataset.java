@@ -18,10 +18,11 @@ import com.gooddata.qa.graphene.fragments.AbstractFragment;
 
 public class Dataset extends AbstractFragment {
 
-    private static final By BY_DETAIL_BUTTON = className("s-dataset-detail-button");
-    private static final By BY_UPDATE_BUTTON = className("s-dataset-update-button");
-    private static final By BY_DELETE_BUTTON = className("s-dataset-delete-button");
-    private static final By BY_ANALYZE_LINK = cssSelector(".icon-analyze.button-link");
+    public static final By BY_UPDATE_BUTTON = By.className("s-dataset-update-button");
+    public static final By BY_DELETE_BUTTON = By.className("s-dataset-delete-button");
+
+    private static final By BY_DETAIL_BUTTON = By.className("s-dataset-detail-button");
+    private static final By BY_ANALYZE_LINK = By.cssSelector(".icon-analyze.button-link");
 
     @FindBy(className = "s-dataset-status")
     private WebElement status;
