@@ -127,7 +127,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         analysisPage.resetToBlankState();
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void testWithAttribute() {
         String attribute = getRandomAttribute();
         initAnalysePage();
@@ -147,7 +147,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         }
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void dragMetricToColumnChartShortcutPanel() {
         initAnalysePage();
 
@@ -204,7 +204,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void testSimpleContribution() {
         initAnalysePage();
 
@@ -282,7 +282,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_PERCENTS));
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void testSimpleComparison() {
         initAnalysePage();
 
@@ -416,7 +416,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertFalse(recommendationContainer.isRecommendationVisible(RecommendationStep.SEE_TREND));
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void displayWhenDraggingFirstMetric() {
         initAnalysePage();
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
@@ -438,7 +438,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(analysisPage.getChartReport().getTrackersCount() >= 1);
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void exportCustomDiscovery() {
         initAnalysePage();
 
@@ -495,7 +495,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void filterOnDateAttribute() {
         initAnalysePage();
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
@@ -601,7 +601,7 @@ public class AnalyticalDesignerGeneralTest extends AnalyticalDesignerAbstractTes
         assertTrue(recommendationContainer.isRecommendationVisible(RecommendationStep.COMPARE));
     }
 
-    @Test(dependsOnGroups = {"prepare"}, groups = {"sanity"})
+    @Test(dependsOnGroups = {"prepare"})
     public void testSimplePoP() {
         initAnalysePage();
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();

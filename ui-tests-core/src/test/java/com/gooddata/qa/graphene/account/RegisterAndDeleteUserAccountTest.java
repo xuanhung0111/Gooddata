@@ -14,6 +14,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
 
@@ -285,7 +286,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         Predicate<WebDriver> dashboardOrWalkmeAppear = browser -> isElementPresent(dashboardPageLocator, browser)
                 || isElementPresent(walkmeCloseLocator, browser);
 
-        Graphene.waitGui().until(dashboardOrWalkmeAppear);
+        Graphene.waitGui().withTimeout(180, TimeUnit.SECONDS).until(dashboardOrWalkmeAppear);
 
         try {
             WebElement walkmeCloseElement = waitForElementVisible(walkmeCloseLocator, browser,

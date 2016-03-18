@@ -56,7 +56,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     private static final String ADDITIONAL_PROJECT_TITLE = "GoodSales-project-to-share-dashboard";
     private static final String EMBEDDED_DASHBOARD_NAME = "Embedded Dashboard";
 
-    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 1300000L;
+    private static final long EXPECTED_EXPORT_DASHBOARD_SIZE = 1200000L;
     private static final long EXPECTED_EXPORT_CHART_SIZE = 28000L;
 
     @FindBy(css = "iframe.yui3-c-iframewidget-content")
@@ -157,7 +157,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         String exportedDashboardName =
                 embeddedDashboardWidget.downloadEmbeddedDashboardInFrame(OTHER_WIDGETS_TAB_INDEX);
-        verifyDashboardExport(exportedDashboardName.replace(" ", "_"), EXPECTED_EXPORT_DASHBOARD_SIZE);
+        verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
         embeddedDashboardWidget.checkRedBarInFrame();
     }
 
@@ -180,7 +180,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         String exportedDashboardName =
                 embeddedDashboarWidgetWithoutIframe.downloadEmbeddedDashboard(OTHER_WIDGETS_TAB_INDEX);
-        verifyDashboardExport(exportedDashboardName.replace(" ", "_"), EXPECTED_EXPORT_DASHBOARD_SIZE);
+        verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
         checkRedBar(browser);
     }
 
@@ -511,7 +511,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardEditBar.addWebContentToDashboard(embedCode);
         dashboardsPage.getContent().resizeWidgetTopLeft(-300, 0);
-        dashboardsPage.getContent().resizeWidgetBottomRight(200, 500);
+        dashboardsPage.getContent().resizeWidgetBottomRight(200, 600);
         dashboardEditBar.saveDashboard();
         Sleeper.sleepTightInSeconds(3);
         browser.navigate().refresh();
