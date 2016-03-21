@@ -3,7 +3,6 @@ package com.gooddata.qa.graphene.manage;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttribute;
 import static com.gooddata.qa.graphene.entity.metric.CustomMetricUI.buildAttributeValue;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
@@ -1098,12 +1097,6 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
             results.add(asList("40334", "41054", "41048", "41054", "40334"));
         }
         return results;
-    }
-
-    private void openReport(String reportName) {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getReportsList().openReport(reportName);
-        waitForAnalysisPageLoaded(browser);
     }
 
     private void checkReportRenderedWell(String reportName) {

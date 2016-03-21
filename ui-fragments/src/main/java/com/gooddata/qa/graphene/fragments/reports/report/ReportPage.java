@@ -6,6 +6,7 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
@@ -232,8 +233,8 @@ public class ReportPage extends AbstractFragment {
         // so need a short time to wait in case like this
         sleepTightInSeconds(2);
 
-        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done"), browser)
-            .sendKeys(Keys.ENTER);
+        waitForElementNotPresent(By.cssSelector("form.sndFooterForm > .progress.is-loading"));
+        waitForElementVisible(By.cssSelector("form.sndFooterForm > button.s-btn-done:not([disabled])"), browser).click();
 
         Predicate<WebDriver> predicate = input -> !waitForElementVisible(filterButton)
                 .getAttribute("class")

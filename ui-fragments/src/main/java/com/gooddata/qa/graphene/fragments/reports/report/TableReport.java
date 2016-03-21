@@ -12,6 +12,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -103,6 +104,23 @@ public class TableReport extends AbstractReport {
         }));
     }
 
+    public List<String> getTotalHeaders() {
+        waitForReportLoading();
+        return browser
+                .findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile .totalHeader span.captionWrapper"))
+                .stream().map(WebElement::getText)
+                .collect(Collectors.toList());
+    }
+
+    public List<Float> getTotalValues() {
+        waitForReportLoading();
+        return browser
+                .findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile div.total:not(.totalHeader)"))
+                .stream().map(e -> e.getAttribute("title"))
+                .map(ReportPage::getNumber)
+                .collect(Collectors.toList());
+    }
+
     public TableReport changeAliasToAttribute(final String attribute, String alias) {
         WebElement header = attributesHeader.stream()
             .filter(e -> attribute.equals(e.getText().trim()))
@@ -144,15 +162,16 @@ public class TableReport extends AbstractReport {
         }));
     }
 
-    public void showOnly(String attributeValue) {
+    public TableReport showOnly(String attributeValue) {
         waitForReportLoading();
         WebElement cell = attributeElementInGrid.stream()
             .filter(e -> attributeValue.equals(e.getText().trim()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Cannot find attribute value: " + attributeValue));
-        new Actions(browser).contextClick(cell).perform();
-        waitForElementVisible(className(format("s-show_only__%s_", attributeValue)), browser).click();
+        getActions().contextClick(cell).perform();
+        waitForElementVisible(className(format("s-show_only__%s_", simplifyText(attributeValue))), browser).click();
         waitForReportLoading();
+        return this;
     }
 
     public List<List<String>> getAttributeElementsByRow() {
@@ -351,15 +370,22 @@ public class TableReport extends AbstractReport {
         return !getRoot().findElement(reportLabelLocator).getCssValue("display").startsWith("none");
     }
 
-    public ContextMenu openContextMenuFromReportHeader(final String headerName) {
-        new Actions(browser).contextClick(Stream.of(metricsHeader, attributesHeader, attributeElementInGrid)
+    public ContextMenu openContextMenuFromCellValue(final String cellValue) {
+        new Actions(browser).contextClick(Stream.of(metricsHeader, attributesHeader, attributeElementInGrid, metricValuesInGrid)
                 .flatMap(l -> l.stream())
-                .filter(e -> headerName.equals(e.getText()))
+                .filter(e -> cellValue.equals(e.getText()))
                 .findFirst()
                 .get())
                 .perform();
 
         return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(By.id("ctxMenu"), browser));
+    }
+
+    public List<String> getDrillableElements() {
+        waitForReportLoading();
+        return drillableElements.stream()
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
     }
 
     private Pair<Integer, Integer> getPossitionFromRegion(String region) {
