@@ -98,7 +98,7 @@ public class MetricPage extends AbstractFragment {
     public boolean isMetricCreatedSuccessfully(String metricName, String expectedMaql, String expectedFormat) {
         openMetricDetailPage(metricName);
         return Graphene.createPageFragment(MetricDetailsPage.class, waitForElementVisible(By.id("p-objectPage"),
-                browser)).isMetricCreatedSuccessfully(metricName, expectedMaql, expectedFormat);
+                browser)).isMetricCreatedSuccessfully(expectedMaql, expectedFormat);
     }
 
     public void openMetricDetailPage(String metric) {

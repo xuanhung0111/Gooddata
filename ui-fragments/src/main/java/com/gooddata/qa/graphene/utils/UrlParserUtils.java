@@ -3,9 +3,11 @@ package com.gooddata.qa.graphene.utils;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringInUrl;
 import static java.lang.String.format;
 
+import java.util.stream.Stream;
+
 import org.openqa.selenium.WebDriver;
 
-public class NavigateUtils {
+public class UrlParserUtils {
     public static void replaceInUrl(WebDriver browser, String target, String replacement) {
         waitForStringInUrl(target);
 
@@ -18,5 +20,13 @@ public class NavigateUtils {
 
         browser.get(replacedUrl);
         System.out.println(format("Changed url from %s to %s", currentUrl, replacedUrl));
+    }
+
+    public static String getObjdUri(String currentUrl) {
+        return Stream.of(currentUrl.split("\\|"))
+                .filter(part -> part.matches("/gdc/md/.*/obj/.*"))
+                .findFirst()
+                .get();
+        
     }
 }

@@ -100,13 +100,15 @@ public class DashboardEditBar extends AbstractFragment {
         return dashboardEditFilter;
     }
 
-    public void addReportToDashboard(String reportName) {
+    public DashboardEditBar addReportToDashboard(String reportName) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(reportMenuButton).click();
         waitForElementVisible(reportPicker.getRoot());
         reportPicker.searchAndSelectItem(reportName);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
+
+        return this;
     }
 
     public void addWidgetToDashboard(WidgetTypes widgetType, String metricLabel) {
@@ -139,7 +141,7 @@ public class DashboardEditBar extends AbstractFragment {
                 "Widget wasn't added");
     }
 
-    public void addListFilterToDashboard(DashFilterTypes type, String name) {
+    public DashboardEditBar addListFilterToDashboard(DashFilterTypes type, String name) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addFilterMenu).click();
         waitForElementVisible(attributeFilter).click();
@@ -147,6 +149,7 @@ public class DashboardEditBar extends AbstractFragment {
         dashboardFilter.addListFilter(type, name);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
+        return this;
     }
 
     public void addTimeFilterToDashboard(int dateDimensionIndex, String dateRange) {
@@ -167,13 +170,14 @@ public class DashboardEditBar extends AbstractFragment {
                 waitForElementVisible(WidgetConfigPanel.LOCATOR, browser));
     }
 
-    public void addTextToDashboard(TextObject textObject, String text, String link) {
+    public DashboardEditBar addTextToDashboard(TextObject textObject, String text, String link) {
         int widgetCountBefore = listDashboardWidgets.size();
         waitForElementVisible(addText).click();
         waitForElementVisible(dashboardTextObject.getRoot());
         dashboardTextObject.addText(textObject, text, link);
         Assert.assertEquals(listDashboardWidgets.size(), widgetCountBefore + 1,
                 "Widget wasn't added");
+        return this;
     }
 
     public void addVariableStatusToDashboard(String variable) {

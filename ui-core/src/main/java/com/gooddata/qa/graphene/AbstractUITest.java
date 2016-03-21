@@ -436,13 +436,13 @@ public class AbstractUITest extends AbstractGreyPageTest {
         checkRedBar(browser);
     }
 
-    public void initReportCreation() {
+    public ReportPage initReportCreation() {
         initReportsPage();
         selectReportsDomainFolder("My Reports");
         reportsPage.startCreateReport();
         waitForAnalysisPageLoaded(browser);
-        waitForElementVisible(reportPage.getRoot());
         assertNotNull(reportPage, "Report page not initialized!");
+        return waitForFragmentVisible(reportPage);
     }
 
     public void verifyDashboardExport(String dashboardName, long minimalSize) {
@@ -545,9 +545,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementVisible(By.cssSelector(".gd-message.success"), browser);
     }
 
-    private void waitForDashboardPage() {
+    private DashboardsPage waitForDashboardPage() {
         waitForDashboardPageLoaded(browser);
-        waitForElementVisible(dashboardsPage.getRoot());
+        return waitForFragmentVisible(dashboardsPage);
     }
 
     public void initDataUploadPage() {
@@ -566,15 +566,15 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForElementVisible(By.id("p-projectDashboardPage"), browser);
     }
 
-    public void initDashboardsPage() {
+    public DashboardsPage initDashboardsPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + DASHBOARD_PAGE_SUFFIX);
-        waitForDashboardPage();
+        return waitForDashboardPage();
     }
 
-    public void initReportsPage() {
+    public ReportsPage initReportsPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|domainPage");
         waitForReportsPageLoaded(browser);
-        waitForElementVisible(reportsPage.getRoot());
+        return waitForFragmentVisible(reportsPage);
     }
 
     public void initAttributePage() {
@@ -587,9 +587,11 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForDataPageLoaded(browser);
     }
 
-    public void initMetricPage() {
+    public MetricPage initMetricPage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|metrics");
         waitForDataPageLoaded(browser);
+        return waitForFragmentVisible(metricPage);
+        
     }
 
     public void initAnalysePage() {
@@ -609,9 +611,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         waitForAccountPageLoaded(browser);
     }
 
-    public void initVariablePage() {
+    public VariablesPage initVariablePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|variables");
         waitForDataPageLoaded(browser);
+        return waitForFragmentVisible(variablePage);
     }
 
     public void initFactPage() {

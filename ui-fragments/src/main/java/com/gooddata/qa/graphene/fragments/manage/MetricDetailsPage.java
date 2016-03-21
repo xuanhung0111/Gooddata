@@ -40,7 +40,7 @@ public class MetricDetailsPage extends AbstractFragment {
     private static final By RENAME_INPUT_LOCATOR = By.cssSelector(".c-ipeEditorIn input");
     private static final By OK_BUTTON_LOCATOR = By.cssSelector(".c-ipeEditorControls button");
 
-    public String getMAQL(String metricName) {
+    public String getMAQL() {
         return waitForElementVisible(maql).getText();
     }
 
@@ -48,8 +48,8 @@ public class MetricDetailsPage extends AbstractFragment {
         return waitForElementVisible(metricFormat).getText();
     }
 
-    public boolean isMetricCreatedSuccessfully(String metricName, String expectedMaql, String expectedFormat) {
-        if (!expectedMaql.equals(getMAQL(metricName))) {
+    public boolean isMetricCreatedSuccessfully(String expectedMaql, String expectedFormat) {
+        if (!expectedMaql.equals(getMAQL())) {
             System.out.println("Metric is not created properly");
             return false;
         }
