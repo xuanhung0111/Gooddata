@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoade
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForObjectPageLoaded;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -108,24 +109,24 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         createAttributePage.selectMetric("# of Won Opps.");
 
         createAttributePage.setBucket(0, "Poor", "");
-        assertTrue("is not a number".equals(createAttributePage.getBubleText()), "error message");
+        assertTrue("is not a number".equals(getBubbleMessage(browser)), "error message");
 
         createAttributePage.setBucket(0, "", "1000");
         createAttributePage.setBucket(0, "");
-        assertTrue("Field is required.".equals(createAttributePage.getBubleText()), "error message");
+        assertTrue("Field is required.".equals(getBubbleMessage(browser)), "error message");
 
         createAttributePage.setBucket(0, "Poor", "abc");
-        assertTrue("is not a number".equals(createAttributePage.getBubleText()), "error message");
+        assertTrue("is not a number".equals(getBubbleMessage(browser)), "error message");
 
         createAttributePage.setBucket(0, "Poor", "3000");
         createAttributePage.setBucket(1, "Good", "2000");
-        assertTrue("Value should be greater than 3000".equals(createAttributePage.getBubleText()), "error message");
+        assertTrue("Value should be greater than 3000".equals(getBubbleMessage(browser)), "error message");
 
         createAttributePage.setBucket(0, "This is a long name which is longer than 128 characters. "
                 + "So it should show error that the Values is so long. And I am checking it", "1000");
         createAttributePage.setBucket(0, "This is a long name which is longer than 128 characters. "
                 + "So it should show error that the Values is so long. And I am checking it");
-        assertTrue("Value is too long.".equals(createAttributePage.getBubleText()), "error message");
+        assertTrue("Value is too long.".equals(getBubbleMessage(browser)), "error message");
     }
 
     @Test(dependsOnMethods = {"createComputedAttributeTest"}, priority = 1)

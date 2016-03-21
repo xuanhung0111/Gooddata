@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.graphene.utils.ElementUtils.getBubbleMessage;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
@@ -246,10 +247,9 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         assertTrue(dataPreviewTable.isColumnNameError("10230"), "Error is not shown!");
 
         dataPreviewTable.getColumnNameInput("2006 03 01").click();
-        assertEquals(getErrorBubbleMessage(), NUMBERIC_COLUMN_NAME_ERROR);
-
+        assertEquals(getBubbleMessage(browser), NUMBERIC_COLUMN_NAME_ERROR);
         dataPreviewTable.getColumnNameInput("10230").click();
-        assertEquals(getErrorBubbleMessage(), NUMBERIC_COLUMN_NAME_ERROR);
+        assertEquals(getBubbleMessage(browser), NUMBERIC_COLUMN_NAME_ERROR);
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when column names start with numbers");
 
@@ -363,7 +363,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
         assertTrue(dataPreviewTable.isEmptyColumnNameError(2), "Error is not shown!");
 
         dataPreviewTable.getColumnNameInputs().get(1).click();
-        assertEquals(getErrorBubbleMessage(), EMPTY_COLUMN_NAME_ERROR);
+        assertEquals(getBubbleMessage(browser), EMPTY_COLUMN_NAME_ERROR);
 
         waitForFragmentVisible(dataPreviewPage)
             .selectHeader()
@@ -496,10 +496,6 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
 
         assertThat(dataPreviewTable.getColumnNames(), containsInAnyOrder(simplifyHeaderNames(expectedColumnNames).toArray()));
         assertThat(dataPreviewTable.getColumnTypes(), containsInAnyOrder(expectedColumnTypes.toArray()));
-    }
-
-    private String getErrorBubbleMessage() {
-        return waitForElementVisible(cssSelector(".bubble-negative .content"), browser).getText();
     }
 
     private WebElement getItemFromSpecificDropdown(DataPreviewPage dataPreviewPage, String item, ColumnType typeDropdown) {

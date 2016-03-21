@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.disc;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.ElementUtils.BY_BUBBLE_CONTENT;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
@@ -69,7 +70,6 @@ public class ScheduleDetail extends ScheduleForm {
             .xpath("//div[contains(@class, 'ait-schedule-title-section')]//button[1]");
     private static final By BY_OK_GROUP_EXPAND_BUTTON = By.cssSelector(".icon-navigatedown");
     private static final By BY_PARAMETERS_EDIT_SECTION = By.cssSelector(".parameters-section.modified");
-    private static final By BY_TOOLTIP = By.cssSelector(".bubble-content .content");
     private static final By BY_EXECUTION_TOOLTIP = By.cssSelector(".execution-tooltip");
 
     private static final String SCHEDULE_STOP_BUTTON_CLASS = "ait-schedule-stop-btn";
@@ -733,7 +733,7 @@ public class ScheduleDetail extends ScheduleForm {
         Actions action = new Actions(browser);
         action.moveToElement(scheduleTitle).perform();
         action.moveToElement(inlineBubbleHelp).perform();
-        return UPLOAD_DATA_HELP_TEXT.equals(waitForElementVisible(BY_TOOLTIP, browser).getText().trim());
+        return UPLOAD_DATA_HELP_TEXT.equals(waitForElementVisible(BY_BUBBLE_CONTENT, browser).getText().trim());
     }
 
     public boolean isCorrectAllDatasetSelected() {

@@ -50,8 +50,6 @@ public class CreateAttributePage extends AbstractFragment {
     @FindBy(css = ".buckets .row")
     private List<WebElement> bucketingRows;
 
-    private static final By bubleContentLocator = By.cssSelector(".bubble-content .content");
-
     private static final By bucketNameLocator = By.cssSelector(".row-item .bucket-name input");
 
     private static final By bucketToLocator = By.cssSelector(".row-item .bucket-range input");
@@ -81,10 +79,6 @@ public class CreateAttributePage extends AbstractFragment {
 
     public void setBucket(int index, String name) {
         setBucketName(index, name);
-    }
-    
-    public String getBubleText() {
-        return waitForElementVisible(bubleContentLocator, browser).getText();
     }
 
     public void setComputedAttributeName(String name) {

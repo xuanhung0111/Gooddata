@@ -199,15 +199,6 @@ public class CataloguePanel extends AbstractFragment {
         return true;
     }
 
-    public String getDataLinkBubbleMessage() {
-        getActions().moveToElement(waitForElementVisible(BY_ADD_DATA, getRoot())).perform();
-        return waitForElementVisible(By.cssSelector(".bubble-content .content"), browser).getText();
-    }
-
-    public void goToDataSectionPage() {
-        waitForElementVisible(BY_ADD_DATA, getRoot()).click();
-    }
-
     public CataloguePanel changeDataset(String dataset) {
         waitForElementVisible(datasetPicker).click();
         Graphene.createPageFragment(DatasourceDropDown.class,
