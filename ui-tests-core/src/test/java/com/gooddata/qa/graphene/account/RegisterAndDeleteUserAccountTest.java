@@ -5,7 +5,6 @@ import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -14,7 +13,6 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
 
@@ -24,8 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -37,8 +33,6 @@ import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-import com.gooddata.qa.utils.mail.ImapClient;
-import com.google.common.base.Predicate;
 
 public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
@@ -80,8 +74,6 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     private RegistrationForm registrationForm;
 
-    private ImapClient imapClient;
-
     @BeforeClass
     public void initData() {
         String registrationString = String.valueOf(System.currentTimeMillis());
@@ -98,11 +90,9 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         imapHost = testParams.loadProperty("imap.host");
         imapUser = REGISTRATION_USER;
         imapPassword = REGISTRATION_USER_PASSWORD;
-
-        imapClient = new ImapClient(imapHost, imapUser, imapPassword);
     }
 
-    @Test(groups = PROJECT_INIT_GROUP, priority = 1)
+    @Test(groups = PROJECT_INIT_GROUP)
     public void selectLoginLink() {
         initRegistrationPage();
 
@@ -113,7 +103,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         waitForElementVisible(registrationPage.getRoot());
     }
 
-    @Test(groups = PROJECT_INIT_GROUP, priority = 2)
+    @Test(groups = PROJECT_INIT_GROUP)
     public void registerUserWithInvalidValue() {
         initRegistrationPage();
 
@@ -137,14 +127,44 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(registrationPage.getErrorMessage(), INVALID_PHONE_NUMBER_ERROR_MESSAGE);
     }
 
-    @Test(groups = PROJECT_INIT_GROUP, priority = 3)
+    // Due to bug CL-9252, Walkme just appears one time and never display again.
+    // So all test that depend on this test will continue and no need to check Walkme display or not
+    @Test(groups = PROJECT_INIT_GROUP)
+    public void testWalkme() throws ParseException, JSONException, IOException {
+        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
+
+        initRegistrationPage();
+        registrationPage.registerNewUser(registrationForm);
+        waitForFragmentNotVisible(registrationPage);
+
+        waitForDashboardPageLoaded(browser);
+        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
+
+        testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
+
+        initAnalysePageByUrl();
+        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
+
+        initProjectsAndUsersPage();
+        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
+
+        openProject(DEMO_PROJECT);
+        assertFalse(isWalkmeDisplayed(), "Walkme-dialog-is-visible-in-project-that-is-not-Product-Tour");
+
+        openProject(GOODDATA_PRODUCT_TOUR_PROJECT);
+        assertFalse(isWalkmeDisplayed(), "Walkme-dialog-displays-more-than-one-time-in-Product-Tour-project");
+    }
+
+    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = "testWalkme")
     public void loginAsUnverifiedUserAfterRegistering()
             throws ParseException, JSONException, IOException, MessagingException {
-        initRegistrationPage();
-        activationLink = registrationPage.registerNewUser(imapClient, registrationForm);
+        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
 
-        waitForFragmentNotVisible(registrationPage);
-        waitForWalkmeAndTurnOff();
+        initRegistrationPage();
+
+        activationLink = doActionWithImapClient(
+                imapClient -> registrationPage.registerNewUser(imapClient, registrationForm));
+        waitForDashboardPageLoaded(browser);
 
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
 
@@ -172,8 +192,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
         loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
-        waitForFragmentNotVisible(loginFragment);
-        waitForWalkmeAndTurnOff();
+        waitForDashboardPageLoaded(browser);
 
         initProjectsAndUsersPage();
         assertTrue(projectAndUsersPage.isEmailingDashboardsTabDisplayed(),
@@ -189,24 +208,24 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(userProfilePage.getUserRole(), UserRoles.ADMIN.getName());
     }
 
-    @Test(groups = PROJECT_INIT_GROUP, priority = 4)
+    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = "loginAsUnverifiedUserAfterRegistering")
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
         deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
 
         initRegistrationPage();
-        activationLink = registrationPage.registerNewUser(imapClient, registrationForm);
 
-        waitForFragmentNotVisible(registrationPage);
-        waitForWalkmeAndTurnOff();
+        activationLink = doActionWithImapClient(
+                imapClient -> registrationPage.registerNewUser(imapClient, registrationForm));
+        waitForDashboardPageLoaded(browser);
 
         openUrl(activationLink);
         waitForElementVisible(loginFragment.getRoot());
-        assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
+
         takeScreenshot(browser, "register user successfully", this.getClass());
+        assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
         loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
-        waitForFragmentNotVisible(loginFragment);
-        waitForWalkmeAndTurnOff();
+        waitForDashboardPageLoaded(browser);
 
         openProject(DEMO_PROJECT);
         assertFalse(dashboardsPage.isEditButtonPresent(), "Dashboard can be edited in Goodsales Demo project");
@@ -277,27 +296,19 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         return waitForFragmentVisible(projectsPage).getProjectsIds(name).get(0);
     }
 
-    private void waitForWalkmeAndTurnOff() {
+    private boolean isWalkmeDisplayed() {
         final int walkmeLoadTimeoutSeconds = 30;
-
-        final By dashboardPageLocator = By.cssSelector("#p-projectDashboardPage.s-displayed");
-        final By walkmeCloseLocator = By.className("walkme-action-close");
-
-        Predicate<WebDriver> dashboardOrWalkmeAppear = browser -> isElementPresent(dashboardPageLocator, browser)
-                || isElementPresent(walkmeCloseLocator, browser);
-
-        Graphene.waitGui().withTimeout(180, TimeUnit.SECONDS).until(dashboardOrWalkmeAppear);
+        final By walkmeCloseLocator = By.cssSelector(".walkme-action-close, .walkme-action-cancel");
 
         try {
-            WebElement walkmeCloseElement = waitForElementVisible(walkmeCloseLocator, browser,
-                    walkmeLoadTimeoutSeconds);
-
-            walkmeCloseElement.click();
-            waitForElementNotPresent(walkmeCloseElement);
+            waitForElementVisible(walkmeCloseLocator, browser, walkmeLoadTimeoutSeconds);
+            return true;
 
         } catch (TimeoutException e) {
             takeScreenshot(browser, "Walkme-dialog-is-not-appeared", getClass());
             log.info("Walkme dialog is not appeared!");
+
+            return false;
         }
     }
 }
