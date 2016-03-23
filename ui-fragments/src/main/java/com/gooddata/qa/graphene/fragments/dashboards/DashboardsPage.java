@@ -7,6 +7,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,8 @@ import com.gooddata.qa.graphene.fragments.dashboards.widget.FilterWidget;
 import com.gooddata.qa.utils.CssUtils;
 
 public class DashboardsPage extends AbstractFragment {
+    public static final String BY_EDIT_DASHBOARD_BAR = "//div[contains(@class,'s-dashboard-edit-bar')]";
+
     private static final By SAVE_AS_DIALOG_LOCATOR = By.className("dashboardSettingsDialogView"); 
     private static final By BY_EXPORTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Exporting…']");
     private static final By BY_PRINTING_PANEL = By.xpath("//div[@class='box']//div[@class='rightContainer' and text()='Preparing printable PDF for download…']");
@@ -59,7 +62,7 @@ public class DashboardsPage extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class,'editTitleDialogView')]")
     private TabDialog newTabDialog;
 
-    @FindBy(xpath = "//div[contains(@class,'s-dashboard-edit-bar')]")
+    @FindBy(xpath = BY_EDIT_DASHBOARD_BAR)
     private DashboardEditBar editDashboardBar;
 
     @FindBy(xpath = "//div[contains(@class,'dashboardTitleEditBox')]/input")
@@ -187,7 +190,11 @@ public class DashboardsPage extends AbstractFragment {
 
     public DashboardEditBar editDashboard() {
         waitForDashboardPageLoaded(browser);
-        openEditExportEmbedMenu().select("Edit");
+
+        if (!isElementPresent(By.xpath(BY_EDIT_DASHBOARD_BAR), getRoot())) {
+            openEditExportEmbedMenu().select("Edit");
+        }
+
         return waitForFragmentVisible(editDashboardBar);
     }
 
