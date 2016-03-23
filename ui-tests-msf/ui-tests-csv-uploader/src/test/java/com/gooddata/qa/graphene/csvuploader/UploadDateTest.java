@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -24,9 +23,10 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.DateFormat;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
-import com.gooddata.qa.graphene.utils.Sleeper;
+import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 /**
  * Reference the document to know the supported date formats
@@ -84,23 +84,20 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"}, dataProvider = "dateDataProvider")
     public void uploadDateDatasetWithDifferentFormats(CsvFile fileToUpload) {
-        initDataUploadPage();
-        uploadFile(fileToUpload);
-        DataPreviewTable dataPreviewTable = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable();
-        takeScreenshot(browser, toScreenshotName("data-preview", fileToUpload.getFileName()), getClass());
+        final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(fileToUpload.getFilePath());
+
+        final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
+        takeScreenshot(browser, "data-preview-" + fileToUpload.getFileName(), getClass());
         assertThat(dataPreviewTable.getColumnNames(), contains(fileToUpload.getColumnNames().toArray()));
         assertThat(dataPreviewTable.getColumnTypes(), contains(fileToUpload.getColumnTypes().toArray()));
+
         dataPreviewPage.triggerIntegration();
-        String datasetName = getNewDataset(fileToUpload);
-        waitForDatasetName(datasetName);
-        waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        Sleeper.sleepTightInSeconds(5);
+        Dataset.waitForDatasetLoaded(browser);
 
-        DatasetDetailPage csvDatasetDetailPage = datasetsListPage
-                .getMyDatasetsTable()
-                .getDataset(datasetName)
-                .openDetailPage();
+        final Dataset dataset = datasetsListPage.getMyDatasetsTable().getDataset(getNewDataset(fileToUpload));
+        assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
 
+        final DatasetDetailPage csvDatasetDetailPage = dataset.openDetailPage();
         assertThat(csvDatasetDetailPage.getColumnNames(), contains(fileToUpload.getColumnNames().toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), contains(fileToUpload.getColumnTypes().toArray()));
     }
@@ -147,16 +144,18 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
 
     @Test(dependsOnMethods = {"createProject"}, dataProvider = "ambiguousDateDataProvider")
     public void uploadAmbigousDateDataset(CsvFile fileToUpload, List<DateFormat> dateFormats, int dateFormatCounts) {
-        initDataUploadPage();
-        uploadFile(fileToUpload);
-        DataPreviewTable dataPreviewTable = waitForFragmentVisible(dataPreviewPage).getDataPreviewTable();
-        takeScreenshot(browser, toScreenshotName("data-preview", fileToUpload.getFileName()), getClass());
+        final DataPreviewPage dataPreviewPage = initDataUploadPage().uploadFile(fileToUpload.getFilePath());
+
+        final DataPreviewTable dataPreviewTable = dataPreviewPage.getDataPreviewTable();
+        takeScreenshot(browser, "data-preview-" + fileToUpload.getFileName(), getClass());
+
         assertThat(dataPreviewTable.getColumnNames(), contains(fileToUpload.getColumnNames().toArray()));
         assertThat(dataPreviewTable.getColumnTypes(), contains(fileToUpload.getColumnTypes().toArray()));
         assertThat(dataPreviewPage.getPreviewPageErrorMessage(),
                 containsString("Fill in or correct the names and types for highlighted columns"));
         assertTrue(dataPreviewPage.isIntegrationButtonDisabled(),
                 "Add data button should be disabled when column names are invalid");
+
         int indexColumn = 0;
         for (DateFormat dateFormat : dateFormats) {
             assertEquals(dataPreviewTable.getColumnDateFormatCount(indexColumn), dateFormatCounts,
@@ -167,47 +166,38 @@ public class UploadDateTest extends AbstractCsvUploaderTest {
         assertFalse(dataPreviewPage.hasPreviewPageErrorMessage(), "Error in preview page should not be shown");
 
         dataPreviewPage.triggerIntegration();
-        String datasetName = getNewDataset(fileToUpload);
-        waitForDatasetName(datasetName);
-        waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        Sleeper.sleepTightInSeconds(5);
+        Dataset.waitForDatasetLoaded(browser);
 
-        DatasetDetailPage csvDatasetDetailPage = datasetsListPage
-                .getMyDatasetsTable()
-                .getDataset(datasetName)
-                .openDetailPage();
+        final Dataset dataset = datasetsListPage.getMyDatasetsTable().getDataset(getNewDataset(fileToUpload));
+        assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
 
-        List<String> columnTypes = dateFormats.stream()
-                .map(DateFormat::getColumnType)
-                .collect(toList());
+        final DatasetDetailPage csvDatasetDetailPage = dataset.openDetailPage();
+
+        final List<String> columnTypes = dateFormats.stream().map(DateFormat::getColumnType).collect(toList());
         columnTypes.add("Measure");
+
         assertThat(csvDatasetDetailPage.getColumnNames(), contains(fileToUpload.getColumnNames().toArray()));
         assertThat(csvDatasetDetailPage.getColumnTypes(), contains(columnTypes.toArray()));
     }
 
     @Test(dependsOnMethods = {"createProject"})
     public void updateDateDataset() {
-        initDataUploadPage();
-        checkCsvUpload(DATE_YYYY_FILE, this::uploadCsv, true);
-        String datasetName = getNewDataset(DATE_YYYY_FILE);
-        waitForDatasetName(datasetName);
-        waitForDatasetStatus(datasetName, SUCCESSFUL_STATUS_MESSAGE_REGEX);
-        Sleeper.sleepTightInSeconds(5);
+        final Dataset dataset = uploadCsv(DATE_YYYY_FILE);
+        final String datasetName = dataset.getName();
 
-        Dataset dataset = datasetsListPage.getMyDatasetsTable().getDataset(datasetName);
+        assertTrue(dataset.getStatus().matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
 
-        dataset.clickUpdateButton();
-        refreshCsv(DATE_YYYY_FILE, datasetName, true);
+        updateCsv(DATE_YYYY_FILE, datasetName, true);
         waitForFragmentVisible(datasetsListPage);
-
-        dataset.clickUpdateButton();
 
         final CsvFile dateInvalidYYYY = CsvFile.loadFile(
                 getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/24dates.yyyy.invalid.csv"));
-        doUploadFromDialog(dateInvalidYYYY);
+        final FileUploadDialog fileUploadDialog = dataset.clickUpdateButton();
 
-        List<String> backendValidationErrors =
-                waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+        fileUploadDialog.pickCsvFile(dateInvalidYYYY.getFilePath())
+            .clickUploadButton();
+
+        final List<String> backendValidationErrors = waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
         assertThat(backendValidationErrors,
                 hasItems(format("Update from file \"%s\" failed. "
                         + "Number, type, and order of the columns do not match the dataset. "

@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.csvuploader;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.fail;
 
@@ -13,6 +12,7 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.google.common.base.Predicate;
 
 public class DatasetDetailTest extends HappyUploadTest {
@@ -22,41 +22,42 @@ public class DatasetDetailTest extends HappyUploadTest {
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvDatasetDetail() {
-        openDatasetDetailsPage();
-        waitForFragmentVisible(csvDatasetDetailPage);
+        final DatasetDetailPage datasetDetailPage = openDatasetDetailsPage();
         takeScreenshot(browser, DATASET_DETAIL_PAGE_NAME, getClass());
+
         checkCsvDatasetDetail(PAYROLL_DATASET_NAME, PAYROLL.getColumnNames(), PAYROLL.getColumnTypes());
-        csvDatasetDetailPage.clickBackButton();
-        waitForFragmentVisible(datasetsListPage);
+
+        datasetDetailPage.clickBackButton();
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkDatasetDetailPage() {
-        openDatasetDetailsPage();
+        final DatasetDetailPage datasetDetailPage = openDatasetDetailsPage().downloadTheLatestCsvFileUpload();
 
-        waitForFragmentVisible(csvDatasetDetailPage).downloadTheLatestCsvFileUpload();
-        final File downloadedCsvFile = new File(testParams.getDownloadFolder() + testParams.getFolderSeparator()
-                + PAYROLL.getFileName());
-        Predicate<WebDriver> fileDownloadComplete =
-                browser -> downloadedCsvFile.length() > PAYROLL_FILE_SIZE_MINIMUM;
-        Graphene.waitGui().withTimeout(3, TimeUnit.MINUTES).pollingEvery(10, TimeUnit.SECONDS)
-                .until(fileDownloadComplete);
+        final File downloadedCsvFile = new File(testParams.getDownloadFolder(), PAYROLL.getFileName());
+
+        final Predicate<WebDriver> fileDownloadComplete = browser ->
+            downloadedCsvFile.length() > PAYROLL_FILE_SIZE_MINIMUM;
+        Graphene.waitGui()
+            .withTimeout(3, TimeUnit.MINUTES)
+            .pollingEvery(10, TimeUnit.SECONDS)
+            .until(fileDownloadComplete);
+
         log.info("Download file size: " + downloadedCsvFile.length());
         log.info("Download file path: " + downloadedCsvFile.getPath());
         log.info("Download file name: " + downloadedCsvFile.getName());
 
-        String createdDateTime =
-                csvDatasetDetailPage.getCreatedDateTime().replaceAll("Created by.*on\\s+", "");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'Today at' h:mm a");
+        final String createdDateTime = datasetDetailPage.getCreatedDateTime().replaceAll("Created by.*on\\s+", "");
+
         try {
-            formatter.parse(createdDateTime);
+            DateTimeFormatter.ofPattern("'Today at' h:mm a").parse(createdDateTime);
         } catch (DateTimeParseException e) {
             fail("Incorrect format of created date time: " + createdDateTime);
         }
     }
 
-    private void openDatasetDetailsPage() {
+    private DatasetDetailPage openDatasetDetailsPage() {
         initDataUploadPage();
-        datasetsListPage.openDatasetDetailPage(PAYROLL_DATASET_NAME);
+        return datasetsListPage.openDatasetDetailPage(PAYROLL_DATASET_NAME);
     }
 }

@@ -179,6 +179,10 @@ public final class WaitUtils {
         Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(byElement).is().not().present();
     }
 
+    public static void waitForElementNotPresent(WebElement element, int timeout) {
+        Graphene.waitGui().withTimeout(timeout, TimeUnit.SECONDS).until().element(element).is().not().present();
+    }
+
     public static void waitForElementNotPresent(WebElement element) {
         Graphene.waitGui().until().element(element).is().not().present();
     }

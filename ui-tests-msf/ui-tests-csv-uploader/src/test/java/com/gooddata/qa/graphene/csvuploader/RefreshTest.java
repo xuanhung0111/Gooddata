@@ -2,7 +2,6 @@ package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.graphene.Screenshots.toScreenshotName;
 import static com.gooddata.qa.utils.io.ResourceUtils.getFilePathFromResource;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -17,76 +16,65 @@ import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
+import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
+import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 public class RefreshTest extends HappyUploadTest {
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshFromList() {
-        initDataUploadPage();
-        String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
-        datasetsListPage
-                .getMyDatasetsTable()
-                .getDataset(datasetName)
-                .clickUpdateButton();
-
-        refreshCsv(PAYROLL_REFRESH, datasetName, true);
-        waitForDatasetStatus(PAYROLL.getDatasetNameOfFirstUpload(), SUCCESSFUL_STATUS_MESSAGE_REGEX);
+        updateCsv(PAYROLL_REFRESH, PAYROLL.getDatasetNameOfFirstUpload(), true);
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshFromDetail() {
-        initDataUploadPage();
-        String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
-        datasetsListPage
+        final Dataset dataset = initDataUploadPage()
                 .getMyDatasetsTable()
-                .getDataset(datasetName)
-                .openDetailPage()
-                .clickRefreshButton();
+                .getDataset(PAYROLL.getDatasetNameOfFirstUpload());
 
-        refreshCsv(PAYROLL_REFRESH, datasetName, true);
-        waitForFragmentVisible(csvDatasetDetailPage);
+        updateCsvInDetailPage(PAYROLL_REFRESH, dataset, true);
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkSetHeaderHiddenWhenUpdate() {
         initDataUploadPage();
-        String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
 
         waitForFragmentVisible(datasetsListPage)
-                .getMyDatasetsTable()
-                .getDataset(datasetName)
-                .clickUpdateButton();
+            .getMyDatasetsTable()
+            .getDataset(PAYROLL.getDatasetNameOfFirstUpload())
+            .clickUpdateButton()
+            .pickCsvFile(PAYROLL_REFRESH.getFilePath())
+            .clickUploadButton();
 
-        doUploadFromDialog(PAYROLL_REFRESH);
-        waitForFragmentVisible(dataPreviewPage);
-        assertTrue(dataPreviewPage.isSetHeaderButtonHidden());
-        takeScreenshot(browser, toScreenshotName("set-header-button-hidden", PAYROLL_REFRESH.getFileName())
-                , getClass());
+        assertTrue(DataPreviewPage.getInstance(browser).isSetHeaderLinkHidden());
+        takeScreenshot(browser, "set-header-button-hidden-" + PAYROLL_REFRESH.getFileName(), getClass());
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvRefreshWithIncorrectMetadata() {
-        initDataUploadPage();
+        final String badUpdateCsvFileName = "payroll.refresh.bad.csv";
 
-        datasetsListPage
-                .getMyDatasetsTable()
-                .getDataset(PAYROLL.getDatasetNameOfFirstUpload())
-                .clickUpdateButton();
+        final FileUploadDialog fileUploadDialog = initDataUploadPage()
+            .getMyDatasetsTable()
+            .getDataset(PAYROLL.getDatasetNameOfFirstUpload())
+            .clickUpdateButton();
 
-        final CsvFile payrollRefreshBadFile = CsvFile.loadFile(
-                getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/payroll.refresh.bad.csv"));
-        doUploadFromDialog(payrollRefreshBadFile);
+        fileUploadDialog.pickCsvFile(getFilePathFromResource("/" + ResourceDirectory.UPLOAD_CSV + "/" + badUpdateCsvFileName))
+            .clickUploadButton();
 
-        List<String> backendValidationErrors =
+        final List<String> backendValidationErrors =
                 waitForFragmentVisible(fileUploadDialog).getBackendValidationErrors();
+
         assertThat(backendValidationErrors,
                 hasItems(format("Update from file \"%s\" failed. "
                         + "Number, type, and order of the columns do not match the dataset. "
-                        + "Check the dataset structure.", payrollRefreshBadFile.getFileName())));
+                        + "Check the dataset structure.", badUpdateCsvFileName)));
+
         assertEquals(fileUploadDialog.getLinkInBackendValidationError(),
                 format(DATASET_LINK, testParams.getHost(), testParams.getProjectId(),
                         getDatasetId(PAYROLL.getDatasetNameOfFirstUpload())));
@@ -94,23 +82,26 @@ public class RefreshTest extends HappyUploadTest {
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCancelCsvRefresh() {
-        initDataUploadPage();
+        final Dataset dataset = initDataUploadPage()
+            .getMyDatasetsTable()
+            .getDataset(PAYROLL.getDatasetNameOfFirstUpload());
 
-        Dataset dataset = datasetsListPage
-                .getMyDatasetsTable()
-                .getDataset(PAYROLL.getDatasetNameOfFirstUpload());
+        dataset.clickUpdateButton()
+            .pickCsvFile(PAYROLL_REFRESH.getFilePath())
+            .clickUploadButton();
+        DataPreviewPage.getInstance(browser).cancelTriggerIntegration();
 
-        dataset.clickUpdateButton();
-
-        doUploadFromDialog(PAYROLL_REFRESH);
-        waitForFragmentVisible(dataPreviewPage).cancelTriggerIntegration();
         waitForFragmentVisible(datasetsListPage);
 
-        waitForFragmentVisible(dataset).openDetailPage().clickRefreshButton();
+        final DatasetDetailPage datasetDetailPage = waitForFragmentVisible(dataset)
+            .openDetailPage();
 
-        doUploadFromDialog(PAYROLL_REFRESH);
-        waitForFragmentVisible(dataPreviewPage).cancelTriggerIntegration();
-        waitForFragmentVisible(csvDatasetDetailPage);
+        datasetDetailPage.clickUpdateButton()
+            .pickCsvFile(PAYROLL_REFRESH.getFilePath())
+            .clickUploadButton();
+        DataPreviewPage.getInstance(browser).cancelTriggerIntegration();
+
+        waitForFragmentVisible(datasetDetailPage);
     }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"}, alwaysRun = true)
@@ -121,27 +112,28 @@ public class RefreshTest extends HappyUploadTest {
     @Test(dependsOnMethods = {"addOtherAdminToProject"})
     public void checkAdminUpdateDataOfOthers() throws JSONException {
         try {
-            String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
+            final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
             log.info("datasetName by owner: " + datasetName);
+
             logout();
             signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
 
-            initDataUploadPage();
+            final Dataset dataset = initDataUploadPage()
+                    .getOthersDatasetsTable()
+                    .getDataset(datasetName);
 
-            Dataset dataset = datasetsListPage.getOthersDatasetsTable().getDataset(datasetName);
+            dataset.clickUpdateButton()
+                .pickCsvFile(PAYROLL_REFRESH.getFilePath())
+                .clickUploadButton();
+            DataPreviewPage.getInstance(browser).triggerIntegration();
+            Dataset.waitForDatasetLoaded(browser);
 
-            dataset.clickUpdateButton();
-            refreshCsv(PAYROLL_REFRESH, datasetName, false);
-
-            assertEquals(csvDatasetMessageBar.waitForSuccessMessageBar().getText(),
+            assertEquals(DatasetMessageBar.getInstance(browser).waitForSuccessMessageBar().getText(),
                     format(SUCCESSFUL_DATA_MESSAGE, datasetName));
 
-            dataset.openDetailPage().clickRefreshButton();
-            refreshCsv(PAYROLL_REFRESH, datasetName, false);
-
+            updateCsvInDetailPage(PAYROLL_REFRESH, dataset, false);
         } finally {
-            logout();
-            signInAtGreyPages(testParams.getUser(), testParams.getPassword());
+            logoutAndLoginAs(true, UserRoles.ADMIN);
         }
     }
 }
