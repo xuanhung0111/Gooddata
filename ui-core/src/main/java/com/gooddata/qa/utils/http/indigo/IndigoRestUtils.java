@@ -22,6 +22,7 @@ import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
+import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
@@ -77,12 +78,29 @@ public class IndigoRestUtils {
         }
     };
 
+    private static final Supplier<String> VISUALIZATION_WIDGET_BODY = () -> {
+        try {
+            return new JSONObject() {{
+                put("visualization", new JSONObject() {{
+                    put("meta", new JSONObject() {{
+                        put("title", "${title}");
+                    }});
+                    put("content", new JSONObject());
+                }});
+            }}.toString();
+        } catch (JSONException e) {
+            throw new IllegalStateException("There is an exception during json object initialization! ", e);
+        }
+    };
+
     /**
      * Get analytical dashboards of a project
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @return list of analytical dashboard links
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
      */
     public static List<String> getAnalyticalDashboards(final RestApiClient restApiClient, final String projectId)
             throws JSONException, IOException {
@@ -100,11 +118,13 @@ public class IndigoRestUtils {
 
     /**
      * Create KPI widget
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param kpiConfig
      * @return KPI uri
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
      */
     public static String createKpiWidget(final RestApiClient restApiClient, final String projectId,
             final KpiMDConfiguration kpiConfig) throws JSONException, IOException {
@@ -145,12 +165,35 @@ public class IndigoRestUtils {
     }
 
     /**
+     * Create Visualization widget
+     *
+     * @param restApiClient
+     * @param projectId
+     * @param vizConfig
+     * @return Visualization uri
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
+     */
+    public static String createVisualizationWidget(final RestApiClient restApiClient, final String projectId,
+            final VisualizationMDConfiguration vizConfig) throws JSONException, IOException {
+        String content = VISUALIZATION_WIDGET_BODY.get().replace("${title}", vizConfig.getTitle());
+
+        return getJsonObject(restApiClient,
+                restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
+                    .getJSONObject("visualization")
+                    .getJSONObject("meta")
+                    .getString("uri");
+    }
+
+    /**
      * Add KPI to analytical dashboard
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param dashboardUri
      * @param widgetUri
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
      */
     public static void addKpiWidgetToAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
             final String dashboardUri, final String widgetUri) throws JSONException, IOException {
@@ -165,11 +208,13 @@ public class IndigoRestUtils {
 
     /**
      * Delete KPI from analytical dashboard
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param dashboardUri
      * @param widgetUri
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
      */
     public static void deleteKpiWidgetFromAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
             final String dashboardUri, final String widgetUri) throws JSONException, IOException {
@@ -193,11 +238,13 @@ public class IndigoRestUtils {
 
     /**
      * Create new analytical dashboard
-     * 
+     *
      * @param restApiClient
      * @param projectId
      * @param widgetUris
      * @return new analytical dashboard uri
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
      */
     public static String createAnalyticalDashboard(final RestApiClient restApiClient, final String projectId,
             final Collection<String> widgetUris) throws JSONException, IOException {
@@ -215,10 +262,12 @@ public class IndigoRestUtils {
 
     /**
      * A helper method to prepare analytical dashboard with some kpis added
-     *  
+     *
      * @param restApiClient
      * @param goodData
      * @param projectId
+     * @throws org.json.JSONException
+     * @throws java.io.IOException
      */
     public static void prepareAnalyticalDashboardTemplate(final RestApiClient restApiClient,
             final GoodData goodData, final String projectId) throws JSONException, IOException {
@@ -271,7 +320,7 @@ public class IndigoRestUtils {
 
     /**
      * Get date data set created uri
-     * 
+     *
      * @param goodData
      * @param projectId
      * @return date data set created uri

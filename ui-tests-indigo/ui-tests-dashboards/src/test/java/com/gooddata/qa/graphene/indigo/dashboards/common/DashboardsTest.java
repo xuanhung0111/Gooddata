@@ -7,6 +7,9 @@ import java.util.List;
 
 public abstract class DashboardsTest extends DashboardsGeneralTest {
 
+    public static final String DASH_WIDGET_PREV_DROPZONE_CLASS = "prev";
+    public static final String DASH_WIDGET_NEXT_DROPZONE_CLASS = "next";
+
     public static final String AMOUNT = "Amount";
     public static final String ACCOUNT = "Account";
     public static final String STAT_REGION = "stat_region";
