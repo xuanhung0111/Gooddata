@@ -37,9 +37,10 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
     public void testNumberFormatEditor() {
         initMetricPage();
         waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
-        waitForFragmentVisible(metricDetailPage).changeMetricFormatButDiscard(Formatter.BARS);
         // don't know why get text of metric format in metric detail page return #,##0 instead of #,##0.00
-        assertTrue(Formatter.DEFAULT.toString().startsWith(metricDetailPage.getMetricFormat()));
+        assertTrue(Formatter.DEFAULT.toString().startsWith(waitForFragmentVisible(metricDetailPage)
+                .changeMetricFormatButDiscard(Formatter.BARS)
+                .getMetricFormat()));
         Screenshots.takeScreenshot(browser, "testNumberFormatEditor-beforeChangeFormat", getClass());
         metricDetailPage.changeMetricFormat(Formatter.BARS);
         Screenshots.takeScreenshot(browser, "testNumberFormatEditor-afterChangeFormat", getClass());
@@ -164,7 +165,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
         initProjectsPage();
         initMetricPage();
         waitForFragmentVisible(metricPage).openMetricDetailPage(NUMBER_OF_ACTIVITIES);
-        waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT);
-        assertEquals(metricDetailPage.getMetricFormat(), Formatter.DEFAULT.toString());
+        assertEquals(waitForFragmentVisible(metricDetailPage).changeMetricFormat(Formatter.DEFAULT)
+                .getMetricFormat(), Formatter.DEFAULT.toString());
     }
 }

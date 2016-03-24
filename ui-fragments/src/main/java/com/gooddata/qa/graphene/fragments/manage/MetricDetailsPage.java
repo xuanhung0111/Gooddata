@@ -62,16 +62,18 @@ public class MetricDetailsPage extends AbstractFragment {
         return true;
     }
 
-    public void changeMetricFormat(MetricFormatterDialog.Formatter format) {
+    public MetricDetailsPage changeMetricFormat(MetricFormatterDialog.Formatter format) {
         waitForElementVisible(metricFormat).click();
         Graphene.createPageFragment(MetricFormatterDialog.class,
                 waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(format);
+        return this;
     }
 
-    public void changeMetricFormatButDiscard(MetricFormatterDialog.Formatter format) {
+    public MetricDetailsPage changeMetricFormatButDiscard(MetricFormatterDialog.Formatter format) {
         waitForElementVisible(metricFormat).click();
         Graphene.createPageFragment(MetricFormatterDialog.class,
                 waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
+        return this;
     }
 
     public void deleteMetric() {

@@ -34,14 +34,14 @@ public class MetricFormatterDialog extends AbstractFragment {
 
     public static final By LOCATOR = By.className("c-formatterDialog");
 
-    public MetricFormatterDialog changeFormat(Formatter format) {
+    public void changeFormat(Formatter format) {
         waitForElementVisible(getPresetFormatterFrom(format)).click();
-        return submit();
+        submit();
     }
 
-    public MetricFormatterDialog changeFormatButDiscard(Formatter format) {
+    public void changeFormatButDiscard(Formatter format) {
         waitForElementVisible(getPresetFormatterFrom(format)).click();
-        return discard();
+        discard();
     }
 
     private WebElement getPresetFormatterFrom(Formatter format) {
@@ -57,16 +57,14 @@ public class MetricFormatterDialog extends AbstractFragment {
         }
     }
 
-    private MetricFormatterDialog submit() {
+    private void submit() {
         waitForElementVisible(applyButton).click();
         waitForFragmentNotVisible(this);
-        return this;
     }
 
-    private MetricFormatterDialog discard() {
+    private void discard() {
         waitForElementVisible(cancelButton).click();
         waitForFragmentNotVisible(this);
-        return this;
     }
 
     public static enum Formatter {
