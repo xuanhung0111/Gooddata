@@ -100,8 +100,6 @@ public class ReportPage extends AbstractFragment {
 
     private static final By CUSTOM_METRIC_FORMAT_LOCATOR = className("customMetricFormatItem-format");
 
-    private static final By APPLY_CONFIG_FORMAT_LOCATOR = By.cssSelector(".s-btn-apply:not(.disabled)");
-
     private static final String XPATH_REPORT_VISUALIZATION_TYPE =
             "//div[contains(@class, 's-enabled')]/div[contains(@class, 'c-chartType') and"
             + " ./span[@title='${type}']]";
@@ -292,7 +290,6 @@ public class ReportPage extends AbstractFragment {
         waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
         Graphene.createPageFragment(MetricFormatterDialog.class,
                 waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormat(format);
-        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
         return this;
     }
 
@@ -300,7 +297,6 @@ public class ReportPage extends AbstractFragment {
         waitForElementVisible(CUSTOM_METRIC_FORMAT_LOCATOR, browser).click();
         Graphene.createPageFragment(MetricFormatterDialog.class,
                 waitForElementVisible(MetricFormatterDialog.LOCATOR, browser)).changeFormatButDiscard(format);
-        waitForElementVisible(APPLY_CONFIG_FORMAT_LOCATOR, browser).click();
         return this;
     }
 
