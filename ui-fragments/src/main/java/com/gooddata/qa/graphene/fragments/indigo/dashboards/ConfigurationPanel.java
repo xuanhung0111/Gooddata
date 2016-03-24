@@ -21,7 +21,7 @@ public class ConfigurationPanel extends AbstractFragment {
     @FindBy(className = "s-metric_select")
     private MetricSelect metricSelect;
 
-    @FindBy(css = ".s-metric_select button.is-loaded")
+    @FindBy(css = ".s-metric_select button")
     private WebElement metricSelectLoaded;
 
     @FindBy(css = ".s-dataSet_select button")
@@ -44,6 +44,9 @@ public class ConfigurationPanel extends AbstractFragment {
 
     @FindBy(className = "s-alert-edit-warning")
     private WebElement alertEditWarning;
+
+    @FindBy(className = "s-unlisted_measure")
+    private WebElement unlistedMeasure;
 
     public ConfigurationPanel waitForButtonsLoaded() {
         waitForElementVisible(metricSelectLoaded);
@@ -103,6 +106,11 @@ public class ConfigurationPanel extends AbstractFragment {
 
     public String getSelectedMetric() {
         return waitForFragmentVisible(metricSelect).getSelection();
+    }
+
+    public ConfigurationPanel waitForSelectedMetricIsUnlisted() {
+        waitForElementVisible(unlistedMeasure);
+        return this;
     }
 
     public ConfigurationPanel waitForAlertEditWarning() {
