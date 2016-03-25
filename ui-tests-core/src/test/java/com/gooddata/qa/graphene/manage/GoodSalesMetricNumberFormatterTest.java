@@ -94,8 +94,7 @@ public class GoodSalesMetricNumberFormatterTest extends GoodSalesAbstractTest {
             assertEquals(values.get(0), "154,271.00");
 
             Screenshots.takeScreenshot(browser, "editFormatInReportPage-beforeChangeFormat", getClass());
-            reportPage.showCustomNumberFormat()
-                .changeNumberFormat(Formatter.BARS);
+            reportPage.changeNumberFormat(Formatter.BARS);
             report.waitForReportLoading();
             Screenshots.takeScreenshot(browser, "editFormatInReportPage-afterChangeFormat", getClass());
             values = report.getRawMetricElements();
