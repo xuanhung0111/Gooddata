@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.csvuploader;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
@@ -15,10 +16,17 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.google.common.base.Predicate;
 
-public class DatasetDetailTest extends HappyUploadTest {
+public class DatasetDetailTest extends AbstractCsvUploaderTest {
 
     private static String PAYROLL_DATASET_NAME = PAYROLL.getDatasetNameOfFirstUpload();
     private static final long PAYROLL_FILE_SIZE_MINIMUM = 476L;
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkCsvUploadHappyPath() {
+        assertTrue(uploadCsv(PAYROLL)
+            .getStatus()
+            .matches(SUCCESSFUL_STATUS_MESSAGE_REGEX));
+    }
 
     @Test(dependsOnMethods = {"checkCsvUploadHappyPath"})
     public void checkCsvDatasetDetail() {
