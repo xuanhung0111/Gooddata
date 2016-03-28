@@ -1,6 +1,8 @@
 package com.gooddata.qa.graphene.indigo.user;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.createUser;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -17,6 +19,7 @@ import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -87,8 +90,9 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = { "createProject" }, groups = { "initialize", "sanity" })
     public void initData() throws JSONException, IOException {
-        userManagementAdmin = testParams.loadProperty("userManagementAdmin");
-        userManagementPassword = testParams.loadProperty("userManagementPassword");
+        userManagementAdmin = generateEmail(testParams.getUser());
+        userManagementPassword = testParams.getPassword();
+        createUser(getRestApiClient(), userManagementAdmin, userManagementPassword);
 
         domainAdminUser = testParams.getUser();
         editorUser = testParams.getEditorUser();
@@ -594,6 +598,11 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
     public void turnOffUserManagementFeature() throws IOException, JSONException {
         ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
                 ProjectFeatureFlags.DISPLAY_USER_MANAGEMENT, false);
+    }
+
+    @AfterClass
+    public void deleteAccount() throws ParseException, IOException, JSONException {
+        deleteUserByEmail(getRestApiClient(), userManagementAdmin);
     }
 
     private void checkEditorCannotAccessUserGroupsLinkInDashboardPage(PermissionsDialog permissionsDialog) {
