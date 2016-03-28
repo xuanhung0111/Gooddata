@@ -64,18 +64,6 @@ public class DateFilterPickerPanel extends AbstractFragment {
         return getElementTexts(waitForElementVisible(dimensionSwitch).getOptions());
     }
 
-    public void hoverOnPeriod(final String period) {
-        WebElement element = waitForCollectionIsNotEmpty(periods).stream()
-            .filter(e -> period.equals(e.getText()))
-            .findFirst()
-            .get();
-        getActions().moveToElement(element).perform();
-    }
-
-    public String getTooltipFromPeriod() {
-        return waitForElementVisible(By.cssSelector(".bubble-content > .content"), browser).getText().trim();
-    }
-
     /**
      * @param from format MM/DD/YYYY
      * @param to   format MM/DD/YYYY
