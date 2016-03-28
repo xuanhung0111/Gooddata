@@ -92,6 +92,38 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         imapPassword = REGISTRATION_USER_PASSWORD;
     }
 
+    /**
+     * Due to bug CL-9252, Walkme just appears one time and never display again.
+     * So all test that depend on this test will continue and no need to check Walkme display or not
+     * 
+     * Notes: This test always run first base on alphabet order. 
+     */
+    @Test(groups = PROJECT_INIT_GROUP)
+    public void checkWalkme() throws ParseException, JSONException, IOException {
+        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
+
+        initRegistrationPage();
+        registrationPage.registerNewUser(registrationForm);
+        waitForFragmentNotVisible(registrationPage);
+
+        waitForDashboardPageLoaded(browser);
+        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
+
+        testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
+
+        initAnalysePageByUrl();
+        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
+
+        initProjectsAndUsersPage();
+        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
+
+        openProject(DEMO_PROJECT);
+        assertFalse(isWalkmeDisplayed(), "Walkme-dialog-is-visible-in-project-that-is-not-Product-Tour");
+
+        openProject(GOODDATA_PRODUCT_TOUR_PROJECT);
+        assertFalse(isWalkmeDisplayed(), "Walkme-dialog-displays-more-than-one-time-in-Product-Tour-project");
+    }
+
     @Test(groups = PROJECT_INIT_GROUP)
     public void selectLoginLink() {
         initRegistrationPage();
@@ -127,35 +159,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(registrationPage.getErrorMessage(), INVALID_PHONE_NUMBER_ERROR_MESSAGE);
     }
 
-    // Due to bug CL-9252, Walkme just appears one time and never display again.
-    // So all test that depend on this test will continue and no need to check Walkme display or not
     @Test(groups = PROJECT_INIT_GROUP)
-    public void testWalkme() throws ParseException, JSONException, IOException {
-        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
-
-        initRegistrationPage();
-        registrationPage.registerNewUser(registrationForm);
-        waitForFragmentNotVisible(registrationPage);
-
-        waitForDashboardPageLoaded(browser);
-        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
-
-        testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
-
-        initAnalysePageByUrl();
-        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
-
-        initProjectsAndUsersPage();
-        assertTrue(isWalkmeDisplayed(), "Walkme-dialog-is-not-visible");
-
-        openProject(DEMO_PROJECT);
-        assertFalse(isWalkmeDisplayed(), "Walkme-dialog-is-visible-in-project-that-is-not-Product-Tour");
-
-        openProject(GOODDATA_PRODUCT_TOUR_PROJECT);
-        assertFalse(isWalkmeDisplayed(), "Walkme-dialog-displays-more-than-one-time-in-Product-Tour-project");
-    }
-
-    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = "testWalkme")
     public void loginAsUnverifiedUserAfterRegistering()
             throws ParseException, JSONException, IOException, MessagingException {
         deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
@@ -208,7 +212,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(userProfilePage.getUserRole(), UserRoles.ADMIN.getName());
     }
 
-    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = "loginAsUnverifiedUserAfterRegistering")
+    @Test(groups = PROJECT_INIT_GROUP)
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
         deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
 
@@ -224,14 +228,18 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         takeScreenshot(browser, "register user successfully", this.getClass());
         assertEquals(loginFragment.getNotificationMessage(), ACTIVATION_SUCCESS_MESSAGE);
 
-        loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
-        waitForDashboardPageLoaded(browser);
+        try {
+            loginFragment.login(REGISTRATION_USER, REGISTRATION_USER_PASSWORD, true);
+            waitForDashboardPageLoaded(browser);
 
-        openProject(DEMO_PROJECT);
-        assertFalse(dashboardsPage.isEditButtonPresent(), "Dashboard can be edited in Goodsales Demo project");
+            openProject(DEMO_PROJECT);
+            assertFalse(dashboardsPage.isEditButtonPresent(), "Dashboard can be edited in Goodsales Demo project");
+        } finally {
+            logout();
+        }
     }
 
-    @Test(dependsOnGroups = PROJECT_INIT_GROUP)
+    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = {"registerNewUser"})
     public void openAtivationLinkAfterRegistration() {
         openUrl(activationLink);
         waitForElementVisible(loginFragment.getRoot());
@@ -241,7 +249,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         waitForElementVisible(BY_LOGGED_USER_BUTTON, browser);
     }
 
-    @Test(dependsOnGroups = PROJECT_INIT_GROUP)
+    @Test(groups = PROJECT_INIT_GROUP, dependsOnMethods = {"registerNewUser"})
     public void registerUserWithEmailOfExistingAccount() {
         initRegistrationPage();
 
