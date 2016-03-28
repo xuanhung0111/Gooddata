@@ -16,6 +16,7 @@ import javax.mail.MessagingException;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -222,7 +223,12 @@ public class ProjectAndUsersPage extends AbstractFragment {
                 .map(e -> e.findElement(RESEND_INVITATION_BUTTON_LOCATOR)).get();
 
         waitForElementVisible(resendButton).click();
-        waitForElementVisible(By.cssSelector(".item.invitation .loader"), browser);
+        final Predicate<WebDriver> predicate = browser -> resendButton.getAttribute("class").contains("disabled");
+        try {
+            Graphene.waitGui().until(predicate);
+        } catch (TimeoutException e) {
+            log.info("Resend button is disabled in so short time so cannot catch it");
+        }
         waitForElementVisible(resendButton);
 
         return this;
