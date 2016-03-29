@@ -129,7 +129,10 @@ public class ResetPasswordTest extends AbstractUITest {
         }
     }
 
-    @Test(dependsOnMethods = {"resetWithValidAndInvalidPassword"})
+    /*
+     * Disable this test case due to bug https://jira.intgdc.com/browse/WA-5739, will enable again when it is fixed
+     */
+    @Test(dependsOnMethods = {"resetWithValidAndInvalidPassword"}, enabled = false)
     public void openOneProject() {
         initProjectsPage();
 
@@ -142,7 +145,7 @@ public class ResetPasswordTest extends AbstractUITest {
         testParams.setProjectId(projectIds.get(0));
     }
 
-    @Test(dependsOnMethods = { "openOneProject" })
+    @Test(dependsOnMethods = { "openOneProject" }, enabled = false)
     public void checkSectionManagementVulnerability() throws ParseException, JSONException, IOException {
         initDashboardsPage();
         UserManagementRestUtils.updateCurrentUserPassword(getRestApiClient(), oldPassword, NEW_PASSWORD);
