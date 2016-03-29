@@ -435,6 +435,12 @@ public class AbstractUITest extends AbstractGreyPageTest {
         checkRedBar(browser);
     }
 
+    public ReportPage openReport(String reportName) {
+        initReportsPage().getReportsList().openReport(reportName);
+        waitForAnalysisPageLoaded(browser);
+        return reportPage.waitForReportExecutionProgress();
+    }
+
     public ReportPage initReportCreation() {
         initReportsPage();
         selectReportsDomainFolder("My Reports");
@@ -562,9 +568,10 @@ public class AbstractUITest extends AbstractGreyPageTest {
         return waitForFragmentVisible(reportsPage);
     }
 
-    public void initAttributePage() {
+    public AttributePage initAttributePage() {
         openUrl(PAGE_UI_PROJECT_PREFIX + testParams.getProjectId() + "|dataPage|attributes");
         waitForDataPageLoaded(browser);
+        return waitForFragmentVisible(attributePage);
     }
 
     public void initModelPage() {

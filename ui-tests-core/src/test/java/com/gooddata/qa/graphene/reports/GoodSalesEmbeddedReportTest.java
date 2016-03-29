@@ -85,7 +85,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = "addEditorAndSignInAsEditor")
     public void editorGetEmbedCode() {
-        openReport(reportUrl);
+        openReportByUrl(reportUrl);
         reportPage.getTableReport().waitForReportLoading();
         ReportEmbedDialog embedDialog = reportPage.openReportEmbedDialog();
         htmlEmbedCode = embedDialog.getHtmlCode();
@@ -223,7 +223,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         embedReportToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, reportTitle);
         String dashboardUrl = browser.getCurrentUrl();
 
-        openReport(reportUrl);
+        openReportByUrl(reportUrl);
         String[] filteredValues =
                 {"Interest", "Discovery", "Short List", "Negotiation", "Closed Won", "Closed Lost"};
         reportPage.addFilter(FilterItem.Factory.createAttributeFilter("Stage Name", filteredValues));
@@ -403,7 +403,7 @@ public class GoodSalesEmbeddedReportTest extends GoodSalesAbstractTest {
         signInAtGreyPages(testParams.getUser(), testParams.getPassword());
     }
 
-    private void openReport(String reportUrl) {
+    private void openReportByUrl(String reportUrl) {
         browser.get(reportUrl);
         waitForFragmentVisible(reportPage);
     }

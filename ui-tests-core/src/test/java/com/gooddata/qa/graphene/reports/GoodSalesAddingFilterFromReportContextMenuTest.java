@@ -58,7 +58,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     @Test(dependsOnMethods = "addAndRemoveReportFilterInSndDialog")
     public void addAttributeFilterFromAttributeHeader() {
         initReport().getTableReport()
-                .openContextMenuFromReportHeader("2010")
+                .openContextMenuFromCellValue("2010")
                 .selectItem("Show only \"2010\"");
         waitForReportLoaded();
 
@@ -69,7 +69,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
         assertThat(reportPage.getFilters(), hasItem("Year (Snapshot) is 2010"));
 
         reportPage.getTableReport()
-                .openContextMenuFromReportHeader("2010")
+                .openContextMenuFromCellValue("2010")
                 .selectItem("Remove filter (Show All)");
         waitForReportLoaded();
 
@@ -83,7 +83,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     @Test(dependsOnMethods = "addAndRemoveReportFilterInSndDialog")
     public void addRankingFilterFromMetricHeader() {
         initReport().getTableReport()
-                .openContextMenuFromReportHeader(METRIC_AMOUNT)
+                .openContextMenuFromCellValue(METRIC_AMOUNT)
                 .hoverToItem("Numbers in column")
                 .addRankingFilter(Ranking.TOP, 6);
         waitForReportLoaded();
@@ -98,7 +98,7 @@ public class GoodSalesAddingFilterFromReportContextMenuTest extends GoodSalesAbs
     @Test(dependsOnMethods = "addAndRemoveReportFilterInSndDialog")
     public void addRangeFilterFromAttributeHeader() {
         initReport().getTableReport()
-                .openContextMenuFromReportHeader("2010")
+                .openContextMenuFromCellValue("2010")
                 .hoverToItem(METRIC_AMOUNT + " in 2010")
                 .addRangeFilter(RangeType.IS_GREATER_THAN, 27000);
         waitForReportLoaded();

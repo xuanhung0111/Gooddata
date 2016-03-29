@@ -51,14 +51,14 @@ public class AttributePage extends AbstractFragment {
         attributeDetailPage.setDrillToExternalPage();
     }
 
-    public void initAttribute(String attributeName) {
+    public AttributeDetailPage initAttribute(String attributeName) {
         waitForElementVisible(attributesTable.getRoot());
         waitForDataPageLoaded(browser);
         assertTrue(attributesTable.selectObject(attributeName));
         waitForObjectPageLoaded(browser);
         String variableDetailsWindowHandle = browser.getWindowHandle();
         browser.switchTo().window(variableDetailsWindowHandle);
-        waitForElementVisible(attributeDetailPage.getRoot());
+        return waitForFragmentVisible(attributeDetailPage);
     }
 
     public void createAttribute() {

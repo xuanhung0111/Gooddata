@@ -117,7 +117,7 @@ public class ReportFilter extends AbstractFragment {
                 waitForElementVisible(returnFragment.getLocator(), browser));
     }
 
-    private WebElement getFilterElement(final String filterName) {
+    public WebElement getFilterElement(final String filterName) {
         return existingFilters.stream()
                 .map(e -> e.findElement(By.className("text")))
                 .filter(e -> filterName.equals(e.getText()))
