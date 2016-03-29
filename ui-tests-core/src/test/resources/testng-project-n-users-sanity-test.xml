@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+
+    <test name="invite-user" enabled="true">
+        <classes>
+            <class name="com.gooddata.qa.graphene.account.InviteUserTest" />
+        </classes>
+    </test>
+
+    <test name="register-user" enabled="true">
+        <groups>
+            <run>
+                <include name="sanity" />
+                <include name="arquillian" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.account.RegisterAndDeleteUserAccountTest" />
+        </classes>
+    </test>
+
+</suite>

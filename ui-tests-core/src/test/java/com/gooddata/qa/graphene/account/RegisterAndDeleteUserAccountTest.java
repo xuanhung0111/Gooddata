@@ -74,7 +74,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     private RegistrationForm registrationForm;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void initData() {
         String registrationString = String.valueOf(System.currentTimeMillis());
         registrationForm = new RegistrationForm()
@@ -212,7 +212,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
         assertEquals(userProfilePage.getUserRole(), UserRoles.ADMIN.getName());
     }
 
-    @Test(groups = PROJECT_INIT_GROUP)
+    @Test(groups = {PROJECT_INIT_GROUP, "sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
         deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
 
