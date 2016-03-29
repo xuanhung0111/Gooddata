@@ -10,6 +10,7 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -386,6 +387,33 @@ public class TableReport extends AbstractReport {
         return drillableElements.stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
+    }
+
+    public List<WebElement> getImageElements() {
+        waitForReportLoading();
+        final List<WebElement> images = attributeElementInGrid.stream()
+                .map(e -> e.findElement(BY_PARENT))
+                .filter(e -> 
+                        Stream.of(e.getAttribute("class").split("\\s+"))
+                                .anyMatch(input -> input.equals("image")))
+                .map(e -> e.findElement(By.tagName("img")))
+                .collect(Collectors.toList());
+
+        if(images.isEmpty())
+            throw new RuntimeException("Cannot find any image element");
+
+        return images;
+    }
+
+    public WebElement getImageElement(String imageSource) {
+        waitForReportLoading();
+
+        return waitForElementVisible(attributeElementInGrid.stream()
+                .map(e -> e.findElement(BY_PARENT))
+                .filter(e -> e.getAttribute("class").contains("s-grid-" + simplifyText(imageSource)))
+                .findAny()
+                .get()
+                .findElement(By.tagName("img")));
     }
 
     private Pair<Integer, Integer> getPossitionFromRegion(String region) {

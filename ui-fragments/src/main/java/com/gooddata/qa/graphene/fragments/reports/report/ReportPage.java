@@ -780,7 +780,7 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    private ReportPage selectAttributePosition(HowItem attribute) {
+    public ReportPage selectAttributePosition(HowItem attribute) {
         sleepTight(500);
         WebElement attributeElement = findAttribute(attribute.getAttribute().getName());
         sleepTightInSeconds(2);
