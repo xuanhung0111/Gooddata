@@ -58,6 +58,7 @@ public class DataloadProcessTest extends AbstractMSFTest {
     public void initialData() throws JSONException, IOException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();
+        enableDataExplorer();
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 0)

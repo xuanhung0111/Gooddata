@@ -297,14 +297,13 @@ public class AbstractOverviewProjectsTest extends AbstractDISCTest {
         browser.get(selectedSchedule.getScheduleUrl());
         waitForFragmentVisible(scheduleDetail);
         if (projectState != OverviewProjectStates.RUNNING) {
-            try {
-                assertTrue(scheduleDetail.isStarted(), "Schedule execution is not started!");
+            if (scheduleDetail.isStarted()) {
                 scheduleDetail.waitForExecutionFinish();
-            } catch (NoSuchElementException ex) {
-                if (projectState == OverviewProjectStates.FAILED)
-                    assertEquals(scheduleDetail.getExecutionItemsNumber(), 2);
-                else if (projectState == OverviewProjectStates.SUCCESSFUL)
-                    checkOkExecutionGroup(2, 0);
+            }
+            if (projectState == OverviewProjectStates.FAILED) {
+                assertEquals(scheduleDetail.getExecutionItemsNumber(), 2);
+            } else if (projectState == OverviewProjectStates.SUCCESSFUL) {
+                checkOkExecutionGroup(2, 0);
             }
         } else {
             assertManualStoppedExecution();

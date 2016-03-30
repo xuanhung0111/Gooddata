@@ -33,12 +33,10 @@ import com.gooddata.qa.graphene.entity.Dataset;
 import com.gooddata.qa.graphene.entity.Field;
 import com.gooddata.qa.graphene.entity.Field.FieldStatus;
 import com.gooddata.qa.graphene.entity.Field.FieldTypes;
-import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.DataSourcesFragment;
 import com.gooddata.qa.utils.graphene.Screenshots;
-import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -76,11 +74,9 @@ public abstract class AbstractAnnieDialogTest extends AbstractMSFTest {
         initManagePage();
         assertThat(browser.findElements(By.cssSelector(ADD_DATA_BUTTON_CSS_LOCATOR)), is(empty()));
 
-        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
-                ProjectFeatureFlags.ENABLE_DATA_EXPLORER, true);
-
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();
+        enableDataExplorer();
     }
 
     protected void openAnnieDialog() {
