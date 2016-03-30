@@ -1,10 +1,16 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-public class ComparisonSelect extends ReactDropdown {
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+
+public class ComparisonSelect extends AbstractReactDropDown {
 
     @Override
-    public String getDropdownCssSelector() {
+    protected String getDropdownCssSelector() {
         return ".overlay .comparison-list";
     }
 
+    @Override
+    protected String getSearchInputCssSelector() {
+        return null;
+    }
 }

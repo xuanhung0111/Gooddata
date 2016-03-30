@@ -16,6 +16,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.qa.graphene.fragments.FixedDataTable;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
+import com.gooddata.qa.graphene.fragments.csvuploader.DateFormatSelect.DateFormat;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
@@ -32,7 +34,7 @@ public class DataPreviewTable extends FixedDataTable {
     private List<WebElement> columnNames;
 
     @FindBy(css = ".data-type-picker.s-data-type-picker")
-    private List<ReactDropdown> columnTypes;
+    private List<DataTypePicker> columnTypes;
 
     public List<String> getColumnNames() {
         waitForCollectionIsNotEmpty(columnNames);
@@ -47,7 +49,8 @@ public class DataPreviewTable extends FixedDataTable {
 
     public List<String> getColumnTypes() {
         return columnTypes.stream()
-                .map(ReactDropdown::getTypeSelection)
+                .map(DataTypePicker::getDataTypeSelect)
+                .map(DataTypeSelect::getTypeSelection)
                 .collect(toList());
     }
 
@@ -61,8 +64,8 @@ public class DataPreviewTable extends FixedDataTable {
     }
 
     public void changeColumnDateFormat(int fieldIndex, DateFormat type) {
-        final ReactDropdown selectedColumnType = columnTypes.get(fieldIndex);
-        selectedColumnType.selectFormatByValue(type.getVisibleText());
+        final DateFormatSelect selectedColumnType = columnTypes.get(fieldIndex).getDateFormatSelect();
+        selectedColumnType.selectByName(type.getVisibleText());
         final Predicate<WebDriver> formatIsSelected =
                 input -> type.getVisibleText().equals(selectedColumnType.getFormatSelection());
         Graphene.waitGui(browser)
@@ -72,8 +75,8 @@ public class DataPreviewTable extends FixedDataTable {
     }
 
     public int getColumnDateFormatCount(int fieldIndex) {
-        final ReactDropdown selectedColumnType = columnTypes.get(fieldIndex);
-        return selectedColumnType.getFormatValues().size();
+        final DateFormatSelect selectedColumnType = columnTypes.get(fieldIndex).getDateFormatSelect();
+        return selectedColumnType.getValues().size();
     }
 
     public void changeColumnType(String columnName, ColumnType type) {
@@ -82,8 +85,8 @@ public class DataPreviewTable extends FixedDataTable {
     }
 
     public void changeColumnType(int fieldIndex, ColumnType type) {
-        final ReactDropdown selectedColumnType = columnTypes.get(fieldIndex);
-        selectedColumnType.selectTypeByValue(type.getVisibleText());
+        final DataTypeSelect selectedColumnType = columnTypes.get(fieldIndex).getDataTypeSelect();
+        selectedColumnType.selectByName(type.getVisibleText());
         final Predicate<WebDriver> typeIsSelected =
                 input -> type.getVisibleText().equals(selectedColumnType.getTypeSelection());
         Graphene.waitGui(browser)
@@ -149,8 +152,9 @@ public class DataPreviewTable extends FixedDataTable {
         return getColumns(getHeaderRow());
     }
 
-    public ReactDropdown getColumnTypeDropdown(final ColumnType columnType) {
+    public DataTypeSelect getColumnTypeDropdown(final ColumnType columnType) {
         return columnTypes.stream()
+                .map(DataTypePicker::getDataTypeSelect)
                 .filter(e -> e.getTypeSelection().contains(columnType.getVisibleText()))
                 .findFirst()
                 .get();
@@ -172,54 +176,5 @@ public class DataPreviewTable extends FixedDataTable {
         if (columnElement == null)
             return Lists.newArrayList();
         return getElementTexts(columnElement.findElements(By.tagName("td")));
-    }
-
-    public enum ColumnType {
-        ATTRIBUTE("Attribute"),
-        FACT("Measure"),
-        DATE("Date");
-        
-        private String typeByVisibleText;
-        
-        ColumnType(String typeByVisibleText) {
-            this.typeByVisibleText = typeByVisibleText;
-        }
-        
-        public String getVisibleText() {
-            return typeByVisibleText;
-        }
-        
-        public String getValue() {
-            return this.name();
-        }
-    }
-
-    public enum DateFormat {
-        DAY_MONTH_YEAR_SEPARATED_BY_DOT("Day.Month.Year"),
-        MONTH_DAY_YEAR_SEPARATED_BY_DOT("Month.Day.Year"),
-        YEAR_MONTH_DAY_SEPARATED_BY_DOT("Year.Month.Day"),
-        DAY_MONTH_YEAR_SEPARATED_BY_SLASH("Day/Month/Year"),
-        MONTH_DAY_YEAR_SEPARATED_BY_SLASH("Month/Day/Year"),
-        YEAR_MONTH_DAY_SEPARATED_BY_SLASH("Year/Month/Day"),
-        DAY_MONTH_YEAR_SEPARATED_BY_HYPHEN("Day-Month-Year"),
-        MONTH_DAY_YEAR_SEPARATED_BY_HYPHEN("Month-Day-Year"),
-        YEAR_MONTH_DAY_SEPARATED_BY_HYPHEN("Year-Month-Day"),
-        DAY_MONTH_YEAR_SEPARATED_BY_SPACE("Day Month Year"),
-        MONTH_DAY_YEAR_SEPARATED_BY_SPACE("Month Day Year"),
-        YEAR_MONTH_DAY_SEPARATED_BY_SPACE("Year Month Day");
-
-        private String formatByVisibleText;
-
-        DateFormat(String formatByVisibleText) {
-            this.formatByVisibleText = formatByVisibleText;
-        }
-
-        public String getVisibleText() {
-            return formatByVisibleText;
-        }
-        
-        public String getColumnType() {
-            return String.format("Date (%s)", getVisibleText());
-        }
     }
 }

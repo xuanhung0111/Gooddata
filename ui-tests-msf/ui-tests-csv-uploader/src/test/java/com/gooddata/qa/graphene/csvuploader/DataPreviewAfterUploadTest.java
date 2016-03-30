@@ -32,7 +32,7 @@ import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
-import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;
 import com.google.common.collect.Lists;
 
@@ -501,7 +501,7 @@ public class DataPreviewAfterUploadTest extends AbstractCsvUploaderTest {
     private WebElement getItemFromSpecificDropdown(DataPreviewPage dataPreviewPage, String item, ColumnType typeDropdown) {
         return dataPreviewPage.getDataPreviewTable()
                 .getColumnTypeDropdown(typeDropdown)
-                .getItemElement(item);
+                .getElementByName(item);
     }
 
     private boolean isItemDisable(WebElement item) {

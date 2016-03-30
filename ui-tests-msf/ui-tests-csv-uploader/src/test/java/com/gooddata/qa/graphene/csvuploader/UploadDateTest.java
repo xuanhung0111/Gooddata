@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
-import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.DateFormat;
+import com.gooddata.qa.graphene.fragments.csvuploader.DateFormatSelect.DateFormat;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetDetailPage;

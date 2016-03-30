@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.AttributeLabelTypes;
-import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 
 public class SimpleProjectGeoLabelTest extends AbstractProjectTest {

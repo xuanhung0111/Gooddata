@@ -1,16 +1,22 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-public class DataSetSelect extends ReactDropdown {
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+
+public class DataSetSelect extends AbstractReactDropDown {
 
     @Override
-    public String getDropdownButtonCssSelector() {
+    protected String getDropdownButtonCssSelector() {
         // datasets dropdown is ready immediately, so no .is-loaded flag
         return "button";
     }
 
     @Override
-    public String getDropdownCssSelector() {
+    protected String getDropdownCssSelector() {
         return ".overlay .dataSets-list";
     }
 
+    @Override
+    protected String getSearchInputCssSelector() {
+        return null;
+    }
 }

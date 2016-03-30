@@ -1,17 +1,17 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 
 import java.util.stream.Stream;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class AttributeFilter extends ReactDropdownParent {
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+
+public class AttributeFilter extends AbstractReactDropDown {
 
     @FindBy(className = "button-title")
     private WebElement buttonTitle;
@@ -20,12 +20,15 @@ public class AttributeFilter extends ReactDropdownParent {
     private WebElement buttonText;
 
     @Override
-    public String getDropdownCssSelector() {
+    protected String getDropdownCssSelector() {
         return ".overlay .attributevalues-list";
     }
 
     public AttributeFilter selectByNames(String... names) {
-        Stream.of(names).forEach(this::selectByName);
+        Stream.of(names).forEach(name -> {
+            selectByName(name);
+            waitForElementVisible(cssSelector("button.s-apply_button"), browser).click();
+        });
         return this;
     }
 
@@ -53,21 +56,8 @@ public class AttributeFilter extends ReactDropdownParent {
         return waitForElementVisible(buttonText.findElement(className("button-selected-items-count"))).getText();
     }
 
-    private AttributeFilter selectByName(String name) {
-        ensureDropdownOpen();
-
-        String nameSimplified = simplifyText(name);
-        // in case there is a search field, use it
-        if (this.hasSearchField()) {
-            this.searchForText(name);
-        }
-
-        By selectedItem = cssSelector(getDropdownCssSelector() + " .s-" + nameSimplified);
-        waitForElementVisible(selectedItem, browser).click();
-
-        By applyButton = cssSelector("button.s-apply_button");
-        waitForElementVisible(applyButton, browser).click();
-
-        return this;
+    @Override
+    protected void waitForSelectionIsApplied(String name) {
+        // ignore this in attribute filter
     }
 }
