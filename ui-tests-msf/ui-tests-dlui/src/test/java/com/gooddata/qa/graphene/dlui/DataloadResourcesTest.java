@@ -55,6 +55,7 @@ public class DataloadResourcesTest extends AbstractMSFTest {
             groups = {"DataloadResourcesTest", "initialData"}, alwaysRun = true)
     public void prepareData() throws IOException, JSONException {
         setUpOutputStageAndCreateCloudConnectProcess();
+        enableDataExplorer();
     }
 
     @Test(dependsOnGroups = {"initialData"})
