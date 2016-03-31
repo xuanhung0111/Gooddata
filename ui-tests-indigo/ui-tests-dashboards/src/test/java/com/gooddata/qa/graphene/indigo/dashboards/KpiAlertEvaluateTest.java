@@ -116,8 +116,8 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             indigoDashboardsPage
                     .waitForDashboardLoad()
                     .addWidget(kpi)
-                    .saveEditModeWithKpis()
                     .selectDateFilterByName(DATE_FILTER_ALL_TIME)
+                    .saveEditModeWithKpis()
                     .getKpiByHeadline(metricName)
                     .openAlertDialog()
                     .selectTriggeredWhen(TRIGGERED_WHEN_GOES_ABOVE)
