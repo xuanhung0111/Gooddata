@@ -203,7 +203,8 @@ public class DashboardPermissionsTest extends GoodSalesAbstractTest {
 
         logout();
         signIn(false, UserRoles.ADMIN);
-        sleepTightInSeconds(1);
+        initDashboardsPage();
+
         createDashboard(getRestApiClient(), "Unlocked and published for viewer");
         publishDashboard(true);
 
