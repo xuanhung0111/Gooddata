@@ -372,12 +372,12 @@ public class TableReport extends AbstractReport {
     }
 
     public ContextMenu openContextMenuFromCellValue(final String cellValue) {
-        new Actions(browser).contextClick(Stream.of(metricsHeader, attributesHeader, attributeElementInGrid, metricValuesInGrid)
-                .flatMap(l -> l.stream())
-                .filter(e -> cellValue.equals(e.getText()))
-                .findFirst()
-                .get())
-                .perform();
+        getActions()
+            .contextClick(
+                    browser.findElements(By.cssSelector(".containerBody .gridTabPlate .gridTile div.cell"))
+                        .stream()
+                        .filter(e -> e.getText().equals(cellValue)).findFirst().get())
+            .perform();
 
         return Graphene.createPageFragment(ContextMenu.class, waitForElementVisible(By.id("ctxMenu"), browser));
     }
