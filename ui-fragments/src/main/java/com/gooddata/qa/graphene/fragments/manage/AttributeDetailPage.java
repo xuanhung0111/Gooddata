@@ -107,7 +107,7 @@ public class AttributeDetailPage extends AbstractFragment {
         return this;
     }
 
-    public void setDrillToAttribute(String attribute) {
+    public AttributeDetailPage setDrillToAttribute(String attribute) {
         waitForElementPresent(clearExternalPageButton);
         if (!clearExternalPageButton.getAttribute("class").contains("gdc-hidden")) {
             clearDrillingSetting();
@@ -120,6 +120,7 @@ public class AttributeDetailPage extends AbstractFragment {
         waitForElementVisible(By.cssSelector(".attr.option"), browser);
         waitForElementVisible(By.cssSelector(String.format("button.s-btn-%s",
                 CssUtils.simplifyText(attribute.toLowerCase()))), browser);
+        return this;
     }
 
     public boolean isDeleteButtonDisabled() {

@@ -67,9 +67,9 @@ public class BrowserUtils {
         browser.manage().window().setSize(new Dimension(width, height));
     }
 
-    public static void runScript(WebDriver driver, String script) {
+    public static Object runScript(WebDriver driver, String script, Object... args) {
         if (driver instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) driver).executeScript(script);
+            return ((JavascriptExecutor) driver).executeScript(script, args);
         } else {
             throw new IllegalStateException("This driver does not support JavaScript!");
         }

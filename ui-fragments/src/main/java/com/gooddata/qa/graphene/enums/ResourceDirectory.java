@@ -8,7 +8,8 @@ public enum ResourceDirectory {
     UPLOAD_CSV("upload-csv"),
     MAQL_FILES("maql-file"),
     API_RESOURCES("api-resources"),
-    SQL_FILES("sql-file");
+    SQL_FILES("sql-file"),
+    DYNAMIC_IMAGES("dynamic-images");
 
     private String name;
 
