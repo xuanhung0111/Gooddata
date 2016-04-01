@@ -23,8 +23,6 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_result_is_too_large__413() {
-        initAnalysePageByUrl();
-
         analysisPage.addAttribute(ACCOUNT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
@@ -37,8 +35,6 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_error_even_when_there_are_too_many_data_points() {
-        initAnalysePageByUrl();
-
         analysisPage.addStack(ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
@@ -47,8 +43,6 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_chart_cannot_be_rendered_because_of_it() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addStack(ACCOUNT)
             .waitForReportComputing();
@@ -66,9 +60,6 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
             String activitiesUri = getMdService().getObjUri(getProject(), Metric.class, title("# of Activities"));
             createMetric("__EMPTY__", "SELECT [" + activitiesUri + "] WHERE 1 = 0", "#,##0");
         }
-
-        initAnalysePageByUrl();
-
         analysisPage.addMetric("__EMPTY__")
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-empty-result"), browser));
@@ -77,8 +68,6 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_when_configuration_does_not_contain_one() {
-        initAnalysePageByUrl();
-
         analysisPage.addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
@@ -87,8 +76,6 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_invalid_configuration_error_when_execution_fails() {
-        initAnalysePageByUrl();
-
         analysisPage.addStack(ACCOUNT)
             .addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing();
@@ -99,8 +86,6 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_blank_message_after_reset_from_error_state() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addStack(ACCOUNT)
             .waitForReportComputing();

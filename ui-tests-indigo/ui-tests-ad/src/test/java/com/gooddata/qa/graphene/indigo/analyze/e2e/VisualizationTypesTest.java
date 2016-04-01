@@ -23,8 +23,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_table_visualization() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
@@ -34,8 +32,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_line_chart_visualization() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.LINE_CHART)
@@ -50,8 +46,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_bar_chart_visualization() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.BAR_CHART)
@@ -64,8 +58,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_column_chart_visualization() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.COLUMN_CHART)
@@ -78,8 +70,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_changing_the_visualization_type() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
@@ -113,8 +103,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_sort_bar_chart() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.BAR_CHART)
@@ -125,8 +113,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_line_chart() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.LINE_CHART)
@@ -137,8 +123,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_column_chart() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.COLUMN_CHART)
@@ -149,8 +133,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_table() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
@@ -161,8 +143,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_update_visualization_upon_config_change() {
-        initAnalysePageByUrl();
-
         analysisPage.changeReportType(ReportType.BAR_CHART)
             // add a metric to configuration
             .addMetric(NUMBER_OF_ACTIVITIES)
@@ -184,8 +164,6 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_if_one_attribute_is_dragged_in() {
-        initAnalysePageByUrl();
-
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();

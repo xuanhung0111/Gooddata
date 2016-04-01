@@ -28,8 +28,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply__period_over_period__recommendation() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
@@ -66,8 +64,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_honor_period_change_for__period_over_period() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
@@ -88,8 +84,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_widget_after_apply() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
@@ -116,8 +110,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_pop_checkbox_if_date_and_attribute_are_moved_to_bucket() {
-        initAnalysePageByUrl();
-
         MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .getMetricsBucket()
@@ -132,8 +124,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_the_recommendation_if_something_in_stack_bucket() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
@@ -145,8 +135,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_the_recommendation_if_date_in_categories_and_something_in_stack_bucket() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .addStack(ACTIVITY_TYPE)
@@ -158,8 +146,6 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_recommendations_if_categories_empty_and_something_in_stack_bucket() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addStack(ACTIVITY_TYPE)
             .waitForReportComputing();

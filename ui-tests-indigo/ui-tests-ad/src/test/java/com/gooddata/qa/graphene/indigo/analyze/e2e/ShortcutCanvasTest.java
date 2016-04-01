@@ -22,8 +22,6 @@ public class ShortcutCanvasTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_replace_attribute_when_user_drops_it_on_canvas_shortcut() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .drag(analysisPage.getCataloguePanel().searchAndGet(DEPARTMENT, FieldType.ATTRIBUTE),

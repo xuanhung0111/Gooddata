@@ -21,8 +21,6 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_render_column_chart_after_a_metric_is_dragged_to_main_recommendation() {
-        initAnalysePageByUrl();
-
         // D&D the first metric to the initial metric recommendation
         analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
@@ -36,8 +34,6 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_render_date_sliced_metric_column_chart_after_a_metric_is_dragged_to_the_overtime_recommendation() {
         String quarterYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Quarter/Year (Activity)", "Short");
-        initAnalysePageByUrl();
-
         // D&D the first metric to the metric overtime recommendation
         analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
@@ -65,8 +61,6 @@ public class DragRecommendationsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_render_attribute_elements_table_after_an_attribute_is_dragged_to_main_recommendation() {
-        initAnalysePageByUrl();
-
         // D&D the first metric to the metric overtime recommendation
         analysisPage.drag(analysisPage.getCataloguePanel().getDate(),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-attribute-canvas"), browser))

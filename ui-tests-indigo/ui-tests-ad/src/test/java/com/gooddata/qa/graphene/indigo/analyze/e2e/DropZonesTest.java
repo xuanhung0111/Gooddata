@@ -32,8 +32,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_attribute_dropzones() {
-        initAnalysePageByUrl();
-
         assertFalse(isElementPresent(ACTIVE_CATEGORIES_SELECTOR, browser));
 
         analysisPage.startDrag(analysisPage.getCataloguePanel().getDate());
@@ -49,8 +47,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_metric_dropzones() {
-        initAnalysePageByUrl();
-
         assertFalse(isElementPresent(ACTIVE_METRICS_SELECTOR, browser));
 
         analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC));
@@ -66,8 +62,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_drag_attribute_from_filters_to_shortcut() {
-        initAnalysePageByUrl();
-
         WebElement filter = analysisPage.addFilter(ACTIVITY_TYPE)
             .getFilterBuckets()
             .getFilter(ACTIVITY_TYPE);
@@ -84,8 +78,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_titles_for_fact_based_metric_dropzones() {
-        initAnalysePageByUrl();
-
         analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
 
         try {
@@ -103,8 +95,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_possible_attribute_replacement() {
-        initAnalysePageByUrl();
-
         analysisPage.addAttribute(ACTIVITY_TYPE);
 
         assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
@@ -122,8 +112,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_possible_metric_replacement() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
 
         assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
@@ -141,8 +129,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_highlight_attribute_when_already_present_in_the_bucket() {
-        initAnalysePageByUrl();
-
         WebElement source = analysisPage.addAttribute(ACTIVITY_TYPE)
             .getAttributesBucket()
             .getFirst();
@@ -158,8 +144,6 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_highlight_date_when_already_present_in_the_bucket() {
-        initAnalysePageByUrl();
-
         WebElement date = analysisPage.addDate()
             .getAttributesBucket()
             .getFirst();
