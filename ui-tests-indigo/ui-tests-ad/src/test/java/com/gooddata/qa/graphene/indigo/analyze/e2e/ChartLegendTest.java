@@ -18,8 +18,6 @@ public class ChartLegendTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void test_chart_legend_should_not_be_clickable() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()

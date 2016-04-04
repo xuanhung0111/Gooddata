@@ -26,8 +26,6 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_one_version_per_user_action() {
-        initAnalysePageByUrl();
-
         // 1st version
         MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -50,8 +48,6 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_metric_over_time_shortcut_followed_by_filter_change() {
-        initAnalysePageByUrl();
-
         // D&D the first metric to the metric overtime recommendation
         analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
@@ -66,8 +62,6 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_redo_single_visualization_type_change() {
-        initAnalysePageByUrl();
-
         assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.LINE_CHART)
             .undo()
@@ -79,8 +73,6 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_visualization_type_change_for_complex_configuration() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.changeReportType(ReportType.TABLE)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
@@ -93,8 +85,6 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_properly_deserialize_auto_generated_filters() {
-        initAnalysePageByUrl();
-
         assertTrue(analysisPage.addAttribute(ACTIVITY_TYPE)
             .resetToBlankState()
             .undo()
@@ -105,8 +95,6 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_properly_deserialize_modified_filters() {
-        initAnalysePageByUrl();
-
         analysisPage.addAttribute(ACTIVITY_TYPE)
             .getFilterBuckets()
             .configAttributeFilter(ACTIVITY_TYPE, "Email");

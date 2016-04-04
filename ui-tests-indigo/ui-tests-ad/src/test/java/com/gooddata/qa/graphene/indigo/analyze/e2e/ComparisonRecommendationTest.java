@@ -27,8 +27,6 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_hide_recommendation() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
@@ -41,8 +39,6 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_first_attribute_and_show_other_recommendations() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
@@ -57,8 +53,6 @@ public class ComparisonRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_initial_value_selected_after_resetting_report() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         String initialValue = getValueFrom(".s-recommendation-comparison .s-attribute-switch");

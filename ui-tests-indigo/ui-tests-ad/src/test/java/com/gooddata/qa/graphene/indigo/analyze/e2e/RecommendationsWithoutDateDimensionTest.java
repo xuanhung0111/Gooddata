@@ -46,8 +46,6 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void trending_recommendation_should_not_be_visible() {
-        initAnalysePageByUrl();
-
         assertFalse(analysisPage.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
         analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .waitForReportComputing();
@@ -57,8 +55,6 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void metric_with_period_recommendation_should_not_be_visible() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .addAttribute("id")
             .waitForReportComputing();
@@ -68,8 +64,6 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void trending_shortcut_should_not_appear() {
-        initAnalysePageByUrl();
-
         analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
 
         try {

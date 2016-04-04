@@ -65,6 +65,8 @@
         <browserstack.project>local</browserstack.project>
         <browserstack.build>${user.name}</browserstack.build>
 
+        <indigo.analyze.resource>analyze</indigo.analyze.resource>
+
         <coreModuleName>ui-core</coreModuleName>
         <corePath>${moduleCorePath}</corePath>
         <moduleCorePath>${basedir}${file.separator}..${file.separator}${coreModuleName}</moduleCorePath>
@@ -377,6 +379,10 @@
                                             <property>
                                                 <name>browserstack.build</name>
                                                 <value>${browserstack.build}</value>
+                                            </property>
+                                            <property>
+                                                <name>indigo.analyze.resource</name>
+                                                <value>${indigo.analyze.resource}</value>
                                             </property>
                                         </systemProperties>
                                     </configuration>

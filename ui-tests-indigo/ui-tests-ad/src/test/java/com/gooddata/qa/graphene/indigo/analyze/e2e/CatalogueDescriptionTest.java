@@ -16,8 +16,6 @@ public class CatalogueDescriptionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_metric_info_bubble_when_hovering_the_info_icon() {
-        initAnalysePageByUrl();
-
         assertTrue(analysisPage.getCataloguePanel()
                 .getMetricDescription(NUMBER_OF_ACTIVITIES)
                 .contains("SELECT COUNT(Activity)"));
@@ -25,8 +23,6 @@ public class CatalogueDescriptionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_attribute_info_bubble_when_hovering_the_info_icon() {
-        initAnalysePageByUrl();
-
         assertTrue(analysisPage.getCataloguePanel()
                 .getAttributeDescription(ACTIVITY_TYPE)
                 .contains("Email"));
@@ -34,8 +30,6 @@ public class CatalogueDescriptionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_dataset_of_fact() {
-        initAnalysePageByUrl();
-
         assertTrue(analysisPage.getCataloguePanel()
                 .getFactDescription(AMOUNT)
                 .contains("OpportunitySnapshot"));

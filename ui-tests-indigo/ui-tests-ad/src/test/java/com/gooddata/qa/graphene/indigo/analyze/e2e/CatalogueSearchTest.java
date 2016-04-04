@@ -19,14 +19,11 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_empty_catalogue_if_no_catalogue_item_is_matched() {
-        initAnalysePageByUrl();
-
         assertFalse(analysisPage.getCataloguePanel().search("xyz"));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_only_matched_items() {
-        initAnalysePageByUrl();
         CataloguePanel panel = analysisPage.getCataloguePanel();
 
         panel.search("Opps.");
@@ -38,7 +35,6 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_case_insensitive() {
-        initAnalysePageByUrl();
         CataloguePanel panel = analysisPage.getCataloguePanel();
 
         panel.search("opps.");
@@ -48,7 +44,6 @@ public class CatalogueSearchTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_cancel_search() {
-        initAnalysePageByUrl();
         CataloguePanel panel = analysisPage.getCataloguePanel();
 
         panel.search(NUMBER_OF_LOST_OPPS);

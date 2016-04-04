@@ -25,8 +25,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_metric_details() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -38,8 +36,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_fact_details() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + AMOUNT)
@@ -50,8 +46,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_attribute_details() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .getMetricsBucket()
             .getMetricConfiguration("Count of " + ACTIVITY_TYPE)
@@ -62,8 +56,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_open_and_close_configuration() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
         assertFalse(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
 
@@ -78,8 +70,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_able_to_drop_second_metric_into_bucket() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .waitForReportComputing();
@@ -92,8 +82,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_show_in_percent_correctly() {
-        initAnalysePageByUrl();
-
         MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -112,8 +100,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_show_PoP_correctly() {
-        initAnalysePageByUrl();
-
         MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -132,8 +118,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_PoP_after_second_metric_is_added() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .getMetricsBucket()
@@ -152,8 +136,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_percent_if_2_metric_is_added() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .getMetricsBucket()
@@ -169,8 +151,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_second_metric_if_user_wants() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
@@ -185,8 +165,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_allow_to_add_second_instance_of_metric_already_bucket() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -196,8 +174,6 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_legend_for_only_one_metric() {
-        initAnalysePageByUrl();
-
         assertFalse(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getChartReport()

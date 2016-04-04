@@ -45,8 +45,6 @@ public class DateGranularitySwitchTest extends AbstractAdE2ETest {
     }
 
     private void beforeEach() {
-        initAnalysePageByUrl();
-
         // D&D the first metric/attribute to configuration
         analysisPage.changeReportType(ReportType.COLUMN_CHART)
             .addMetric(NUMBER_OF_ACTIVITIES)

@@ -16,8 +16,6 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_export_button_if_stacking_and_slicing_by_the_same_attribute() {
-        initAnalysePageByUrl();
-
         assertFalse(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             // Drag exactly the same attribute to the category and stack
             .addAttribute(ACTIVITY_TYPE)
@@ -29,8 +27,6 @@ public class ExportLimitationsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_export_if_the_same_metric_is_in_metric_bucket_twice() {
-        initAnalysePageByUrl();
-
         assertFalse(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()

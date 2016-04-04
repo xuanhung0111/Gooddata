@@ -93,7 +93,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final By BY_IFRAME = By.tagName("iframe");
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 
-    protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
+    protected static final String PAGE_UI_ANALYSE_PREFIX = "${analyze.resource}/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
     protected static final String ACCOUNT_PAGE = "account.html";
     protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
@@ -594,7 +594,8 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void initAnalysePageByUrl() {
-        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
+        openUrl(PAGE_UI_ANALYSE_PREFIX.replace("${analyze.resource}", testParams.getIndigoAnalyzeResource()) +
+                testParams.getProjectId() + "/reportId/edit");
         waitForFragmentVisible(analysisPage);
     }
 

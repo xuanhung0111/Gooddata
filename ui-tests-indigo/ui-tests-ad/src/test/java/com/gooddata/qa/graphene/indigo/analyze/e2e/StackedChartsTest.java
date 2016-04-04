@@ -24,8 +24,6 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_put_stack_by_attribute_into_color_series() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
@@ -36,8 +34,6 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_totals_for_stacked_columns() {
-        initAnalysePageByUrl();
-
         analysisPage.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
@@ -48,8 +44,6 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_stack_warn_msg_when_there_is_something_in_stack_by_bucket() {
-        initAnalysePageByUrl();
-
         assertFalse(analysisPage.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
@@ -60,8 +54,6 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_stack_warn_msg_if_there_is_more_than_1_metrics() {
-        initAnalysePageByUrl();
-
         assertFalse(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .addAttribute(ACCOUNT)
@@ -72,8 +64,6 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disappear_when_visualization_is_switched_to_table_and_should_be_empty_when_going_back() {
-        initAnalysePageByUrl();
-
         analysisPage.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
@@ -89,8 +79,6 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disappear_when_switched_to_table_via_result_too_large_link() {
-        initAnalysePageByUrl();
-
         analysisPage.addStack(ACTIVITY_TYPE)
             .addAttribute(ACCOUNT)
             .addMetric(NUMBER_OF_ACTIVITIES);

@@ -21,8 +21,6 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_turned_off_when_second_metric_is_added() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing();

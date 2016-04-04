@@ -25,8 +25,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_fact_on_the_metrics_bucket() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + AMOUNT)
@@ -35,8 +33,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_remove_created_metric() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + AMOUNT)
@@ -49,8 +45,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_change_aggregation_function() {
-        initAnalysePageByUrl();
-
         MetricConfiguration configuration = analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .waitForReportComputing()
             .getMetricsBucket()
@@ -73,8 +67,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_the_same_fact_multiple_times() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .addMetric(AMOUNT, FieldType.FACT)
             .addMetric(AMOUNT, FieldType.FACT)
@@ -85,8 +77,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_allow_to_have_two_different_metrics_from_one_fact() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + AMOUNT)
@@ -106,8 +96,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_aggregation_change() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + AMOUNT)
@@ -133,8 +121,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_fact_based_metric_via_single_metric_shortcut() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-canvas"), browser))
             .waitForReportComputing()
@@ -145,8 +131,6 @@ public class FactBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_fact_based_metric_via_trending_shortcut() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
             .waitForReportComputing()

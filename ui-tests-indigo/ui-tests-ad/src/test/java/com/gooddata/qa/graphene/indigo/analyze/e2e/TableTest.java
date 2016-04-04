@@ -52,8 +52,6 @@ public class TableTest extends AbstractAdE2ETest {
     public void it_should_be_blank_by_default() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
 
-        initAnalysePageByUrl();
-
         analysisPage.addMetric("__EMPTY__")
             .addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
@@ -64,8 +62,6 @@ public class TableTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void it_should_be_empty_if_formatted() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] empty");
-
-        initAnalysePageByUrl();
 
         analysisPage.addMetric("__EMPTY__")
             .addMetric(NUMBER_OF_ACTIVITIES)
@@ -78,8 +74,6 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_show_zeros_as_usual() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] 0.00 $");
 
-        initAnalysePageByUrl();
-
         analysisPage.addMetric("__EMPTY__")
             .addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
@@ -89,8 +83,6 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_table_correctly_when_filter_is_removed() {
-        initAnalysePageByUrl();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addFilter(ACTIVITY_TYPE)
             .getFilterBuckets()
@@ -201,8 +193,6 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drag_more_than_one_attribute_to_category() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.changeReportType(ReportType.TABLE)
             .addAttribute(ACTIVITY_TYPE)
             .addAttribute(ACCOUNT)
@@ -214,8 +204,6 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
             .addAttribute(ACTIVITY_TYPE)
             .drag(analysisPage.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE),
@@ -227,8 +215,6 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_move_stacks_to_categories_when_switching_to_table() {
-        initAnalysePageByUrl();
-
         assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
             .changeReportType(ReportType.TABLE)
@@ -239,8 +225,6 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_move_second_category_to_stacks_and_remove_to_rest_when_switching_to_chart() {
-        initAnalysePageByUrl();
-
         analysisPage.addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
             .changeReportType(ReportType.TABLE)
@@ -251,7 +235,6 @@ public class TableTest extends AbstractAdE2ETest {
     }
 
     private void beforeOrderingTable() {
-        initAnalysePageByUrl();
         analysisPage.changeReportType(ReportType.TABLE)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
