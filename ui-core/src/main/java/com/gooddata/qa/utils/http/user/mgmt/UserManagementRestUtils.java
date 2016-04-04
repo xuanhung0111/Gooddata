@@ -164,7 +164,7 @@ public final class UserManagementRestUtils {
         if (Objects.nonNull(userProfile)) {
             final String userProfileUri = userProfile.getJSONObject("links").getString("self");
             deleteUserByUri(restApiClient, userProfileUri);
-            log.info("successfully deleted" + userEmail);
+            log.info("successfully deleted: " + userEmail);
         }
     }
 
