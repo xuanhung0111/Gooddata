@@ -10,16 +10,15 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.deleteUserByEmail;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import javax.mail.MessagingException;
 
 import org.apache.http.ParseException;
 import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.AfterClass;
@@ -31,8 +30,6 @@ import com.gooddata.qa.graphene.entity.account.RegistrationForm;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.profile.UserProfilePage;
-import com.gooddata.qa.utils.http.RestApiClient;
-import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
@@ -100,7 +97,7 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
      */
     @Test(groups = PROJECT_INIT_GROUP)
     public void checkWalkme() throws ParseException, JSONException, IOException {
-        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
 
         initRegistrationPage();
         registrationPage.registerNewUser(registrationForm);
@@ -162,12 +159,14 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     @Test(groups = PROJECT_INIT_GROUP)
     public void loginAsUnverifiedUserAfterRegistering()
             throws ParseException, JSONException, IOException, MessagingException {
-        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
 
         initRegistrationPage();
 
         activationLink = doActionWithImapClient(
                 imapClient -> registrationPage.registerNewUser(imapClient, registrationForm));
+
+        waitForFragmentNotVisible(registrationPage);
         waitForDashboardPageLoaded(browser);
 
         testParams.setProjectId(getProjectId(GOODDATA_PRODUCT_TOUR_PROJECT));
@@ -214,12 +213,14 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @Test(groups = {PROJECT_INIT_GROUP, "sanity"})
     public void registerNewUser() throws MessagingException, IOException, ParseException, JSONException {
-        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
 
         initRegistrationPage();
 
         activationLink = doActionWithImapClient(
                 imapClient -> registrationPage.registerNewUser(imapClient, registrationForm));
+
+        waitForFragmentNotVisible(registrationPage);
         waitForDashboardPageLoaded(browser);
 
         openUrl(activationLink);
@@ -278,21 +279,12 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() throws ParseException, JSONException, IOException {
-        deleteUserIfExist(getRestApiClient(), REGISTRATION_USER);
+        deleteUserByEmail(getRestApiClient(), REGISTRATION_USER);
     }
 
     private void openProject(String projectName) {
         projectsPage.goToProject(getProjectId(projectName));
         waitForDashboardPageLoaded(browser);
-    }
-
-    private void deleteUserIfExist(RestApiClient restApiClient, String userEmail)
-            throws ParseException, JSONException, IOException {
-        JSONObject userProfile = UserManagementRestUtils.getUserProfileByEmail(restApiClient, userEmail);
-        if (Objects.nonNull(userProfile)) {
-            String userProfileUri = userProfile.getJSONObject("links").getString("self");
-            UserManagementRestUtils.deleteUserByUri(restApiClient, userProfileUri);
-        }
     }
 
     private String getPageErrorMessage() {
