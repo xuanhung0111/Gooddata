@@ -12,7 +12,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -140,7 +142,7 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
     }
 
     @Test(dependsOnMethods = "createAdditionalProject")
-    public void shareDashboardWithIframe() {
+    public void shareDashboardWithIframe(Method m) {
         embedDashboardToOtherProjectDashboard(htmlEmbedCode, additionalProjectId, "Embedded Dashboard");
         assertEquals(embeddedDashboardWidget.getNumberOfTabsInFrame(), NUMBER_OF_TABS,
                 "Incorrect tab number on embedded dashboard!");
@@ -150,19 +152,28 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         embeddedDashboardWidget.openTabInFrame(CHART_REPORT_TAB_INDEX).exportChartReportInFrame(
                 chartReportDef.getName());
-        verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
-
+        try {
+            verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
+        } finally {
+            String newExportedReportFileName = chartReportDef.getName() + "_" + m.getName();
+            renameExportedFileName(chartReportDef.getName(), newExportedReportFileName, ExportFormat.PDF);
+        }
         embeddedDashboardWidget.openTabInFrame(HEADLINE_REPORT_TAB_INDEX);
         assertHeadlineReportInFrame(headlineReportDef.getName(), headlineReportDescription, headlineReportValue);
 
         String exportedDashboardName =
                 embeddedDashboardWidget.downloadEmbeddedDashboardInFrame(OTHER_WIDGETS_TAB_INDEX);
-        verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
+        try {
+            verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
+        } finally {
+            String newExportedDashboardFileName = exportedDashboardName + "_" + m.getName();
+            renameExportedFileName(exportedDashboardName, newExportedDashboardFileName, ExportFormat.PDF);
+        }
         embeddedDashboardWidget.checkRedBarInFrame();
     }
 
     @Test(dependsOnMethods = "createDashboardToShare")
-    public void shareDashboardWithoutIframe() {
+    public void shareDashboardWithoutIframe(Method m) {
         browser.get(embedUri);
         waitForFragmentVisible(embeddedDashboarWidgetWithoutIframe).waitForEmbeddedDashboardLoaded();
         assertEquals(dashboardsPage.getTabs().getNumberOfTabs(), NUMBER_OF_TABS,
@@ -173,14 +184,24 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
 
         embeddedDashboarWidgetWithoutIframe.openTab(CHART_REPORT_TAB_INDEX).exportChartReport(
                 chartReportDef.getName());
-        verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
+        try {
+            verifyReportExport(ExportFormat.PDF, chartReportDef.getName(), EXPECTED_EXPORT_CHART_SIZE);
+        } finally {
+            String newExportedReportFileName = chartReportDef.getName() + "_" + m.getName();
+            renameExportedFileName(chartReportDef.getName(), newExportedReportFileName, ExportFormat.PDF);
+        }
 
         embeddedDashboarWidgetWithoutIframe.openTab(HEADLINE_REPORT_TAB_INDEX);
         assertHeadlineReport(headlineReportDef.getName(), headlineReportDescription, headlineReportValue);
 
         String exportedDashboardName =
                 embeddedDashboarWidgetWithoutIframe.downloadEmbeddedDashboard(OTHER_WIDGETS_TAB_INDEX);
-        verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
+        try {
+            verifyDashboardExport(exportedDashboardName, EXPECTED_EXPORT_DASHBOARD_SIZE);
+        } finally {
+            String newExportedDashboardFileName = exportedDashboardName + "_" + m.getName();
+            renameExportedFileName(exportedDashboardName, newExportedDashboardFileName, ExportFormat.PDF);
+        }
         checkRedBar(browser);
     }
 
@@ -532,5 +553,20 @@ public class GoodSalesEmbeddedDashboardTest extends GoodSalesAbstractTest {
         embeddedDashboarWidgetWithoutIframe.getDashboardsPage()
             .getDashboardEditBar()
             .saveDashboard();
+    }
+
+    /**
+     * this method is used to rename the exported file name so that the next call will check the correct file
+     * @param oldName
+     * @param newName
+     * @param format
+     */
+    private void renameExportedFileName(String oldName, String newName, ExportFormat format) {
+        String fileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + oldName + "."
+                + format.getName();
+        File export = new File(fileURL);
+        String newFileURL = testParams.getDownloadFolder() + testParams.getFolderSeparator() + newName + "."
+                + format.getName();
+        export.renameTo(new File(newFileURL));
     }
 }
