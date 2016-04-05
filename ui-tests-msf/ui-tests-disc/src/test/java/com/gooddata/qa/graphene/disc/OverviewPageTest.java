@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import org.openqa.selenium.NoSuchElementException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -245,9 +244,7 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
         browser.get(overviewSchedule.getScheduleUrl());
         waitForElementVisible(scheduleDetail.getRoot());
-        try {
-            assertTrue(scheduleDetail.isStarted());
-        } catch (NoSuchElementException ex) {
+        if (!scheduleDetail.isStarted()) {
             assertEquals(scheduleDetail.getExecutionItemsNumber(), 2);
         }
     }

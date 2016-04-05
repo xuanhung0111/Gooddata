@@ -33,6 +33,7 @@ public class DataloadResourcesPermissionTest extends AbstractMSFTest {
     public void initialData() throws JSONException, IOException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();
+        enableDataExplorer();
 
         editorRestApi = getRestApiClient(testParams.getEditorUser(), testParams.getEditorPassword());
         viewerRestApi = getRestApiClient(testParams.getViewerUser(), testParams.getViewerPassword());

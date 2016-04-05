@@ -66,8 +66,10 @@ import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
 import com.gooddata.qa.graphene.enums.DatasetElements;
+import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.utils.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
+import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.report.ReportExportFormat;
 import com.gooddata.warehouse.Warehouse;
 import com.google.common.collect.Lists;
@@ -134,6 +136,11 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected ProcessService getProcessService() {
         return getGoodDataClient().getProcessService();
+    }
+
+    protected void enableDataExplorer() {
+        ProjectRestUtils.setFeatureFlagInProject(getGoodDataClient(), testParams.getProjectId(),
+                ProjectFeatureFlags.ENABLE_DATA_EXPLORER, true);
     }
 
     protected void prepareLDMAndADSInstance() throws IOException, JSONException {
