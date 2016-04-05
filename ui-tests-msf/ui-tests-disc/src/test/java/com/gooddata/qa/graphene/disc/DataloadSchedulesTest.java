@@ -62,6 +62,7 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
     public void setUp() throws IOException, JSONException {
         prepareLDMAndADSInstance();
         setUpOutputStageAndCreateCloudConnectProcess();
+        enableDataExplorer();
     }
 
     @Test(dependsOnMethods = {"setUp"}, groups = {"schedule", "tests", "dataloadSchedulesTest"})

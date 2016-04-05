@@ -7,7 +7,6 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmp
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.className;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,7 @@ public class ScheduleDetail extends ScheduleForm {
             + "is already included in an existing schedule. "
             + "If multiple schedules that load same dataset run concurrently, "
             + "all schedules except the first will fail.";
-    private static final int MAX_EXECUTION_HISTORY_LOADING_TIME = 5; // In minutes
+    private static final int MAX_EXECUTION_HISTORY_LOADING_TIME = 10; // In minutes
     private static final int MAX_SCHEDULE_RUN_TIME = 15; // In minutes
     private static final int MAX_DELAY_TIME_WAITING_AUTO_RUN = 2; // In minutes
 
@@ -71,8 +70,6 @@ public class ScheduleDetail extends ScheduleForm {
     private static final By BY_OK_GROUP_EXPAND_BUTTON = By.cssSelector(".icon-navigatedown");
     private static final By BY_PARAMETERS_EDIT_SECTION = By.cssSelector(".parameters-section.modified");
     private static final By BY_EXECUTION_TOOLTIP = By.cssSelector(".execution-tooltip");
-
-    private static final String SCHEDULE_STOP_BUTTON_CLASS = "ait-schedule-stop-btn";
 
     @FindBy(css = ".ait-schedule-title-section-heading")
     private WebElement scheduleTitle;
@@ -152,7 +149,7 @@ public class ScheduleDetail extends ScheduleForm {
     @FindBy(css = ".ait-schedule-run-confirm-btn")
     private WebElement confirmRunButton;
 
-    @FindBy(className = SCHEDULE_STOP_BUTTON_CLASS)
+    @FindBy(className = "ait-schedule-stop-btn")
     private WebElement manualStopButton;
 
     @FindBy(css = ".overlay .dialog-main")
@@ -536,11 +533,12 @@ public class ScheduleDetail extends ScheduleForm {
     }
 
     public boolean isStarted() {
-        if (!isElementPresent(className(SCHEDULE_STOP_BUTTON_CLASS), getRoot())) {
+        try {
+            waitForElementVisible(manualStopButton, 10);
+            return true;
+        } catch (TimeoutException | NoSuchElementException e) {
             return false;
-        }
-
-        return waitForElementVisible(manualStopButton).isDisplayed();
+        } 
     }
 
     public int getExecutionItemsNumber() {
