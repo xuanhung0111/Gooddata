@@ -1,20 +1,18 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.json.JSONException;
-import org.openqa.selenium.Point;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
@@ -60,17 +58,5 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void trending_shortcut_should_not_appear() {
-        analysisPageReact.startDrag(analysisPageReact.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
-
-        try {
-            assertTrue(isElementPresent(cssSelector(".s-recommendation-metric-canvas"), browser));
-            assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-over-time-canvas"), browser));
-        } finally {
-            analysisPageReact.stopDrag(new Point(-1, -1));
-        }
     }
 }

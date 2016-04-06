@@ -1,20 +1,9 @@
 package com.gooddata.qa.graphene.flow;
 
-import java.io.IOException;
-
-import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeBasedMetricsTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.AttributeFiltersTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.BucketsTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.DropZonesTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.EmptyCatalogueTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.ErrorStatesTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.FactBasedMetricsTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.RecommendationsWithoutDateDimensionTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.ResetButtonTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.StackedChartsTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.TableTest;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.UndoTest;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.*;
 import com.gooddata.qa.utils.flow.TestsRegistry;
+
+import java.io.IOException;
 
 public class PRCheckerTestFlow {
 
@@ -24,7 +13,6 @@ public class PRCheckerTestFlow {
             .register(RecommendationsWithoutDateDimensionTest.class)
             .register(AttributeFiltersTest.class)
             .register(BucketsTest.class)
-            .register(DropZonesTest.class)
             .register(ErrorStatesTest.class)
             .register(TableTest.class)
             .register(UndoTest.class)
