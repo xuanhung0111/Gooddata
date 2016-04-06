@@ -10,7 +10,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.entity.Field;
+import com.gooddata.qa.graphene.entity.dlui.Field;
 
 public class SelectionArea extends AbstractFragment {
 

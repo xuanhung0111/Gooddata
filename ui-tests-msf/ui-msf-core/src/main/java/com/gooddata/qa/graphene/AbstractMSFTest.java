@@ -37,8 +37,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.http.ParseException;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,15 +61,15 @@ import com.gooddata.md.report.GridElement;
 import com.gooddata.md.report.GridReportDefinitionContent;
 import com.gooddata.md.report.Report;
 import com.gooddata.md.report.ReportDefinition;
-import com.gooddata.qa.graphene.entity.DataSource;
-import com.gooddata.qa.graphene.entity.Dataset;
-import com.gooddata.qa.graphene.entity.Field;
-import com.gooddata.qa.graphene.entity.Field.FieldTypes;
 import com.gooddata.qa.graphene.entity.disc.ProjectInfo;
 import com.gooddata.qa.graphene.entity.disc.ScheduleBuilder;
+import com.gooddata.qa.graphene.entity.dlui.DataSource;
+import com.gooddata.qa.graphene.entity.dlui.Dataset;
+import com.gooddata.qa.graphene.entity.dlui.Field;
+import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.DatasetElements;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
-import com.gooddata.qa.graphene.utils.AdsHelper;
+import com.gooddata.qa.utils.ads.AdsHelper;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.report.ReportExportFormat;

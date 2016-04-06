@@ -10,9 +10,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.gooddata.qa.graphene.entity.DataSource;
-import com.gooddata.qa.graphene.entity.Dataset;
-import com.gooddata.qa.graphene.entity.Field;
+import com.gooddata.qa.graphene.entity.dlui.DataSource;
+import com.gooddata.qa.graphene.entity.dlui.Dataset;
+import com.gooddata.qa.graphene.entity.dlui.Field;
 import com.google.common.base.Predicate;
 
 public class DataSourcesFragment extends AbstractFragment {

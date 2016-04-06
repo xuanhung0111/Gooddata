@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.entity;
+package com.gooddata.qa.graphene.entity.dlui;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
