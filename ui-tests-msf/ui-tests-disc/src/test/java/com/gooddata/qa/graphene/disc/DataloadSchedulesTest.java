@@ -32,7 +32,7 @@ import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail.Confirmation;
-import com.gooddata.qa.graphene.utils.AdsHelper.AdsRole;
+import com.gooddata.qa.utils.ads.AdsHelper.AdsRole;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.google.common.collect.Lists;

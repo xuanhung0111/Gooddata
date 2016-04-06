@@ -1,4 +1,4 @@
-package com.gooddata.qa.graphene.utils;
+package com.gooddata.qa.utils.ads;
 
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.http.RestUtils.getResource;

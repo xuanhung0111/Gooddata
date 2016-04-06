@@ -28,11 +28,11 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
 import com.gooddata.qa.graphene.AbstractMSFTest;
-import com.gooddata.qa.graphene.entity.DataSource;
-import com.gooddata.qa.graphene.entity.Dataset;
-import com.gooddata.qa.graphene.entity.Field;
-import com.gooddata.qa.graphene.entity.Field.FieldStatus;
-import com.gooddata.qa.graphene.entity.Field.FieldTypes;
+import com.gooddata.qa.graphene.entity.dlui.DataSource;
+import com.gooddata.qa.graphene.entity.dlui.Dataset;
+import com.gooddata.qa.graphene.entity.dlui.Field;
+import com.gooddata.qa.graphene.entity.dlui.Field.FieldStatus;
+import com.gooddata.qa.graphene.entity.dlui.Field.FieldTypes;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.AnnieUIDialogFragment;
 import com.gooddata.qa.graphene.fragments.DataSourcesFragment;
