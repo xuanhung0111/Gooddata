@@ -46,8 +46,8 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void trending_recommendation_should_not_be_visible() {
-        assertFalse(analysisPage.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
-        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        assertFalse(analysisPageReact.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
+        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
         assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
@@ -55,7 +55,7 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void metric_with_period_recommendation_should_not_be_visible() {
-        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .addAttribute("id")
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
@@ -64,13 +64,13 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void trending_shortcut_should_not_appear() {
-        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
+        analysisPageReact.startDrag(analysisPageReact.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
 
         try {
             assertTrue(isElementPresent(cssSelector(".s-recommendation-metric-canvas"), browser));
             assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-over-time-canvas"), browser));
         } finally {
-            analysisPage.stopDrag(new Point(-1, -1));
+            analysisPageReact.stopDrag(new Point(-1, -1));
         }
     }
 }

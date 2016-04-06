@@ -18,7 +18,7 @@ public class ChartLegendTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void test_chart_legend_should_not_be_clickable() {
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getChartReport()
@@ -32,6 +32,6 @@ public class ChartLegendTest extends AbstractAdE2ETest {
             .findFirst()
             .get()
             .click();
-        assertEquals(analysisPage.getChartReport().getLegends().size(), 2);
+        assertEquals(analysisPageReact.getChartReport().getLegends().size(), 2);
     }
 }

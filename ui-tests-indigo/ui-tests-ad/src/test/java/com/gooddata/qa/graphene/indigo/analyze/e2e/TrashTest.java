@@ -19,31 +19,31 @@ public class TrashTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_clear_all_items_by_dragging_them_to_the_trash() {
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .removeMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .isEmpty());
 
-        assertTrue(analysisPage.removeAttribute(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.removeAttribute(ACTIVITY_TYPE)
             .getAttributesBucket()
             .isEmpty());
 
-        assertFalse(analysisPage.getPageHeader().isResetButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isResetButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_trash_item_by_throwing_it_anyplace_other_than_trash() {
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing()
             .getPageHeader()
             .isResetButtonEnabled());
 
-        assertEquals(analysisPage.drag(analysisPage.getMetricsBucket().get(NUMBER_OF_ACTIVITIES),
-                analysisPage.getPageHeader().getResetButton())
+        assertEquals(analysisPageReact.drag(analysisPageReact.getMetricsBucket().get(NUMBER_OF_ACTIVITIES),
+                analysisPageReact.getPageHeader().getResetButton())
             .getMetricsBucket()
             .getItemNames(), asList(NUMBER_OF_ACTIVITIES));
-        assertTrue(analysisPage.getPageHeader().isResetButtonEnabled());
+        assertTrue(analysisPageReact.getPageHeader().isResetButtonEnabled());
     }
 }

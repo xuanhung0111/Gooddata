@@ -27,53 +27,53 @@ public class UndoTest extends AbstractAdE2ETest {
     @Test(dependsOnGroups = {"init"})
     public void should_create_one_version_per_user_action() {
         // 1st version
-        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
         // 2nd version
-        analysisPage.addDate();
+        analysisPageReact.addDate();
 
         // 3rd version
         configuration.showPop();
 
         // 4th version -- switch category and turn off pop
-        analysisPage.replaceAttribute(DATE, ACTIVITY_TYPE);
+        analysisPageReact.replaceAttribute(DATE, ACTIVITY_TYPE);
 
         assertFalse(configuration.isPopSelected());
 
-        IntStream.rangeClosed(0, 3).forEach(i -> analysisPage.undo());
+        IntStream.rangeClosed(0, 3).forEach(i -> analysisPageReact.undo());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_metric_over_time_shortcut_followed_by_filter_change() {
         // D&D the first metric to the metric overtime recommendation
-        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
+        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC),
                 () -> waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser))
                 .waitForReportComputing()
                 .getFilterBuckets()
                 .configDateFilter("Last 12 months");
 
-        assertEquals(analysisPage.undo()
+        assertEquals(analysisPageReact.undo()
             .getFilterBuckets()
             .getDateFilterText(), "Activity: Last 4 quarters");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_redo_single_visualization_type_change() {
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.LINE_CHART)
             .undo()
             .isReportTypeSelected(ReportType.COLUMN_CHART));
 
-        assertTrue(analysisPage.redo()
+        assertTrue(analysisPageReact.redo()
             .isReportTypeSelected(ReportType.LINE_CHART));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_undo_visualization_type_change_for_complex_configuration() {
-        assertEquals(analysisPage.changeReportType(ReportType.TABLE)
+        assertEquals(analysisPageReact.changeReportType(ReportType.TABLE)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
@@ -85,7 +85,7 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_properly_deserialize_auto_generated_filters() {
-        assertTrue(analysisPage.addAttribute(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .resetToBlankState()
             .undo()
             .removeAttribute(ACTIVITY_TYPE)
@@ -95,11 +95,11 @@ public class UndoTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_properly_deserialize_modified_filters() {
-        analysisPage.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .getFilterBuckets()
             .configAttributeFilter(ACTIVITY_TYPE, "Email");
 
-        assertTrue(analysisPage.undo()
+        assertTrue(analysisPageReact.undo()
             .redo()
             .removeAttribute(ACTIVITY_TYPE)
             .getFilterBuckets()

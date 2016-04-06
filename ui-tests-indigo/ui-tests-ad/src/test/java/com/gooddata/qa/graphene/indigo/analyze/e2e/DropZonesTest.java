@@ -34,12 +34,12 @@ public class DropZonesTest extends AbstractAdE2ETest {
     public void should_highlight_attribute_dropzones() {
         assertFalse(isElementPresent(ACTIVE_CATEGORIES_SELECTOR, browser));
 
-        analysisPage.startDrag(analysisPage.getCataloguePanel().getDate());
+        analysisPageReact.startDrag(analysisPageReact.getCataloguePanel().getDate());
 
         try {
             assertTrue(isElementPresent(ACTIVE_CATEGORIES_SELECTOR, browser));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
 
         assertFalse(isElementPresent(ACTIVE_CATEGORIES_SELECTOR, browser));
@@ -49,12 +49,12 @@ public class DropZonesTest extends AbstractAdE2ETest {
     public void should_highlight_metric_dropzones() {
         assertFalse(isElementPresent(ACTIVE_METRICS_SELECTOR, browser));
 
-        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC));
+        analysisPageReact.startDrag(analysisPageReact.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC));
 
         try {
             assertTrue(isElementPresent(ACTIVE_METRICS_SELECTOR, browser));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
 
         assertFalse(isElementPresent(ACTIVE_METRICS_SELECTOR, browser));
@@ -62,23 +62,23 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_drag_attribute_from_filters_to_shortcut() {
-        WebElement filter = analysisPage.addFilter(ACTIVITY_TYPE)
+        WebElement filter = analysisPageReact.addFilter(ACTIVITY_TYPE)
             .getFilterBuckets()
             .getFilter(ACTIVITY_TYPE);
 
-        analysisPage.startDrag(filter);
+        analysisPageReact.startDrag(filter);
 
         try {
             assertTrue(isElementPresent(cssSelector(".s-blank-canvas-message"), browser));
             assertFalse(isElementPresent(cssSelector(".s-recommendation-attribute-canvas"), browser));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_correct_titles_for_fact_based_metric_dropzones() {
-        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
+        analysisPageReact.startDrag(analysisPageReact.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
 
         try {
             assertTrue(isElementPresent(cssSelector(".s-recommendation-metric-canvas"), browser));
@@ -89,22 +89,22 @@ public class DropZonesTest extends AbstractAdE2ETest {
             assertThat(waitForElementVisible(cssSelector(".s-recommendation-metric-over-time-canvas"), browser)
                     .getText(), containsString("Sum of " + AMOUNT));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_possible_attribute_replacement() {
-        analysisPage.addAttribute(ACTIVITY_TYPE);
+        analysisPageReact.addAttribute(ACTIVITY_TYPE);
 
         assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
 
-        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE));
+        analysisPageReact.startDrag(analysisPageReact.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE));
 
         try {
             assertTrue(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
 
         assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
@@ -112,16 +112,16 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_highlight_possible_metric_replacement() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES);
 
         assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
 
-        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_LOST_OPPS, FieldType.METRIC));
+        analysisPageReact.startDrag(analysisPageReact.getCataloguePanel().searchAndGet(NUMBER_OF_LOST_OPPS, FieldType.METRIC));
 
         try {
             assertTrue(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
 
         assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
@@ -129,30 +129,30 @@ public class DropZonesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_highlight_attribute_when_already_present_in_the_bucket() {
-        WebElement source = analysisPage.addAttribute(ACTIVITY_TYPE)
+        WebElement source = analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .getAttributesBucket()
             .getFirst();
 
-        analysisPage.startDrag(source);
+        analysisPageReact.startDrag(source);
 
         try {
             assertFalse(isElementPresent(ACTIVE_REPLACABLE_SELECTOR, browser));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_highlight_date_when_already_present_in_the_bucket() {
-        WebElement date = analysisPage.addDate()
+        WebElement date = analysisPageReact.addDate()
             .getAttributesBucket()
             .getFirst();
-        analysisPage.startDrag(date);
+        analysisPageReact.startDrag(date);
 
         try {
             assertFalse(isElementPresent(cssSelector(".s-bucket-categories .adi-droppable-active"), browser));
         } finally {
-            analysisPage.stopDrag(NON_DROPPABLE_POSITION);
+            analysisPageReact.stopDrag(NON_DROPPABLE_POSITION);
         }
     }
 }

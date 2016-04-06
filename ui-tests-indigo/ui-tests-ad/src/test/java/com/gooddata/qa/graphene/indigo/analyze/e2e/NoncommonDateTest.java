@@ -22,25 +22,25 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void date_dimension_in_chart_should_reflect_currently_selected_dimension() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertThat(waitForElementVisible(cssSelector(".highcharts-xaxis-title tspan"), browser).getText(),
                 containsString("Created"));
 
-        analysisPage.getAttributesBucket()
+        analysisPageReact.getAttributesBucket()
             .changeDateDimension("Activity");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertThat(waitForElementVisible(cssSelector(".highcharts-xaxis-title tspan"), browser).getText(),
                 containsString("Activity"));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void enable_date_dimension_selects_correctly() {
-        WebElement dateFilter = analysisPage.addDateFilter()
+        WebElement dateFilter = analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .getDateFilter();
 
@@ -48,7 +48,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(".s-filter-date-dimension-switch:not(.disabled)"), browser));
         dateFilter.click();
 
-        analysisPage.addDate();
+        analysisPageReact.addDate();
         assertTrue(isElementPresent(cssSelector(".s-date-dimension-switch:not(.disabled)"), browser));
 
         // date dimension picker in select is now disabled
@@ -58,7 +58,7 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void keeps_date_dimensions_in_categories_in_sync_with_the_filter() {
-        analysisPage.addDateFilter()
+        analysisPageReact.addDateFilter()
             .addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
@@ -67,13 +67,13 @@ public class NoncommonDateTest extends AbstractAdE2ETest {
                 containsString("Created: All time"));
 
         // update filter to last quarter
-        analysisPage.getFilterBuckets()
+        analysisPageReact.getFilterBuckets()
             .configDateFilter("Last quarter");
         assertThat(waitForElementVisible(cssSelector(".s-filter-button span"), browser).getText(),
                 containsString("Created: Last quarter"));
 
         // switch date dimension to Foundation Date
-        analysisPage.getAttributesBucket()
+        analysisPageReact.getAttributesBucket()
             .changeDateDimension("Activity");
 
         // check that filter is kept switched to last quarter, but in switched date dimension

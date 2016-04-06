@@ -23,7 +23,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_table_visualization() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -32,7 +32,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_line_chart_visualization() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
@@ -46,7 +46,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_bar_chart_visualization() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing();
@@ -58,7 +58,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_column_chart_visualization() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.COLUMN_CHART)
             .waitForReportComputing();
@@ -70,13 +70,13 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply_changing_the_visualization_type() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component"), browser));
 
-        analysisPage.changeReportType(ReportType.LINE_CHART)
+        analysisPageReact.changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .dda-line-component"), browser));
         assertTrue(isElementPresent(cssSelector(
@@ -84,26 +84,26 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .visualization-line .s-property-x" + getActivityTypeIdentifier()), browser));
 
-        analysisPage.changeReportType(ReportType.BAR_CHART)
+        analysisPageReact.changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .dda-bar-component"), browser));
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
 
-        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .dda-column-component"), browser));
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .visualization-column .s-property-y.s-id-metricvalues"), browser));
 
-        analysisPage.changeReportType(ReportType.TABLE)
+        analysisPageReact.changeReportType(ReportType.TABLE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .dda-table-component"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_sort_bar_chart() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.BAR_CHART)
             .waitForReportComputing();
@@ -113,7 +113,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_line_chart() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
@@ -123,7 +123,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_column_chart() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.COLUMN_CHART)
             .waitForReportComputing();
@@ -133,7 +133,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_sorted_in_table() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -143,7 +143,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_update_visualization_upon_config_change() {
-        analysisPage.changeReportType(ReportType.BAR_CHART)
+        analysisPageReact.changeReportType(ReportType.BAR_CHART)
             // add a metric to configuration
             .addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -156,7 +156,7 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
                 ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
 
         // add an attribute
-        analysisPage.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .visualization-bar .s-property-x" + getActivityTypeIdentifier()), browser));
@@ -164,23 +164,23 @@ public class VisualizationTypesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_if_one_attribute_is_dragged_in() {
-        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
             .addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"), browser));
 
-        analysisPage.changeReportType(ReportType.TABLE)
+        analysisPageReact.changeReportType(ReportType.TABLE)
             .waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message"), browser));
 
-        analysisPage.changeReportType(ReportType.LINE_CHART)
+        analysisPageReact.changeReportType(ReportType.LINE_CHART)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message.adi-canvas-message-missing-metric"), browser));
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(
                 ".adi-editor-canvas .adi-canvas-message"), browser));

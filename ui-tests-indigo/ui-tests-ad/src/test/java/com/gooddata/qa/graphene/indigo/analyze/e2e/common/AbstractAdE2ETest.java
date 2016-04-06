@@ -23,7 +23,7 @@ public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
 
             @Override
             public void waitForStartPageLoaded() {
-                waitForFragmentVisible(analysisPage);
+                waitForFragmentVisible(analysisPageReact);
             }
 
             @Override

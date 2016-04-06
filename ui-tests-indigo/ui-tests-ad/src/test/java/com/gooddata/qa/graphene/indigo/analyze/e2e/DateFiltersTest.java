@@ -27,7 +27,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_add_and_remove_date_from_filter_bucket() {
-        assertTrue(analysisPage.addDateFilter()
+        assertTrue(analysisPageReact.addDateFilter()
             // try to drag a second date filter
             .addDateFilter()
             .removeDateFilter()
@@ -37,11 +37,11 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_reflect_changes_in_category_bucket() {
-        analysisPage.addDate()
+        analysisPageReact.addDate()
             .getAttributesBucket()
             .changeDateDimension("Created");
 
-        analysisPage.getFilterBuckets()
+        analysisPageReact.getFilterBuckets()
             .getDateFilter()
             .click();
 
@@ -50,7 +50,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_picker() {
-        analysisPage.addDateFilter()
+        analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .getDateFilter()
             .click();
@@ -59,7 +59,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_keep_selection_if_date_dimensions_reloaded_in_the_background() {
-        analysisPage.addDateFilter()
+        analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .changeDateDimension("Activity", "Created");
         assertEquals(getValueFrom(".s-filter-date-dimension-switch"), "created.dim_date");
@@ -67,16 +67,16 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_reflect_selection_changes() {
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDateFilter()
             .getFilterBuckets()
             .getDateFilterText(), "Activity: All time");
 
-        assertEquals(analysisPage.getFilterBuckets()
+        assertEquals(analysisPageReact.getFilterBuckets()
             .configDateFilter("Last year")
             .getDateFilterText(), "Activity: Last year");
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         String yearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Year (Activity)");
         assertTrue(isElementPresent(cssSelector(".s-date-filter" + yearActivityLabel), browser));
         assertTrue(isElementPresent(cssSelector(".s-date-filter.s-where-___between____1__1__"), browser));
@@ -86,11 +86,11 @@ public class DateFiltersTest extends AbstractAdE2ETest {
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .adi-component .s-property-where.s-where-___between____1__1__"), browser));
 
-        assertEquals(analysisPage.getFilterBuckets()
+        assertEquals(analysisPageReact.getFilterBuckets()
             .configDateFilter("Last 12 months")
             .getDateFilterText(), "Activity: Last 12 months");
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         String monthYearActivityLabel = ".s-id-" + getAttributeDisplayFormIdentifier("Month/Year (Activity)", "Short");
         assertTrue(isElementPresent(cssSelector(".s-date-filter" + monthYearActivityLabel), browser));
         assertTrue(isElementPresent(cssSelector(".s-date-filter.s-where-___between____11_0__"), browser));
@@ -103,19 +103,19 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_reset_filters_on_all_time() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDateFilter()
             .getFilterBuckets()
             .configDateFilter("All time");
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .adi-component"), browser));
         assertFalse(isElementPresent(cssSelector(".adi-components .adi-component.s-property-where"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_prefill_interval_filters_when_floating_filter_is_selected() {
-        analysisPage.addDateFilter()
+        analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .configDateFilter("Last quarter")
             .getDateFilter()
@@ -129,7 +129,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_support_date_ranges() throws ParseException {
-        assertTrue(analysisPage.addDateFilter()
+        assertTrue(analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .configDateFilter("11/17/2015", "11/19/2015")
             .getDateFilterText().contains("Nov 17, 2015 – Nov 19, 2015"));
@@ -137,7 +137,7 @@ public class DateFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_correct_ranges_when_editing() {
-        analysisPage.addDateFilter()
+        analysisPageReact.addDateFilter()
             .getFilterBuckets()
             .getDateFilter()
             .click();

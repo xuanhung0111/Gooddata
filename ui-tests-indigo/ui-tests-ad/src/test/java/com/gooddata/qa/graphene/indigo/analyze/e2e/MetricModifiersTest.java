@@ -21,14 +21,14 @@ public class MetricModifiersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_turned_off_when_second_metric_is_added() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing();
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
-        assertFalse(analysisPage.waitForReportComputing()
+        assertFalse(analysisPageReact.waitForReportComputing()
             .addMetric(QUOTA)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)

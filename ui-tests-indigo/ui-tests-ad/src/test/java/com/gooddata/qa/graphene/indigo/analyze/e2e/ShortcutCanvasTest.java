@@ -22,13 +22,13 @@ public class ShortcutCanvasTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_replace_attribute_when_user_drops_it_on_canvas_shortcut() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
-            .drag(analysisPage.getCataloguePanel().searchAndGet(DEPARTMENT, FieldType.ATTRIBUTE),
+            .drag(analysisPageReact.getCataloguePanel().searchAndGet(DEPARTMENT, FieldType.ATTRIBUTE),
                     () -> waitForElementPresent(cssSelector(".s-shortcut-metric-attribute"), browser))
             .waitForReportComputing();
 
         assertTrue(isElementPresent(cssSelector(".adi-components .s-id-metricvalues"), browser));
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DEPARTMENT));
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(DEPARTMENT));
     }
 }

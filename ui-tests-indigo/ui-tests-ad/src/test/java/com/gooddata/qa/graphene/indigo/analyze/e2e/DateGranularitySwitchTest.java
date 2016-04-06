@@ -21,9 +21,9 @@ public class DateGranularitySwitchTest extends AbstractAdE2ETest {
     public void should_change_date_granularity_appropriately() {
         beforeEach();
 
-        analysisPage.getAttributesBucket()
+        analysisPageReact.getAttributesBucket()
             .changeGranularity("Month");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-x.s-id-" +
                 getAttributeDisplayFormIdentifier("Month/Year (Activity)", "Short")), browser));
     }
@@ -33,9 +33,9 @@ public class DateGranularitySwitchTest extends AbstractAdE2ETest {
         beforeEach();
 
         // switch granularity to non-default value
-        analysisPage.getAttributesBucket()
+        analysisPageReact.getAttributesBucket()
             .changeGranularity("Month");
-        analysisPage.resetToBlankState()
+        analysisPageReact.resetToBlankState()
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing();
@@ -46,7 +46,7 @@ public class DateGranularitySwitchTest extends AbstractAdE2ETest {
 
     private void beforeEach() {
         // D&D the first metric/attribute to configuration
-        analysisPage.changeReportType(ReportType.COLUMN_CHART)
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addDate();
     }

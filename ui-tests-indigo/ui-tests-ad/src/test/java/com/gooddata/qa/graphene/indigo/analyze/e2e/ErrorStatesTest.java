@@ -23,34 +23,34 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_result_is_too_large__413() {
-        analysisPage.addAttribute(ACCOUNT)
+        analysisPageReact.addAttribute(ACCOUNT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
-        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_error_even_when_there_are_too_many_data_points() {
-        analysisPage.addStack(ACTIVITY_TYPE)
+        analysisPageReact.addStack(ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
-        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_too_many_data_points_when_chart_cannot_be_rendered_because_of_it() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addStack(ACCOUNT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
-        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
 
         waitForElementVisible(cssSelector(".s-error-too-many-data-points .s-switch-to-table"), browser).click();
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-visualization-picker .vis-type-table.is-selected"), browser));
     }
 
@@ -60,37 +60,37 @@ public class ErrorStatesTest extends AbstractAdE2ETest {
             String activitiesUri = getMdService().getObjUri(getProject(), Metric.class, title("# of Activities"));
             createMetric("__EMPTY__", "SELECT [" + activitiesUri + "] WHERE 1 = 0", "#,##0");
         }
-        analysisPage.addMetric("__EMPTY__")
+        analysisPageReact.addMetric("__EMPTY__")
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-empty-result"), browser));
-        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_missing_metric_when_configuration_does_not_contain_one() {
-        analysisPage.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-missing-metric"), browser));
-        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_invalid_configuration_error_when_execution_fails() {
-        analysisPage.addStack(ACCOUNT)
+        analysisPageReact.addStack(ACCOUNT)
             .addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing();
 
         assertTrue(isElementPresent(cssSelector(".s-error-invalid-configuration"), browser));
-        assertFalse(analysisPage.getPageHeader().isExportButtonEnabled());
+        assertFalse(analysisPageReact.getPageHeader().isExportButtonEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_blank_message_after_reset_from_error_state() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addStack(ACCOUNT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-error-too-many-data-points"), browser));
 
-        analysisPage.resetToBlankState();
+        analysisPageReact.resetToBlankState();
     }
 }
