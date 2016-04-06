@@ -100,7 +100,7 @@ public class ReportFilter extends AbstractFragment {
         return openFilterFragment(promptFilterLink, FilterFragment.PROMPT_FILTER);
     }
 
-    private RankingFilterFragment openRankingFilterFragment() {
+    public RankingFilterFragment openRankingFilterFragment() {
         return openFilterFragment(rankFilterLink, FilterFragment.RANKING_FILTER);
     }
 

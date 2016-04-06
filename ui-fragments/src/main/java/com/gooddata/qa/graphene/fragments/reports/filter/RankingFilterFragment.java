@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.fragments.reports.filter;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
+import static org.openqa.selenium.By.cssSelector;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +48,12 @@ public class RankingFilterFragment extends AbstractFilterFragment {
                 .selectMetric(rankingFilterItem.getMetric())
                 .apply();
         waitForFragmentNotVisible(this);
+    }
+
+    public RankingFilterFragment openSelectMetricPopupPanel() {
+        waitForElementVisible(selectMetricButton).click();
+        waitForElementVisible(cssSelector(".c-AttributeFilterPicker .loaded"), browser);
+        return this;
     }
 
     private RankingFilterFragment selectAttributes(List<String> attribute) {

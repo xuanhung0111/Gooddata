@@ -108,7 +108,7 @@ public class SelectItemPopupPanel extends AbstractFragment {
         return this;
     }
 
-    public Collection<String> getItems() {
+    public List<String> getItems() {
         return getElementTexts(items);
     }
 

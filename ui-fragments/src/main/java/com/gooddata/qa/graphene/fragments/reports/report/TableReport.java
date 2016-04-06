@@ -10,7 +10,6 @@ import static org.openqa.selenium.By.cssSelector;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,19 +67,27 @@ public class TableReport extends AbstractReport {
 
     private static final By BY_SORT_LOCATOR = className("sort");
 
-    public TableReport sortColumn(final String column, Sort howToSort) {
-        WebElement header = metricElementInGrid.stream()
-            .filter(e -> column.equals(e.getText()))
-            .map(e -> e.findElement(BY_PARENT))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Cannot find column named: " + column));
+    public TableReport sortByHeader(final String header, final Sort howToSort) {
+        getActions().moveToElement(getHeaderElement(header)).perform();
 
-        new Actions(browser).moveToElement(header).perform();
-        waitForElementVisible(header.findElement(BY_SORT_LOCATOR)
-                .findElement(className(howToSort.toString())))
-                .click();
+        //graphene finds wrong sort arrows in some cases, so we need to find parent node again 
+        List<WebElement> sortElements = browser.findElement(cssSelector("div.hover"))
+                .findElements(By.className("sortArrow"));
+        for(WebElement e : sortElements) {
+            if(e.getAttribute("class").contains(howToSort.toString())) {
+                //have tried to use WebElement.click() but it's unstable
+                getActions().moveToElement(e).click().perform();
+            }
+        }
+
         waitForReportLoading();
         return this;
+    }
+
+    public boolean isSortAvailable(final String header) {
+        final WebElement headerElement = waitForElementVisible(getHeaderElement(header));
+        getActions().moveToElement(headerElement).perform();
+        return !headerElement.findElements(BY_SORT_LOCATOR).isEmpty();
     }
 
     public List<String> getAttributesHeader() {
@@ -419,6 +426,19 @@ public class TableReport extends AbstractReport {
     private Pair<Integer, Integer> getPossitionFromRegion(String region) {
         String[] parts = region.split(",");
         return Pair.of(Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()));
+    }
+
+    private List<WebElement> getAllHeaderElements() {
+        return browser.findElements(By.cssSelector(
+                ".containerBody .gridTabPlate .gridTile .cell:not(.element):not(.data) span.captionWrapper"));
+    }
+
+    private WebElement getHeaderElement(final String header) {
+        return getAllHeaderElements().stream()
+                .filter(e -> header.equals(e.getText()))
+                .map(e -> e.findElement(BY_PARENT))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Cannot find header named: " + header));
     }
 
     public static enum Sort {
