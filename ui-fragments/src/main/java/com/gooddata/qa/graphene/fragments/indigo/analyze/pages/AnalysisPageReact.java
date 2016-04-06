@@ -30,7 +30,7 @@ public class AnalysisPageReact extends AbstractFragment {
     private AnalysisPageHeader pageHeader;
 
     @FindBy(className = "s-catalogue")
-    private CataloguePanel cataloguePanel;
+    private CataloguePanelReact cataloguePanel;
 
     @FindBy(className = "adi-editor-main")
     private MainEditor mainEditor;
@@ -48,7 +48,7 @@ public class AnalysisPageReact extends AbstractFragment {
     private StacksBucket stacksBucket;
 
     @FindBy(className = "s-bucket-filters")
-    private FiltersBucket filterBuckets;
+    private FiltersBucketReact filterBuckets;
 
     public static final String MAIN_CLASS = "adi-editor";
 
@@ -226,7 +226,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return getMainEditor().getChartReport();
     }
 
-    public CataloguePanel getCataloguePanel() {
+    public CataloguePanelReact getCataloguePanel() {
         return waitForFragmentVisible(cataloguePanel);
     }
 
@@ -242,7 +242,7 @@ public class AnalysisPageReact extends AbstractFragment {
         return waitForFragmentVisible(stacksBucket);
     }
 
-    public FiltersBucket getFilterBuckets() {
+    public FiltersBucketReact getFilterBuckets() {
         return waitForFragmentVisible(filterBuckets);
     }
 
