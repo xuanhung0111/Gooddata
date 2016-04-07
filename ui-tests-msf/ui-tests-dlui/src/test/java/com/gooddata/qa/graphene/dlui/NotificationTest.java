@@ -268,13 +268,14 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     private void failToLoadData(DataSource dataSource, String screenshotName) {
         final Map<String, String> params = prepareParamsToUpdateADS("dropTableWithAdditionalFields_Person.txt",
                 "copyTableWithAdditionalFields_Drop_Person.txt", ads.getId());
+        final Map<String, String> hiddenParams = prepareHiddenParamsToUpdateADS();
 
         openAnnieDialog();
         annieUIDialog.selectFields(dataSource);
         annieUIDialog.clickOnApplyButton();
 
-        assertTrue(executeProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params)
-                .isSuccess());
+        assertTrue(executeProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params, 
+                hiddenParams).isSuccess());
 
         checkFailedDataAddingResult();
         Screenshots.takeScreenshot(browser, screenshotName, getClass());

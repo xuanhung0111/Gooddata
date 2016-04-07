@@ -182,7 +182,9 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected void createUpdateADSTableBySQLFiles(final String createTableFile, final String copyTableFile,
             final Warehouse ads) {
         final Map<String, String> params = prepareParamsToUpdateADS(createTableFile, copyTableFile, ads.getId());
-        assertTrue(executeProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params).isSuccess());
+        final Map<String, String> hiddenParams = prepareHiddenParamsToUpdateADS();
+        assertTrue(executeProcess(cloudconnectProcess, DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS, params, 
+                hiddenParams).isSuccess());
     }
 
     protected DataSource prepareADSTable(final ADSTables adsTable) {
@@ -192,6 +194,12 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected void createUpdateADSTable(final ADSTables adsTable) {
         createUpdateADSTableBySQLFiles(adsTable.createTableSqlFile, adsTable.copyTableSqlFile, ads);
+    }
+
+    protected Map<String, String> prepareHiddenParamsToUpdateADS() {
+        final Map<String, String> hiddenParams = new HashMap<>();
+        hiddenParams.put("ADS_PASSWORD", testParams.getPassword());
+        return hiddenParams;
     }
 
     protected Map<String, String> prepareParamsToUpdateADS(final String createTableSqlFile,
@@ -205,7 +213,6 @@ public class AbstractMSFTest extends AbstractProjectTest {
         params.put("COPY_TABLE", copyTableSql);
         params.put("ADS_URL", adsUrl);
         params.put("ADS_USER", testParams.getUser());
-        params.put("ADS_PASSWORD", testParams.getPassword());
         return params;
     }
 
@@ -251,7 +258,16 @@ public class AbstractMSFTest extends AbstractProjectTest {
 
     protected ProcessExecutionDetail executeProcess(final DataloadProcess process, final String executable,
             final Map<String, String> params) {
-        return getProcessService().executeProcess(new ProcessExecution(process, executable, params)).get();
+        return getProcessService()
+                .executeProcess(new ProcessExecution(process, executable, params))
+                .get();
+    }
+
+    protected ProcessExecutionDetail executeProcess(final DataloadProcess process, final String executable,
+            final Map<String, String> params, final Map<String, String> hiddenParams) {
+        return getProcessService()
+                .executeProcess(new ProcessExecution(process, executable, params, hiddenParams))
+                .get();
     }
 
     protected void createSchedule(ScheduleBuilder scheduleBuilder) {
