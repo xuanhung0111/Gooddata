@@ -48,7 +48,7 @@ public class ContextMenu extends AbstractFragment {
         aggregateTableData(type, subItem, true);
     }
 
-    public void nonAggregateTableDate(final AggregationType type, final String subItem) {
+    public void nonAggregateTableData(final AggregationType type, final String subItem) {
         aggregateTableData(type, subItem, false);
     }
 

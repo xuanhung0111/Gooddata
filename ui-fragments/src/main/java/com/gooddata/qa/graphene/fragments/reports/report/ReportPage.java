@@ -722,6 +722,18 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
+    public ReportPage exchangeColAndRowHeaders() {
+        waitForElementVisible(By.className("iconBtnSwapheaders"), browser).click();
+        waitForReportExecutionProgress();
+        return this;
+    }
+
+    public ReportPage displayMetricsInDifferentRows() {
+        waitForElementVisible(By.className("iconBtnMetricsvertically"), browser).click();
+        waitForReportExecutionProgress();
+        return this;
+    }
+
     private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
         WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
                 browser);
