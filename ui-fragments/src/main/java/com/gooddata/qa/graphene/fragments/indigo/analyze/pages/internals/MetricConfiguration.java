@@ -2,11 +2,11 @@ package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsEmpty;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForCollectionIsNotEmpty;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
 import static org.openqa.selenium.By.tagName;
@@ -18,12 +18,12 @@ import java.util.stream.Stream;
 
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import com.gooddata.qa.graphene.fragments.common.AbstractPicker;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.description.DescriptionPanel;
 
 public class MetricConfiguration extends AbstractFragment {
@@ -169,10 +169,7 @@ public class MetricConfiguration extends AbstractFragment {
         return clickAddAttributeFilter().getDescription(attribute);
     }
 
-    public class AttributeFilterPicker extends AbstractFragment {
-
-        @FindBy(className = "searchfield-input")
-        private WebElement searchInput;
+    public static class AttributeFilterPicker extends AbstractPicker {
 
         @FindBy(className = "s-clear")
         private WebElement clearButton;
@@ -180,13 +177,35 @@ public class MetricConfiguration extends AbstractFragment {
         @FindBy(className = "s-select_all")
         private WebElement selectAllButton;
 
-        @FindBy(xpath = "//*[contains(@class, 'adi-filter-item')]")
-        private List<WebElement> items;
-
         @FindBy(css = ".s-apply:not(.disabled)")
         private WebElement applyButton;
 
-        private static final String WEIRD_STRING_TO_CLEAR_ALL_ITEMS = "!@#$%^";
+        private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("searchfield-clear");
+
+        @Override
+        protected String getListItemsCssSelector() {
+            return ".adi-filter-item";
+        }
+
+        @Override
+        protected String getSearchInputCssSelector() {
+            return ".searchfield-input";
+        }
+
+        @Override
+        protected void waitForPickerLoaded() {
+            waitForElementNotPresent(cssSelector(".filter-items-loading"));
+        }
+
+        @Override
+        protected void clearSearchText() {
+            if (isElementPresent(CLEAR_SEARCH_TEXT_SHORTCUT, getRoot())) {
+                waitForElementVisible(CLEAR_SEARCH_TEXT_SHORTCUT, getRoot()).click();
+                return;
+            }
+
+            super.clearSearchText();
+        }
 
         public AttributeFilterPicker clear() {
             waitForElementVisible(clearButton).click();
@@ -199,22 +218,16 @@ public class MetricConfiguration extends AbstractFragment {
         }
 
         public AttributeFilterPicker selectOnly(String element) {
-            searchItem(element);
-            WebElement ele = waitForCollectionIsNotEmpty(items).stream()
-                    .filter(item -> element.equals(item.findElement(tagName("span")).getText()))
-                    .findFirst()
-                    .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element));
+            searchForText(element);
+            WebElement ele = getElement(format("[title='%s']", element));
             getActions().moveToElement(ele).perform();
             waitForElementVisible(className("gd-list-item-only"), ele).click();
             return this;
         }
 
         public String getDescription(String element) {
-            searchItem(element);
-            WebElement ele = waitForCollectionIsNotEmpty(items).stream()
-                    .filter(item -> element.equals(item.findElement(cssSelector(".attr-field-icon + span")).getText()))
-                    .findFirst()
-                    .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element));
+            searchForText(element);
+            final WebElement ele = getElementByName(element);
             getActions().moveToElement(ele).perform();
             getActions().moveToElement(waitForElementPresent(cssSelector(".inlineBubbleHelp"), ele)).perform();
 
@@ -223,58 +236,27 @@ public class MetricConfiguration extends AbstractFragment {
         }
 
         public void selectAttribute(String element) {
-            searchItem(element);
-            waitForCollectionIsNotEmpty(items).stream()
-                .map(item -> item.findElement(cssSelector(".attr-field-icon + span")))
-                .filter(item -> element.equals(item.getText()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element))
-                .click();
+            searchForText(element);
+            getElementByName(element).click();
         }
 
         public List<String> getAllAttributesInViewPort() {
-            return getElementTexts(waitForCollectionIsNotEmpty(items), e -> e.findElement(cssSelector(".attr-field-icon + span")));
+            return getElementTexts(getElements(), e -> e.findElement(cssSelector(".attr-field-icon + span")));
         }
 
         public AttributeFilterPicker selectItems(String... items) {
-            Stream.of(items).forEach(this::selectInputItem);
+            Stream.of(items).forEach(element -> {
+                searchForText(element);
+                getElement(format("[title='%s']", element))
+                    .findElement(tagName("input"))
+                    .click();
+            });
             return this;
         }
 
         public void apply() {
             waitForElementVisible(applyButton).click();
             waitForElementNotVisible(getRoot());
-        }
-
-        private void selectInputItem(String element) {
-            searchItem(element);
-            waitForCollectionIsNotEmpty(items).stream()
-                .filter(item -> element.equals(item.findElement(tagName("span")).getText()))
-                .findFirst()
-                .map(item -> item.findElement(tagName("input")))
-                .orElseThrow(() -> new NoSuchElementException("Cannot find: " + element))
-                .click();
-        }
-
-        private void searchItem(String name) {
-            waitForElementVisible(this.getRoot());
-
-            clearSearchField();
-            searchInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-            waitForCollectionIsEmpty(items);
-
-            clearSearchField();
-            searchInput.sendKeys(name);
-            waitForCollectionIsNotEmpty(items);
-        }
-
-        private void clearSearchField() {
-            final By searchFieldClear = className("searchfield-clear");
-            if (isElementPresent(searchFieldClear, getRoot())) {
-                waitForElementVisible(searchFieldClear, getRoot()).click();
-            } else {
-                waitForElementVisible(searchInput).clear();
-            }
         }
     }
 }

@@ -32,7 +32,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
 
         AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
                 waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
-        panel.searchItem("asdf");
+        panel.searchForText("asdf");
 
         sleepTightInSeconds(1);
         waitForElementVisible(cssSelector(".gd-list-noResults"), browser);
@@ -138,7 +138,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
 
         analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
         panel.getClearButton().click();
-        panel.searchItem("Email");
+        panel.searchForText("Email");
         assertTrue(panel.getApplyButton()
                 .getAttribute("class")
                 .contains("disabled"));
@@ -165,8 +165,8 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
 
         analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
         panel.getClearButton().click();
-        panel.searchItem("Email");
-        panel.searchItem("In Person Meeting");
+        panel.searchForText("Email");
+        panel.searchForText("In Person Meeting");
         assertTrue(panel.getApplyButton()
                 .getAttribute("class")
                 .contains("disabled"));

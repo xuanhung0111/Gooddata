@@ -1,33 +1,29 @@
 package com.gooddata.qa.graphene.fragments.indigo;
 
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.ReactDropdown;
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 
-public class ReactProjectSwitch extends ReactDropdown {
+public class ReactProjectSwitch extends AbstractReactDropDown {
 
     @Override
-    public String getListItemCssSelector() {
+    protected String getListItemsCssSelector() {
         return ".gd-project-list-item";
     }
 
     @Override
-    public String getDropdownButtonCssSelector() {
+    protected String getDropdownButtonCssSelector() {
         return ".gd-header-project";
     }
 
     @Override
-    public String getDropdownCssSelector() {
+    protected String getDropdownCssSelector() {
         return ".overlay.project-picker-dropdown";
     }
 
-    // When switch project with Embeded Dashboard role, user is directed to Projects.html page 
-    // and project picker button will disappears
-    // So override the origin action because cannot wait that button here
     @Override
-    public ReactDropdown selectByName(String name) {
-        searchByName(name);
-        getElementByName(name).click();
-
-        return this;
+    protected void waitForSelectionIsApplied(String name) {
+        // When switch project with Embeded Dashboard role, user is directed to Projects.html page 
+        // and project picker button will disappears
+        // So override the origin action because cannot wait that button here
     }
 
 }

@@ -1,20 +1,23 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-import org.openqa.selenium.By;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static org.openqa.selenium.By.cssSelector;
 
-import com.gooddata.qa.graphene.utils.ElementUtils;
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
 
-public class DateFilter extends ReactDropdown {
-
-    private static final String DROPDOWN_CSS_SELECTOR = ".overlay .s-date-filter-dropdown";
-    private static final String DROPDOWN_MESSAGE_CSS_SELECTOR = DROPDOWN_CSS_SELECTOR + " .set-default-filter-message";
+public class DateFilter extends AbstractReactDropDown {
 
     @Override
-    public String getDropdownCssSelector() {
-        return DROPDOWN_CSS_SELECTOR;
+    protected String getDropdownCssSelector() {
+        return ".overlay .s-date-filter-dropdown";
+    }
+
+    @Override
+    protected String getSearchInputCssSelector() {
+        return null;
     }
 
     public boolean isInfoMessageDisplayed() {
-        return ElementUtils.isElementPresent(By.cssSelector(DROPDOWN_MESSAGE_CSS_SELECTOR), browser);
+        return isElementPresent(cssSelector(".set-default-filter-message"), getPanelRoot());
     }
 }

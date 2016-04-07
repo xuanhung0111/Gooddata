@@ -15,7 +15,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
     public void checkSearchStringResetAfterDropdownToggle() {
         MetricSelect ms = getMetricSelect();
 
-        ms.searchByName("amount");
+        ms.searchForText("amount");
         takeScreenshot(browser, "checkSearchStringResetAfterDropdownToggle-searchField_amount", this.getClass());
 
         assertEquals(3, ms.getValues().size());
@@ -31,7 +31,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
     public void checkSearchStringResetAfterDropdownClose() {
         MetricSelect ms = getMetricSelect();
 
-        ms.searchByName("amount");
+        ms.searchForText("amount");
         takeScreenshot(browser, "checkSearchStringResetAfterDropdownClose-searchField_amount", this.getClass());
 
         assertEquals(3, ms.getValues().size());
@@ -63,7 +63,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
     public void checkNoMatchingMessage() {
         MetricSelect ms = getMetricSelect();
 
-        ms.searchByName("name-of-nonexisting-metric-&!~$#");
+        ms.searchForText("name-of-nonexisting-metric-&!~$#");
         takeScreenshot(browser, "checkNoMatchingMessage", this.getClass());
 
         assertTrue(ms.getValues().isEmpty());

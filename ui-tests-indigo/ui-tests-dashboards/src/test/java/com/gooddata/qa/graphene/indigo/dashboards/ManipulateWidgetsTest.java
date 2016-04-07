@@ -1,6 +1,11 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -9,11 +14,6 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
 
 public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
@@ -239,17 +239,18 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
                 .clickAddWidget()
                 .getConfigurationPanel()
                 .getMetricSelect();
-        metricSelect.waitForItem(LONG_NAME_METRIC);
+        metricSelect.searchForText(LONG_NAME_METRIC);
         takeScreenshot(browser, "Metric with longer name", getClass());
+        assertEquals(metricSelect.getValues().size(), 1);
 
-        metricSelect.searchByName(PATTERN_OF_METRIC_NAME);
+        metricSelect.searchForText(PATTERN_OF_METRIC_NAME);
         assertTrue(metricSelect.isNameShortened(LONG_NAME_METRIC), "The metric still displays full name");
 
         String metricTooltip = metricSelect.getTooltip(LONG_NAME_METRIC);
         takeScreenshot(browser, "Metric tooltip when partial searching", getClass());
         assertEquals(metricTooltip, LONG_NAME_METRIC);
 
-        metricSelect.searchByName(LONG_NAME_METRIC);
+        metricSelect.searchForText(LONG_NAME_METRIC);
         assertTrue(metricSelect.isNameShortened(LONG_NAME_METRIC), "The metric still displays full name");
 
         metricTooltip = metricSelect.getTooltip(LONG_NAME_METRIC);

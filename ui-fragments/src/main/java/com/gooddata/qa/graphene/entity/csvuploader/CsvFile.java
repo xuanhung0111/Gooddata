@@ -19,7 +19,7 @@ import org.supercsv.io.CsvListReader;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable.ColumnType;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.google.common.collect.Lists;
 
 public class CsvFile {

@@ -1,10 +1,16 @@
 package com.gooddata.qa.graphene.fragments.indigo.dashboards;
 
-public class KpiAlertTriggeredWhenSelect extends ReactDropdown {
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+
+public class KpiAlertTriggeredWhenSelect extends AbstractReactDropDown {
 
     @Override
-    public String getDropdownCssSelector() {
+    protected String getDropdownCssSelector() {
         return ".overlay .s-alert-list";
     }
 
+    @Override
+    protected String getSearchInputCssSelector() {
+        return null;
+    }
 }

@@ -74,7 +74,7 @@ public class ConfigurationPanel extends AbstractFragment {
     }
 
     public String getDrillToValue() {
-        return waitForFragmentVisible(drillToSelect).getDropdownButton().getText();
+        return waitForFragmentVisible(drillToSelect).getSelection();
     }
 
     public ConfigurationPanel clickRemoveDrillToButton() {

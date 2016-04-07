@@ -52,11 +52,11 @@ public class TestParameters {
         viewerPassword = loadProperty("viewerPassword");
         adminUser = loadProperty("adminUser");
         adminPassword = loadProperty("adminPassword");
-        projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.POSTGRES, "getValue");
+        projectDriver = lookup(loadProperty("project.dwhDriver"), ProjectDriver.class, ProjectDriver.POSTGRES, "getValue");
         authorizationToken = loadProperty("project.authorizationToken");
         authorizationToken2 = loadProperty("project.authorizationToken2");
-        deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.DELETE_NEVER);
-        projectEnvironment = lookup(loadProperty("project.environment"), Environment.TESTING);
+        deleteMode = lookup(loadProperty("deleteMode"), DeleteMode.class, DeleteMode.DELETE_NEVER);
+        projectEnvironment = lookup(loadProperty("project.environment"), Environment.class, Environment.TESTING);
         downloadFolder = loadProperty("browserDownloadFolder");
         csvFolder = loadProperty("csvFolder");
         defaultTimeout = Integer.parseInt(loadProperty("timeout"));

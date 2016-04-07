@@ -26,6 +26,7 @@ import com.gooddata.qa.graphene.entity.csvuploader.CsvFile;
 import com.gooddata.qa.graphene.enums.ResourceDirectory;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewPage;
 import com.gooddata.qa.graphene.fragments.csvuploader.DataPreviewTable;
+import com.gooddata.qa.graphene.fragments.csvuploader.DataTypeSelect.ColumnType;
 import com.gooddata.qa.graphene.fragments.csvuploader.FileUploadDialog;
 
 public class UploadErrorTest extends AbstractCsvUploaderTest {
@@ -90,13 +91,13 @@ public class UploadErrorTest extends AbstractCsvUploaderTest {
 
         waitForFragmentVisible(dataPreviewPage)
             .getDataPreviewTable()
-            .changeColumnType(factColumnName, DataPreviewTable.ColumnType.ATTRIBUTE);
+            .changeColumnType(factColumnName, ColumnType.ATTRIBUTE);
 
         assertThat(dataPreviewPage.getPreviewPageErrorMessage(),
                 containsString("Mark at least one column as measure. Only files with at least one numerical column are supported."));
 
         dataPreviewPage.getDataPreviewTable()
-            .changeColumnType(factColumnName, DataPreviewTable.ColumnType.FACT);
+            .changeColumnType(factColumnName, ColumnType.FACT);
 
         dataPreviewPage.selectHeader()
             .getRowSelectionTable()

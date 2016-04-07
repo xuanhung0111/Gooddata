@@ -48,22 +48,22 @@ public class MetricsAccessibilityTest extends DashboardWithWidgetsTest {
             .getConfigurationPanel()
             .getMetricSelect();
 
-        metricSelect.searchByName(PUBLIC_METRIC_OF_ADMIN);
+        metricSelect.searchForText(PUBLIC_METRIC_OF_ADMIN);
         takeScreenshot(browser, "admin-can-see-his-public-metric", this.getClass());
         assertFalse(metricSelect.getValues().isEmpty());
         assertFalse(metricSelect.isShowingNoMatchingDataMessage());
 
-        metricSelect.searchByName(PRIVATE_METRIC_OF_ADMIN);
+        metricSelect.searchForText(PRIVATE_METRIC_OF_ADMIN);
         takeScreenshot(browser, "admin-can-see-his-private-metric", this.getClass());
         assertFalse(metricSelect.getValues().isEmpty());
         assertFalse(metricSelect.isShowingNoMatchingDataMessage());
 
-        metricSelect.searchByName(PUBLIC_METRIC_OF_EDITOR);
+        metricSelect.searchForText(PUBLIC_METRIC_OF_EDITOR);
         takeScreenshot(browser, "admin-can-see-editor-public-metric", this.getClass());
         assertFalse(metricSelect.getValues().isEmpty());
         assertFalse(metricSelect.isShowingNoMatchingDataMessage());
 
-        metricSelect.searchByName(PRIVATE_METRIC_OF_EDITOR);
+        metricSelect.searchForText(PRIVATE_METRIC_OF_EDITOR);
         takeScreenshot(browser, "admin-can-NOT-see-editor-private-metric", this.getClass());
         assertTrue(metricSelect.getValues().isEmpty());
         assertTrue(metricSelect.isShowingNoMatchingDataMessage());

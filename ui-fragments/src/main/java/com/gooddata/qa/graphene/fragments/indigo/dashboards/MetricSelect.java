@@ -5,12 +5,14 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 
-public class MetricSelect extends ReactDropdown {
+import com.gooddata.qa.graphene.fragments.common.AbstractReactDropDown;
+
+public class MetricSelect extends AbstractReactDropDown {
 
     private static final By TOOLTIP_LOCATOR = By.className("bubble-content");
 
     @Override
-    public String getDropdownCssSelector() {
+    protected String getDropdownCssSelector() {
         return ".overlay .metrics-list";
     }
 
