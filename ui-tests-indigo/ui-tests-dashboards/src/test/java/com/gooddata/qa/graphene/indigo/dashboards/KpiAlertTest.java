@@ -2,11 +2,15 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_DROPS_BELOW;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.util.UUID;
 
 import org.json.JSONException;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -15,10 +19,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.RestUtils;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 public class KpiAlertTest extends DashboardWithWidgetsTest {
 
@@ -26,7 +26,9 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         .metric(AMOUNT)
         .dataSet(DATE_CREATED)
         .build();
+
     private static final String METRIC_IN_PERCENT = "M" + UUID.randomUUID().toString().substring(0, 6);
+
     private static final KpiConfiguration kpiConfigWithMetricInPercent = new KpiConfiguration.Builder()
         .metric(METRIC_IN_PERCENT)
         .dataSet(DATE_CREATED)
@@ -41,7 +43,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
         try {
             takeScreenshot(browser, "checkNewKpiDoesNotHaveAlertSet", getClass());
-            Assert.assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
+            assertFalse(getLastKpiAfterAlertsLoaded().hasSetAlert());
         } finally {
             teardownKpi();
         }
@@ -77,7 +79,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
             .openAlertDialog();
 
         takeScreenshot(browser, "checkKpiAlertDialogHeader", getClass());
-        Assert.assertEquals(kpiAlertDialog.getDialogHeader(), KPI_ALERT_DIALOG_HEADER);
+        assertEquals(kpiAlertDialog.getDialogHeader(), KPI_ALERT_DIALOG_HEADER);
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
@@ -106,7 +108,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
-            kpiAlertDialog = initIndigoDashboardsPageWithWidgets()
+            kpiAlertDialog = waitForFragmentVisible(indigoDashboardsPage)
                 .getLastKpi()
                 .openAlertDialog();
 
@@ -118,7 +120,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
-            kpiAlertDialog = initIndigoDashboardsPageWithWidgets()
+            kpiAlertDialog = waitForFragmentVisible(indigoDashboardsPage)
                 .getLastKpi()
                 .openAlertDialog();
 
@@ -136,7 +138,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfigWithMetricInPercent);
 
         try {
-            boolean hasPercentSymbol = initIndigoDashboardsPageWithWidgets()
+            boolean hasPercentSymbol = waitForFragmentVisible(indigoDashboardsPage)
                 .getLastKpi()
                 .openAlertDialog()
                 .hasInputSuffix();
@@ -156,7 +158,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfig);
 
         try {
-            KpiAlertDialog kpiAlertDialog = initIndigoDashboardsPageWithWidgets()
+            KpiAlertDialog kpiAlertDialog = waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(DATE_FILTER_LAST_MONTH)
                 .getLastKpi()
                 .openAlertDialog();
@@ -167,7 +169,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
             assertTrue(getLastKpiAfterAlertsLoaded().hasSetAlert());
 
-            boolean isAlertMessageDisplayed = initIndigoDashboardsPageWithWidgets()
+            boolean isAlertMessageDisplayed = waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(DATE_FILTER_ALL_TIME)
                 .getLastKpi()
                 .openAlertDialog()
@@ -185,12 +187,12 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfig);
 
         try {
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(DATE_FILTER_THIS_MONTH);
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
 
-            initIndigoDashboardsPageWithWidgets()
+            waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(DATE_FILTER_THIS_QUARTER)
                 .getLastKpi()
                 .openAlertDialog()
@@ -230,7 +232,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfig);
 
         try {
-            initIndigoDashboardsPageWithWidgets()
+            waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(dateFilter);
 
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, KPI_ALERT_THRESHOLD);
@@ -247,7 +249,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
 
             String anotherDateFilter =
                     dateFilter.equals(DATE_FILTER_LAST_MONTH) ? DATE_FILTER_THIS_MONTH : DATE_FILTER_LAST_MONTH;
-            String kpiAlertDialogTextAfter = initIndigoDashboardsPageWithWidgets()
+            String kpiAlertDialogTextAfter = waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(anotherDateFilter)
                 .getLastKpi()
                 .openAlertDialog()
@@ -284,7 +286,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
         setupKpi(kpiConfig);
 
         try {
-            KpiAlertDialog dialog = initIndigoDashboardsPageWithWidgets()
+            KpiAlertDialog dialog = waitForFragmentVisible(indigoDashboardsPage)
                 .getLastKpi()
                 .openAlertDialog();
 
@@ -300,7 +302,7 @@ public class KpiAlertTest extends DashboardWithWidgetsTest {
     }
 
     private Kpi getLastKpiAfterAlertsLoaded() {
-        return initIndigoDashboardsPageWithWidgets()
+        return waitForFragmentVisible(indigoDashboardsPage)
             .waitForAllKpiWidgetContentLoaded()
             .waitForAlertsLoaded()
             .getLastKpi();

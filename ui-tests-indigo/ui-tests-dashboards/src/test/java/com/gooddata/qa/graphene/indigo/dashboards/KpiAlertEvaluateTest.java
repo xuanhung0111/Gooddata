@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_ALL_TIME;
 import static com.gooddata.qa.graphene.utils.UrlParserUtils.replaceInUrl;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
 import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -113,7 +115,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
                     .getSplashScreen()
                     .startEditingWidgets();
 
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                     .waitForDashboardLoad()
                     .addWidget(kpi)
                     .selectDateFilterByName(DATE_FILTER_ALL_TIME)
@@ -131,7 +133,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
             // metric name is in mail subject and is unique
             checkKpiAlertTriggered(metricName, DATE_FILTER_ALL_TIME, testStartTime);
 
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                     .switchToEditMode()
                     .deleteDashboard(true);
 
@@ -211,8 +213,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     }
 
     private Kpi initDashboardsPageAndGetKpi(String metricName) {
-        return initIndigoDashboardsPage()
-                .waitForDashboardLoad()
+        return initIndigoDashboardsPageWithWidgets()
                 .waitForAllKpiWidgetContentLoaded()
                 .getKpiByHeadline(metricName);
     }
@@ -243,7 +244,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         if (testParams.isHostProxy()) {
             replaceInUrl(browser, testParams.getHostProxy(), testParams.getHost());
         }
-        Kpi checkKpi = indigoDashboardsPage
+        Kpi checkKpi = waitForFragmentVisible(indigoDashboardsPage)
                 .waitForDashboardLoad()
                 .waitForAllKpiWidgetContentLoaded()
                 .getKpiByHeadline(metricName);

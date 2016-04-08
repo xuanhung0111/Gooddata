@@ -13,9 +13,14 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.SplashScreen;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForStringMissingInUrl;
+
 import java.util.Arrays;
+
 import org.openqa.selenium.By;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -41,8 +46,7 @@ public class SplashScreenTest extends DashboardsTest {
 
     @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"desktop", "empty-state"})
     public void checkNewProjectWithoutKpisFallsToSplashCreen() {
-        initIndigoDashboardsPage()
-                .getSplashScreen();
+        initIndigoDashboardsPage().getSplashScreen();
 
         takeScreenshot(browser, "checkNewProjectWithoutKpisFallsToSplashCreen", getClass());
     }
@@ -63,7 +67,7 @@ public class SplashScreenTest extends DashboardsTest {
                 .getSplashScreen()
                 .startEditingWidgets();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .waitForDashboardLoad()
                 .addWidget(kpi)
                 .cancelEditMode()
@@ -72,7 +76,7 @@ public class SplashScreenTest extends DashboardsTest {
 
         takeScreenshot(browser, "checkEnterCreateNewKpiDashboardAndCancel", getClass());
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .getSplashScreen()
                 .startEditingWidgets();
 
@@ -86,7 +90,7 @@ public class SplashScreenTest extends DashboardsTest {
 
         // do not use setupKpi here - it refreshes the page
         // this is a test case without page refresh
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .getSplashScreen()
                 .startEditingWidgets();
         indigoDashboardsPage
@@ -97,7 +101,7 @@ public class SplashScreenTest extends DashboardsTest {
 
         // do not use teardownKpi here - it refreshes the page
         // this is a test case without page refresh
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .clickLastKpiDeleteButton()
                 .waitForDialog()
@@ -111,17 +115,17 @@ public class SplashScreenTest extends DashboardsTest {
     public void checkDeleteDashboardWithCancelAndConfirm() {
         setupKpisFromSplashScreen(Arrays.asList(kpi));
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .deleteDashboard(false);
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .waitForEditingControls()
                 .waitForSplashscreenMissing();
 
         takeScreenshot(browser, "checkDeleteDashboardWithCancelAndConfirm-cancel", getClass());
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .deleteDashboard(true);
 
         indigoDashboardsPage.getSplashScreen();
@@ -142,12 +146,12 @@ public class SplashScreenTest extends DashboardsTest {
         takeScreenshot(browser, "checkDefaultDateFilterWhenCreatingDashboard-" + dateFilterDefault, getClass());
         assertEquals(dateFilterSelection, dateFilterDefault);
 
-        DateFilter dateFilterAfterRefresh = refreshIndigoDashboardPage().waitForDateFilter();
+        DateFilter dateFilterAfterRefresh = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
 
         takeScreenshot(browser, "Default date interval when refresh Indigo dashboard page-" + dateFilterDefault, getClass());
         assertEquals(dateFilterAfterRefresh.getSelection(), dateFilterDefault);
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .deleteDashboard(true);
 
@@ -160,8 +164,7 @@ public class SplashScreenTest extends DashboardsTest {
                 .getSplashScreen()
                 .startEditingWidgets();
 
-        indigoDashboardsPage.waitForEditingControls();
-        assertFalse(indigoDashboardsPage.isDeleteButtonVisible());
+        assertFalse(indigoDashboardsPage.waitForEditingControls().isDeleteButtonVisible());
 
         takeScreenshot(browser, "checkDeleteDashboardButtonMissingOnUnsavedDashboard", getClass());
     }
@@ -213,7 +216,7 @@ public class SplashScreenTest extends DashboardsTest {
         initIndigoDashboardsPage()
                 .getSplashScreen()
                 .startEditingWidgets();
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .selectDateFilterByName(DATE_FILTER_THIS_QUARTER);
 
         takeScreenshot(browser, "checkCannotSaveNewEmptyDashboard", getClass());

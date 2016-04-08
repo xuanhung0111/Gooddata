@@ -28,7 +28,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
         takeScreenshot(browser, "Hamburger-menu-link", getClass());
 
-        indigoDashboardsPage.openHamburgerMenu();
+        waitForFragmentVisible(indigoDashboardsPage).openHamburgerMenu();
         takeScreenshot(browser, "Hamburger-menu-is-opened", getClass());
 
         indigoDashboardsPage.closeHamburgerMenu();
@@ -38,7 +38,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
     public void checkHamburgerMenuItems() {
         if (!isDeviceSupportHamburgerMenu()) return;
 
-        HamburgerMenu menu = indigoDashboardsPage.openHamburgerMenu();
+        HamburgerMenu menu = waitForFragmentVisible(indigoDashboardsPage).openHamburgerMenu();
         List<String> pages = menu.getAllMenuItems();
         assertTrue(pages.contains("Dashboards"));
         indigoDashboardsPage.closeHamburgerMenu();
@@ -62,7 +62,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
         try {
             String currentUrl = browser.getCurrentUrl();
 
-            indigoDashboardsPage.openHamburgerMenu()
+            waitForFragmentVisible(indigoDashboardsPage).openHamburgerMenu()
                 .logout();
             browser.get(currentUrl);
             waitForStringInUrl(ACCOUNT_PAGE);
@@ -83,7 +83,7 @@ public class ResponsiveNavigationTest extends DashboardWithWidgetsTest {
 
         if (!isDeviceSupportHamburgerMenu()) return;
 
-        HamburgerMenu menu = indigoDashboardsPage.openHamburgerMenu();
+        HamburgerMenu menu = waitForFragmentVisible(indigoDashboardsPage).openHamburgerMenu();
         List<String> pages = menu.getAllMenuItems();
         indigoDashboardsPage.closeHamburgerMenu();
 

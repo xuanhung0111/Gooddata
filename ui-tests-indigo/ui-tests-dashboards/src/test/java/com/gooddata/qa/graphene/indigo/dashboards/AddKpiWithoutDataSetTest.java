@@ -1,31 +1,28 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.md.Restriction.identifier;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static org.testng.Assert.assertFalse;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import org.json.JSONException;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static org.testng.Assert.assertFalse;
 
 public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
 
     private static final String METRIC_CONNECT_WITH_DATA_SET = "Connected";
     private static final String METRIC_NOT_CONNECT_WITH_DATA_SET = "NotConnected";
     private static final String DATA_SET = "templ:minimalistic";
-
-    private MetadataService mdService;
-    private Project project;
 
     @BeforeClass
     public void initProperties() {
@@ -38,21 +35,14 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
                 ProjectFeatureFlags.ENABLE_ANALYTICAL_DASHBOARDS, true);
     }
 
-    @Test(dependsOnMethods = {"createProject"}, groups = {"precondition"})
-    public void initializeGoodDataSDK() {
-        goodDataClient = getGoodDataClient();
-        mdService = goodDataClient.getMetadataService();
-        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-    }
-
     @Test(dependsOnGroups = {"precondition"}, groups = {"nodate-precondition"})
     public void setupForNoDate()
             throws JSONException, IOException, URISyntaxException {
         setupMaql("/no-date/no-date-maql.txt");
         setupData("/no-date/no-date.csv", "/no-date/upload_info.json");
 
-        String age = mdService.getObjUri(project, Fact.class, identifier("fact.fact"));
-        mdService.createObj(project, new Metric(METRIC_NOT_CONNECT_WITH_DATA_SET,
+        String age = getMdService().getObjUri(getProject(), Fact.class, identifier("fact.fact"));
+        getMdService().createObj(getProject(), new Metric(METRIC_NOT_CONNECT_WITH_DATA_SET,
                 "SELECT SUM([" + age + "])", "#,##0"));
     }
 
@@ -62,7 +52,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
             .getSplashScreen()
             .startEditingWidgets();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .waitForDashboardLoad()
             .clickAddWidget();
 
@@ -81,8 +71,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
         setupMaql("/add-date/add-date-maql.txt");
         setupData("/add-date/add-date.csv", "/add-date/upload_info.json");
 
-        String age = mdService.getObjUri(project, Fact.class, identifier("fact.fact"));
-        mdService.createObj(project, new Metric(METRIC_CONNECT_WITH_DATA_SET,
+        getMdService().createObj(getProject(), new Metric(METRIC_CONNECT_WITH_DATA_SET,
                 "SELECT 1", "#,##0"));
     }
 
@@ -94,7 +83,7 @@ public class AddKpiWithoutDataSetTest extends AbstractProjectTest {
             .switchToEditMode()
             .selectLastKpi();
 
-        indigoDashboardsPage.getConfigurationPanel()
+        waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(METRIC_CONNECT_WITH_DATA_SET)
             .selectDataSetByName(DATA_SET);
 

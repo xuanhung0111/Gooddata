@@ -1,9 +1,10 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
-import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
-import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+
 import java.util.List;
+
+import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 
 public abstract class DashboardsTest extends DashboardsGeneralTest {
 
@@ -43,18 +44,17 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
                 .getSplashScreen()
                 .startEditingWidgets();
 
-        IndigoDashboardsPage dashboard = indigoDashboardsPage.waitForDashboardLoad();
-        configs.forEach(config -> dashboard.addWidget(config));
-        dashboard.saveEditModeWithKpis();
+        waitForFragmentVisible(indigoDashboardsPage).waitForDashboardLoad();
+        configs.forEach(config -> indigoDashboardsPage.addWidget(config));
+        indigoDashboardsPage.saveEditModeWithKpis();
     }
 
     protected void teardownKpiWithDashboardDelete() {
         if (initIndigoDashboardsPageWithWidgets().isEditButtonVisible()) {
-            initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode();
+            waitForFragmentVisible(indigoDashboardsPage).switchToEditMode();
         }
 
-        initIndigoDashboardsPageWithWidgets()
+        waitForFragmentVisible(indigoDashboardsPage)
             .clickLastKpiDeleteButton()
             .waitForDialog()
             .submitClick();
@@ -62,13 +62,5 @@ public abstract class DashboardsTest extends DashboardsGeneralTest {
         indigoDashboardsPage
                 .saveEditModeWithoutKpis()
                 .getSplashScreen();
-    }
-
-    protected IndigoDashboardsPage refreshIndigoDashboardPage() {
-        browser.navigate().refresh();
-
-        return waitForFragmentVisible(indigoDashboardsPage)
-                .waitForDashboardLoad()
-                .waitForAllKpiWidgetsLoaded();
     }
 }

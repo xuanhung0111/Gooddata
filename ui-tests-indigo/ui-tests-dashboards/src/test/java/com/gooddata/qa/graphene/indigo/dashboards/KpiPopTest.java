@@ -1,12 +1,13 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -19,10 +20,10 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
         Kpi amount = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(AMOUNT);
         assertFalse(amount.hasPopSection());
 
-        Kpi lost = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(LOST);
+        Kpi lost = waitForFragmentVisible(indigoDashboardsPage).getKpiByHeadline(LOST);
         assertTrue(lost.hasPopSection());
 
-        Kpi numberOfActivities = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(NUMBER_OF_ACTIVITIES);
+        Kpi numberOfActivities = indigoDashboardsPage.getKpiByHeadline(NUMBER_OF_ACTIVITIES);
         assertTrue(numberOfActivities.hasPopSection());
 
         assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
@@ -30,7 +31,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         // When project is created by REST API (and not using SplashScreen)
         // "All time" is the initial filter --> switch to "This month"
-        initIndigoDashboardsPageWithWidgets()
+        indigoDashboardsPage
                 .waitForDateFilter()
                 .selectByName(DATE_FILTER_THIS_MONTH);
 
@@ -39,7 +40,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
         assertEquals(lost.getPopSection().getChangeTitle(), "change");
         assertEquals(lost.getPopSection().getPeriodTitle(), "prev. year");
 
-        numberOfActivities = initIndigoDashboardsPageWithWidgets().getKpiByHeadline(NUMBER_OF_ACTIVITIES);
+        numberOfActivities = indigoDashboardsPage.getKpiByHeadline(NUMBER_OF_ACTIVITIES);
         assertTrue(numberOfActivities.hasPopSection());
 
         assertEquals(numberOfActivities.getPopSection().getChangeTitle(), "change");
@@ -58,11 +59,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         assertTrue(justAddedKpi.hasPopSection());
 
-        indigoDashboardsPage
-            .saveEditModeWithKpis();
-
-        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-            .getLastKpi();
+        Kpi lastKpi = indigoDashboardsPage.saveEditModeWithKpis().getLastKpi();
 
         takeScreenshot(browser, "checkNewlyAddedKpiHasPopSection", getClass());
         assertTrue(lastKpi.hasPopSection());
@@ -90,11 +87,10 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
 
         assertFalse(kpi.hasPopSection());
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .saveEditModeWithKpis();
 
-        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
-            .getLastKpi();
+        Kpi lastKpi = indigoDashboardsPage.getLastKpi();
 
         takeScreenshot(browser, "checkKpiWithoutComparison", getClass());
         assertFalse(lastKpi.hasPopSection());
@@ -133,8 +129,7 @@ public class KpiPopTest extends DashboardWithWidgetsTest {
                 .build())
             .saveEditModeWithKpis();
 
-        Kpi kpi = initIndigoDashboardsPageWithWidgets()
-            .getLastKpi();
+        Kpi kpi = waitForFragmentVisible(indigoDashboardsPage).getLastKpi();
 
         indigoDashboardsPage.selectDateFilterByName(dateFilter);
 

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 import static com.gooddata.qa.graphene.fragments.indigo.dashboards.KpiAlertDialog.TRIGGERED_WHEN_GOES_ABOVE;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -14,6 +15,7 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -81,7 +83,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .selectLastKpi();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .getConfigurationPanel()
             .waitForAlertEditWarningMissing();
     }
@@ -93,7 +95,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         try {
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
-            initIndigoDashboardsPageWithWidgets()
+            waitForFragmentVisible(indigoDashboardsPage)
                     .switchToEditMode()
                     .selectLastKpi();
 
@@ -114,6 +116,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
+            initIndigoDashboardsPageWithWidgets();
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
         } finally {
@@ -126,7 +129,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
                     .selectLastKpi();
 
             takeScreenshot(browser, "checkMessageIsShownWhenEditingKpiWithOthersAlerts", getClass());
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
         } finally {
@@ -141,10 +144,12 @@ public class EditModeTest extends DashboardWithWidgetsTest {
         try {
             signIn(canAccessGreyPage(browser), UserRoles.VIEWER);
 
+            initIndigoDashboardsPageWithWidgets();
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
             signIn(canAccessGreyPage(browser), UserRoles.EDITOR);
 
+            initIndigoDashboardsPageWithWidgets();
             setAlertForLastKpi(TRIGGERED_WHEN_GOES_ABOVE, "200");
 
         } finally {
@@ -157,7 +162,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
                     .selectLastKpi();
 
             takeScreenshot(browser, "Check alert message with number of users is shown correctly", getClass());
-            assertThat(indigoDashboardsPage
+            assertThat(waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
                     .getKpiAlertMessage(), containsString("2 alerts"));
 
@@ -179,7 +184,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
                     .switchToEditMode()
                     .selectLastKpi();
 
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
                     .selectMetricByName(NUMBER_OF_ACTIVITIES);
 
@@ -197,7 +202,7 @@ public class EditModeTest extends DashboardWithWidgetsTest {
                     .selectLastKpi();
 
             takeScreenshot(browser, "KPI Alert are kept after updating from another user", getClass());
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                     .getConfigurationPanel()
                     .waitForAlertEditWarning();
             assertEquals(kpi.getHeadline(), NUMBER_OF_ACTIVITIES);

@@ -2,6 +2,8 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 
@@ -11,9 +13,13 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.VisualizationsList;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createVisualizationWidget;
+
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+
 import java.io.IOException;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
@@ -43,14 +49,14 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
         Actions action = new Actions(browser);
         action.doubleClick(visualizationItem).perform();
 
-        indigoDashboardsPage.leaveEditMode();
+        waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 
-        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+        int visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
 
         takeScreenshot(browser, "checkAddVisualizationToLastPositionUsingDoubleClick-added_1_visualization", getClass());
         assertEquals(visualizationsCount, 1);
 
-        initIndigoDashboardsPage()
+        indigoDashboardsPage
                 .switchToEditMode()
                 .selectLastVisualization()
                 .clickDeleteButton();
@@ -58,7 +64,7 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage
                 .leaveEditMode();
 
-        visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+        visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
 
         takeScreenshot(browser, "checkAddVisualizationToLastPositionUsingDoubleClick-removed_visualization", getClass());
         assertEquals(visualizationsCount, 0);
@@ -77,14 +83,14 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
 
         BrowserUtils.dragAndDrop(browser, fromSelector, toSelector);
 
-        indigoDashboardsPage.leaveEditMode();
+        waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 
-        int visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+        int visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
 
         takeScreenshot(browser, "checkaddVisualizationFromList-added_1_visualization", getClass());
         assertEquals(visualizationsCount, 1);
 
-        initIndigoDashboardsPage()
+        indigoDashboardsPage
                 .switchToEditMode()
                 .selectLastVisualization()
                 .clickDeleteButton();
@@ -92,7 +98,7 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
         indigoDashboardsPage
                 .leaveEditMode();
 
-        visualizationsCount = initIndigoDashboardsPageWithWidgets().getVisualizationsCount();
+        visualizationsCount = indigoDashboardsPage.getVisualizationsCount();
 
         takeScreenshot(browser, "checkaddVisualizationFromList-removed_visualization", getClass());
         assertEquals(visualizationsCount, 0);

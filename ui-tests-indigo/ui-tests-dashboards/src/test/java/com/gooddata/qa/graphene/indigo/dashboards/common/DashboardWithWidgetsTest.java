@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards.common;
 
-
 import java.io.IOException;
 import java.util.UUID;
 
@@ -9,6 +8,8 @@ import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 
 public abstract class DashboardWithWidgetsTest extends DashboardsTest {
@@ -22,11 +23,10 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
 
     protected void teardownKpi() {
         if (initIndigoDashboardsPageWithWidgets().isEditButtonVisible()) {
-            initIndigoDashboardsPageWithWidgets()
-                .switchToEditMode();
+            waitForFragmentVisible(indigoDashboardsPage).switchToEditMode();
         }
 
-        initIndigoDashboardsPageWithWidgets()
+        waitForFragmentVisible(indigoDashboardsPage)
             .clickLastKpiDeleteButton()
             .waitForDialog()
             .submitClick();
@@ -54,7 +54,9 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
     }
 
     protected void setAlertForLastKpi(String triggeredWhen, String threshold) {
-        initIndigoDashboardsPageWithWidgets()
+        waitForFragmentVisible(indigoDashboardsPage)
+            .waitForDashboardLoad()
+            .waitForAllKpiWidgetsLoaded()
             .getLastKpi()
             .openAlertDialog()
             .selectTriggeredWhen(triggeredWhen)
@@ -63,7 +65,7 @@ public abstract class DashboardWithWidgetsTest extends DashboardsTest {
     }
 
     protected void deleteAlertForLastKpi() {
-        initIndigoDashboardsPageWithWidgets()
+        waitForFragmentVisible(indigoDashboardsPage)
             .getLastKpi()
             .openAlertDialog()
             .deleteAlert();

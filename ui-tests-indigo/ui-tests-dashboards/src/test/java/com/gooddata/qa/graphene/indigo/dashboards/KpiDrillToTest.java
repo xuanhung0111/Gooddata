@@ -5,6 +5,7 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_DISMISS_BUTTON;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
@@ -29,6 +30,7 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
 import com.google.common.base.Predicate;
+
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -64,7 +66,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         try {
             String currentUrl = browser.getCurrentUrl();
 
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .selectLastKpi()
                 .clickKpiValue();
@@ -72,7 +74,9 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
             takeScreenshot(browser, "checkNewlyAddedKpiHasNoDrillTo-beforeDashboardSaved", getClass());
 
             checkNoNewBrowserTabOrWindowNorRedirected(currentUrl);
-            assertEquals(indigoDashboardsPage.getConfigurationPanel().getDrillToValue(), DrillToSelect.PLACEHOLDER);
+            assertEquals(waitForFragmentVisible(indigoDashboardsPage)
+                    .getConfigurationPanel()
+                    .getDrillToValue(), DrillToSelect.PLACEHOLDER);
 
             indigoDashboardsPage
                 .cancelEditMode();
@@ -98,7 +102,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         try {
             String currentUrl = browser.getCurrentUrl();
 
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                 .getLastKpi()
                 .clickKpiValue();
 
@@ -121,7 +125,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         try {
             String currentUrl = browser.getCurrentUrl();
 
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .selectLastKpi()
                 .clickKpiValue();
@@ -136,7 +140,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
             BrowserUtils.switchToFirstTab(browser);
 
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                 .cancelEditMode()
                 .switchToEditMode()
                 .getLastKpi()
@@ -169,7 +173,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         setupKpi(kpiWithDrillTo);
 
         try {
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .selectLastKpi();
 
@@ -197,7 +201,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
         setupKpi(kpiWithDrillTo);
 
         try {
-            indigoDashboardsPage
+            waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .selectLastKpi();
 
@@ -205,10 +209,12 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
             assertEquals(cp.getDrillToValue(), DRILL_TO_OUTLOOK);
 
             cp.selectDrillToByName(DRILL_TO_WHATS_CHANGED);
+
             indigoDashboardsPage.saveEditModeWithKpis()
                 .getLastKpi()
                 .clickKpiValue();
             waitForDashboardPageLoaded(browser);
+
             assertFalse(dashboardsPage.getTabs().isTabSelected(0));
             assertTrue(dashboardsPage.getTabs().isTabSelected(1));
         } finally {
@@ -328,7 +334,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
         String currentUrl = browser.getCurrentUrl();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .getLastKpi()
             .clickKpiValue();
 
@@ -347,7 +353,7 @@ public class KpiDrillToTest extends DashboardWithWidgetsTest {
 
         String currentUrl = browser.getCurrentUrl();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .getFirstKpi()
             .clickKpiValue();
 
