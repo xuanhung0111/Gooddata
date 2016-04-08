@@ -95,12 +95,7 @@ public abstract class AbstractTest extends Arquillian {
     public void openUrl(String url) {
         String pageURL = getRootUrl() + url.replaceAll("^/", "");
         System.out.println("Loading page ... " + pageURL);
-
-        if (pageURL.equals(browser.getCurrentUrl())) {
-            browser.navigate().refresh();
-        } else {
-            browser.get(pageURL);
-        }
+        browser.get(pageURL);
     }
 
     public String getRootUrl() {
