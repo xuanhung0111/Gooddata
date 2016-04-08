@@ -2,9 +2,12 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.MetricSelect;
+
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
@@ -36,7 +39,7 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
 
         assertEquals(3, ms.getValues().size());
 
-        indigoDashboardsPage.clickAddWidget(); // clicking away shall close MetricsDropdown
+        waitForFragmentVisible(indigoDashboardsPage).clickAddWidget(); // clicking away shall close MetricsDropdown
         ms.ensureDropdownOpen();
         takeScreenshot(browser, "checkSearchStringResetAfterDropdownClose-searchField_<empty>", this.getClass());
 
@@ -71,11 +74,9 @@ public class MetricsDropdownTest extends DashboardWithWidgetsTest {
     }
 
     private MetricSelect getMetricSelect() {
-        IndigoDashboardsPage page = initIndigoDashboardsPageWithWidgets()
+        return initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode()
-                .clickAddWidget();
-
-        return page
+                .clickAddWidget()
                 .getConfigurationPanel()
                 .getMetricSelect();
     }

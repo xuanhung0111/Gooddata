@@ -39,7 +39,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         String kpiHeadline = selectedKpi.getHeadline();
         String kpiValue = selectedKpi.getValue();
 
-        indigoDashboardsPage.cancelEditMode();
+        waitForFragmentVisible(indigoDashboardsPage).cancelEditMode();
 
         assertEquals(selectedKpi.getHeadline(), kpiHeadline);
         assertEquals(selectedKpi.getValue(), kpiValue);
@@ -60,7 +60,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .cancelEditMode()
                 .waitForDialog()
                 .submitClick();
@@ -81,7 +81,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         assertNotEquals(selectedKpi.getHeadline(), kpiHeadline);
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
                 .cancelEditMode()
                 .waitForDialog()
                 .cancelClick();
@@ -99,7 +99,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         String uniqueHeadline = generateUniqueHeadlineTitle();
         selectedKpi.setHeadline(uniqueHeadline);
 
-        indigoDashboardsPage.saveEditModeWithKpis();
+        waitForFragmentVisible(indigoDashboardsPage).saveEditModeWithKpis();
 
         assertEquals(selectedKpi.getHeadline(), uniqueHeadline);
 
@@ -114,7 +114,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         selectedKpi.setHeadline("");
 
-        indigoDashboardsPage.getConfigurationPanel()
+        waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(AMOUNT)
             .selectDataSetByName(DATE_CREATED);
 
@@ -134,7 +134,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
             .switchToEditMode()
             .selectKpi(0);
 
-        indigoDashboardsPage.getConfigurationPanel()
+        waitForFragmentVisible(indigoDashboardsPage).getConfigurationPanel()
             .selectMetricByName(AMOUNT)
             .selectDataSetByName(DATE_CREATED);
 
@@ -158,7 +158,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         int kpisCountAfterAdd = kpisCount + 1;
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
@@ -184,7 +184,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
     public void checkDeleteKpiConfirmAndDiscard() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode()
             .deleteKpi(0)
             .waitForDialog()
@@ -203,7 +203,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
     public void testCancelAddingWidget() {
         int kpisCount = initIndigoDashboardsPageWithWidgets().getKpisCount();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode()
             .addWidget(new KpiConfiguration.Builder()
                 .metric(AMOUNT)
@@ -278,7 +278,7 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
         initIndigoDashboardsPageWithWidgets();
         takeScreenshot(browser, "Dashboards after deleting metric using in Kpi", getClass());
 
-        indigoDashboardsPage.switchToEditMode().selectLastKpi();
+        waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().selectLastKpi();
         takeScreenshot(browser, "Unlisted measure in metric selection", getClass());
         assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedMetric(), "Unlisted measure");
 
@@ -303,6 +303,6 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
                 .switchToEditMode();
 
         takeScreenshot(browser, "checkNoVisualizationListInPanel", getClass());
-        indigoDashboardsPage.waitForVisualizationsListAbsent();
+        waitForFragmentVisible(indigoDashboardsPage).waitForVisualizationsListAbsent();
     }
 }

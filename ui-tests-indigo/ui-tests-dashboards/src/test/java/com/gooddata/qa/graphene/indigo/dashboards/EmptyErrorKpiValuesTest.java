@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-
 import java.io.IOException;
 
 import org.apache.http.ParseException;
@@ -14,6 +13,8 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -36,7 +37,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
             .dataSet(DATE_CREATED)
             .build());
 
-        Kpi lastKpi = initIndigoDashboardsPageWithWidgets()
+        Kpi lastKpi = waitForFragmentVisible(indigoDashboardsPage)
                 .waitForAllKpiWidgetContentLoaded()
                 .getLastKpi();
 
@@ -80,7 +81,7 @@ public class EmptyErrorKpiValuesTest extends DashboardWithWidgetsTest {
         assertEquals(lastKpi.getTooltipOfValue(),
                 "KPI cannot be displayed. Contact your administrator to fix the KPI definition.");
 
-        initIndigoDashboardsPageWithWidgets()
+        waitForFragmentVisible(indigoDashboardsPage)
             .switchToEditMode();
         assertEquals(lastKpi.getTooltipOfValue(),
                 "KPI cannot be displayed. Check if the measure definition is properly defined.");

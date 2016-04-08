@@ -15,6 +15,8 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.AttributeFiltersPanel;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.lang.String.join;
@@ -30,7 +32,8 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
 
     @Test(dependsOnMethods = {"setupAttributeFiltersFeatureFlag"}, groups = {"desktop", "mobile"})
     public void checkAttributeFilterDefaultState() {
-        final AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPageWithWidgets().waitForAttributeFilters();
+        final AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPageWithWidgets()
+                .waitForAttributeFilters();
 
         takeScreenshot(browser, "checkAttributeFilterDefaultState-All", getClass());
 
@@ -47,7 +50,8 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         String attributeFilterVideo = "1st in Video - Music World";
         String attributeFilterShoppingCart = "3dCart Shopping Cart Software";
 
-        AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPageWithWidgets().waitForAttributeFilters();
+        AttributeFiltersPanel attributeFiltersPanel = initIndigoDashboardsPageWithWidgets()
+                .waitForAttributeFilters();
 
         attributeFiltersPanel.getAttributeFilter(STAT_REGION)
             .clearAllCheckedValues()
@@ -83,7 +87,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
         );
 
         try {
-            indigoDashboardsPage.waitForDateFilter()
+            waitForFragmentVisible(indigoDashboardsPage).waitForDateFilter()
                 .selectByName(DATE_FILTER_ALL_TIME);
             AttributeFiltersPanel attributeFiltersPanel = indigoDashboardsPage.waitForAllKpiWidgetContentLoaded()
                 .waitForAttributeFilters();
@@ -96,6 +100,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
             attributeFiltersPanel.getAttributeFilter(ACCOUNT)
                 .clearAllCheckedValues()
                 .selectByNames(attribute14West, attribute123Exteriors);
+
             indigoDashboardsPage.waitForAllKpiWidgetContentLoaded();
             takeScreenshot(browser, "testFilterBySuggestedAttributes-account-westAndExteriors", getClass());
             assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
@@ -106,6 +111,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
             attributeFiltersPanel.getAttributeFilter(ACCOUNT)
                 .clearAllCheckedValues()
                 .selectByNames(attribute14West);
+
             indigoDashboardsPage.waitForAllKpiWidgetContentLoaded();
             takeScreenshot(browser, "testFilterBySuggestedAttributes-account-west", getClass());
             assertThat(indigoDashboardsPage.getKpiByHeadline(accountFilterMetricName).getValue(),
@@ -113,7 +119,6 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
             assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(),
                     equalTo(attribute14West));
 
-            initReportsPage();
             initIndigoDashboardsPageWithWidgets();
             takeScreenshot(browser, "testFilterBySuggestedAttributes-refresh", getClass());
             assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), equalTo("All"));

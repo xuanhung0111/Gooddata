@@ -1,6 +1,7 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static java.util.Objects.nonNull;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import com.gooddata.qa.graphene.enums.project.ProjectFeatureFlags;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.indigo.IndigoRestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertTrue;
 
@@ -38,7 +40,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
             .getSplashScreen()
             .startEditingWidgets();
 
-        indigoDashboardsPage
+        waitForFragmentVisible(indigoDashboardsPage)
             .waitForDashboardLoad()
             .addWidget(new KpiConfiguration.Builder()
                 .metric("Sales")
@@ -66,7 +68,7 @@ public class PartialExportDashboardsTest extends AbstractProjectTest {
             initIndigoDashboardsPageWithWidgets();
             takeScreenshot(browser, "Imported dashboard", getClass());
 
-            indigoDashboardsPage.getLastKpi()
+            waitForFragmentVisible(indigoDashboardsPage).getLastKpi()
                 .clickKpiValue();
             waitForDashboardPageLoaded(browser);
 

@@ -6,11 +6,13 @@ import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getDateDataSetCreatedUri;
 
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getDateDataSetCreatedUri;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
+import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static com.gooddata.md.Restriction.title;
 
@@ -23,6 +25,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class DragWidgetsTest extends DashboardsGeneralTest {
+
     private static final String WIDGET_SELECTOR_FORMATTER = ".dash-item-%1d";
     private static final String WIDGET_DROPZONE_FORMATTER = ".dropzone.%1s";
 
@@ -31,7 +34,7 @@ public class DragWidgetsTest extends DashboardsGeneralTest {
 
     @Test(dependsOnMethods = "createProject")
     public void initIndigoDashboardWithKpis() throws JSONException, IOException {
-        Metric metric = getGoodDataClient().getMetadataService().getObj(getProject(), Metric.class, title("Amount"));
+        Metric metric = getMdService().getObj(getProject(), Metric.class, title("Amount"));
 
         String dateDimensionUri = getDateDataSetCreatedUri(getGoodDataClient(), testParams.getProjectId());
 
@@ -66,13 +69,15 @@ public class DragWidgetsTest extends DashboardsGeneralTest {
         initIndigoDashboardsPageWithWidgets()
                 .switchToEditMode();
 
-        String sourceKpiHeadline = indigoDashboardsPage.getKpiByIndex(fromIndex).getHeadline();
-        String targetKpiHeadline = indigoDashboardsPage.getKpiByIndex(toIndex).getHeadline();
+        String sourceKpiHeadline = waitForFragmentVisible(indigoDashboardsPage)
+                .getKpiByIndex(fromIndex)
+                .getHeadline();
+        String targetKpiHeadline = indigoDashboardsPage
+                .getKpiByIndex(toIndex)
+                .getHeadline();
 
         dragWidgets(fromIndex, toIndex, dropzone);
         indigoDashboardsPage.saveEditModeWithKpis();
-
-        initIndigoDashboardsPageWithWidgets();
 
         takeScreenshot(browser, screenshotName, getClass());
 
@@ -84,10 +89,10 @@ public class DragWidgetsTest extends DashboardsGeneralTest {
     }
 
     private void dragWidgets(int fromIndex, int toIndex, String dropzoneType) {
-        String from = String.format(WIDGET_SELECTOR_FORMATTER, fromIndex);
+        String from = format(WIDGET_SELECTOR_FORMATTER, fromIndex);
 
-        String to = String.format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
-                String.format(WIDGET_DROPZONE_FORMATTER, dropzoneType);
+        String to = format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
+                format(WIDGET_DROPZONE_FORMATTER, dropzoneType);
 
         BrowserUtils.dragAndDrop(browser, from, to);
     }

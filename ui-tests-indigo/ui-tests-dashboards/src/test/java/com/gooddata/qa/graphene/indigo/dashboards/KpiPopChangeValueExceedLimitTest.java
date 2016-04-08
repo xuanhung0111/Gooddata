@@ -4,10 +4,14 @@ import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_LAST_YEAR;
 import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.DATE_FILTER_THIS_YEAR;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
 import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,6 +19,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -26,17 +31,12 @@ import org.testng.annotations.Test;
 import com.gooddata.md.Attribute;
 import com.gooddata.md.Dataset;
 import com.gooddata.md.Fact;
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static org.testng.Assert.assertEquals;
 
 public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
 
@@ -45,9 +45,6 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
     private static final String CHANGE_VALUE_EXCEED_LIMIT_OR_INFINITY = ">999%";
 
     private static final String KPI_ERROR_DATA_RESOURCE = "/kpi-error-data/";
-
-    private MetadataService mdService;
-    private Project project;
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
@@ -70,25 +67,18 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
         uploadDatasetFromCsv(updatedResourceName);
     }
 
-    @Test(dependsOnMethods = {"initDashboardTests"}, groups = {"precondition"})
-    public void initializeGoodDataSDK() {
-        goodDataClient = getGoodDataClient();
-        mdService = goodDataClient.getMetadataService();
-        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-    }
-
-    @Test(dependsOnMethods = {"uploadDatasetFromCsv", "initializeGoodDataSDK"}, groups = {"precondition"})
+    @Test(dependsOnMethods = {"uploadDatasetFromCsv"}, groups = {"precondition"})
     public void setupDashboardWithKpi() throws JSONException, IOException {
-        String numberFactUri = mdService.getObjUri(project, Fact.class, title("number"));
-        String firstNameAttributeUri = mdService.getObjUri(project, Attribute.class, title("firstname"));
+        String numberFactUri = getMdService().getObjUri(getProject(), Fact.class, title("number"));
+        String firstNameAttributeUri = getMdService().getObjUri(getProject(), Attribute.class, title("firstname"));
         String firstNameValueUri = firstNameAttributeUri + "/elements?id=2";
 
-        String dateDatasetUri = mdService.getObjUri(project, Dataset.class, identifier("user_date.dataset.dt"));
+        String dateDatasetUri = getMdService().getObjUri(getProject(), Dataset.class, identifier("user_date.dataset.dt"));
 
         String maqlExpression = format("SELECT SUM([%s]) WHERE [%s] = [%s]",
                 numberFactUri, firstNameAttributeUri, firstNameValueUri);
 
-        String numberMetricUri = mdService.createObj(project, new Metric(METRIC_NUMBER, maqlExpression, "#,##0"))
+        String numberMetricUri = getMdService().createObj(getProject(), new Metric(METRIC_NUMBER, maqlExpression, "#,##0"))
                 .getUri();
 
         String sumOfNumberKpi = createKpiWidget(getRestApiClient(), testParams.getProjectId(),
@@ -107,7 +97,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
     public void testChangeValueExceedLimitOrInfinity() {
         Kpi kpi = initIndigoDashboardsPageWithWidgets().getLastKpi();
 
-        indigoDashboardsPage.selectDateFilterByName(DATE_FILTER_THIS_YEAR);
+        waitForFragmentVisible(indigoDashboardsPage).selectDateFilterByName(DATE_FILTER_THIS_YEAR);
 
         takeScreenshot(browser, "Change value exceeds limit", getClass());
         assertEquals(kpi.getPopSection().getChangeValue(), CHANGE_VALUE_EXCEED_LIMIT_OR_INFINITY);

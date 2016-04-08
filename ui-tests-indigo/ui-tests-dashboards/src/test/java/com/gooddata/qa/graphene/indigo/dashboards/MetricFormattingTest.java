@@ -44,10 +44,12 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
     }
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, dataProvider = "formattingProvider", groups = {"desktop"})
-    public void testCustomMetricFormatting(Formatter format, String expectedValue, boolean compareFormat) throws ParseException, JSONException, IOException {
+    public void testCustomMetricFormatting(Formatter format, String expectedValue, boolean compareFormat)
+            throws ParseException, JSONException, IOException {
         String customFormatMetricName = "Custom format metric";
         String customFormatMetricMaql = "SELECT 154271";
-        Metric customFormatMetric = getMdService().createObj(getProject(), new Metric(customFormatMetricName, customFormatMetricMaql, format.toString()));
+        Metric customFormatMetric = getMdService().createObj(getProject(),
+                new Metric(customFormatMetricName, customFormatMetricMaql, format.toString()));
 
         setupKpi(new KpiConfiguration.Builder()
             .metric(customFormatMetricName)
@@ -123,7 +125,8 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
     public void checkXssInMetricFormat() throws ParseException, JSONException, IOException {
         String xssFormatMetricName = "<button>" + PERCENT_OF_GOAL + "</button>";
         String xssFormatMetricMaql = "SELECT 1";
-        Metric xssFormatMetric = getMdService().createObj(getProject(), new Metric(xssFormatMetricName, xssFormatMetricMaql, "<button>#,##0.00</button>"));
+        Metric xssFormatMetric = getMdService().createObj(getProject(),
+                new Metric(xssFormatMetricName, xssFormatMetricMaql, "<button>#,##0.00</button>"));
         final String projectId = testParams.getProjectId();
         final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
 
@@ -156,7 +159,8 @@ public class MetricFormattingTest extends DashboardWithWidgetsTest {
     public void checkKpiStateWithNoDataMetric() throws JSONException, IOException {
         String invalidMetricName = "No data metric";
         String invalidMetricMaql = "SELECT 1 where 2 = 3";
-        Metric invalidMetric = getMdService().createObj(getProject(), new Metric(invalidMetricName, invalidMetricMaql, "#,##0.00"));
+        Metric invalidMetric = getMdService().createObj(getProject(),
+                new Metric(invalidMetricName, invalidMetricMaql, "#,##0.00"));
         final String projectId = testParams.getProjectId();
         final String dashboardUri = getAnalyticalDashboards(getRestApiClient(), projectId).get(0);
 

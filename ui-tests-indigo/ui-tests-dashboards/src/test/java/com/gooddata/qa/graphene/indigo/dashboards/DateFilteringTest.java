@@ -3,6 +3,7 @@ package com.gooddata.qa.graphene.indigo.dashboards;
 import static com.gooddata.md.Restriction.identifier;
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 import org.json.JSONException;
 import org.testng.annotations.Test;
@@ -13,7 +14,9 @@ import com.gooddata.qa.graphene.entity.kpi.KpiConfiguration;
 import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.DateFilter;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardWithWidgetsTest;
+
 import org.testng.annotations.DataProvider;
+
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -59,7 +62,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "testInfoMessage-hidden", getClass());
         assertFalse(dateFilter.isInfoMessageDisplayed());
 
-        dateFilter = indigoDashboardsPage
+        dateFilter = waitForFragmentVisible(indigoDashboardsPage)
                 .switchToEditMode()
                 .waitForDateFilter();
 
@@ -76,15 +79,14 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
                 .waitForDateFilter()
                 .selectByName(DATE_FILTER_THIS_YEAR);
 
-        indigoDashboardsPage.leaveEditMode();
-
-        initIndigoDashboardsPageWithWidgets()
-                .waitForDateFilter()
-                .selectByName(DATE_FILTER_ALL_TIME);
-
-        indigoDashboardsPage.switchToEditMode();
+        waitForFragmentVisible(indigoDashboardsPage)
+            .leaveEditMode()
+            .waitForAllKpiWidgetContentLoaded()
+            .waitForDateFilter()
+            .selectByName(DATE_FILTER_ALL_TIME);
 
         String selectionAfterEditModeSwitch = indigoDashboardsPage
+                .switchToEditMode()
                 .waitForDateFilter()
                 .getSelection();
 
@@ -115,7 +117,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
         );
 
         try {
-            DateFilter dateFilter = indigoDashboardsPage.waitForDateFilter();
+            DateFilter dateFilter = waitForFragmentVisible(indigoDashboardsPage).waitForDateFilter();
             dateFilter.getValues().stream()
                     .forEach(filter -> {
                         dateFilter.selectByName(filter);
@@ -144,7 +146,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
     public void checkDefaultDateInterval(String dateFilterValue) throws JSONException {
         setDefaultDateFilter(dateFilterValue);
 
-        DateFilter dateFilter = indigoDashboardsPage.waitForDateFilter();
+        DateFilter dateFilter = waitForFragmentVisible(indigoDashboardsPage).waitForDateFilter();
         takeScreenshot(browser, "Date interval applied", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
 
@@ -154,7 +156,7 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
         takeScreenshot(browser, "Default date interval when switch to another page then go back", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
 
-        dateFilter = refreshIndigoDashboardPage().waitForDateFilter();
+        dateFilter = initIndigoDashboardsPageWithWidgets().waitForDateFilter();
 
         takeScreenshot(browser, "Default date interval when refresh Indigo dashboard page", getClass());
         assertEquals(dateFilter.getSelection(), dateFilterValue);
@@ -214,6 +216,6 @@ public class DateFilteringTest extends DashboardWithWidgetsTest {
                 .waitForDateFilter();
 
         dateFilter.selectByName(dateFilterValue);
-        indigoDashboardsPage.leaveEditMode();
+        waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
     }
 }

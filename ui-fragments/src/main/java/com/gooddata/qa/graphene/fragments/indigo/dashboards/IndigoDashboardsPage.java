@@ -109,6 +109,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     public IndigoDashboardsPage saveEditModeWithKpis() {
         waitForElementVisible(enabledSaveButton).click();
         waitForElementVisible(editButton);
+        waitForAllKpiWidgetContentLoaded();
 
         return this;
     }
