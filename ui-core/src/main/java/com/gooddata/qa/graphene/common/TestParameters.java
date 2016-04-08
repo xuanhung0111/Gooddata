@@ -1,14 +1,14 @@
 package com.gooddata.qa.graphene.common;
 
-import static com.gooddata.qa.utils.EnumUtils.lookup;
+import com.gooddata.project.Environment;
+import com.gooddata.project.ProjectDriver;
+import com.gooddata.qa.graphene.enums.project.DeleteMode;
 
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import com.gooddata.project.Environment;
-import com.gooddata.project.ProjectDriver;
-import com.gooddata.qa.graphene.enums.project.DeleteMode;
+import static com.gooddata.qa.utils.EnumUtils.lookup;
 
 public class TestParameters {
 
@@ -39,7 +39,6 @@ public class TestParameters {
     // set this to what `host` is proxied to
     // (e.g. set hostProxy=staging3.intgdc.com if host is localhost:8443 and proxied to staging3)
     private String hostProxy;
-    private String indigoAnalyzeResource;
 
     public TestParameters(Properties testVariables) {
         this.testVariables = testVariables;
@@ -69,7 +68,6 @@ public class TestParameters {
         reuseProject = Boolean.valueOf(loadProperty("project.reuse"));
         if (reuseProject) projectId = loadProperty("projectId");
         hostProxy = loadProperty("hostProxy");
-        indigoAnalyzeResource = loadProperty("indigo.analyze.resource");
     }
 
     /**
@@ -198,10 +196,6 @@ public class TestParameters {
 
     public String getHostProxy() {
         return this.hostProxy;
-    }
-
-    public String getIndigoAnalyzeResource() {
-        return this.indigoAnalyzeResource;
     }
 
     /**
