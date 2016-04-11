@@ -67,6 +67,11 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
         reportsPage.getDefaultFolders().openFolder(ALL_FOLDER);
         reportsPage.moveReportsToFolder(CURRENT_SALES_FOLDER, TAG_REPORT);
         reportsPage.getCustomFolders().openFolder(CURRENT_SALES_FOLDER);
+
+        //sometimes the tag selection is cached from previous testcase and make checking number of reports failed
+        //so we need to deselect all tags for sure
+        reportsPage.deselectAllTags();
+
         assertEquals(reportsPage.getReportsList().getNumberOfReports(), 4);
 
         assertEquals(reportsPage.moveReportsToFolderByDragDrop(ACTIVITY_REPORTS_FOLDER, TAG_REPORT)
