@@ -280,7 +280,8 @@ public class ManipulateWidgetsTest extends DashboardWithWidgetsTest {
 
         waitForFragmentVisible(indigoDashboardsPage).switchToEditMode().selectLastKpi();
         takeScreenshot(browser, "Unlisted measure in metric selection", getClass());
-        assertEquals(indigoDashboardsPage.getConfigurationPanel().getSelectedMetric(), "Unlisted measure");
+
+        indigoDashboardsPage.getConfigurationPanel().waitForSelectedMetricIsUnlisted();
 
         indigoDashboardsPage.clickLastKpiDeleteButton()
             .waitForDialog()

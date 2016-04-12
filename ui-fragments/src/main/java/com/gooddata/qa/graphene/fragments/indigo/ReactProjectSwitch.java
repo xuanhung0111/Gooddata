@@ -16,12 +16,12 @@ public class ReactProjectSwitch extends AbstractReactDropDown {
 
     @Override
     protected String getDropdownCssSelector() {
-        return ".overlay.project-picker-dropdown";
+        return ".overlay .project-picker-dropdown";
     }
 
     @Override
     protected void waitForSelectionIsApplied(String name) {
-        // When switch project with Embeded Dashboard role, user is directed to Projects.html page 
+        // When switch project with Embeded Dashboard role, user is directed to Projects.html page
         // and project picker button will disappears
         // So override the origin action because cannot wait that button here
     }

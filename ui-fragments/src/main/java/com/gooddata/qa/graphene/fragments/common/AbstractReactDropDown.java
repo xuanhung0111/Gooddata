@@ -20,7 +20,7 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
 
     @Override
     protected String getDropdownButtonCssSelector() {
-        return "button.is-loaded";
+        return "button";
     }
 
     @Override
@@ -35,7 +35,7 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
 
     @Override
     protected void waitForPickerLoaded() {
-        waitForElementNotPresent(cssSelector(getDropdownCssSelector() + "." + IS_LOADING_CLASS));
+        waitForElementNotPresent(cssSelector(getDropdownCssSelector() + " ." + IS_LOADING_CLASS));
     }
 
     @Override

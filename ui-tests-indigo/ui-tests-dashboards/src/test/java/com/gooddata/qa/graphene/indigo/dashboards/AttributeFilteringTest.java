@@ -120,6 +120,7 @@ public class AttributeFilteringTest extends DashboardWithWidgetsTest {
                     equalTo(attribute14West));
 
             initIndigoDashboardsPageWithWidgets();
+
             takeScreenshot(browser, "testFilterBySuggestedAttributes-refresh", getClass());
             assertThat(attributeFiltersPanel.getAttributeFilter(ACCOUNT).getSelectedItems(), equalTo("All"));
         } finally {
