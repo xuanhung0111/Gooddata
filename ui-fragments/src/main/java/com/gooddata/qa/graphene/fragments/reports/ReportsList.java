@@ -26,7 +26,7 @@ public class ReportsList extends AbstractFragment {
     private static final By BY_REPORT_CHECKBOX = By.tagName("input");
     private static final By BY_FAVORITE = By.className("favorite");
     private static final By BY_USER_LABEL = By.xpath("p//a");
-    public static final By ACCOUNT_CARD_LOCATOR = By.cssSelector(".bd_container div.userInfo");
+    public static final By ACCOUNT_CARD_LOCATOR = By.cssSelector(".bd div.userInfo");
     public static final By USER_PROFILE_LOCATOR = By.cssSelector("#p-profilePage");
 
     @FindBy(css = "div.report")
