@@ -177,8 +177,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     @Test(dependsOnMethods = {"createProject"})
     public void filterInheritAttributeName() {
         try {
-            initDashboardsPage();
-            dashboardsPage.addNewDashboard(TEST_DASHBOAD_FILTERS);
+            initDashboardsPage().addNewDashboard(TEST_DASHBOAD_FILTERS);
 
             DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
             dashboardsPage.editDashboard();
@@ -191,11 +190,11 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
             attributePage.initAttribute("Account");
             attributeDetailPage.renameAttribute("Account Edit");
 
-            initDashboardsPage();
-            assertEquals(getFilterWidget("account").getTitle(), "ACCOUNT EDIT");
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_FILTERS);
+            assertEquals(getFilterWidget("account_edit").getTitle(), "ACCOUNT EDIT");
 
             dashboardsPage.editDashboard();
-            getFilterWidget("account").changeTitle("Filter Account");
+            getFilterWidget("account_edit").changeTitle("Filter Account");
             dashboardEditBar.saveDashboard();
             assertEquals(getFilterWidget("filter_account").getTitle(), "FILTER ACCOUNT");
 
@@ -313,7 +312,6 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
         createReport(new UiReportDefinition().withName("Report 4").withWhats(AMOUNT, metric)
                 .withHows(YEAR_SNAPSHOT), "Report 4");
 
-        initDashboardsPage();
         try {
             addReportToDashboard("Report 4");
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
@@ -361,8 +359,7 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
     }
 
     private void addReportToDashboard(String name, DashboardWidgetDirection direction) {
-        initDashboardsPage();
-        dashboardsPage.addNewDashboard(TEST_DASHBOAD_FILTERS);
+        initDashboardsPage().addNewDashboard(TEST_DASHBOAD_FILTERS);
         addReportToCurrentDashboard(name, direction);
     }
 
@@ -379,17 +376,17 @@ public class GoodSalesDashboardAllKindsFiltersTest extends GoodSalesAbstractTest
 
     private void addAttributeFilterToDashboard(String attribute, DashFilterTypes type,
             DashboardWidgetDirection direction) {
-        initDashboardsPage();
+        initDashboardsPage().selectDashboard(TEST_DASHBOAD_FILTERS);;
         DashboardEditBar dashboardEditBar = dashboardsPage.getDashboardEditBar();
         dashboardsPage.editDashboard();
         dashboardEditBar.addListFilterToDashboard(type, attribute);
-        dashboardEditBar.saveDashboard();
-        checkRedBar(browser);
 
-        if (direction == DashboardWidgetDirection.NONE)
+        if (direction == DashboardWidgetDirection.NONE) {
+            dashboardEditBar.saveDashboard();
+            checkRedBar(browser);
             return;
+        }
 
-        dashboardsPage.editDashboard();
         WebElement filter = getFilterWidget(CssUtils.simplifyText(attribute)).getRoot();
         // get focus
         filter.click();
