@@ -71,6 +71,7 @@ public enum DeployPackages {
         DWHS2(DeployPackages.CLOUDCONNECT, "DWHS2.grf", "graph"),
         RUBY1(DeployPackages.RUBY, "ruby1.rb", "script"),
         RUBY2(DeployPackages.RUBY, "ruby2.rb", "script"),
+        RUBY3(DeployPackages.RUBY, "ruby3.rb", "script"),
         EXECUTABLES_GRAPH1(DeployPackages.EXECUTABLES_GRAPH, "01 - REST_GET_1.grf", "graph"),
         EXECUTABLES_GRAPH2(DeployPackages.EXECUTABLES_GRAPH, "02 - REST_POST.grf", "graph"),
         EXECUTABLES_GRAPH3(DeployPackages.EXECUTABLES_GRAPH, "03 - REST_PUT.grf", "graph"),
