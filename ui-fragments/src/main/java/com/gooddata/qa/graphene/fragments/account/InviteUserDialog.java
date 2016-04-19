@@ -2,8 +2,7 @@ package com.gooddata.qa.graphene.fragments.account;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentNotVisible;
-import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessageWithExpectedCount;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -46,12 +45,11 @@ public class InviteUserDialog extends AbstractFragment {
 
     public String inviteUsers(ImapClient imapClient, String emailSubject, UserRoles role,
             String message, String...emails) throws MessagingException, IOException {
-        int expectedMessageCount = getMessageWithExpectedReceivedTime(imapClient,
-                GDEmails.INVITATION, emailSubject, 0).size();
+        int messageCount = imapClient.getMessagesCount(GDEmails.INVITATION, emailSubject);
 
         inviteUsers(role, message, emails);
 
-        return getInvitationLink(imapClient, emailSubject, expectedMessageCount);
+        return getInvitationLink(imapClient, emailSubject, messageCount + 1);
     }
 
     public void cancelInvite() {
@@ -98,7 +96,7 @@ public class InviteUserDialog extends AbstractFragment {
 
     private String getInvitationLink(ImapClient imapClient, String emailSubject, int expectedMessageCount)
             throws MessagingException, IOException {
-        Collection<Message> messages = waitForMessageWithExpectedCount(imapClient, GDEmails.INVITATION,
+        Collection<Message> messages = waitForMessages(imapClient, GDEmails.INVITATION,
                 emailSubject, expectedMessageCount);
         Message invitationMessage = Iterables.getLast(messages);
         String messageBody = ImapClient.getEmailBody(invitationMessage);

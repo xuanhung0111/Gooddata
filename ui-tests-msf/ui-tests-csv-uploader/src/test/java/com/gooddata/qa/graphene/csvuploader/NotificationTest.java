@@ -3,9 +3,9 @@ package com.gooddata.qa.graphene.csvuploader;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.mail.Message;
 
@@ -19,7 +19,6 @@ import com.gooddata.qa.graphene.fragments.csvuploader.Dataset;
 import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class NotificationTest extends AbstractCsvUploaderTest {
@@ -124,11 +123,11 @@ public class NotificationTest extends AbstractCsvUploaderTest {
 
     private Document getNotification(String subject, int expectedMessageCount) {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
-            Collection<Message> notifications = ImapUtils.waitForMessage(imapClient, GDEmails.NO_REPLY, subject);
-            assertTrue(notifications.size() == expectedMessageCount, "Number of notifcation is wrong!");
-            Message notification = Iterables.getLast(notifications);
+            List<Message> notifications = 
+                    waitForMessages(imapClient, GDEmails.NO_REPLY, subject, expectedMessageCount);
 
-            return Jsoup.parse(ImapClient.getEmailBody(notification));
+            return Jsoup.parse(ImapClient.getEmailBody(Iterables.getLast(notifications)));
+
         } catch (Exception e) {
             throw new IllegalStateException("There is an exception when checking notification content!", e);
         }

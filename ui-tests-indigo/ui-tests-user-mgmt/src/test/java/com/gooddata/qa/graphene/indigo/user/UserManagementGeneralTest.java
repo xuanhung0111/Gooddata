@@ -7,6 +7,7 @@ import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -40,7 +41,6 @@ import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -646,8 +646,7 @@ public class UserManagementGeneralTest extends GoodSalesAbstractTest {
 
     private String getEmailContent(final ImapClient imapClient, final String mailTitle) throws IOException,
             MessagingException {
-        Collection<Message> messages = ImapUtils.waitForMessage(imapClient, GDEmails.INVITATION, mailTitle);
-        System.out.println("The message arrived");
+        Collection<Message> messages = waitForMessages(imapClient, GDEmails.INVITATION, mailTitle, 1);
         return Iterables.getLast(messages).getContent().toString().trim();
     }
 

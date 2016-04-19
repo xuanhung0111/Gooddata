@@ -10,6 +10,8 @@ import java.util.Calendar;
 
 import org.apache.http.ParseException;
 import org.springframework.http.HttpStatus;
+import javax.mail.MessagingException;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -146,7 +148,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void createAndAssertNotification() {
+    public void createAndAssertNotification() throws MessagingException {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         String processName = "Check Notification";
         try {
