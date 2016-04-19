@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <test name="metric-number-format-tests">
+        <groups>
+            <run>
+                <include name="metricFormat" />
+                <include name="precondition" />
+                <include name="init" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+            <dependencies>
+                <group name="metricFormat" depends-on="precondition" />
+                <group name="precondition" depends-on="init" />
+                <group name="init" depends-on="projectInit" />
+            </dependencies>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.indigo.analyze.GoodSalesMetricNumberFormatTest" />
+        </classes>
+    </test>
+
+</suite>

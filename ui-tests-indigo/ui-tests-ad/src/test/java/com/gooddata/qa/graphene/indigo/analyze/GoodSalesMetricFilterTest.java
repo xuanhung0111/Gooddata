@@ -17,11 +17,11 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesMetricFilterTest extends AnalyticalDesignerAbstractTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTitle = "Indigo-GoodSales-Demo-Filter-Metrics-Test";
+        projectTitle += "Metric-Filter-Test";
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -77,7 +77,6 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
 
     @Test(dependsOnGroups = {"init"})
     public void addAttributeFilterForMultipleMetrics() {
-        initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -102,7 +101,6 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
 
     @Test(dependsOnGroups = {"init"})
     public void searchOnlyAttributeElement() {
-        initAnalysePage();
         MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -119,7 +117,6 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
     public void checkReportWhenFilterContainManyCharacters() {
         String unselectedValue = "14 West";
 
-        initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -133,7 +130,6 @@ public class GoodSalesFilterMetricsTest extends AnalyticalDesignerAbstractTest {
     }
 
     private void addFilterToMetric() {
-        initAnalysePage();
         MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
