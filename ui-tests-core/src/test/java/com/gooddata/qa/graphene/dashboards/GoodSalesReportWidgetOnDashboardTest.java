@@ -156,7 +156,7 @@ public class GoodSalesReportWidgetOnDashboardTest extends GoodSalesAbstractTest 
             TableReport report = dashboardsPage.getContent().getLatestReport(TableReport.class);
             assertEquals(report.getRawMetricElements(), asList("101,054", "53,217"));
 
-            report.sortColumn("# of Activities", Sort.ASC);
+            report.sortByHeader("# of Activities", Sort.ASC);
             takeScreenshot(browser, "sortTableReport - after sorting", getClass());
             assertEquals(report.getRawMetricElements(), asList("53,217", "101,054"));
 

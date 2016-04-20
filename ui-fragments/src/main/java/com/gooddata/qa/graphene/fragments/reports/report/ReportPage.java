@@ -74,6 +74,9 @@ public class ReportPage extends AbstractFragment {
     @FindBy(xpath = "//div[contains(@class, 'reportEditorFilterArea')]/button[not (@disabled)]")
     private WebElement filterButton;
 
+    @FindBy(className = "s-btn-hide_filters")
+    private WebElement hideFilterButton;
+
     @FindBy(xpath = "//div[@id='reportSaveButtonContainer']/button")
     private WebElement createReportButton;
 
@@ -91,6 +94,8 @@ public class ReportPage extends AbstractFragment {
     private static final By METRICS_LOCATOR = cssSelector(".sndMetric .metricName");
 
     private static final By ATTRIBUTES_CONTAINER_LOCATOR = cssSelector(".s-snd-AttributesContainer .gridTile");
+
+    private static final By METRICS_CONTAINER_LOCATOR = cssSelector(".s-snd-MetricsContainer .gridTile");
 
     private static final By SHOW_CONFIGURATION_LOCATOR =
             cssSelector(".s-btn-__show_configuration:not(.gdc-hidden)");
@@ -123,6 +128,9 @@ public class ReportPage extends AbstractFragment {
 
     private static final By NO_MATCHING_ATTRIBUTE = 
             By.cssSelector(".sndPanel .s-snd-AttributesContainer + .noMatch");
+
+    private static final By METRIC_AXIS_CONFIGURATION_CONTENT_LOCATOR = By
+            .cssSelector("div.yui3-c-metricaxisconfiguration-content:not(.gdc-hidden)");
 
     public ReportPage initPage() {
         waitForAnalysisPageLoaded(browser);
@@ -166,6 +174,13 @@ public class ReportPage extends AbstractFragment {
         return Graphene.createPageFragment(ReportFilter.class,
                 waitForElementVisible(REPORT_FILTER_LOCATOR, browser));
     }
+
+    public ReportPage hideFilterPanel() {
+        waitForElementVisible(hideFilterButton).click();
+        waitForElementNotVisible(hideFilterButton);
+        return this;
+    }
+
     
     public void tryOpenFilterPanel() {
         selectFilterButton();
@@ -734,26 +749,27 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
-        WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
-                browser);
-        List<WebElement> metrics = browser.findElements(METRICS_LOCATOR);
+    public ReportPage openMetricAxisConfiguration() {
+        waitForElementVisible(cssSelector(".bucketsContainer .metric .dropdown"), browser).click();
+        return this;
+    }
 
-        filterInput.clear();
-        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
-        sleepTightInSeconds(1);
-        waitForElementVisible(NO_MATCHING_METRIC, browser);
+    public List<String> getMetricAxisConfigurationNames() {
+        openMetricAxisConfiguration();
+        return getElementTexts(getMetricAxisConfigurationRows(), e -> e.findElement(tagName("label")));
+    }
 
-        filterInput.clear();
-        filterInput.sendKeys(metric);
-        sleepTightInSeconds(1);
-        waitForElementNotVisible(NO_MATCHING_METRIC);
+    public String getReportStatistic() {
+        return waitForElementVisible(className("statistics"), browser).getText();
+    }
 
-        howToSelect.accept(metrics.stream()
-            .filter(e -> metric.equals(e.getText()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Cannot find metric: " + metric)));
+    public List<String> getCustomFormatItemTitles() {
+        return getElementTexts(getCustomFormatElements(), e -> e.findElement(className("metricTitle")));
+    }
 
+    public ReportPage deselectMetric(final String metric) {
+        searchMetric(metric);
+        findMetric(metric).findElement(tagName("input")).click();
         return this;
     }
 
@@ -779,7 +795,7 @@ public class ReportPage extends AbstractFragment {
         return this;
     }
 
-    private ReportPage selectAttributes(Collection<HowItem> attributes) {
+    public ReportPage selectAttributes(Collection<HowItem> attributes) {
         if (attributes.isEmpty()) {
             return this;
         }
@@ -872,5 +888,44 @@ public class ReportPage extends AbstractFragment {
         Optional.of(waitForElementVisible(filterButton))
                 .filter(e -> !e.getAttribute("class").contains("editorBtnEditorSadHighlight"))
                 .ifPresent(WebElement::click);
+    }
+
+    private List<WebElement> getMetricAxisConfigurationRows() {
+        return waitForElementVisible(METRIC_AXIS_CONFIGURATION_CONTENT_LOCATOR, browser).findElements(
+                cssSelector(".c-collectionWidget .content.yui3-c-metricaxisconfigurationrow"));
+    }
+
+    private List<WebElement> getCustomFormatElements() {
+        return waitForElementVisible(className("customMetricFormatContainer"), browser)
+                .findElements(By.className("customMetricFormatItem"));
+    }
+
+    private ReportPage searchMetric(final String metric) {
+        final WebElement filterInput = waitForElementVisible(xpath("//label[@class='sndMetricFilterLabel']/../input"),
+                browser);
+
+        filterInput.clear();
+        filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
+        sleepTightInSeconds(1);
+        waitForElementVisible(NO_MATCHING_METRIC, browser);
+
+        filterInput.clear();
+        filterInput.sendKeys(metric);
+        sleepTightInSeconds(1);
+        waitForElementNotVisible(NO_MATCHING_METRIC);
+        return this;
+    }
+
+    private ReportPage selectMetric(String metric, Consumer<WebElement> howToSelect) {
+        searchMetric(metric);
+        howToSelect.accept(findMetric(metric));
+
+        return this;
+    }
+
+    private WebElement findMetric(final String metric) {
+        final WebElement metricContainer = waitForElementVisible(METRICS_CONTAINER_LOCATOR, browser);
+        return waitForElementVisible(cssSelector(".s-grid-" + simplifyText(metric) + " .metricName"),
+                metricContainer);
     }
 }

@@ -1,5 +1,6 @@
 package com.gooddata.qa.graphene.fragments.reports.filter;
 
+import static com.gooddata.qa.graphene.utils.ElementUtils.getElementTexts;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 
 import java.util.List;
@@ -50,6 +51,10 @@ public class ContextMenu extends AbstractFragment {
 
     public void nonAggregateTableData(final AggregationType type, final String subItem) {
         aggregateTableData(type, subItem, false);
+    }
+
+    public List<String> getItemNames() {
+        return getElementTexts(items);
     }
 
     private WebElement getItemElement(final String item) {
