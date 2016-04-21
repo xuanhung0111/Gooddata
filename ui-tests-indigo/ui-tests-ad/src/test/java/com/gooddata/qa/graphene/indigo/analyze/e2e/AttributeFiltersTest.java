@@ -27,7 +27,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_reset_search_results_after_closing() {
         beforeEach();
 
-        WebElement filter = analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE);
+        WebElement filter = analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE);
         filter.click();
 
         AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
@@ -47,10 +47,10 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_be_possible_to_add_and_remove_attribute_from_filters_bucket() {
         beforeEach();
 
-        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE);
+        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE);
 
         // try to drag a duplicate attribute filter
-        assertTrue(analysisPage.addFilter(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.addFilter(ACTIVITY_TYPE)
             .removeFilter(ACTIVITY_TYPE)
             .getFilterBuckets()
             .isEmpty());
@@ -60,13 +60,13 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_not_allow_moving_other_buckets_items_to_filters_bucket() {
         beforeEach();
 
-        assertTrue(analysisPage.addAttribute(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .removeFilter(ACTIVITY_TYPE)
             .getFilterBuckets()
             .isEmpty());
 
-        assertTrue(analysisPage.drag(analysisPage.getAttributesBucket().getFirst(),
-                analysisPage.getFilterBuckets().getInvitation())
+        assertTrue(analysisPageReact.drag(analysisPageReact.getAttributesBucket().getFirst(),
+                analysisPageReact.getFilterBuckets().getInvitation())
             .getFilterBuckets()
             .isEmpty());
     }
@@ -75,14 +75,14 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_set_in_filter_where_clause() {
         beforeEach();
 
-        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
         AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
                 waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
         String id = panel.getId("Email");
         panel.discard();
 
-        analysisPage.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email");
+        analysisPageReact.waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .adi-component .s-property-where.s-where-___in_____id__" + id + "___"), browser));
     }
@@ -91,14 +91,14 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     public void should_set_not_in_filter_where_clause() {
         beforeEach();
 
-        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
         AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
                 waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
         String id = panel.getId("Email");
         panel.selectItem("Email");
         panel.getApplyButton().click();
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
 
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .adi-component .s-property-where.s-where-___not_____in_____id__" + id + "____"),
@@ -136,7 +136,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email");
 
-        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
         panel.getClearButton().click();
         panel.searchForText("Email");
         assertTrue(panel.getApplyButton()
@@ -155,7 +155,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
                 .contains("disabled"));
 
         panel.getApplyButton().click();
-        assertEquals(analysisPage.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email");
+        assertEquals(analysisPageReact.getFilterBuckets().getFilterText(ACTIVITY_TYPE), ACTIVITY_TYPE + ": Email");
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
@@ -163,7 +163,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         AttributeFilterPickerPanel panel = beforeEachDisablingApplyButton();
         panel.select("Email", "In Person Meeting");
 
-        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
         panel.getClearButton().click();
         panel.searchForText("Email");
         panel.searchForText("In Person Meeting");
@@ -173,7 +173,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     }
 
     private void beforeEach() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addFilter(ACTIVITY_TYPE)
             .waitForReportComputing();
     }
@@ -181,7 +181,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
     private AttributeFilterPickerPanel beforeEachDisablingApplyButton() {
         beforeEach();
 
-        analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
+        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
         return Graphene.createPageFragment(AttributeFilterPickerPanel.class,
                 waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
     }

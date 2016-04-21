@@ -28,7 +28,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_filter_metric_by_attribute() {
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -38,7 +38,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_filter_metric_by_unavailable_attribute() {
-        List<String> attributes = analysisPage.addMetric(NUMBER_OF_LOST_OPPS)
+        List<String> attributes = analysisPageReact.addMetric(NUMBER_OF_LOST_OPPS)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_LOST_OPPS)
             .expandConfiguration()
@@ -51,7 +51,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_remove_filter() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -62,7 +62,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_show_tooltip() {
-        String description = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        String description = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -78,21 +78,21 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_restore_filter_creation() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .clickAddAttributeFilter()
             .selectAttribute(ACTIVITY_TYPE);
 
-        analysisPage.undo()
+        analysisPageReact.undo()
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
         assertFalse(isElementPresent(cssSelector(".s-filter-button"), browser));
 
-        assertEquals(analysisPage.redo()
+        assertEquals(analysisPageReact.redo()
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
@@ -101,13 +101,13 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_restore_attribute_elements_settings() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .addFilter(ACTIVITY_TYPE, "Email");
 
-        analysisPage.undo()
+        analysisPageReact.undo()
             .redo()
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -126,7 +126,7 @@ public class MetricFiltersTest extends AbstractAdE2ETest {
     public void should_show_total_count_in_attribute_filter_label_correctly() {
         String labelCount = ".s-attribute-filter-label .s-total-count";
 
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()

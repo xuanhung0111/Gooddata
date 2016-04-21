@@ -1,28 +1,25 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
 import com.gooddata.md.Metric;
-import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.kpi.KpiMDConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsGeneralTest;
-
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.getDateDataSetCreatedUri;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createAnalyticalDashboard;
-import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
-import static java.lang.String.format;
-import static org.testng.Assert.assertEquals;
-import static com.gooddata.md.Restriction.title;
+import com.gooddata.qa.browser.DragAndDropUtils;
+import org.json.JSONException;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.*;
+import static java.lang.String.format;
+import static org.testng.Assert.assertEquals;
 
 public class DragWidgetsTest extends DashboardsGeneralTest {
 
@@ -94,7 +91,7 @@ public class DragWidgetsTest extends DashboardsGeneralTest {
         String to = format(WIDGET_SELECTOR_FORMATTER, toIndex) + ' ' +
                 format(WIDGET_DROPZONE_FORMATTER, dropzoneType);
 
-        BrowserUtils.dragAndDrop(browser, from, to);
+        DragAndDropUtils.dragAndDrop(browser, from, to);
     }
 
     private int getSourceKpiIndexAfterDragDropTo(int index, String dropzone) {

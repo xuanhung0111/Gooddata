@@ -19,7 +19,7 @@
         </classes>
     </test>
 
-    <test name="available-items" enabled="true">
+    <test name="available-items" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.AvailableItemsTest" />
         </classes>

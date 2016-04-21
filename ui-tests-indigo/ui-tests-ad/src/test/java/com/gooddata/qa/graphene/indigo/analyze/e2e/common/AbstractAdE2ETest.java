@@ -1,14 +1,13 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e.common;
 
+import com.gooddata.md.Attribute;
+import com.gooddata.qa.graphene.common.StartPageContext;
+import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerAbstractTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-
-import com.gooddata.qa.graphene.common.StartPageContext;
-import org.testng.annotations.BeforeClass;
-
-import com.gooddata.md.Attribute;
-import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerAbstractTest;
-import org.testng.annotations.Test;
 
 public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
 
@@ -23,12 +22,12 @@ public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
 
             @Override
             public void waitForStartPageLoaded() {
-                waitForFragmentVisible(analysisPage);
+                waitForFragmentVisible(analysisPageReact);
             }
 
             @Override
             public String getStartPage() {
-                return PAGE_UI_ANALYSE_PREFIX.replace("${analyze.resource}", testParams.getIndigoAnalyzeResource()) +
+                return PAGE_UI_ANALYSE_PREFIX.replace("analyze", "analyze-new") +
                         testParams.getProjectId() + "/reportId/edit";
             }
         };

@@ -1,15 +1,12 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static java.util.Arrays.asList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import static java.util.Arrays.asList;
+import static org.testng.Assert.*;
 
 public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
@@ -20,15 +17,15 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_attribute_to_the_metrics_bucket() {
-        analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        analysisPageReact.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing();
 
-        assertFalse(analysisPage.getMetricsBucket().isEmpty());
+        assertFalse(analysisPageReact.getMetricsBucket().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_remove_created_metric() {
-        assertTrue(analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertTrue(analysisPageReact.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .removeMetric("Count of " + ACTIVITY_TYPE)
             .getMetricsBucket()
             .isEmpty());
@@ -36,7 +33,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drop_same_attribute_multiple_time_to_metrics() {
-        assertEquals(analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(analysisPageReact.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .getMetricsBucket()
@@ -46,7 +43,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_and_visualize_attribute_based_metrics_with_correct_titles() {
-        assertEquals(analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(analysisPageReact.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .waitForReportComputing()
             .getChartReport()
@@ -55,7 +52,7 @@ public class AttributeBasedMetricsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_combine_attribute_and_fact_based_metrics() {
-        assertEquals(analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        assertEquals(analysisPageReact.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
                 .addMetric(AMOUNT, FieldType.FACT)
                 .waitForReportComputing()
                 .getChartReport()

@@ -1,18 +1,16 @@
 package com.gooddata.qa.browser;
 
-import com.gooddata.qa.utils.io.ResourceUtils;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.arquillian.drone.browserstack.webdriver.BrowserStackDriver;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class BrowserUtils {
     public static List<String> getWindowHandles(WebDriver browser) {
@@ -65,25 +63,5 @@ public class BrowserUtils {
         int width = (int) toolkit.getScreenSize().getWidth();
         int height = (int) toolkit.getScreenSize().getHeight();
         browser.manage().window().setSize(new Dimension(width, height));
-    }
-
-    public static Object runScript(WebDriver driver, String script, Object... args) {
-        if (driver instanceof JavascriptExecutor) {
-            return ((JavascriptExecutor) driver).executeScript(script, args);
-        } else {
-            throw new IllegalStateException("This driver does not support JavaScript!");
-        }
-    }
-
-    public static void dragAndDrop(WebDriver driver, String fromSelector, String toSelector) {
-        // just to be sure, load dragdrop simulation suppport every time dragdrop is needed
-        String scriptDragDropSetup = "/scripts/setupDragDropSimulation.js";
-        String scriptContent = ResourceUtils.getResourceAsString(scriptDragDropSetup);
-
-        BrowserUtils.runScript(driver, scriptContent);
-
-        String dragScript = String.format("jQuery('%1s').simulateDragDrop({ dropTarget: '%2s'});",
-                fromSelector, toSelector);
-        BrowserUtils.runScript(driver, dragScript);
     }
 }

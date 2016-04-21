@@ -25,7 +25,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_metric_details() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
@@ -36,7 +36,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_fact_details() {
-        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .getMetricsBucket()
             .getMetricConfiguration("Sum of " + AMOUNT)
             .expandConfiguration();
@@ -46,7 +46,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_attribute_details() {
-        analysisPage.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
+        analysisPageReact.addMetric(ACTIVITY_TYPE, FieldType.ATTRIBUTE)
             .getMetricsBucket()
             .getMetricConfiguration("Count of " + ACTIVITY_TYPE)
             .expandConfiguration();
@@ -56,10 +56,10 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_open_and_close_configuration() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES);
         assertFalse(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
 
-        MetricConfiguration configuration = analysisPage.getMetricsBucket()
+        MetricConfiguration configuration = analysisPageReact.getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
         assertTrue(isElementPresent(cssSelector(".s-bucket-metrics input[type=checkbox]"), browser));
@@ -70,28 +70,28 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_able_to_drop_second_metric_into_bucket() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .waitForReportComputing();
 
         assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-y"), browser));
         assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-color"), browser));
 
-        assertEquals(analysisPage.getChartReport().getLegends(), asList(NUMBER_OF_ACTIVITIES, NUMBER_OF_LOST_OPPS));
+        assertEquals(analysisPageReact.getChartReport().getLegends(), asList(NUMBER_OF_ACTIVITIES, NUMBER_OF_LOST_OPPS));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_show_in_percent_correctly() {
-        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
         assertFalse(configuration.isShowPercentEnabled());
 
-        analysisPage.addAttribute(ACTIVITY_TYPE);
+        analysisPageReact.addAttribute(ACTIVITY_TYPE);
         assertTrue(configuration.isShowPercentEnabled());
 
-        assertFalse(analysisPage.addMetric(QUOTA)
+        assertFalse(analysisPageReact.addMetric(QUOTA)
             .getMetricsBucket()
             .getMetricConfiguration(QUOTA)
             .expandConfiguration()
@@ -100,16 +100,16 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_show_PoP_correctly() {
-        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
         assertFalse(configuration.isPopEnabled());
 
-        analysisPage.addDate();
+        analysisPageReact.addDate();
         assertTrue(configuration.isPopEnabled());
 
-        assertFalse(analysisPage.addMetric(QUOTA)
+        assertFalse(analysisPageReact.addMetric(QUOTA)
             .getMetricsBucket()
             .getMetricConfiguration(QUOTA)
             .expandConfiguration()
@@ -118,17 +118,17 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_PoP_after_second_metric_is_added() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .showPop();
-        assertEquals(analysisPage.waitForReportComputing()
+        assertEquals(analysisPageReact.waitForReportComputing()
             .getChartReport()
             .getLegends(), asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
 
-        assertEquals(analysisPage.addMetric(QUOTA)
+        assertEquals(analysisPageReact.addMetric(QUOTA)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), asList(NUMBER_OF_ACTIVITIES, QUOTA));
@@ -136,14 +136,14 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_percent_if_2_metric_is_added() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .showPercents();
 
-        assertEquals(analysisPage.addMetric(QUOTA)
+        assertEquals(analysisPageReact.addMetric(QUOTA)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), asList(NUMBER_OF_ACTIVITIES, QUOTA));
@@ -151,13 +151,13 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_remove_second_metric_if_user_wants() {
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getChartReport()
             .getLegends(), asList(NUMBER_OF_ACTIVITIES, NUMBER_OF_LOST_OPPS));
 
-        assertFalse(analysisPage.removeMetric(NUMBER_OF_ACTIVITIES)
+        assertFalse(analysisPageReact.removeMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getChartReport()
             .isLegendVisible());
@@ -165,7 +165,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_allow_to_add_second_instance_of_metric_already_bucket() {
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getItemNames()
@@ -174,7 +174,7 @@ public class MetricBucketTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_legend_for_only_one_metric() {
-        assertFalse(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertFalse(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
             .getChartReport()
             .isLegendVisible());

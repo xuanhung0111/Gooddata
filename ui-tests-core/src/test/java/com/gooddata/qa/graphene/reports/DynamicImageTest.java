@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 
 import com.gooddata.md.Fact;
 import com.gooddata.md.Metric;
-import com.gooddata.qa.browser.BrowserUtils;
+import com.gooddata.qa.utils.browser.BrowserUtils;
 import com.gooddata.qa.graphene.AbstractProjectTest;
 import com.gooddata.qa.graphene.entity.report.HowItem;
 import com.gooddata.qa.graphene.entity.report.HowItem.Position;

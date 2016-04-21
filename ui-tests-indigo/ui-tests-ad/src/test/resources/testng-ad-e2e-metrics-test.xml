@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GD_UI_Selenium_Tests">
 
-    <test name="metric-bucket" enabled="true">
+    <test name="metric-bucket" enabled="false">
         <classes>
             <class name="com.gooddata.qa.graphene.indigo.analyze.e2e.MetricBucketTest" />
         </classes>

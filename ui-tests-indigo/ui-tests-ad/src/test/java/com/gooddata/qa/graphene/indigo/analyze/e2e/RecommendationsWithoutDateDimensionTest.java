@@ -1,20 +1,18 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import com.gooddata.qa.graphene.enums.indigo.FieldType;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import org.json.JSONException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.json.JSONException;
-import org.openqa.selenium.Point;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.gooddata.qa.graphene.enums.indigo.FieldType;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static org.openqa.selenium.By.cssSelector;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
@@ -46,8 +44,8 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void trending_recommendation_should_not_be_visible() {
-        assertFalse(analysisPage.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
-        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        assertFalse(analysisPageReact.getCataloguePanel().getFieldNamesInViewPort().contains(DATE));
+        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-comparison"), browser));
         assertFalse(isElementPresent(cssSelector(".s-recommendation-trending"), browser));
@@ -55,22 +53,10 @@ public class RecommendationsWithoutDateDimensionTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void metric_with_period_recommendation_should_not_be_visible() {
-        analysisPage.addMetric(AMOUNT, FieldType.FACT)
+        analysisPageReact.addMetric(AMOUNT, FieldType.FACT)
             .addAttribute("id")
             .waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".s-recommendation-contribution"), browser));
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void trending_shortcut_should_not_appear() {
-        analysisPage.startDrag(analysisPage.getCataloguePanel().searchAndGet(AMOUNT, FieldType.FACT));
-
-        try {
-            assertTrue(isElementPresent(cssSelector(".s-recommendation-metric-canvas"), browser));
-            assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-over-time-canvas"), browser));
-        } finally {
-            analysisPage.stopDrag(new Point(-1, -1));
-        }
     }
 }

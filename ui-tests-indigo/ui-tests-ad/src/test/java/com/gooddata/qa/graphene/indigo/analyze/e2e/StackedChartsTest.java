@@ -24,7 +24,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_put_stack_by_attribute_into_color_series() {
-        assertEquals(analysisPage.addStack(ACTIVITY_TYPE)
+        assertEquals(analysisPageReact.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing()
@@ -34,7 +34,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_totals_for_stacked_columns() {
-        analysisPage.addStack(ACTIVITY_TYPE)
+        analysisPageReact.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
@@ -44,7 +44,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_stack_warn_msg_when_there_is_something_in_stack_by_bucket() {
-        assertFalse(analysisPage.addStack(ACTIVITY_TYPE)
+        assertFalse(analysisPageReact.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
@@ -54,7 +54,7 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_display_stack_warn_msg_if_there_is_more_than_1_metrics() {
-        assertFalse(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertFalse(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .addAttribute(ACCOUNT)
             .getStacksBucket()
@@ -64,30 +64,30 @@ public class StackedChartsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disappear_when_visualization_is_switched_to_table_and_should_be_empty_when_going_back() {
-        analysisPage.addStack(ACTIVITY_TYPE)
+        analysisPageReact.addStack(ACTIVITY_TYPE)
             .addAttribute(DEPARTMENT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE);
 
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
 
-        analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertFalse(analysisPage.getMetricsBucket().isEmpty());
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
-        assertFalse(analysisPage.getAttributesBucket().isEmpty());
+        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        assertFalse(analysisPageReact.getMetricsBucket().isEmpty());
+        assertFalse(analysisPageReact.getStacksBucket().isEmpty());
+        assertFalse(analysisPageReact.getAttributesBucket().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_disappear_when_switched_to_table_via_result_too_large_link() {
-        analysisPage.addStack(ACTIVITY_TYPE)
+        analysisPageReact.addStack(ACTIVITY_TYPE)
             .addAttribute(ACCOUNT)
             .addMetric(NUMBER_OF_ACTIVITIES);
 
         waitForElementVisible(cssSelector(".s-error-too-many-data-points .s-switch-to-table"), browser).click();
 
-        analysisPage.changeReportType(ReportType.BAR_CHART);
-        assertFalse(analysisPage.getMetricsBucket().isEmpty());
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
-        assertFalse(analysisPage.getAttributesBucket().isEmpty());
+        analysisPageReact.changeReportType(ReportType.BAR_CHART);
+        assertFalse(analysisPageReact.getMetricsBucket().isEmpty());
+        assertFalse(analysisPageReact.getStacksBucket().isEmpty());
+        assertFalse(analysisPageReact.getAttributesBucket().isEmpty());
     }
 }

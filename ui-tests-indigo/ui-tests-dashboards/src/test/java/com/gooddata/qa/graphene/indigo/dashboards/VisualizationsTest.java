@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.dashboards;
 
-import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.entity.visualization.VisualizationMDConfiguration;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
@@ -20,6 +19,7 @@ import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 
 import java.io.IOException;
 
+import com.gooddata.qa.browser.DragAndDropUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
@@ -34,8 +34,8 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
 
         createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
                 new VisualizationMDConfiguration.Builder()
-                    .title(VISUALIZATION_TITLE)
-                    .build());
+                        .title(VISUALIZATION_TITLE)
+                        .build());
     }
 
     @Test(dependsOnMethods = {"setupVisualizations"}, groups = {"desktop"})
@@ -81,7 +81,7 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
         String fromSelector = "." + VisualizationsList.MAIN_CLASS + ".s-" + VISUALIZATION_TITLE;
         String toSelector = ".dash-item-0 .dropzone." + DASH_WIDGET_PREV_DROPZONE_CLASS;
 
-        BrowserUtils.dragAndDrop(browser, fromSelector, toSelector);
+        DragAndDropUtils.dragAndDrop(browser, fromSelector, toSelector);
 
         waitForFragmentVisible(indigoDashboardsPage).leaveEditMode();
 

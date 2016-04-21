@@ -28,11 +28,11 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_apply__period_over_period__recommendation() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
-        analysisPage.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(
@@ -42,7 +42,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(
                 ".adi-components .visualization-column .s-property-color.s-id-metricnames"), browser));
         assertTrue(isElementPresent(cssSelector(
@@ -64,18 +64,18 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_honor_period_change_for__period_over_period() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-comparison-with-period"), browser));
-        analysisPage.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();
 
         Graphene.createPageFragment(RecommendationContainer.class,
             waitForElementVisible(RecommendationContainer.LOCATOR, browser))
             .<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).select("This month").apply();
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(isElementPresent(cssSelector(".adi-components .visualization-column .s-property-where.s-id-" +
                 getAttributeDisplayFormIdentifier("Month/Year (Activity)", "Short")), browser));
         assertTrue(isElementPresent(cssSelector(
@@ -84,7 +84,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_widget_after_apply() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
 
         assertFalse(isElementPresent(cssSelector(".s-recommendation-metric-with-period"), browser));
@@ -92,13 +92,13 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
             waitForElementVisible(RecommendationContainer.LOCATOR, browser));
         container.<TrendingRecommendation>getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertFalse(isElementPresent(cssSelector(
                 ".adi-components .visualization-column .highcharts-series [fill=\"rgb(172,220,254)\"]"), browser));
 
         container.<ComparisonRecommendation>getRecommendation(RecommendationStep.COMPARE).apply();
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertThat(waitForElementVisible(cssSelector(
                 ".adi-components .visualization-column .highcharts-legend-item tspan"), browser).getText(),
                 containsString(NUMBER_OF_ACTIVITIES + " - previous year"));
@@ -110,21 +110,21 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_pop_checkbox_if_date_and_attribute_are_moved_to_bucket() {
-        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
                 .addDate()
                 .getMetricsBucket()
                 .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
         assertTrue(configuration.isPopEnabled());
 
-        analysisPage.replaceAttribute(ACTIVITY_TYPE);
+        analysisPageReact.replaceAttribute(ACTIVITY_TYPE);
 
         assertFalse(configuration.isPopEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_the_recommendation_if_something_in_stack_bucket() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
             .waitForReportComputing();
@@ -135,7 +135,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_hide_the_recommendation_if_date_in_categories_and_something_in_stack_bucket() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .addStack(ACTIVITY_TYPE)
             .waitForReportComputing();
@@ -146,7 +146,7 @@ public class PopRecommendationTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_recommendations_if_categories_empty_and_something_in_stack_bucket() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addStack(ACTIVITY_TYPE)
             .waitForReportComputing();
 

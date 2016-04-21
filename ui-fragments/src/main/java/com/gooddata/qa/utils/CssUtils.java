@@ -18,4 +18,8 @@ public final class CssUtils {
         String replacedText = text.replaceAll("[^a-zA-Z0-9]", "_");
         return replacedText.toLowerCase();
     }
+
+    public static String convertCSSClassTojQuerySelector(String cssClass) {
+        return "." + cssClass.replaceAll(" ", ".");
+    }
 }

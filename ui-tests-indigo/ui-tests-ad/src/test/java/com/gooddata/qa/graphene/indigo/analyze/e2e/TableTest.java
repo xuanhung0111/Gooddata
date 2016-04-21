@@ -52,7 +52,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void it_should_be_blank_by_default() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "#,##0");
 
-        analysisPage.addMetric("__EMPTY__")
+        analysisPageReact.addMetric("__EMPTY__")
             .addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -63,7 +63,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void it_should_be_empty_if_formatted() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] empty");
 
-        analysisPage.addMetric("__EMPTY__")
+        analysisPageReact.addMetric("__EMPTY__")
             .addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -74,7 +74,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_show_zeros_as_usual() throws ParseException, JSONException, IOException {
         DashboardsRestUtils.changeMetricFormat(getRestApiClient(), emptyMetricUri, "[=null] 0.00 $");
 
-        analysisPage.addMetric("__EMPTY__")
+        analysisPageReact.addMetric("__EMPTY__")
             .addMetric(NUMBER_OF_ACTIVITIES)
             .changeReportType(ReportType.TABLE)
             .waitForReportComputing();
@@ -83,15 +83,15 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_show_table_correctly_when_filter_is_removed() {
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addFilter(ACTIVITY_TYPE)
             .getFilterBuckets()
             .configAttributeFilter(ACTIVITY_TYPE, "Email");
 
-        analysisPage.changeReportType(ReportType.TABLE)
+        analysisPageReact.changeReportType(ReportType.TABLE)
             .getFilterBuckets()
             .configAttributeFilter(ACTIVITY_TYPE, "All");
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertFalse(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim().isEmpty());
     }
 
@@ -99,7 +99,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_be_ordered_by_first_column_in_asc_by_default() {
         beforeOrderingTable();
 
-        assertTrue(analysisPage.getTableReport().isHeaderSortedUp(ACTIVITY_TYPE));
+        assertTrue(analysisPageReact.getTableReport().isHeaderSortedUp(ACTIVITY_TYPE));
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -109,7 +109,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_order_the_table_by_attribute() {
         beforeOrderingTable();
 
-        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPageReact.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Web Meeting");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "Phone Call");
@@ -119,7 +119,7 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_order_the_table_by_metric() {
         beforeOrderingTable();
 
-        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
+        analysisPageReact.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
 
         List<Integer> values = newArrayList();
         IntStream.rangeClosed(0, 3).forEach(i -> values.add(unformatNumber(
@@ -135,28 +135,28 @@ public class TableTest extends AbstractAdE2ETest {
     public void clean_sorting_if_column_removed() {
         beforeOrderingTable();
 
-        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
-        analysisPage.removeMetric(NUMBER_OF_ACTIVITIES)
+        analysisPageReact.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
+        analysisPageReact.removeMetric(NUMBER_OF_ACTIVITIES)
             .waitForReportComputing();
-        assertTrue(analysisPage.getTableReport().isHeaderSortedUp(ACTIVITY_TYPE));
+        assertTrue(analysisPageReact.getTableReport().isHeaderSortedUp(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_shift_keep_sorting_on_metric_if_attribute_added() {
         beforeOrderingTable();
 
-        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
-        analysisPage.addAttribute(DEPARTMENT)
+        analysisPageReact.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
+        analysisPageReact.addAttribute(DEPARTMENT)
             .waitForReportComputing();
-        assertTrue(analysisPage.getTableReport().isHeaderSortedDown(NUMBER_OF_ACTIVITIES));
+        assertTrue(analysisPageReact.getTableReport().isHeaderSortedDown(NUMBER_OF_ACTIVITIES));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_order_the_table_in_asc_order_if_same_column_clicked_twice() {
         beforeOrderingTable();
 
-        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
-        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPageReact.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPageReact.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -166,8 +166,8 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_order_the_table_only_by_one_column_at_the_time() {
         beforeOrderingTable();
 
-        analysisPage.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
-        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPageReact.getTableReport().sortBaseOnHeader(NUMBER_OF_ACTIVITIES);
+        analysisPageReact.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -177,15 +177,15 @@ public class TableTest extends AbstractAdE2ETest {
     public void should_work_with_undo_redo() {
         beforeOrderingTable();
 
-        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
-        analysisPage.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPageReact.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
+        analysisPageReact.getTableReport().sortBaseOnHeader(ACTIVITY_TYPE);
 
-        analysisPage.undo();
+        analysisPageReact.undo();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Web Meeting");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "Phone Call");
 
-        analysisPage.redo();
+        analysisPageReact.redo();
 
         assertEquals(waitForElementVisible(cssSelector(".s-cell-0-0"), browser).getText().trim(), "Email");
         assertEquals(waitForElementVisible(cssSelector(".s-cell-1-0"), browser).getText().trim(), "In Person Meeting");
@@ -193,7 +193,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drag_more_than_one_attribute_to_category() {
-        assertEquals(analysisPage.changeReportType(ReportType.TABLE)
+        assertEquals(analysisPageReact.changeReportType(ReportType.TABLE)
             .addAttribute(ACTIVITY_TYPE)
             .addAttribute(ACCOUNT)
             .addAttribute("Activity")
@@ -204,10 +204,10 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_drag_more_than_one_attribute_to_bar__view_by() {
-        assertEquals(analysisPage.changeReportType(ReportType.BAR_CHART)
+        assertEquals(analysisPageReact.changeReportType(ReportType.BAR_CHART)
             .addAttribute(ACTIVITY_TYPE)
-            .drag(analysisPage.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE),
-                    analysisPage.getAttributesBucket().getRoot())
+            .drag(analysisPageReact.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE),
+                    analysisPageReact.getAttributesBucket().getRoot())
             .getAttributesBucket()
             .getItemNames()
             .size(), 1);
@@ -215,7 +215,7 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_move_stacks_to_categories_when_switching_to_table() {
-        assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE)
+        assertEquals(analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
             .changeReportType(ReportType.TABLE)
             .getAttributesBucket()
@@ -225,17 +225,17 @@ public class TableTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_move_second_category_to_stacks_and_remove_to_rest_when_switching_to_chart() {
-        analysisPage.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
             .changeReportType(ReportType.TABLE)
             .changeReportType(ReportType.BAR_CHART);
 
-        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames().size(), 1);
+        assertFalse(analysisPageReact.getStacksBucket().isEmpty());
     }
 
     private void beforeOrderingTable() {
-        analysisPage.changeReportType(ReportType.TABLE)
+        analysisPageReact.changeReportType(ReportType.TABLE)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing();

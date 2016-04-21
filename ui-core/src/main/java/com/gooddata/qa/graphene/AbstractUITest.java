@@ -1,38 +1,5 @@
 package com.gooddata.qa.graphene;
 
-import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAccountPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDataPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsAndUsersPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForProjectsPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForReportsPageLoaded;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForSchedulesPageLoaded;
-import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.json.JSONException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.FindBy;
-
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
@@ -50,40 +17,36 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetsListPage;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardEditBar;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardTabs;
 import com.gooddata.qa.graphene.fragments.dashboards.DashboardsPage;
-import com.gooddata.qa.graphene.fragments.disc.DISCProjectsPage;
-import com.gooddata.qa.graphene.fragments.disc.DeployForm;
-import com.gooddata.qa.graphene.fragments.disc.NavigationBar;
-import com.gooddata.qa.graphene.fragments.disc.NotificationRulesDialog;
-import com.gooddata.qa.graphene.fragments.disc.OverviewProjects;
-import com.gooddata.qa.graphene.fragments.disc.OverviewStates;
-import com.gooddata.qa.graphene.fragments.disc.ProjectDetailPage;
-import com.gooddata.qa.graphene.fragments.disc.ProjectsList;
-import com.gooddata.qa.graphene.fragments.disc.ScheduleDetail;
-import com.gooddata.qa.graphene.fragments.disc.ScheduleForm;
-import com.gooddata.qa.graphene.fragments.disc.SchedulesTable;
+import com.gooddata.qa.graphene.fragments.disc.*;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPage;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.AnalysisPageReact;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.IndigoDashboardsPage;
 import com.gooddata.qa.graphene.fragments.indigo.user.UserManagementPage;
 import com.gooddata.qa.graphene.fragments.login.LoginFragment;
-import com.gooddata.qa.graphene.fragments.manage.AttributeDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.AttributePage;
-import com.gooddata.qa.graphene.fragments.manage.CreateAttributePage;
-import com.gooddata.qa.graphene.fragments.manage.DataPage;
+import com.gooddata.qa.graphene.fragments.manage.*;
 import com.gooddata.qa.graphene.fragments.manage.DatasetDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage;
-import com.gooddata.qa.graphene.fragments.manage.FactDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.MetricDetailsPage;
-import com.gooddata.qa.graphene.fragments.manage.MetricPage;
-import com.gooddata.qa.graphene.fragments.manage.ObjectPropertiesPage;
-import com.gooddata.qa.graphene.fragments.manage.ObjectsTable;
-import com.gooddata.qa.graphene.fragments.manage.ProjectAndUsersPage;
-import com.gooddata.qa.graphene.fragments.manage.VariableDetailPage;
-import com.gooddata.qa.graphene.fragments.manage.VariablesPage;
 import com.gooddata.qa.graphene.fragments.projects.ProjectsPage;
 import com.gooddata.qa.graphene.fragments.reports.ReportsPage;
 import com.gooddata.qa.graphene.fragments.reports.report.ReportPage;
 import com.gooddata.qa.utils.mail.ImapClientAction;
 import com.google.common.base.Predicate;
+import org.jboss.arquillian.graphene.Graphene;
+import org.json.JSONException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.FindBy;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.graphene.utils.WaitUtils.*;
+import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
+import static java.lang.String.format;
+import static org.testng.Assert.*;
 
 public class AbstractUITest extends AbstractGreyPageTest {
 
@@ -93,7 +56,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     protected static final By BY_IFRAME = By.tagName("iframe");
     private static final By BY_SCHEDULES_LOADING = By.cssSelector(".loader");
 
-    protected static final String PAGE_UI_ANALYSE_PREFIX = "${analyze.resource}/#/";
+    protected static final String PAGE_UI_ANALYSE_PREFIX = "analyze/#/";
     protected static final String PAGE_UI_PROJECT_PREFIX = "#s=/gdc/projects/";
     protected static final String ACCOUNT_PAGE = "account.html";
     protected static final String PAGE_LOGIN = ACCOUNT_PAGE + "#/login";
@@ -236,6 +199,9 @@ public class AbstractUITest extends AbstractGreyPageTest {
 
     @FindBy(className = AnalysisPage.MAIN_CLASS)
     protected AnalysisPage analysisPage;
+
+    @FindBy(className = AnalysisPageReact.MAIN_CLASS)
+    protected AnalysisPageReact analysisPageReact;
 
     @FindBy(css = ".ember-application .main")
     protected UserManagementPage userManagementPage;
@@ -594,8 +560,7 @@ public class AbstractUITest extends AbstractGreyPageTest {
     }
 
     public void initAnalysePageByUrl() {
-        openUrl(PAGE_UI_ANALYSE_PREFIX.replace("${analyze.resource}", testParams.getIndigoAnalyzeResource()) +
-                testParams.getProjectId() + "/reportId/edit");
+        openUrl(PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit");
         waitForFragmentVisible(analysisPage);
     }
 

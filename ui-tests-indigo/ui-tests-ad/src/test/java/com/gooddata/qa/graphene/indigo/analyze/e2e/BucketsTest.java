@@ -32,7 +32,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void allow_metric_properties_to_be_set_in_chart_configuration_buckets() {
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration metricConfiguration = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
@@ -44,57 +44,57 @@ public class BucketsTest extends AbstractAdE2ETest {
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(metricConfiguration.showPercents().isShowPercentSelected());
         assertTrue(metricConfiguration.showPop().isPopSelected());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void test_stack_bucket_is_visible_for_line_colunm_and_bar_charts() {
-        analysisPage.changeReportType(ReportType.COLUMN_CHART);
+        analysisPageReact.changeReportType(ReportType.COLUMN_CHART);
         assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
 
-        analysisPage.changeReportType(ReportType.BAR_CHART);
+        analysisPageReact.changeReportType(ReportType.BAR_CHART);
         assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
 
-        analysisPage.changeReportType(ReportType.LINE_CHART);
+        analysisPageReact.changeReportType(ReportType.LINE_CHART);
         assertTrue(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void test_stack_bucket_is_hidden_for_table_visualization() {
-        analysisPage.changeReportType(ReportType.TABLE);
+        analysisPageReact.changeReportType(ReportType.TABLE);
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void test_stack_bucket_should_accept_only_attributes() {
-        WebElement metric = analysisPage.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
-        analysisPage.drag(metric, analysisPage.getStacksBucket().getInvitation());
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
+        WebElement metric = analysisPageReact.getCataloguePanel().searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
+        analysisPageReact.drag(metric, analysisPageReact.getStacksBucket().getInvitation());
+        assertTrue(analysisPageReact.getStacksBucket().isEmpty());
 
-        WebElement date = analysisPage.getCataloguePanel().getDate();
-        analysisPage.drag(date, analysisPage.getStacksBucket().getInvitation());
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
+        WebElement date = analysisPageReact.getCataloguePanel().getDate();
+        analysisPageReact.drag(date, analysisPageReact.getStacksBucket().getInvitation());
+        assertTrue(analysisPageReact.getStacksBucket().isEmpty());
 
-        assertFalse(analysisPage.addStack(ACTIVITY_TYPE).getStacksBucket().isEmpty());
+        assertFalse(analysisPageReact.addStack(ACTIVITY_TYPE).getStacksBucket().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void test_stack_bucket_automatically_adds_new_attribute_filter() {
-        assertFalse(analysisPage.addStack(ACTIVITY_TYPE).getFilterBuckets().isEmpty());
+        assertFalse(analysisPageReact.addStack(ACTIVITY_TYPE).getFilterBuckets().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void test_stack_bucket_should_accept_only_one_attribute_at_the_time() {
-        WebElement invitation = analysisPage.getStacksBucket().getInvitation();
-        analysisPage.addStack(ACTIVITY_TYPE);
+        WebElement invitation = analysisPageReact.getStacksBucket().getInvitation();
+        analysisPageReact.addStack(ACTIVITY_TYPE);
         assertFalse(invitation.isDisplayed());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void test_stack_bucket_should_prevent_dropping_if_two_metrics_are_active() {
-        StacksBucket stacksBucket = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        StacksBucket stacksBucket = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .waitForReportComputing()
             .getStacksBucket();
@@ -104,56 +104,56 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drag_item_from_stack_by_to_category() {
-        analysisPage.addStack(ACTIVITY_TYPE)
-            .drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getInvitation());
+        analysisPageReact.addStack(ACTIVITY_TYPE)
+            .drag(analysisPageReact.getStacksBucket().get(), analysisPageReact.getAttributesBucket().getInvitation());
 
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
+        assertTrue(analysisPageReact.getStacksBucket().isEmpty());
 
-        assertFalse(analysisPage.getAttributesBucket().isEmpty());
+        assertFalse(analysisPageReact.getAttributesBucket().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_drag_item_from_category_to_stack_by() {
-        analysisPage.addAttribute(ACTIVITY_TYPE)
-            .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().getInvitation());
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
+            .drag(analysisPageReact.getAttributesBucket().getFirst(), analysisPageReact.getStacksBucket().getInvitation());
 
-        assertFalse(analysisPage.getStacksBucket().isEmpty());
-        assertTrue(analysisPage.getAttributesBucket().isEmpty());
+        assertFalse(analysisPageReact.getStacksBucket().isEmpty());
+        assertTrue(analysisPageReact.getAttributesBucket().isEmpty());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_swap_items_between_category_and_stack_by() {
-        analysisPage.addAttribute(ACTIVITY_TYPE)
+        analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
-            .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
+            .drag(analysisPageReact.getAttributesBucket().getFirst(), analysisPageReact.getStacksBucket().get());
 
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ACCOUNT));
-        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ACTIVITY_TYPE);
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(ACCOUNT));
+        assertEquals(analysisPageReact.getStacksBucket().getAttributeName(), ACTIVITY_TYPE);
 
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ACCOUNT));
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ACTIVITY_TYPE));
+        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible(ACCOUNT));
+        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_swap_if_date_dimension_is_present() {
-        analysisPage.addDate()
+        analysisPageReact.addDate()
             .addStack(ACTIVITY_TYPE)
             // Drag date to stack by
-            .drag(analysisPage.getAttributesBucket().getFirst(), analysisPage.getStacksBucket().get());
+            .drag(analysisPageReact.getAttributesBucket().getFirst(), analysisPageReact.getStacksBucket().get());
 
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(DATE));
-        assertEquals(analysisPage.getStacksBucket().getAttributeName(), ACTIVITY_TYPE);
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(DATE));
+        assertEquals(analysisPageReact.getStacksBucket().getAttributeName(), ACTIVITY_TYPE);
 
         // Drag stacking attribute to x-axis category
-        analysisPage.drag(analysisPage.getStacksBucket().get(), analysisPage.getAttributesBucket().getFirst());
+        analysisPageReact.drag(analysisPageReact.getStacksBucket().get(), analysisPageReact.getAttributesBucket().getFirst());
 
-        assertTrue(analysisPage.getStacksBucket().isEmpty());
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), asList(ACTIVITY_TYPE));
+        assertTrue(analysisPageReact.getStacksBucket().isEmpty());
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames(), asList(ACTIVITY_TYPE));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_metric_properties_when_there_are_two_metrics() {
-        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
@@ -162,7 +162,7 @@ public class BucketsTest extends AbstractAdE2ETest {
         assertFalse(configuration.isPopEnabled());
         assertFalse(configuration.isShowPercentEnabled());
 
-        configuration = analysisPage.getMetricsBucket()
+        configuration = analysisPageReact.getMetricsBucket()
                 .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
 
@@ -172,21 +172,21 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_metric_properties_when_there_are_two_attributes() {
-        MetricConfiguration configuration = analysisPage.addAttribute(ACTIVITY_TYPE)
+        MetricConfiguration configuration = analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .addStack(ACCOUNT)
             .addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration();
 
-        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames().size(), 1);
         assertFalse(configuration.isPopEnabled());
         assertFalse(configuration.isShowPercentEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_disable_metric_properties_when_trending_recommendation_and_stacking_are_applied() {
-        MetricConfiguration configuration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        MetricConfiguration configuration = analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
                 .getMetricsBucket()
                 .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
                 .expandConfiguration();
@@ -197,20 +197,20 @@ public class BucketsTest extends AbstractAdE2ETest {
                 waitForElementVisible(RecommendationContainer.LOCATOR, browser))
                 .getRecommendation(RecommendationStep.SEE_TREND).apply();
 
-        analysisPage.waitForReportComputing();
+        analysisPageReact.waitForReportComputing();
         assertTrue(configuration.showPercents().isShowPercentSelected());
-        assertEquals(analysisPage.getAttributesBucket().getItemNames().size(), 1);
+        assertEquals(analysisPageReact.getAttributesBucket().getItemNames().size(), 1);
 
         assertTrue(configuration.showPop().isPopSelected());
 
-        analysisPage.addStack(ACTIVITY_TYPE);
+        analysisPageReact.addStack(ACTIVITY_TYPE);
         assertFalse(configuration.isPopEnabled());
         assertFalse(configuration.isShowPercentEnabled());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_create_two_autogenerated_filters() {
-        assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE)
+        assertEquals(analysisPageReact.addAttribute(ACTIVITY_TYPE)
                 .addStack(ACCOUNT)
                 .addMetric(NUMBER_OF_ACTIVITIES)
                 .getFilterBuckets()
@@ -219,19 +219,19 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_generate_filter_for_date_item() {
-        analysisPage.addDate()
+        analysisPageReact.addDate()
             .addMetric(NUMBER_OF_ACTIVITIES)
             .getAttributesBucket()
             .changeGranularity("Month");
 
-        assertTrue(analysisPage.removeMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.removeMetric(NUMBER_OF_ACTIVITIES)
             .getFilterBuckets()
             .isDateFilterVisible());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_replace_filter_attribute_when_replacing_attribute_in_configuration() {
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addAttribute(ACTIVITY_TYPE)
             .waitForReportComputing()
             .getFilterBuckets()
@@ -239,15 +239,15 @@ public class BucketsTest extends AbstractAdE2ETest {
 
         assertTrue(isElementPresent(cssSelector(".adi-components .s-property-y.s-id-metricvalues"), browser));
 
-        analysisPage.drag(analysisPage.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE),
+        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE),
                 () -> waitForElementPresent(className("s-shortcut-metric-attribute"), browser));
 
-        assertTrue(analysisPage.getFilterBuckets().isFilterVisible(ACCOUNT));
+        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible(ACCOUNT));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_add_date_filter_when_adding_date_to_configuration_bucket() {
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing()
             .getFilterBuckets()
@@ -258,7 +258,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_date_filter_when_replacing_date_in_configuration_bucket_with_date() {
-        assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate()
             .waitForReportComputing()
             .getFilterBuckets()
@@ -266,59 +266,59 @@ public class BucketsTest extends AbstractAdE2ETest {
 
         assertTrue(isElementPresent(cssSelector(".adi-components .s-property-y.s-id-metricvalues"), browser));
 
-        assertTrue(analysisPage.replaceAttributeWithDate(DATE)
+        assertTrue(analysisPageReact.replaceAttributeWithDate(DATE)
             .getFilterBuckets()
             .isDateFilterVisible());
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_keep_the_selected_date_dimension_second_time_dropped() {
-        assertEquals(analysisPage.addDate()
+        assertEquals(analysisPageReact.addDate()
             .getFilterBuckets()
             .getDateFilterText(), "Activity: All time");
 
-        assertTrue(analysisPage.removeAttribute(DATE)
+        assertTrue(analysisPageReact.removeAttribute(DATE)
             .getAttributesBucket()
             .isEmpty());
 
-        assertEquals(analysisPage.addDate()
+        assertEquals(analysisPageReact.addDate()
             .getFilterBuckets()
             .getDateFilterText(), "Activity: All time");
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_have_metric_series_in_correct_order() {
-        analysisPage.addDate()
+        analysisPageReact.addDate()
             .addMetric(NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
             .expandConfiguration()
             .showPop();
 
-        assertEquals(analysisPage.waitForReportComputing()
+        assertEquals(analysisPageReact.waitForReportComputing()
             .getChartReport()
             .getLegends(), asList(NUMBER_OF_ACTIVITIES + " - previous year", NUMBER_OF_ACTIVITIES));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_replace_metrics() {
-        assertEquals(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
             .addMetric(NUMBER_OF_LOST_OPPS)
             .getMetricsBucket()
             .getItemNames(), asList(NUMBER_OF_ACTIVITIES, NUMBER_OF_LOST_OPPS));
 
-        assertEquals(analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, NUMBER_OF_OPEN_OPPS)
+        assertEquals(analysisPageReact.replaceMetric(NUMBER_OF_ACTIVITIES, NUMBER_OF_OPEN_OPPS)
             .getMetricsBucket()
             .getItemNames(), asList(NUMBER_OF_OPEN_OPPS, NUMBER_OF_LOST_OPPS));
 
-        assertEquals(analysisPage.replaceMetric(NUMBER_OF_LOST_OPPS, NUMBER_OF_ACTIVITIES)
+        assertEquals(analysisPageReact.replaceMetric(NUMBER_OF_LOST_OPPS, NUMBER_OF_ACTIVITIES)
             .getMetricsBucket()
             .getItemNames(), asList(NUMBER_OF_OPEN_OPPS, NUMBER_OF_ACTIVITIES));
     }
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_replace_categories() {
-        assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE)
+        assertEquals(analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .replaceAttribute(ACTIVITY_TYPE, ACCOUNT)
             .getAttributesBucket()
             .getItemNames(), asList(ACCOUNT));
@@ -326,7 +326,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_replace_category_with_date() {
-        assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE)
+        assertEquals(analysisPageReact.addAttribute(ACTIVITY_TYPE)
             .replaceAttributeWithDate(ACTIVITY_TYPE)
             .getAttributesBucket()
             .getItemNames(), asList(DATE));
@@ -334,7 +334,7 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_be_possible_to_replace_stacks() {
-        assertEquals(analysisPage.addStack(ACTIVITY_TYPE)
+        assertEquals(analysisPageReact.addStack(ACTIVITY_TYPE)
             .replaceStack(ACCOUNT)
             .getStacksBucket()
             .getAttributeName(), ACCOUNT);
@@ -342,21 +342,21 @@ public class BucketsTest extends AbstractAdE2ETest {
 
     @Test(dependsOnGroups = {"init"})
     public void should_not_be_possible_to_replace_filters() {
-        assertTrue(analysisPage.addFilter(ACTIVITY_TYPE)
+        assertTrue(analysisPageReact.addFilter(ACTIVITY_TYPE)
             .getFilterBuckets()
             .isFilterVisible(ACTIVITY_TYPE));
 
-        assertTrue(analysisPage.addFilter(ACCOUNT)
+        assertTrue(analysisPageReact.addFilter(ACCOUNT)
             .getFilterBuckets()
             .isFilterVisible(ACCOUNT));
 
-        assertEquals(analysisPage.getFilterBuckets().getFiltersCount(), 2);
+        assertEquals(analysisPageReact.getFilterBuckets().getFiltersCount(), 2);
 
         // drag onto existing item in the filter should still add the filter, not replace
-        assertTrue(analysisPage.drag(analysisPage.getCataloguePanel().getDate(),
-                analysisPage.getFilterBuckets().getFilter(ACTIVITY_TYPE))
+        assertTrue(analysisPageReact.drag(analysisPageReact.getCataloguePanel().getDate(),
+                analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE))
             .getFilterBuckets()
             .isDateFilterVisible());
-        assertEquals(analysisPage.getFilterBuckets().getFiltersCount(), 3);
+        assertEquals(analysisPageReact.getFilterBuckets().getFiltersCount(), 3);
     }
 }
