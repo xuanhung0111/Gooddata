@@ -195,14 +195,6 @@ public class AbstractGreyPageTest extends AbstractTest {
                 "Partial project import failed");
     }
 
-    public void postPullIntegration(String integrationEntry, int statusPollingCheckIterations)
-            throws JSONException {
-        openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/etl/pull");
-        waitForElementPresent(pullFragment.getRoot());
-        assertTrue(pullFragment.invokePull(integrationEntry, statusPollingCheckIterations),
-                "ETL PULL was not successfully processed");
-    }
-
     public JSONObject fetchSLIManifest(String dataset) throws JSONException {
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/ldm/singleloadinterface");
         waitForElementPresent(singleLoadInterfaceFragment.getRoot());

@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.reports;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -61,7 +62,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         URL uploadInfoResource = getClass().getResource("/etl/upload_info.json");
         uploadFileToWebDav(uploadInfoResource, webdavURL);
 
-        postPullIntegration(parseIntegrationEntry(webdavURL), statusPollingCheckIterations);
+        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(), parseIntegrationEntry(webdavURL));
 
         // create comp-attrs model
         maqlResource = getClass().getResource("/comp-attributes/extended/ca-model2-maql.txt");
@@ -73,7 +74,7 @@ public class SimpleCompAttributesTest extends AbstractProjectTest {
         uploadInfoResource = getClass().getResource("/comp-attributes/extended/upload_info.json");
         uploadFileToWebDav(uploadInfoResource, webdavURL);
 
-        postPullIntegration(parseIntegrationEntry(webdavURL), statusPollingCheckIterations);
+        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(), parseIntegrationEntry(webdavURL));
     }
 
     @Test(dependsOnMethods = {"loadProject"}, dataProvider = "defaultRelations")

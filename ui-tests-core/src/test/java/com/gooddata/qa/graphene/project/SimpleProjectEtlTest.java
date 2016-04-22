@@ -2,6 +2,7 @@ package com.gooddata.qa.graphene.project;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.http.rolap.RolapRestUtils.postEtlPullIntegration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +76,8 @@ public class SimpleProjectEtlTest extends AbstractProjectTest {
         System.out.println("Checking local and remote CRC");
         assertEquals(getCRC(uploadInfoResource.openStream()), getCRC(fileFromWebDav), "Local and remote file CRC checksum do not match");
 
-        postPullIntegration(webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()), statusPollingCheckIterations);
+        postEtlPullIntegration(getRestApiClient(), testParams.getProjectId(),
+                webdavURL.substring(webdavURL.lastIndexOf("/") + 1, webdavURL.length()));
     }
 
     @Test(dependsOnMethods = {"loadProject"})
