@@ -25,6 +25,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"verifyDashboardTabs"}, groups = {"dashboards-verification"})
     public void exportFirstDashboard() {
+        if (!testParams.isClusterEnvironment()) return;
         initDashboardsPage();
         dashboardsPage.selectDashboard("Pipeline Analysis");
         waitForDashboardPageLoaded(browser);
@@ -34,6 +35,7 @@ public class GoodSalesDashboardTest extends GoodSalesAbstractTest {
 
     @Test(dependsOnMethods = {"exportFirstDashboard"}, groups = {"dashboards-verification"})
     public void verifyExportedDashboardPDF() {
+        if (!testParams.isClusterEnvironment()) return;
         verifyDashboardExport(exportedDashboardName, expectedDashboardExportSize);
     }
 
