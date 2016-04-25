@@ -116,12 +116,28 @@ public class RegistrationPage extends AbstractFragment {
         return enterData(phone, phoneNumber);
     }
 
+    public RegistrationPage enterCaptcha(String captchaCode) {
+        return enterData(captchaInput, captchaCode);
+    }
+
+    public RegistrationPage enterSpecialCaptcha() {
+        return enterCaptcha(CAPTCHA_SECRITY_CODE);
+    }
+
     public void submitForm() {
         waitForElementVisible(registerButton).click();
     }
 
     public String getErrorMessage() {
         return waitForElementVisible(ERROR_MESSAGE_LOCATOR, browser).getText();
+    }
+
+    public boolean isEmailInputError() {
+        return isInputError(email);
+    }
+
+    public boolean isCaptchaInputError() {
+        return isInputError(captchaInput);
     }
 
     public void selectLoginLink() {
@@ -136,8 +152,10 @@ public class RegistrationPage extends AbstractFragment {
         return isElementPresent(By.cssSelector(CAPTCHA_INPUT_CLASS_NAME), browser);
     }
 
-    private RegistrationPage agreeRegistrationLicense() {
-        waitForElementVisible(agreeCheckbox).click();
+    public RegistrationPage agreeRegistrationLicense() {
+        if (!waitForElementVisible(agreeCheckbox).isSelected()) {
+            agreeCheckbox.click();
+        }
         return this;
     }
 
@@ -153,6 +171,10 @@ public class RegistrationPage extends AbstractFragment {
         waitForElementVisible(input).clear();
         input.sendKeys(data);
         return this;
+    }
+
+    private boolean isInputError(WebElement input) {
+        return waitForElementVisible(input).getAttribute("class").contains("has-error");
     }
 
     private String getActivationLink(ImapClient imapClient, int expectedMessageCount)
