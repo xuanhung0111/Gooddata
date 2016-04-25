@@ -201,7 +201,10 @@ public class ReportPage extends AbstractFragment {
     }
 
     public ReportPage selectMetric(String metric) {
-        return selectMetric(metric, WebElement::click);
+        return selectMetric(metric, e -> {
+            e.click();
+            waitForElementVisible(cssSelector(".c-metricDetailViewButton"), browser);
+        });
     }
 
     public ReportPage selectInapplicableMetric(String metric) {
@@ -908,7 +911,7 @@ public class ReportPage extends AbstractFragment {
         filterInput.sendKeys(WEIRD_STRING_TO_CLEAR_ALL_ITEMS);
         sleepTightInSeconds(1);
         waitForElementVisible(NO_MATCHING_METRIC, browser);
-
+        sleepTightInSeconds(1);
         filterInput.clear();
         filterInput.sendKeys(metric);
         sleepTightInSeconds(1);
