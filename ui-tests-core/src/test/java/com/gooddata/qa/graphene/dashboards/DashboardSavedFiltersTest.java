@@ -349,7 +349,7 @@ public class DashboardSavedFiltersTest extends AbstractProjectTest{
 
         dashboardsPage.selectDashboard(FIRST_DASHBOARD_NAME);
         initVariablePage();
-        initDashboardsPage();
+        initDashboardsPage().selectDashboard(FIRST_DASHBOARD_NAME);
         sleepTightInSeconds(2);
 
         assertEquals(waitForElementVisible(savedViewWidget.getRoot()).getText(),
