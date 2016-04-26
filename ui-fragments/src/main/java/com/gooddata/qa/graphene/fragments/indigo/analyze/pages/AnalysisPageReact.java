@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages;
 
-import com.gooddata.qa.browser.DragAndDropUtils;
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.AbstractFragment;
@@ -10,18 +9,18 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.TableReport;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.function.Supplier;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
-import static com.gooddata.qa.utils.CssUtils.convertCSSClassTojQuerySelector;
 import static org.openqa.selenium.By.className;
 
 /**
- * This class uses HTML5 simulated DragAndDrop from DragAndDropUtils.
- * Also assertTrue(isBlankState()) is commented out from resetToBlankState()
+ * assertTrue(isBlankState()) is commented out from resetToBlankState()
  * method until main-editor is fully functional.
  */
 public class AnalysisPageReact extends AbstractFragment {
@@ -54,17 +53,38 @@ public class AnalysisPageReact extends AbstractFragment {
 
     private static final By BY_TRASH_PANEL = className("s-trash");
 
+    public AnalysisPageReact startDrag(WebElement source) {
+        WebElement editor = waitForElementVisible(getRoot());
+
+        Point location = editor.getLocation();
+        Dimension dimension = editor.getSize();
+        getActions().clickAndHold(source)
+                .moveByOffset(location.x + dimension.width / 2, location.y + dimension.height / 2).perform();
+        return this;
+    }
+
+    public AnalysisPageReact stopDrag(Point offset) {
+        getActions().moveByOffset(offset.x, offset.y).release().perform();
+        return this;
+    }
+
     public AnalysisPageReact drag(WebElement source, Supplier<WebElement> target) {
-        String src = convertCSSClassTojQuerySelector(source.getAttribute("class"));
-        String trg = convertCSSClassTojQuerySelector(target.get().getAttribute("class"));
-        DragAndDropUtils.dragAndDrop(browser, src, trg);
+        startDrag(source);
+        try {
+            getActions().moveToElement(target.get()).perform();
+        } finally {
+            getActions().release().perform();
+        }
         return this;
     }
 
     public AnalysisPageReact drag(WebElement source, WebElement target) {
-        String src = convertCSSClassTojQuerySelector(source.getAttribute("class"));
-        String trg = convertCSSClassTojQuerySelector(target.getAttribute("class"));
-        DragAndDropUtils.dragAndDrop(browser, src, trg);
+        startDrag(source);
+        try {
+            getActions().moveToElement(waitForElementPresent(target)).perform();
+        } finally {
+            getActions().release().perform();
+        }
         return this;
     }
 
