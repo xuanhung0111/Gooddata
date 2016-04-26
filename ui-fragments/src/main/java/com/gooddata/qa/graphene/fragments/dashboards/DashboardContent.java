@@ -29,9 +29,6 @@ import com.google.common.collect.Lists;
 
 public class DashboardContent extends AbstractFragment {
 
-    @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-reportdashboardwidget")
-    private List<WebElement> reports;
-
     @FindBy(css = ".geo-content-wrapper")
     private List<DashboardGeoChart> geoCharts;
 
@@ -40,39 +37,40 @@ public class DashboardContent extends AbstractFragment {
 
     @FindBy(css = ".yui3-selectionbox-resize-tl")
     private WebElement topLeftWidgetResizeButton;
-    
+
     @FindBy(css = ".yui3-selectionbox-resize-br")
     private WebElement bottomRightWidgetResizeButton;
 
     @FindBy(css = ".c-collectionWidget:not(.gdc-hidden) .yui3-c-dashboardcollectionwidget-content .yui3-c-dashboardwidget")
     private List<WebElement> widgets;
-    
-    private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
 
-    public int getNumberOfReports() {
-        return reports.size();
-    }
+    private static final By REPORT_TITLE_LOCATOR = By.cssSelector(".yui3-c-reportdashboardwidget-reportTitle");
+    private static final By REPORT_LOCATOR =
+            By.cssSelector(".c-collectionWidget:not(.gdc-hidden) .yui3-c-reportdashboardwidget");
 
     private static String REPORT_IMAGE_LOCATOR = "div.s-${reportName} img";
     private static String REPORT_IMAGE_LOADED_LOCATOR =
             "div.s-${reportName} span.c-report-loading-message[style ^='display: none']";
 
+    public int getNumberOfReports() {
+        return getReports().size();
+    }
+
     public <T extends AbstractReport> T getReport(int reportIndex, Class<T> clazz) {
-        return createPageFragment(clazz, reports.get(reportIndex));
+        return createPageFragment(clazz, getReports().get(reportIndex));
     }
 
     public <T extends AbstractReport> T getReport(final String name, Class<T> clazz) {
-        return createPageFragment(clazz, Iterables.find(reports, new Predicate<WebElement>() {
-            @Override
-            public boolean apply(WebElement input) {
-                WebElement title = input.findElement(REPORT_TITLE_LOCATOR).findElement(BY_LINK);
-                return name.equals(title.getAttribute("title"));
-            }
-        }));
+        return createPageFragment(clazz, getReports()
+            .stream()
+            .filter(report ->
+                name.equals(report.findElement(REPORT_TITLE_LOCATOR).findElement(BY_LINK).getAttribute("title")))
+            .findFirst()
+            .get());
     }
 
     public <T extends AbstractReport> T getLatestReport(Class<T> clazz) {
-        return getReport(reports.size() - 1, clazz);
+        return getReport(getNumberOfReports() - 1, clazz);
     }
 
     public List<DashboardGeoChart> getGeoCharts() {
@@ -144,5 +142,9 @@ public class DashboardContent extends AbstractFragment {
     private void resizeWidget(WebElement resizeButton, int xOffset, int yOffset) {
         Actions action = new Actions(browser);
         action.clickAndHold(resizeButton).moveByOffset(xOffset, yOffset).release().perform();
+    }
+
+    private List<WebElement> getReports() {
+        return getRoot().findElements(REPORT_LOCATOR);
     }
 }
