@@ -90,16 +90,4 @@ public class GoodSalesReportsPageTest extends GoodSalesAbstractTest {
         waitForFragmentVisible(reportsPage).getDefaultFolders().openFolder(FAVORITES_FOLDER);
         assertEquals(reportsPage.getReportsList().getNumberOfReports(), 1);
     }
-
-    @Test(dependsOnMethods = {"createProject"})
-    public void testRememberViewing() {
-        initReportsPage();
-        waitForFragmentVisible(reportsPage).getCustomFolders().openFolder(ACTIVITY_REPORTS_FOLDER);
-        assertEquals(reportsPage.getReportsList().getNumberOfReports(), 5);
-
-        initManagePage();
-        initReportsPage();
-        assertTrue(reportsPage.isFolderSelected(ACTIVITY_REPORTS_FOLDER));
-        assertEquals(waitForFragmentVisible(reportsPage).getReportsList().getNumberOfReports(), 5);
-    }
 }

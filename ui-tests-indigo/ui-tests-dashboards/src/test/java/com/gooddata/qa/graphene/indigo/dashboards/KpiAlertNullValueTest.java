@@ -10,11 +10,11 @@ import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +42,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class KpiAlertNullValueTest extends AbstractProjectTest {
@@ -185,7 +184,7 @@ public class KpiAlertNullValueTest extends AbstractProjectTest {
 
     private Document getAlertEmail(ImapClient imapClient, GDEmails from, String subject)
             throws MessagingException, IOException {
-        Collection<Message> messages  = ImapUtils.waitForMessage(imapClient, from, subject);
+        List<Message> messages  = waitForMessages(imapClient, from, subject, 1);
         return Jsoup.parse(ImapClient.getEmailBody(Iterables.getLast(messages)));
     }
 

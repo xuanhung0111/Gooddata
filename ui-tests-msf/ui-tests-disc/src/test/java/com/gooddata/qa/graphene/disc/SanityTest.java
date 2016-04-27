@@ -1,8 +1,16 @@
 package com.gooddata.qa.graphene.disc;
 
+import static com.gooddata.qa.utils.http.RestUtils.getResource;
 import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
+import java.io.IOException;
 import java.util.Calendar;
+
+import org.apache.http.ParseException;
+import org.springframework.http.HttpStatus;
+import javax.mail.MessagingException;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -94,6 +102,32 @@ public class SanityTest extends AbstractOverviewProjectsTest {
         }
     }
 
+    /**
+     * this testcase is used to check that a ruby process could be executed well in DISC.
+     * @throws IOException 
+     * @throws ParseException 
+     */
+    @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
+    public void checkRubyExecution() throws ParseException, IOException {
+        try {
+            openProjectDetailByUrl(getWorkingProject().getProjectId());
+
+            String processName = "Check Ruby Execution";
+            ScheduleBuilder scheduleBuilder =
+                    new ScheduleBuilder().setProcessName(processName).setExecutable(Executables.RUBY3)
+                            .setCronTime(ScheduleCronTimes.CRON_15_MINUTES);
+            prepareScheduleWithBasicPackage(scheduleBuilder);
+
+            scheduleDetail.manualRun();
+            assertSuccessfulExecution();
+            assertTrue(scheduleDetail.isLastExecutionManualIconDisplay());
+            assertThat(getResource(getRestApiClient(), scheduleDetail.getLastExecutionLogLink(), HttpStatus.OK),
+                    containsString("Hello World"));
+        } finally {
+            cleanProcessesInWorkingProject();
+        }
+    }
+
     @Test(dependsOnMethods = {"createProject"}, groups = {"schedule"})
     public void checkScheduleAutoRun() {
         try {
@@ -114,7 +148,7 @@ public class SanityTest extends AbstractOverviewProjectsTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void createAndAssertNotification() {
+    public void createAndAssertNotification() throws MessagingException {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         String processName = "Check Notification";
         try {

@@ -14,13 +14,16 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.ParseException;
+import org.jboss.arquillian.graphene.Graphene;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import com.gooddata.project.ProjectDriver;
@@ -29,7 +32,6 @@ import com.gooddata.qa.graphene.fragments.greypages.account.AccountLoginFragment
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.datawarehouse.InstanceUsersFragment;
 import com.gooddata.qa.graphene.fragments.greypages.gdc.GdcFragment;
-import com.gooddata.qa.graphene.fragments.greypages.md.etl.pull.PullFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.manage2.Manage2Fragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.ldm.singleloadinterface.SingleLoadInterfaceFragment;
 import com.gooddata.qa.graphene.fragments.greypages.md.maintenance.exp.ExportFragment;
@@ -45,6 +47,7 @@ import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.model.ModelRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.webdav.WebDavClient;
+import com.google.common.base.Predicate;
 
 public class AbstractGreyPageTest extends AbstractTest {
 
@@ -60,6 +63,7 @@ public class AbstractGreyPageTest extends AbstractTest {
     protected static final String PAGE_ACCOUNT_LOGIN = PAGE_GDC + "/account/login";
     protected static final String HOST_NAME = "%{HostName}";
     protected static final String PROJECT_ID = "%{ProjectID}";
+    protected static final String PAGE_TOKEN = PAGE_GDC + "/account/token";
     /**
      * ----- Grey pages fragments -----
      */
@@ -90,9 +94,6 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     @FindBy(tagName = "form")
     protected PartialImportFragment partialImportFragment;
-
-    @FindBy(tagName = "form")
-    protected PullFragment pullFragment;
 
     @FindBy(tagName = "pre")
     protected QueryAttributesFragment queryAttributesFragment;
@@ -125,6 +126,7 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     public String validateProject() throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/validate");
         waitForElementPresent(validateFragment.getRoot());
         int timeout = testParams.getProjectDriver() == ProjectDriver.VERTICA ?
@@ -136,12 +138,15 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     public void postMAQL(String maql, int statusPollingCheckIterations) throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/ldm/manage2");
+        waitForElementPresent(manage2Fragment.getRoot());
         waitForElementPresent(manage2Fragment.getRoot());
         assertTrue(manage2Fragment.postMAQL(maql, statusPollingCheckIterations), "MAQL was not successfully processed");
     }
 
     public String uploadFileToWebDav(URL resourcePath, String webContainer) throws URISyntaxException {
+        refreshToken();
         WebDavClient webDav = WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
         File resourceFile = new File(resourcePath.toURI());
         if (webContainer == null) {
@@ -161,19 +166,24 @@ public class AbstractGreyPageTest extends AbstractTest {
         return webDav.getWebDavStructure();
     }
 
-    public InputStream getFileFromWebDav(String webContainer, URL resourcePath) throws URISyntaxException, IOException {
+    public InputStream getFileFromWebDav(String webContainer, URL resourcePath)
+            throws URISyntaxException, IOException {
         File resourceFile = new File(resourcePath.toURI());
-        return WebDavClient.getInstance(testParams.getUser(), testParams.getPassword()).getFile(webContainer + "/" + resourceFile.getName());
+        return WebDavClient.getInstance(testParams.getUser(), testParams.getPassword())
+                .getFile(webContainer + "/" + resourceFile.getName());
     }
 
     public String exportProject(boolean exportUsers, boolean exportData, boolean crossDataCenter,
             int statusPollingCheckIterations) throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/export");
         waitForElementPresent(exportFragment.getRoot());
         return exportFragment.invokeExport(exportUsers, exportData, crossDataCenter, statusPollingCheckIterations);
     }
 
-    public String exportPartialProject(String exportObjectUri, int statusPollingCheckIterations) throws JSONException {
+    public String exportPartialProject(String exportObjectUri, int statusPollingCheckIterations)
+            throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/partialmdexport");
         waitForElementPresent(partialExportFragment.getRoot());
         return partialExportFragment.invokeExport(exportObjectUri, statusPollingCheckIterations);
@@ -181,6 +191,7 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     public void importProject(String exportToken, int statusPollingCheckIterations)
             throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/import");
         waitForElementPresent(importFragment.getRoot());
         assertTrue(importFragment.invokeImport(exportToken, statusPollingCheckIterations),
@@ -189,6 +200,7 @@ public class AbstractGreyPageTest extends AbstractTest {
 
     public void importPartialProject(String exportToken, int statusPollingCheckIterations)
             throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/maintenance/partialmdimport");
         waitForElementPresent(partialImportFragment.getRoot());
         assertTrue(partialImportFragment.invokeImport(exportToken, statusPollingCheckIterations),
@@ -196,24 +208,28 @@ public class AbstractGreyPageTest extends AbstractTest {
     }
 
     public JSONObject fetchSLIManifest(String dataset) throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/ldm/singleloadinterface");
         waitForElementPresent(singleLoadInterfaceFragment.getRoot());
         return singleLoadInterfaceFragment.postDataset(dataset);
     }
 
     public int getAttributeID(String attributeTitle) throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/query/attributes");
         waitForElementPresent(queryAttributesFragment.getRoot());
         return queryAttributesFragment.getAttributeIDByTitle(attributeTitle);
     }
 
     public JSONObject getObjectByID(int objectID) throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/" + objectID);
         waitForElementPresent(objectFragment.getRoot());
         return objectFragment.getObject();
     }
 
     public ArrayList<Pair<String, Integer>> getObjectElementsByID(int objectID) throws JSONException {
+        refreshToken();
         openUrl(PAGE_GDC_MD + "/" + testParams.getProjectId() + "/obj/" + objectID + "/elements");
         waitForElementPresent(objectElementsFragment.getRoot());
         return objectElementsFragment.getObjectElements();
@@ -291,5 +307,16 @@ public class AbstractGreyPageTest extends AbstractTest {
             input.close();
             if (output!= null) output.close();
         }
+    }
+
+    private void refreshToken() {
+        openUrl(PAGE_TOKEN);
+        Predicate<WebDriver> tokenIsRefreshed = browser -> waitForElementPresent(By.tagName("p"), browser)
+                .getText()
+                .equals("Your authentication context has been refreshed and stays valid next 10 minutes.");
+        Graphene.waitGui()
+            .pollingEvery(1, TimeUnit.SECONDS)
+            .withTimeout(5, TimeUnit.SECONDS)
+            .until(tokenIsRefreshed);
     }
 }

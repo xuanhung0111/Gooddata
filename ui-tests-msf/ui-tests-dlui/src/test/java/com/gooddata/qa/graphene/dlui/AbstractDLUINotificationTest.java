@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.mail.Message;
@@ -36,7 +37,7 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
     protected String imapEditorUser;
     protected String imapEditorPassword;
     
-    protected void checkSuccessfulDataAddingNotification(UserRoles role, long receivedTime,
+    protected void checkSuccessfulDataAddingNotification(UserRoles role, Date receivedTime,
             String... fieldNames) {
         Document message =
                 role.equals(UserRoles.ADMIN) ? getEmailOfAdminUser(
@@ -46,41 +47,41 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
         assertSuccessDataAddingEmailContent(message, fieldNames);
     }
 
-    protected void checkSuccessfulDataAddingEmail(long receivedTime, String... fieldNames) {
+    protected void checkSuccessfulDataAddingEmail(Date receivedTime, String... fieldNames) {
         assertSuccessDataAddingEmailContent(
                 getEmailOfAdminUser(SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
                 fieldNames);
     }
 
-    protected void checkSuccessfulDataAddingEmailForEditor(long receivedTime, String... fieldNames) {
+    protected void checkSuccessfulDataAddingEmailForEditor(Date receivedTime, String... fieldNames) {
         assertSuccessDataAddingEmailContent(
                 getEmailOfEditorUser(SUCCESSFUL_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
                 fieldNames);
     }
 
-    protected void checkFailedDataAddingEmail(long receivedTime, String... fieldNames) {
+    protected void checkFailedDataAddingEmail(Date receivedTime, String... fieldNames) {
         assertFailedDataAddingEmailContent(
                 getEmailOfAdminUser(FAILED_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
                 fieldNames);
     }
 
-    protected void checkFailedDataAddingEmailForEditor(long receivedTime, String... fieldNames) {
+    protected void checkFailedDataAddingEmailForEditor(Date receivedTime, String... fieldNames) {
         assertFailedDataAddingEmailContentForEditor(
                 getEmailOfEditorUser(FAILED_DATA_ADDING_NOTIFICATION_SUBJECT, receivedTime),
                 fieldNames);
     }
 
-    private Document getEmailOfEditorUser(String subject, long receivedTime) {
+    private Document getEmailOfEditorUser(String subject, Date receivedTime) {
         ImapClient imapClient = new ImapClient(imapHost, imapEditorUser, imapEditorPassword);
         return getEmailContent(subject, receivedTime, imapClient);
     }
 
-    private Document getEmailOfAdminUser(String subject, long receivedTime) {
+    private Document getEmailOfAdminUser(String subject, Date receivedTime) {
         ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword);
         return getEmailContent(subject, receivedTime, imapClient);
     }
 
-    private Document getEmailContent(String subject, long receivedTime, ImapClient imapClient) {
+    private Document getEmailContent(String subject, Date receivedTime, ImapClient imapClient) {
         try {
             System.out.println("Waiting for notification...");
             Message notification = getNotification(imapClient, subject, receivedTime);
@@ -158,14 +159,11 @@ public abstract class AbstractDLUINotificationTest extends AbstractAnnieDialogTe
     }
 
     private Message getNotification(final ImapClient imapClient, final String subject,
-            long receivedTime) throws MessagingException {
+            Date receivedTime) throws MessagingException {
         Collection<Message> notifications =
-                ImapUtils.waitForMessageWithExpectedReceivedTime(imapClient,
+                ImapUtils.waitForMessages(imapClient,
                         GDEmails.NO_REPLY,
-                        String.format(subject, getWorkingProject().getProjectName()), receivedTime);
-
-        assertTrue(notifications.size() > 0, "The notification was not sent!");
-        assertEquals(notifications.size(), 1, "More than one notification were sent!");
+                        String.format(subject, getWorkingProject().getProjectName()), receivedTime, 1);
 
         return Iterables.getLast(notifications);
     }

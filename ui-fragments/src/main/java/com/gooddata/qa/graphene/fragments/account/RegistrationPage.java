@@ -3,8 +3,7 @@ package com.gooddata.qa.graphene.fragments.account;
 import static com.gooddata.qa.graphene.fragments.account.LostPasswordPage.ERROR_MESSAGE_LOCATOR;
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessageWithExpectedCount;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -92,13 +91,12 @@ public class RegistrationPage extends AbstractFragment {
 
     public String registerNewUser(ImapClient imapClient, RegistrationForm registrationForm)
             throws MessagingException, IOException {
-        int expectedMessageCount = getMessageWithExpectedReceivedTime(imapClient,
-                GDEmails.REGISTRATION, REGISTRATION_EMAIL_SUBJECT, 0).size();
+        int messageCount = imapClient.getMessagesCount(GDEmails.REGISTRATION, REGISTRATION_EMAIL_SUBJECT);
 
         registerNewUser(registrationForm);
         waitForElementVisible(SYSTEM_LOADING_MESSAGE_LOCATOR, browser);
 
-        return getActivationLink(imapClient, expectedMessageCount);
+        return getActivationLink(imapClient, messageCount + 1);
     }
 
     public void registerNewUser(RegistrationForm registrationForm) {
@@ -159,7 +157,7 @@ public class RegistrationPage extends AbstractFragment {
 
     private String getActivationLink(ImapClient imapClient, int expectedMessageCount)
             throws MessagingException, IOException {
-        Collection<Message> messages = waitForMessageWithExpectedCount(imapClient, GDEmails.REGISTRATION,
+        Collection<Message> messages = waitForMessages(imapClient, GDEmails.REGISTRATION,
                 REGISTRATION_EMAIL_SUBJECT, expectedMessageCount);
         Message activationMessage = Iterables.getLast(messages);
         String messageBody = ImapClient.getEmailBody(activationMessage);

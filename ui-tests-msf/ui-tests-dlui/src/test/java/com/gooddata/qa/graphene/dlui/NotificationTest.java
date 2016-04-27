@@ -5,6 +5,7 @@ import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsString;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.http.ParseException;
@@ -64,20 +65,19 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         "george", "basicTest"})
     public void checkNotificationForAddingSingleBasicField(AddedFields addedField)
             throws JSONException, IOException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         addNewFieldAndCheckNotification(UserRoles.ADMIN, addedField, requestTime);
     }
 
-    @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithGeorge",
-            groups = {"george"})
+    @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithGeorge", groups = {"george"})
     public void checkNotificationForAddingSingleField(AddedFields addedField) throws JSONException, IOException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         addNewFieldAndCheckNotification(UserRoles.ADMIN, addedField, requestTime);
     }
 
     @Test(dependsOnMethods = {"signInWithGeorge"}, groups = {"george"})
     public void addMultiFieldsFromADSToLDM() throws IOException, JSONException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         try {
             Dataset personDataset =
                     new Dataset().withName("person").withFields(
@@ -103,7 +103,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Test(dependsOnMethods = "signInWithGeorge", groups = {"george"})
     public void failToAddNewField() throws IOException, JSONException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         try {
             Dataset selectedDataset =
                     new Dataset().withName("person").withFields(
@@ -124,7 +124,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     @Test(dependsOnMethods = "signInWithGeorge", groups = {"george"})
     public void failToLoadDataForNewField() throws IOException, JSONException {
 
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         try {
             Dataset selectedDataset =
                     new Dataset().withName("person").withFields(
@@ -158,19 +158,19 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     @Test(dataProvider = "basicNotificationData", dependsOnMethods = "signInWithAnnie", groups = {
         "basicTest"})
     public void checkBasicNotificationWithEditorRole(AddedFields addedField) throws JSONException, IOException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
     }
 
     @Test(dataProvider = "extendedFieldData", dependsOnMethods = "signInWithAnnie")
     public void checkExtendedNotificationWithEditor(AddedFields addedField) throws JSONException, IOException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         addNewFieldAndCheckNotification(UserRoles.EDITOR, addedField, requestTime);
     }
 
     @Test(dependsOnMethods = "signInWithAnnie")
     public void failToAddNewFieldWithEditorRole() throws IOException, JSONException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         try {
             Dataset selectedDataset =
                     new Dataset().withName("person").withFields(
@@ -191,7 +191,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
 
     @Test(dependsOnMethods = "signInWithAnnie")
     public void failToLoadDataForNewFieldWithEdiorRole() throws IOException, JSONException {
-        long requestTime = System.currentTimeMillis();
+        Date requestTime = new Date();
         try {
             Dataset selectedDataset =
                     new Dataset().withName("person").withFields(
@@ -282,7 +282,7 @@ public class NotificationTest extends AbstractDLUINotificationTest {
     }
 
     private void addNewFieldAndCheckNotification(UserRoles role, AddedFields addedField,
-            long requestTime) throws JSONException, IOException {
+            Date requestTime) throws JSONException, IOException {
         try {
             checkNewDataAdding(role, addedField);
             checkSuccessfulDataAddingNotification(role, requestTime, addedField.getField()

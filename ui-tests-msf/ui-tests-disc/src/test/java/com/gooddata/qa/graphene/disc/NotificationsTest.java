@@ -7,6 +7,8 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Calendar;
 
+import javax.mail.MessagingException;
+
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -156,7 +158,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     }
 
     @Test(dependsOnMethods = {"successEventTrigger"}, groups = {"notification"})
-    public void checkSuccessMessage() {
+    public void checkSuccessMessage() throws MessagingException {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
@@ -174,7 +176,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"successEventTrigger", "createNotificationForProcessStartedEvent"},
             groups = {"notification"})
-    public void checkProcessStartedSuccessMessage() {
+    public void checkProcessStartedSuccessMessage() throws MessagingException {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
@@ -192,7 +194,7 @@ public class NotificationsTest extends AbstractNotificationTest {
 
     @Test(dependsOnMethods = {"successEventTrigger", "createNotificationForProcessScheduledEvent"},
             groups = {"notification"})
-    public void checkProcessScheduledSuccessMessage() {
+    public void checkProcessScheduledSuccessMessage() throws MessagingException {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
@@ -208,7 +210,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     }
 
     @Test(dependsOnMethods = {"failureEventTrigger"}, groups = {"notification"})
-    public void checkFailureMessage() {
+    public void checkFailureMessage() throws MessagingException {
         NotificationParameters expectedParams =
                 new NotificationParameters()
                         .setProjectId(testParams.getProjectId())
@@ -225,7 +227,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     }
 
     @Test(dependsOnMethods = {"customEventTrigger"}, groups = {"notification"})
-    public void checkCustomEventMessage() {
+    public void checkCustomEventMessage() throws MessagingException {
         NotificationParameters expectedParams = new NotificationParameters().setCustomParam("World");
         checkNotification(NotificationEvents.CUSTOM_EVENT, expectedParams);
     }
@@ -366,7 +368,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkEditNotification() {
+    public void checkEditNotification() throws MessagingException {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         String processName = "Check Edit Notification";
         try {
@@ -401,7 +403,7 @@ public class NotificationsTest extends AbstractNotificationTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkCancelEditNotification() {
+    public void checkCancelEditNotification() throws MessagingException {
         openProjectDetailByUrl(getWorkingProject().getProjectId());
         String processName = "Check Cancel Edit Notification";
         try {
@@ -444,7 +446,8 @@ public class NotificationsTest extends AbstractNotificationTest {
     }
 
     @Test(dependsOnMethods = {"createProject"}, groups = {"notification"})
-    public void checkRepeatedDataLoadingFailureNotification() throws ParseException, IOException, JSONException {
+    public void checkRepeatedDataLoadingFailureNotification()
+            throws ParseException, IOException, JSONException, MessagingException {
         try {
             addUserToProject(imapUser, UserRoles.ADMIN);
             logout();

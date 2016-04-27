@@ -1,12 +1,14 @@
 package com.gooddata.qa.graphene.fragments.reports.report;
 
 import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static java.lang.String.format;
 import static org.openqa.selenium.By.className;
 import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.xpath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -58,14 +60,12 @@ public class TableReport extends AbstractReport {
     @FindBy(css = ".containerBody .gridTabPlate .gridTile .metric span")
     private List<WebElement> metricsHeader;
 
-    @FindBy(xpath = "//div[contains(@class,'c-report-message')]")
-    private WebElement reportMessage;
-
     private static final String NO_DATA = "No data";
 
     private static final String REPORT_NOT_COMPUTABLE = "Report not computable due to improper metric definition.";
 
     private static final By BY_SORT_LOCATOR = className("sort");
+    private static final By REPORT_MESAGE_LOCATOR = xpath("//div[contains(@class,'c-report-message')]");
 
     public TableReport sortByHeader(final String header, final Sort howToSort) {
         getActions().moveToElement(getHeaderElement(header)).perform();
@@ -350,12 +350,13 @@ public class TableReport extends AbstractReport {
     }
 
     public boolean isNoData() {
-        return waitForElementVisible(reportMessage).getText().contains(NO_DATA);
+        return waitForElementPresent(REPORT_MESAGE_LOCATOR, getRoot()).getText().contains(NO_DATA);
     }
 
     public boolean isNotComputed() {
+        WebElement reportMessage = waitForElementPresent(REPORT_MESAGE_LOCATOR, getRoot());
         return waitForElementVisible(reportMessage.findElement(By.tagName("p"))).getText()
-                                                               .contains(REPORT_NOT_COMPUTABLE);
+                .contains(REPORT_NOT_COMPUTABLE);
     }
 
     public void changeAttributeDisplayLabelByRightClick(final String attribute, String label) {

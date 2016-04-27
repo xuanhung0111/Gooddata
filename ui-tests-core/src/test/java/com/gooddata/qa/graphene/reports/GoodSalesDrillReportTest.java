@@ -243,7 +243,7 @@ public class GoodSalesDrillReportTest extends GoodSalesAbstractTest {
             attributePage.initAttribute("Opportunity");
             attributeDetailPage.setDrillToAttribute("Account");
 
-            initDashboardsPage();
+            initDashboardsPage().selectDashboard(TEST_DASHBOAD_NAME);
             tableReport = dashboardsPage.getContent().getLatestReport(TableReport.class);
             tableReport.drillOnMetricValue();
             tableReport.waitForReportLoading();
