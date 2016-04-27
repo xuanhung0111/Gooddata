@@ -564,8 +564,8 @@ public class DataloadSchedulesTest extends AbstractSchedulesTest {
                 "Schedule is not deleted well!");
     }
 
-    @AfterClass
-    public void cleanUp() {
+    @AfterClass(alwaysRun = true)
+    public void cleanUp() throws ParseException, JSONException, IOException {
         getAdsHelper().removeAds(ads);
     }
 
