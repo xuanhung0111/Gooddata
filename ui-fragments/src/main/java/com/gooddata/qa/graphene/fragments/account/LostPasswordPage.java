@@ -2,8 +2,7 @@ package com.gooddata.qa.graphene.fragments.account;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementNotVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessageWithExpectedCount;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -55,12 +54,11 @@ public class LostPasswordPage extends AbstractFragment {
 
     public String resetPassword(ImapClient imapClient, String email)
             throws MessagingException, IOException {
-        int expectedMessageCount = getMessageWithExpectedReceivedTime(imapClient,
-                GDEmails.REGISTRATION, RESET_PASSWORD_EMAIL_SUBJECT, 0).size();
+        int messageCount = imapClient.getMessagesCount(GDEmails.REGISTRATION, RESET_PASSWORD_EMAIL_SUBJECT);
 
         resetPassword(email, true);
 
-        return getResetPasswordLink(imapClient, expectedMessageCount);
+        return getResetPasswordLink(imapClient, messageCount + 1);
     }
 
     public void setNewPassword(String password) {
@@ -83,7 +81,7 @@ public class LostPasswordPage extends AbstractFragment {
 
     private String getResetPasswordLink(ImapClient imapClient, int expectedMessageCount)
             throws MessagingException, IOException {
-        Collection<Message> messages = waitForMessageWithExpectedCount(imapClient, GDEmails.REGISTRATION,
+        Collection<Message> messages = waitForMessages(imapClient, GDEmails.REGISTRATION,
                 RESET_PASSWORD_EMAIL_SUBJECT, expectedMessageCount);
         Message resetPasswordMessage = Iterables.getLast(messages);
         String messageBody = ImapClient.getEmailBody(resetPasswordMessage);

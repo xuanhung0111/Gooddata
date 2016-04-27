@@ -36,8 +36,6 @@ public class AbstractGoodSalesEmailSchedulesTest extends GoodSalesAbstractTest {
     protected static final int MAILBOX_TIMEOUT_MINUTES = 6;
     protected static final int MAILBOX_POLL_INTERVAL_MILLIS = 30000;
 
-    protected static final String FROM = "noreply@gooddata.com";
-
     protected static final String CANNOT_DELETE_DASHBOARD_MESSAGE = "Dashboard cannot be deleted"
             + " because it is linked from a scheduled email or KPI dashboard. Remove all links and retry.";
 

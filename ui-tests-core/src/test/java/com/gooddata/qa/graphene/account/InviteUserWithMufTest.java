@@ -10,10 +10,10 @@ import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getRo
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileByEmail;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUsersUsingMuf;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.inviteUserWithMufObj;
-import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.utils.mail.ImapUtils.getLastEmail;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -46,7 +46,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.io.ResourceUtils;
-import com.gooddata.qa.utils.mail.ImapUtils;
 
 public class InviteUserWithMufTest extends AbstractProjectTest {
 
@@ -86,8 +85,8 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void getExpectedMessage() {
-        expectedMessageCount = doActionWithImapClient((imapClient) -> getMessageWithExpectedReceivedTime(imapClient,
-                GDEmails.INVITATION, invitationSubject, 0).size());
+        expectedMessageCount = doActionWithImapClient(imapClient ->
+                imapClient.getMessagesCount(GDEmails.INVITATION, invitationSubject));
     }
 
     @Test(dependsOnMethods = {"getExpectedMessage"})
@@ -104,7 +103,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         sendDefaultInvitation(imapUser);
 
         logoutAndopenActivationLink(imapUser, imapPassword,
-                getLinkInLastInvitation(invitationSubject, expectedMessageCount));
+                getLinkInLastInvitation(invitationSubject, expectedMessageCount + 1));
 
         createSimpleReport();
 
@@ -126,7 +125,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         final String nonRegistedUser = generateEmail(imapUser);
         sendDefaultInvitation(nonRegistedUser);
 
-        final String previousActivitionLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount);
+        final String previousActivitionLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount + 1);
 
         ++expectedMessageCount;
 
@@ -137,7 +136,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
                 .getMufUriFromInvitation(getRestApiClient(), invitationUri);
         assertEquals(updatedMufUri, mufUriInInvitation, "The MUF in invitation content has not been updated ");
 
-        final String activitionLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount);
+        final String activitionLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount + 1);
         assertTrue(activitionLink.equals(previousActivitionLink), "The invitation link is not the same as previous email");
 
         logout();
@@ -168,7 +167,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
         final String previousRoleUri = getRoleUriFromInvitation(getRestApiClient(),
                 sendDefaultInvitation(nonRegistedUser));
-        final String previousActivitionLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount);
+        final String previousActivitionLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount + 1);
 
         ++expectedMessageCount;
 
@@ -179,7 +178,7 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         final String roleUri = getRoleUriFromInvitation(getRestApiClient(), invitationUri);
         assertTrue(!previousRoleUri.equals(roleUri) && roleUri.contains("roles/" + UserRoles.VIEWER.getRoleId()),
                 "The role in invitation content has not been updated ");
-        assertTrue(previousActivitionLink.equals(getLinkInLastInvitation(invitationSubject, expectedMessageCount)),
+        assertTrue(previousActivitionLink.equals(getLinkInLastInvitation(invitationSubject, expectedMessageCount + 1)),
                 "The invitation link is not the same as previous email");
 
         ++expectedMessageCount;
@@ -190,11 +189,11 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         final String nonRegistedUser = generateEmail(imapUser);
         sendDefaultInvitation(nonRegistedUser);
 
-        Email lastEmail = ImapUtils.getLastEmail(imapHost, imapUser, imapPassword,
-                GDEmails.INVITATION, invitationSubject, expectedMessageCount);
+        Email lastEmail = doActionWithImapClient(imapClient ->
+                getLastEmail(imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 1));
         
         final String previousEmailBody = lastEmail.getBody();
-        final String previousLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount);
+        final String previousLink = getLinkInLastInvitation(invitationSubject, expectedMessageCount + 1);
 
         ++expectedMessageCount;
 
@@ -202,14 +201,14 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         inviteUserWithMufObj(getRestApiClient(), testParams.getProjectId(), nonRegistedUser,
                 defaultMufUri, UserRoles.VIEWER, updatedMessage);
 
-        lastEmail = ImapUtils.getLastEmail(imapHost, imapUser, imapPassword,
-                GDEmails.INVITATION, invitationSubject, expectedMessageCount);
+        lastEmail = doActionWithImapClient(imapClient ->
+                getLastEmail(imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 1));
 
         assertFalse(previousEmailBody.contains(updatedMessage),
                 "The previous invitation contains updated message");
         assertTrue(lastEmail.getBody().contains(updatedMessage),
                 "The invitation has not been updated ");
-        assertTrue(previousLink.equals(getLinkInLastInvitation(invitationSubject, expectedMessageCount)),
+        assertTrue(previousLink.equals(getLinkInLastInvitation(invitationSubject, expectedMessageCount + 1)),
                 "The invitation link is not the same as previous email");
 
         ++expectedMessageCount;
@@ -226,8 +225,8 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
     }
 
     private String getLinkInLastInvitation(String emailSubject, int expectedMessageCount) {
-        final String messageBody = ImapUtils.getLastEmail(imapHost, imapUser, imapPassword,
-                GDEmails.INVITATION, invitationSubject, expectedMessageCount).getBody();
+        final String messageBody = doActionWithImapClient(imapClient ->
+                getLastEmail(imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount).getBody());
         int beginIndex = messageBody.indexOf("/p/");
         return messageBody.substring(beginIndex, messageBody.indexOf("\n", beginIndex));
     }
@@ -272,5 +271,4 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
 
         return createMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
     }
-
 }

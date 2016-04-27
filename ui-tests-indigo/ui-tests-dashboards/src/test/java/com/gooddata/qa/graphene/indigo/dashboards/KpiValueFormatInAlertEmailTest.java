@@ -10,6 +10,7 @@ import static com.gooddata.qa.utils.http.indigo.IndigoRestUtils.createKpiWidget;
 import static java.lang.String.format;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +43,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonDirection;
 import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi.ComparisonType;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
@@ -163,7 +163,7 @@ public class KpiValueFormatInAlertEmailTest extends AbstractProjectTest {
 
     private Document getAlertEmail(ImapClient imapClient, GDEmails from, String subject)
             throws MessagingException, IOException {
-        Collection<Message> messages = ImapUtils.waitForMessage(imapClient, from, subject);
+        Collection<Message> messages = waitForMessages(imapClient, from, subject, 1);
         return Jsoup.parse(ImapClient.getEmailBody(Iterables.getLast(messages)));
     }
 

@@ -10,6 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.mail.Message;
@@ -19,6 +20,7 @@ import javax.mail.Part;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.utils.graphene.Screenshots;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
@@ -88,16 +90,16 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
     }
 
     private void checkMailbox(ImapClient imapClient) throws MessagingException {
-        Message[] reportMessages = new Message[0];
-        Message[] dashboardMessages = new Message[0];
+        List<Message> reportMessages = Collections.emptyList();
+        List<Message> dashboardMessages = Collections.emptyList();
 
         for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();; loop++) {
             if (loop >= maxLoops)
                 throw new RuntimeException("No message arrived!");
 
             System.out.println("Waiting for messages, try " + (loop + 1));
-            reportMessages = imapClient.getMessagesFromInbox(FROM, reportTitle);
-            dashboardMessages = imapClient.getMessagesFromInbox(FROM, dashboardTitle);
+            reportMessages = imapClient.getMessagesFromInbox(GDEmails.NOREPLY, reportTitle);
+            dashboardMessages = imapClient.getMessagesFromInbox(GDEmails.NOREPLY, dashboardTitle);
 
             if (bothEmailsArrived(reportMessages, dashboardMessages)) {
                 System.out.println("Both export messages arrived");
@@ -108,17 +110,17 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         }
 
         System.out.println("Saving dashboard message ...");
-        ImapClient.saveMessageAttachments(dashboardMessages[0], attachmentsDirectory);
+        ImapClient.saveMessageAttachments(dashboardMessages.get(0), attachmentsDirectory);
 
         System.out.println("Saving report messages ...");
-        ImapClient.saveMessageAttachments(reportMessages[0], attachmentsDirectory);
+        ImapClient.saveMessageAttachments(reportMessages.get(0), attachmentsDirectory);
 
         System.out.println("Email checks ...");
-        assertEquals(reportMessages.length, 1, "Report message arrived.");
-        assertEquals(dashboardMessages.length, 1, "Dashboard message arrived.");
+        assertEquals(reportMessages.size(), 1, "Report message arrived.");
+        assertEquals(dashboardMessages.size(), 1, "Dashboard message arrived.");
 
         // REPORT EXPORT
-        List<Part> reportAttachmentParts = ImapClient.getAttachmentParts(reportMessages[0]);
+        List<Part> reportAttachmentParts = ImapClient.getAttachmentParts(reportMessages.get(0));
         assertEquals(reportAttachmentParts.size(), 4, "Report message has correct number of attachments.");
 
         Part pdfPart = findPartByContentType(reportAttachmentParts, "application/pdf");
@@ -135,15 +137,15 @@ public class GoodSalesEmailSchedulesTest extends AbstractGoodSalesEmailSchedules
         verifyAttachment(csvPart, "CSV", 120);
 
         // DASHBOARD EXPORT
-        List<Part> dashboardAttachmentParts = ImapClient.getAttachmentParts(dashboardMessages[0]);
+        List<Part> dashboardAttachmentParts = ImapClient.getAttachmentParts(dashboardMessages.get(0));
         assertEquals(dashboardAttachmentParts.size(), 1, "Dashboard message has correct number of attachments.");
         assertTrue(dashboardAttachmentParts.get(0).getContentType().contains("application/pdf".toUpperCase()),
                 "Dashboard attachment has PDF content type.");
         verifyAttachment(dashboardAttachmentParts.get(0), "PDF", 67000);
     }
 
-    private boolean bothEmailsArrived(Message[] reportMessages, Message[] dashboardMessages) {
-        return reportMessages.length > 0 && dashboardMessages.length > 0;
+    private boolean bothEmailsArrived(List<Message> reportMessages, List<Message> dashboardMessages) {
+        return reportMessages.size() > 0 && dashboardMessages.size() > 0;
     }
 
     private void verifyAttachment(Part attachment, String type, long minimalSize) throws MessagingException {

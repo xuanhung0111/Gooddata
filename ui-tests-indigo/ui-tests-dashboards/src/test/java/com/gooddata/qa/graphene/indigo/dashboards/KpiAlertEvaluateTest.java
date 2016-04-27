@@ -5,11 +5,12 @@ import static com.gooddata.qa.graphene.indigo.dashboards.common.DashboardsTest.D
 import static com.gooddata.qa.graphene.utils.UrlParserUtils.replaceInUrl;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,9 +35,6 @@ import com.gooddata.qa.graphene.fragments.indigo.dashboards.Kpi;
 import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.project.ProjectRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
-import com.google.common.collect.Iterables;
 
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static org.testng.Assert.assertEquals;
@@ -95,7 +93,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
     public void checkKpiAlertEvaluation(String factName, String metricTemplate, String format, String threshold)
             throws URISyntaxException, JSONException, IOException, MessagingException {
 
-        long testStartTime = new Date().getTime();
+        Date testStartTime = new Date();
         String imapUniqueUser = generateImapUniqueUserEmail(imapUser);
         String userUri = addImapUserToProject(imapUniqueUser, imapPassword);
 
@@ -151,10 +149,6 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         return email.replace("@", "+dashboards_" + append + "@");
     }
 
-    private ImapClient getImapClient() {
-        return new ImapClient(imapHost, imapUser, imapPassword);
-    }
-
     private String getDashboardLink(String emailContent) {
         Pattern pattern = Pattern.compile(KPI_LINK_CLASS + ".*?href=\"(.*?)\"");
         Matcher matcher = pattern.matcher(emailContent);
@@ -170,11 +164,13 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         return userUri;
     }
 
-    private String getLastMailContent(String subject, long messagesArrivedAfter) throws IOException, MessagingException {
-        Collection<Message> messages = ImapUtils.waitForMessageWithExpectedReceivedTime(
-                getImapClient(), GDEmails.NOREPLY, subject, messagesArrivedAfter);
-
-        return Iterables.getLast(messages).getContent().toString().trim();
+    private String getLastMailContent(String subject, Date arrivedDate) throws IOException, MessagingException {
+        return doActionWithImapClient(imapClient -> {
+                    List<Message> messages =
+                            waitForMessages(
+                                    imapClient, GDEmails.NOREPLY, subject, arrivedDate, 1);
+                    return messages.get(0).getContent().toString().trim();
+                });
     }
 
     private String createMetricFromFact(String metricName, String factName, String template, String format)
@@ -194,7 +190,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         signInAtGreyPages(username, password);
     }
 
-    private void checkKpiAlertTriggered(String metricName, String dateFilter, long testStartTime)
+    private void checkKpiAlertTriggered(String metricName, String dateFilter, Date testStartTime)
             throws IOException, MessagingException {
         // check that dashboard alert worker triggered the alert in UI
         checkAlertInUI(metricName);
@@ -233,7 +229,7 @@ public class KpiAlertEvaluateTest extends AbstractProjectTest {
         takeScreenshot(browser, "checkKpiAlertEvaluation-alert-triggered-via-UI-"+metricName, getClass());
     }
 
-    private void checkAlertViaEmail(String metricName, String dateFilter, long testStartTime)
+    private void checkAlertViaEmail(String metricName, String dateFilter, Date testStartTime)
             throws IOException, MessagingException {
         log.info("Checking the alert via email notification...");
         String link = getDashboardLink(getLastMailContent(metricName, testStartTime));

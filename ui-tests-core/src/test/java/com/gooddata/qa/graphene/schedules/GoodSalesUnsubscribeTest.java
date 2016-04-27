@@ -5,14 +5,15 @@ package com.gooddata.qa.graphene.schedules;
 
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.assertFalse;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static com.gooddata.qa.utils.mail.ImapUtils.areMessagesArrived;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import org.openqa.selenium.support.FindBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
@@ -86,7 +88,8 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
 
             // wait for expected messages to arrive
             int expectedMessageCount = 2;
-            Message[] emailMessages = getMessagesFromInbox(imapClient, FROM, reportTitle, expectedMessageCount);
+            List<Message> emailMessages =
+                    waitForMessages(imapClient, GDEmails.NOREPLY, reportTitle, expectedMessageCount);
 
             // get and visit unsubscribe links in each of the received mails
             for (Message message: emailMessages) {
@@ -100,14 +103,11 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
             initEmailSchedulesPage();
             updateRecurrencyString(emailSchedulesPage.getScheduleMailUriByName(reportTitle));
             pssClient.accelerate();
-            try {
-                // check that we will get exception because no more email is sent
-                getMessagesFromInbox(imapClient, FROM, reportTitle, expectedMessageCount + 1);
-                fail("Expected no more email will be sent but it's not!");
-            } catch (RuntimeException e) {
-                assertEquals(e.getMessage(), format("Expected: %s message(s) but actual: %s message(s)",
-                        expectedMessageCount + 1, expectedMessageCount));
-            }
+
+            // check that no more email is sent
+            assertFalse(areMessagesArrived(imapClient, GDEmails.NOREPLY, reportTitle, expectedMessageCount + 1),
+                    "Expected no more email will be sent but it's not!");
+
         } finally {
             System.out.println("DECELERATE scheduled mails processing");
             pssClient.decelerate();
@@ -148,35 +148,6 @@ public class GoodSalesUnsubscribeTest extends AbstractGoodSalesEmailSchedulesTes
         waitForElementPresent(unsubscribedLogo);
         assertEquals(unsubscribedLogo.getAttribute("alt"), "GoodData",
                 "Attribute 'alt' in the logo contains GoodData.");
-    }
-
-    private Message[] getMessagesFromInbox(ImapClient imapClient, String from, String subject,
-            int expectedMessagesCount) {
-        int totalMessages = 0;
-
-        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();; loop++) {
-            
-            if (loop >= maxLoops) {
-                throw new RuntimeException(format("Expected: %s message(s) but actual: %s message(s)",
-                        expectedMessagesCount, totalMessages));
-            }
-
-            System.out.println("Waiting for messages, try " + (loop + 1));
-
-            Message[] receivedMessages = imapClient.getMessagesFromInbox(from, subject);
-            totalMessages = receivedMessages.length;
-
-            if (messagesArrived(totalMessages, expectedMessagesCount)) {
-                System.out.println(format("Report export messages from %s arrived (subj: %s)", from, subject));
-                return receivedMessages;
-            }
-
-            sleepTight(MAILBOX_POLL_INTERVAL_MILLIS);
-        }
-    }
-
-    private boolean messagesArrived(int totalMessages, int expectedMessagesCount) {
-        return totalMessages >= expectedMessagesCount;
     }
 
     private String getBccEmail() {

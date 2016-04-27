@@ -9,7 +9,6 @@ import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR;
 import static com.gooddata.qa.graphene.utils.CheckUtils.BY_RED_BAR_WARNING;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
 import static com.gooddata.qa.graphene.utils.CheckUtils.logRedBarMessageInfo;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
@@ -24,6 +23,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.File;
 import java.io.FileReader;
@@ -60,6 +60,7 @@ import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.report.UiReportDefinition;
 import com.gooddata.qa.graphene.entity.variable.AttributeVariable;
 import com.gooddata.qa.graphene.entity.variable.NumericVariable;
+import com.gooddata.qa.graphene.enums.GDEmails;
 import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.manage.EmailSchedulePage.RepeatTime;
 import com.gooddata.qa.utils.http.ScheduleMailPssClient;
@@ -80,7 +81,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
     private int scheduledTimeInMinute;
 
-    private Map<String, Message[]> messages;
+    private Map<String, List<Message>> messages;
     private Map<String, MessageContent> attachments = new HashMap<String, MessageContent>();
 
     private static final String NO_DATA_REPORT = "No data report";
@@ -92,8 +93,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         String identification = ": " + testParams.getHost() + " - " + testParams.getTestIdentification();
         attachmentsDirectory = new File(getProperty("maven.project.build.directory", "./target/attachments"));
 
-        Message[] emptyMessage = new Message[0];
-        messages = new HashMap<String, Message[]>();
+        List<Message> emptyMessage = Collections.emptyList();
+        messages = new HashMap<String, List<Message>>();
         messages.put(emptyDashboardTitle += identification, emptyMessage);
         messages.put(noDataReportTitle += identification, emptyMessage);
         messages.put(incomputableReportTitle += identification, emptyMessage);
@@ -399,7 +400,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
     }
 
     @Test(dependsOnMethods = {"updateScheduledMailRecurrency"})
-    public void waitForMessages() throws MessagingException, IOException {
+    public void waitForScheduleMessages() throws MessagingException, IOException {
         ScheduleMailPssClient pssClient = new ScheduleMailPssClient(getRestApiClient(), testParams.getProjectId());
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("ACCELERATE scheduled mails processing");
@@ -411,7 +412,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         }
     }
 
-    @Test(dependsOnMethods = {"waitForMessages"})
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyEmptyDashboardSchedule() {
         System.out.println("Email checks ...");
         int arrivedMessageCount = attachments.get(emptyDashboardTitle).totalMessage;
@@ -433,7 +434,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         verifyAttachment(attachments.get(emptyDashboardTitle).savedAttachments.get(0), "PDF", 22000);
     }
 
-    @Test(dependsOnMethods = {"waitForMessages"})
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyNoDataReport() {
         String error = format("Report '%s' produced an empty result during conversion to '%s' format",
                 NO_DATA_REPORT, "html");
@@ -441,21 +442,21 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Cannot find message: [" + error + "] in email!");
     }
 
-    @Test(dependsOnMethods = {"waitForMessages"})
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyIncomputableReport() {
         String error = format("ERROR: report '%s' did not export to '%s' format", INCOMPUTABLE_REPORT, "pdf");
         assertTrue(attachments.get(incomputableReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
     }
 
-    @Test(dependsOnMethods = {"waitForMessages"})
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyTooLargeReport() {
         String error = format("ERROR: report '%s' did not export to '%s' format", TOO_LARGE_REPORT, "pdf");
         assertTrue(attachments.get(tooLargeReportTitle).body.contains(error),
                 "Cannot find message: [" + error + "] in email!");
     }
 
-    @Test(dependsOnMethods = {"waitForMessages"})
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyFilteredVariableReport() throws IOException {
         List<String> reportResult = getCsvContent(new File(attachmentsDirectory,
                 attachments.get(filteredVariableReportTitle).savedAttachments.get(0).fileName));
@@ -463,7 +464,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Data in report is not correct!");
     }
 
-    @Test(dependsOnMethods = {"waitForMessages"})
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyNumericVariableReport() throws IOException {
         List<String> reportResult = getCsvContent(new File(attachmentsDirectory,
                 attachments.get(numericVariableReportTitle).savedAttachments.get(0).fileName));
@@ -471,7 +472,7 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Data in report is not correct!");
     }
 
-    @Test(dependsOnMethods = {"waitForMessages"})
+    @Test(dependsOnMethods = {"waitForScheduleMessages"})
     public void verifyMufReport() throws IOException {
         List<String> reportResult = getCsvContent(new File(attachmentsDirectory,
                 attachments.get(mufReportTitle).savedAttachments.get(0).fileName));
@@ -479,39 +480,25 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
                 "Data in report is not correct!");
     }
 
-    private void updateRecurrencies(Map<String, Message[]> messages) throws IOException {
+    private void updateRecurrencies(Map<String, List<Message>> messages) throws IOException {
         for (String recurrency : messages.keySet()) {
             updateRecurrencyString(emailSchedulesPage.getScheduleMailUriByName(recurrency));
         }
     }
 
     private void checkMailbox(ImapClient imapClient) throws MessagingException, IOException {
-        for (int loop = 0, maxLoops = getMailboxMaxPollingLoops();; loop++) {
-            if (loop >= maxLoops)
-                throw new RuntimeException("No message arrived!");
-
-            System.out.println("Waiting for messages, try " + (loop + 1));
-            getMessagesFromInbox(imapClient);
-
-            if (areEmailsArrived(messages)) {
-                System.out.println("Export messages arrived");
-                break;
-            }
-
-            sleepTight(MAILBOX_POLL_INTERVAL_MILLIS);
-        }
-
+        getMessagesFromInbox(imapClient);
         saveMessageAttachments(messages);
     }
 
-    private void saveMessageAttachments(Map<String, Message[]> messages) throws MessagingException, IOException {
+    private void saveMessageAttachments(Map<String, List<Message>> messages) throws MessagingException, IOException {
         for (String title : messages.keySet()) {
             System.out.println("Saving message ...");
-            ImapClient.saveMessageAttachments(messages.get(title)[0], attachmentsDirectory);
+            ImapClient.saveMessageAttachments(messages.get(title).get(0), attachmentsDirectory);
             attachments.put(title,
-                    new MessageContent().setTotalMessage(messages.get(title).length)
-                        .setBody(ImapClient.getEmailBody(messages.get(title)[0])));
-            List<Part> attachmentParts = ImapClient.getAttachmentParts(messages.get(title)[0]);
+                    new MessageContent().setTotalMessage(messages.get(title).size())
+                        .setBody(ImapClient.getEmailBody(messages.get(title).get(0))));
+            List<Part> attachmentParts = ImapClient.getAttachmentParts(messages.get(title).get(0));
             List<SavedAttachment> savedAttachments = new ArrayList<SavedAttachment>();
             for (Part part : attachmentParts) {
                 savedAttachments.add(new SavedAttachment().setContentType(part.getContentType())
@@ -542,19 +529,10 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
         }
     }
 
-    private void getMessagesFromInbox(ImapClient imapClient) {
+    private void getMessagesFromInbox(ImapClient imapClient) throws MessagingException {
         for (String title : messages.keySet()) {
-            messages.put(title, imapClient.getMessagesFromInbox(FROM, title));
+            messages.put(title, waitForMessages(imapClient, GDEmails.NOREPLY, title, 1));
         }
-    }
-
-    private boolean areEmailsArrived(Map<String, Message[]> messages) {
-        for (Message[] msg : messages.values()) {
-            if (msg == null || msg.length == 0) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private void verifyAttachment(SavedAttachment attachment, String type, long minimalSize) {

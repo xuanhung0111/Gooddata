@@ -4,8 +4,8 @@ import static com.gooddata.qa.graphene.fragments.account.InviteUserDialog.INVITE
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.mail.ImapUtils.getMessageWithExpectedReceivedTime;
-import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessageWithExpectedCount;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
+import static com.gooddata.qa.utils.mail.ImapUtils.getLastEmail;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -30,7 +30,6 @@ import com.gooddata.qa.graphene.enums.user.UserRoles;
 import com.gooddata.qa.graphene.fragments.account.InviteUserDialog;
 import com.gooddata.qa.graphene.fragments.account.RegistrationPage;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-import com.gooddata.qa.utils.mail.ImapUtils;
 
 public class InviteUserTest extends AbstractProjectTest {
 
@@ -68,8 +67,8 @@ public class InviteUserTest extends AbstractProjectTest {
 
     @Test(dependsOnGroups = {"createProject"})
     public void getExpectedMessage() {
-        expectedMessageCount = doActionWithImapClient((imapClient) -> getMessageWithExpectedReceivedTime(imapClient,
-                GDEmails.INVITATION, invitationSubject, 0).size());
+        expectedMessageCount = doActionWithImapClient(imapClient ->
+                imapClient.getMessagesCount(GDEmails.INVITATION, invitationSubject));
     }
 
     @Test(dependsOnMethods = {"getExpectedMessage"})
@@ -82,8 +81,8 @@ public class InviteUserTest extends AbstractProjectTest {
         projectAndUsersPage.openInvitedUserTab();
         checkResendAndCancelInvitationAvailable(imapUser);
 
-        final Email lastEmail = ImapUtils.getLastEmail(imapHost, imapUser, imapPassword,
-              GDEmails.INVITATION, invitationSubject, expectedMessageCount);
+        final Email lastEmail = doActionWithImapClient(imapClient ->
+                getLastEmail(imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 1));
 
         assertEquals(lastEmail.getFrom(), GDEmails.INVITATION.getEmailAddress());
         assertEquals(lastEmail.getSubject(), invitationSubject);
@@ -147,8 +146,8 @@ public class InviteUserTest extends AbstractProjectTest {
 
         projectAndUsersPage.resendInvitation(nonRegistedUser);
 
-        final Collection<Message> invitations = doActionWithImapClient((imapClient) -> waitForMessageWithExpectedCount(imapClient,
-                GDEmails.INVITATION, invitationSubject, expectedMessageCount));
+        final Collection<Message> invitations = doActionWithImapClient(imapClient ->waitForMessages(
+                imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 1));
         assertTrue(invitations.size() == expectedMessageCount + 1, "The resend invitation has not been sent");
 
         ++expectedMessageCount;
@@ -174,8 +173,8 @@ public class InviteUserTest extends AbstractProjectTest {
         projectAndUsersPage.openInviteUserDialog().inviteUsers(UserRoles.EDITOR,
                 INVITATION_MESSAGE, nonRegistedUserA, nonRegistedUserB);
 
-        final Collection<Message> invitations = doActionWithImapClient((imapClient) -> waitForMessageWithExpectedCount(imapClient,
-                GDEmails.INVITATION, invitationSubject, expectedMessageCount));
+        final Collection<Message> invitations = doActionWithImapClient(imapClient -> waitForMessages(
+                imapClient, GDEmails.INVITATION, invitationSubject, expectedMessageCount + 2));
         assertTrue(invitations.size() == expectedMessageCount + 2, "There are less than 2 new invitations in inbox");
 
         projectAndUsersPage.openInvitedUserTab();

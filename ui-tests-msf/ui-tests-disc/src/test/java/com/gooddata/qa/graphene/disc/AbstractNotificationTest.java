@@ -4,13 +4,13 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import static com.gooddata.qa.utils.mail.ImapUtils.waitForMessages;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.Message;
@@ -34,7 +34,6 @@ import com.gooddata.qa.graphene.fragments.disc.NotificationRule;
 import com.gooddata.qa.graphene.fragments.greypages.md.obj.ObjectFragment;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 import com.gooddata.qa.utils.mail.ImapClient;
-import com.gooddata.qa.utils.mail.ImapUtils;
 import com.google.common.collect.Iterables;
 
 public class AbstractNotificationTest extends AbstractDISCTest {
@@ -198,21 +197,22 @@ public class AbstractNotificationTest extends AbstractDISCTest {
             notificationRule.cancelSaveNotification();
     }
 
-    protected void waitForNotification(String subject, NotificationParameters expectedParams) {
+    protected void waitForNotification(String subject, NotificationParameters expectedParams) throws MessagingException {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("Waiting for notification...");
             checkScheduleEventNotification(imapClient, subject, expectedParams);
         }
     }
 
-    protected void waitForRepeatedFailuresEmail(ScheduleBuilder scheduleBuilder) {
+    protected void waitForRepeatedFailuresEmail(ScheduleBuilder scheduleBuilder) throws MessagingException {
         try (ImapClient imapClient = new ImapClient(imapHost, imapUser, imapPassword)) {
             System.out.println("Waiting for notification...");
             checkRepeatFailureEmail(imapClient, scheduleBuilder);
         }
     }
 
-    protected void checkNotification(NotificationEvents event, NotificationParameters expectedParams) {
+    protected void checkNotification(NotificationEvents event, NotificationParameters expectedParams)
+            throws MessagingException {
         String notificationSubject = null;
         switch (event) {
             case SUCCESS:
@@ -290,14 +290,12 @@ public class AbstractNotificationTest extends AbstractDISCTest {
         }
     }
 
-    protected static Message getNotification(final ImapClient imapClient, final String subject) {
-        Collection<Message> notifications = ImapUtils.waitForMessage(imapClient, GDEmails.NO_REPLY, subject);
-        assertTrue(notifications.size() == 1, "More than 1 notification!");
-
-        return Iterables.getLast(notifications);
+    protected static Message getNotification(final ImapClient imapClient, final String subject) throws MessagingException {
+        return Iterables.getLast(waitForMessages(imapClient, GDEmails.NO_REPLY, subject, 1));
     }
 
-    private void checkRepeatFailureEmail(ImapClient imapClient, ScheduleBuilder scheduleBuilder) {
+    private void checkRepeatFailureEmail(ImapClient imapClient, ScheduleBuilder scheduleBuilder)
+            throws MessagingException {
         boolean isEnabled = scheduleBuilder.isEnabled();
         String subjectFormat =
                 isEnabled ? REPEATED_FAILURES_NOTIFICATION_SUBJECT : SCHEDULE_DISABLED_NOTIFICATION_SUBJECT;
@@ -340,7 +338,7 @@ public class AbstractNotificationTest extends AbstractDISCTest {
     }
 
     private void checkScheduleEventNotification(ImapClient imapClient, String subject,
-            NotificationParameters expectedParams) {
+            NotificationParameters expectedParams) throws MessagingException {
         Message notification = getNotification(imapClient, subject);
         ArrayList<String> paramValues = new ArrayList<String>();
         String notificationContent = "";
