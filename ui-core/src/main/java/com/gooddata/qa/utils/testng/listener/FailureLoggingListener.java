@@ -2,20 +2,15 @@ package com.gooddata.qa.utils.testng.listener;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import java.util.logging.Level;
 import org.jboss.arquillian.drone.api.annotation.Default;
 import org.jboss.arquillian.graphene.context.GrapheneContext;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
@@ -48,14 +43,6 @@ public class FailureLoggingListener extends TestListenerAdapter {
         String filenameIdentification = getFilenameIdentification(result);
 
         String htmlSource = driver.getPageSource();
-
-        LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-
-        for (LogEntry entry : logEntries) {
-            if (entry.getLevel() == Level.SEVERE) {
-                consolelog += (new Date(entry.getTimestamp()) + " " + entry.getMessage() + "\n");
-            }
-        }
 
         File consoleLogOutputFile = new File(failuresOutputDir, filenameIdentification + "/console.log");
         File stacktraceOutputFile = new File(failuresOutputDir, filenameIdentification + "/stacktrace.txt");
