@@ -87,7 +87,7 @@ public class AbstractMSFTest extends AbstractProjectTest {
     protected static final String OUTPUT_STATE_MODEL_RESOURCE = INTERNAL_OUTPUT_STAGE_URI + "model";
     protected static final String PROJECT_MODEL_VIEW = "/gdc/projects/%s/model/view";
 
-    protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "ADS to LDM synchronization";
+    protected static final String DEFAULT_DATAlOAD_PROCESS_NAME = "Data Distribution Platform";
     protected static final String CLOUDCONNECT_PROCESS_PACKAGE = "dlui.zip";
     protected static final String DLUI_GRAPH_CREATE_AND_COPY_DATA_TO_ADS =
             "DLUI/graph/CreateAndCopyDataToADS.grf";
