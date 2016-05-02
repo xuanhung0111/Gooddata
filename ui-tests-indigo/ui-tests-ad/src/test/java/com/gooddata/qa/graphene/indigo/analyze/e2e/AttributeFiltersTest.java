@@ -71,40 +71,6 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
             .isEmpty());
     }
 
-    @Test(dependsOnGroups = {"init"})
-    public void should_set_in_filter_where_clause() {
-        beforeEach();
-
-        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
-        AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
-                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
-        String id = panel.getId("Email");
-        panel.discard();
-
-        analysisPageReact.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email");
-        analysisPageReact.waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-components .adi-component .s-property-where.s-where-___in_____id__" + id + "___"), browser));
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void should_set_not_in_filter_where_clause() {
-        beforeEach();
-
-        analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
-        AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
-                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
-        String id = panel.getId("Email");
-        panel.selectItem("Email");
-        panel.getApplyButton().click();
-
-        analysisPageReact.waitForReportComputing();
-
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-components .adi-component .s-property-where.s-where-___not_____in_____id__" + id + "____"),
-                browser));;
-    }
-
     @Test(dependsOnGroups = {"init"}, groups = {"disabling-Apply-button"})
     public void should_disable_apply_button_if_nothing_changed() {
         assertTrue(beforeEachDisablingApplyButton()
