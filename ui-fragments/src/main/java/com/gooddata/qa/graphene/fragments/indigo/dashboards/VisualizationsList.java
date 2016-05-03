@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 
 public class VisualizationsList extends AbstractFragment {
 
-    public static final String MAIN_CLASS = "visualizations-list-item";
+    public static final String MAIN_CLASS = "gd-visualizations-list-item";
 
     @FindBy(className = MAIN_CLASS)
     private List<WebElement> visualizationsListItems;

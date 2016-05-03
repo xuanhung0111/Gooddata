@@ -26,6 +26,7 @@ import org.openqa.selenium.interactions.Actions;
 public class VisualizationsTest extends DashboardWithWidgetsTest {
 
     private final String VISUALIZATION_TITLE = "last_dummy_viz";
+    private final String VISUALIZATION_TYPE_BAR = "bar";
 
     @Test(dependsOnMethods = {"initDashboardWithWidgets"}, groups = {"desktop"})
     public void setupVisualizations() throws JSONException, IOException {
@@ -35,6 +36,7 @@ public class VisualizationsTest extends DashboardWithWidgetsTest {
         createVisualizationWidget(getRestApiClient(), testParams.getProjectId(),
                 new VisualizationMDConfiguration.Builder()
                         .title(VISUALIZATION_TITLE)
+                        .type(VISUALIZATION_TYPE_BAR)
                         .build());
     }
 
