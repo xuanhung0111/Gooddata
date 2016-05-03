@@ -73,7 +73,7 @@ public class IndigoDashboardsPage extends AbstractFragment {
     private static final String SAVE_BUTTON_CLASS_NAME = "s-save_button";
     private static final String DELETE_BUTTON_CLASS_NAME = "s-delete_dashboard";
     private static final String ALERTS_LOADED_CLASS_NAME = "alerts-loaded";
-    private static final String VISUALIZATIONS_LIST_CLASS_NAME = "visualizations-list";
+    private static final String VISUALIZATIONS_LIST_CLASS_NAME = "gd-visualizations-list";
 
     private static final By DASHBOARD_LOADED = By.cssSelector(".is-dashboard-loaded");
     private static final By SAVE_BUTTON_ENABLED = By.cssSelector("." + SAVE_BUTTON_CLASS_NAME + ":not(.disabled)");

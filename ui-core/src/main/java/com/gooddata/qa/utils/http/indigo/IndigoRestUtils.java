@@ -85,7 +85,14 @@ public class IndigoRestUtils {
                     put("meta", new JSONObject() {{
                         put("title", "${title}");
                     }});
-                    put("content", new JSONObject());
+                    put("content", new JSONObject() {{
+                        put("type", "${type}");
+                        put("buckets", new JSONObject() {{
+                            put("measures", new JSONArray());
+                            put("categories", new JSONArray());
+                            put("filters", new JSONArray());
+                        }});
+                    }});
                 }});
             }}.toString();
         } catch (JSONException e) {
@@ -176,7 +183,9 @@ public class IndigoRestUtils {
      */
     public static String createVisualizationWidget(final RestApiClient restApiClient, final String projectId,
             final VisualizationMDConfiguration vizConfig) throws JSONException, IOException {
-        String content = VISUALIZATION_WIDGET_BODY.get().replace("${title}", vizConfig.getTitle());
+        String content = VISUALIZATION_WIDGET_BODY.get()
+                .replace("${title}", vizConfig.getTitle())
+                .replace("${type}", vizConfig.getType());
 
         return getJsonObject(restApiClient,
                 restApiClient.newPostMethod(format(CREATE_AND_GET_OBJ_LINK, projectId), content))
