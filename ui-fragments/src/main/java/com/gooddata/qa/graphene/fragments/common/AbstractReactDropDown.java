@@ -107,6 +107,6 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
     }
 
     protected String getNoMatchingDataMessageCssSelector() {
-        return ".no-matching-data";
+        return ".gd-no-matching-data";
     }
 }
