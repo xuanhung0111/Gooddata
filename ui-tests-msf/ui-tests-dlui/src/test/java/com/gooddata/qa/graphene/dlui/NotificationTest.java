@@ -217,8 +217,8 @@ public class NotificationTest extends AbstractDLUINotificationTest {
         }
     }
 
-    @AfterClass
-    public void cleanUp() throws JSONException {
+    @AfterClass(alwaysRun = true)
+    public void cleanUp() throws JSONException, ParseException, IOException {
         logout();
         signInAtGreyPages(testParams.getUser(), testParams.getPassword());
         getAdsHelper().removeAds(ads);
