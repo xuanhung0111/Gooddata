@@ -1,6 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static org.openqa.selenium.By.cssSelector;
@@ -8,7 +7,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -30,8 +28,7 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         WebElement filter = analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE);
         filter.click();
 
-        AttributeFilterPickerPanel panel = Graphene.createPageFragment(AttributeFilterPickerPanel.class,
-                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
+        AttributeFilterPickerPanel panel = AttributeFilterPickerPanel.getInstance(browser);
         panel.searchForText("asdf");
 
         sleepTightInSeconds(1);
@@ -40,7 +37,9 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         panel.discard();
 
         filter.click();
-        assertEquals(panel.getItemNames().size(), 4);
+
+        sleepTightInSeconds(3); // need buffer time for Selenium to refresh element values
+        assertEquals(AttributeFilterPickerPanel.getInstance(browser).getItemNames().size(), 4);
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -148,7 +147,6 @@ public class AttributeFiltersTest extends AbstractAdE2ETest {
         beforeEach();
 
         analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE).click();
-        return Graphene.createPageFragment(AttributeFilterPickerPanel.class,
-                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
+        return AttributeFilterPickerPanel.getInstance(browser);
     }
 }
