@@ -1,3 +1,3 @@
-"user","firstname","lastname","name","address","age","number","date","date_dt"
+"f_user.f_user","d_user_firstname.nm_firstname","d_user_lastname.nm_lastname","d_user_name.nm_name","d_user_address.nm_address","f_user.f_age","f_user.f_number","f_user.dt_user_date_id","f_user.f_date"
 "1","Chi","Le","Le Thi Phuong Chi","Binh Duong","27","1000000",${thisYear},"42338"
 "1","Chi","Le","Le Thi Phuong Chi","Binh Duong","27","100",${lastYear},"42308"
