@@ -260,9 +260,7 @@ public class GoodSalesBasicFilterTest extends AnalyticalDesignerAbstractTest {
 
         WebElement filter = filtersBucket.getFilter(ACTIVITY_TYPE);
         filter.click();
-        AttributeFilterPickerPanel attributePanel =
-                Graphene.createPageFragment(AttributeFilterPickerPanel.class,
-                        waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser));
+        AttributeFilterPickerPanel attributePanel = AttributeFilterPickerPanel.getInstance(browser);
         attributePanel.assertPanel();
         attributePanel.discard();
 

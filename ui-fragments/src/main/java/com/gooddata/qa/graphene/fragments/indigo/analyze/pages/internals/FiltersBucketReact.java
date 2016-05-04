@@ -53,8 +53,7 @@ public class FiltersBucketReact extends AbstractBucket {
         WebElement filter = getFilter(attribute);
         String oldText = getFilterTextHelper(filter);
         filter.click();
-        Graphene.createPageFragment(AttributeFilterPickerPanel.class,
-                waitForElementVisible(AttributeFilterPickerPanel.LOCATOR, browser)).select(values);
+        AttributeFilterPickerPanel.getInstance(browser).select(values);
         assertNotEquals(getFilterTextHelper(filter), oldText);
         return this;
     }

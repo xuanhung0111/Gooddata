@@ -13,7 +13,9 @@ import static org.openqa.selenium.By.tagName;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -33,8 +35,12 @@ public class AttributeFilterPickerPanel extends AbstractPicker {
     @FindBy(className = "s-apply")
     private WebElement applyButton;
 
-    public static final By LOCATOR = className("adi-attr-filter-picker");
     private static final By CLEAR_SEARCH_TEXT_SHORTCUT = className("searchfield-clear");
+
+    public static AttributeFilterPickerPanel getInstance(SearchContext context) {
+        return Graphene.createPageFragment(AttributeFilterPickerPanel.class,
+                waitForElementVisible(className("adi-attr-filter-picker"), context));
+    }
 
     @Override
     protected String getListItemsCssSelector() {
