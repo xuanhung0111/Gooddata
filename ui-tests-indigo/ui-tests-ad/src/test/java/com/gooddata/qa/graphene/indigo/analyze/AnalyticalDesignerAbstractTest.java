@@ -8,7 +8,9 @@ import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.gooddata.qa.browser.BrowserUtils;
 import com.gooddata.qa.graphene.AbstractProjectTest;
+import com.gooddata.qa.graphene.common.StartPageContext;
 
 public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest {
 
@@ -33,11 +35,28 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
     public void initProperties() {
         projectCreateCheckIterations = 60; // 5 minutes
         projectTemplate = "/projectTemplates/GoodSalesDemo/2";
+        projectTitle = "[Indigo Analyse] ";
     }
 
     /* A hook for setup test project */
     @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
     public void prepareSetupProject() throws Throwable {
+    }
+
+    @Test(dependsOnMethods = {"prepareSetupProject"}, groups = {"init"})
+    public void initStartPage() {
+        startPageContext = new StartPageContext() {
+
+            @Override
+            public void waitForStartPageLoaded() {
+                waitForFragmentVisible(analysisPage);
+            }
+
+            @Override
+            public String getStartPage() {
+                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit";
+            }
+        };
     }
 
     protected void checkingOpenAsReport(String screenShot) {
@@ -48,16 +67,14 @@ public abstract class AnalyticalDesignerAbstractTest extends AbstractProjectTest
         }
 
         analysisPage.exportReport();
-        String currentWindowHandle = browser.getWindowHandle();
-        for (String handle : browser.getWindowHandles()) {
-            if (!handle.equals(currentWindowHandle))
-                browser.switchTo().window(handle);
-        }
+
+        BrowserUtils.switchToLastTab(browser);
         waitForAnalysisPageLoaded(browser);
         waitForFragmentVisible(reportPage);
         takeScreenshot(browser, screenShot, getClass());
         checkRedBar(browser);
+
         browser.close();
-        browser.switchTo().window(currentWindowHandle);
+        BrowserUtils.switchToFirstTab(browser);
     }
 }

@@ -1,13 +1,13 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e.common;
 
+import static com.gooddata.md.Restriction.title;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
+
+import org.testng.annotations.BeforeClass;
+
 import com.gooddata.md.Attribute;
 import com.gooddata.qa.graphene.common.StartPageContext;
 import com.gooddata.qa.graphene.indigo.analyze.AnalyticalDesignerAbstractTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import static com.gooddata.md.Restriction.title;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 
 public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
 
@@ -16,7 +16,7 @@ public abstract class AbstractAdE2ETest extends AnalyticalDesignerAbstractTest {
         validateAfterClass = false;
     }
 
-    @Test(dependsOnGroups = {"createProject"}, groups = {"init"})
+    @Override
     public void initStartPage() {
         startPageContext = new StartPageContext() {
 
