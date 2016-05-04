@@ -205,8 +205,8 @@ public class DataloadProcessTest extends AbstractMSFTest {
         getAdsHelper().addUserToAdsInstance(ads, testParams.getEditorUser(), AdsRole.DATA_ADMIN);
     }
 
-    @AfterClass
-    public void cleanUp() throws JSONException {
+    @AfterClass(alwaysRun = true)
+    public void cleanUp() throws JSONException, ParseException, IOException {
         logout();
         signIn(true, UserRoles.ADMIN);
         getAdsHelper().removeAds(ads);

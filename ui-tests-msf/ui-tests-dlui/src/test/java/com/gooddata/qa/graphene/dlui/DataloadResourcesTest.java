@@ -146,8 +146,8 @@ public class DataloadResourcesTest extends AbstractMSFTest {
         }
     }
 
-    @AfterClass
-    public void cleanUp() {
+    @AfterClass(alwaysRun = true)
+    public void cleanUp() throws ParseException, JSONException, IOException {
         getAdsHelper().removeAds(ads);
     }
 

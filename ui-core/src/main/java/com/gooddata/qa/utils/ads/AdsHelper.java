@@ -8,6 +8,10 @@ import static org.apache.commons.lang.Validate.notNull;
 import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.ParseException;
 import org.json.JSONException;
@@ -15,6 +19,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
 import com.gooddata.GoodData;
+import com.gooddata.GoodDataException;
 import com.gooddata.project.Environment;
 import com.gooddata.qa.utils.http.RestApiClient;
 import com.gooddata.warehouse.Warehouse;
@@ -64,9 +69,19 @@ public final class AdsHelper {
         return gdClient.getWarehouseService().createWarehouse(adsInstance).get();
     }
 
-    public void removeAds(Warehouse adsInstance) {
+    public void removeAds(Warehouse adsInstance) throws ParseException, JSONException, IOException {
         if (adsInstance != null) {
-            gdClient.getWarehouseService().removeWarehouse(adsInstance);
+            try {
+                gdClient.getWarehouseService().removeWarehouse(adsInstance);
+            } catch (GoodDataException e) {
+                if (e.getCause().getMessage().contains("cannot be deleted because projects")) {
+                    List<String> pids = findReferencedProjects(e.getCause().getMessage());
+                    removeReferencedProjects(pids);
+                    gdClient.getWarehouseService().removeWarehouse(adsInstance);
+                    return;
+                }
+                throw e;
+            }
         }
     }
 
@@ -75,6 +90,23 @@ public final class AdsHelper {
         final JSONObject outputStageObj = new JSONObject() {{
             put("outputStage", new JSONObject() {{
                 put("schema", format(ADS_INSTANCE_SCHEMA_URI, adsInstance.getId()));
+            }});
+        }};
+        final String outputStageUri = format(OUTPUT_STAGE_URI, projectId);
+
+        getResource(restApiClient,
+                restApiClient.newPutMethod(outputStageUri, outputStageObj.toString()),
+                req -> req.setHeader("Accept", ACCEPT_HEADER_VALUE_WITH_VERSION),
+                HttpStatus.OK);
+    }
+
+    public void resetOutputStageOfProject(final String projectId)
+            throws JSONException, ParseException, IOException {
+        final JSONObject outputStageObj = new JSONObject() {{
+            put("outputStage", new JSONObject() {{
+                put("schema", JSONObject.NULL);
+                put("clientId", JSONObject.NULL);
+                put("outputStagePrefix", JSONObject.NULL);
             }});
         }};
         final String outputStageUri = format(OUTPUT_STAGE_URI, projectId);
@@ -114,6 +146,28 @@ public final class AdsHelper {
 
         public String getName() {
             return this.role;
+        }
+    }
+
+    /**
+     * @param errorMessage, for e.g: "Instance 'a45e21452dceca06598e4cb4783e9130' cannot be deleted because 
+     * projects /gdc/c4/project/njhvfube8fld2wz8zvthntvvbdfwtysc,/gdc/c4/project/j0s8quwgkwwsfs7m60a1c0ay8glf7858 
+     * reference it"
+     * @return List<String> pids
+     */
+    private List<String> findReferencedProjects(String errorMessage) {
+        Pattern p = Pattern.compile("/gdc/c4/project/(?<pid>\\w+)");
+        Matcher m = p.matcher(errorMessage);
+        List<String> pids = new ArrayList<>();
+        while (m.find()) {
+            pids.add(m.group("pid"));
+        }
+        return pids;
+    }
+
+    private void removeReferencedProjects(List<String> pids) throws ParseException, JSONException, IOException {
+        for (String pid : pids) {
+            resetOutputStageOfProject(pid);
         }
     }
 }

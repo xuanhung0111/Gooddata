@@ -465,8 +465,8 @@ public class AnnieDialogTest extends AbstractAnnieDialogTest {
         
     }
 
-    @AfterClass
-    public void cleanUp() {
+    @AfterClass(alwaysRun = true)
+    public void cleanUp() throws ParseException, JSONException, IOException {
         getAdsHelper().removeAds(ads);
     }
 
