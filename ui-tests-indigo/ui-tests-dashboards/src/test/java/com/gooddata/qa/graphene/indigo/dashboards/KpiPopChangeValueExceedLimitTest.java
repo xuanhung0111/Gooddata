@@ -15,11 +15,14 @@ import static org.testng.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 
+import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -60,11 +63,10 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
         // when the time pass to another period.
         // So updating Csv file with new date data every time the test is executing
         // to make sure the data is always valid.
-        String updatedCsvFilename = "data.csv";
-        String updatedResourceName = KPI_ERROR_DATA_RESOURCE + updatedCsvFilename;
-        updateCsvFile(getResourceAsFile(KPI_ERROR_DATA_RESOURCE + "user.csv"), updatedCsvFilename);
-
-        uploadDatasetFromCsv(updatedResourceName);
+        try (InputStream stream =
+                updateCsvFile(getResourceAsFile(KPI_ERROR_DATA_RESOURCE + "user.csv"), "data.csv")) {
+            uploadDatasetFromCsv(stream);
+        }
     }
 
     @Test(dependsOnMethods = {"uploadDatasetFromCsv"}, groups = {"precondition"})
@@ -132,7 +134,7 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
                 .replace("${lastYear}", lastYear);
     }
 
-    private void updateCsvFile(File csvFile, String updatedFileName) throws IOException {
+    private InputStream updateCsvFile(File csvFile, String updatedFileName) throws IOException {
         String csvData = getCsvData(csvFile);
         String updatedCsvFilePath = csvFile.getParent() + "/" + updatedFileName;
 
@@ -140,10 +142,19 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
             fw.append(changeDateFromCsvData(csvData));
             fw.flush();
         }
+
+        return new FileInputStream(updatedCsvFilePath);
     }
 
-    private void uploadDatasetFromCsv(String csvFilePath) throws JSONException, URISyntaxException, IOException {
-        setupMaql(KPI_ERROR_DATA_RESOURCE + "user.maql");
-        setupData(csvFilePath, KPI_ERROR_DATA_RESOURCE + "upload_info.json");
+    private void uploadDatasetFromCsv(InputStream inputStream) throws JSONException, URISyntaxException, IOException {
+        getGoodDataClient()
+            .getModelService()
+            .updateProjectModel(getProject(), IOUtils.toString(getClass().getResource(KPI_ERROR_DATA_RESOURCE + "user.maql")))
+            .get();
+
+        getGoodDataClient()
+            .getDatasetService()
+            .loadDataset(getProject(), "dataset.user", inputStream)
+            .get();
     }
 }
