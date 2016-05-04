@@ -22,7 +22,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Filters
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import java.io.IOException;
 
-public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesMultipleDatasetsTest extends AnalyticalDesignerAbstractTest {
 
     private static final String MAQL_PATH = "/quotes/quotes.maql";
     private static final String QUOTES_CSV_PATH = "/quotes/quotes.csv";
@@ -40,7 +40,7 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTitle = "Indigo-Filter-Catalog-Whole-Project-Test";
+        projectTitle += "Multiple-Datasets-Test";
     }
 
     @Override
@@ -51,8 +51,6 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnProductionData() {
-        initAnalysePage();
-
         ChartReport report = analysisPage.addMetric("Close Price", FieldType.FACT)
                 .addDate()
                 .addStack("Industry")
@@ -71,7 +69,6 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
 
     @Test(dependsOnGroups = {"init"})
     public void analyzeReportOnPayrollData() {
-        initAnalysePage();
         analysisPage.getCataloguePanel().changeDataset(PAYROLL_DATASET);
 
         ChartReport report = analysisPage.addMetric(AMOUNT, FieldType.FACT)
@@ -92,7 +89,6 @@ public class FilterAdCatalogToWholeProjectTest extends AnalyticalDesignerAbstrac
 
     @Test(dependsOnGroups = {"init"})
     public void searchDataAfterSelectDataset() {
-        initAnalysePage();
         final CataloguePanel cataloguePanel = analysisPage.getCataloguePanel();
 
         assertFalse(cataloguePanel.changeDataset(PRODUCTION_DATASET)

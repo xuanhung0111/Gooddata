@@ -6,33 +6,29 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricConfiguration;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 
-public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstractTest {
+public class GoodSalesDropAttributeTest extends AnalyticalDesignerAbstractTest {
 
-    private static final String BEST_CASE = "Best Case";
     private static final String PRIORITY = "Priority";
     private static final String REGION = "Region";
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTitle = "Indigo-GoodSales-Demo-Two-Attribute-Buckets-Test";
+        projectTitle += "Drop-Attribute-Test";
     }
 
     @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
-        initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE).waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 4);
@@ -54,43 +50,6 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
         analysisPage.replaceStack(REGION);
         assertEquals(analysisPage.getStacksBucket().getAttributeName(), REGION);
         checkingOpenAsReport("dropThirdAttributeToBucket");
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void disablePopCheckboxOnDroppingNonDateAttribute() {
-        initAnalysePage();
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
-            .waitForReportComputing()
-            .getMetricsBucket()
-            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .expandConfiguration();
-        ChartReport report = analysisPage.getChartReport();
-        assertEquals(report.getTrackersCount(), 4);
-        assertTrue(metricConfiguration.isShowPercentEnabled());
-
-        analysisPage.addStack(DEPARTMENT);
-        analysisPage.waitForReportComputing();
-        assertFalse(metricConfiguration.isShowPercentEnabled());
-        checkingOpenAsReport("disablePopCheckboxOnDroppingNonDateAttribute");
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void addStackByIfMoreThanOneMetricInReport() {
-        initAnalysePage();
-
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addMetric(BEST_CASE).addAttribute(REGION);
-
-        final StacksBucket stacksBucket = analysisPage.getStacksBucket();
-        assertTrue(stacksBucket.isDisabled());
-        assertEquals(stacksBucket.getWarningMessage(), "TO STACK BY, A VISUALIZATION CAN HAVE ONLY ONE MEASURE");
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void addSecondMetricIfAttributeInStackBy() {
-        initAnalysePage();
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE).addStack(DEPARTMENT);
-        assertEquals(analysisPage.getMetricsBucket().getWarningMessage(), "TO ADD ADDITIONAL MEASURE, REMOVE FROM STACK BY");
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -129,23 +88,6 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
     }
 
     @Test(dependsOnGroups = {"init"})
-    public void attributesInFilterMenu() {
-        initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
-
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE);
-        assertTrue(filtersBucket.isFilterVisible(ACTIVITY_TYPE));
-
-        analysisPage.addStack(DEPARTMENT);
-        assertTrue(filtersBucket.isFilterVisible(DEPARTMENT));
-
-        analysisPage.replaceAttribute(ACTIVITY_TYPE, REGION);
-        assertFalse(filtersBucket.isFilterVisible(ACTIVITY_TYPE));
-        assertTrue(filtersBucket.isFilterVisible(REGION));
-        checkingOpenAsReport("attributesInFilterMenu");
-    }
-
-    @Test(dependsOnGroups = {"init"})
     public void applyAttributeFiltersInReport() {
         dropAttributeToReportHaveOneMetric();
         analysisPage.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email", "Phone Call")
@@ -168,54 +110,6 @@ public class GoodSalesTwoAttributeBucketsTest extends AnalyticalDesignerAbstract
 
         analysisPage.changeReportType(ReportType.TABLE);
         assertFalse(isElementPresent(className(StacksBucket.CSS_CLASS), browser));
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void testAttributeReplaceDate() {
-        initAnalysePage();
-        final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
-
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-        assertTrue(filtersBucket.isDateFilterVisible());
-
-        analysisPage.replaceAttribute(DATE, ACTIVITY_TYPE);
-        assertFalse(filtersBucket.isDateFilterVisible());
-        assertTrue(filtersBucket.isFilterVisible(ACTIVITY_TYPE));
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void applyFilterInReportHasDateAndAttribute() {
-        initAnalysePage();
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addDate().addStack(ACTIVITY_TYPE);
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-
-        analysisPage.getFilterBuckets().configAttributeFilter(ACTIVITY_TYPE, "Email", "Phone Call")
-            .configDateFilter("Last year");
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-        checkingOpenAsReport("applyFilterInReportHasDateAndAttribute");
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void uncheckSelectedPopCheckbox() {
-        initAnalysePage();
-        MetricConfiguration metricConfiguration = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
-            .addDate()
-            .getMetricsBucket()
-            .getMetricConfiguration(NUMBER_OF_ACTIVITIES)
-            .expandConfiguration();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-        assertTrue(metricConfiguration.isPopEnabled());
-
-        metricConfiguration.showPop();
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-
-        analysisPage.replaceAttribute(DATE, ACTIVITY_TYPE);
-        assertTrue(analysisPage.waitForReportComputing().getChartReport().getTrackersCount() >= 1);
-        assertFalse(metricConfiguration.isPopEnabled());
-        assertFalse(metricConfiguration.isPopSelected());
-        assertEquals(analysisPage.getAttributesBucket().getItemNames(), Arrays.asList(ACTIVITY_TYPE));
-        checkingOpenAsReport("uncheckSelectedPopCheckbox");
     }
 
     @Test(dependsOnGroups = {"init"})
