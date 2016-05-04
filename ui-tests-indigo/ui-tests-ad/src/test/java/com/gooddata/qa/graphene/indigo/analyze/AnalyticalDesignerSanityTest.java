@@ -47,8 +47,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void testWithAttribute() {
-        initAnalysePage();
-
         assertEquals(analysisPage.addAttribute(ACTIVITY_TYPE)
                 .getExplorerMessage(), "Now select a measure to display");
 
@@ -66,8 +64,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void dragMetricToColumnChartShortcutPanel() {
-        initAnalysePage();
-
         WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
@@ -94,8 +90,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleContribution() {
-        initAnalysePage();
-
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
                 .addAttribute(ACTIVITY_TYPE)
                 .getChartReport();
@@ -126,8 +120,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void testSimpleComparison() {
-        initAnalysePage();
-
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES).getChartReport();
         assertEquals(report.getTrackersCount(), 1);
         RecommendationContainer recommendationContainer =
@@ -153,8 +145,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void displayWhenDraggingFirstMetric() {
-        initAnalysePage();
-
         WebElement metric = analysisPage.getCataloguePanel()
                 .searchAndGet(NUMBER_OF_ACTIVITIES, FieldType.METRIC);
 
@@ -173,8 +163,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void exportCustomDiscovery() {
-        initAnalysePage();
-
         assertTrue(analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
                 .addAttribute(ACTIVITY_TYPE)
                 .changeReportType(ReportType.TABLE)
@@ -223,7 +211,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void filterOnDateAttribute() {
-        initAnalysePage();
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
 
         ChartReport report = analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
@@ -241,8 +228,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void testSimplePoP() {
-        initAnalysePage();
-
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES)
             .addDate();
         assertTrue(analysisPage.getFilterBuckets()
@@ -271,7 +256,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void replaceMetricByNewOne() {
-        initAnalysePage();
         final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
 
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
@@ -308,7 +292,6 @@ public class AnalyticalDesignerSanityTest extends AnalyticalDesignerAbstractTest
 
     @Test(dependsOnGroups = {"init"})
     public void dropAttributeToReportHaveOneMetric() {
-        initAnalysePage();
         analysisPage.addMetric(NUMBER_OF_ACTIVITIES).addAttribute(ACTIVITY_TYPE).waitForReportComputing();
         ChartReport report = analysisPage.getChartReport();
         assertEquals(report.getTrackersCount(), 4);

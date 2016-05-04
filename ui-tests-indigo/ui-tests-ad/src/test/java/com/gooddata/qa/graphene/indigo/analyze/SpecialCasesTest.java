@@ -26,7 +26,7 @@ public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTitle = "Indigo-Special-Cases-Test";
+        projectTitle += "Special-Cases-Test";
     }
 
     @Override
@@ -37,8 +37,6 @@ public class SpecialCasesTest extends AnalyticalDesignerAbstractTest {
 
     @Test(dependsOnGroups = {"init"})
     public void testAttributeLimitationInTableReport() {
-        initAnalysePage();
-
         analysisPage.getCataloguePanel().changeDataset(MANY_CLOUMNS_DATASET)
             .filterCatalog(CatalogFilterType.ATTRIBUTES);
         analysisPage.changeReportType(ReportType.TABLE);

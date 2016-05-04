@@ -48,7 +48,7 @@ public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTe
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTitle = "Project-navigation-" + UNIQUE_ID;
+        projectTitle += "Project-navigation-" + UNIQUE_ID;
     }
 
     @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
@@ -89,7 +89,7 @@ public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTe
         };
     }
 
-    @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, dataProvider = "userRoleProvider")
+    @Test(dependsOnMethods = {"prepareUserForSwitchingTest"}, dataProvider = "userRoleProvider", groups = {"switchProject"})
     public void switchProjectWithOtherUserRoles(String user, String password, UserRoles role)
             throws ParseException, IOException, JSONException {
         GoodData goodDataClient = getGoodDataClient(user, password);
@@ -214,7 +214,7 @@ public class GoodSalesProjectNavigationTest extends AnalyticalDesignerAbstractTe
         assertThat(browser.getCurrentUrl(), containsString(currentProjectId));
     }
 
-    @Test(dependsOnGroups = {"switchProject"})
+    @Test(dependsOnGroups = {"switchProject"}, groups = {"analyse"})
     public void openAnalysePageAfterDeleteAnotherProject() throws ParseException, JSONException, IOException {
         try {
             testParams.setProjectId(newProjectId);

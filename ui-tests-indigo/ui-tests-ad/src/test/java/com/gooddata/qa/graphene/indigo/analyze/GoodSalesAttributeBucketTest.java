@@ -12,59 +12,17 @@ import org.testng.annotations.Test;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.AttributesBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricsBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 
-public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstractTest {
-
-    private static final String EXPECTED = "Expected";
-    private static final String REMAINING_QUOTA = "Remaining Quota";
+public class GoodSalesAttributeBucketTest extends AnalyticalDesignerAbstractTest {
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTitle = "Indigo-GoodSales-Replace-Metric-Attribute-Test";
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void replaceMetricByNewOne() {
-        initAnalysePage();
-        final MetricsBucket metricsBucket = analysisPage.getMetricsBucket();
-
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(NUMBER_OF_ACTIVITIES)));
-
-        analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, AMOUNT);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(AMOUNT)));
-
-        analysisPage.changeReportType(ReportType.BAR_CHART);
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(NUMBER_OF_ACTIVITIES, AMOUNT)));
-
-        analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, EXPECTED);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(), asList(EXPECTED, AMOUNT)));
-
-        analysisPage.changeReportType(ReportType.TABLE);
-        analysisPage.addMetric(NUMBER_OF_ACTIVITIES);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(NUMBER_OF_ACTIVITIES, AMOUNT, EXPECTED)));
-
-        analysisPage.replaceMetric(NUMBER_OF_ACTIVITIES, REMAINING_QUOTA);
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(REMAINING_QUOTA, AMOUNT, EXPECTED)));
-
-        analysisPage.undo();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(NUMBER_OF_ACTIVITIES, AMOUNT, EXPECTED)));
-
-        analysisPage.redo();
-        assertTrue(isEqualCollection(metricsBucket.getItemNames(),
-                asList(REMAINING_QUOTA, AMOUNT, EXPECTED)));
-        checkingOpenAsReport("replaceMetricByNewOne");
+        projectTitle += "Attribute-Bucket-Test";
     }
 
     @Test(dependsOnGroups = {"init"})
     public void replaceAttributeByNewOne() {
-        initAnalysePage();
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
         final FiltersBucket filtersBucket = analysisPage.getFilterBuckets();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
@@ -106,7 +64,6 @@ public class GoodSalesReplaceMetricAttributeTest extends AnalyticalDesignerAbstr
 
     @Test(dependsOnGroups = {"init"})
     public void switchAttributesBetweenAxisAndStackBy() {
-        initAnalysePage();
         final AttributesBucket categoriesBucket = analysisPage.getAttributesBucket();
         final StacksBucket stacksBucket = analysisPage.getStacksBucket();
 

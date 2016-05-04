@@ -1,16 +1,17 @@
 package com.gooddata.qa.graphene.indigo.analyze;
 
+import static com.gooddata.md.Restriction.title;
 import static com.gooddata.qa.graphene.utils.CheckUtils.checkRedBar;
+import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.changeMetricFormat;
 import static java.util.Arrays.asList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,11 +22,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.gooddata.GoodData;
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
-import com.gooddata.md.Restriction;
-import com.gooddata.project.Project;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
 import com.gooddata.qa.graphene.enums.report.ReportTypes;
 import com.gooddata.qa.graphene.fragments.manage.MetricFormatterDialog.Formatter;
@@ -33,24 +30,17 @@ import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 
 public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractTest {
 
-    private Project project;
-    private MetadataService mdService;
-
     private String percentOfGoalUri;
     private String oldPercentOfGoalMetricFormat;
 
     @BeforeClass(alwaysRun = true)
     public void initialize() {
-        projectTitle = "Indigo-GoodSales-Demo-Metric-Number-Format-Test";
+        projectTitle += "Metric-Number-Format-Test";
     }
 
-    @Test(dependsOnGroups = {"init"})
-    public void initGoodDataClient() {
-        GoodData goodDataClient = getGoodDataClient();
-        project = goodDataClient.getProjectService().getProjectById(testParams.getProjectId());
-        mdService = goodDataClient.getMetadataService();
-
-        percentOfGoalUri = mdService.getObjUri(project, Metric.class, Restriction.title(PERCENT_OF_GOAL));
+    @Test(dependsOnGroups = {"init"}, groups = {"precondition"})
+    public void prepareData() {
+        percentOfGoalUri = getMdService().getObjUri(getProject(), Metric.class, title(PERCENT_OF_GOAL));
         oldPercentOfGoalMetricFormat = getMetricFormat(PERCENT_OF_GOAL);
     }
 
@@ -66,7 +56,7 @@ public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractT
         };
     }
 
-    @Test(dependsOnMethods = {"initGoodDataClient"}, dataProvider = "formattingProvider")
+    @Test(dependsOnGroups = {"precondition"}, dataProvider = "formattingProvider", groups = {"metricFormat"})
     public void testMetricNumberFormat(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
         changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
@@ -100,14 +90,12 @@ public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractT
         }
     }
 
-    @Test(dependsOnMethods = { "initGoodDataClient" }, dataProvider = "formattingProvider")
+    @Test(dependsOnGroups = {"precondition"}, dataProvider = "formattingProvider", groups = {"chartLabel"})
     public void checkDataLabelShowOnBarChart(Formatter format, String expectedValue, boolean compareFormat)
             throws ParseException, JSONException, IOException {
         changeMetricFormat(getRestApiClient(), percentOfGoalUri, format.toString());
 
         try {
-            initAnalysePage();
-
             String dataLabel = analysisPage.addMetric(PERCENT_OF_GOAL)
                     .addAttribute(IS_WON)
                     .waitForReportComputing()
@@ -137,7 +125,6 @@ public class GoodSalesMetricNumberFormatTest extends AnalyticalDesignerAbstractT
     }
 
     private void verifyFormatInAdReport(Formatter format, String expectedValue, boolean compareFormat) {
-        initAnalysePage();
         List<List<String>> tooltip = analysisPage.addMetric(PERCENT_OF_GOAL)
             .addAttribute(IS_WON)
             .waitForReportComputing()
