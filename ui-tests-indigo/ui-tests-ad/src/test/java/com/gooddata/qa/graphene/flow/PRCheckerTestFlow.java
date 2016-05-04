@@ -10,7 +10,7 @@ public class PRCheckerTestFlow {
     public static void main(String[] args) throws IOException {
         TestsRegistry.getInstance()
             .register(EmptyCatalogueTest.class)
-//            .register(RecommendationsWithoutDateDimensionTest.class) recommendations are not yet implemented
+            .register(RecommendationsWithoutDateDimensionTest.class)
             .register(AttributeFiltersTest.class)
 //            .register(BucketsTest.class) all types of charts must be developed first to run BucketsTest
 //            .register(ErrorStatesTest.class) this test requires Open as Report feature
@@ -22,7 +22,7 @@ public class PRCheckerTestFlow {
 //            .register(ResetButtonTest.class) requires charts
             .register("testng-ad-e2e-metrics-test.xml")
 //            .register("testng-ad-e2e-visualization-test.xml") too complex test suite, one of the last to run
-//            .register("testng-ad-e2e-recommendation-test.xml") CL-9025 - shortcuts story
+            .register("testng-ad-e2e-recommendation-test.xml")
             .register("testng-ad-e2e-catalogue-test.xml")
 //            .register("testng-ad-e2e-date-test.xml")
             .toTextFile();
