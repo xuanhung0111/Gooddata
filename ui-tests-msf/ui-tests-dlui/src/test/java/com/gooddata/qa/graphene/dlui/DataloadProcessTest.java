@@ -1,9 +1,7 @@
 package com.gooddata.qa.graphene.dlui;
 
 import static com.gooddata.qa.graphene.enums.ResourceDirectory.API_RESOURCES;
-import static com.gooddata.qa.graphene.utils.Sleeper.sleepTight;
 import static com.gooddata.qa.graphene.utils.Sleeper.sleepTightInSeconds;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
 import static com.gooddata.qa.utils.io.ResourceUtils.getResourceAsFile;
 import static java.lang.String.format;
 import static org.testng.Assert.assertEquals;
@@ -37,9 +35,7 @@ import com.gooddata.qa.utils.http.RestUtils;
 import com.gooddata.qa.utils.http.process.ProcessRestUtils;
 import com.gooddata.qa.utils.http.rolap.RolapRestUtils;
 import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
-import com.gooddata.qa.utils.webdav.WebDavClient;
 import com.gooddata.warehouse.Warehouse;
-import com.google.common.collect.Lists;
 
 public class DataloadProcessTest extends AbstractMSFTest {
 
@@ -164,26 +160,6 @@ public class DataloadProcessTest extends AbstractMSFTest {
     }
 
     @Test(dependsOnGroups = {"initialData"}, priority = 3)
-    public void checkExecutionLogWithETLFailure() throws ParseException, JSONException, IOException {
-        final List<String> deleteFiles = Lists.newArrayList("f_opportunity.csv", "dataset.opportunity.csv",
-                "f_person.csv", "dataset.person.csv");
-
-        createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
-        deleteDataloadProcessAndCreateNewOne();
-
-        final String webDavUrl = getWebDavUrl();
-        final String executionUri = executeDataloadProcess(getRestApiClient(), SYNCHRONIZE_ALL_PARAM);
-        waitForExecutionInRunningState(executionUri);
-        final String etlTrigerParams = waitForTriggerEtlPullAndGetParams(executionUri);
-
-        deleteFilesFromWebdav(webDavUrl + "/" + etlTrigerParams, deleteFiles);
-        assertEquals(waitForRunningExecutionByStatus(getRestApiClient(), executionUri), ERROR_STATE,
-                "Execution is not failed because of ETL pull error!");
-
-        assertContentLogFile(getLogContent(getRestApiClient(), executionUri), "execution_log_error_etl.txt");
-    }
-
-    @Test(dependsOnGroups = {"initialData"}, priority = 3)
     public void checkConcurrentDataLoadViaRestAPI() throws ParseException, JSONException, IOException {
         createUpdateADSTable(ADSTables.WITH_ADDITIONAL_FIELDS_LARGE_DATA);
         deleteDataloadProcessAndCreateNewOne();
@@ -222,29 +198,6 @@ public class DataloadProcessTest extends AbstractMSFTest {
         } while (!ERROR_STATE.equals(state) && !OK_STATE.equals(state));
     }
 
-    private String waitForTriggerEtlPullAndGetParams(String executionUri) throws IOException, JSONException {
-        String logContent;
-        String state;
-
-        long timeOut = System.currentTimeMillis() + 5 * 60 * 1000; // 5 minutes
-        while (true) {
-            logContent = getLogContent(getRestApiClient(), executionUri);
-            Pattern myPattern = Pattern.compile("ETL pull triggered, params: (.*)");
-            Matcher m = myPattern.matcher(logContent);
-
-            if (m.find()) {
-                state = getExecutionStatus(getRestApiClient(), executionUri);
-                assertEquals(state, RUNNING_STATE);
-                return m.group(1);
-            }
-
-            if (System.currentTimeMillis() >= timeOut) { 
-                break;
-            }
-        }
-        throw new IllegalStateException("ETL pull triggered SYNCHRONIZE_ALL_PARAM not found!");
-    }
-
     private String getOwnerLogin() throws IOException, JSONException {
         return ProcessRestUtils.getDataloadProcessOwner(getRestApiClient(), testParams.getProjectId());
     }
@@ -252,40 +205,6 @@ public class DataloadProcessTest extends AbstractMSFTest {
     private String getLogContent(RestApiClient restApiClient, String executionUri)
             throws ParseException, IOException {
         return RestUtils.getResource(restApiClient, executionUri + "/log", HttpStatus.OK);
-    }
-
-    private String getWebDavUrl() {
-        openUrl(PAGE_GDC);
-        waitForElementPresent(gdcFragment.getRoot());
-        return gdcFragment.getUserUploadsURL();
-    }
-
-    private void deleteFilesFromWebdav(String webDavStructure, List<String> deleteUrls) throws IOException {
-        WebDavClient webDav = WebDavClient.getInstance(testParams.getUser(), testParams.getPassword());
-
-        final int timeout = 2 * 60 * 1000; // 2 mins
-        int totalWaitingTime = 0;
-        final int sleepTime = 200;
-        String fileUrl;
-        while (deleteUrls.size() > 0 && totalWaitingTime < timeout) {
-            for (String file : deleteUrls) {
-                System.out.println(String.format("Waiting for deleting file %s from WebDav...", file));
-
-                fileUrl = webDavStructure + "/" + file;
-                if (webDav.isFilePresent(fileUrl)) {
-                    webDav.deleteFile(fileUrl);
-                    deleteUrls.remove(file);
-                    break;
-                }
-
-                if (totalWaitingTime >= timeout) {
-                    System.out.println("Time out for deleting files from webdav!");
-                    break;
-                }
-                sleepTight(sleepTime);
-                totalWaitingTime += sleepTime;
-            }
-        }
     }
 
     private void assertContentLogFile(String logContent, String expectedLogFile) throws IOException {
