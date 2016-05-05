@@ -32,5 +32,5 @@ Expected output stage table column 'person.a__person' for LDM field 'label.perso
 
 Dataset 'dataset.opportunity' has mapping with errors: ValidationProblem{message='Expected output stage table column '%s' for LDM field '%s' does not exist.', messageParameters=[opportunity.cp__name, label.opportunity.name], type=UNMAPPED_DATASET_FIELD, severity=ERROR, datasetId=dataset.opportunity}.
 Dataset 'dataset.person' has mapping with errors: ValidationProblem{message='Expected output stage table column '%s' for LDM field '%s' does not exist.', messageParameters=[person.a__person, label.person.person], type=UNMAPPED_DATASET_FIELD, severity=ERROR, datasetId=dataset.person}.
-Data loading failed, reason:
+Data loader failed, reason:
 Following datasets have invalid mapping: dataset.opportunity, dataset.person
