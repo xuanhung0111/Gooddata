@@ -254,7 +254,37 @@ public class RegisterAndDeleteUserAccountTest extends AbstractUITest {
     public void registerUserWithEmailOfExistingAccount() {
         initRegistrationPage();
 
-        registrationPage.registerNewUser(registrationForm);
+        registrationPage.fillInRegistrationForm(new RegistrationForm())
+                .enterEmail(generateEmail(REGISTRATION_USER))
+                .enterSpecialCaptcha()
+                .agreeRegistrationLicense()
+                .submitForm();
+
+        takeScreenshot(browser, "Verification-on-un-registered-email-show-nothing-when-missing-other-fields", getClass());
+        assertFalse(registrationPage.isEmailInputError(), "Email input shows error but expected is not");
+        assertFalse(registrationPage.isCaptchaInputError(), "Captcha input shows error but expected is not");
+        assertEquals(registrationPage.getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
+
+        registrationPage.enterEmail(REGISTRATION_USER).submitForm();
+
+        takeScreenshot(browser, "Verification-on-registered-email-show-nothing-when-missing-other-fields", getClass());
+        assertFalse(registrationPage.isEmailInputError(), "Email input shows error but expected is not");
+        assertFalse(registrationPage.isCaptchaInputError(), "Captcha input shows error but expected is not");
+        assertEquals(registrationPage.getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
+
+        registrationPage.enterCaptcha("aaaaa").submitForm();
+
+        takeScreenshot(browser, "Email-and-captcha-field-show-nothing-when-enter-wrong-captcha", getClass());
+        assertFalse(registrationPage.isEmailInputError(), "Email input shows error but expected is not");
+        assertFalse(registrationPage.isCaptchaInputError(), "Error not show on captcha input");
+        assertEquals(registrationPage.getErrorMessage(), FIELD_MISSING_ERROR_MESSAGE);
+
+        registrationPage.fillInRegistrationForm(registrationForm)
+                .enterSpecialCaptcha()
+                .submitForm();
+
+        takeScreenshot(browser, "Error-message-displays-when-register-user-with-an-existed-email", getClass());
+        assertTrue(registrationPage.isEmailInputError(), "Error not show on email input");
         assertEquals(registrationPage.getErrorMessage(), EXISTED_EMAIL_ERROR_MESSAGE);
     }
 
