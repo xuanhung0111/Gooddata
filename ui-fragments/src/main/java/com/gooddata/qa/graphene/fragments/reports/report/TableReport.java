@@ -350,7 +350,7 @@ public class TableReport extends AbstractReport {
     }
 
     public boolean isNoData() {
-        return waitForElementPresent(REPORT_MESAGE_LOCATOR, getRoot()).getText().contains(NO_DATA);
+        return waitForElementVisible(REPORT_MESAGE_LOCATOR, getRoot()).getText().contains(NO_DATA);
     }
 
     public boolean isNotComputed() {
