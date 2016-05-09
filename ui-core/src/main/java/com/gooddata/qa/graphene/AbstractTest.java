@@ -93,6 +93,7 @@ public abstract class AbstractTest extends Arquillian {
     }
 
     public void openUrl(String url) {
+        String currentUrl = browser.getCurrentUrl();
         String pageURL = getRootUrl() + url.replaceAll("^/", "");
         System.out.println("Loading page ... " + pageURL);
 
@@ -101,7 +102,7 @@ public abstract class AbstractTest extends Arquillian {
 
         // We need to call browser#get(String) before refreshing page to make sure the last request to browser has
         // method is GET unless we will get an alert about re-sending information to browser 
-        if (pageURL.equals(browser.getCurrentUrl())) {
+        if (pageURL.equals(currentUrl)) {
             browser.navigate().refresh();
         }
     }
