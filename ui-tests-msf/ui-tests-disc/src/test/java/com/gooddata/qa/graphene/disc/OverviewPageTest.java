@@ -73,21 +73,6 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     }
 
     @Test(dependsOnMethods = {"createProject"})
-    public void checkFailedStateNumber() {
-        checkOverviewStateNumber(OverviewProjectStates.FAILED);
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
-    public void checkRunningStateNumber() {
-        checkOverviewStateNumber(OverviewProjectStates.RUNNING);
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
-    public void checkSuccessfulStateNumber() {
-        checkOverviewStateNumber(OverviewProjectStates.SUCCESSFUL);
-    }
-
-    @Test(dependsOnMethods = {"createProject"})
     public void checkScheduledStateNumber() {
         OverviewProjectDetails overviewProject = new OverviewProjectDetails();
         OverviewProcess overviewProcess =
