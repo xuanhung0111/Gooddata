@@ -5,11 +5,15 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static com.gooddata.qa.browser.BrowserUtils.canAccessGreyPage;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.ParseException;
+import org.json.JSONException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -23,6 +27,8 @@ import com.gooddata.qa.graphene.enums.disc.DeployPackages;
 import com.gooddata.qa.graphene.enums.disc.DeployPackages.Executables;
 import com.gooddata.qa.graphene.enums.disc.OverviewProjectStates;
 import com.gooddata.qa.graphene.enums.disc.ScheduleCronTimes;
+import com.gooddata.qa.graphene.enums.user.UserRoles;
+import com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils;
 
 public class OverviewPageTest extends AbstractOverviewProjectsTest {
 
@@ -35,6 +41,34 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
     @AfterMethod(alwaysRun = true)
     public void afterTest(Method m) {
         cleanWorkingProjectAfterTest(m);
+    }
+
+    // Due to bootstrap just save the last visited page, and account qa+test is used in many job at the same time,
+    // the expected page will be incorrect in this case after logout and sign in again.
+    // So we should use a separate user for this test case
+    @Test(dependsOnMethods = {"createProject"})
+    public void checkOverviewPageShowAfterLogoutAndSignIn() throws ParseException, JSONException, IOException {
+        String newUser = generateEmail(testParams.getUser());
+
+        UserManagementRestUtils.createUser(getRestApiClient(), newUser, testParams.getPassword());
+        addUserToProject(newUser, UserRoles.ADMIN);
+
+        try {
+            logout();
+            signInAtGreyPages(newUser, testParams.getPassword());
+
+            initDISCOverviewPage();
+
+            // Use this action to avoid navigating to projects.html before logout.
+            // So when sign in, user will be redirected to DISC page again
+            logoutInDiscPage();
+            signInAtUI(newUser, testParams.getPassword());
+            waitForFragmentVisible(discOverviewProjects);
+
+        } finally {
+            logoutAndLoginAs(canAccessGreyPage(browser), UserRoles.ADMIN);
+            UserManagementRestUtils.deleteUserByEmail(getRestApiClient(), newUser);
+        }
     }
 
     @Test(dependsOnMethods = {"createProject"})
@@ -401,5 +435,11 @@ public class OverviewPageTest extends AbstractOverviewProjectsTest {
         discOverview.selectOverviewState(state);
         waitForFragmentVisible(discOverviewProjects).accessProjectDetailPage(getWorkingProject());
         waitForFragmentVisible(projectDetailPage);
+    }
+
+    private void logoutInDiscPage() {
+        waitForElementVisible(BY_LOGGED_USER_BUTTON, browser).click();
+        waitForElementVisible(BY_LOGOUT_LINK, browser).click();
+        waitForFragmentVisible(loginFragment);
     }
 }
