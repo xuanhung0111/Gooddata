@@ -1,21 +1,19 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.cssSelector;
-import static org.openqa.selenium.By.tagName;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
+import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
+import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.SeeingPercentsRecommendation;
+import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
 import org.jboss.arquillian.graphene.Graphene;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
-import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.SeeingPercentsRecommendation;
-import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
+import static org.openqa.selenium.By.tagName;
+import static org.testng.Assert.assertFalse;
 
 public class ContributionRecommendationTest extends AbstractAdE2ETest {
 
@@ -35,10 +33,10 @@ public class ContributionRecommendationTest extends AbstractAdE2ETest {
             .<SeeingPercentsRecommendation>getRecommendation(RecommendationStep.SEE_PERCENTS).apply();
 
         analysisPageReact.waitForReportComputing();
-        assertTrue(isElementPresent(cssSelector(
-                ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
+//        assertTrue(isElementPresent(cssSelector(
+//                ".adi-components .visualization-bar .s-property-y.s-id-metricvalues"), browser));
 
-        browser.findElements(cssSelector(".adi-components .visualization-bar .highcharts-axis"))
+        browser.findElements(cssSelector(".adi-chart-container .highcharts-axis"))
             .stream()
             .map(e -> e.findElement(tagName("tspan")))
             .map(WebElement::getText)
