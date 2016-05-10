@@ -16,16 +16,18 @@ public class DatasetMessageBar extends AbstractFragment{
     private static final By BY_ERROR_MESSAGE_BAR = cssSelector(".gd-message.error");
     private static final By BY_SUCCESS_MESSAGE_BAR = cssSelector(".gd-message.success");
 
+    private static final int UPLOAD_CSV_TIMEOUT = 3 * 60; // 3 minutes
+
     public static DatasetMessageBar getInstance(SearchContext context) {
         return Graphene.createPageFragment(DatasetMessageBar.class,
                 waitForElementVisible(className("gd-messages"), context));
     }
 
     public WebElement waitForErrorMessageBar() {
-        return waitForElementVisible(BY_ERROR_MESSAGE_BAR, getRoot());
+        return waitForElementVisible(BY_ERROR_MESSAGE_BAR, getRoot(), UPLOAD_CSV_TIMEOUT);
     }
 
     public WebElement waitForSuccessMessageBar() {
-        return waitForElementVisible(BY_SUCCESS_MESSAGE_BAR, getRoot());
+        return waitForElementVisible(BY_SUCCESS_MESSAGE_BAR, getRoot(), UPLOAD_CSV_TIMEOUT);
     }
 }
