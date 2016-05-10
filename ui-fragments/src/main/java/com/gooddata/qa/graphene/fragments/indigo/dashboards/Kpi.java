@@ -37,7 +37,7 @@ public class Kpi extends Widget {
     public static final By IS_NOT_EDITABLE = By.cssSelector(MAIN_SELECTOR + " .kpi:not(.is-editable)");
     public static final By ALERT_DIALOG = By.className(KPI_ALERT_DIALOG_CLASS);
 
-    public static final By HINT_LOCATOR = By.cssSelector(".inplaceedit:hover");
+    public static final By HINT_LOCATOR = By.cssSelector(".gd-editable-label:hover");
 
     @FindBy(className = KPI_ALERT_BUTTON_CLASS)
     private WebElement alertButton;
@@ -45,7 +45,7 @@ public class Kpi extends Widget {
     @FindBy(css = ".kpi-headline > h3")
     private WebElement headline;
 
-    @FindBy(css = ".kpi-headline > h3 .inplaceedit")
+    @FindBy(css = ".kpi-headline > h3 .gd-editable-label")
     private WebElement headlineInplaceEdit;
 
     @FindBy(css = ".kpi-headline > h3 textarea")
