@@ -6,7 +6,7 @@ import static com.gooddata.qa.utils.CssUtils.simplifyText;
 import static com.gooddata.qa.utils.http.RestUtils.executeRequest;
 import static com.gooddata.qa.utils.http.RestUtils.getJsonObject;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjByUri;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createSimpleMufObjByUri;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
@@ -327,7 +327,7 @@ public class GoodSalesFilterDropdownAttributeValueTest extends GoodSalesAbstract
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
         conditions.put(stageNameUri, buildStageElementUris());
 
-        String mufUri = createMufObjByUri(getRestApiClient(),
+        String mufUri = createSimpleMufObjByUri(getRestApiClient(),
                 getProject().getId(), "Stage Name user filter", conditions);
         addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
 

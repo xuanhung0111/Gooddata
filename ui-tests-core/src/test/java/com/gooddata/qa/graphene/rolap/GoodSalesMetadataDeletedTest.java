@@ -637,7 +637,7 @@ public class GoodSalesMetadataDeletedTest extends GoodSalesAbstractTest {
     }
 
     private String createUserFilterFrom(AttributeInfo attribute) throws IOException, JSONException {
-        return DashboardsRestUtils.createMufObjByUri(getRestApiClient(),
+        return DashboardsRestUtils.createSimpleMufObjByUri(getRestApiClient(),
                 testParams.getProjectId(), "User filter "+ System.currentTimeMillis(),
                 getConditionInUriFormat(attribute.getConnectionBetweenAttributeAndElements()));
     }

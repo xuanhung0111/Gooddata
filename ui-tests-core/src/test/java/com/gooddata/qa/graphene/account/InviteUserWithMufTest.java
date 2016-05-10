@@ -5,7 +5,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForAnalysisPageLoaded
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForDashboardPageLoaded;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjByUri;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createSimpleMufObjByUri;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getRoleUriFromInvitation;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUserProfileByEmail;
 import static com.gooddata.qa.utils.http.user.mgmt.UserManagementRestUtils.getUsersUsingMuf;
@@ -269,6 +269,6 @@ public class InviteUserWithMufTest extends AbstractProjectTest {
         final Map<String, Collection<String>> conditions = new HashMap<>();
         conditions.put(education.getUri(), filteredElementUris);
 
-        return createMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
+        return createSimpleMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
     }
 }

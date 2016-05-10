@@ -91,8 +91,6 @@ public class ReportPage extends AbstractFragment {
     private static final By METRIC_ATTRIBUTE_CONTAINER_LOCATOR =
             cssSelector(".sndPanel1:not([style^='display: none']) .dataContainer .cell");
 
-    private static final By METRICS_LOCATOR = cssSelector(".sndMetric .metricName");
-
     private static final By ATTRIBUTES_CONTAINER_LOCATOR = cssSelector(".s-snd-AttributesContainer .gridTile");
 
     private static final By METRICS_CONTAINER_LOCATOR = cssSelector(".s-snd-MetricsContainer .gridTile");
