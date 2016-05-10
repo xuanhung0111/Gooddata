@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
@@ -21,6 +22,7 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.Catalog
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.FiltersBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.reports.ChartReport;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 public class GoodSalesMultipleDatasetsTest extends AnalyticalDesignerAbstractTest {
 
@@ -47,6 +49,17 @@ public class GoodSalesMultipleDatasetsTest extends AnalyticalDesignerAbstractTes
     public void prepareSetupProject() throws JSONException, URISyntaxException, IOException {
         setupProductionData();
         uploadPayrollDataset();
+    }
+
+    //force FF to refresh after each test
+    //because FF is only refreshed when url is different from previous one
+    @BeforeMethod
+    public void refreshStartPage(Method m) {
+        if (!m.getDeclaringClass().equals(this.getClass())) return;
+
+        if (m.getAnnotation(Test.class) != null) {
+            browser.navigate().refresh();
+        }
     }
 
     @Test(dependsOnGroups = {"init"})
