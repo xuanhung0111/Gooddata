@@ -39,6 +39,7 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
 
     private static final String FISCAL_CSV_PATH = "/" + UPLOAD_CSV + "/fiscal_dimension_sample_test.csv";
     private static final String FISCAL_DATASET = "Fiscal Dimension Sample Test";
+    private static final String FISCAL_DATASET_ID = "dataset.csv_fiscal_dimension_sample_test";
 
     @BeforeClass(alwaysRun = true)
     public void initProperties() {
@@ -52,14 +53,15 @@ public class GoodSalesCustomDateDimensionsTest extends AnalyticalDesignerAbstrac
         startPageContext = new StartPageContext() {
             @Override
             public void waitForStartPageLoaded() {
-                waitForFragmentVisible(analysisPage)
-                    .getCataloguePanel()
-                    .changeDataset(FISCAL_DATASET);
+                waitForFragmentVisible(analysisPage);
             }
 
             @Override
             public String getStartPage() {
-                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId() + "/reportId/edit";
+                //load fiscal data set as default 
+                //because FF is only refreshed when url is different from previous one
+                return PAGE_UI_ANALYSE_PREFIX + testParams.getProjectId()
+                        + "/reportId/edit?dataset=" + FISCAL_DATASET_ID;
             }
         };
     }
