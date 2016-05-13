@@ -17,7 +17,7 @@ public class PRCheckerTestFlow {
 //            .register(TableTest.class) Table sorting and bar chart must work first
             .register(UndoTest.class)
 //            .register(AttributeBasedMetricsTest.class) requires charts
-//            .register(FactBasedMetricsTest.class)
+            .register(FactBasedMetricsTest.class)
             .register(StackedChartsTest.class)
             .register(ResetButtonTest.class)
             .register("testng-ad-e2e-metrics-test.xml")
