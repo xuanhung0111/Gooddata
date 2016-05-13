@@ -1,16 +1,15 @@
 package com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals;
 
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static org.openqa.selenium.By.cssSelector;
-
+import com.gooddata.qa.graphene.fragments.AbstractFragment;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import com.gooddata.qa.graphene.fragments.AbstractFragment;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static org.openqa.selenium.By.cssSelector;
 
 public class AnalysisPageHeader extends AbstractFragment {
 
-    @FindBy(className = "s-reset")
+    @FindBy(className = "s-clear")
     private WebElement resetButton;
 
     @FindBy(className = "s-export-to-report")
