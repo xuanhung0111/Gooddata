@@ -7,6 +7,8 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -15,9 +17,12 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,16 +35,20 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.ParseException;
 import org.json.JSONException;
 import org.supercsv.io.CsvListReader;
+import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.gooddata.md.Attribute;
-import com.gooddata.md.MetadataService;
 import com.gooddata.md.Metric;
 import com.gooddata.md.Restriction;
-import com.gooddata.project.Project;
+import com.gooddata.md.report.AttributeInGrid;
+import com.gooddata.md.report.GridElement;
+import com.gooddata.md.report.GridReportDefinitionContent;
+import com.gooddata.md.report.Report;
+import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.qa.graphene.GoodSalesAbstractTest;
 import com.gooddata.qa.graphene.entity.filter.FilterItem;
 import com.gooddata.qa.graphene.entity.metric.CustomMetricUI;
@@ -49,6 +58,8 @@ import com.gooddata.qa.graphene.enums.report.ExportFormat;
 import com.gooddata.qa.graphene.fragments.reports.report.TableReport;
 import com.gooddata.qa.graphene.utils.Sleeper;
 import com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils;
+import com.gooddata.report.ReportExportFormat;
+import com.gooddata.report.ReportService;
 
 @Test(groups = {"GoodSalesMetrics"},
         description = "Tests for GoodSales project (metric creation functionality) in GD platform")
@@ -114,9 +125,6 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     private static final String DEFAULT_METRIC_NUMBER_FORMAT = "#,##0.00";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-    private MetadataService mdService;
-    private Project project;
 
     @BeforeClass(alwaysRun = true)
     public void setProjectTitle() {
@@ -496,21 +504,24 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"}, dataProvider = "likeProvider")
+    @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"}, dataProvider = "likeProvider")
     public void testLikeFunctions(MetricTypes metricType, String pattern, List<List<String>> expectedResult) 
             throws IOException {
-        Metric metricObj = mdService.getObj(project, Metric.class, Restriction.title("# of Activities"));
-        Attribute attrObj = mdService.getObj(project, Attribute.class, Restriction.title("Activity Type"));
-        String metric = createLikeMetric(metricType, attrObj, metricObj, pattern);
-        UiReportDefinition rd = new UiReportDefinition().withName("Report for " + metricType.getLabel())
-                .withHows("Activity Type")
-                .withWhats(metric);
-        createReport(rd, rd.getName());
-        openReport(rd.getName());
+        Metric metricObj = getMdService().getObj(getProject(), Metric.class, Restriction.title("# of Activities"));
+        Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title("Activity Type"));
+        Metric metric = createLikeMetric(metricType, attrObj, metricObj, pattern);
 
+        ReportDefinition definition = GridReportDefinitionContent.create("Report for " + metricType.getLabel(),
+                singletonList("metricGroup"),
+                singletonList(new AttributeInGrid(attrObj.getDefaultDisplayForm().getUri())),
+                singletonList(new GridElement(metric.getUri(), metric.getTitle())));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
+
+        final ByteArrayOutputStream output = exportReport(definition);
         List<List<String>> actualResult = new ArrayList<>();
-        try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
-                reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
+        try (ICsvListReader reader = new CsvListReader(new InputStreamReader(
+                new ByteArrayInputStream(output.toByteArray())), CsvPreference.STANDARD_PREFERENCE)){
             reader.getHeader(true);
             List<String> reportResult;
             while ((reportResult = reader.read()) != null) {
@@ -520,32 +531,32 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         assertEquals(actualResult, expectedResult);
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
     public void testLikeFunctionWithVariousPattern() throws IOException {
         List<List<String>> expectedResult = asList(asList("Explorer", "1465", "1465", "1465", null));
         String reportName = "LIKE_OPERATOR_with_various_pattern";
-        Metric metricObj = mdService.getObj(project, Metric.class, Restriction.title("# of Opportunities"));
-        Attribute attrObj = mdService.getObj(project, Attribute.class, Restriction.title("Product"));
+        Metric metricObj = getMdService().getObj(getProject(), Metric.class, Restriction.title("# of Opportunities"));
+        Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title("Product"));
 
-        String metricWithFullStringPattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Explorer");
-        String metricWithPercentSignPattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "%lorer");
+        Metric metricWithFullStringPattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Explorer");
+        Metric metricWithPercentSignPattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "%lorer");
         //one underscore presents for one character, so if two characters are missing, it requires two underscores
-        String metricWithUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Expl__er");
-        String metricWithWrongUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, 
-                "Expl_r");
+        Metric metricWithUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Expl__er");
+        Metric metricWithWrongUnderscorePattern = createLikeMetric(MetricTypes.LIKE, attrObj, metricObj, "Expl_r");
 
-        UiReportDefinition rd = new UiReportDefinition().withName(reportName)
-                .withHows("Product")
-                .withWhats(metricWithFullStringPattern)
-                .withWhats(metricWithPercentSignPattern)
-                .withWhats(metricWithUnderscorePattern)
-                .withWhats(metricWithWrongUnderscorePattern);
-        createReport(rd, rd.getName());
-        openReport(reportName);
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
+                singletonList(new AttributeInGrid(attrObj.getDefaultDisplayForm().getUri())),
+                asList(new GridElement(metricWithFullStringPattern.getUri(), metricWithFullStringPattern.getTitle()),
+                        new GridElement(metricWithPercentSignPattern.getUri(), metricWithPercentSignPattern.getTitle()),
+                        new GridElement(metricWithUnderscorePattern.getUri(), metricWithUnderscorePattern.getTitle()),
+                        new GridElement(metricWithWrongUnderscorePattern.getUri(), metricWithWrongUnderscorePattern.getTitle())));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
 
+        final ByteArrayOutputStream output = exportReport(definition);
         List<List<String>> actualResult = new ArrayList<>();
-        try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
-                reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
+        try (ICsvListReader reader = new CsvListReader(new InputStreamReader(
+                new ByteArrayInputStream(output.toByteArray())), CsvPreference.STANDARD_PREFERENCE)){
             reader.getHeader(true);
             List<String> reportResult;
             while ((reportResult = reader.read()) != null) {
@@ -581,36 +592,46 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         };
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric", "init-metrics"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric", "init-metrics"})
     public void createNegativeMetric() {
-        String negativeMaql = "SELECT [" + mdService.getObjUri(project, Metric.class,
+        String negativeMaql = "SELECT [" + getMdService().getObjUri(getProject(), Metric.class,
                 Restriction.title(NUMBER_OF_OPEN_OPPS)) + "] - 300";
-        mdService.createObj(project, new Metric(NEGATIVE, negativeMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+        getMdService().createObj(getProject(), new Metric(NEGATIVE, negativeMaql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric", "init-metrics"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric", "init-metrics"})
     public void createMetricHasNullValue() {
-        String nullMaql = "SELECT CASE WHEN [" + mdService.getObjUri(project, Metric.class,
+        String nullMaql = "SELECT CASE WHEN [" + getMdService().getObjUri(getProject(), Metric.class,
                 Restriction.title(NUMBER_OF_OPEN_OPPS)) + "] > 200 THEN 1 END";
         String ifNullMaql = "SELECT IFNULL((" + nullMaql+ "),0)";
-        mdService.createObj(project, new Metric(NULL_METRIC, ifNullMaql, DEFAULT_METRIC_NUMBER_FORMAT));
+        getMdService().createObj(getProject(), new Metric(NULL_METRIC, ifNullMaql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
     @Test(dependsOnGroups = {"init-metrics"}, groups = {"non-UI-metric"},
             dataProvider = "greatestLeastProvider")
     public void testGreatestAndLeastFunction(String reportName, List<String> metrics,
             List<List<String>> expectedResult) throws IOException {
-        List<String> greatestLeastMetrics = createGreatestAndLeastMetric(STAGE_NAME, metrics);
+        List<Metric> greatestLeastMetrics = createGreatestAndLeastMetric(STAGE_NAME, metrics);
+        Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title(STAGE_NAME));
 
-        UiReportDefinition rd = new UiReportDefinition().withName(reportName).withHows(STAGE_NAME);
-        metrics.stream().forEach(metric -> rd.withWhats(metric));
-        greatestLeastMetrics.stream().forEach(metric -> rd.withWhats(metric));
-        createReport(rd, rd.getName());
-        openReport(reportName);
-        
+        List<GridElement> gridElements = metrics.stream()
+            .map(title -> getMdService().getObj(getProject(), Metric.class, Restriction.title(title)))
+            .map(metric -> new GridElement(metric.getUri(), metric.getTitle()))
+            .collect(toList());
+
+        greatestLeastMetrics.stream()
+            .map(metric -> new GridElement(metric.getUri(), metric.getTitle()))
+            .forEach(metric -> gridElements.add(metric));
+
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
+                singletonList(new AttributeInGrid(attrObj.getDefaultDisplayForm().getUri())), gridElements);
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
+
+        final ByteArrayOutputStream output = exportReport(definition);
         List<List<String>> actualResult = new ArrayList<>();
-        try (CsvListReader reader = new CsvListReader(new FileReader(new File(testParams.getDownloadFolder(),
-                reportPage.exportReport(ExportFormat.CSV) + ".csv")), CsvPreference.STANDARD_PREFERENCE)) {
+        try (ICsvListReader reader = new CsvListReader(new InputStreamReader(
+                new ByteArrayInputStream(output.toByteArray())), CsvPreference.STANDARD_PREFERENCE)){
             reader.getHeader(true);
             List<String> reportResult;
             while ((reportResult = reader.read()) != null) {
@@ -620,39 +641,53 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         assertEquals(actualResult, expectedResult);
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
     public void testRollingWindowMetrics() throws ParseException, JSONException, IOException {
-        String amountUri = mdService.getObjUri(project, Metric.class, Restriction.title(AMOUNT));
-        String yearUri = mdService.getObjUri(project, Attribute.class, Restriction.title(YEAR_SNAPSHOT));
+        Metric amount = getMdService().getObj(getProject(), Metric.class, Restriction.title(AMOUNT));
+        String yearUri = getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(YEAR_SNAPSHOT));
+        Attribute date = getMdService().getObj(getProject(), Attribute.class, Restriction.title(DATE_SNAPSHOT));
+        Attribute monthYear = getMdService().getObj(getProject(), Attribute.class, Restriction.title(MONTH_YEAR_SNAPSHOT));
 
-        Metric m1 = mdService.createObj(project, new Metric("M1",
-                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW",
+        Metric m1 = getMdService().createObj(getProject(), new Metric("M1",
+                "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW",
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
-        mdService.createObj(project, new Metric("M2",
-                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING",
+        Metric m2 = getMdService().createObj(getProject(), new Metric("M2",
+                "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING",
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
-        mdService.createObj(project, new Metric("M3",
-                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND 1 FOLLOWING",
+        Metric m3 = getMdService().createObj(getProject(), new Metric("M3",
+                "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5 PRECEDING AND 1 FOLLOWING",
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
-        mdService.createObj(project, new Metric("M4",
-                "SELECT RUNSUM( [" + amountUri + "] ) WITHIN ([" + yearUri + "])"
+        Metric m4 = getMdService().createObj(getProject(), new Metric("M4",
+                "SELECT RUNSUM( [" + amount.getUri() + "] ) WITHIN ([" + yearUri + "])"
                         + " ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
                 DEFAULT_METRIC_NUMBER_FORMAT));
 
         String reportName = "RollingMetric - Date";
-        UiReportDefinition rd = new UiReportDefinition().withName(reportName).withHows(DATE_SNAPSHOT)
-                .withWhats(AMOUNT, "M1", "M2", "M3", "M4");
-        createReport(rd, rd.getName());
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
+                singletonList(new AttributeInGrid(date.getDefaultDisplayForm().getUri())),
+                asList(new GridElement(amount.getUri(), amount.getTitle()),
+                        new GridElement(m1.getUri(), m1.getTitle()),
+                        new GridElement(m2.getUri(), m2.getTitle()),
+                        new GridElement(m3.getUri(), m3.getTitle()),
+                        new GridElement(m4.getUri(), m4.getTitle())));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
         openReport(reportName);
         checkReportRenderedWell(reportName);
 
         reportName = "RollingMetric - Month_Year";
-        rd = new UiReportDefinition().withName(reportName).withHows(MONTH_YEAR_SNAPSHOT)
-                .withWhats(AMOUNT, "M1", "M2", "M3", "M4");
-        createReport(rd, rd.getName());
+        definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
+                singletonList(new AttributeInGrid(monthYear.getDefaultDisplayForm().getUri())),
+                asList(new GridElement(amount.getUri(), amount.getTitle()),
+                        new GridElement(m1.getUri(), m1.getTitle()),
+                        new GridElement(m2.getUri(), m2.getTitle()),
+                        new GridElement(m3.getUri(), m3.getTitle()),
+                        new GridElement(m4.getUri(), m4.getTitle())));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
         openReport(reportName);
         checkReportRenderedWell(reportName);
 
@@ -665,39 +700,36 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         assertNull(firstRow.get(3));
 
         DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
-                "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW");
+                "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5.5 PRECEDING AND CURRENT ROW");
         try {
             openReport(reportName);
             takeScreenshot(browser, "checkReportRenderedWell - report not computable", getClass());
             assertThat(reportPage.getInvalidDataReportMessage(), equalTo(REPORT_NOT_COMPUTABLE_MESSAGE));
         } finally {
             DashboardsRestUtils.changeMetricExpression(getRestApiClient(), m1.getUri(),
-                    "SELECT RUNSUM( [" + amountUri + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW");
+                    "SELECT RUNSUM( [" + amount.getUri() + "] ) ROWS BETWEEN 5 PRECEDING AND CURRENT ROW");
         }
     }
 
     @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
-    public void initializeGoodDataSDK() {
-        mdService = getGoodDataClient().getMetadataService();
-        project = getGoodDataClient().getProjectService().getProjectById(testParams.getProjectId());
-    }
-
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
     public void createTimeMacrosMetrics() {
+        Attribute product = getMdService().getObj(getProject(), Attribute.class, Restriction.title(PRODUCT));
+
         for (MetricTypes metric : asList(MetricTypes.THIS, MetricTypes.PREVIOUS, MetricTypes.NEXT)) {
-            checkMetricValuesInReport(createMetricByGoodDataClient(metric).getTitle(),
-                    PRODUCT, getMetricValues(metric), PRODUCT_VALUES);
+            checkMetricValuesInReport(createMetricByGoodDataClient(metric), product,
+                    getMetricValues(metric), PRODUCT_VALUES);
         }
     }
 
-    @Test(dependsOnMethods = {"initializeGoodDataSDK"}, groups = {"non-UI-metric"})
+    @Test(dependsOnGroups = {"createProject"}, groups = {"non-UI-metric"})
     public void createMetricsWithParentFilterExcept() {
         List<Float> withPFExceptValues = getMetricValues(MetricTypes.WITH_PF_EXCEPT);
         List<Float> withoutPFExceptValues = getMetricValues(MetricTypes.WITHOUT_PF_EXCEPT);
         List<String> attributeValues = asList("2010", "2011", "2012");
+        Attribute year = getMdService().getObj(getProject(), Attribute.class, Restriction.title(YEAR_SNAPSHOT));
 
-        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITH_PF_EXCEPT).getTitle(),
-                YEAR_SNAPSHOT, withPFExceptValues, attributeValues);
+        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITH_PF_EXCEPT),
+                year, withPFExceptValues, attributeValues);
         addFilterAndCheckReport(attributeValues, withPFExceptValues,
                 PRODUCT, "CompuSci", "Educationly", "Explorer");
         addFilterAndCheckReport(attributeValues, withPFExceptValues, 
@@ -705,8 +737,8 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         addFilterAndCheckReport(attributeValues, asList(1.7967886E7f, 6.2103956E7f, 8.0406328E7f),
                 DEPARTMENT, "Direct Sales");
 
-        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITHOUT_PF_EXCEPT).getTitle(),
-                YEAR_SNAPSHOT, withoutPFExceptValues, attributeValues);
+        checkMetricValuesInReport(createMetricByGoodDataClient(MetricTypes.WITHOUT_PF_EXCEPT),
+                year, withoutPFExceptValues, attributeValues);
         addFilterAndCheckReport(attributeValues, withoutPFExceptValues, DEPARTMENT, "Direct Sales");
         addFilterAndCheckReport(attributeValues, asList(1.3019884E7f, 4.7406964E7f, 6.5819096E7f),
                 PRODUCT, "CompuSci", "Explorer");
@@ -795,6 +827,34 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
         reportPage.saveReport();
     }
 
+    private ByteArrayOutputStream exportReport(ReportDefinition rd) {
+        ReportService reportService = goodDataClient.getReportService();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        reportService.exportReport(rd, ReportExportFormat.CSV, output).get();
+        return output;
+    }
+
+    private void checkMetricValuesInReport(Metric metric, Attribute attribute, List<Float> metricValues,
+            List<String> attributeValues) {
+        String reportName = "report_" + metric.getTitle();
+        ReportDefinition definition = GridReportDefinitionContent.create(reportName, singletonList("metricGroup"),
+                singletonList(new AttributeInGrid(attribute.getDefaultDisplayForm().getUri())),
+                singletonList(new GridElement(metric.getUri(), metric.getTitle())));
+        definition = getMdService().createObj(getProject(), definition);
+        getMdService().createObj(getProject(), new Report(definition.getTitle(), definition));
+
+        openReport(reportName);
+        List<Float> metricValuesinGrid = reportPage.getTableReport().getMetricElements();
+        takeScreenshot(browser, "check-metric" + "-" + metric.getTitle(), this.getClass());
+        System.out.println("Actual metric values:   " + metricValuesinGrid);
+        System.out.println("Expected metric values: " + metricValues);
+        assertEquals(metricValuesinGrid, metricValues, "Metric values list is incorrrect");
+        if (attributeValues != null) {
+            List<String> attributeValuesinGrid = reportPage.getTableReport().getAttributeElements();
+            assertEquals(attributeValuesinGrid, attributeValues);
+        }
+    }
+
     private void checkMetricValuesInReport(String metricName, String attributeName, List<Float> metricValues,
             List<String> attributeValues) {
         System.out.println("Verifying metric values of [" + metricName + "] in report");
@@ -828,16 +888,16 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
     }
 
     private Metric createMetricByGoodDataClient(MetricTypes metricType) {
-        String amountUri = "[" + mdService.getObjUri(project, Metric.class, Restriction.title(AMOUNT)) + "]";
+        String amountUri = "[" + getMdService().getObjUri(getProject(), Metric.class, Restriction.title(AMOUNT)) + "]";
         String dateClosedUri =
-                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title("Date (Closed)")) + "]";
+                "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title("Date (Closed)")) + "]";
         String dateSnapshotUri = 
-                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title("Date (Created)"))  + "]";
+                "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title("Date (Created)"))  + "]";
         String dateCreatedUri = 
-                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title("Date (Snapshot)")) + "]";
+                "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title("Date (Snapshot)")) + "]";
         String stageNameUri =
-                "[" + mdService.getObjUri(project, Attribute.class, Restriction.title(STAGE_NAME)) + "]";
-        String productUri = "[" + mdService.getObjUri(project, Attribute.class, Restriction.title(PRODUCT)) + "]";
+                "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(STAGE_NAME)) + "]";
+        String productUri = "[" + getMdService().getObjUri(getProject(), Attribute.class, Restriction.title(PRODUCT)) + "]";
 
         String metric = "__metric__";
         String attribute = "__attr__";
@@ -861,7 +921,7 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 break;
         }
 
-        return mdService.createObj(project, new Metric(metricType.getLabel(),
+        return getMdService().createObj(getProject(), new Metric(metricType.getLabel(),
                 maql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
@@ -905,19 +965,18 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
-    private String createLikeMetric(MetricTypes metricLikeType, Attribute attrObj, Metric metricObj , String pattern){
+    private Metric createLikeMetric(MetricTypes metricLikeType, Attribute attrObj, Metric metricObj , String pattern){
         String metricMaql = metricLikeType.getMaql()
                 .replace("__metric__", format("[%s]", metricObj.getUri()))
                 .replace("__attr__", format("[%s]", attrObj.getDisplayForms().iterator().next().getUri()))
                 .replace("__like.pattern__", pattern);
         log.info(metricMaql);
         String likeMetricName = metricLikeType.getLabel() + System.currentTimeMillis(); 
-        mdService.createObj(project, new Metric(likeMetricName, metricMaql, DEFAULT_METRIC_NUMBER_FORMAT));
-        return likeMetricName;
+        return getMdService().createObj(getProject(), new Metric(likeMetricName, metricMaql, DEFAULT_METRIC_NUMBER_FORMAT));
     }
 
-    private List<String> createGreatestAndLeastMetric(String attribute, List<String> metrics) {
-        Attribute attrObj = mdService.getObj(project, Attribute.class, Restriction.title(attribute));
+    private List<Metric> createGreatestAndLeastMetric(String attribute, List<String> metrics) {
+        Attribute attrObj = getMdService().getObj(getProject(), Attribute.class, Restriction.title(attribute));
 
         String greatestMaql = MetricTypes.GREATEST.getMaql()
                 .replace("__attr__", format("[%s]", attrObj.getUri()));
@@ -925,17 +984,17 @@ public class GoodSalesMetricTest extends GoodSalesAbstractTest {
                 .replace("__attr__", format("[%s]", attrObj.getUri()));
 
         for (String metric : metrics) {
-            String uri = mdService.getObjUri(project, Metric.class, Restriction.title(metric));
+            String uri = getMdService().getObjUri(getProject(), Metric.class, Restriction.title(metric));
             greatestMaql = greatestMaql.replaceFirst("__metric__", format("[%s]", uri));
             leastMaql = leastMaql.replaceFirst("__metric__", format("[%s]", uri));
         };
 
         String greatestMetric = MetricTypes.GREATEST.getLabel() + System.currentTimeMillis();
         String leastMetric = MetricTypes.LEAST.getLabel() + System.currentTimeMillis();
-        mdService.createObj(project, new Metric(greatestMetric, greatestMaql, DEFAULT_METRIC_NUMBER_FORMAT));
-        mdService.createObj(project, new Metric(leastMetric, leastMaql, DEFAULT_METRIC_NUMBER_FORMAT));
 
-        return asList(greatestMetric, leastMetric);
+        return asList(
+            getMdService().createObj(getProject(), new Metric(greatestMetric, greatestMaql, DEFAULT_METRIC_NUMBER_FORMAT)),
+            getMdService().createObj(getProject(), new Metric(leastMetric, leastMaql, DEFAULT_METRIC_NUMBER_FORMAT)));
     }
 
     private List<Float> getMetricValues(MetricTypes metric) {
