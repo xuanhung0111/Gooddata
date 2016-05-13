@@ -24,7 +24,10 @@ import com.gooddata.qa.graphene.fragments.csvuploader.DatasetMessageBar;
 
 public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
 
-    @Test(dependsOnMethods = {"createProject"})
+    private String newAdminUser;
+    private String newAdminPassword;
+
+    @Test(dependsOnMethods = {"createProject"}, groups = "csv")
     public void checkMyDataAndNoDataOfOthers() {
         final Dataset dataset = uploadCsv(PAYROLL);
         assertTrue(dataset.getStatus()
@@ -33,12 +36,16 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         takeScreenshot(browser, "dataset-uploaded-" + dataset.getName(), getClass());
     }
 
-    @Test(dependsOnMethods = {"checkMyDataAndNoDataOfOthers"})
-    public void addOtherAdminToProject() throws ParseException, IOException, JSONException {
-        addUserToProject(testParams.getAdminUser(), UserRoles.ADMIN);
+    @Test(dependsOnMethods = {"checkMyDataAndNoDataOfOthers"}, groups = "csv")
+    public void inviteUsersToProject() throws ParseException, IOException, JSONException {
+        newAdminUser = testParams.getViewerUser();
+        newAdminPassword = testParams.getViewerPassword();
+
+        addUserToProject(newAdminUser, UserRoles.ADMIN);
+        addEditorUserToProject();
     }
 
-    @Test(dependsOnMethods = {"addOtherAdminToProject"})
+    @Test(dependsOnMethods = {"inviteUsersToProject"}, groups = "csv")
     public void checkNoMyDataButDataOfOthers() throws JSONException {
         try {
             final List<String> projectOwnerDatasetNames = initDataUploadPage()
@@ -46,7 +53,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     .getDatasetNames();
 
             logout();
-            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
+            signInAtGreyPages(newAdminUser, newAdminPassword);
 
             initDataUploadPage().waitForMyDatasetsEmptyStateLoaded();
 
@@ -59,7 +66,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"checkNoMyDataButDataOfOthers"})
+    @Test(dependsOnMethods = {"checkNoMyDataButDataOfOthers"}, groups = "csv")
     public void checkMyDataAndDataOfOthers() throws JSONException {
         try {
             final List<String> projectOwnerDatasetNames = initDataUploadPage()
@@ -67,7 +74,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
                     .getDatasetNames();
 
             logout();
-            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
+            signInAtGreyPages(newAdminUser, newAdminPassword);
 
             initDataUploadPage().waitForMyDatasetsEmptyStateLoaded();
 
@@ -86,11 +93,11 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"checkMyDataAndDataOfOthers"})
+    @Test(dependsOnMethods = {"checkMyDataAndDataOfOthers"}, groups = "csv")
     public void checkAdminCanDeleteDatasetOfOthers() throws JSONException {
         try {
             logout();
-            signInAtGreyPages(testParams.getAdminUser(), testParams.getAdminPassword());
+            signInAtGreyPages(newAdminUser, newAdminPassword);
 
             final String datasetName = PAYROLL.getDatasetNameOfFirstUpload();
             final int datasetCountBeforeDelete = initDataUploadPage().getOtherDatasetsCount();
@@ -115,12 +122,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"checkAdminCanDeleteDatasetOfOthers"})
-    public void addViewerAndEditorToProject() throws ParseException, IOException, JSONException {
-        addUsersWithOtherRolesToProject();
-    }
-
-    @Test(dependsOnMethods = {"addViewerAndEditorToProject"})
+    @Test(dependsOnMethods = {"checkAdminCanDeleteDatasetOfOthers"}, groups = "csv")
     public void checkEditorCanManageHisOwnData() throws JSONException {
         try {
             logoutAndLoginAs(true, UserRoles.EDITOR);
@@ -169,7 +171,7 @@ public class DataOfOtherUsersTest extends AbstractCsvUploaderTest {
         }
     }
 
-    @Test(dependsOnMethods = {"addViewerAndEditorToProject"})
+    @Test(dependsOnMethods = {"checkAdminCanDeleteDatasetOfOthers"}, groups = "csv")
     public void checEditorCannotEditDataOfOthers() throws JSONException {
         try {
             Dataset dataset = uploadCsv(PAYROLL);
