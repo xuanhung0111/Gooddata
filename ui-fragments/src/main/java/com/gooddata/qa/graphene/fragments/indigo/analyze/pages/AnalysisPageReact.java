@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 
 import static com.gooddata.qa.graphene.utils.WaitUtils.*;
 import static org.openqa.selenium.By.className;
+import static org.testng.Assert.assertTrue;
 
 /**
  * assertTrue(isBlankState()) is commented out from resetToBlankState()
@@ -194,7 +195,7 @@ public class AnalysisPageReact extends AbstractFragment {
 
     public AnalysisPageReact resetToBlankState() {
         getPageHeader().resetToBlankState();
-//        assertTrue(isBlankState());
+        assertTrue(isBlankState());
         return this;
     }
 
