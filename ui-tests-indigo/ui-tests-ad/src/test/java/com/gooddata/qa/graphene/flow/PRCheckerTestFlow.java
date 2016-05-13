@@ -16,7 +16,7 @@ public class PRCheckerTestFlow {
             .register(ErrorStatesTest.class)
 //            .register(TableTest.class) Table sorting and bar chart must work first
             .register(UndoTest.class)
-//            .register(AttributeBasedMetricsTest.class) requires charts
+            .register(AttributeBasedMetricsTest.class)
             .register(FactBasedMetricsTest.class)
             .register(StackedChartsTest.class)
             .register(ResetButtonTest.class)
