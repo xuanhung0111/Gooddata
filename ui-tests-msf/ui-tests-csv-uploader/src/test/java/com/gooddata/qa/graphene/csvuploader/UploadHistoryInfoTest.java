@@ -29,7 +29,7 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
 
     private CsvFile csvFile;
 
-    @Test(dependsOnMethods = {"createProject"})
+    @Test(dependsOnMethods = {"createProject"}, groups = "precondition")
     public void inviteUser() throws ParseException, IOException, JSONException {
         otherAdminUser = testParams.getEditorUser();
         otherAdminPassword = testParams.getEditorPassword();
@@ -37,7 +37,7 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
         addUserToProject(otherAdminUser, UserRoles.ADMIN);
     }
 
-    @Test(dependsOnMethods = "inviteUser")
+    @Test(dependsOnGroups = "precondition", groups = "csv")
     public void checkInfoWhenAddingData() throws IOException {
         csvFile = new CsvFile(DATASET_NAME)
                 .columns(new CsvFile.Column("Firstname"), new CsvFile.Column("Number"))
@@ -68,7 +68,7 @@ public class UploadHistoryInfoTest extends AbstractCsvUploaderTest {
                 .matches(DATE_FORMAT), "Date format is invalid");
     }
 
-    @Test(dependsOnMethods = "checkInfoWhenAddingData")
+    @Test(dependsOnMethods = "checkInfoWhenAddingData", groups = "csv")
     public void checkInfoWhenUpdatingData() throws JSONException, ParseException, IOException {
         final String adminUserName = getFullNameOf(testParams.getUser());
         final String otherAdminUserName = getFullNameOf(otherAdminUser);

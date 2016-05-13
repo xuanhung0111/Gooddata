@@ -1,0 +1,21 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="GD_UI_Selenium_Tests">
+    <test name="notification-tests">
+        <groups>
+            <run>
+                <include name="csv" />
+                <include name="precondition" />
+                <include name="createProject" />
+                <include name="projectInit" />
+                <include name="arquillian" />
+            </run>
+            <dependencies>
+                <group name="csv" depends-on="projectInit" />
+            </dependencies>
+        </groups>
+        <classes>
+            <class name="com.gooddata.qa.graphene.csvuploader.NotificationTest" />
+        </classes>
+    </test>
+
+</suite>
