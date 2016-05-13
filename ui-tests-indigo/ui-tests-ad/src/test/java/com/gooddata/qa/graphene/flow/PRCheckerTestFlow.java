@@ -18,7 +18,7 @@ public class PRCheckerTestFlow {
             .register(UndoTest.class)
 //            .register(AttributeBasedMetricsTest.class) requires charts
 //            .register(FactBasedMetricsTest.class)
-//            .register(StackedChartsTest.class) requires stacked charts
+            .register(StackedChartsTest.class)
             .register(ResetButtonTest.class)
             .register("testng-ad-e2e-metrics-test.xml")
 //            .register("testng-ad-e2e-visualization-test.xml") too complex test suite, one of the last to run
