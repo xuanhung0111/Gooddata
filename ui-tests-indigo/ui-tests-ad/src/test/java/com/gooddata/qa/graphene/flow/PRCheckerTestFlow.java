@@ -12,7 +12,7 @@ public class PRCheckerTestFlow {
             .register(EmptyCatalogueTest.class)
             .register(RecommendationsWithoutDateDimensionTest.class)
             .register(AttributeFiltersTest.class)
-//            .register(BucketsTest.class) all types of charts must be developed first to run BucketsTest
+            .register(BucketsTest.class)
 //            .register(ErrorStatesTest.class) this test requires Open as Report feature
 //            .register(TableTest.class) Table sorting and bar chart must work first
 //            .register(UndoTest.class) requires recommendations and charts

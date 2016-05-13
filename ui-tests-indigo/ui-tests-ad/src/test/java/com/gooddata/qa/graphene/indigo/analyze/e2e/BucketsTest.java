@@ -1,20 +1,5 @@
 package com.gooddata.qa.graphene.indigo.analyze.e2e;
 
-import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementPresent;
-import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
-import static java.util.Arrays.asList;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.By.cssSelector;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import org.jboss.arquillian.graphene.Graphene;
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.gooddata.qa.graphene.enums.indigo.FieldType;
 import com.gooddata.qa.graphene.enums.indigo.RecommendationStep;
 import com.gooddata.qa.graphene.enums.indigo.ReportType;
@@ -22,6 +7,16 @@ import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.MetricC
 import com.gooddata.qa.graphene.fragments.indigo.analyze.pages.internals.StacksBucket;
 import com.gooddata.qa.graphene.fragments.indigo.analyze.recommendation.RecommendationContainer;
 import com.gooddata.qa.graphene.indigo.analyze.e2e.common.AbstractAdE2ETest;
+import org.jboss.arquillian.graphene.Graphene;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import static com.gooddata.qa.graphene.utils.ElementUtils.isElementPresent;
+import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
+import static java.util.Arrays.asList;
+import static org.openqa.selenium.By.className;
+import static org.testng.Assert.*;
 
 public class BucketsTest extends AbstractAdE2ETest {
 
@@ -99,7 +94,6 @@ public class BucketsTest extends AbstractAdE2ETest {
             .waitForReportComputing()
             .getStacksBucket();
         assertFalse(stacksBucket.getWarningMessage().isEmpty());
-        assertFalse(stacksBucket.getInvitation().isDisplayed());
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -229,21 +223,6 @@ public class BucketsTest extends AbstractAdE2ETest {
             .isDateFilterVisible());
     }
 
-    @Test(dependsOnGroups = {"init"})
-    public void should_replace_filter_attribute_when_replacing_attribute_in_configuration() {
-        assertTrue(analysisPageReact.addMetric(NUMBER_OF_ACTIVITIES)
-            .addAttribute(ACTIVITY_TYPE)
-            .waitForReportComputing()
-            .getFilterBuckets()
-            .isFilterVisible(ACTIVITY_TYPE));
-
-        assertTrue(isElementPresent(cssSelector(".adi-components .s-property-y.s-id-metricvalues"), browser));
-
-        analysisPageReact.drag(analysisPageReact.getCataloguePanel().searchAndGet(ACCOUNT, FieldType.ATTRIBUTE),
-                () -> waitForElementPresent(className("s-shortcut-metric-attribute"), browser));
-
-        assertTrue(analysisPageReact.getFilterBuckets().isFilterVisible(ACCOUNT));
-    }
 
     @Test(dependsOnGroups = {"init"})
     public void should_add_date_filter_when_adding_date_to_configuration_bucket() {
@@ -253,7 +232,6 @@ public class BucketsTest extends AbstractAdE2ETest {
             .getFilterBuckets()
             .isDateFilterVisible());
 
-        assertTrue(isElementPresent(cssSelector(".adi-components .s-property-y.s-id-metricvalues"), browser));
     }
 
     @Test(dependsOnGroups = {"init"})
@@ -263,8 +241,6 @@ public class BucketsTest extends AbstractAdE2ETest {
             .waitForReportComputing()
             .getFilterBuckets()
             .isDateFilterVisible());
-
-        assertTrue(isElementPresent(cssSelector(".adi-components .s-property-y.s-id-metricvalues"), browser));
 
         assertTrue(analysisPageReact.replaceAttributeWithDate(DATE)
             .getFilterBuckets()
@@ -338,25 +314,5 @@ public class BucketsTest extends AbstractAdE2ETest {
             .replaceStack(ACCOUNT)
             .getStacksBucket()
             .getAttributeName(), ACCOUNT);
-    }
-
-    @Test(dependsOnGroups = {"init"})
-    public void should_not_be_possible_to_replace_filters() {
-        assertTrue(analysisPageReact.addFilter(ACTIVITY_TYPE)
-            .getFilterBuckets()
-            .isFilterVisible(ACTIVITY_TYPE));
-
-        assertTrue(analysisPageReact.addFilter(ACCOUNT)
-            .getFilterBuckets()
-            .isFilterVisible(ACCOUNT));
-
-        assertEquals(analysisPageReact.getFilterBuckets().getFiltersCount(), 2);
-
-        // drag onto existing item in the filter should still add the filter, not replace
-        assertTrue(analysisPageReact.drag(analysisPageReact.getCataloguePanel().getDate(),
-                analysisPageReact.getFilterBuckets().getFilter(ACTIVITY_TYPE))
-            .getFilterBuckets()
-            .isDateFilterVisible());
-        assertEquals(analysisPageReact.getFilterBuckets().getFiltersCount(), 3);
     }
 }
