@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -147,14 +146,9 @@ public class KpiPopChangeValueExceedLimitTest extends DashboardsGeneralTest {
     }
 
     private void uploadDatasetFromCsv(InputStream inputStream) throws JSONException, URISyntaxException, IOException {
-        getGoodDataClient()
-            .getModelService()
-            .updateProjectModel(getProject(), IOUtils.toString(getClass().getResource(KPI_ERROR_DATA_RESOURCE + "user.maql")))
-            .get();
+        setupMaql(KPI_ERROR_DATA_RESOURCE + "user.maql");
 
-        getGoodDataClient()
-            .getDatasetService()
-            .loadDataset(getProject(), "dataset.user", inputStream)
-            .get();
+        // Grey page cannot be accessed on mobile, should use Rest to setup dataset for project here
+        setupDataViaRest("dataset.user", inputStream);
     }
 }

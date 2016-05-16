@@ -40,7 +40,6 @@ public abstract class AbstractReactDropDown extends AbstractDropDown {
 
     @Override
     public AbstractPicker searchForText(String text) {
-        ensureDropdownOpen();
         if (hasSearchField()) {
             return super.searchForText(text);
         }

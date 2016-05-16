@@ -1,0 +1,11 @@
+CREATE DATASET {dataset.user} VISUAL(TITLE "user");
+INCLUDE TEMPLATE "URN:GOODDATA:DATE" MODIFY (IDENTIFIER "user_date", TITLE "user_date");
+CREATE ATTRIBUTE {attr.user.factsof} VISUAL(TITLE "Records of user") AS KEYS {f_user.id} FULLSET;
+ALTER DATASET {dataset.user} ADD {attr.user.factsof};
+CREATE ATTRIBUTE {attr.user.firstname} VISUAL(TITLE "firstname") AS KEYS {d_user_firstname.id} FULLSET, {f_user.firstname_id};
+ALTER DATASET {dataset.user} ADD {attr.user.firstname};
+ALTER ATTRIBUTE {attr.user.firstname} ADD LABELS {label.user.firstname} VISUAL(TITLE "firstname") AS {d_user_firstname.nm_firstname};
+CREATE FACT {fact.user.number} VISUAL(TITLE "number") AS {f_user.f_number};
+ALTER DATASET {dataset.user} ADD {fact.user.number};
+ALTER ATTRIBUTE {user_date.date} ADD KEYS {f_user.dt_user_date_id};
+SYNCHRONIZE {dataset.user} PRESERVE DATA;
