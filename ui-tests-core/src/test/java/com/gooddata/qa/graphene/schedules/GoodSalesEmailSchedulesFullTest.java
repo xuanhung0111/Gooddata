@@ -13,7 +13,7 @@ import static com.gooddata.qa.graphene.utils.WaitUtils.waitForElementVisible;
 import static com.gooddata.qa.graphene.utils.WaitUtils.waitForFragmentVisible;
 import static com.gooddata.qa.utils.graphene.Screenshots.takeScreenshot;
 import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.addMufToUser;
-import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createMufObjByUri;
+import static com.gooddata.qa.utils.http.dashboards.DashboardsRestUtils.createSimpleMufObjByUri;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -278,7 +278,8 @@ public class GoodSalesEmailSchedulesFullTest extends AbstractGoodSalesEmailSched
 
         Map<String, Collection<String>> conditions = new HashMap<String, Collection<String>>();
         conditions.put(product.getUri(), singletonList(explorerUri));
-        String mufUri = createMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
+        String mufUri =
+                createSimpleMufObjByUri(getRestApiClient(), getProject().getId(), "Product user filter", conditions);
         addMufToUser(getRestApiClient(), getProject().getId(), testParams.getUser(), mufUri);
 
         ReportDefinition definition = GridReportDefinitionContent.create(report, singletonList("metricGroup"),

@@ -222,7 +222,7 @@ public final class DashboardsRestUtils {
     }
 
     /**
-     * Create mandatory user filter object using uri
+     * Create mandatory user filter object with simple expression '%s IN (%s)'using uri
      * 
      * @param restApiClient
      * @param projectID
@@ -230,7 +230,7 @@ public final class DashboardsRestUtils {
      * @param conditions
      * @return mandatory user filter uri
      */
-    public static String createMufObjByUri(final RestApiClient restApiClient, final String projectID,
+    public static String createSimpleMufObjByUri(final RestApiClient restApiClient, final String projectID,
             final String mufTitle, final Map<String, Collection<String>> conditions)
                     throws ParseException, JSONException, IOException {
         final String expression = "(%s IN (%s))";
@@ -241,10 +241,27 @@ public final class DashboardsRestUtils {
                     format("[%s]", attribute),
                     conditions.get(attribute).stream().map(e -> format("[%s]", e)).collect(joining(","))));
         }
-        final String contentBody = MUF_OBJ.get().replace("${MUFExpression}", expressions.stream()
-                .collect(joining(" AND "))).replace("${MUFTitle}", mufTitle);
 
-        return getJsonObject(restApiClient, restApiClient.newPostMethod(format(OBJ_LINK, projectID), contentBody)).getString("uri");
+        return createMufObjectByUri(restApiClient, projectID, mufTitle, expressions.stream().collect(joining(" AND ")));
+    }
+
+    /**
+     * Create mandatory user filter object with complex expression using uri
+     * 
+     * @param restApiClient
+     * @param projectID
+     * @param mufTitle
+     * @param expression
+     * @return mandatory user filter uri
+     */
+    public static String createMufObjectByUri(final RestApiClient restApiClient, final String projectID,
+            final String mufTitle, final String expression) throws ParseException, JSONException, IOException {
+        final String contentBody = MUF_OBJ.get()
+                .replace("${MUFExpression}", expression)
+                .replace("${MUFTitle}", mufTitle);
+
+        return getJsonObject(restApiClient, restApiClient.newPostMethod(format(OBJ_LINK, projectID), contentBody))
+                .getString("uri");
     }
 
     /**

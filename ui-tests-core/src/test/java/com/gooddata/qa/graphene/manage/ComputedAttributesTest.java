@@ -430,7 +430,8 @@ public class ComputedAttributesTest extends GoodSalesAbstractTest {
         final Map<String, Collection<String>> conditions = new HashMap<>();
         conditions.put(stage.getUri(), elementUris);
 
-        return DashboardsRestUtils.createMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
+        return DashboardsRestUtils
+                .createSimpleMufObjByUri(getRestApiClient(), testParams.getProjectId(), mufTitle, conditions);
     }
 
 }
